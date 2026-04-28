@@ -21,19 +21,30 @@ export class ApiClient {
         }
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), this.timeout);
-        const response = await fetch(url.toString(), {
-            ...init,
-            signal: controller.signal,
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-                ...(locale && { "Content-Language": locale }),
-                ...init.headers,
-            },
-        });
-        clearTimeout(timeout);
-        const body = await response.json() as ApiResponseBody<T>;
-        return new ApiResponse<T>(body);
+        try {
+            const response = await fetch(url.toString(), {
+                ...init,
+                signal: controller.signal,
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    ...(locale && { "Content-Language": locale }),
+                    ...init.headers,
+                },
+            });
+            const body = await response.json() as ApiResponseBody<T>;
+            return new ApiResponse<T>(body);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Request failed";
+            return new ApiResponse<T>({
+                success: false,
+                message,
+                data: null,
+                errors: [{ code: "request_failed", message }],
+            });
+        } finally {
+            clearTimeout(timeout);
+        }
     }
 
     get<T>(endpoint: string, options?: RequestOptions) {

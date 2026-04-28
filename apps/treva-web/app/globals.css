@@ -1,3 +1,5 @@
 @import "tailwindcss";
 @import "@repo/ui/styles";
+@import "./components/Container/container.css";
+@import "./components/Navbar/navbar.css";
 @source "../../../packages/ui/src/**/*.{ts,tsx}";

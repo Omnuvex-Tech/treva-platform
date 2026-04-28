@@ -1,33 +1,37 @@
-import type { Language, Translation } from "@repo/types/types";
 import { notFound } from "next/navigation";
-import { api } from "@/lib/api";
+import Container from "@/app/components/Container/container";
+import Navbar from "@/app/components/Navbar/navbar";
 import { config } from "@/config";
-import { NavbarWrapper } from "@/app/components/Navbar/navbar-wrapper";
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+    return config.project.staticLanguages.map((language) => ({
+        locale: language.code,
+    }));
+}
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
+    const languages = [...config.project.staticLanguages];
 
-    const langResponse = await api.get<Language[]>(config.endpoints.languages.list);
-
-    if (!langResponse.success || !langResponse.data) {
-        return (
-            <div className="flex min-h-svh items-center justify-center py-8">
-                <p className="text-destructive">{langResponse.message}</p>
-            </div>
-        );
-    }
-
-    if (!langResponse.data.some((language) => language.code === locale)) {
+    if (!languages.some((language) => language.code === locale)) {
         notFound();
     }
 
-    const translationResponse = await api.get<Translation[]>(config.endpoints.translations.list, { locale });
+    const content = config.staticContent[locale as keyof typeof config.staticContent];
+
+    if (!content) {
+        notFound();
+    }
 
     return (
-        <div className="flex min-h-svh w-full flex-col items-center justify-start gap-6 pt-0 pb-8">
-            <NavbarWrapper locale={locale} languages={langResponse.data} />
+        <div>
+            <Navbar locale={locale} />
 
-            {/* Centered LanguageSwitcher removed — navbar now contains the language control */}
+            <main>
+
+            </main>
         </div>
     );
 }

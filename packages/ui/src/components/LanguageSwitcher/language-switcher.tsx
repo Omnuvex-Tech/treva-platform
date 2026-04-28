@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
-import type { Language, LanguageSwitcherProps } from "@repo/types/types";
+import type { LanguageSwitcherProps } from "@repo/types/types";
 import { cn } from "../../lib/utils";
 
 const localeOptions = [
