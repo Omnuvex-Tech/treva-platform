@@ -39,39 +39,43 @@
 }
 
 .nav_link {
-    display: inline-flex;
-    align-items: center;
-    height: 18px;
-    padding: 0 21px;
-    color: var(--_color---blue-100);
-    text-decoration: none;
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: 0.28px;
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 18px !important;
+    padding: 0 21px !important;
+    color: var(--_color---blue-100) !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+    line-height: 18px !important;
+    letter-spacing: 0.28px !important;
+    text-transform: uppercase !important;
 }
 
 .nav_link-mask {
-    display: block;
-    height: 18px;
-    overflow: hidden;
+    display: block !important;
+    height: 18px !important;
+    max-height: 18px !important;
+    overflow: hidden !important;
+    position: relative !important;
 }
 
 .nav_link-content {
-    display: flex;
-    flex-direction: column;
-    transition: transform 300ms ease;
-    will-change: transform;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 300ms ease !important;
+    will-change: transform !important;
 }
 
 .nav_link:hover .nav_link-content {
-    transform: translateY(-18px);
+    transform: translateY(-18px) !important;
 }
 
 .nav_link-text {
-    display: block;
-    height: 18px;
-    line-height: 18px;
-    white-space: nowrap;
+    display: block !important;
+    height: 18px !important;
+    line-height: 35px !important;
+    white-space: nowrap !important;
+    transform: none !important; /* Disable individual text transform from legacy CSS */
 }
 
 .nav_cta-wrap {
@@ -86,23 +90,26 @@
 }
 
 .nav_lang-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0;
-    background: transparent;
-    color: var(--_color---blue-400);
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: 0.28px;
-    text-transform: uppercase;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: var(--_color---blue-400) !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    line-height: 18px !important;
+    letter-spacing: 0.28px !important;
+    text-transform: uppercase !important;
+    border: none !important;
 }
 
 .nav_lang-icon {
-    display: inline-flex;
-    width: 12px;
-    height: 7px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 12px !important;
+    height: 7px !important;
 }
 
 .nav_lang-list {
@@ -172,26 +179,27 @@
 }
 
 .button-text-wrap {
-    display: flex;
-    flex-direction: column;
-    height: 14px;
-    overflow: hidden;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 14px !important;
+    overflow: hidden !important;
+    position: relative !important;
 }
 
 .button-text {
-    display: block;
-    height: 14px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 16px;
-    letter-spacing: 0.28px;
-    transition: transform 0.25s;
-    will-change: transform;
+    display: block !important;
+    height: 14px !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 14px !important;
+    letter-spacing: 0.28px !important;
+    transition: transform 0.25s !important;
+    will-change: transform !important;
+    transform: none !important; /* Disable legacy individual transform */
 }
 
-.button:hover .button-text:first-child,
-.button:hover .button-text:last-child {
-    transform: translateY(-14px);
+.button:hover .button-text {
+    transform: translateY(-14px) !important;
 }
 
 .nav_menu-btn {

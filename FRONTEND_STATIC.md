@@ -34,5 +34,5 @@
 - Phase 1 locales: `az`, `en`, `ru`
 - Root path redirects to default locale
 - `app/[locale]` now uses static content
-- Custom navbar integrated into `app/components/Navbar`
-- Custom container integrated into `app/components/Container`
+- Shared UI moved to `components/shared`
+- Home sections moved to `components/home`

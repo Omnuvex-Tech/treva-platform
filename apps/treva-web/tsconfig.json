@@ -20,7 +20,8 @@
         "**/*.tsx",
         "next-env.d.ts",
         "next.config.js",
-        ".next/types/**/*.ts"
+        ".next/types/routes.d.ts",
+        ".next/types/validator.ts"
     ],
     "exclude": ["node_modules"]
 }

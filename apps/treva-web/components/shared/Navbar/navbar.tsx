@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Container from "@/app/components/Container/container";
+import "./navbar.css";
+
 
 const TrevaLogoSvg = ({ light = false }: { light?: boolean }) => (
     <svg
@@ -83,11 +84,11 @@ const languageLabels = {
 
 const navDictionary = {
     az: [
-        { name: "Layihələr", href: "#projects", hasDot: false },
-        { name: "Developerlər", href: "#developers", hasDot: false },
-        { name: "Brokerlər", href: "#brokers", hasDot: false },
+        { name: "Layiheler", href: "#projects", hasDot: false },
+        { name: "Developerler", href: "#developers", hasDot: false },
+        { name: "Brokerler", href: "#brokers", hasDot: false },
         { name: "Pulse", href: "#pulse", hasDot: true },
-        { name: "Əlaqə", href: "#contact", hasDot: false },
+        { name: "Elaqe", href: "#contact", hasDot: false },
     ],
     en: [
         { name: "Projects", href: "#projects", hasDot: false },
@@ -97,11 +98,11 @@ const navDictionary = {
         { name: "Contact", href: "#contact", hasDot: false },
     ],
     ru: [
-        { name: "Проекты", href: "#projects", hasDot: false },
-        { name: "Девелоперы", href: "#developers", hasDot: false },
-        { name: "Брокеры", href: "#brokers", hasDot: false },
+        { name: "Projects", href: "#projects", hasDot: false },
+        { name: "Developers", href: "#developers", hasDot: false },
+        { name: "Brokers", href: "#brokers", hasDot: false },
         { name: "Pulse", href: "#pulse", hasDot: true },
-        { name: "Контакт", href: "#contact", hasDot: false },
+        { name: "Contact", href: "#contact", hasDot: false },
     ],
 } as const;
 
@@ -247,8 +248,8 @@ export default function Navbar({ locale }: { locale: string }) {
     return (
         <>
             <header className="header">
-                <div className="nav">
-                    <Container>
+                <div className="nav" id="top">
+                    <div className="nav_padding">
                         <div className="nav_container">
                             <Link href={homeHref} className="nav_logo" aria-label={secondary.homeLabel}>
                                 <TrevaLogoSvg />
@@ -271,12 +272,7 @@ export default function Navbar({ locale }: { locale: string }) {
                             <div className="nav_cta-wrap">
                                 <LanguageDropdown currentLang={currentLang} onLangChange={handleLangChange} />
 
-                                <a
-                                    href={secondary.partnerHref}
-                                    target="_blank"
-                                    className="button"
-                                    rel="noreferrer"
-                                >
+                                <a href={secondary.partnerHref} target="_blank" className="button" rel="noreferrer">
                                     <UserIcon />
                                     <span className="button-text-wrap">
                                         <span className="button-text">{secondary.login}</span>
@@ -294,7 +290,7 @@ export default function Navbar({ locale }: { locale: string }) {
                                 </button>
                             </div>
                         </div>
-                    </Container>
+                    </div>
                 </div>
             </header>
 
@@ -352,12 +348,7 @@ export default function Navbar({ locale }: { locale: string }) {
                             </div>
                         </div>
 
-                        <a
-                            href={secondary.partnerHref}
-                            target="_blank"
-                            className="burger_login"
-                            rel="noreferrer"
-                        >
+                        <a href={secondary.partnerHref} target="_blank" className="burger_login" rel="noreferrer">
                             <UserIcon />
                             <span>{secondary.login}</span>
                         </a>

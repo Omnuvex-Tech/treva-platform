@@ -33,8 +33,18 @@ export default function RootLayout({
     children: ReactNode;
 }>) {
     return (
-        <html lang="az">
+        <html lang="az" className="w-mod-js">
             <head>
+                <link
+                    rel="preconnect"
+                    href="https://cdn.prod.website-files.com"
+                    crossOrigin="anonymous"
+                />
+                <link
+                    rel="stylesheet"
+                    href="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/css/treva-2025.webflow.shared.01e61ec63.min.css"
+                    crossOrigin="anonymous"
+                />
                 <link
                     rel="stylesheet"
                     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -43,7 +53,7 @@ export default function RootLayout({
                     referrerPolicy="no-referrer"
                 />
             </head>
-            <body className={inter.variable}>
+            <body className={`${inter.variable} body`}>
                 <QueryProvider>
                     <NotifyProvider>
                         <main>{children}</main>
