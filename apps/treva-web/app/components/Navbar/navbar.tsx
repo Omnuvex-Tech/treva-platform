@@ -298,25 +298,25 @@ export default function Navbar({ locale }: { locale: string }) {
                 </div>
             </header>
 
-            <div className={`burger_menu ${isMenuOpen ? "is-open" : ""}`}>
+            <div className={`nav_burger-menu ${isMenuOpen ? "is-open" : ""}`}>
                 <button
-                    className="burger_overlay"
+                    className="nav_burger-overlay"
                     onClick={() => setIsMenuOpen(false)}
                     type="button"
                     aria-label="Close menu"
                 />
 
-                <aside className="burger_side">
-                    <div className="burger_content-wrap">
+                <aside className="nav_burger-side">
+                    <div className="nav_burger-content-wrap">
                         <div>
-                            <div className="burger_top">
-                                <Link href={homeHref} className="burger_logo" onClick={() => setIsMenuOpen(false)}>
+                            <div className="nav_burger-top">
+                                <Link href={homeHref} className="nav_burger-logo" onClick={() => setIsMenuOpen(false)}>
                                     <TrevaLogoSvg light />
                                     <span>{secondary.realEstate}</span>
                                 </Link>
 
                                 <button
-                                    className="burger_close"
+                                    className="nav_burger-close"
                                     onClick={() => setIsMenuOpen(false)}
                                     type="button"
                                     aria-label="Close menu"
@@ -325,12 +325,12 @@ export default function Navbar({ locale }: { locale: string }) {
                                 </button>
                             </div>
 
-                            <nav className="burger_body" aria-label="Mobile navigation">
+                            <nav className="nav_burger-body" aria-label="Mobile navigation">
                                 {localizedLinks.map((link) => (
                                     <Link
                                         key={link.name}
                                         href={link.href}
-                                        className="burger_link"
+                                        className="nav_burger-link"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         <span>{link.name}</span>
@@ -339,14 +339,14 @@ export default function Navbar({ locale }: { locale: string }) {
                                 ))}
                             </nav>
 
-                            <div className="burger_contact-wrap">
-                                <a href={`mailto:${secondary.mail}`} className="burger_sec-link">
+                            <div className="nav_burger-contact-wrap">
+                                <a href={`mailto:${secondary.mail}`} className="nav_burger-sec-link">
                                     {secondary.mail}
                                 </a>
-                                <a href={`tel:${secondary.phone.replace(/-/g, "")}`} className="burger_sec-link">
+                                <a href={`tel:${secondary.phone.replace(/-/g, "")}`} className="nav_burger-sec-link">
                                     {secondary.phone}
                                 </a>
-                                <a href="tel:2662" className="burger_sec-link">
+                                <a href="tel:2662" className="nav_burger-sec-link">
                                     {secondary.shortPhone}
                                 </a>
                             </div>
@@ -355,7 +355,7 @@ export default function Navbar({ locale }: { locale: string }) {
                         <a
                             href={secondary.partnerHref}
                             target="_blank"
-                            className="burger_login"
+                            className="nav_burger-login"
                             rel="noreferrer"
                         >
                             <UserIcon />

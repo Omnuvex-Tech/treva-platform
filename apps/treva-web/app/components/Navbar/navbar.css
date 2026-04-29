@@ -38,7 +38,7 @@
     justify-content: center;
 }
 
-.nav_link {
+.nav .nav_link {
     display: inline-flex !important;
     align-items: center !important;
     height: 18px !important;
@@ -51,7 +51,7 @@
     text-transform: uppercase !important;
 }
 
-.nav_link-mask {
+.nav .nav_link-mask {
     display: block !important;
     height: 18px !important;
     max-height: 18px !important;
@@ -59,21 +59,21 @@
     position: relative !important;
 }
 
-.nav_link-content {
+.nav .nav_link-content {
     display: flex !important;
     flex-direction: column !important;
     transition: transform 300ms ease !important;
     will-change: transform !important;
 }
 
-.nav_link:hover .nav_link-content {
+.nav .nav_link:hover .nav_link-content {
     transform: translateY(-18px) !important;
 }
 
-.nav_link-text {
+.nav .nav_link-text {
     display: block !important;
     height: 18px !important;
-    line-height: 35px !important;
+    line-height: 18px !important;
     white-space: nowrap !important;
     transform: none !important; /* Disable individual text transform from legacy CSS */
 }
@@ -146,7 +146,7 @@
     color: var(--_color---blue-400);
 }
 
-.button {
+.nav .button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -166,19 +166,19 @@
     border: 1px solid transparent;
 }
 
-.button:hover {
+.nav .button:hover {
     background-color: #ffffff;
     color: var(--_color---blue-400);
     border-color: var(--_color---blue-400);
 }
 
-.button svg {
+.nav .button svg {
     width: 18px;
     height: 18px;
     flex: 0 0 auto;
 }
 
-.button-text-wrap {
+.nav .button-text-wrap {
     display: flex !important;
     flex-direction: column !important;
     height: 14px !important;
@@ -186,7 +186,7 @@
     position: relative !important;
 }
 
-.button-text {
+.nav .button-text {
     display: block !important;
     height: 14px !important;
     font-size: 14px !important;
@@ -198,7 +198,7 @@
     transform: none !important; /* Disable legacy individual transform */
 }
 
-.button:hover .button-text {
+.nav .button:hover .button-text {
     transform: translateY(-14px) !important;
 }
 
@@ -250,7 +250,7 @@
     }
 }
 
-.burger_menu {
+.nav_burger-menu {
     position: fixed;
     inset: 0;
     z-index: 99999999;
@@ -258,12 +258,12 @@
     pointer-events: none;
 }
 
-.burger_menu.is-open {
+.nav_burger-menu.is-open {
     visibility: visible;
     pointer-events: auto;
 }
 
-.burger_overlay {
+.nav_burger-overlay {
     position: absolute;
     inset: 0;
     padding: 0;
@@ -273,11 +273,11 @@
     transition: opacity 300ms ease;
 }
 
-.burger_menu.is-open .burger_overlay {
+.nav_burger-menu.is-open .nav_burger-overlay {
     opacity: 1;
 }
 
-.burger_side {
+.nav_burger-side {
     position: absolute;
     top: 0;
     left: 0;
@@ -292,11 +292,11 @@
     overflow: hidden;
 }
 
-.burger_menu.is-open .burger_side {
+.nav_burger-menu.is-open .nav_burger-side {
     transform: translateX(0);
 }
 
-.burger_content-wrap {
+.nav_burger-content-wrap {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -304,27 +304,27 @@
     padding: 32px 27px 30px;
 }
 
-.burger_top {
+.nav_burger-top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 48px;
 }
 
-.burger_logo {
+.nav_burger-logo {
     display: inline-flex;
     flex-direction: column;
     gap: 3px;
     text-decoration: none;
 }
 
-.burger_logo svg {
+.nav_burger-logo svg {
     display: block;
     width: 100px;
     height: 22px;
 }
 
-.burger_logo span {
+.nav_burger-logo span {
     padding-left: 6px;
     color: rgba(255, 255, 255, 0.75);
     font-size: 7px;
@@ -332,7 +332,7 @@
     letter-spacing: 4.5px;
 }
 
-.burger_close {
+.nav_burger-close {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -343,13 +343,13 @@
     cursor: pointer;
 }
 
-.burger_body {
+.nav_burger-body {
     display: flex;
     flex-direction: column;
     gap: 26px;
 }
 
-.burger_link {
+.nav_burger-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -362,12 +362,12 @@
     letter-spacing: 0.32px;
 }
 
-.burger_link .red-dot {
+.nav_burger-link .red-dot {
     margin-right: 0;
     margin-left: 4px;
 }
 
-.burger_contact-wrap {
+.nav_burger-contact-wrap {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -376,7 +376,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.13);
 }
 
-.burger_sec-link {
+.nav_burger-sec-link {
     color: rgba(255, 255, 255, 0.48);
     text-decoration: none;
     font-size: 13px;
@@ -385,7 +385,7 @@
     letter-spacing: 0.26px;
 }
 
-.burger_login {
+.nav_burger-login {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -402,7 +402,7 @@
     letter-spacing: 0.3px;
 }
 
-.burger_login svg {
+.nav_burger-login svg {
     width: 24px;
     height: 24px;
 }
@@ -540,62 +540,62 @@
         min-width: 76px;
     }
 
-    .button {
+    .nav .button {
         min-width: 94px;
         min-height: 32px;
         padding: 4px 12px;
         gap: 6px;
     }
 
-    .button svg {
+    .nav .button svg {
         width: 14px;
         height: 14px;
     }
 
-    .button-text-wrap {
+    .nav .button-text-wrap {
         height: 12px;
     }
 
-    .button-text {
+    .nav .button-text {
         height: 12px;
         font-size: 11px;
         line-height: 12px;
         letter-spacing: 0.22px;
     }
 
-    .button:hover .button-text:first-child,
-    .button:hover .button-text:last-child {
+    .nav .button:hover .button-text:first-child,
+    .nav .button:hover .button-text:last-child {
         transform: translateY(-12px);
     }
 
-    .burger_side {
+    .nav_burger-side {
         width: 320px;
         max-width: 84vw;
     }
 
-    .burger_content-wrap {
+    .nav_burger-content-wrap {
         padding: 28px 22px 24px;
     }
 
-    .burger_top {
+    .nav_burger-top {
         margin-bottom: 40px;
     }
 
-    .burger_logo svg {
+    .nav_burger-logo svg {
         width: 96px;
         height: 21px;
     }
 
-    .burger_body {
+    .nav_burger-body {
         gap: 22px;
     }
 
-    .burger_link {
+    .nav_burger-link {
         font-size: 15px;
         line-height: 19px;
     }
 
-    .burger_login {
+    .nav_burger-login {
         min-height: 48px;
     }
 

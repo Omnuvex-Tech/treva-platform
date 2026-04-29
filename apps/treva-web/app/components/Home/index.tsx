@@ -1,7 +1,5 @@
 
-import React from "react";
-import { HomeNavbar } from "./HomeNavbar";
-import { HomeBurger } from "./HomeBurger";
+import Navbar from "@/app/components/Navbar/navbar";
 import { HomeHeroSection } from "./HomeHeroSection";
 import { HomePulse } from "./HomePulse";
 import { HomeServices } from "./HomeServices";
@@ -11,11 +9,14 @@ import { HomeLogos } from "./HomeLogos";
 import { HomeOffices } from "./HomeOffices";
 import { HomeFooter } from "./HomeFooter";
 
-const Home = () => {
+type HomeProps = {
+  locale: string;
+};
+
+const Home = ({ locale }: HomeProps) => {
   return (
-    <main className="page-wrapper">
-      <HomeNavbar />
-      <HomeBurger />
+    <main className="page-wrapper" data-locale={locale}>
+      <Navbar locale={locale} />
       <HomeHeroSection />
       <HomePulse />
       <HomeServices />

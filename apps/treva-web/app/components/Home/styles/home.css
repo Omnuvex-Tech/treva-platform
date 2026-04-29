@@ -1065,6 +1065,10 @@ body.gsap-hidden {
 .offices_item:nth-child(2) { animation-delay: 0.40s; }
 
 /* Footer section */
+.section_footer {
+  line-height: 1;
+}
+
 .section_footer .footer_nav-wrap .footer_col {
   animation: treva-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -1079,6 +1083,10 @@ body.gsap-hidden {
 .section_footer .footer_bottom-wrap {
   animation: treva-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: 0.45s;
+}
+
+.section_footer .text-color-white60 {
+  line-height: 1.3;
 }
 
 /* Live carousel reveal */
@@ -1105,16 +1113,97 @@ body.gsap-hidden {
 }
 
 /* Footer link sliding text effect (uses .footer_link-content shift) */
-.footer_link-content {
+.section_footer .footer_link-content {
   display: inline-flex;
   flex-direction: column;
   overflow: hidden;
-  line-height: 1.2;
+  line-height: 1.6rem !important;
 }
 
-.footer_link-text {
+.section_footer .footer_link-text {
   display: block;
+  flex: 0 0 1.6rem;
+  line-height: 1.6rem !important;
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section_footer .footer_link-wrap.is-large .footer_link-content {
+  line-height: 2.5rem !important;
+}
+
+.section_footer .footer_link-wrap.is-large .footer_link-text {
+  flex-basis: 2.5rem;
+  line-height: 2.5rem !important;
+}
+
+.section_footer .footer_link-wrap.is-pulse {
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.section_footer .footer_link-wrap.is-pulse .footer_link-content {
+  flex: 0 0 auto;
+  height: 1.6rem;
+}
+
+.section_footer .footer_link-wrap.is-pulse .red-dot {
+  margin: calc((1.6rem - 9px) / 2) 5px 0 8px;
+}
+
+.section_footer .footer_specs-wrap,
+.section_footer .footer_specs-wrap .cs_scroll-wrap {
+  line-height: 1.3rem !important;
+}
+
+.section_footer .footer_specs-wrap .button-text-wrap {
+  height: 1.3rem;
+  line-height: 1.3rem !important;
+}
+
+.section_footer .footer_specs-wrap .button-text {
+  display: block;
+  flex: 0 0 1.3rem;
+  height: 1.3rem;
+  line-height: 1.3rem !important;
+}
+
+@media screen and (max-width: 991px) {
+  .section_footer .footer_link-wrap.is-large .footer_link-content {
+    line-height: 2rem !important;
+  }
+
+  .section_footer .footer_link-wrap.is-large .footer_link-text {
+    flex-basis: 2rem;
+    line-height: 2rem !important;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .section_footer .footer_link-content {
+    line-height: 1.5rem !important;
+  }
+
+  .section_footer .footer_link-text {
+    flex-basis: 1.5rem;
+    line-height: 1.5rem !important;
+  }
+
+  .section_footer .footer_link-wrap.is-pulse .footer_link-content {
+    height: 1.5rem;
+  }
+
+  .section_footer .footer_link-wrap.is-pulse .red-dot {
+    margin-top: calc((1.5rem - 9px) / 2);
+  }
+
+  .section_footer .footer_link-wrap.is-large .footer_link-content {
+    line-height: 1.7rem !important;
+  }
+
+  .section_footer .footer_link-wrap.is-large .footer_link-text {
+    flex-basis: 1.7rem;
+    line-height: 1.7rem !important;
+  }
 }
 
 /* Nav link sliding text effect */
@@ -1181,8 +1270,9 @@ body.gsap-hidden {
 .cs_scroll-wrap .button-text-wrap {
   display: inline-flex;
   flex-direction: column;
+  height: 1.3rem;
   overflow: hidden;
-  line-height: 1.2;
+  line-height: 1.3rem !important;
 }
 
 .cs_scroll-wrap .button-icon-wrap {
@@ -1191,16 +1281,33 @@ body.gsap-hidden {
   overflow: hidden;
 }
 
-/* Button text wrap default — needed for hover slide */
-.button .button-text-wrap {
-  display: inline-flex;
-  flex-direction: column;
-  overflow: hidden;
-  line-height: 1.2;
+.cs_scroll-wrap .button-text {
+  display: block;
+  flex: 0 0 1.3rem;
+  height: 1.3rem;
+  line-height: 1.3rem !important;
 }
 
-.button .button-text {
+/* Button text wrap default — needed for hover slide */
+.section_header .button .button-text-wrap,
+.section_services .button .button-text-wrap,
+.section_projects-prev .button .button-text-wrap,
+.section_logos .button .button-text-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.3rem;
+  overflow: hidden;
+  line-height: 1.3rem !important;
+}
+
+.section_header .button .button-text,
+.section_services .button .button-text,
+.section_projects-prev .button .button-text,
+.section_logos .button .button-text {
   display: block;
+  flex: 0 0 1.3rem;
+  height: 1.3rem;
+  line-height: 1.3rem !important;
 }
 
 /* Cascaded reveal for footer links */
