@@ -1,8 +1,8 @@
 import { normalizer } from "@repo/shared/utils";
 
 export const project = {
-    url: normalizer.string(process.env.NEXT_PUBLIC_APP_URL),
-    name: normalizer.string(process.env.NEXT_PUBLIC_APP_NAME),
+    url: normalizer.string(process.env.NEXT_PUBLIC_APP_URL, "http://localhost:3000"),
+    name: normalizer.string(process.env.NEXT_PUBLIC_APP_NAME, "Treva"),
     projectName: "Treva",
     projectDescription: "Treva",
     keywords: ["Treva"],

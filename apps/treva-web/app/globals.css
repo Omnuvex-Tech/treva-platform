@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@repo/ui/styles";
-@import "../components/shared/Container/container.css";
-@import "../components/shared/Navbar/navbar.css";
-@import "../components/home/styles/home.css";
+@import "./styles/webflow.css";
+@import "./styles/treva-webflow-site.css";
+@import "./styles/treva-custom.css";
+@import "./styles/home-original.css";
+@import "./components/Navbar/navbar.css";
+@import "./components/Container/container.css";
 @source "../../../packages/ui/src/**/*.{ts,tsx}";

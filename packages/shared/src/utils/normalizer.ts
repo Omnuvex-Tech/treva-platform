@@ -1,28 +1,28 @@
 import { isPlainObject } from "./guards";
 
 export const normalizer = {
-    number(value: unknown): number {
+    number(value: unknown, defaultValue: number = 0): number {
         const num = Number(value);
         if (Number.isNaN(num)) {
-            throw new Error(`Cannot normalize "${value}" to number`);
+            return defaultValue;
         }
         return num;
     },
 
-    string(value: unknown): string {
+    string(value: unknown, defaultValue: string = ""): string {
         if (value === null || value === undefined) {
-            throw new Error(`Cannot normalize ${value} to string`);
+            return defaultValue;
         }
         return String(value).trim();
     },
 
-    boolean(value: unknown): boolean {
+    boolean(value: unknown, defaultValue: boolean = false): boolean {
         if (value === "true" || value === "1" || value === true) return true;
         if (value === "false" || value === "0" || value === false) return false;
-        throw new Error(`Cannot normalize "${value}" to boolean`);
+        return defaultValue;
     },
 
-    array<T>(value: unknown): T[] {
+    array<T>(value: unknown, defaultValue: T[] = []): T[] {
         if (Array.isArray(value)) return value as T[];
         if (typeof value === "string") {
             try {
@@ -30,10 +30,10 @@ export const normalizer = {
                 if (Array.isArray(parsed)) return parsed as T[];
             } catch {}
         }
-        throw new Error(`Cannot normalize "${value}" to array`);
+        return defaultValue;
     },
 
-    object<T extends Record<string, unknown>>(value: unknown): T {
+    object<T extends Record<string, unknown>>(value: unknown, defaultValue: T = {} as T): T {
         if (isPlainObject(value)) return value as T;
         if (typeof value === "string") {
             try {
@@ -41,6 +41,6 @@ export const normalizer = {
                 if (isPlainObject(parsed)) return parsed as T;
             } catch {}
         }
-        throw new Error(`Cannot normalize "${value}" to object`);
+        return defaultValue;
     },
 } as const;

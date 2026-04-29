@@ -1,533 +1,77 @@
-const partnerLogos = [
-    { name: "SIG", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6880c7caac01b2176b7a2840_SIG%20blue%202.png" },
-    { name: "Sea Breeze Real Estate", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6887158ebff1d28bc62ec9f0_seabreeze%201.png" },
-    { name: "Reportage Properties", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6880c7cfb2730b05a0143175_reportage%204.png" },
-    { name: "Etagi", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6880c7ca81f1ddf220343938_Etagi%20-%20logo%201.png" },
-    { name: "Trident", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6880c7cadbe0002df55f8ea0_Logo%20-%20Trident%201.png" },
-    { name: "Megapolis Estate", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6880c7caaa52d1681e827451_megapolis%20-%20logo%201.png" },
-    { name: "AUF Invest", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688c5e4e39e6dc2ebee591e2_AUF%201.png" },
-    { name: "RNS Real Estate", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6880c7cad8c0aa9c2bf2abc3_Logo-RNS%201.png" },
-    { name: "Villa AZ", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6887158e4499458c3bafba1f_villa%201.png" },
-    { name: "Bazis Real Estate", image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6885e01df74b709059435ec2_bazis%20real%20estate%20-%20logo%203.png" },
-] as const;
-
-const socialLinks = [
-    { label: "Linkedin", href: "https://www.linkedin.com/company/trevarealestate" },
-    { label: "Instagram", href: "https://www.instagram.com/treva.realestate?igsh=cDY3OTh0b3JyOGZy" },
-    { label: "Facebook", href: "https://www.facebook.com/people/Trevarealestate/61576234409540/" },
-    { label: "Youtube", href: "https://youtube.com/@trevarealestate?si=zN8KQjIc7UJA7mlY" },
-    { label: "Tiktok", href: "https://www.tiktok.com/@treva.realestate?_t=ZS-8y85uLU6heS&_r=1" },
-] as const;
-
-const projectShowcase = [
-    {
-        title: "Panorama by Elie Saab",
-        location: "Sea Breeze",
-        href: "https://www.treva.realestate/project/panorama-by-elie-saab",
-        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis.avif",
-    },
-    {
-        title: "Reportage Heights",
-        location: "Sea Breeze",
-        href: "https://www.treva.realestate/project/reportage-heights",
-        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif",
-    },
-    {
-        title: "Arabian Ranches",
-        location: "Sea Breeze",
-        href: "https://www.treva.realestate/project/arabian-ranches",
-        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp",
-    },
-    {
-        title: "Marina Village",
-        location: "Sea Breeze",
-        href: "https://www.treva.realestate/project/marina-village",
-        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif",
-    },
-] as const;
-
 export const staticContent = {
     az: {
-        home: {
-            hero: {
-                title: "Daşınmaz əmlak satışlarınızı bizimlə maksimuma çatdırın",
-                scrollLabel: "Sürüşdürün",
-                primaryCta: {
-                    label: "Satış şəbəkəmizə qoşulun",
-                    href: "https://www.treva.realestate/brokers#broker-registration",
-                },
-                secondaryCta: {
-                    label: "Satışlarınızı artırmaq üçün tərəfdaşlıq edin",
-                    href: "https://www.treva.realestate/developers",
-                },
+        nav: ["Ana səhifə", "Haqqımızda", "Xidmətlər", "Əlaqə"],
+        heroTag: "Statik Frontend Mərhələsi",
+        heroTitle: "Treva üçün sürətli, təmiz və genişlənən vitrin qatı",
+        heroText:
+            "İlk mərhələdə məqsədimiz backend-dən asılı olmayan, locale əsaslı və rahat genişlənən frontend skeleti qurmaqdır.",
+        primaryCta: "Layihəyə bax",
+        secondaryCta: "Ətraflı oxu",
+        statLabel: "Hazır locale",
+        statValue: "3 dil",
+        sections: [
+            {
+                title: "Struktur",
+                text: "Page axını `app/[locale]` üzərində saxlanılır və bütün statik ekranlar bu strukturdan idarə olunur.",
             },
-            live: {
-                ctaLabel: "Discover treva live",
-                ctaHref: "https://www.treva.realestate/pulse",
-                readLabel: "Məqaləni oxu",
-                items: [
-                    {
-                        category: "Bloq",
-                        date: "23.04.2026",
-                        title: "Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr",
-                        author: "Leyla Bağırzadə",
-                        href: "https://www.treva.realestate/pulse/bakida-menzil-qiymetleri-2026-serfeli-layiheler",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e9dc5d25a4d7cb27fafcbc_leyla%20cover.webp",
-                    },
-                    {
-                        category: "Bloq",
-                        date: "17.04.2026",
-                        title: "Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?",
-                        author: "Cavid Axundov",
-                        href: "https://www.treva.realestate/pulse/bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e23b2e65222dfa1568b506_javid%20cover.webp",
-                    },
-                    {
-                        category: "Bloq",
-                        date: "10.04.2026",
-                        title: "Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?",
-                        author: "Nəzrin Kərimli",
-                        href: "https://www.treva.realestate/pulse/bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d8fa41ad243257771d2882_Nezrin%20Kerimli%20cover%20(1)%20(1).webp",
-                    },
-                    {
-                        category: "Bloq",
-                        date: "06.04.2026",
-                        title: "İnvestisiya üçün niyə məhz Sea Breeze?",
-                        author: "Türkan Mamedova",
-                        href: "https://www.treva.realestate/pulse/investisiya-ucun-niye-mehz-sea-breeze",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d387faabd8941c551800fa_turkan%20cover%20(1).webp",
-                    },
-                    {
-                        category: "Bloq",
-                        date: "19.03.2026",
-                        title: "Satışdan Sonrakı Şəffaflıq: Müştəri Məmnuniyyəti Şirkətin Nüfuzunu Necə Müəyyən Edir?",
-                        author: "Səbinə Muxtarova",
-                        href: "https://www.treva.realestate/pulse/satisdan-sonraki-seffafliq",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69bbea28ae4fb211e7614275_cover%20sebine.webp",
-                    },
-                    {
-                        category: "Bloq",
-                        date: "13.03.2026",
-                        title: "Bakı Daşınmaz Əmlak Bazarı: İnvestisiya İmkanları və Off-plan Trendi",
-                        author: "Batula Mohubbi",
-                        href: "https://www.treva.realestate/pulse/baki-dasinmaz-emlak-bazari",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b419b1ccd29af57469cce0_batula%20cover.webp",
-                    },
-                ],
+            {
+                title: "Dizayn",
+                text: "UI komponentləri paylaşılmış qatdadır və sonrakı mərhələdə real data gələndə yenidən istifadə ediləcək.",
             },
-            services: {
-                eyebrow: "(xidmətlər)",
-                title: "AZƏRBAYCANIN BÖYÜK DAŞINMAZ ƏMLAK PLATFORMASI TREVA İLƏ ƏMƏKDAŞLIQ EDİN VƏ İNKİŞAF POTENSİALINIZI TAM AÇIN.",
-                note: "Satış imkanlarınızı genişləndirmək istəyirsiniz?",
-                ctaLabel: "Satış şəbəkəmizə qoşulun",
-                ctaHref: "https://www.treva.realestate/brokers#broker-registration",
-                items: [
-                    {
-                        index: "01",
-                        title: "Satış və Marketinq",
-                        href: "https://www.treva.realestate/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8559bf006e7ed8f4aa8_SALE%26MARKETING.avif",
-                    },
-                    {
-                        index: "02",
-                        title: "CRM və Leadlərin İdarəolunması",
-                        href: "https://www.treva.realestate/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d855e5db3d2303249ad9_CRM%26LEAD-MANAGEMENT.avif",
-                    },
-                    {
-                        index: "03",
-                        title: "Broker Şəbəkəsinin Aktivləşdirilməsi",
-                        href: "https://www.treva.realestate/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION.avif",
-                    },
-                    {
-                        index: "04",
-                        title: "İnvestisiya Konsultasiyası",
-                        href: "https://www.treva.realestate/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY.avif",
-                    },
-                ],
+            {
+                title: "Hazırlıq",
+                text: "Bu mərhələ vizual əsasları, naviqasiyanı və locale davranışını sabitləşdirir.",
             },
-            projects: {
-                eyebrow: "(portfolio)",
-                title: "Bizə şəffaflıq, nəticə və peşəkar yanaşmamıza görə güvənirlər. TREVA ilə əməkdaşlıq edən müştərilərimizin satış və tanınmada necə irəliləyiş qazandıqlarını kəşf edin.",
-                ctaText: "Növbəti investisiya fürsətinizi tapmaq üçün layihələrimizi kəşf edin.",
-                ctaLabel: "Seçilmiş layihələri kəşf edin",
-                ctaHref: "https://www.treva.realestate/projects",
-                items: projectShowcase,
-            },
-            partners: {
-                eyebrow: "(etibarlı tərəfdaşlar)",
-                title: "Sahə üzrə etibarlı tərəfdaş şəbəkəsi tərəfindən dəstəklənir.",
-                ctaText: "Tərəfdaş şəbəkəmizə qoşulmaq istəyirsiniz?",
-                ctaLabel: "TREVA ilə tərəfdaşlıq edin",
-                ctaHref: "https://www.treva.realestate/brokers#broker-registration",
-                logos: partnerLogos,
-                testimonials: [
-                    {
-                        quote: "TREVA ilə əməkdaşlıq etdiyimiz hər bir layihədə onlar operativ intizamı təmin edirlər. Yenilənən siyahılar və brokerlər üçün hazır alətlərlə satış prosesi daha sürətli və şəffaf olur.",
-                        author: "ETAGI Azerbaijan",
-                    },
-                    {
-                        quote: "TREVA qiymət strategiyasından tutmuş müştəri axınınadək hər detalda dəqiqlik göstərir və marağı nəticəyə çevirir.",
-                        author: "TRIDENT Investment",
-                    },
-                    {
-                        quote: "TREVA-nı fərqləndirən prosesdəki aydınlıq və davamlılıqdır. Elanlar aktual qalır, əlaqə çevik olur, alətlər isə satışı asanlaşdırır.",
-                        author: "RNS Estate",
-                    },
-                    {
-                        quote: "Yüksək keyfiyyətli vizuallar, güclü təqdimat və effektiv lead sistemi brokerlərin daha inamlı satış etməsinə kömək edir.",
-                        author: "Bazis Real Estate",
-                    },
-                ],
-            },
-            workWithUs: {
-                eyebrow: "(TREVA ilə birlikdə çalışın)",
-                title: "TREVA REAL ESTATE-DA DEVELOPERLƏR VƏ PEŞƏKAR BROKERLƏR ARASINDA ƏLAQƏ YARADIRIQ.",
-                description: "Hər iki tərəfin satış potensialını sübut edilmiş metodologiyalar və texnologiya yönümlü proseslərimiz vasitəsilə maksimuma çatdırmağa kömək edirik.",
-                items: [
-                    {
-                        title: "Layihəniz var?",
-                        label: "Bizimlə başlayın",
-                        href: "https://www.treva.realestate/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687f29a824c54963ab21fc5f_work%20with.avif",
-                        large: true,
-                    },
-                    {
-                        title: "Bizimlə satış etmək istəyirsiniz?",
-                        label: "Bizimlə satış edin",
-                        href: "https://www.treva.realestate/brokers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687f29ff72802ad85f05c0c5_work%20with%20left.avif",
-                    },
-                ],
-            },
-            footer: {
-                sitemapLabel: "Sayt xəritəsi",
-                socialLabel: "Sosial media",
-                addressLabel: "Baş ofis — Ziya Yusifzade 10, Sabah Residence",
-                addressHref: "https://www.google.com/maps/place/TREVA+Real+Estate/@40.3517196,49.827273,17z/",
-                backToTop: "YUXARIYA QAYIT",
-                copyright: "©treva 2025",
-                nav: [
-                    { label: "Ana səhifə", href: "https://www.treva.realestate" },
-                    { label: "Layihələr", href: "https://www.treva.realestate/projects" },
-                    { label: "Developerlər", href: "https://www.treva.realestate/developers" },
-                    { label: "Brokerlər", href: "https://www.treva.realestate/brokers" },
-                    { label: "Pulse", href: "https://www.treva.realestate/pulse", hasDot: true },
-                    { label: "Əlaqə", href: "https://www.treva.realestate/contacts" },
-                    { label: "Məxfilik Siyasəti", href: "https://www.treva.realestate/privacy-policy" },
-                ],
-                socials: socialLinks,
-                contacts: ["*2662", "050-277-2662", "info@treva.realestate"],
-            },
-        },
+        ],
     },
     en: {
-        home: {
-            hero: {
-                title: "Maximize your real estate sales with us",
-                scrollLabel: "Scroll",
-                primaryCta: {
-                    label: "Join our sales network",
-                    href: "https://www.treva.realestate/en/brokers#broker-registration",
-                },
-                secondaryCta: {
-                    label: "Partner with us to grow your sales",
-                    href: "https://www.treva.realestate/en/developers",
-                },
+        nav: ["Home", "About", "Services", "Contact"],
+        heroTag: "Static Frontend Phase",
+        heroTitle: "A fast, clean, and scalable storefront layer for Treva",
+        heroText:
+            "In the first phase, our goal is to build a locale-based frontend shell that stays independent from backend integration.",
+        primaryCta: "View project",
+        secondaryCta: "Learn more",
+        statLabel: "Ready locales",
+        statValue: "3 languages",
+        sections: [
+            {
+                title: "Structure",
+                text: "The page flow stays on `app/[locale]` and all static screens are driven from that route model.",
             },
-            live: {
-                ctaLabel: "Discover treva live",
-                ctaHref: "https://www.treva.realestate/en/pulse",
-                readLabel: "Read article",
-                items: [
-                    {
-                        category: "Blog",
-                        date: "23.04.2026",
-                        title: "Baku Apartment Prices 2026: Affordable Projects",
-                        author: "Leyla Bagirzade",
-                        href: "https://www.treva.realestate/en/pulse/bakida-menzil-qiymetleri-2026-serfeli-layiheler",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e9dc5d25a4d7cb27fafcbc_leyla%20cover.webp",
-                    },
-                    {
-                        category: "Blog",
-                        date: "17.04.2026",
-                        title: "What Defines Sales Success in Baku Real Estate?",
-                        author: "Javid Akhundov",
-                        href: "https://www.treva.realestate/en/pulse/bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e23b2e65222dfa1568b506_javid%20cover.webp",
-                    },
-                    {
-                        category: "Blog",
-                        date: "10.04.2026",
-                        title: "Which Projects Are Best for Investment in Baku?",
-                        author: "Nazrin Karimli",
-                        href: "https://www.treva.realestate/en/pulse/bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d8fa41ad243257771d2882_Nezrin%20Kerimli%20cover%20(1)%20(1).webp",
-                    },
-                ],
+            {
+                title: "Design",
+                text: "UI components live in the shared layer and can be reused later when real data is connected.",
             },
-            services: {
-                eyebrow: "(services)",
-                title: "PARTNER WITH TREVA, AZERBAIJAN'S LEADING REAL ESTATE PLATFORM, AND UNLOCK YOUR FULL GROWTH POTENTIAL.",
-                note: "Looking to expand your sales opportunities?",
-                ctaLabel: "Join our sales network",
-                ctaHref: "https://www.treva.realestate/en/brokers#broker-registration",
-                items: [
-                    {
-                        index: "01",
-                        title: "Sales and Marketing",
-                        href: "https://www.treva.realestate/en/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8559bf006e7ed8f4aa8_SALE%26MARKETING.avif",
-                    },
-                    {
-                        index: "02",
-                        title: "CRM and Lead Management",
-                        href: "https://www.treva.realestate/en/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d855e5db3d2303249ad9_CRM%26LEAD-MANAGEMENT.avif",
-                    },
-                    {
-                        index: "03",
-                        title: "Broker Network Activation",
-                        href: "https://www.treva.realestate/en/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION.avif",
-                    },
-                    {
-                        index: "04",
-                        title: "Investment Advisory",
-                        href: "https://www.treva.realestate/en/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY.avif",
-                    },
-                ],
+            {
+                title: "Readiness",
+                text: "This phase stabilizes the visual foundation, navigation, and locale behavior.",
             },
-            projects: {
-                eyebrow: "(portfolio)",
-                title: "Clients trust us for transparency, results, and a professional approach. Explore how brands working with TREVA are accelerating sales and visibility.",
-                ctaText: "Explore our projects to find your next investment opportunity.",
-                ctaLabel: "Discover selected projects",
-                ctaHref: "https://www.treva.realestate/en/projects",
-                items: projectShowcase,
-            },
-            partners: {
-                eyebrow: "(trusted partners)",
-                title: "Backed by a trusted network of industry partners.",
-                ctaText: "Want to join our partner network?",
-                ctaLabel: "Partner with TREVA",
-                ctaHref: "https://www.treva.realestate/en/brokers#broker-registration",
-                logos: partnerLogos,
-                testimonials: [
-                    {
-                        quote: "TREVA brings structure, speed, and visibility into every project we run together. The process feels coordinated and sales-ready from day one.",
-                        author: "ETAGI Azerbaijan",
-                    },
-                    {
-                        quote: "What stands out in our work with TREVA is their precision around packaging, broker enablement, and follow-through across the funnel.",
-                        author: "TRIDENT Investment",
-                    },
-                    {
-                        quote: "The clarity of the workflow, accurate listings, and responsive communication make TREVA especially effective for broker-led sales.",
-                        author: "RNS Estate",
-                    },
-                    {
-                        quote: "High-quality visuals and a strong lead pipeline help us present projects better and close opportunities with more confidence.",
-                        author: "Bazis Real Estate",
-                    },
-                ],
-            },
-            workWithUs: {
-                eyebrow: "(work with TREVA)",
-                title: "WE CONNECT DEVELOPERS AND PROFESSIONAL BROKERS AT TREVA REAL ESTATE.",
-                description: "We help both sides unlock more sales through proven methodology and technology-led operating processes.",
-                items: [
-                    {
-                        title: "Do you have a project?",
-                        label: "Start with us",
-                        href: "https://www.treva.realestate/en/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687f29a824c54963ab21fc5f_work%20with.avif",
-                        large: true,
-                    },
-                    {
-                        title: "Want to sell with us?",
-                        label: "Sell with us",
-                        href: "https://www.treva.realestate/en/brokers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687f29ff72802ad85f05c0c5_work%20with%20left.avif",
-                    },
-                ],
-            },
-            footer: {
-                sitemapLabel: "Sitemap",
-                socialLabel: "Social",
-                addressLabel: "Head office — Ziya Yusifzade 10, Sabah Residence",
-                addressHref: "https://www.google.com/maps/place/TREVA+Real+Estate/@40.3517196,49.827273,17z/",
-                backToTop: "BACK TO TOP",
-                copyright: "©treva 2025",
-                nav: [
-                    { label: "Home", href: "https://www.treva.realestate/en" },
-                    { label: "Projects", href: "https://www.treva.realestate/en/projects" },
-                    { label: "Developers", href: "https://www.treva.realestate/en/developers" },
-                    { label: "Brokers", href: "https://www.treva.realestate/en/brokers" },
-                    { label: "Pulse", href: "https://www.treva.realestate/en/pulse", hasDot: true },
-                    { label: "Contact", href: "https://www.treva.realestate/en/contacts" },
-                    { label: "Privacy Policy", href: "https://www.treva.realestate/en/privacy-policy" },
-                ],
-                socials: socialLinks,
-                contacts: ["*2662", "050-277-2662", "info@treva.realestate"],
-            },
-        },
+        ],
     },
     ru: {
-        home: {
-            hero: {
-                title: "Maximize your real estate sales with us",
-                scrollLabel: "Scroll",
-                primaryCta: {
-                    label: "Join our sales network",
-                    href: "https://www.treva.realestate/ru/brokers#broker-registration",
-                },
-                secondaryCta: {
-                    label: "Partner with us to grow your sales",
-                    href: "https://www.treva.realestate/ru/developers",
-                },
+        nav: ["Главная", "О нас", "Услуги", "Контакт"],
+        heroTag: "Этап Статического Frontend",
+        heroTitle: "Быстрый, чистый и масштабируемый витринный слой для Treva",
+        heroText:
+            "На первом этапе наша цель построить frontend-оболочку с поддержкой locale без зависимости от backend-интеграции.",
+        primaryCta: "Открыть проект",
+        secondaryCta: "Подробнее",
+        statLabel: "Готовые языки",
+        statValue: "3 языка",
+        sections: [
+            {
+                title: "Структура",
+                text: "Маршрут `app/[locale]` сохраняется, и все статические экраны управляются через эту модель.",
             },
-            live: {
-                ctaLabel: "Discover treva live",
-                ctaHref: "https://www.treva.realestate/ru/pulse",
-                readLabel: "Read article",
-                items: [
-                    {
-                        category: "Blog",
-                        date: "23.04.2026",
-                        title: "Baku Apartment Prices 2026: Affordable Projects",
-                        author: "Leyla Bagirzade",
-                        href: "https://www.treva.realestate/ru/pulse/bakida-menzil-qiymetleri-2026-serfeli-layiheler",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e9dc5d25a4d7cb27fafcbc_leyla%20cover.webp",
-                    },
-                    {
-                        category: "Blog",
-                        date: "17.04.2026",
-                        title: "What Defines Sales Success in Baku Real Estate?",
-                        author: "Javid Akhundov",
-                        href: "https://www.treva.realestate/ru/pulse/bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e23b2e65222dfa1568b506_javid%20cover.webp",
-                    },
-                    {
-                        category: "Blog",
-                        date: "10.04.2026",
-                        title: "Which Projects Are Best for Investment in Baku?",
-                        author: "Nazrin Karimli",
-                        href: "https://www.treva.realestate/ru/pulse/bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir",
-                        image: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d8fa41ad243257771d2882_Nezrin%20Kerimli%20cover%20(1)%20(1).webp",
-                    },
-                ],
+            {
+                title: "Дизайн",
+                text: "UI-компоненты находятся в общем слое и позже будут повторно использованы с реальными данными.",
             },
-            services: {
-                eyebrow: "(services)",
-                title: "PARTNER WITH TREVA, AZERBAIJAN'S LEADING REAL ESTATE PLATFORM, AND UNLOCK YOUR FULL GROWTH POTENTIAL.",
-                note: "Looking to expand your sales opportunities?",
-                ctaLabel: "Join our sales network",
-                ctaHref: "https://www.treva.realestate/ru/brokers#broker-registration",
-                items: [
-                    {
-                        index: "01",
-                        title: "Sales and Marketing",
-                        href: "https://www.treva.realestate/ru/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8559bf006e7ed8f4aa8_SALE%26MARKETING.avif",
-                    },
-                    {
-                        index: "02",
-                        title: "CRM and Lead Management",
-                        href: "https://www.treva.realestate/ru/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d855e5db3d2303249ad9_CRM%26LEAD-MANAGEMENT.avif",
-                    },
-                    {
-                        index: "03",
-                        title: "Broker Network Activation",
-                        href: "https://www.treva.realestate/ru/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION.avif",
-                    },
-                    {
-                        index: "04",
-                        title: "Investment Advisory",
-                        href: "https://www.treva.realestate/ru/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY.avif",
-                    },
-                ],
+            {
+                title: "Готовность",
+                text: "Этот этап стабилизирует визуальную основу, навигацию и логику locale.",
             },
-            projects: {
-                eyebrow: "(portfolio)",
-                title: "Clients trust us for transparency, results, and a professional approach. Explore how brands working with TREVA are accelerating sales and visibility.",
-                ctaText: "Explore our projects to find your next investment opportunity.",
-                ctaLabel: "Discover selected projects",
-                ctaHref: "https://www.treva.realestate/ru/projects",
-                items: projectShowcase,
-            },
-            partners: {
-                eyebrow: "(trusted partners)",
-                title: "Backed by a trusted network of industry partners.",
-                ctaText: "Want to join our partner network?",
-                ctaLabel: "Partner with TREVA",
-                ctaHref: "https://www.treva.realestate/ru/brokers#broker-registration",
-                logos: partnerLogos,
-                testimonials: [
-                    {
-                        quote: "TREVA brings structure, speed, and visibility into every project we run together. The process feels coordinated and sales-ready from day one.",
-                        author: "ETAGI Azerbaijan",
-                    },
-                    {
-                        quote: "What stands out in our work with TREVA is their precision around packaging, broker enablement, and follow-through across the funnel.",
-                        author: "TRIDENT Investment",
-                    },
-                    {
-                        quote: "The clarity of the workflow, accurate listings, and responsive communication make TREVA especially effective for broker-led sales.",
-                        author: "RNS Estate",
-                    },
-                    {
-                        quote: "High-quality visuals and a strong lead pipeline help us present projects better and close opportunities with more confidence.",
-                        author: "Bazis Real Estate",
-                    },
-                ],
-            },
-            workWithUs: {
-                eyebrow: "(work with TREVA)",
-                title: "WE CONNECT DEVELOPERS AND PROFESSIONAL BROKERS AT TREVA REAL ESTATE.",
-                description: "We help both sides unlock more sales through proven methodology and technology-led operating processes.",
-                items: [
-                    {
-                        title: "Do you have a project?",
-                        label: "Start with us",
-                        href: "https://www.treva.realestate/ru/developers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687f29a824c54963ab21fc5f_work%20with.avif",
-                        large: true,
-                    },
-                    {
-                        title: "Want to sell with us?",
-                        label: "Sell with us",
-                        href: "https://www.treva.realestate/ru/brokers",
-                        image: "https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687f29ff72802ad85f05c0c5_work%20with%20left.avif",
-                    },
-                ],
-            },
-            footer: {
-                sitemapLabel: "Sitemap",
-                socialLabel: "Social",
-                addressLabel: "Head office — Ziya Yusifzade 10, Sabah Residence",
-                addressHref: "https://www.google.com/maps/place/TREVA+Real+Estate/@40.3517196,49.827273,17z/",
-                backToTop: "BACK TO TOP",
-                copyright: "©treva 2025",
-                nav: [
-                    { label: "Home", href: "https://www.treva.realestate/ru" },
-                    { label: "Projects", href: "https://www.treva.realestate/ru/projects" },
-                    { label: "Developers", href: "https://www.treva.realestate/ru/developers" },
-                    { label: "Brokers", href: "https://www.treva.realestate/ru/brokers" },
-                    { label: "Pulse", href: "https://www.treva.realestate/ru/pulse", hasDot: true },
-                    { label: "Contact", href: "https://www.treva.realestate/ru/contacts" },
-                    { label: "Privacy Policy", href: "https://www.treva.realestate/ru/privacy-policy" },
-                ],
-                socials: socialLinks,
-                contacts: ["*2662", "050-277-2662", "info@treva.realestate"],
-            },
-        },
+        ],
     },
 } as const;

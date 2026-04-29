@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import Home from "@/components/home";
+import Container from "@/app/components/Container/container";
+import Home from "@/app/components/Home";
 import { config } from "@/config";
 
 export const dynamicParams = false;
@@ -18,5 +19,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         notFound();
     }
 
-    return <Home locale={locale} />;
+    const content = config.staticContent[locale as keyof typeof config.staticContent];
+
+    if (!content) {
+        notFound();
+    }
+
+    return (
+        <Home locale={locale} />
+    );
 }
