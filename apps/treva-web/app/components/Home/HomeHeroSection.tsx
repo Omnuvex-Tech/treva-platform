@@ -1,20 +1,187 @@
+'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import "./styles/home.css";
 
+if (typeof window !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+}
+
+const newsItems = [
+    { title: 'Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr', author: 'Leyla Bağırzadə', category: 'Bloq', date: '23.04.2026', img: '/cdn-assets/c818f17b39-69e9dc5d25a4d7cb27fafcbc_leyla-cover.webp', link: 'bakida-menzil-qiymetleri-2026-serfeli-layiheler' },
+    { title: 'Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?', author: 'Cavid Axundov', category: 'Bloq', date: '17.04.2026', img: '/cdn-assets/687dcaf737-69e23b2e65222dfa1568b506_javid-cover.webp', link: 'bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir' },
+    { title: 'Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?', author: 'Nəzrin Kərimli', category: 'Bloq', date: '10.04.2026', img: '/cdn-assets/8841250f2a-69d8fa41ad243257771d2882_Nezrin-Kerimli-cover-(1)-(1).webp', link: 'bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir' },
+    { title: 'İnvestisiya üçün niyə məhz Sea Breeze?', author: 'Türkan Mamedova', category: 'Bloq', date: '06.04.2026', img: '/cdn-assets/ddd2aa230f-69d387faabd8941c551800fa_turkan-cover-(1).webp', link: 'investisiya-ucun-niye-mehz-sea-breeze' },
+    { title: 'Satışdan Sonrakı Şəffaflıq: Müştəri Məmnuniyyəti', author: 'Səbinə Muxtarova', category: 'Bloq', date: '19.03.2026', img: '/cdn-assets/8e2a7414c0-69bbea28ae4fb211e7614275_cover-sebine.webp', link: 'satisdan-sonraki-seffafliq' },
+    { title: 'Bakı Daşınmaz Əmlak Bazarı: İnvestisiya İmkanları', author: 'Batula Mohubbi', category: 'Bloq', date: '13.03.2026', img: '/cdn-assets/9247778e39-69b419b1ccd29af57469cce0_batula-cover.webp', link: 'baki-dasinmaz-emlak-bazari' },
+    { title: 'Marina Village-də Xanımlar üçün 8 Mart Kampaniyası', author: 'Treva Team', category: 'Kampaniya', date: '06.03.2026', img: '/cdn-assets/f6c2eb9e80-69aad644a4043868699c2dc8_GÜCLÜ-TEKLİF-AZ.webp', link: 'ugurlu-investisiya-imkani' },
+    { title: 'Daşınmaz əmlak almaq istəyən insanlar nə ilə maraqlanır?', author: 'Ilhamə Paşazadə', category: 'Bloq', date: '04.03.2026', img: '/cdn-assets/2dfb5ca2bc-69b0356bc47fd3803791ac60_Gemini_Generated_Image_tcieq9tcieq9tcie.webp', link: 'dasinmaz-emlak-almaq-isteyen-insanlar-ilk-novbede-ne-ile-maraqlanirlar' },
+    { title: 'Treva Real Estate Daşkənddə beynəlxalq forumda', author: 'Treva Team', category: 'Tədbir', date: '24.02.2026', img: '/cdn-assets/ba4e1938cf-699da3a67e74e27a7ab28be0_2-(1).webp', link: 'treva-real-estate-daskendde' },
+    { title: 'Arabian Ranches Sea Breeze-də investisiya imkanı', author: 'Treva Team', category: 'Kampaniya', date: '17.02.2026', img: '/cdn-assets/c42dbd8b6c-69941644ea2d8a06b09eefc2_arabian-16x9-az.webp', link: 'arabian-ranches-sea-breeze-de-investisiya' }
+];
+
 export const HomeHeroSection = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const headingRef = useRef<HTMLHeadingElement>(null);
+    const ctaBlockRef = useRef<HTMLDivElement>(null);
+    const imgWrapRef = useRef<HTMLDivElement>(null);
+    const trackRef = useRef<HTMLDivElement>(null);
+    const firstBlockRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // 1) SƏHİFƏ FADE-IN — body.gsap-hidden-i söndür
+        document.body.classList.remove('gsap-hidden');
+        gsap.fromTo(
+            document.body,
+            { opacity: 0, visibility: 'hidden' },
+            { opacity: 1, visibility: 'visible', duration: 0.6, ease: 'power2.out' }
+        );
+
+        const ctx = gsap.context(() => {
+            // 2) BAŞLIQ ANİMASİYASI — söz-söz aşağıdan yuxarı reveal
+            if (headingRef.current) {
+                const heading = headingRef.current;
+                const original = heading.textContent || '';
+                const words = original.trim().split(/\s+/);
+                heading.innerHTML = words
+                    .map((w: string) =>
+                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.05;padding-bottom:0.05em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
+                    )
+                    .join(' ');
+
+                gsap.from(heading.querySelectorAll('.word-inner'), {
+                    yPercent: 115,
+                    duration: 1.1,
+                    ease: 'power3.out',
+                    stagger: 0.07,
+                    delay: 0.25,
+                });
+            }
+
+            // 3) HEADER ŞƏKLİ — yumşaq scale + opacity giriş
+            if (imgWrapRef.current) {
+                gsap.from(imgWrapRef.current, {
+                    scale: 1.08,
+                    opacity: 0,
+                    duration: 1.4,
+                    ease: 'power3.out',
+                    delay: 0.2,
+                });
+            }
+
+            // 4) CTA BLOK — aşağıdan yuxarı (data-gsap-delay="0.6")
+            if (ctaBlockRef.current) {
+                const delay = parseFloat(
+                    ctaBlockRef.current.getAttribute('data-gsap-delay') || '0.6'
+                );
+                gsap.from(ctaBlockRef.current, {
+                    y: 60,
+                    opacity: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    delay,
+                });
+            }
+
+            // 5) KARUSEL — sonsuz scroll (loop)
+            if (trackRef.current && firstBlockRef.current) {
+                const track = trackRef.current;
+                const setX = gsap.quickSetter(track, 'x', 'px');
+                let blockWidth = firstBlockRef.current.offsetWidth;
+                let pos = 0;
+                const speed = 60; // px/saniyə — sürəti dəyişmək üçün
+
+                const tick = (time: number, deltaTime: number) => {
+                    pos -= (speed * deltaTime) / 1000;
+                    if (Math.abs(pos) >= blockWidth) pos += blockWidth;
+                    setX(pos);
+                };
+                gsap.ticker.add(tick);
+
+                // Pəncərə ölçüsü dəyişəndə yenidən hesabla
+                const onResize = () => {
+                    if (firstBlockRef.current) {
+                        blockWidth = firstBlockRef.current.offsetWidth;
+                    }
+                };
+                window.addEventListener('resize', onResize);
+
+                // Hover-də dayan
+                const pause = () => gsap.ticker.remove(tick);
+                const resume = () => {
+                    gsap.ticker.remove(tick);
+                    gsap.ticker.add(tick);
+                };
+                track.addEventListener('mouseenter', pause);
+                track.addEventListener('mouseleave', resume);
+
+                return () => {
+                    gsap.ticker.remove(tick);
+                    window.removeEventListener('resize', onResize);
+                    track.removeEventListener('mouseenter', pause);
+                    track.removeEventListener('mouseleave', resume);
+                };
+            }
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    const renderBlock = (keyPrefix: string, blockRef?: React.Ref<HTMLDivElement>) => (
+        <div className="live_block" ref={blockRef as React.RefObject<HTMLDivElement>}>
+            {newsItems.map((item, index) => (
+                <div key={`${keyPrefix}-${index}`} role="listitem" className="w-dyn-item">
+                    <Link href={`pulse/${item.link}`} className="live_link w-inline-block">
+                        <div className="news_middle-img-wrap is-carousel">
+                            <div className="news_middle-img-holder">
+                                <img src={item.img} loading="lazy" alt={item.title} className="fullwidth-img" />
+                            </div>
+                            <div className="projects_overlay hide-tablet">
+                                <div className="news_btn">
+                                    <div>Məqaləni oxu</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="news-header_middle-content-wrap">
+                            <div className="news_middle-content">
+                                <div className="news_specs-wrap">
+                                    <div className="news_category-label">
+                                        <div>{item.category}</div>
+                                    </div>
+                                    <div>{item.date}</div>
+                                </div>
+                                <h2 className="live_title no-animate">{item.title}</h2>
+                            </div>
+                            <div className="news_author-wrap hide-landscape">
+                                <div>{item.author}</div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+            ))}
+        </div>
+    );
+
     return (
-        <section className="section_header">
+        <section className="section_header" ref={sectionRef}>
             <div className="global-padding">
                 <div className="container-large">
                     <div className="header_component">
                         <div data-w-id="e4074abf-c232-ac8e-2a04-e835a6611a3a" className="header_wrap">
                             <div className="header_content-wrap">
                                 <div className="max-width-48rem is-az">
-                                    <h1 className="indented-heading-h1">Daşınmaz Əmlak satışlarınızı bizimlə maksimumA çatdırın</h1>
+                                    <h1 ref={headingRef} className="indented-heading-h1">
+                                        Daşınmaz Əmlak satışlarınızı bizimlə maksimumA çatdırın
+                                    </h1>
                                 </div>
-                                <div data-gsap-delay="0.6" className="header_cta-block animate-instant animate-up">
+                                <div
+                                    ref={ctaBlockRef}
+                                    data-gsap-delay="0.6"
+                                    className="header_cta-block animate-instant animate-up"
+                                >
                                     <a href="#services" className="cs_scroll-wrap hide-landscape w-inline-block">
                                         <div className="button-text-wrap">
                                             <div className="button-text">sürüşdürün</div>
@@ -49,95 +216,11 @@ export const HomeHeroSection = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="header_img-wrap"></div>
+                            <div className="header_img-wrap" ref={imgWrapRef}></div>
                             <div className="live_carousel">
-                                <div className="live_track">
-                                    <div className="live_block">
-                                        {[
-                                            { title: 'Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr', author: 'Leyla Bağırzadə', category: 'Bloq', date: '23.04.2026', img: '/cdn-assets/c818f17b39-69e9dc5d25a4d7cb27fafcbc_leyla-cover.webp', link: 'bakida-menzil-qiymetleri-2026-serfeli-layiheler' },
-                                            { title: 'Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?', author: 'Cavid Axundov', category: 'Bloq', date: '17.04.2026', img: '/cdn-assets/687dcaf737-69e23b2e65222dfa1568b506_javid-cover.webp', link: 'bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir' },
-                                            { title: 'Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?', author: 'Nəzrin Kərimli', category: 'Bloq', date: '10.04.2026', img: '/cdn-assets/8841250f2a-69d8fa41ad243257771d2882_Nezrin-Kerimli-cover-(1)-(1).webp', link: 'bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir' },
-                                            { title: 'İnvestisiya üçün niyə məhz Sea Breeze?', author: 'Türkan Mamedova', category: 'Bloq', date: '06.04.2026', img: '/cdn-assets/ddd2aa230f-69d387faabd8941c551800fa_turkan-cover-(1).webp', link: 'investisiya-ucun-niye-mehz-sea-breeze' },
-                                            { title: 'Satışdan Sonrakı Şəffaflıq: Müştəri Məmnuniyyəti', author: 'Səbinə Muxtarova', category: 'Bloq', date: '19.03.2026', img: '/cdn-assets/8e2a7414c0-69bbea28ae4fb211e7614275_cover-sebine.webp', link: 'satisdan-sonraki-seffafliq' },
-                                            { title: 'Bakı Daşınmaz Əmlak Bazarı: İnvestisiya İmkanları', author: 'Batula Mohubbi', category: 'Bloq', date: '13.03.2026', img: '/cdn-assets/9247778e39-69b419b1ccd29af57469cce0_batula-cover.webp', link: 'baki-dasinmaz-emlak-bazari' },
-                                            { title: 'Marina Village-də Xanımlar üçün 8 Mart Kampaniyası', author: 'Treva Team', category: 'Kampaniya', date: '06.03.2026', img: '/cdn-assets/f6c2eb9e80-69aad644a4043868699c2dc8_GÜCLÜ-TEKLİF-AZ.webp', link: 'ugurlu-investisiya-imkani' },
-                                            { title: 'Daşınmaz əmlak almaq istəyən insanlar nə ilə maraqlanır?', author: 'Ilhamə Paşazadə', category: 'Bloq', date: '04.03.2026', img: '/cdn-assets/2dfb5ca2bc-69b0356bc47fd3803791ac60_Gemini_Generated_Image_tcieq9tcieq9tcie.webp', link: 'dasinmaz-emlak-almaq-isteyen-insanlar-ilk-novbede-ne-ile-maraqlanirlar' },
-                                            { title: 'Treva Real Estate Daşkənddə beynəlxalq forumda', author: 'Treva Team', category: 'Tədbir', date: '24.02.2026', img: '/cdn-assets/ba4e1938cf-699da3a67e74e27a7ab28be0_2-(1).webp', link: 'treva-real-estate-daskendde' },
-                                            { title: 'Arabian Ranches Sea Breeze-də investisiya imkanı', author: 'Treva Team', category: 'Kampaniya', date: '17.02.2026', img: '/cdn-assets/c42dbd8b6c-69941644ea2d8a06b09eefc2_arabian-16x9-az.webp', link: 'arabian-ranches-sea-breeze-de-investisiya' }
-                                        ].map((item, index) => (
-                                            <div key={index} role="listitem" className="w-dyn-item">
-                                                <Link href={`pulse/${item.link}`} className="live_link w-inline-block">
-                                                    <div className="news_middle-img-wrap is-carousel">
-                                                        <div className="news_middle-img-holder">
-                                                            <img src={item.img} loading="lazy" alt={item.title} className="fullwidth-img" />
-                                                        </div>
-                                                        <div className="projects_overlay hide-tablet">
-                                                            <div className="news_btn">
-                                                                <div>Məqaləni oxu</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="news-header_middle-content-wrap">
-                                                        <div className="news_middle-content">
-                                                            <div className="news_specs-wrap">
-                                                                <div className="news_category-label">
-                                                                    <div>{item.category}</div>
-                                                                </div>
-                                                                <div>{item.date}</div>
-                                                            </div>
-                                                            <h2 className="live_title no-animate">{item.title}</h2>
-                                                        </div>
-                                                        <div className="news_author-wrap hide-landscape">
-                                                            <div>{item.author}</div>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="live_block">
-                                        {[
-                                            { title: 'Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr', author: 'Leyla Bağırzadə', category: 'Bloq', date: '23.04.2026', img: '/cdn-assets/c818f17b39-69e9dc5d25a4d7cb27fafcbc_leyla-cover.webp', link: 'bakida-menzil-qiymetleri-2026-serfeli-layiheler' },
-                                            { title: 'Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?', author: 'Cavid Axundov', category: 'Bloq', date: '17.04.2026', img: '/cdn-assets/687dcaf737-69e23b2e65222dfa1568b506_javid-cover.webp', link: 'bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir' },
-                                            { title: 'Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?', author: 'Nəzrin Kərimli', category: 'Bloq', date: '10.04.2026', img: '/cdn-assets/8841250f2a-69d8fa41ad243257771d2882_Nezrin-Kerimli-cover-(1)-(1).webp', link: 'bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir' },
-                                            { title: 'İnvestisiya üçün niyə məhz Sea Breeze?', author: 'Türkan Mamedova', category: 'Bloq', date: '06.04.2026', img: '/cdn-assets/ddd2aa230f-69d387faabd8941c551800fa_turkan-cover-(1).webp', link: 'investisiya-ucun-niye-mehz-sea-breeze' },
-                                            { title: 'Satışdan Sonrakı Şəffaflıq: Müştəri Məmnuniyyəti', author: 'Səbinə Muxtarova', category: 'Bloq', date: '19.03.2026', img: '/cdn-assets/8e2a7414c0-69bbea28ae4fb211e7614275_cover-sebine.webp', link: 'satisdan-sonraki-seffafliq' },
-                                            { title: 'Bakı Daşınmaz Əmlak Bazarı: İnvestisiya İmkanları', author: 'Batula Mohubbi', category: 'Bloq', date: '13.03.2026', img: '/cdn-assets/9247778e39-69b419b1ccd29af57469cce0_batula-cover.webp', link: 'baki-dasinmaz-emlak-bazari' },
-                                            { title: 'Marina Village-də Xanımlar üçün 8 Mart Kampaniyası', author: 'Treva Team', category: 'Kampaniya', date: '06.03.2026', img: '/cdn-assets/f6c2eb9e80-69aad644a4043868699c2dc8_GÜCLÜ-TEKLİF-AZ.webp', link: 'ugurlu-investisiya-imkani' },
-                                            { title: 'Daşınmaz əmlak almaq istəyən insanlar nə ilə maraqlanır?', author: 'Ilhamə Paşazadə', category: 'Bloq', date: '04.03.2026', img: '/cdn-assets/2dfb5ca2bc-69b0356bc47fd3803791ac60_Gemini_Generated_Image_tcieq9tcieq9tcie.webp', link: 'dasinmaz-emlak-almaq-isteyen-insanlar-ilk-novbede-ne-ile-maraqlanirlar' },
-                                            { title: 'Treva Real Estate Daşkənddə beynəlxalq forumda', author: 'Treva Team', category: 'Tədbir', date: '24.02.2026', img: '/cdn-assets/ba4e1938cf-699da3a67e74e27a7ab28be0_2-(1).webp', link: 'treva-real-estate-daskendde' },
-                                            { title: 'Arabian Ranches Sea Breeze-də investisiya imkanı', author: 'Treva Team', category: 'Kampaniya', date: '17.02.2026', img: '/cdn-assets/c42dbd8b6c-69941644ea2d8a06b09eefc2_arabian-16x9-az.webp', link: 'arabian-ranches-sea-breeze-de-investisiya' }
-                                        ].map((item, index) => (
-                                            <div key={`dup-${index}`} role="listitem" className="w-dyn-item">
-                                                <Link href={`pulse/${item.link}`} className="live_link w-inline-block">
-                                                    <div className="news_middle-img-wrap is-carousel">
-                                                        <div className="news_middle-img-holder">
-                                                            <img src={item.img} loading="lazy" alt={item.title} className="fullwidth-img" />
-                                                        </div>
-                                                        <div className="projects_overlay hide-tablet">
-                                                            <div className="news_btn">
-                                                                <div>Məqaləni oxu</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="news-header_middle-content-wrap">
-                                                        <div className="news_middle-content">
-                                                            <div className="news_specs-wrap">
-                                                                <div className="news_category-label">
-                                                                    <div>{item.category}</div>
-                                                                </div>
-                                                                <div>{item.date}</div>
-                                                            </div>
-                                                            <h2 className="live_title no-animate">{item.title}</h2>
-                                                        </div>
-                                                        <div className="news_author-wrap hide-landscape">
-                                                            <div>{item.author}</div>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <div className="live_track" ref={trackRef} style={{ display: 'flex', willChange: 'transform' }}>
+                                    {renderBlock('orig', firstBlockRef)}
+                                    {renderBlock('dup', null)}
                                 </div>
                             </div>
                         </div>
