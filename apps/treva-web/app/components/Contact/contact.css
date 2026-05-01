@@ -739,3 +739,156 @@ html.disable-smooth-scroll { scroll-behavior: auto !important; }
 .button[data-wf--button--variant="ghost-large"]:hover {
   background: rgba(17,18,18,0.05);
 }
+
+
+
+/* Formun əsas konteyneri */
+.connect_form-wrap {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+}
+
+/* Formun özü */
+.connect_form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Hər bir input qrupu */
+.field_wrap {
+  width: 100%;
+  position: relative;
+}
+
+/* Input və textarea ümumi stilləri */
+.connect_input-field {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  outline: none;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+.connect_input-field:focus {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.connect_input-field.error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.connect_input-field.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Textarea xüsusi */
+textarea.connect_input-field {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Xəta mesajı */
+.connect_error {
+  display: block;
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  margin-left: 12px;
+  text-align: left;
+}
+
+/* Düymə stili */
+.button.white {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 8px;
+  font-family: inherit;
+  background-color: #f3f4f6;
+}
+
+.button.white:hover:not(:disabled) {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.button.white:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+/* Server xətası üçün */
+.cs_error {
+  margin-top: 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+/* Responsive – kiçik ekranlarda 1-ci sətir sütun olur */
+@media (max-width: 640px) {
+  .connect_form-wrap {
+    max-width: 100%;
+    padding: 0 16px;
+    box-shadow: none;
+  }
+  
+  /* Flex ilə yan-yana olan sahələr sütun şəklinə düşür */
+  .connect_form > div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  .connect_input-field {
+    padding: 10px 14px;
+  }
+  
+  .button.white {
+    padding: 10px 20px;
+  }
+}
+
+/* Animasiya (animate-up) */
+.animate-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

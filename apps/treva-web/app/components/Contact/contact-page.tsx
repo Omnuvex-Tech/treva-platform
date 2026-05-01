@@ -60,13 +60,12 @@ type ContactStatus = 'idle' | 'loading' | 'success' | 'error'
    CONFIG
 ───────────────────────────────────────────────────────── */
 const LEAD_ENDPOINT = 'https://nodebitrixproject15.vercel.app/api/webflow-lead'
-const GEO_IP_ENDPOINT = 'https://ipwho.is/'
 const FALLBACK_PHONE_PREFIX = '+994'
 
 const INITIAL_CONTACT_FIELDS: ContactFields = {
   name: '',
   email: '',
-  phone: '',
+  phone: FALLBACK_PHONE_PREFIX,
   message: '',
 }
 
@@ -92,20 +91,6 @@ function ContactForm() {
   const [fields, setFields] = useState<ContactFields>(INITIAL_CONTACT_FIELDS)
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<ContactStatus>('idle')
-  const phoneRef = useRef<HTMLInputElement | null>(null)
-
-  // Auto-prefix phone
-  useEffect(() => {
-    fetch(GEO_IP_ENDPOINT)
-      .then(r => r.json())
-      .then(data => {
-        const prefix = data?.calling_code ? `+${data.calling_code}` : FALLBACK_PHONE_PREFIX
-        if (phoneRef.current && !fields.phone) {
-          setFields(f => ({ ...f, phone: prefix }))
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   const validate = () => {
     const errs: ContactErrors = {}
@@ -117,7 +102,7 @@ function ContactForm() {
     return errs
   }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     const fieldName = name as keyof ContactFields
     setFields(f => ({ ...f, [name]: value }))
@@ -125,10 +110,10 @@ function ContactForm() {
   }
 
   const handlePhoneInput = (e: ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value.replace(/[^\d+]/g, '')
-    const firstPlus = val.indexOf('+')
-    val = val.split('').filter((c: string, i: number) => c !== '+' || i === firstPlus).join('')
-    setFields(f => ({ ...f, phone: val }))
+    let digits = e.target.value.replace(/\D/g, '')
+    if (digits.startsWith('994')) digits = digits.slice(3)
+    if (digits.startsWith('0')) digits = digits.slice(1)
+    setFields(f => ({ ...f, phone: `${FALLBACK_PHONE_PREFIX}${digits.slice(0, 9)}` }))
     if (errors.phone) setErrors(er => ({ ...er, phone: '' }))
   }
 
@@ -172,66 +157,79 @@ function ContactForm() {
 
   return (
     <div className="connect_form-wrap animate-up">
-      <form id="email-form" name="email-form" onSubmit={handleSubmit} className="connect_form" noValidate>
-        {/* Name */}
-        <div className="field_wrap">
-          <input
-            className={`connect_input-field${errors.name ? ' error' : ''}`}
-            name="name" maxLength={256}
-            placeholder="Tam ad *"
-            type="text"
-            value={fields.name}
-            onChange={handleChange}
-          />
-          {errors.name && <div className="connect_error" style={{ display: 'block' }}>{errors.name}</div>}
+      <form id="email-form" name="email-form" onSubmit={handleSubmit} className="connect_form contact_form" noValidate>
+        <div className="contact_form-row contact_form-row--split">
+          <div className="field_wrap">
+            <input
+              className={`connect_input-field${errors.name ? ' error' : ''}`}
+              name="name"
+              maxLength={256}
+              placeholder="TAM AD *"
+              type="text"
+              value={fields.name}
+              onChange={handleChange}
+            />
+            {errors.name && <div className="connect_error" style={{ display: 'block' }}>{errors.name}</div>}
+          </div>
+
+          <div className="field_wrap">
+            <input
+              className={`connect_input-field${errors.email ? ' error' : ''}`}
+              name="email"
+              maxLength={256}
+              placeholder="EMAIL ÜNVANI *"
+              type="email"
+              value={fields.email}
+              onChange={handleChange}
+            />
+            {errors.email && <div className="connect_error" style={{ display: 'block' }}>{errors.email}</div>}
+          </div>
         </div>
-        {/* Email */}
-        <div className="field_wrap">
-          <input
-            className={`connect_input-field${errors.email ? ' error' : ''}`}
-            name="email" maxLength={256}
-            placeholder="Email ünvanı *"
-            type="email"
-            value={fields.email}
-            onChange={handleChange}
-          />
-          {errors.email && <div className="connect_error" style={{ display: 'block' }}>{errors.email}</div>}
+
+        <div className="contact_form-row">
+          <div className="field_wrap">
+            <input
+              className={`connect_input-field${errors.phone ? ' error' : ''}`}
+              name="phone"
+              maxLength={13}
+              placeholder="+994"
+              type="tel"
+              value={fields.phone}
+              onChange={handlePhoneInput}
+            />
+            {errors.phone && <div className="connect_error" style={{ display: 'block' }}>{errors.phone}</div>}
+          </div>
         </div>
-        {/* Phone */}
-        <div className="field_wrap">
-          <input
-            ref={phoneRef}
-            className={`connect_input-field${errors.phone ? ' error' : ''}`}
-            name="phone" maxLength={256}
-            placeholder="Telefon nömrəsi *"
-            type="tel"
-            value={fields.phone}
-            onChange={handlePhoneInput}
-          />
-          {errors.phone && <div className="connect_error" style={{ display: 'block' }}>{errors.phone}</div>}
+
+        <div className="contact_form-row">
+          <div className="field_wrap">
+            <textarea
+              className="connect_input-field contact_message-field"
+              name="message"
+              maxLength={500}
+              placeholder="MESAJ"
+              rows={1}
+              value={fields.message}
+              onChange={handleChange}
+            />
+          </div>
         </div>
-        {/* Message */}
-        <input
-          className="connect_input-field"
-          name="message" maxLength={256}
-          placeholder="Mesaj"
-          type="text"
-          value={fields.message}
-          onChange={handleChange}
-        />
-        {/* Submit */}
-        <button
-          type="submit"
-          className="button white"
-          disabled={status === 'loading'}
-          style={{ cursor: status === 'loading' ? 'wait' : 'pointer' }}
-        >
-          {status === 'loading' ? 'Göndərilir...' : 'Mesaj göndər'}
-        </button>
+
+        <div className="contact_form-row contact_form-row--submit">
+          <button
+            type="submit"
+            className="button white"
+            disabled={status === 'loading'}
+            style={{ cursor: status === 'loading' ? 'wait' : 'pointer' }}
+          >
+            {status === 'loading' ? 'GÖNDƏRİLİR...' : 'MESAJ GÖNDƏR'}
+          </button>
+        </div>
       </form>
+
       {status === 'error' && (
-        <div className="cs_error" style={{ display: 'block' }}>
-          <div>Oops! Something went wrong.</div>
+        <div className="cs_error" style={{ display: 'block', marginTop: '1rem' }}>
+          <div>Oops! Xəta baş verdi. Yenidən cəhd edin.</div>
         </div>
       )}
     </div>
@@ -424,7 +422,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                     {/* Intro */}
                     <div className="contact_office-intro">
                       <div className="max-width-48rem">
-                        <h1>
+                        <h1 className="contact_heading-az no-animate">
                           <span className="heading-gap-h1">      </span>
                           Kömək üçün buradayıq, bizimlə əlaqə saxlayın
                         </h1>
@@ -518,7 +516,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                     <div className="connect_wrap">
                       <div className="connect_title-wrap">
                         <p className="text-color-white60">TREVA ilə əlaqədə qalın</p>
-                        <h2 className="text-color-white">Bizimlə Əlaqə saxlayın</h2>
+                        <h2 className="text-color-white contact_heading-az no-animate">Bizimlə Əlaqə saxlayın</h2>
                       </div>
                       <ContactForm />
                     </div>
@@ -583,8 +581,8 @@ export function ContactPage({ locale }: ContactPageProps) {
                         </h2>
                         <div className="button-group">
                           <Link
-                            href="/contacts#get-in-touch"
-                            className="button"
+                            href="#get-in-touch"
+                            className="button w-inline-block w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e contact_cta-button contact_cta-button--primary"
                             data-wf--button--variant="blue-large"
                           >
                             <div className="button-text-wrap">
@@ -594,7 +592,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                           </Link>
                           <Link
                             href="/brokers#broker-registration"
-                            className="button"
+                            className="button w-inline-block w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb contact_cta-button contact_cta-button--secondary"
                             data-wf--button--variant="ghost-large"
                           >
                             <div className="button-text-wrap">
@@ -668,6 +666,3 @@ export function ContactPage({ locale }: ContactPageProps) {
     </>
   )
 }
-
-
-
