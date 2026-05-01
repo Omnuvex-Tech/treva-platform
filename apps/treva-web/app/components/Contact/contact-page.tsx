@@ -164,7 +164,7 @@ function ContactForm() {
               className={`connect_input-field${errors.name ? ' error' : ''}`}
               name="name"
               maxLength={256}
-              placeholder="TAM AD *"
+              placeholder="Tam ad *"
               type="text"
               value={fields.name}
               onChange={handleChange}
@@ -177,7 +177,7 @@ function ContactForm() {
               className={`connect_input-field${errors.email ? ' error' : ''}`}
               name="email"
               maxLength={256}
-              placeholder="EMAIL ÜNVANI *"
+              placeholder="Email ünvanı *"
               type="email"
               value={fields.email}
               onChange={handleChange}
@@ -192,7 +192,7 @@ function ContactForm() {
               className={`connect_input-field${errors.phone ? ' error' : ''}`}
               name="phone"
               maxLength={13}
-              placeholder="+994"
+              placeholder="Telefon nömrəsi (+994...) *"
               type="tel"
               value={fields.phone}
               onChange={handlePhoneInput}
@@ -207,8 +207,8 @@ function ContactForm() {
               className="connect_input-field contact_message-field"
               name="message"
               maxLength={500}
-              placeholder="MESAJ"
-              rows={1}
+              placeholder="Mesajınızı yazın..."
+              rows={4}
               value={fields.message}
               onChange={handleChange}
             />
@@ -222,7 +222,7 @@ function ContactForm() {
             disabled={status === 'loading'}
             style={{ cursor: status === 'loading' ? 'wait' : 'pointer' }}
           >
-            {status === 'loading' ? 'GÖNDƏRİLİR...' : 'MESAJ GÖNDƏR'}
+            {status === 'loading' ? 'Göndərilir...' : 'Mesaj göndər'}
           </button>
         </div>
       </form>
@@ -582,20 +582,20 @@ export function ContactPage({ locale }: ContactPageProps) {
                         <div className="button-group">
                           <Link
                             href="#get-in-touch"
-                            className="button w-inline-block w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e contact_cta-button contact_cta-button--primary"
+                            className="button contact_cta-action-button contact_cta-action-button--primary"
                             data-wf--button--variant="blue-large"
                           >
-                            <div className="button-text-wrap">
+                            <div className="button-text-wrap elaqe-saxlayin">
                               <div className="button-text">Əlaqə saxlayın</div>
                               <div className="button-text">Əlaqə saxlayın</div>
                             </div>
                           </Link>
                           <Link
                             href="/brokers#broker-registration"
-                            className="button w-inline-block w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb contact_cta-button contact_cta-button--secondary"
+                            className="button contact_cta-action-button contact_cta-action-button--secondary"
                             data-wf--button--variant="ghost-large"
                           >
-                            <div className="button-text-wrap">
+                            <div className="button-text-wrap elaqe-saxlayin">
                               <div className="button-text">Şəbəkəmizə qoşulun</div>
                               <div className="button-text">Şəbəkəmizə qoşulun</div>
                             </div>
