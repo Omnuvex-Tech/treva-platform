@@ -22,6 +22,7 @@
         "packages/*"
     ],
     "dependencies": {
-        "gsap": "^3.15.0"
+        "gsap": "^3.15.0",
+        "lucide-react": "^1.14.0"
     }
 }

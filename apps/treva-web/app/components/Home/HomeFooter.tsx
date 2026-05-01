@@ -21,7 +21,14 @@ const ArrowUpIconCurrent = () => (
   </svg>
 );
 
-export const HomeFooter = () => {
+type HomeFooterProps = {
+  locale?: string;
+};
+
+export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
+  const homeHref = `/${locale}`;
+  const contactHref = `/${locale}/contact`;
+
   return (
     <footer className="footer">
       <section className="section_footer bg-color-blue100 parallax-reveal">
@@ -35,7 +42,7 @@ export const HomeFooter = () => {
                   <div className="footer_col">
                     <div className="text-color-white60">sayt xəritəsi</div>
                     <div className="footer_nav">
-                      <Link href="/" aria-current="page" className="footer_link-wrap w-inline-block w--current">
+                      <Link href={homeHref} aria-current="page" className="footer_link-wrap w-inline-block w--current">
                         <div className="footer_link-content">
                           <div className="footer_link-text">Ana səhifə</div>
                           <div className="footer_link-text">Ana səhifə</div>
@@ -69,7 +76,7 @@ export const HomeFooter = () => {
                           <span className="red-dot__core" />
                         </span>
                       </Link>
-                      <Link href="/contacts" className="footer_link-wrap w-inline-block">
+                      <Link href={contactHref} className="footer_link-wrap w-inline-block">
                         <div className="footer_link-content">
                           <div className="footer_link-text">Əlaqə</div>
                           <div className="footer_link-text">Əlaqə</div>
@@ -172,7 +179,7 @@ export const HomeFooter = () => {
 
               {/* Bottom bar */}
               <div className="footer_bottom-wrap">
-                <Link href="/" aria-current="page" className="footer_logo-wrap w-inline-block w--current">
+                <Link href={homeHref} aria-current="page" className="footer_logo-wrap w-inline-block w--current">
                   <img
                     loading="lazy"
                     src="/cdn-assets/c06d6deb09-685d6b08f6dce7040049422e_treva-logo.svg"

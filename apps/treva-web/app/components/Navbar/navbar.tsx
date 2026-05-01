@@ -87,21 +87,21 @@ const navDictionary = {
         { name: "Developerlər", href: "#developers", hasDot: false },
         { name: "Brokerlər", href: "#brokers", hasDot: false },
         { name: "Pulse", href: "#pulse", hasDot: true },
-        { name: "Əlaqə", href: "#contact", hasDot: false },
+        { name: "Əlaqə", href: "/contact", hasDot: false },
     ],
     en: [
         { name: "Projects", href: "#projects", hasDot: false },
         { name: "Developers", href: "#developers", hasDot: false },
         { name: "Brokers", href: "#brokers", hasDot: false },
         { name: "Pulse", href: "#pulse", hasDot: true },
-        { name: "Contact", href: "#contact", hasDot: false },
+        { name: "Contact", href: "/contact", hasDot: false },
     ],
     ru: [
         { name: "Проекты", href: "#projects", hasDot: false },
         { name: "Девелоперы", href: "#developers", hasDot: false },
         { name: "Брокеры", href: "#brokers", hasDot: false },
         { name: "Pulse", href: "#pulse", hasDot: true },
-        { name: "Контакт", href: "#contact", hasDot: false },
+        { name: "Контакт", href: "/contact", hasDot: false },
     ],
 } as const;
 
@@ -222,9 +222,9 @@ export default function Navbar({ locale }: { locale: string }) {
     const localizedLinks = useMemo(() => {
         return navLinks.map((link) => ({
             ...link,
-            href: `${homeHref}${link.href}`,
+            href: link.href.startsWith("#") ? `${homeHref}${link.href}` : `/${currentLocale}${link.href}`,
         }));
-    }, [homeHref, navLinks]);
+    }, [currentLocale, homeHref, navLinks]);
 
     const handleLangChange = (lang: string) => {
         const nextLocale = labelToLocale[lang as keyof typeof labelToLocale];

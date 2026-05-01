@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Home from "@/app/components/Home";
+import { ContactPage }  from "@/app/components/Contact/contact-page";
 import { config } from "@/config";
 
 export const dynamicParams = false;
@@ -10,7 +10,7 @@ export function generateStaticParams() {
     }));
 }
 
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ContactRoute({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     const languages = [...config.project.staticLanguages];
 
@@ -18,13 +18,5 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         notFound();
     }
 
-    const content = config.staticContent[locale as keyof typeof config.staticContent];
-
-    if (!content) {
-        notFound();
-    }
-
-    return (
-        <Home locale={locale} />
-    );
+    return <ContactPage locale={locale} />;
 }
