@@ -1,5 +1,8 @@
-/* Contact page styles moved from globals.css */
+/* =============================================
+   CONTACT PAGE SPECIFIC STYLES
+   ============================================= */
 
+/* --- Form & connect section styles --- */
 .section_connect .connect_form-wrap {
     width: 100%;
     max-width: none;
@@ -118,6 +121,7 @@
     }
 }
 
+/* --- Heading fixes --- */
 .contact_heading-az {
     overflow: visible !important;
     line-height: 1.11 !important;
@@ -132,6 +136,7 @@
     overflow: visible !important;
 }
 
+/* --- CTA buttons general --- */
 .section_cta .contact_cta-button {
     grid-column-gap: 0.375rem;
     grid-row-gap: 0.375rem;
@@ -191,10 +196,6 @@
     color: #ffffff;
 }
 
-.section_cta .contact_cta-button--secondary:hover .button-text {
-    color: #ffffff;
-}
-
 .section_cta .button.contact_cta-action-button {
     gap: 0.375rem !important;
     flex: 0 0 auto !important;
@@ -247,6 +248,18 @@
     color: var(--_color---white) !important;
 }
 
+/* --- Desktop: force CTA buttons to match submit button dimensions --- */
+@media (min-width: 992px) {
+    .section_cta .button.contact_cta-action-button {
+        padding: 1.0rem 0.875rem !important;
+        font-size: 0.875rem !important;
+        border-radius: 80px !important;
+        line-height: 1.5 !important;
+        min-height: auto !important;
+    }
+}
+
+/* --- CTA section layout (responsive) --- */
 .contact_cta-section {
     position: relative;
     isolation: isolate;

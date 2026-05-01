@@ -6,6 +6,7 @@ import Script from 'next/script'
 import Link from 'next/link'
 import Header from '@/app/components/Navbar/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import './contact.css'  // ayrıca CSS faylı
 
 declare global {
   interface Window {
@@ -16,7 +17,6 @@ declare global {
   }
 }
 
-
 /* ── Arrow Icon (used in offices & connect) ─────────────── */
 const ArrowDiagSVG = ({ fill = '#2E3139' }) => (
   <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,7 +24,6 @@ const ArrowDiagSVG = ({ fill = '#2E3139' }) => (
   </svg>
 )
 
-/* Small diagonal arrow for connect links */
 const LinkArrowSVG = ({ fill = 'white' }) => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.1859 5.5V14.4375C17.1859 14.6198 17.1135 14.7947 16.9846 14.9236C16.8556 15.0526 16.6808 15.125 16.4984 15.125C16.3161 15.125 16.1412 15.0526 16.0123 14.9236C15.8834 14.7947 15.8109 14.6198 15.8109 14.4375V7.15945L5.98484 16.9864C5.85583 17.1154 5.68087 17.1879 5.49843 17.1879C5.31599 17.1879 5.14103 17.1154 5.01202 16.9864C4.88302 16.8574 4.81055 16.6824 4.81055 16.5C4.81055 16.3176 4.88302 16.1426 5.01202 16.0136L14.839 6.1875H7.56093C7.37859 6.1875 7.20372 6.11507 7.07479 5.98614C6.94586 5.8572 6.87343 5.68234 6.87343 5.5C6.87343 5.31766 6.94586 5.1428 7.07479 5.01386C7.20372 4.88493 7.37859 4.8125 7.56093 4.8125H16.4984C16.6808 4.8125 16.8556 4.88493 16.9846 5.01386C17.1135 5.1428 17.1859 5.31766 17.1859 5.5Z" fill={fill}/>
@@ -37,7 +36,6 @@ const CheckCircleSVG = () => (
   </svg>
 )
 
-/* ── Connect Link (social / phone / email) ──────────────── */
 type ConnectLinkProps = {
   href: string
   label: string
@@ -247,7 +245,6 @@ export function ContactPage({ locale }: ContactPageProps) {
   const smoothWrapRef = useRef<HTMLDivElement | null>(null)
   const gsapReady = useRef(false)
 
-  // ── GSAP Init ──────────────────────────────────────────
   const initGSAP = () => {
     if (gsapReady.current) return
     if (typeof window === 'undefined') return
@@ -259,13 +256,11 @@ export function ContactPage({ locale }: ContactPageProps) {
     if (ScrollTrigger) gsap.registerPlugin(ScrollTrigger)
     if (SplitText)     gsap.registerPlugin(SplitText)
 
-    // Show body
     gsap.to('body', { autoAlpha: 1, duration: 0.3 })
 
     const isMobile  = window.matchMedia('(max-width: 768px)').matches
     const noSmooth  = window.location.pathname.includes('/treva-live')
 
-    // Smooth Scroll
     if (!isMobile && !noSmooth && ScrollSmoother) {
       const smoother = ScrollSmoother.create({
         wrapper:  '#smooth-wrapper',
@@ -273,7 +268,6 @@ export function ContactPage({ locale }: ContactPageProps) {
         smooth:   1.6,
         effects:  true,
       })
-      // Handle anchor on load
       const hash = window.location.hash
       if (hash) {
         setTimeout(() => {
@@ -281,7 +275,6 @@ export function ContactPage({ locale }: ContactPageProps) {
           if (target) smoother.scrollTo(target, true)
         }, 500)
       }
-      // Disable smooth for same-page anchors
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', () => {
           document.documentElement.classList.add('disable-smooth-scroll')
@@ -294,7 +287,6 @@ export function ContactPage({ locale }: ContactPageProps) {
       return el.hasAttribute(name) ? parseFloat(el.getAttribute(name) ?? `${fallback}`) : fallback
     }
 
-    // Animate Up/Down/Right/Fade
     const animTypes = [
       { cls: '.animate-up',    y:  40, x:  0 },
       { cls: '.animate-down',  y: -40, x:  0 },
@@ -320,11 +312,9 @@ export function ContactPage({ locale }: ContactPageProps) {
       })
     })
 
-    // SplitText line reveal (desktop only)
     if (!isMobile && SplitText) {
       document.querySelectorAll('h1, h2, h3, p').forEach(el => {
         if (el.classList.contains('no-animate')) return
-        // skip richtext children
         if (el.closest('.w-richtext')) return
 
         const split = new SplitText(el, { type: 'lines', lineClass: 'line-wrap' })
@@ -346,7 +336,6 @@ export function ContactPage({ locale }: ContactPageProps) {
       })
     }
 
-    // Image reveal (.img-cover)
     document.querySelectorAll('.img-reveal').forEach(wrapper => {
       const cover = wrapper.querySelector('.img-cover')
       if (!cover) return
@@ -363,11 +352,9 @@ export function ContactPage({ locale }: ContactPageProps) {
   }
 
   useEffect(() => {
-    // Try immediately (scripts might already be loaded)
     if (window.gsap && window.ScrollTrigger) {
       initGSAP()
     }
-    // Also listen for script load events
     const onLoad = () => initGSAP()
     window.addEventListener('gsap-ready', onLoad)
     return () => window.removeEventListener('gsap-ready', onLoad)
@@ -375,7 +362,6 @@ export function ContactPage({ locale }: ContactPageProps) {
 
   return (
     <>
-      {/* ── GSAP CDN Scripts ────────────────────────────── */}
       <Script
         src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"
         strategy="afterInteractive"
@@ -399,7 +385,6 @@ export function ContactPage({ locale }: ContactPageProps) {
         src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollSmoother.min.js"
         strategy="afterInteractive"
         onLoad={() => {
-          // All loaded — fire final init
           setTimeout(initGSAP, 100)
         }}
       />
@@ -411,15 +396,11 @@ export function ContactPage({ locale }: ContactPageProps) {
 
           <main className="main-wrapper">
 
-            {/* ══════════════════════════════════════════════
-                SECTION 1: OFFICES
-            ══════════════════════════════════════════════ */}
+            {/* SECTION 1: OFFICES */}
             <section className="section_contact">
               <div className="global-padding padding-section-medium">
                 <div className="container-large">
                   <div className="offices_component">
-
-                    {/* Intro */}
                     <div className="contact_office-intro">
                       <div className="max-width-48rem">
                         <h1 className="contact_heading-az no-animate">
@@ -430,7 +411,6 @@ export function ContactPage({ locale }: ContactPageProps) {
                       <p className="contact_top-label">(bizimlə əlaqə)</p>
                     </div>
 
-                    {/* Offices */}
                     <div className="contact_offices-wrap">
                       <div className="offices_bio-wrap">
                         <p>
@@ -440,7 +420,6 @@ export function ContactPage({ locale }: ContactPageProps) {
                       </div>
 
                       <div className="offices_block">
-                        {/* Office 1 — Large */}
                         <a
                           href="https://www.google.com/maps/place/TREVA+Real+Estate/@40.3517196,49.827273,17z"
                           target="_blank"
@@ -469,7 +448,6 @@ export function ContactPage({ locale }: ContactPageProps) {
                           </div>
                         </a>
 
-                        {/* Office 2 */}
                         <a
                           href="https://maps.app.goo.gl/fU1nX7dWJVy4KTkA9"
                           target="_blank"
@@ -498,21 +476,16 @@ export function ContactPage({ locale }: ContactPageProps) {
                         </a>
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* ══════════════════════════════════════════════
-                SECTION 2: CONNECT
-            ══════════════════════════════════════════════ */}
+            {/* SECTION 2: CONNECT */}
             <section className="section_connect bg-color-blue100 parallax-reveal">
               <div id="get-in-touch" className="global-padding padding-section-large">
                 <div className="container-large">
                   <div className="connect_component">
-
-                    {/* Left — Form */}
                     <div className="connect_wrap">
                       <div className="connect_title-wrap">
                         <p className="text-color-white60">TREVA ilə əlaqədə qalın</p>
@@ -521,37 +494,18 @@ export function ContactPage({ locale }: ContactPageProps) {
                       <ContactForm />
                     </div>
 
-                    {/* Right — Social & Direct */}
                     <div className="connect_contact-wrap">
-
-                      {/* Social */}
                       <div className="connect_contact-block animate-up">
                         <div>TREVA ilə Əlaqədə Qalın</div>
                         <div className="connect_list-wrap">
-                          <ConnectLink
-                            href="https://www.linkedin.com/company/trevarealestate"
-                            label="Linkedin" external
-                          />
-                          <ConnectLink
-                            href="https://www.instagram.com/treva.realestate?igsh=cDY3OTh0b3JyOGZy"
-                            label="instagram" external
-                          />
-                          <ConnectLink
-                            href="https://www.facebook.com/people/Trevarealestate/61576234409540/"
-                            label="facebook" external
-                          />
-                          <ConnectLink
-                            href="https://youtube.com/@trevarealestate?si=zN8KQjIc7UJA7mlY"
-                            label="Youtube" external
-                          />
-                          <ConnectLink
-                            href="https://www.tiktok.com/@treva.realestate?_t=ZS-8y85uLU6heS&_r=1"
-                            label="Tiktok" external
-                          />
+                          <ConnectLink href="https://www.linkedin.com/company/trevarealestate" label="Linkedin" external />
+                          <ConnectLink href="https://www.instagram.com/treva.realestate?igsh=cDY3OTh0b3JyOGZy" label="instagram" external />
+                          <ConnectLink href="https://www.facebook.com/people/Trevarealestate/61576234409540/" label="facebook" external />
+                          <ConnectLink href="https://youtube.com/@trevarealestate?si=zN8KQjIc7UJA7mlY" label="Youtube" external />
+                          <ConnectLink href="https://www.tiktok.com/@treva.realestate?_t=ZS-8y85uLU6heS&_r=1" label="Tiktok" external />
                         </div>
                       </div>
 
-                      {/* Direct contact */}
                       <div className="connect_contact-block animate-up">
                         <div>Birbaşa əlaqə saxlayın</div>
                         <div className="connect_list-wrap">
@@ -560,16 +514,13 @@ export function ContactPage({ locale }: ContactPageProps) {
                           <ConnectLink href="mailto:info@treva.realestate" label="info@treva.realestate" isLarge isSmallCaps external />
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* ══════════════════════════════════════════════
-                SECTION 3: CTA
-            ══════════════════════════════════════════════ */}
+            {/* SECTION 3: CTA */}
             <section className="section_cta bg-color-white">
               <div className="global-padding padding-section-xlarge">
                 <div className="container-large">
@@ -607,7 +558,6 @@ export function ContactPage({ locale }: ContactPageProps) {
                 </div>
               </div>
 
-              {/* Background images */}
               <div className="cta_bg-wrap" aria-hidden="true">
                 <div className="cta_bg-top is-consultation">
                   <div className="cta_img-wrap is-top-left is-az">
