@@ -1,0 +1,177 @@
+/* ==========================================================================
+   PULSE SECTION SAFE LAYOUT FIX
+   Problem: bloglar yuxarı çıxanda başqa section-ların içinə girirdi.
+   Həll: bütün Pulse news layout normal document flow-da qalır.
+   ========================================================================== */
+
+/* Section özü normal axında qalsın və footer/başqa section-larla qarışmasın */
+.section_news {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  clear: both;
+  overflow: visible;
+  padding-top: 3rem;
+  padding-bottom: 7rem;
+}
+
+/* Container-lər normal blok kimi davransın */
+.section_news .global-padding,
+.section_news .container-large,
+.section_news .news_component {
+  position: relative;
+  width: 100%;
+  max-width: none;
+}
+
+/* ƏSAS LAYOUT:
+   1-ci sıra: Həftənin seçimi + Filter
+   2-ci sıra: Bloglar tam en
+*/
+.section_news .news_wrap {
+  position: relative;
+  width: 100%;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  grid-template-areas:
+    "week filters"
+    "articles articles";
+  align-items: start;
+  gap: 2rem;
+  overflow: visible;
+}
+
+/* Webflow-un köhnə grid node placement-lərini sıfırlayır */
+.section_news .news_week-col,
+.section_news .news_middle-wrap,
+.section_news .news_filters-col,
+.section_news #all-articles {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+/* Həftənin seçimi yuxarı solda */
+.section_news .news_week-col {
+  grid-area: week !important;
+  display: block !important;
+  align-self: start;
+}
+
+/* Filter yuxarı sağda */
+.section_news .news_filters-col {
+  grid-area: filters !important;
+  display: block !important;
+  align-self: start;
+}
+
+/* Bloglar aşağıda bütün eni tutur */
+.section_news #all-articles,
+.section_news .news_middle-wrap {
+  grid-area: articles !important;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+  align-self: start;
+}
+
+/* Blog list tam enə yayılsın */
+.section_news .news_middle-list {
+  position: relative !important;
+  width: 100%;
+  max-width: none;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 2rem;
+}
+
+/* Kartlar normal flow-da qalsın */
+.section_news .news_middle-list .news_header-item {
+  position: relative !important;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
+  transform: none;
+}
+
+/* Link kartın tam enini tutsun */
+.section_news .news_middle-list .news_middle-link {
+  width: 100%;
+  max-width: none;
+}
+
+/* Şəkillər mövcud dizaynla tam eni tutsun */
+.section_news .news_middle-list .news_middle-img-wrap,
+.section_news .news_middle-list .news_middle-img-holder,
+.section_news .news_middle-list .fullwidth-img {
+  width: 100%;
+}
+
+/* Yuxarı bloklar normal hündürlük yaratsın */
+.section_news .news_week-list,
+.section_news .news_week-link,
+.section_news .news_filters-holder,
+.section_news .news_filters-form {
+  position: relative;
+  width: 100%;
+  max-width: none;
+}
+
+/* Footer və növbəti section-lar blogların altından başlasın */
+.section_news + * {
+  position: relative;
+  z-index: 0;
+  clear: both;
+}
+
+/* Tablet */
+@media screen and (max-width: 991px) {
+  .section_news {
+    padding-top: 2.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .section_news .news_wrap {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "week"
+      "filters"
+      "articles";
+    gap: 1.75rem;
+  }
+
+  .section_news .news_middle-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* Mobile */
+@media screen and (max-width: 767px) {
+  .section_news {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+  }
+
+  .section_news .news_wrap {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "week"
+      "filters"
+      "articles";
+    gap: 1.5rem;
+  }
+
+  .section_news .news_middle-list {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
