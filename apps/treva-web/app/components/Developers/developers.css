@@ -61,8 +61,11 @@
 
 @media screen and (min-width: 991px) {
   .features_toggle:hover .features_toggle-text {
-    transform: translateY(-108%);
+    transform: translateY(-115%); /* Increased slightly to ensure full clearance */
     color: rgba(255, 255, 255, 0.6);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
   }
 }
 
@@ -210,6 +213,8 @@ input:focus::placeholder, textarea:focus::placeholder {
 .cs_scroll-wrap:hover .button-text {
   transform: translateY(-1.3rem);
   transition: transform 0.3s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .cs_scroll-wrap:hover .button-icon {
@@ -220,6 +225,8 @@ input:focus::placeholder, textarea:focus::placeholder {
 .button:hover .button-text {
   transform: translateY(-100%);
   transition: transform 0.3s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .cs_input-field::placeholder {
@@ -235,9 +242,10 @@ input:focus::placeholder, textarea:focus::placeholder {
 .ease0-6 { transition-property: all; transition-duration: 600ms; transition-timing-function: ease; }
 
 .footer_link-wrap:hover .footer_link-text,
-.nav_link:hover .nav_link-text,
 .projects_clear-link:hover .projects_clear-text {
   transform: translateY(-100%);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .bg-color-white { background-color: white; }
@@ -245,11 +253,19 @@ input:focus::placeholder, textarea:focus::placeholder {
 .line-mask {
   overflow: hidden;
   display: block;
+  /* Prevent clipping of characters with diacritics like Ş, İ, Ö */
+  padding-top: 0.15em;
+  margin-top: -0.15em;
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
 }
 
 .line-wrap {
   display: inline-block;
   will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .nav_lang-toggle.w--open .nav_lang-icon {
@@ -263,4 +279,15 @@ input:focus::placeholder, textarea:focus::placeholder {
 
 html.disable-smooth-scroll {
   scroll-behavior: auto !important;
+}
+
+/* Page-specific hover translation adjustment to match global line-height (1.4) */
+@media screen and (min-width: 991px) {
+  .features_toggle:hover .features_toggle-text {
+    transform: translateY(-1.6em); /* Move exactly one line up */
+    color: rgba(255, 255, 255, 0.6);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
 }

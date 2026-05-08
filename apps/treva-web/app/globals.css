@@ -8,3 +8,63 @@
 @import "./components/Container/container.css";
 @import "./components/Contact/contact.css";
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
+
+/* GLOBAL FIX: Prevent clipping of Azerbaijani/Turkish characters (Ş, İ, Ö, Ç, Ğ, Ü, Q)
+   Separate rules for Buttons, Toggles, and Lines to avoid interdependencies. */
+
+/* 1. BUTTONS & LINKS */
+.button-text-wrap,
+.button-text,
+.footer_link-text,
+.projects_clear-text {
+    padding-top: 0.1em !important;
+    padding-bottom: 0.1em !important;
+    margin-top: -0.1em !important;
+    margin-bottom: -0.1em !important;
+    line-height: 1.35 !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* 2. ACCORDION / FEATURES TOGGLES */
+.features_toggle-title {
+    overflow: hidden !important;
+    display: block !important;
+    height: 1.6em !important; /* Fixed height to match line-height and show only one line */
+    position: relative !important;
+    /* Vertical bleed trick to prevent clipping within the overflow:hidden container */
+    padding-top: 0.3em !important;
+    padding-bottom: 0.3em !important;
+    margin-top: -0.3em !important;
+    margin-bottom: -0.3em !important;
+}
+
+.features_toggle-text {
+    line-height: 1.6em !important;
+    height: 1.6em !important;
+    display: block !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+/* 3. GSAP SPLITTEXT LINES (Headings, Paragraphs) */
+.line-mask {
+    overflow: hidden !important;
+    display: block;
+    padding-top: 0.15em !important;
+    padding-bottom: 0.15em !important;
+    margin-top: -0.15em !important;
+    margin-bottom: -0.15em !important;
+}
+
+.line-wrap {
+    display: inline-block;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
