@@ -30,6 +30,7 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
   const contactHref = `/${locale}/contact`;
   const pulseHref = `/${locale}/pulse`;
   const brokersHref = `/${locale}/brokers`;
+  const developersHref = `/${locale}/developers`;
 
   return (
     <footer className="footer">
@@ -56,7 +57,7 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
                           <div className="footer_link-text">Layihələr</div>
                         </div>
                       </Link>
-                      <Link href="/developers" className="footer_link-wrap w-inline-block">
+                      <Link href={developersHref} className="footer_link-wrap w-inline-block">
                         <div className="footer_link-content">
                           <div className="footer_link-text">Developerlər</div>
                           <div className="footer_link-text">Developerlər</div>
