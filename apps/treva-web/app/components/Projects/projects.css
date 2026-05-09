@@ -1,0 +1,261 @@
+/* PROJECTS CARDS HOVER EFFECTS */
+.projects_item .projects_img-wrap {
+  position: relative;
+  overflow: hidden;
+  display: block;
+}
+
+.projects_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(17, 18, 18, 0.45) !important; /* Force darken color */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 20 !important; /* Ensure it's above everything */
+}
+
+.section_projects {
+  padding-bottom: 0rem !important; /* Adjust to match section_header-services or established pattern */
+}
+
+.projects_wrap {
+  margin-top: 0rem !important; /* Remove extra margin from Webflow source */
+}
+
+.projects_item:hover .projects_overlay {
+  opacity: 1 !important;
+}
+
+/* CONTAINER */
+.projects_item {
+  position: relative;
+  overflow: hidden;
+}
+
+/* IMAGE BUTTON (center icon) */
+.projects_btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4rem;
+  height: 4rem;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* OVAL RING EFFECT */
+.projects_item::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 140px;
+  height: 140px;
+
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* HOVER EFFECT */
+.projects_item:hover .projects_btn {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.projects_item:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+
+.projects_item:hover  {
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+.projects_item:hover .projects_img-wrap {
+  transform: scale(0.98);
+  transition: transform 0.4s ease;
+}
+
+.projects_item:hover .projects_img-holder {
+  transform: scale(1.06);
+  transition: transform 0.4s ease;
+}
+
+.projects_toggle.w--open .icon-regular {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+/* GLOBAL STYLES FROM ORIGINAL */
+html {
+  font-size: calc(100vw / 1440 * 14);
+}
+
+@media (max-width: 479px) and (orientation: portrait) {
+  html {
+    font-size: calc(100vw / 420 * 14);
+  }
+}
+
+@media screen and (max-width: 991px) and (min-width: 480px) {
+  html {
+    font-size: clamp(12.5px, calc(100vw / 500 * 14), 14px);
+  }
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Heading Image Removal */
+.heading-span::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Finsweet & Webflow UI specific fixes */
+.w-dropdown-list.w--open {
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  transform: translateY(0px) !important;
+}
+
+.projects_dropdown-nav {
+  display: none;
+}
+
+.projects_dropdown-nav.w--open {
+  display: block;
+}
+
+/* Animations Masks */
+.line-mask {
+  overflow: hidden;
+  display: block;
+}
+
+.line-wrap {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.img-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.img-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 2;
+  transform: translateY(0%);
+}
+
+/* Typography Hover States */
+.footer_link-wrap:hover .footer_link-text,
+.nav_link:hover .nav_link-text,
+.projects_clear-link:hover .projects_clear-text {
+  transform: translateY(-100%);
+}
+
+.projects_clear-text {
+  transition: transform 0.3s ease;
+}
+
+.projects_clear-link .projects_clear-content {
+  overflow: hidden;
+  height: 1.2em;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Radio Input Styling to match Webflow custom radio */
+.projects_checkbox.w--redirected-checked {
+  background-color: #4d65ff;
+  border-color: #4d65ff;
+}
+
+.projects_checkbox.w--redirected-checked:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.projects_checkbox {
+  position: relative;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.projects_checkbox-field {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.projects_checkbox-field:hover {
+  background-color: #f5f5f5;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
