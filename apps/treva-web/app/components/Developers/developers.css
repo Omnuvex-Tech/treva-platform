@@ -143,7 +143,7 @@ body {
 
 *[tabindex]:focus-visible,
 input[type="file"]:focus-visible {
-  outline: 0.125rem solid #4d65ff;
+  outline: 0.125rem solid transparent;
   outline-offset: 0.125rem;
 }
 
