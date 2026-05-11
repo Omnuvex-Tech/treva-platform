@@ -1,19 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Script from 'next/script'
 import Navbar from '@/app/components/Navbar/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import './projects.css'
-
-declare global {
-  interface Window {
-    gsap: any
-    ScrollTrigger: any
-    ScrollSmoother: any
-    SplitText: any
-  }
-}
 
 interface ProjectsPageProps {
   locale: string
@@ -39,26 +29,35 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
   }, [])
 
   useEffect(() => {
-    const initGSAP = () => {
-      if (typeof window === 'undefined' || !window.gsap || !window.ScrollTrigger) return
-      
-      const { gsap, ScrollTrigger, ScrollSmoother, SplitText } = window
+    let isCancelled = false
+    let cleanupGSAP: (() => void) | null = null
+
+    const initGSAP = async () => {
+      if (typeof window === 'undefined' || gsapReady.current) return
+
+      const [{ gsap }, { ScrollTrigger }, { ScrollSmoother }, { SplitText }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+        import('gsap/ScrollSmoother'),
+        import('gsap/SplitText'),
+      ])
+
+      if (isCancelled) return
+
       gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText)
+      const splitInstances: any[] = []
+      const smoother =
+        window.innerWidth > 768
+          ? ScrollSmoother.create({
+              wrapper: '#smooth-wrapper',
+              content: '#smooth-content',
+              smooth: 1.6,
+              effects: true,
+            })
+          : null
 
-      // 1. ScrollSmoother
-      if (window.innerWidth > 768) {
-        ScrollSmoother.create({
-          wrapper: '#smooth-wrapper',
-          content: '#smooth-content',
-          smooth: 1.6,
-          effects: true,
-        })
-      }
-
-      // 2. Body Fade In
       gsap.to('body', { autoAlpha: 1, duration: 0.3 })
 
-      // 3. Basic Animations (animate-up, etc.)
       const animationTypes = [
         { cls: ".animate-up", y: 40, x: 0 },
         { cls: ".animate-down", y: -40, x: 0 },
@@ -88,7 +87,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
         })
       })
 
-      // 4. Line Reveal
       if (window.innerWidth > 767) {
         document.querySelectorAll("h1, h2, h3, p").forEach((el: any) => {
           if (el.classList.contains("no-animate") || el.closest(".w-richtext")) return
@@ -97,8 +95,9 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
             type: "lines",
             lineClass: "line-wrap"
           })
+          splitInstances.push(split)
 
-          split.lines.forEach((line: HTMLElement) => {
+          split.lines.forEach((line: Element) => {
             const wrapper = document.createElement("div")
             wrapper.classList.add("line-mask")
             line.parentNode?.insertBefore(wrapper, line)
@@ -121,11 +120,40 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
       }
 
       gsapReady.current = true
+      cleanupGSAP = () => {
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+        smoother?.kill()
+        splitInstances.forEach((split) => split.revert())
+        gsapReady.current = false
+      }
     }
 
-    const timer = setTimeout(initGSAP, 500)
-    return () => clearTimeout(timer)
+    const timer = window.setTimeout(() => {
+      void initGSAP()
+    }, 500)
+
+    return () => {
+      isCancelled = true
+      window.clearTimeout(timer)
+      cleanupGSAP?.()
+    }
   }, [locale])
+
+  useEffect(() => {
+    const scriptId = 'finsweet-attributes-script'
+
+    if (document.getElementById(scriptId)) {
+      return
+    }
+
+    const script = document.createElement('script')
+    script.id = scriptId
+    script.async = true
+    script.type = 'module'
+    script.src = 'https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js'
+    script.setAttribute('fs-list', 'true')
+    document.body.appendChild(script)
+  }, [])
 
   const toggleDropdown = (name: string) => {
     setOpenDropdown(openDropdown === name ? null : name)
@@ -145,19 +173,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
   return (
     <>
-      <Script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" strategy="beforeInteractive" />
-      <Script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" strategy="beforeInteractive" />
-      <Script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollSmoother.min.js" strategy="beforeInteractive" />
-      <Script src="https://cdn.prod.website-files.com/gsap/3.15.0/SplitText.min.js" strategy="lazyOnload" />
-      
-      <Script 
-        async 
-        type="module" 
-        src="https://cdn.jsdelivr.net/npm/@finsweet/attributes@2/attributes.js" 
-        fs-list="true"
-        strategy="afterInteractive"
-      />
-
       <div id="smooth-wrapper" className="smooth-wrapper" ref={smoothWrapRef}>
         <div id="smooth-content" className="page-wrapper">
           <Navbar locale={locale} />
@@ -427,8 +442,3 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
     </>
   )
 }
-
-
-
-
-
