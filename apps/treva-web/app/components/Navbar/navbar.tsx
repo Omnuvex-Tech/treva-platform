@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Container from "@/app/components/Container/container";
+import "./navbar.css";
 
 const TrevaLogoSvg = ({ light = false }: { light?: boolean }) => (
     <svg
@@ -248,8 +249,8 @@ export default function Navbar({ locale }: { locale: string }) {
         <>
             <header className="header">
                 <div className="nav">
-                    <Container>
-                        <div className="nav_container">
+                        <div className="container">
+                            <div className="nav_container">
                             <Link href={homeHref} className="nav_logo" aria-label={secondary.homeLabel}>
                                 <TrevaLogoSvg />
                             </Link>
@@ -294,7 +295,7 @@ export default function Navbar({ locale }: { locale: string }) {
                                 </button>
                             </div>
                         </div>
-                    </Container>
+                    </div>
                 </div>
             </header>
 

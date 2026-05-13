@@ -4,9 +4,8 @@
 @import "./styles/treva-webflow-site.css";
 @import "./styles/treva-custom.css";
 @import "./styles/home-original.css";
-@import "./components/Navbar/navbar.css";
-@import "./components/Container/container.css";
 @import "./components/Contact/contact.css";
+@import "./components/Container/container.css";
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
 /* GLOBAL FIX: Prevent clipping of Azerbaijani/Turkish characters (Ş, İ, Ö, Ç, Ğ, Ü, Q)
@@ -16,7 +15,8 @@
 .button-text-wrap,
 .button-text,
 .footer_link-text,
-.projects_clear-text {
+.projects_clear-text,
+.news_btn {
     padding-top: 0.1em !important;
     padding-bottom: 0.1em !important;
     margin-top: -0.1em !important;

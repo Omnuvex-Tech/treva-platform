@@ -175,3 +175,200 @@
     gap: 1.25rem;
   }
 }
+
+/* ==========================================================================
+   ARTICLE CARD HOVER EFFECTS
+   ========================================================================== */
+
+/* Pulse Page & Continue Reading Section */
+.news_middle-img-wrap, 
+.news_leftcol-img-wrap, 
+.news_week-img-wrap,
+.news-header_middle-img-wrap,
+.f-articles_img-wrap {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.news_middle-img-wrap:hover .news_middle-img-holder,
+.news_leftcol-img-wrap:hover .news_leftcol-img-holder,
+.news_week-img-wrap:hover img,
+.news-header_middle-img-wrap:hover .news_middle-img-holder,
+.f-articles_img-wrap:hover img {
+  transform: scale(1.05);
+  transition: transform 0.4s ease;
+}
+
+.news_middle-img-wrap .news_middle-img-holder,
+.news_leftcol-img-wrap .news_leftcol-img-holder,
+.news_week-img-wrap img,
+.news-header_middle-img-wrap .news_middle-img-holder,
+.f-articles_img-wrap img {
+  transition: transform 0.4s ease;
+}
+
+/* Overlay and Button */
+.projects_overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  background-color: rgba(23, 25, 28, 0.4);
+  transition: opacity 0.3s ease;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.news_middle-img-wrap:hover .projects_overlay,
+.news_leftcol-img-wrap:hover .projects_overlay,
+.news_week-img-wrap:hover .projects_overlay,
+.news-header_middle-img-wrap:hover .projects_overlay,
+.f-articles_img-wrap:hover .projects_overlay {
+  opacity: 1;
+}
+
+.news_btn {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: white !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  white-space: nowrap;
+}
+
+.news_middle-img-wrap:hover .news_btn,
+.news_leftcol-img-wrap:hover .news_btn,
+.news_week-img-wrap:hover .news_btn,
+.news-header_middle-img-wrap:hover .news_btn,
+.f-articles_img-wrap:hover .news_btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.news_btn:hover {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Continue Reading Section (section_f-articles) */
+.section_f-articles {
+  background-color: #f7f7f7;
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+.f-articles_intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4rem;
+}
+
+.f-articles_intro h2 {
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  max-width: 40rem;
+  line-height: 1.1;
+}
+
+.f-articles_intro .text-size-small {
+  text-transform: uppercase;
+  color: rgba(23, 25, 28, 0.6);
+}
+
+.f-articles_list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #e4e4e4;
+}
+
+.f-articles_item {
+  border-right: 1px solid #e4e4e4;
+  border-bottom: 1px solid #e4e4e4;
+  padding: 1.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.f-articles_item:nth-child(3n) {
+  border-right: none;
+}
+
+.f-articles_item:hover {
+  background-color: #efefef;
+}
+
+.f-articles_link {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.f-articles_img-wrap {
+  flex: none;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 0.5rem;
+}
+
+.f-articles_content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.f-articles_title {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 400;
+  color: #17191c;
+}
+
+.author_mini-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.author_mini-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 991px) {
+  .f-articles_list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .f-articles_item:nth-child(2n) {
+    border-right: none;
+  }
+  .f-articles_item:nth-child(3n) {
+    border-right: 1px solid #e4e4e4;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .f-articles_list {
+    grid-template-columns: 1fr;
+  }
+  .f-articles_item {
+    border-right: none;
+  }
+  .f-articles_link {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .f-articles_img-wrap {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+}

@@ -43,7 +43,7 @@ export default function RootLayout({
                     referrerPolicy="no-referrer"
                 />
             </head>
-            <body className={inter.variable}>
+            <body className={inter.variable} suppressHydrationWarning>
                 <QueryProvider>
                     <NotifyProvider>
                         <main>{children}</main>

@@ -1,4 +1,5 @@
 import type { ElementType, ReactNode } from "react";
+import "./container.css";
 
 type ContainerProps<T extends ElementType = "div"> = {
     as?: T;

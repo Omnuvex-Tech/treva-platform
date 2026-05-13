@@ -9,9 +9,15 @@
     background-color: transparent;
 }
 
+.nav_container-outer {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 .nav_container {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     width: 100%;
     min-height: 84px;
@@ -634,3 +640,4 @@
         line-height: 26px;
     }
 }
+

@@ -1,5 +1,6 @@
 import Navbar from "@/app/components/Navbar/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
+import Link from "next/link";
 import "./pulse.css";
 
 type PulseProps = {
@@ -19,7 +20,7 @@ type Article = {
 const articles: Article[] = [
   {
     title: "Panorama By Elie Saab-da 30/70 Kampaniyası: Aylıq Ödənişsiz Eksklüziv İnvestisiya",
-    href: "pulse/panorama-by-elie-saab-da-30-70-kampaniyasi.html",
+    href: "panorama-by-elie-saab-da-30-70-kampaniyasi",
     category: "Kampaniya",
     date: "12.05.2026",
     image:
@@ -27,7 +28,7 @@ const articles: Article[] = [
   },
   {
     title: "Reportage Heights-də 30/70 Kampaniyası: Aylıq Ödənişsiz Prestijli Həyat",
-    href: "pulse/reportage-heights-de-30-70-kampaniyasi.html",
+    href: "reportage-heights-de-30-70-kampaniyasi",
     category: "Kampaniya",
     date: "12.05.2026",
     image:
@@ -35,7 +36,7 @@ const articles: Article[] = [
   },
   {
     title: "Mənzil almaq üçün ilkin ödəniş nə qədər olmalıdır?",
-    href: "pulse/menzil-almaq-ucun-ilkin-odenis-ne-qeder-olmalidir.html",
+    href: "menzil-almaq-ucun-ilkin-odenis-ne-qeder-olmalidir",
     category: "Bloq",
     date: "08.05.2026",
     author: "Emil Qurbanov",
@@ -46,7 +47,7 @@ const articles: Article[] = [
   },
   {
     title: "Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?",
-    href: "pulse/bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir.html",
+    href: "bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir",
     category: "Bloq",
     date: "17.04.2026",
     author: "Cavid Axundov",
@@ -277,7 +278,7 @@ function NewsCard({ article, variant = "middle" }: { article: Article; variant?:
 
   return (
     <div role="listitem" className={`news_header-item w-dyn-item ${isWeek ? "is-week-card" : ""}`}>
-      <a href={article.href} className={linkClass}>
+      <Link href={`/${(article as any).locale || "az"}/pulse/${article.href}`} className={linkClass}>
         <div className={imgWrapClass}>
           <div className={variant === "left" ? "news_leftcol-img-holder" : "news_middle-img-holder"}>
             <img src={article.image} loading="lazy" alt={article.title} className="fullwidth-img" />
@@ -298,7 +299,7 @@ function NewsCard({ article, variant = "middle" }: { article: Article; variant?:
 
           {variant !== "left" && <AuthorBlock author={article.author} authorImage={article.authorImage} />}
         </div>
-      </a>
+      </Link>
     </div>
   );
 }
