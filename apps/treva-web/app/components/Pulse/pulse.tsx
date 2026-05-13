@@ -18,6 +18,33 @@ type Article = {
 
 const articles: Article[] = [
   {
+    title: "Panorama By Elie Saab-da 30/70 Kampaniyası: Aylıq Ödənişsiz Eksklüziv İnvestisiya",
+    href: "pulse/panorama-by-elie-saab-da-30-70-kampaniyasi.html",
+    category: "Kampaniya",
+    date: "12.05.2026",
+    image:
+      "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6a03349150df278a38351b4a_panorama%20aze.webp",
+  },
+  {
+    title: "Reportage Heights-də 30/70 Kampaniyası: Aylıq Ödənişsiz Prestijli Həyat",
+    href: "pulse/reportage-heights-de-30-70-kampaniyasi.html",
+    category: "Kampaniya",
+    date: "12.05.2026",
+    image:
+      "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6a03347538e0bfa6ec214d61_reportage%20aze.webp",
+  },
+  {
+    title: "Mənzil almaq üçün ilkin ödəniş nə qədər olmalıdır?",
+    href: "pulse/menzil-almaq-ucun-ilkin-odenis-ne-qeder-olmalidir.html",
+    category: "Bloq",
+    date: "08.05.2026",
+    author: "Emil Qurbanov",
+    image:
+      "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69fd94d16c2f782bfe2b200b_emil%20blog%20cover.webp",
+    authorImage:
+      "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69fdbb3400787a93557e84ca_emil%20qurbanov.webp",
+  },
+  {
     title: "Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?",
     href: "pulse/bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir.html",
     category: "Bloq",
