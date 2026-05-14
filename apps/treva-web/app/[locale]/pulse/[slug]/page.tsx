@@ -9,12 +9,8 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const { locale, slug } = await params;
+  const { locale } = await params;
 
-  // In a real app, you might fetch data based on the slug.
-  // For this migration, we're serving the specific article we've built.
-  // We can add a check if needed, but since it's a dynamic route, it will catch this specific slug.
-  
   return <PulseArticleDetail locale={locale} />;
 }
 
