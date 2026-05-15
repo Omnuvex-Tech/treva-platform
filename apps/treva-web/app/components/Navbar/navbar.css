@@ -7,6 +7,7 @@
   position: relative;
   z-index: 1000;
   background-color: transparent;
+  font-family: Helveticanowdisplay, Arial, sans-serif;
 }
 
 .nav_container {
@@ -16,30 +17,32 @@
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 14px 40px;
+  padding: 14.93px 40px;
+  height: 60.61px;
   border-bottom: 1px solid var(--_color---grey-300);
 }
 
 @media (max-width: 991px) {
   .nav_container {
-    padding: 24px 16px;
+    padding: 15.75px 16px 14px;
     display: flex;
     justify-content: space-between;
-    min-height: 64px;
+    min-height: 58.95px;
+    height: auto;
   }
 }
 
 .nav_logo {
   display: inline-flex;
   align-items: center;
-  width: 112px;
+  width: 100px;
   height: 25px;
   text-decoration: none;
 }
 
 .nav_logo svg {
   display: block;
-  width: 112px;
+  width: 100px;
   height: 25px;
 }
 
@@ -52,13 +55,13 @@
 .nav .nav_link {
   display: inline-flex !important;
   align-items: center !important;
-  height: 18.2px !important;
-  padding: 0 21px !important;
+  height: 19.6px !important;
+  padding: 0 22.4px !important;
   color: var(--_color---blue-100) !important;
   text-decoration: none !important;
-  font-size: 14px !important;
-  line-height: 1.3 !important;
-  letter-spacing: 0.28px !important;
+  font-size: 13.07px !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.3px !important;
   text-transform: uppercase !important;
 }
 
@@ -103,14 +106,14 @@
 .nav_lang-toggle {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 5.6px !important;
+  gap: 5.97px !important;
   padding: 0 !important;
   background: transparent !important;
   color: var(--_color---blue-100) !important;
   cursor: pointer !important;
-  font-size: 14px !important;
-  line-height: 18px !important;
-  letter-spacing: 0.28px !important;
+  font-size: 13.07px !important;
+  line-height: 19.6px !important;
+  letter-spacing: 0.3px !important;
   text-transform: uppercase !important;
   border: none !important;
 }
@@ -171,10 +174,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5.25px;
+  gap: 5.6px;
   min-width: 98px;
-  min-height: 34px;
-  padding: 4.2px 12.25px;
+  min-height: 31.73px;
+  padding: 4.16px 12.14px;
   border-radius: 80px;
   background-color: var(--_color---blue-300);
   color: #ffffff;
@@ -182,6 +185,7 @@
   overflow: hidden;
   transition: all 0.3s;
   border: 1px solid var(--_color---blue-300);
+  font-size: 13.07px;
 }
 
 .nav .button:hover {
@@ -224,11 +228,14 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  background: transparent;
+  width: 34px;
+  height: 28.4px;
+  padding: 4.2px 7px;
+  background: #f7f8f9;
+  border: none;
+  border-radius: 80px;
   cursor: pointer;
+  z-index: 1001;
 }
 
 .red-dot {
@@ -281,13 +288,16 @@
   position: fixed;
   inset: 0;
   z-index: 99999999;
+  height: 100dvh;
   visibility: hidden;
   pointer-events: none;
+  transition: visibility 0s linear 350ms;
 }
 
 .nav_burger-menu.is-open {
   visibility: visible;
   pointer-events: auto;
+  transition-delay: 0s;
 }
 
 .nav_burger-overlay {
@@ -311,11 +321,12 @@
   width: 390px;
   max-width: 82vw;
   height: 100%;
+  min-height: 100dvh;
   background: var(--_color---blue-100);
   transform: translateX(-100%);
-  transition: transform 350ms ease;
-  border-top-right-radius: 18px;
-  border-bottom-right-radius: 18px;
+  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-top-right-radius: 21px;
+  border-bottom-right-radius: 0;
   overflow: hidden;
 }
 
@@ -373,20 +384,22 @@
 .nav_burger-body {
   display: flex;
   flex-direction: column;
-  gap: 26px;
 }
 
 .nav_burger-link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  width: fit-content;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10.5px 0;
+  min-height: 47.25px;
   color: #ffffff;
   text-decoration: none;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 20px;
-  letter-spacing: 0.32px;
+  font-size: 17.5px;
+  font-weight: 400;
+  line-height: 26.25px;
+  letter-spacing: 0.28px;
+  text-transform: uppercase;
 }
 
 .nav_burger-link .red-dot {
@@ -623,8 +636,8 @@
   }
 
   .nav_burger-link {
-    font-size: 15px;
-    line-height: 19px;
+    font-size: 17.5px;
+    line-height: 26.25px;
   }
 
   .nav_burger-login {
