@@ -33,7 +33,7 @@ export const HomeServices = () => {
                     words
                         .map(
                             (w: string) =>
-                                `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.05;padding-bottom:0.05em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
+                                `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.25;padding-top:0.18em;padding-bottom:0.18em;margin-top:-0.18em;margin-bottom:-0.18em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
                         )
                         .join(' ');
 

@@ -48,7 +48,7 @@ export const HomeHeroSection = () => {
                 const words = original.trim().split(/\s+/);
                 heading.innerHTML = words
                     .map((w: string) =>
-                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.4;padding-top:0.25em;padding-bottom:0.25em;margin-top:-0.25em;margin-bottom:-0.25em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
+                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.18;padding-top:0.14em;padding-bottom:0.14em;margin-top:-0.14em;margin-bottom:-0.14em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
                     )
                     .join(' ');
 
