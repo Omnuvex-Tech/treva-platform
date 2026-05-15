@@ -210,11 +210,7 @@ export const HomeServices = () => {
                                     <div className="note_wrap is-medium-wide">
                                         <div>Satış imkanlarınızı genişləndirmək istəyirsiniz?</div>
                                     </div>
-                                    <Link
-                                        data-wf--button--variant="blue"
-                                        href="brokers#broker-registration"
-                                        className="button w-inline-block"
-                                    >
+                                    <Link data-wf--button--variant="blue" href="brokers#broker-registration" className="button w-inline-block">
                                         <div className="button-text-wrap">
                                             <div className="button-text">Satış şəbəkəmizə qoşulun</div>
                                             <div className="button-text">Satış şəbəkəmizə qoşulun</div>
