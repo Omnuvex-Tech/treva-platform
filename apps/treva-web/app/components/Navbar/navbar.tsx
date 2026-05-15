@@ -97,7 +97,7 @@ const ChevronDown = () => (
   >
     <path
       d="M11.354 1.35403L6.35403 6.35403C6.30759 6.40052 6.25245 6.4374 6.19175 6.46256C6.13105 6.48772 6.06599 6.50067 6.00028 6.50067C5.93457 6.50067 5.86951 6.48772 5.80881 6.46256C5.74811 6.4374 5.69297 6.40052 5.64653 6.35403L0.646528 1.35403C0.552708 1.26021 0.5 1.13296 0.5 1.00028C0.5 0.867596 0.552708 0.740348 0.646528 0.646528C0.740348 0.552707 0.867596 0.5 1.00028 0.5C1.13296 0.5 1.26021 0.552707 1.35403 0.646528L6.00028 5.2934L10.6465 0.646528C10.693 0.600073 10.7481 0.563222 10.8088 0.538081C10.8695 0.51294 10.9346 0.5 11.0003 0.5C11.066 0.5 11.131 0.51294 11.1917 0.538081C11.2524 0.563222 11.3076 0.600073 11.354 0.646528C11.4005 0.692983 11.4373 0.748133 11.4625 0.80883C11.4876 0.869526 11.5006 0.934581 11.5006 1.00028C11.5006 1.06598 11.4876 1.13103 11.4625 1.19173C11.4373 1.25242 11.4005 1.30757 11.354 1.35403Z"
-      fill="#17191C"
+      fill="currentColor"
     />
   </svg>
 );
@@ -197,7 +197,7 @@ function LanguageDropdown({
   return (
     <div className="nav_lang-dropdown" ref={dropdownRef}>
       <button
-        className="nav_lang-toggle"
+        className={`nav_lang-toggle ${isOpen ? "w--open" : ""}`}
         onClick={() => setIsOpen((prev) => !prev)}
         type="button"
         aria-expanded={isOpen}
@@ -210,20 +210,22 @@ function LanguageDropdown({
       </button>
 
       {isOpen && (
-        <div className="nav_lang-list">
-          {languages.map((lang) => (
-            <button
-              key={lang}
-              className={`nav_lang-link ${currentLang === lang ? "is-active" : ""}`}
-              onClick={() => {
-                onLangChange(lang);
-                setIsOpen(false);
-              }}
-              type="button"
-            >
-              {lang}
-            </button>
-          ))}
+        <div className="nav_lang-list w--open">
+          {languages
+            .filter((lang) => lang !== currentLang)
+            .map((lang) => (
+              <button
+                key={lang}
+                className="nav_lang-link"
+                onClick={() => {
+                  onLangChange(lang);
+                  setIsOpen(false);
+                }}
+                type="button"
+              >
+                {lang}
+              </button>
+            ))}
         </div>
       )}
     </div>
@@ -288,15 +290,14 @@ export default function Navbar({ locale }: { locale: string }) {
     <>
       <header className="header">
         <div className="nav">
-          <div className="treva-nav_container">
-            <div className="nav_inner">
-              <Link
-                href={homeHref}
-                className="nav_logo"
-                aria-label={secondary.homeLabel}
-              >
-                <TrevaLogoSvg />
-              </Link>
+          <div className="nav_container">
+            <Link
+              href={homeHref}
+              className="nav_logo"
+              aria-label={secondary.homeLabel}
+            >
+              <TrevaLogoSvg />
+            </Link>
 
               <nav className="nav_menu" aria-label="Primary navigation">
                 {localizedLinks.map((link) => (
@@ -340,7 +341,6 @@ export default function Navbar({ locale }: { locale: string }) {
                   <MenuIcon />
                 </button>
               </div>
-            </div>
           </div>
         </div>
       </header>
