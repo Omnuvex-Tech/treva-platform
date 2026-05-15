@@ -67,13 +67,14 @@ export const HomeServices = () => {
             }
 
             // 3) CTA blok (qeyd + buton) — aşağıdan yuxarı
-            if (ctaWrapRef.current?.children) {
-                gsap.from(ctaWrapRef.current.children, {
+            if (ctaWrapRef.current) {
+                const note = ctaWrapRef.current.querySelector('.note_wrap');
+
+                if (note) gsap.from(note, {
                     y: 40,
                     opacity: 0,
                     duration: 0.9,
                     ease: 'power3.out',
-                    stagger: 0.15,
                     scrollTrigger: {
                         trigger: ctaWrapRef.current,
                         start: 'top 88%',

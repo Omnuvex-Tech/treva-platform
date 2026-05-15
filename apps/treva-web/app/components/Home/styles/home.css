@@ -1310,6 +1310,44 @@ body.gsap-hidden {
   line-height: 1.6rem !important;
 }
 
+.section_services .services_cta-wrap .button .button-text-wrap {
+  position: relative;
+  height: 22px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 22px !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  transform-style: flat !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.section_services .services_cta-wrap .button .button-text {
+  position: relative;
+  top: 0;
+  flex: 0 0 22px;
+  height: 22px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 22px !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  transform-style: flat !important;
+  transform: none !important;
+  transition: top 0.3s ease;
+  will-change: auto !important;
+}
+
+.section_services .services_cta-wrap .button:hover .button-text {
+  top: -22px;
+  transform: none !important;
+}
+
 /* Cascaded reveal for footer links */
 .footer_nav .footer_link-wrap {
   animation: treva-fade-up 0.6s ease both;
