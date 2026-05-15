@@ -449,7 +449,7 @@ textarea:focus::placeholder {
 }
 
 .cs_scroll-wrap:hover .button-text {
-  transform: translateY(-1.3rem);
+  transform: translateY(-100%);
   transition: transform 0.3s ease;
 }
 

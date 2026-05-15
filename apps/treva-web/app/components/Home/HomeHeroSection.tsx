@@ -48,7 +48,7 @@ export const HomeHeroSection = () => {
                 const words = original.trim().split(/\s+/);
                 heading.innerHTML = words
                     .map((w: string) =>
-                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.3;padding-top:0.1em;margin-top:-0.1em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
+                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.3;padding-top:0.15em;padding-bottom:0.15em;margin-top:-0.15em;margin-bottom:-0.15em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
                     )
                     .join(' ');
 
@@ -184,8 +184,8 @@ export const HomeHeroSection = () => {
                                 >
                                     <a href="#services" className="cs_scroll-wrap hide-landscape w-inline-block">
                                         <div className="button-text-wrap">
-                                            <div className="button-text">sürüşdürün</div>
-                                            <div className="button-text">sürüşdürün</div>
+                                            <div className="button-text">SÜRÜŞDÜRÜN</div>
+                                            <div className="button-text">SÜRÜŞDÜRÜN</div>
                                         </div>
                                         <div className="button-icon-wrap is-small">
                                             <div className="button-icon w-embed">
