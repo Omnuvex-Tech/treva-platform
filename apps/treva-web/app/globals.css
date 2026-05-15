@@ -17,18 +17,18 @@
 .footer_link-text,
 .projects_clear-text,
 .news_btn {
-    padding-top: 0.2em !important;
-    padding-bottom: 0.25em !important;
-    margin-top: -0.2em !important;
-    margin-bottom: -0.25em !important;
-    line-height: 1.4 !important;
+    padding-top: 0.1em !important;
+    padding-bottom: 0.1em !important;
+    margin-top: -0.1em !important;
+    margin-bottom: -0.1em !important;
+    line-height: 1.8 !important;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
 }
 
 .button-text-wrap {
-    height: 1.5em !important; /* Increase from 1.3rem to accommodate vertical glyphs */
+    height: 1.8em !important; /* Increased to accommodate vertical glyphs and descenders */
 }
 
 /* 2. ACCORDION / FEATURES TOGGLES */

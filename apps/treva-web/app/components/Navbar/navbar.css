@@ -67,8 +67,8 @@
 
 .nav .nav_link-mask {
   display: block !important;
-  height: 22px !important;
-  max-height: 22px !important;
+  height: 26px !important;
+  max-height: 26px !important;
   overflow: hidden !important;
   position: relative !important;
 }
@@ -81,13 +81,13 @@
 }
 
 .nav .nav_link:hover .nav_link-content {
-  transform: translateY(-22px) !important;
+  transform: translateY(-26px) !important;
 }
 
 .nav .nav_link-text {
   display: block !important;
-  height: 22px !important;
-  line-height: 22px !important;
+  height: 26px !important;
+  line-height: 26px !important;
   white-space: nowrap !important;
   transform: none !important; /* Disable individual text transform from legacy CSS */
 }
@@ -203,17 +203,17 @@
 .nav .button-text-wrap {
   display: flex !important;
   flex-direction: column !important;
-  height: 18px !important;
+  height: 22px !important;
   overflow: hidden !important;
   position: relative !important;
 }
 
 .nav .button-text {
   display: block !important;
-  height: 18px !important;
+  height: 22px !important;
   font-size: 14px !important;
   font-weight: 400 !important;
-  line-height: 18px !important;
+  line-height: 22px !important;
   letter-spacing: 0.28px !important;
   transition: transform 0.25s !important;
   will-change: transform !important;
@@ -221,7 +221,7 @@
 }
 
 .nav .button:hover .button-text {
-  transform: translateY(-18px) !important;
+  transform: translateY(-22px) !important;
 }
 
 .nav_menu-btn {
@@ -598,19 +598,18 @@
   }
 
   .nav .button-text-wrap {
-    height: 12px;
+    height: 16px;
   }
 
   .nav .button-text {
-    height: 12px;
+    height: 16px;
     font-size: 11px;
-    line-height: 12px;
+    line-height: 16px;
     letter-spacing: 0.22px;
   }
 
-  .nav .button:hover .button-text:first-child,
-  .nav .button:hover .button-text:last-child {
-    transform: translateY(-12px);
+  .nav .button:hover .button-text {
+    transform: translateY(-16px) !important;
   }
 
   .nav_burger-side {
@@ -632,7 +631,7 @@
   }
 
   .nav_burger-body {
-    gap: 22px;
+    gap: 5px;
   }
 
   .nav_burger-link {

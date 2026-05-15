@@ -701,7 +701,7 @@ html.disable-smooth-scroll {
 
 .live_title {
   font-size: 1.5rem;
-  line-height: 1.3;
+  line-height: 1.5;
   margin-top: 0.75rem;
   font-weight: 500;
   display: -webkit-box;
@@ -1270,9 +1270,9 @@ body.gsap-hidden {
 .cs_scroll-wrap .button-text-wrap {
   display: inline-flex;
   flex-direction: column;
-  height: 1.3rem;
+  height: 1.6rem;
   overflow: hidden;
-  line-height: 1.3rem !important;
+  line-height: 1.6rem !important;
 }
 
 .cs_scroll-wrap .button-icon-wrap {
@@ -1283,9 +1283,9 @@ body.gsap-hidden {
 
 .cs_scroll-wrap .button-text {
   display: block;
-  flex: 0 0 1.3rem;
-  height: 1.3rem;
-  line-height: 1.3rem !important;
+  flex: 0 0 1.6rem;
+  height: 1.6rem;
+  line-height: 1.6rem !important;
 }
 
 /* Button text wrap default — needed for hover slide */
@@ -1295,9 +1295,9 @@ body.gsap-hidden {
 .section_logos .button .button-text-wrap {
   display: inline-flex;
   flex-direction: column;
-  height: 1.3rem;
+  height: 1.6rem;
   overflow: hidden;
-  line-height: 1.3rem !important;
+  line-height: 1.6rem !important;
 }
 
 .section_header .button .button-text,
@@ -1305,9 +1305,9 @@ body.gsap-hidden {
 .section_projects-prev .button .button-text,
 .section_logos .button .button-text {
   display: block;
-  flex: 0 0 1.3rem;
-  height: 1.3rem;
-  line-height: 1.3rem !important;
+  flex: 0 0 1.6rem;
+  height: 1.6rem;
+  line-height: 1.6rem !important;
 }
 
 /* Cascaded reveal for footer links */
