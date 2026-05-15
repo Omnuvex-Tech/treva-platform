@@ -48,7 +48,7 @@ export const HomeHeroSection = () => {
                 const words = original.trim().split(/\s+/);
                 heading.innerHTML = words
                     .map((w: string) =>
-                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.05;padding-bottom:0.05em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
+                        `<span class="word-mask" style="display:inline-block;overflow:hidden;vertical-align:bottom;line-height:1.3;padding-top:0.1em;margin-top:-0.1em;"><span class="word-inner" style="display:inline-block;will-change:transform;">${w}</span></span>`
                     )
                     .join(' ');
 
@@ -174,7 +174,7 @@ export const HomeHeroSection = () => {
                             <div className="header_content-wrap">
                                 <div className="max-width-48rem is-az">
                                     <h1 ref={headingRef} className="indented-heading-h1">
-                                        Daşınmaz Əmlak satışlarınızı bizimlə maksimumA çatdırın
+                                        DAŞINMAZ ƏMLAK SATIŞLARINIZI BİZİMLƏ MAKSİMUMA ÇATDIRIN
                                     </h1>
                                 </div>
                                 <div

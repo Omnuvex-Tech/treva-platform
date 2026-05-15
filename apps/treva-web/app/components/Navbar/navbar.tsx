@@ -117,11 +117,11 @@ const languageLabels = {
 
 const navDictionary = {
   az: [
-    { name: "Layihələr", href: "/projects", hasDot: false },
-    { name: "Developerlər", href: "/developers", hasDot: false },
-    { name: "Brokerlər", href: "/brokers", hasDot: false },
-    { name: "Pulse", href: "/pulse", hasDot: true },
-    { name: "Əlaqə", href: "/contact", hasDot: false },
+    { name: "LAYİHƏLƏR", href: "/projects", hasDot: false },
+    { name: "DEVELOPERLƏR", href: "/developers", hasDot: false },
+    { name: "BROKERLƏR", href: "/brokers", hasDot: false },
+    { name: "PULSE", href: "/pulse", hasDot: true },
+    { name: "ƏLAQƏ", href: "/contact", hasDot: false },
   ],
   en: [
     { name: "Projects", href: "/projects", hasDot: false },
