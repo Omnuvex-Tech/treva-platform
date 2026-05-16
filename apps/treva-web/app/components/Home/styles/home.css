@@ -1083,11 +1083,27 @@ body.gsap-hidden {
 }
 
 /* Logos / Testimonials section */
+.section_logos .logos_intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
 .section_logos .logos_intro > * {
   animation: treva-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .section_logos .logos_intro > *:nth-child(1) { animation-delay: 0.10s; }
 .section_logos .logos_intro > *:nth-child(2) { animation-delay: 0.20s; }
+
+@media screen and (max-width: 991px) {
+  .section_logos .logos_intro {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+}
 
 .section_logos .logos_wrap {
   animation: treva-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -1102,12 +1118,6 @@ body.gsap-hidden {
 .testimonials_card,
 .n-testimonials_card {
   transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.testimonials_card:hover,
-.n-testimonials_card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
 /* Offices section */
@@ -1299,7 +1309,6 @@ body.gsap-hidden {
 }
 
 .logos_cell:hover .logos_cell-decoration .icon-large svg {
-  transform: rotate(45deg);
   opacity: 0.9;
 }
 

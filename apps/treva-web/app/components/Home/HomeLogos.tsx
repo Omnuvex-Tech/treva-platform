@@ -1,8 +1,15 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import Link from "next/link";
 import "./styles/home.css";
+import { Swiper } from 'swiper';
+import { Navigation, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 import { ButtonText } from '@/app/components/ButtonText';
+
 // Reusable decorative SVG icon
 const DecorativeIcon = () => (
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,7 +21,58 @@ const DecorativeIcon = () => (
   </svg>
 );
 
+const testimonials = [
+  {
+    quote: "“TREVA ilə əməkdaşlıq etdiyimiz hər bir layihədə onlar operativ intizamı təmin edirlər. Strukturlaşdırılmış, daim yenilənən siyahılar və brokerlər üçün hazır alətlərlə Bakıdakı daşınmaz əmlak satış prosesi daha sürətli, daha şəffaf və idarəolunması asan olur.”",
+    author: "ETAGI azerbaijan"
+  },
+  {
+    quote: "“TREVA ilə aramızda formalaşan etimad hər bir layihədə daha da möhkəmlənir. Onlar qiymət strategiyasından tutmuş müştəri axınına qədər hər detala dəqiqliklə yanaşmışdırlar. Onların yaradıcı dəstəyi, layihələrin düzgün paketlənməsi və ardıcıl izləmələri bizə güclü marağı təsirli nəticələrə çevirməyə kömək etmişdir.”",
+    author: "TRIDENT Investment"
+  },
+  {
+    quote: "“TREVA-nı digərlərindən fərqləndirən iş prosesindəki aydınlıq və davamlılıqdır. Broker olaraq hər zaman məlumatlısınız: elanlar aktualdır, əlaqə çevikdir, və bütün alətlər satış prosesini asanlaşdırır.”",
+    author: "rnS estate"
+  },
+  {
+    quote: "“TREVA brokerlərə lazım olan hər şeyi təqdim edir: yüksək keyfiyyətli vizuallar və effektiv lead sistemi. Biz artıq sadəcə obyekt göstərmirik, onu düzgün təqdim edirik.”",
+    author: "bazis real estate"
+  },
+  {
+    quote: "“TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkanı yaradır.”",
+    author: "AUF Invest"
+  },
+  {
+    quote: "“TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.”",
+    author: "megapolis estate"
+  },
+  {
+    quote: "“TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.”",
+    author: "Sabah Investment Group"
+  }
+];
+
 export const HomeLogos = () => {
+  useEffect(() => {
+    const swiper = new Swiper('.swiper-testimonials', {
+      modules: [Navigation, Autoplay],
+      speed: 800,
+      loop: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: '.swiper-testimonials-next',
+        prevEl: '.swiper-testimonials-prev',
+      },
+    });
+
+    return () => {
+      swiper.destroy();
+    };
+  }, []);
+
   return (
     <section className="section_logos bg-color-blue100 parallax-reveal">
       <div className="global-padding padding-section-medium">
@@ -28,7 +86,7 @@ export const HomeLogos = () => {
                   Sahə üzrə etibarlı tərəfdaş şəbəkəsi tərəfindən dəstəklənir.
                 </h2>
               </div>
-              <div className="text-color-white60 first-child">(etibarlı tərəfdaşlar)</div>
+              <div className="text-color-white60 first-child">(ETİBARLI TƏRƏFDAŞLAR)</div>
             </div>
 
             {/* Logos Grid */}
@@ -206,28 +264,14 @@ export const HomeLogos = () => {
                 <div id="w-node-_38e37002-95f4-8d06-cfd1-4ad5658a810d-82ace242" className="testimonials_slider">
                   <div className="swiper swiper-testimonials">
                     <div className="swiper-wrapper swiper-wrapper-testimonials">
-                      {[
-                        "“TREVA ilə əməkdaşlıq etdiyimiz hər bir layihədə onlar operativ intizamı təmin edirlər. Strukturlaşdırılmış, daim yenilənən siyahılar və brokerlər üçün hazır alətlərlə Bakıdakı daşınmaz əmlak satış prosesi daha sürətli, daha şəffaf və idarəolunması asan olur.”",
-                        "“TREVA ilə aramızda formalaşan etimad hər bir layihədə daha da möhkəmlənir. Onlar qiymət strategiyasından tutmuş müştəri axınına qədər hər detala dəqiqliklə yanaşmışdırlar. Onların yaradıcı dəstəyi, layihələrin düzgün paketlənməsi və ardıcıl izləmələri bizə güclü marağı təsirli nəticələrə çevirməyə kömək etmişdir.”",
-                        "“TREVA-nı digərlərindən fərqləndirən iş prosesindəki aydınlıq və davamlılıqdır. Broker olaraq hər zaman məlumatlısınız: elanlar aktualdır, əlaqə çevikdir, və bütün alətlər satış prosesini asanlaşdırır.”",
-                        "“TREVA brokerlərə lazım olan hər şeyi təqdim edir: yüksək keyfiyyətli vizuallar və effektiv lead sistemi. Biz artıq sadəcə obyekt göstərmirik, onu düzgün təqdim edirik.”",
-                        "“TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkanı yaradır.”",
-                        "“TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.”",
-                        "“TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.”",
-                      ].map((quote, idx) => (
+                      {testimonials.map((item, idx) => (
                         <div key={idx} className="swiper-slide swiper-slide-testimonials">
                           <div className="testimonials_card">
-                            <p className="testimonials_quote">            {quote}</p>
+                            <p className="testimonials_quote">            {item.quote}</p>
                             <div className="testimonials_specs">
                               <div className="testimonials_author-wrap">
-                                <div>
-                                  {idx === 0 && "ETAGI azerbaijan"}
-                                  {idx === 1 && "TRIDENT Investment"}
-                                  {idx === 2 && "rnS estate"}
-                                  {idx === 3 && "bazis real estate"}
-                                  {idx === 4 && "AUF Invest"}
-                                  {idx === 5 && "megapolis estate"}
-                                  {idx === 6 && "Sabah Investment Group"}
+                                <div style={{ textTransform: 'uppercase' }}>
+                                  {item.author}
                                 </div>
                               </div>
                             </div>
