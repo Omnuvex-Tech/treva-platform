@@ -24,7 +24,7 @@ const productionStyles = `
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-end !important;
-    margin-bottom: 4.5rem !important;
+    margin-bottom: 63px !important;
     width: 100% !important;
   }
   
@@ -35,8 +35,8 @@ const productionStyles = `
   .n-testimonials_quote {
     font-family: Helveticanowdisplay, sans-serif !important;
     letter-spacing: -0.04em !important;
-    max-width: 46rem !important;
-    font-size: 2rem !important;
+    max-width: 644px !important;
+    font-size: 28px !important;
     font-weight: 500 !important;
     line-height: 1.1 !important;
     color: #fff !important;
@@ -51,7 +51,7 @@ const productionStyles = `
     align-items: center !important;
     display: flex !important;
     color: #fff !important;
-    font-size: 1rem !important;
+    font-size: 14px !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
   }
@@ -66,13 +66,13 @@ const productionStyles = `
   }
 
   .n-testimonials_card {
-    grid-column-gap: 3.125rem !important;
-    grid-row-gap: 3.125rem !important;
+    grid-column-gap: 43.75px !important;
+    grid-row-gap: 43.75px !important;
     flex-flow: column !important;
     justify-content: center !important;
     align-items: flex-start !important;
     height: 100% !important;
-    padding: 5rem 2.75rem 3.25rem 4.5rem !important;
+    padding: 70px 38.5px 45.5px 63px !important;
     display: flex !important;
     transition: none !important;
     transform: none !important;
@@ -100,10 +100,10 @@ const productionStyles = `
   .swiper-nav-testimonials {
     display: flex !important;
     align-items: center !important;
-    gap: 1.2rem !important;
+    gap: 16.8px !important;
     position: absolute !important;
-    right: 4.5rem !important;
-    bottom: 3.25rem !important;
+    right: 63px !important;
+    bottom: 45.5px !important;
     z-index: 10 !important;
   }
 
@@ -163,7 +163,7 @@ const productionStyles = `
   .section_logos .logos-partnership-button .button-text {
     position: absolute !important;
     left: 0 !important;
-    top: 50% !important;
+    top: 0 !important;
     width: 100% !important;
     height: 17px !important;
     line-height: 17px !important;
@@ -171,36 +171,36 @@ const productionStyles = `
     white-space: nowrap !important;
     margin: 0 !important;
     padding: 0 !important;
-    transform: translateY(-50%) !important;
+    transform: translateY(0) !important;
     transition: transform .3s ease !important;
   }
 
   .section_logos .logos-partnership-button .button-text + .button-text {
-    top: calc(50% + 17px) !important;
+    top: 17px !important;
   }
 
   .section_logos .logos-partnership-button:hover .button-text {
-    transform: translateY(calc(-50% - 17px)) !important;
+    transform: translateY(-17px) !important;
   }
 
   @media screen and (max-width: 991px) {
     .section_logos .logos_intro {
       flex-direction: column !important;
       align-items: flex-start !important;
-      gap: 1.5rem !important;
+      gap: 21px !important;
     }
     
     .n-testimonials_quote {
-      font-size: 1.5rem !important;
+      font-size: 21px !important;
     }
     
     .n-testimonials_card {
-      padding: 3rem 2rem !important;
+      padding: 42px 28px !important;
     }
     
     .swiper-nav-testimonials {
-      right: 2rem !important;
-      bottom: 2rem !important;
+      right: 28px !important;
+      bottom: 28px !important;
     }
   }
 `;
@@ -270,23 +270,23 @@ export const HomeLogos = () => {
   }, []);
 
   return (
-    <section className="section_logos bg-color-blue100 parallax-reveal">
+    <section className="section_logos home-logos-section bg-color-blue100 parallax-reveal">
       <style dangerouslySetInnerHTML={{ __html: productionStyles }} />
-      <div className="global-padding padding-section-medium">
-        <div className="container-large">
-          <div className="logos_component">
+      <div className="global-padding home-logos-padding padding-section-medium">
+        <div className="container-large home-logos-container">
+          <div className="logos_component home-logos-component">
             {/* Intro Section */}
-            <div className="logos_intro">
-              <div className="max-width-56rem">
-                <h2 className="text-color-white">
+            <div className="logos_intro home-logos-intro">
+              <div className="home-logos-title-wrap">
+                <h2 className="text-color-white home-logos-title">
                   Sahə üzrə etibarlı tərəfdaş şəbəkəsi tərəfindən dəstəklənir.
                 </h2>
               </div>
-              <div className="text-color-white60 first-child">(etibarlı tərəfdaşlar)</div>
+              <div className="text-color-white60 home-logos-label first-child">(etibarlı tərəfdaşlar)</div>
             </div>
 
             {/* Logos Grid */}
-            <div className="logos_wrap">
+            <div className="logos_wrap home-logos-grid-wrap">
               {/* Row 1 */}
               <div className="n-testimonials_row">
                 <div className="logos_cell-holder">
@@ -462,11 +462,11 @@ export const HomeLogos = () => {
                     <div className="swiper-wrapper swiper-wrapper-testimonials">
                       {testimonials.map((item, idx) => (
                         <div key={idx} className="swiper-slide swiper-slide-testimonials">
-                          <div className="n-testimonials_card">
-                            <p className="n-testimonials_quote">{item.quote}</p>
-                            <div className="n-testimonials_specs">
-                              <div className="n-testimonials_author-wrap">
-                                <div>
+                        <div className="n-testimonials_card home-logos-testimonial-card">
+                            <p className="n-testimonials_quote home-logos-testimonial-quote">{item.quote}</p>
+                            <div className="n-testimonials_specs home-logos-testimonial-specs">
+                              <div className="n-testimonials_author-wrap home-logos-testimonial-author-wrap">
+                                <div className="home-logos-testimonial-author">
                                   {item.author}
                                 </div>
                               </div>
@@ -577,16 +577,16 @@ export const HomeLogos = () => {
             </div>
 
             {/* Mobile Logos (simplified, kept as original) */}
-            <div className="logos_mobile">
+            <div className="logos_mobile home-logos-mobile">
               <div data-w-id="3667447e-bb70-d435-2c4e-2b618901377f" className="n-testimonials_holder-mob">
                 {/* Keeping original structure for brevity */}
               </div>
             </div>
 
             {/* CTA */}
-            <div className="logos_cta-wrap">
-              <div className="note_wrap is-white">
-                <div className="text-color-white60">Tərəfdaş şəbəkəmizə qoşulmaq istəyirsiniz?</div>
+            <div className="logos_cta-wrap home-logos-cta-wrap">
+              <div className="note_wrap home-logos-note-wrap is-white">
+                <div className="text-color-white60 home-logos-note-text">Tərəfdaş şəbəkəmizə qoşulmaq istəyirsiniz?</div>
               </div>
               <Link
                 data-wf--button--variant="white"

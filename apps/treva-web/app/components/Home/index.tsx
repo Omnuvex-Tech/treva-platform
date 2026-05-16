@@ -13,7 +13,7 @@ type HomeProps = {
 
 const Home = ({ locale }: HomeProps) => {
   return (
-    <main className="page-wrapper" data-locale={locale}>
+    <main className="page-wrapper home-page" data-locale={locale}>
       <Navbar locale={locale} />
       <HomeHeroSection />
       <HomeServices />

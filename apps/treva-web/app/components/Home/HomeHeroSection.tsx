@@ -223,7 +223,7 @@ export const HomeHeroSection = () => {
     }, []);
 
     const renderBlock = (keyPrefix: string, blockRef?: React.Ref<HTMLDivElement>) => (
-        <div className="live_block" ref={blockRef as React.RefObject<HTMLDivElement>}>
+        <div className={`live_block home-hero-live-block home-hero-live-block-${keyPrefix}`} ref={blockRef as React.RefObject<HTMLDivElement>}>
             {newsItems.map((item, index) => (
                 <HomeLiveCard key={`${keyPrefix}-${index}`} item={item} />
             ))}
@@ -231,50 +231,50 @@ export const HomeHeroSection = () => {
     );
 
     return (
-        <section className="section_header" ref={sectionRef}>
-            <div className="global-padding">
-                <div className="container-large">
-                    <div className="header_component">
-                        <div data-w-id="e4074abf-c232-ac8e-2a04-e835a6611a3a" className="header_wrap">
-                            <div className="header_content-wrap">
-                                <div className="max-width-48rem is-az">
-                                    <h1 ref={headingRef} className="indented-heading-h1">
+        <section className="section_header home-hero-section" ref={sectionRef}>
+            <div className="global-padding home-hero-padding">
+                <div className="container-large home-hero-container">
+                    <div className="header_component home-hero-component">
+                        <div data-w-id="e4074abf-c232-ac8e-2a04-e835a6611a3a" className="header_wrap home-hero-wrap">
+                            <div className="header_content-wrap home-hero-content-wrap">
+                                <div className="is-az home-hero-title-wrap">
+                                    <h1 ref={headingRef} className="indented-heading-h1 home-hero-title">
                                         DAŞINMAZ ƏMLAK SATIŞLARINIZI BİZİMLƏ MAKSİMUMA ÇATDIRIN
                                     </h1>
                                 </div>
                                 <div
                                     ref={ctaBlockRef}
                                     data-gsap-delay="0.6"
-                                    className="header_cta-block animate-instant animate-up"
+                                    className="header_cta-block home-hero-cta-block animate-instant animate-up"
                                 >
-                                    <a href="#services" className="cs_scroll-wrap hide-landscape w-inline-block">
+                                    <a href="#services" className="cs_scroll-wrap home-hero-scroll-button hide-landscape w-inline-block">
                                         <ButtonText>SÜRÜŞDÜRÜN</ButtonText>
-                                        <div className="button-icon-wrap is-small">
-                                            <div className="button-icon w-embed">
-                                                <svg width="0.75rem" height="0.875rem" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <div className="button-icon-wrap home-hero-scroll-icon-wrap is-small">
+                                            <div className="button-icon home-hero-scroll-icon w-embed">
+                                                <svg width="10.5px" height="12.25px" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M5.37586 13.3742L0.501599 8.49998C0.402158 8.40054 0.346293 8.26567 0.346293 8.12504C0.346293 7.98441 0.402158 7.84954 0.5016 7.7501C0.601041 7.65065 0.735913 7.59479 0.876544 7.59479C1.01717 7.59479 1.15205 7.65065 1.25149 7.7501L5.22073 11.7193L5.22026 1.00111C5.22026 0.860404 5.27616 0.725457 5.37566 0.62596C5.47515 0.526464 5.6101 0.470568 5.75081 0.470568C5.89152 0.470568 6.02646 0.526464 6.12596 0.625961C6.22546 0.725457 6.28135 0.860403 6.28135 1.00111L6.28089 11.7193L10.2501 7.7501C10.3496 7.65065 10.4844 7.59479 10.6251 7.59479C10.7657 7.59479 10.9006 7.65065 11 7.7501C11.0995 7.84954 11.1553 7.98441 11.1553 8.12504C11.1553 8.26567 11.0995 8.40054 11 8.49998L6.12575 13.3742C6.02631 13.4737 5.89144 13.5296 5.75081 13.5296C5.61018 13.5296 5.47531 13.4737 5.37586 13.3742Z" fill="#4C525E" />
                                                 </svg>
                                             </div>
-                                            <div className="button-icon w-embed">
-                                                <svg width="0.75rem" height="0.875rem" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <div className="button-icon home-hero-scroll-icon w-embed">
+                                                <svg width="10.5px" height="12.25px" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M5.37586 13.3742L0.501599 8.49998C0.402158 8.40054 0.346293 8.26567 0.346293 8.12504C0.346293 7.98441 0.402158 7.84954 0.5016 7.7501C0.601041 7.65065 0.735913 7.59479 0.876544 7.59479C1.01717 7.59479 1.15205 7.65065 1.25149 7.7501L5.22073 11.7193L5.22026 1.00111C5.22026 0.860404 5.27616 0.725457 5.37566 0.62596C5.47515 0.526464 5.6101 0.470568 5.75081 0.470568C5.89152 0.470568 6.02646 0.526464 6.12596 0.625961C6.22546 0.725457 6.28135 0.860403 6.28135 1.00111L6.28089 11.7193L10.2501 7.7501C10.3496 7.65065 10.4844 7.59479 10.6251 7.59479C10.7657 7.59479 10.9006 7.65065 11 7.7501C11.0995 7.84954 11.1553 7.98441 11.1553 8.12504C11.1553 8.26567 11.0995 8.40054 11 8.49998L6.12575 13.3742C6.02631 13.4737 5.89144 13.5296 5.75081 13.5296C5.61018 13.5296 5.47531 13.4737 5.37586 13.3742Z" fill="#4C525E" />
                                                 </svg>
                                             </div>
                                         </div>
                                     </a>
-                                    <div className="header_cta-wrap is-home">
-                                        <Link data-wf--button--variant="blue" href="brokers#broker-registration" className="button w-inline-block">
+                                    <div className="header_cta-wrap home-hero-actions is-home">
+                                        <Link data-wf--button--variant="blue" href="brokers#broker-registration" className="button home-hero-primary-button w-inline-block">
                                             <ButtonText>Satış şəbəkəmizə qoşulun</ButtonText>
                                         </Link>
-                                        <Link data-wf--button--variant="ghost" href="/developers" className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block">
+                                        <Link data-wf--button--variant="ghost" href="/developers" className="button home-hero-secondary-button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block">
                                             <ButtonText>Satışlarınızı artırmaq üçün tərəfdaşlıq edin</ButtonText>
                                         </Link>
                                     </div>
                                 </div>
                             </div>
-                            <div className="header_img-wrap" ref={imgWrapRef}></div>
-                            <div className="live_carousel">
-                                <div className="live_track" ref={trackRef} style={{ display: 'flex', willChange: 'transform' }}>
+                            <div className="header_img-wrap home-hero-image-wrap" ref={imgWrapRef}></div>
+                            <div className="live_carousel home-hero-live-carousel">
+                                <div className="live_track home-hero-live-track" ref={trackRef} style={{ display: 'flex', willChange: 'transform' }}>
                                     {renderBlock('orig', firstBlockRef)}
                                     {renderBlock('dup', null)}
                                 </div>

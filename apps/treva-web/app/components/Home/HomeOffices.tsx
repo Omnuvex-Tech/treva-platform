@@ -4,48 +4,48 @@ import "./styles/home.css";
 
 export const HomeOffices = () => {
   return (
-    <section className="section_offices">
-      <div className="global-padding padding-section-medium">
-        <div className="container-large">
-          <div className="offices_component">
-            <div className="offices_intro">
-              <div>(TREVA ilə birlikdə çalışın)</div>
-              <div className="max-width-48rem is-large-tablet is-az">
-                <h2>
-                  <span className="heading-gap-h1">     </span>
+    <section className="section_offices home-offices-section">
+      <div className="global-padding home-offices-padding padding-section-medium">
+        <div className="container-large home-offices-container">
+          <div className="offices_component home-offices-component">
+            <div className="offices_intro home-offices-intro">
+              <div className="home-offices-label">(TREVA ilə birlikdə çalışın)</div>
+              <div className="home-offices-title-wrap is-large-tablet is-az">
+                <h2 className="home-offices-title">
+                  <span className="heading-gap-h1 home-offices-title-gap">     </span>
                   TREVA REAL ESTATE-DA DEVELOPERLƏR VƏ PEŞƏKAR BROKERLƏR ARASINDA ƏLAQƏ YARADIRIQ.
                 </h2>
               </div>
             </div>
 
-            <div className="offices_wrap">
-              <div className="offices_bio-wrap">
-                <p>
+            <div className="offices_wrap home-offices-wrap">
+              <div className="offices_bio-wrap home-offices-bio-wrap">
+                <p className="home-offices-bio-text">
                   Hər ikisinin satış potensialını sübut edilmiş metodologiyalarımız və texnologiya yönümlü proseslərimiz vasitəsilə
                   <br />
                   maksimuma çatdırmağa kömək edirik
                 </p>
               </div>
 
-              <div className="offices_block">
-                <Link href="/developers" className="offices_item is-large img-reveal w-inline-block">
-                  <div className="offices_img-wrap is-large">
+              <div className="offices_block home-offices-block">
+                <Link href="/developers" className="offices_item home-offices-card home-offices-card-developers is-large img-reveal w-inline-block">
+                  <div className="offices_img-wrap home-offices-card-image-wrap is-large">
                     <img
                       src="/cdn-assets/7d88de73ab-687f29a824c54963ab21fc5f_work-with.avif"
                       loading="lazy"
                       alt="meeting"
-                      className="fullwidth-img ease0-6"
+                      className="fullwidth-img home-offices-card-image ease0-6"
                     />
-                    <div className="offices_overlay">
-                      <div className="offices_btn">
-                        <div>Bizimlə başlayın</div>
+                    <div className="offices_overlay home-offices-card-overlay">
+                      <div className="offices_btn home-offices-card-overlay-button">
+                        <div className="home-offices-card-overlay-button-text">Bizimlə başlayın</div>
                       </div>
                     </div>
-                    <div className="img-cover"></div>
+                    <div className="img-cover home-offices-card-cover"></div>
                   </div>
-                  <div className="offices_content-wrap">
-                    <div>Layihəniz var?</div>
-                    <div className="icon-xxlarge w-embed">
+                  <div className="offices_content-wrap home-offices-card-content">
+                    <div className="home-offices-card-title">Layihəniz var?</div>
+                    <div className="icon-xxlarge home-offices-card-icon w-embed">
                       <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                           d="M22.6558 7.25V19.0313C22.6558 19.2716 22.5603 19.5021 22.3903 19.6721C22.2204 19.842 21.9899 19.9375 21.7495 19.9375C21.5092 19.9375 21.2787 19.842 21.1087 19.6721C20.9388 19.5021 20.8433 19.2716 20.8433 19.0313V9.43746L7.8907 22.3912C7.72065 22.5612 7.49001 22.6568 7.24953 22.6568C7.00904 22.6568 6.7784 22.5612 6.60836 22.3912C6.43831 22.2211 6.34277 21.9905 6.34277 21.75C6.34277 21.5095 6.43831 21.2789 6.60836 21.1088L19.5621 8.15625H9.96828C9.72792 8.15625 9.49742 8.06077 9.32746 7.89082C9.15751 7.72086 9.06203 7.49035 9.06203 7.25C9.06203 7.00965 9.15751 6.77914 9.32746 6.60918C9.49742 6.43923 9.72792 6.34375 9.96828 6.34375H21.7495C21.9899 6.34375 22.2204 6.43923 22.3903 6.60918C22.5603 6.77914 22.6558 7.00965 22.6558 7.25Z"
@@ -56,24 +56,24 @@ export const HomeOffices = () => {
                   </div>
                 </Link>
 
-                <Link href="/brokers" className="offices_item img-reveal w-inline-block">
-                  <div className="offices_img-wrap">
-                    <div className="offices_overlay">
-                      <div className="offices_btn">
-                        <div>Bizimlə satış edin</div>
+                <Link href="/brokers" className="offices_item home-offices-card home-offices-card-brokers img-reveal w-inline-block">
+                  <div className="offices_img-wrap home-offices-card-image-wrap">
+                    <div className="offices_overlay home-offices-card-overlay">
+                      <div className="offices_btn home-offices-card-overlay-button">
+                        <div className="home-offices-card-overlay-button-text">Bizimlə satış edin</div>
                       </div>
                     </div>
                     <img
                       src="/cdn-assets/6cd22a4842-687f29ff72802ad85f05c0c5_work-with-left.avif"
                       loading="lazy"
                       alt="A group of people sitting around a table."
-                      className="fullwidth-img ease0-6"
+                      className="fullwidth-img home-offices-card-image ease0-6"
                     />
-                    <div className="img-cover"></div>
+                    <div className="img-cover home-offices-card-cover"></div>
                   </div>
-                  <div className="offices_content-wrap">
-                    <div>Bizimlə satış etmək istəyirsiniz?</div>
-                    <div className="icon-xxlarge w-embed">
+                  <div className="offices_content-wrap home-offices-card-content">
+                    <div className="home-offices-card-title">Bizimlə satış etmək istəyirsiniz?</div>
+                    <div className="icon-xxlarge home-offices-card-icon w-embed">
                       <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                           d="M22.6558 7.25V19.0313C22.6558 19.2716 22.5603 19.5021 22.3903 19.6721C22.2204 19.842 21.9899 19.9375 21.7495 19.9375C21.5092 19.9375 21.2787 19.842 21.1087 19.6721C20.9388 19.5021 20.8433 19.2716 20.8433 19.0313V9.43746L7.8907 22.3912C7.72065 22.5612 7.49001 22.6568 7.24953 22.6568C7.00904 22.6568 6.7784 22.5612 6.60836 22.3912C6.43831 22.2211 6.34277 21.9905 6.34277 21.75C6.34277 21.5095 6.43831 21.2789 6.60836 21.1088L19.5621 8.15625H9.96828C9.72792 8.15625 9.49742 8.06077 9.32746 7.89082C9.15751 7.72086 9.06203 7.49035 9.06203 7.25C9.06203 7.00965 9.15751 6.77914 9.32746 6.60918C9.49742 6.43923 9.72792 6.34375 9.96828 6.34375H21.7495C21.9899 6.34375 22.2204 6.43923 22.3903 6.60918C22.5603 6.77914 22.6558 7.00965 22.6558 7.25Z"
