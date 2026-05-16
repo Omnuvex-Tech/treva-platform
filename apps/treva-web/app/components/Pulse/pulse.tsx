@@ -5,6 +5,7 @@ import { ARTICLES, FEATURED_ARTICLE, WEEK_ARTICLE } from "@/lib/pulse-data";
 import { Article } from "@/lib/pulse.types";
 import "./pulse.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 type PulseProps = {
   locale: string;
 };
@@ -170,10 +171,7 @@ function PulseHeaderSection({ locale }: { locale: string }) {
 
                 <div className="news-header_right-cta-holder">
                   <a href="#all-articles" className="button w-inline-block">
-                    <div className="button-text-wrap">
-                      <div className="button-text">Bütün məqalələr</div>
-                      <div className="button-text">Bütün məqalələr</div>
-                    </div>
+                    <ButtonText>Bütün məqalələr</ButtonText>
                   </a>
                 </div>
               </div>

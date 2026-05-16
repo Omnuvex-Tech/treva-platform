@@ -1,3 +1,4 @@
+import { ButtonText } from '@/app/components/ButtonText';
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -236,16 +237,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                           <p>TREVA DEVELOPERLƏRƏ ƏMLAK LAYİHƏLƏRİNİ BAZARA ÇIXARMAQDA STRATEJİ SATIŞ VƏ MARKETİNQ DƏSTƏYİ GÖSTƏRİR. BAZARA ÇIXIŞ PLANLAMASINDAN MÜRACİƏTLƏRİN İDARƏETMƏSİNƏ QƏDƏR SATIŞLARI ARTIRMAQ VƏ LAYİHƏNİN UĞURUNU YÜKSƏLTMƏK ÜÇÜN HƏRTƏRƏFLİ HƏLLƏR TƏQDİM EDİRİK.</p>
                           <div className="button-group animate-up">
                             <Link href="#services" className="button w-inline-block" data-wf--button--variant="blue">
-                              <div className="button-text-wrap">
-                                <div className="button-text">Xidmətlərlə tanış olun</div>
-                                <div className="button-text">Xidmətlərlə tanış olun</div>
-                              </div>
+                              <ButtonText>Xidmətlərlə tanış olun</ButtonText>
                             </Link>
                             <Link href={`/${locale}/projects`} className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block" data-wf--button--variant="ghost">
-                              <div className="button-text-wrap">
-                                <div className="button-text">Layihələrlə tanış olun</div>
-                                <div className="button-text">Layihələrlə tanış olun</div>
-                              </div>
+                              <ButtonText>Layihələrlə tanış olun</ButtonText>
                             </Link>
                           </div>
                         </div>
@@ -652,10 +647,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                         <p>Növbəti investisiya imkanınızı tapmaq üçün layihələrimizlə tanış olun.</p>
                       </div>
                       <Link href={`/${locale}/projects`} className="button w-inline-block" data-wf--button--variant="blue">
-                        <div className="button-text-wrap">
-                          <div className="button-text">Seçilmiş Layihələrlə Tanış Olun</div>
-                          <div className="button-text">Seçilmiş Layihələrlə Tanış Olun</div>
-                        </div>
+                        <ButtonText>Seçilmiş Layihələrlə Tanış Olun</ButtonText>
                       </Link>
                     </div>
                   </div>
@@ -673,17 +665,11 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                         <div className="button-group">
                           <Link href={`/${locale}/contact#get-in-touch`} className="button w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e w-inline-block" data-wf--button--variant="blue-large">
                             <div className="svg-code">This is some text inside of a div block.</div>
-                            <div className="button-text-wrap w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e">
-                              <div className="button-text">Əlaqə saxlayın</div>
-                              <div className="button-text">Əlaqə saxlayın</div>
-                            </div>
+                            <ButtonText className="w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e">Əlaqə saxlayın</ButtonText>
                           </Link>
                           <Link href={`/${locale}/brokers#broker-registration`} className="button w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb w-inline-block" data-wf--button--variant="ghost-large">
                             <div className="svg-code">This is some text inside of a div block.</div>
-                            <div className="button-text-wrap w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb">
-                              <div className="button-text">Şəbəkəmizə qoşulun</div>
-                              <div className="button-text">Şəbəkəmizə qoşulun</div>
-                            </div>
+                            <ButtonText className="w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb">Şəbəkəmizə qoşulun</ButtonText>
                           </Link>
                         </div>
                       </div>

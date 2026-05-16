@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import "./navbar.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 const TrevaLogoSvg = ({ light = false }: { light?: boolean }) => (
   <svg
     width="100%"
@@ -326,10 +327,7 @@ export default function Navbar({ locale }: { locale: string }) {
                   rel="noreferrer"
                 >
                   <UserIcon />
-                  <span className="button-text-wrap">
-                    <span className="button-text">{secondary.login}</span>
-                    <span className="button-text">{secondary.login}</span>
-                  </span>
+                  <ButtonText as="span" textAs="span">{secondary.login}</ButtonText>
                 </a>
 
                 <button

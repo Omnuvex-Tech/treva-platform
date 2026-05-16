@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import "./styles/home.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 // Reusable plus icon to avoid repetition
 const PlusIcon = () => (
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -237,10 +238,7 @@ export const HomeProjects = () => {
                 <div>Növbəti investisiya fürsətinizi tapmaq üçün layihələrimizi kəşf edin.</div>
               </div>
               <Link data-wf--button--variant="blue" href="/projects" className="button w-inline-block">
-                <div className="button-text-wrap">
-                  <div className="button-text">Seçilmiş Layihələri Kəşf Edin</div>
-                  <div className="button-text">Seçilmiş Layihələri Kəşf Edin</div>
-                </div>
+                <ButtonText>Seçilmiş Layihələri Kəşf Edin</ButtonText>
               </Link>
             </div>
           </div>

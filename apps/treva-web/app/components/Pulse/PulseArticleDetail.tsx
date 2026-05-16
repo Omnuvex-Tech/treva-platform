@@ -1,5 +1,6 @@
 "use client";
 
+import { ButtonText } from '@/app/components/ButtonText';
 /* eslint-disable @next/next/no-img-element, react/no-unknown-property */
 
 import React from "react";
@@ -124,10 +125,7 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
       </div>
       <div className="article_sidebar-cta">
         <a href={`/${locale}/pulse`} className="button w-inline-block">
-          <div className="button-text-wrap">
-            <div className="button-text">Bütün məqalələr</div>
-            <div className="button-text">Bütün məqalələr</div>
-          </div>
+          <ButtonText>Bütün məqalələr</ButtonText>
         </a>
       </div>
     </div>

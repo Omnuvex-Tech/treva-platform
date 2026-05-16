@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './styles/home.css';
 
+import { ButtonText } from '@/app/components/ButtonText';
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 }
@@ -212,10 +213,7 @@ export const HomeServices = () => {
                                         <div>Satış imkanlarınızı genişləndirmək istəyirsiniz?</div>
                                     </div>
                                     <Link data-wf--button--variant="blue" href="brokers#broker-registration" className="button w-inline-block">
-                                        <div className="button-text-wrap">
-                                            <div className="button-text">Satış şəbəkəmizə qoşulun</div>
-                                            <div className="button-text">Satış şəbəkəmizə qoşulun</div>
-                                        </div>
+                                        <ButtonText>Satış şəbəkəmizə qoşulun</ButtonText>
                                     </Link>
                                 </div>
                                 <div className="services_block">

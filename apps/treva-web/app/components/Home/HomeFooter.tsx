@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import "./styles/home.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 // Reusable arrow up icon to avoid repetition
 const ArrowUpIcon = () => (
   <svg width="0.75rem" height="0.875rem" viewBox="0 0 11 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -197,16 +198,10 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
                     rel="noopener noreferrer"
                     className="cs_scroll-wrap is-alternate w-inline-block"
                   >
-                    <div className="button-text-wrap">
-                      <div className="button-text">Baş ofis — Ziya Yusifzade 10, Sabah Residence</div>
-                      <div className="button-text">Baş ofis — Ziya Yusifzade 10, Sabah Residence</div>
-                    </div>
+                    <ButtonText>Baş ofis — Ziya Yusifzade 10, Sabah Residence</ButtonText>
                   </a>
                   <a href="#top" className="cs_scroll-wrap is-alternate w-inline-block">
-                    <div className="button-text-wrap">
-                      <div className="button-text">YUXARIYA QAYIT</div>
-                      <div className="button-text">YUXARIYA QAYIT</div>
-                    </div>
+                    <ButtonText>YUXARIYA QAYIT</ButtonText>
                     <div className="button-icon-wrap is-small">
                       <div className="button-icon w-embed">
                         <ArrowUpIcon />

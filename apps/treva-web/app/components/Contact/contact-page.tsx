@@ -1,3 +1,4 @@
+import { ButtonText } from '@/app/components/ButtonText';
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -536,20 +537,14 @@ export function ContactPage({ locale }: ContactPageProps) {
                             className="button contact_cta-action-button contact_cta-action-button--primary"
                             data-wf--button--variant="blue-large"
                           >
-                            <div className="button-text-wrap elaqe-saxlayin">
-                              <div className="button-text">Əlaqə saxlayın</div>
-                              <div className="button-text">Əlaqə saxlayın</div>
-                            </div>
+                            <ButtonText className="elaqe-saxlayin">Əlaqə saxlayın</ButtonText>
                           </Link>
                           <Link
                             href="/brokers#broker-registration"
                             className="button contact_cta-action-button contact_cta-action-button--secondary"
                             data-wf--button--variant="ghost-large"
                           >
-                            <div className="button-text-wrap elaqe-saxlayin">
-                              <div className="button-text">Şəbəkəmizə qoşulun</div>
-                              <div className="button-text">Şəbəkəmizə qoşulun</div>
-                            </div>
+                            <ButtonText className="elaqe-saxlayin">Şəbəkəmizə qoşulun</ButtonText>
                           </Link>
                         </div>
                       </div>

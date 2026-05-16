@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import "./styles/home.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 }
@@ -183,10 +184,7 @@ export const HomeHeroSection = () => {
                                     className="header_cta-block animate-instant animate-up"
                                 >
                                     <a href="#services" className="cs_scroll-wrap hide-landscape w-inline-block">
-                                        <div className="button-text-wrap">
-                                            <div className="button-text">SÜRÜŞDÜRÜN</div>
-                                            <div className="button-text">SÜRÜŞDÜRÜN</div>
-                                        </div>
+                                        <ButtonText>SÜRÜŞDÜRÜN</ButtonText>
                                         <div className="button-icon-wrap is-small">
                                             <div className="button-icon w-embed">
                                                 <svg width="0.75rem" height="0.875rem" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -202,16 +200,10 @@ export const HomeHeroSection = () => {
                                     </a>
                                     <div className="header_cta-wrap is-home">
                                         <Link data-wf--button--variant="blue" href="brokers#broker-registration" className="button w-inline-block">
-                                            <div className="button-text-wrap">
-                                                <div className="button-text">Satış şəbəkəmizə qoşulun</div>
-                                                <div className="button-text">Satış şəbəkəmizə qoşulun</div>
-                                            </div>
+                                            <ButtonText>Satış şəbəkəmizə qoşulun</ButtonText>
                                         </Link>
                                         <Link data-wf--button--variant="ghost" href="/developers" className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block">
-                                            <div className="button-text-wrap">
-                                                <div className="button-text">Satışlarınızı artırmaq üçün tərəfdaşlıq edin</div>
-                                                <div className="button-text">Satışlarınızı artırmaq üçün tərəfdaşlıq edin</div>
-                                            </div>
+                                            <ButtonText>Satışlarınızı artırmaq üçün tərəfdaşlıq edin</ButtonText>
                                         </Link>
                                     </div>
                                 </div>

@@ -1,3 +1,4 @@
+import { ButtonText } from '@/app/components/ButtonText';
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -297,10 +298,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="header-services_content-wrap">
                           <p>SİZ BROKER, DAŞINMAZ ƏMLAK AGENTLİYİ, YA DA BEYNƏLXALQ ŞİRKƏTSİZ? TREVA OLARAQ, BİZ BÜTÜN SAHƏ VƏ ÖLKƏLƏRDƏN OLAN TƏRƏFDAŞLARI MƏMNUNİYYƏTLƏ QƏBUL EDİRİK. SİZƏ DAHA ÇOX KOMİSSİYA QAZANMAQ VƏ AZƏRBAYCANIN DAŞINMAZ ƏMLAK BAZARINDA, HƏMÇİNİN ONDAN KƏNARDA ŞƏBƏKƏNİZİ GENİŞLƏNDİRMƏK ÜÇÜN LAZIM OLAN BÜTÜN ALƏTLƏRİ, ELANLARI VƏ DƏSTƏYİ BİZİM PLATFORMA TƏQDİM EDİR.</p>
                           <a data-wf--button--variant="blue" href="#broker-registration" className="button w-inline-block">
-                            <div className="button-text-wrap">
-                              <div className="button-text">Şəbəkəmizə qoşulun</div>
-                              <div className="button-text">Şəbəkəmizə qoşulun</div>
-                            </div>
+                            <ButtonText>Şəbəkəmizə qoşulun</ButtonText>
                           </a>
                         </div>
                         <div className="header-services_video-wrap img-reveal">
@@ -406,10 +404,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                           <p>TREVA TƏRƏFDAŞI OLARAQ, SATIŞLARINIZI ARTIRMAQ VƏ ŞƏBƏKƏNİZİ GENİŞLƏNDİRMƏK ÜÇÜN XÜSUSİ HAZIRLANMIŞ GÜCLÜ RESURSLARDAN İSTİFADƏ ETMƏ İMKANI QAZANIRSINIZ.</p>
                         </div>
                         <a data-wf--button--variant="blue" href="#broker-registration" className="button w-inline-block">
-                          <div className="button-text-wrap">
-                            <div className="button-text">TREVA ilə tərəfdaş olun </div>
-                            <div className="button-text">TREVA ilə tərəfdaş olun </div>
-                          </div>
+                          <ButtonText>TREVA ilə tərəfdaş olun </ButtonText>
                         </a>
                       </div>
                     </div>
@@ -544,10 +539,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                           </div>
                           <a data-wf--button--variant="blue" href="#broker-registration" className="button w-inline-block">
                             <div className="svg-code">This is some text inside of a div block.</div>
-                            <div className="button-text-wrap">
-                              <div className="button-text">Bizimlə tərəfdaş olun</div>
-                              <div className="button-text">Bizimlə tərəfdaş olun</div>
-                            </div>
+                            <ButtonText>Bizimlə tərəfdaş olun</ButtonText>
                           </a>
                         </div>
                       </div>

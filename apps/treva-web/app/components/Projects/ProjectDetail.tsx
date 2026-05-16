@@ -7,6 +7,7 @@ import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import { Project } from "@/lib/project.types";
 import "./villa-siena.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 /* eslint-disable @next/next/no-img-element */
 
 interface ProjectDetailProps {
@@ -78,10 +79,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
                             <path d="M0.326388 5.17449L4.57005 0.93083C4.65663 0.844254 4.77405 0.795617 4.89649 0.795617C5.01892 0.795617 5.13635 0.844254 5.22292 0.930831C5.3095 1.01741 5.35814 1.13483 5.35814 1.25727C5.35814 1.3797 5.3095 1.49713 5.22292 1.5837L1.76719 5.03943L11.0988 5.03902C11.2213 5.03902 11.3388 5.08769 11.4254 5.17431C11.512 5.26094 11.5607 5.37842 11.5607 5.50093C11.5607 5.62344 11.512 5.74092 11.4254 5.82755C11.3388 5.91417 11.2213 5.96284 11.0988 5.96284L1.76719 5.96243L5.22292 9.41816C5.3095 9.50473 5.35814 9.62216 5.35814 9.74459C5.35814 9.86703 5.3095 9.98445 5.22292 10.071C5.13635 10.1576 5.01893 10.2062 4.89649 10.2062C4.77405 10.2062 4.65663 10.1576 4.57005 10.071L0.326388 5.82737C0.239812 5.74079 0.191175 5.62337 0.191174 5.50093C0.191175 5.37849 0.239812 5.26107 0.326388 5.17449Z" fill="#17191C"/>
                           </svg>
                         </div>
-                        <div className="button-text-wrap">
-                          <div className="button-text">bütün layihələr</div>
-                          <div className="button-text">bütün layihələr</div>
-                        </div>
+                        <ButtonText>bütün layihələr</ButtonText>
                       </Link>
                       <div className="header_cta-wrap">
                         <a href={project.externalLink} target="_blank" className="button w-inline-block">
@@ -90,16 +88,10 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
                               <path d="M8.30995 0.807353V6.8088C8.30995 6.93124 8.26131 7.04866 8.17474 7.13524C8.08816 7.22181 7.97074 7.27045 7.8483 7.27045C7.72587 7.27045 7.60844 7.22181 7.52187 7.13524C7.43529 7.04866 7.38665 6.93124 7.38665 6.8088L7.38665 1.92166L0.788524 8.52036C0.701899 8.60699 0.584412 8.65566 0.461906 8.65566C0.339401 8.65566 0.221913 8.60699 0.135289 8.52036C0.048665 8.43374 0 8.31625 0 8.19375C0 8.07124 0.048665 7.95376 0.135289 7.86713L6.73399 1.269L1.84686 1.269C1.72442 1.269 1.607 1.22036 1.52042 1.13379C1.43384 1.04721 1.38521 0.92979 1.38521 0.807353C1.38521 0.684916 1.43384 0.567493 1.52042 0.480917C1.607 0.394341 1.72442 0.345703 1.84686 0.345703L7.8483 0.345703C7.97074 0.345703 8.08816 0.394341 8.17474 0.480917C8.26131 0.567493 8.30995 0.684916 8.30995 0.807353Z" fill="currentcolor"/>
                             </svg>
                           </div>
-                          <div className="button-text-wrap">
-                            <div className="button-text">Sayta daxil olun</div>
-                            <div className="button-text">Sayta daxil olun</div>
-                          </div>
+                          <ButtonText>Sayta daxil olun</ButtonText>
                         </a>
                         <Link href={`/${locale}/contacts`} className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block">
-                          <div className="button-text-wrap">
-                            <div className="button-text">sorğu göndərin</div>
-                            <div className="button-text">sorğu göndərin</div>
-                          </div>
+                          <ButtonText>sorğu göndərin</ButtonText>
                         </Link>
                       </div>
                     </div>
@@ -251,16 +243,10 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
                     <h2 className="cta_heading">Tərəfdaşlığa <em>hazırsınız?</em></h2>
                     <div className="button-group">
                       <Link href={`/${locale}/contacts#get-in-touch`} className="button contact_cta-action-button contact_cta-action-button--primary">
-                        <div className="button-text-wrap elaqe-saxlayin">
-                          <div className="button-text">Əlaqə saxlayın</div>
-                          <div className="button-text">Əlaqə saxlayın</div>
-                        </div>
+                        <ButtonText className="elaqe-saxlayin">Əlaqə saxlayın</ButtonText>
                       </Link>
                       <Link href={`/${locale}/brokers#broker-registration`} className="button contact_cta-action-button contact_cta-action-button--secondary">
-                        <div className="button-text-wrap elaqe-saxlayin">
-                          <div className="button-text">Şəbəkəmizə qoşulun</div>
-                          <div className="button-text">Şəbəkəmizə qoşulun</div>
-                        </div>
+                        <ButtonText className="elaqe-saxlayin">Şəbəkəmizə qoşulun</ButtonText>
                       </Link>
                     </div>
                   </div>

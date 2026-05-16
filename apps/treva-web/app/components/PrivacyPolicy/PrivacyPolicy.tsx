@@ -6,6 +6,7 @@ import Navbar from "@/app/components/Navbar/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import "./privacy-policy.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 /* eslint-disable @next/next/no-img-element */
 
 interface PrivacyPolicyProps {
@@ -56,10 +57,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ locale }) => {
                     </div>
                     
                     <Link href={`/${locale}/contacts`} className="button w-inline-block">
-                      <div className="button-text-wrap">
-                        <div className="button-text">SATIŞLA ƏLAQƏ SAXLAYIN</div>
-                        <div className="button-text">SATIŞLA ƏLAQƏ SAXLAYIN</div>
-                      </div>
+                      <ButtonText>SATIŞLA ƏLAQƏ SAXLAYIN</ButtonText>
                     </Link>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import "./styles/home.css";
 
+import { ButtonText } from '@/app/components/ButtonText';
 // Reusable decorative SVG icon
 const DecorativeIcon = () => (
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -353,10 +354,7 @@ export const HomeLogos = () => {
                 href="brokers#broker-registration"
                 className="button w-variant-9209f11a-9939-4a4b-c66f-ac91791c56bc w-inline-block"
               >
-                <div className="button-text-wrap">
-                  <div className="button-text">TREVA ilə tərəfdaşlıq edin</div>
-                  <div className="button-text">TREVA ilə tərəfdaşlıq edin</div>
-                </div>
+                <ButtonText>TREVA ilə tərəfdaşlıq edin</ButtonText>
               </Link>
             </div>
           </div>
