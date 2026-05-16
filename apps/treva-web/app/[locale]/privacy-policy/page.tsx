@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   };
 
-  const { title, description } = translations[locale] || translations.az;
+  const { title, description } = (translations[locale] || translations.az) as { title: string; description: string };
 
   return {
     title,

@@ -1,5 +1,6 @@
+ 'use client'
+
 import { ButtonText } from '@/app/components/ButtonText';
-'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import Script from 'next/script'

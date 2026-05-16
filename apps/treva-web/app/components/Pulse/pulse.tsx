@@ -89,7 +89,7 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
 
 function PulseHeaderSection({ locale }: { locale: string }) {
   const leftArticles = ARTICLES.slice(0, 2);
-  const rightArticles = [FEATURED_ARTICLE, ...ARTICLES.slice(0, 3)];
+  const rightArticles = [...(FEATURED_ARTICLE ? [FEATURED_ARTICLE] : []), ...ARTICLES.slice(0, 3)];
 
   return (
     <section id="pulse" className="section_news-header">
@@ -117,31 +117,33 @@ function PulseHeaderSection({ locale }: { locale: string }) {
               <div className="news-header_middle-col">
                 <div className="w-dyn-list">
                   <div role="list" className="news_header-list w-dyn-items">
-                    <div role="listitem" className="news_header-item w-dyn-item">
-                      <Link href={`/${locale}/pulse/${FEATURED_ARTICLE.slug}`} className="news-header_middle-link w-inline-block">
-                        <div className="news-header_middle-img-wrap">
-                          <div className="news_middle-img-holder">
-                            <img
-                              src={FEATURED_ARTICLE.image}
-                              loading="lazy"
-                              alt={FEATURED_ARTICLE.title}
-                              className="fullwidth-img"
-                            />
+                    {FEATURED_ARTICLE && (
+                      <div role="listitem" className="news_header-item w-dyn-item">
+                        <Link href={`/${locale}/pulse/${FEATURED_ARTICLE.slug}`} className="news-header_middle-link w-inline-block">
+                          <div className="news-header_middle-img-wrap">
+                            <div className="news_middle-img-holder">
+                              <img
+                                src={FEATURED_ARTICLE.image}
+                                loading="lazy"
+                                alt={FEATURED_ARTICLE.title}
+                                className="fullwidth-img"
+                              />
+                            </div>
+
+                            <ReadMoreOverlay className="hide-tablet" />
                           </div>
 
-                          <ReadMoreOverlay className="hide-tablet" />
-                        </div>
+                          <div className="news-header_middle-content-wrap">
+                            <div className="news_middle-content">
+                              <ArticleMeta category={FEATURED_ARTICLE.category} date={FEATURED_ARTICLE.date} />
+                              <h2 className="news-header_middle-title no-animate">{FEATURED_ARTICLE.title}</h2>
+                            </div>
 
-                        <div className="news-header_middle-content-wrap">
-                          <div className="news_middle-content">
-                            <ArticleMeta category={FEATURED_ARTICLE.category} date={FEATURED_ARTICLE.date} />
-                            <h2 className="news-header_middle-title no-animate">{FEATURED_ARTICLE.title}</h2>
+                            <AuthorBlock author={FEATURED_ARTICLE.author} authorImage={FEATURED_ARTICLE.authorImage} />
                           </div>
-
-                          <AuthorBlock author={FEATURED_ARTICLE.author} authorImage={FEATURED_ARTICLE.authorImage} />
-                        </div>
-                      </Link>
-                    </div>
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -190,8 +192,8 @@ function PulseNewsSection({ locale }: { locale: string }) {
 
                 <div className="news-header_right-col">
                   <div className="news_rightcol-list-wrap w-dyn-list">
-                    <div role="list" className="news_week-list w-dyn-items">
-                      <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />
+                      <div role="list" className="news_week-list w-dyn-items">
+                        {WEEK_ARTICLE && <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />}
                     </div>
                   </div>
                 </div>
