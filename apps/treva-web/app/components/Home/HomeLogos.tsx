@@ -10,6 +10,138 @@ import 'swiper/css/navigation';
 
 import { ButtonText } from '@/app/components/ButtonText';
 
+// Production-parity CSS overrides
+const productionStyles = `
+  @font-face {
+    font-family: Helveticanowdisplay;
+    src: url(https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68908bd9d6a08ad4a2ee21dc_HelveticaNowDisplay-Regular.ttf) format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  .section_logos .logos_intro {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    margin-bottom: 4.5rem !important;
+    width: 100% !important;
+  }
+  
+  .text-color-white60 {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  
+  .n-testimonials_quote {
+    font-family: Helveticanowdisplay, sans-serif !important;
+    letter-spacing: -0.04em !important;
+    max-width: 46rem !important;
+    font-size: 2rem !important;
+    font-weight: 500 !important;
+    line-height: 1.1 !important;
+    color: #fff !important;
+    text-transform: uppercase !important;
+  }
+  
+  .n-testimonials_author-wrap {
+    font-family: Helveticanowdisplay, sans-serif !important;
+    grid-column-gap: 10px !important;
+    grid-row-gap: 10px !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    display: flex !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .section_logos h2 {
+    text-transform: uppercase !important;
+  }
+
+  .text-color-white60 {
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-transform: uppercase !important;
+  }
+
+  .n-testimonials_card {
+    grid-column-gap: 3.125rem !important;
+    grid-row-gap: 3.125rem !important;
+    flex-flow: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    height: 100% !important;
+    padding: 5rem 2.75rem 3.25rem 4.5rem !important;
+    display: flex !important;
+    transition: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .n-testimonials_card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .logos_cell:hover .logos_img-wrap {
+    transform: none !important;
+  }
+
+  .logos_cell-decoration .icon-large svg {
+    transition: none !important;
+  }
+
+  .logos_cell:hover .logos_cell-decoration .icon-large svg {
+    opacity: 0.5 !important;
+    transform: none !important;
+  }
+
+  .swiper-nav-testimonials {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.2rem !important;
+    position: absolute !important;
+    right: 4.5rem !important;
+    bottom: 3.25rem !important;
+    z-index: 10 !important;
+  }
+
+  .swiper-testimonials-prev, .swiper-testimonials-next {
+    cursor: pointer !important;
+    transition: opacity 0.3s ease !important;
+  }
+
+  .swiper-testimonials-prev:hover, .swiper-testimonials-next:hover {
+    opacity: 0.6 !important;
+  }
+
+  .heading-gap-h1 {
+    display: none !important;
+  }
+
+  @media screen and (max-width: 991px) {
+    .section_logos .logos_intro {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 1.5rem !important;
+    }
+    
+    .n-testimonials_quote {
+      font-size: 1.5rem !important;
+    }
+    
+    .n-testimonials_card {
+      padding: 3rem 2rem !important;
+    }
+    
+    .swiper-nav-testimonials {
+      right: 2rem !important;
+      bottom: 2rem !important;
+    }
+  }
+`;
+
 // Reusable decorative SVG icon
 const DecorativeIcon = () => (
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,6 +207,7 @@ export const HomeLogos = () => {
 
   return (
     <section className="section_logos bg-color-blue100 parallax-reveal">
+      <style dangerouslySetInnerHTML={{ __html: productionStyles }} />
       <div className="global-padding padding-section-medium">
         <div className="container-large">
           <div className="logos_component">
@@ -82,11 +215,10 @@ export const HomeLogos = () => {
             <div className="logos_intro">
               <div className="max-width-56rem">
                 <h2 className="text-color-white">
-                  <span className="heading-gap-h1">     </span>
                   Sahə üzrə etibarlı tərəfdaş şəbəkəsi tərəfindən dəstəklənir.
                 </h2>
               </div>
-              <div className="text-color-white60 first-child">(ETİBARLI TƏRƏFDAŞLAR)</div>
+              <div className="text-color-white60 first-child">(etibarlı tərəfdaşlar)</div>
             </div>
 
             {/* Logos Grid */}
@@ -266,11 +398,11 @@ export const HomeLogos = () => {
                     <div className="swiper-wrapper swiper-wrapper-testimonials">
                       {testimonials.map((item, idx) => (
                         <div key={idx} className="swiper-slide swiper-slide-testimonials">
-                          <div className="testimonials_card">
-                            <p className="testimonials_quote">            {item.quote}</p>
-                            <div className="testimonials_specs">
-                              <div className="testimonials_author-wrap">
-                                <div style={{ textTransform: 'uppercase' }}>
+                          <div className="n-testimonials_card">
+                            <p className="n-testimonials_quote">            {item.quote}</p>
+                            <div className="n-testimonials_specs">
+                              <div className="n-testimonials_author-wrap">
+                                <div>
                                   {item.author}
                                 </div>
                               </div>
@@ -282,7 +414,7 @@ export const HomeLogos = () => {
                   </div>
                   <div className="swiper-nav swiper-nav-testimonials">
                     <div className="swiper-testimonials-prev">
-                      <div className="icon is-test-arrow w-embed">
+                      <div className="icon w-embed">
                         <svg width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path
                             fillRule="evenodd"
@@ -383,8 +515,7 @@ export const HomeLogos = () => {
             {/* Mobile Logos (simplified, kept as original) */}
             <div className="logos_mobile">
               <div data-w-id="3667447e-bb70-d435-2c4e-2b618901377f" className="n-testimonials_holder-mob">
-                {/* ... mobile content ... */}
-                {/* Keeping original structure for brevity; it's long and repetitive */}
+                {/* Keeping original structure for brevity */}
               </div>
             </div>
 
