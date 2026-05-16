@@ -7,11 +7,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import "./styles/home.css";
 
 import { ButtonText } from '@/app/components/ButtonText';
+import { HomeLiveCard, type HomeLiveCardItem } from './HomeLiveCard';
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 }
 
-const newsItems = [
+const newsItems: HomeLiveCardItem[] = [
     { title: 'Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr', author: 'Leyla Bağırzadə', category: 'Bloq', date: '23.04.2026', img: '/cdn-assets/c818f17b39-69e9dc5d25a4d7cb27fafcbc_leyla-cover.webp', link: 'bakida-menzil-qiymetleri-2026-serfeli-layiheler' },
     { title: 'Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?', author: 'Cavid Axundov', category: 'Bloq', date: '17.04.2026', img: '/cdn-assets/687dcaf737-69e23b2e65222dfa1568b506_javid-cover.webp', link: 'bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir' },
     { title: 'Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?', author: 'Nəzrin Kərimli', category: 'Bloq', date: '10.04.2026', img: '/cdn-assets/8841250f2a-69d8fa41ad243257771d2882_Nezrin-Kerimli-cover-(1)-(1).webp', link: 'bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir' },
@@ -134,34 +135,7 @@ export const HomeHeroSection = () => {
     const renderBlock = (keyPrefix: string, blockRef?: React.Ref<HTMLDivElement>) => (
         <div className="live_block" ref={blockRef as React.RefObject<HTMLDivElement>}>
             {newsItems.map((item, index) => (
-                <div key={`${keyPrefix}-${index}`} role="listitem" className="w-dyn-item">
-                    <Link href={`pulse/${item.link}`} className="live_link w-inline-block">
-                        <div className="news_middle-img-wrap is-carousel">
-                            <div className="news_middle-img-holder">
-                                <img src={item.img} loading="lazy" alt={item.title} className="fullwidth-img" />
-                            </div>
-                            <div className="projects_overlay hide-tablet">
-                                <div className="news_btn">
-                                    <div>Məqaləni oxu</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="news-header_middle-content-wrap">
-                            <div className="news_middle-content">
-                                <div className="news_specs-wrap">
-                                    <div className="news_category-label">
-                                        <div>{item.category}</div>
-                                    </div>
-                                    <div>{item.date}</div>
-                                </div>
-                                <h2 className="live_title no-animate">{item.title}</h2>
-                            </div>
-                            <div className="news_author-wrap hide-landscape">
-                                <div>{item.author}</div>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
+                <HomeLiveCard key={`${keyPrefix}-${index}`} item={item} />
             ))}
         </div>
     );
