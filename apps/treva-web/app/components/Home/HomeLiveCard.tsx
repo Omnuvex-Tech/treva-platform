@@ -3,6 +3,7 @@ import Link from 'next/link';
 export type HomeLiveCardItem = {
   title: string;
   author: string;
+  authorImg?: string;
   category: string;
   date: string;
   img: string;
@@ -34,10 +35,15 @@ export const HomeLiveCard = ({ item }: HomeLiveCardProps) => (
             </div>
             <div>{item.date}</div>
           </div>
-          <h2 className="live_title no-animate">{item.title}</h2>
+          <h3 className="live_title no-animate">{item.title}</h3>
         </div>
         <div className="news_author-wrap hide-landscape">
-          <div>{item.author}</div>
+          {item.authorImg && (
+            <div className="news_author-headshot">
+              <img src={item.authorImg} alt={item.author} className="news_author-headshot-img" />
+            </div>
+          )}
+          <div className="news_author-name">{item.author}</div>
         </div>
       </div>
     </Link>

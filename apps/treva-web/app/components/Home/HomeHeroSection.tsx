@@ -8,21 +8,111 @@ import "./styles/home.css";
 
 import { ButtonText } from '@/app/components/ButtonText';
 import { HomeLiveCard, type HomeLiveCardItem } from './HomeLiveCard';
+
 if (typeof window !== 'undefined') {
     gsap.registerPlugin(ScrollTrigger);
 }
 
 const newsItems: HomeLiveCardItem[] = [
-    { title: 'Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr', author: 'Leyla Bağırzadə', category: 'Bloq', date: '23.04.2026', img: '/cdn-assets/c818f17b39-69e9dc5d25a4d7cb27fafcbc_leyla-cover.webp', link: 'bakida-menzil-qiymetleri-2026-serfeli-layiheler' },
-    { title: 'Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?', author: 'Cavid Axundov', category: 'Bloq', date: '17.04.2026', img: '/cdn-assets/687dcaf737-69e23b2e65222dfa1568b506_javid-cover.webp', link: 'bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir' },
-    { title: 'Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?', author: 'Nəzrin Kərimli', category: 'Bloq', date: '10.04.2026', img: '/cdn-assets/8841250f2a-69d8fa41ad243257771d2882_Nezrin-Kerimli-cover-(1)-(1).webp', link: 'bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir' },
-    { title: 'İnvestisiya üçün niyə məhz Sea Breeze?', author: 'Türkan Mamedova', category: 'Bloq', date: '06.04.2026', img: '/cdn-assets/ddd2aa230f-69d387faabd8941c551800fa_turkan-cover-(1).webp', link: 'investisiya-ucun-niye-mehz-sea-breeze' },
-    { title: 'Satışdan Sonrakı Şəffaflıq: Müştəri Məmnuniyyəti', author: 'Səbinə Muxtarova', category: 'Bloq', date: '19.03.2026', img: '/cdn-assets/8e2a7414c0-69bbea28ae4fb211e7614275_cover-sebine.webp', link: 'satisdan-sonraki-seffafliq' },
-    { title: 'Bakı Daşınmaz Əmlak Bazarı: İnvestisiya İmkanları', author: 'Batula Mohubbi', category: 'Bloq', date: '13.03.2026', img: '/cdn-assets/9247778e39-69b419b1ccd29af57469cce0_batula-cover.webp', link: 'baki-dasinmaz-emlak-bazari' },
-    { title: 'Marina Village-də Xanımlar üçün 8 Mart Kampaniyası', author: 'Treva Team', category: 'Kampaniya', date: '06.03.2026', img: '/cdn-assets/f6c2eb9e80-69aad644a4043868699c2dc8_GÜCLÜ-TEKLİF-AZ.webp', link: 'ugurlu-investisiya-imkani' },
-    { title: 'Daşınmaz əmlak almaq istəyən insanlar nə ilə maraqlanır?', author: 'Ilhamə Paşazadə', category: 'Bloq', date: '04.03.2026', img: '/cdn-assets/2dfb5ca2bc-69b0356bc47fd3803791ac60_Gemini_Generated_Image_tcieq9tcieq9tcie.webp', link: 'dasinmaz-emlak-almaq-isteyen-insanlar-ilk-novbede-ne-ile-maraqlanirlar' },
-    { title: 'Treva Real Estate Daşkənddə beynəlxalq forumda', author: 'Treva Team', category: 'Tədbir', date: '24.02.2026', img: '/cdn-assets/ba4e1938cf-699da3a67e74e27a7ab28be0_2-(1).webp', link: 'treva-real-estate-daskendde' },
-    { title: 'Arabian Ranches Sea Breeze-də investisiya imkanı', author: 'Treva Team', category: 'Kampaniya', date: '17.02.2026', img: '/cdn-assets/c42dbd8b6c-69941644ea2d8a06b09eefc2_arabian-16x9-az.webp', link: 'arabian-ranches-sea-breeze-de-investisiya' }
+    {
+        title: "Bakıda Mənzil Qiymətləri 2026: Sərfəli Layihələr",
+        category: "Bloq",
+        date: "23.04.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e9dc5d25a4d7cb27fafcbc_leyla cover.webp",
+        author: "Leyla Bağırzadə",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69eb87ce2666e56cda7df5f6_leyla-autor.webp",
+        link: "bakida-menzil-qiymetleri-2026-serfeli-layiheler"
+    },
+    {
+        title: "Bakıda Daşınmaz Əmlakda Satış Uğurunu Nə Müəyyən Edir?",
+        category: "Bloq",
+        date: "17.04.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e23b2e65222dfa1568b506_javid cover.webp",
+        author: "Cavid Axundov",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b1127e23e0494e172f15d1_freepik__keep-everything-exactly-the-same-in-the-image-the-__62478.webp",
+        link: "bakida-dasinmaz-emlak-satis-ugurunu-ne-mueyyen-edir"
+    },
+    {
+        title: "Bakıda İnvestisiya Üçün Ən Uğurlu Layihələr Hansılardır?",
+        category: "Bloq",
+        date: "10.04.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d8fa41ad243257771d2882_Nezrin Kerimli cover (1) (1).webp",
+        author: "Nəzrin Kərimli",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d8f643447acae0af6ad0cd_Nezrin Kərimli (1).webp",
+        link: "bakida-investisiya-ucun-en-ugurlu-layiheler-hansilardir"
+    },
+    {
+        title: "İnvestisiya üçün niyə məhz Sea Breeze?",
+        category: "Bloq",
+        date: "06.04.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d387faabd8941c551800fa_turkan cover (1).webp",
+        author: "Türkan Mamedova",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69d39344f03dd689a3df5f48_Turkan Mamedova (1)d.webp",
+        link: "investisiya-ucun-niye-mehz-sea-breeze"
+    },
+    {
+        title: "Satışdan Sonrakı Şəffaflıq: Müştəri Məmnuniyyəti Şirkətin Nüfuzunu Necə Müəyyən Edir?",
+        category: "Bloq",
+        date: "19.03.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69bbea28ae4fb211e7614275_cover sebine.webp",
+        author: "Səbinə Muxtarova",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69bbd13d1d6e953bdfa53e4f_Sebine.webp",
+        link: "satisdan-sonraki-seffafliq"
+    },
+    {
+        title: "Bakı Daşınmaz Əmlak Bazarı: İnvestisiya İmkanları və Off-plan Trendi",
+        category: "Bloq",
+        date: "13.03.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b419b1ccd29af57469cce0_batula cover.webp",
+        author: "Batula Mohubbi",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b40fd1699b4c83ff918f97_batula.webp",
+        link: "baki-dasinmaz-emlak-bazari"
+    },
+    {
+        title: "Daşınmaz əmlak almaq istəyən insanlar ilk növbədə nə ilə maraqlanırlar?",
+        category: "Bloq",
+        date: "04.03.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b0356bc47fd3803791ac60_Gemini_Generated_Image_tcieq9tcieq9tcie.webp",
+        author: "Ilhamə Paşazadə",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69a7d6a31b4102cd82150c58_1x1 size qadin (1).webp",
+        link: "dasinmaz-emlak-almaq-isteyen-insanlar-ilk-novbede-ne-ile-maraqlanirlar"
+    },
+    {
+        title: "Daşınmaz əmlak bazarında brokerlərlə işləmək niyə daha aktualdır?",
+        category: "Bloq",
+        date: "10.02.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/698b3024d7c6aebd7f7d6138_freepik_medium_shot_of_an_azerbaijani_real_estate_broker_i_96816.webp",
+        author: "Tərlan Kərimov",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6989c5263e93fc7d31871a9e_IMAGE.jpeg",
+        link: "dasinmaz-emlak-bazarinda-brokerlerle-islemek"
+    },
+    {
+        title: "Sizə uyğun mənzil növü hansıdır?",
+        category: "Bloq",
+        date: "02.02.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6985f7a8016aab013f18eb73_Narmin_sazmani_upscale_upscales (1) (1) (1) (1) (1) (1).png",
+        author: "Həcər Nağıyeva",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b4284aff4b24810b7251ff_hecer.webp",
+        link: "size-uygun-menzil-novu-hansidir"
+    },
+    {
+        title: "2026 Vizyonu: TREVA və Azərbaycanın Daşınmaz Əmlak Bazarının Sistemli Transformasiyası",
+        category: "Bloq",
+        date: "26.01.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/697773c2eeb67ee81daa27ef_Treva 02.webp",
+        author: "Cavid Axundov",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69b1127e23e0494e172f15d1_freepik__keep-everything-exactly-the-same-in-the-image-the-__62478.webp",
+        link: "2026-baxisi-treva-ve-azerbaycanin-dasinmaz-emlak-bazarinin-sistemli-transformasiyasi"
+    },
+    {
+        title: "Dəniz mənzərəli townhouse nədir və niyə Sea Breeze-də bu qədər seçilir?",
+        category: "Bloq",
+        date: "22.01.2026",
+        img: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6989e187812b56c36e0e41d1_farid.png",
+        author: "Fərid Əlipənahov",
+        authorImg: "https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6971fdc542706589755deb51_profil photo.webp",
+        link: "deniz-menzereli-townhouse-nedir"
+    }
 ];
 
 export const HomeHeroSection = () => {
