@@ -11,10 +11,9 @@
 /* GLOBAL FIX: Prevent clipping of Azerbaijani/Turkish characters (Ş, İ, Ö, Ç, Ğ, Ü, Q)
    Separate rules for Buttons, Toggles, and Lines to avoid interdependencies. */
 
-/* 1. BUTTONS & LINKS */
+/* 1. BUTTONS & LINKS (footer_link-text styled in Home/styles/home.css) */
 .button-text-wrap,
 .button-text,
-.footer_link-text,
 .projects_clear-text,
 .news_btn {
     padding-top: 0.1em !important;
