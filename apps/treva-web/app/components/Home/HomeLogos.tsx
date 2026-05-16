@@ -189,10 +189,11 @@ export const HomeLogos = () => {
     const swiper = new Swiper('.swiper-testimonials', {
       modules: [Navigation, Autoplay],
       speed: 800,
-      loop: true,
+      loop: false,
       autoplay: {
         delay: 5000,
         disableOnInteraction: false,
+          stopOnLastSlide: true,        // optional: autoplay stops at last slide
       },
       navigation: {
         nextEl: '.swiper-testimonials-next',
@@ -399,7 +400,7 @@ export const HomeLogos = () => {
                       {testimonials.map((item, idx) => (
                         <div key={idx} className="swiper-slide swiper-slide-testimonials">
                           <div className="n-testimonials_card">
-                            <p className="n-testimonials_quote">            {item.quote}</p>
+                            <p className="n-testimonials_quote">{item.quote}</p>
                             <div className="n-testimonials_specs">
                               <div className="n-testimonials_author-wrap">
                                 <div>
