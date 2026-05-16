@@ -120,6 +120,69 @@ const productionStyles = `
     display: none !important;
   }
 
+  .section_logos .logos-partnership-button {
+    grid-column-gap: 5px !important;
+    grid-row-gap: 5px !important;
+    border: 1px solid var(--_color---white) !important;
+    background-color: var(--_color---white) !important;
+    color: var(--_color---blue-400) !important;
+    white-space: nowrap !important;
+    border-radius: 80px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    width: 240px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 29px !important;
+    min-height: 29px !important;
+    padding: 0 17px !important;
+    font-size: 14px !important;
+    line-height: 17px !important;
+    text-decoration: none !important;
+    transition: all .3s !important;
+    display: flex !important;
+    flex: none !important;
+    overflow: hidden !important;
+  }
+
+  .section_logos .logos-partnership-button:hover {
+    color: var(--_color---white) !important;
+    background-color: #fff0 !important;
+  }
+
+  .section_logos .logos-partnership-button .button-text-wrap {
+    position: relative !important;
+    width: 100% !important;
+    height: 17px !important;
+    line-height: 17px !important;
+    display: block !important;
+    overflow: hidden !important;
+  }
+
+  .section_logos .logos-partnership-button .button-text {
+    position: absolute !important;
+    left: 0 !important;
+    top: 50% !important;
+    width: 100% !important;
+    height: 17px !important;
+    line-height: 17px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: translateY(-50%) !important;
+    transition: transform .3s ease !important;
+  }
+
+  .section_logos .logos-partnership-button .button-text + .button-text {
+    top: calc(50% + 17px) !important;
+  }
+
+  .section_logos .logos-partnership-button:hover .button-text {
+    transform: translateY(calc(-50% - 17px)) !important;
+  }
+
   @media screen and (max-width: 991px) {
     .section_logos .logos_intro {
       flex-direction: column !important;
@@ -528,7 +591,7 @@ export const HomeLogos = () => {
               <Link
                 data-wf--button--variant="white"
                 href="brokers#broker-registration"
-                className="button w-variant-9209f11a-9939-4a4b-c66f-ac91791c56bc w-inline-block"
+                className="button logos-partnership-button w-variant-9209f11a-9939-4a4b-c66f-ac91791c56bc w-inline-block"
               >
                 <ButtonText>TREVA ilə tərəfdaşlıq edin</ButtonText>
               </Link>
