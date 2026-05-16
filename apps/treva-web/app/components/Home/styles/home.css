@@ -562,11 +562,8 @@ textarea:focus::placeholder {
 
 .projects_overlay {
   position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: rgba(0,0,0,0.4) !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
@@ -582,21 +579,22 @@ textarea:focus::placeholder {
 }
 
 .projects_btn {
-  width: 3.5rem;
-  height: 3.5rem;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
+  width: 3.75rem;
+  height: 3.75rem;
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid rgba(255,255,255,0.3);
-  transform: scale(0.8);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 0.8px solid rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s, opacity 0.4s ease 0.15s;
 }
 
 .projects-prev_holder:hover .projects_btn {
-  transform: scale(1);
+  opacity: 1 !important;
+  transform: scale(1) !important;
 }
 
 .projects_caption {
@@ -608,11 +606,13 @@ textarea:focus::placeholder {
   color: white !important;
   font-size: 1.125rem !important;
   font-weight: 500 !important;
+  opacity: 0 !important;
   transform: translateY(20px) !important;
-  transition: transform 0.4s ease !important;
+  transition: transform 0.4s ease 0.15s, opacity 0.4s ease 0.15s !important;
 }
 
 .projects-prev_holder:hover .projects_caption {
+  opacity: 1 !important;
   transform: translateY(0) !important;
 }
 
