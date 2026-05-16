@@ -531,8 +531,10 @@
 }
 
 @media (max-width: 991px) {
-  .nav_inner {
-    grid-template-columns: auto 1fr auto;
+  .nav_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .nav_menu {
@@ -549,26 +551,31 @@
 }
 
 @media (max-width: 767px) {
-  .treva-nav_container {
+  .nav_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: auto;
+    height: auto;
+    padding-top: 15.75px;
+    padding-bottom: 14px;
     padding-left: 16px;
     padding-right: 16px;
   }
 
-  .nav_inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 64px;
-  }
-
   .nav_logo {
-    width: 70px;
-    height: 16px;
+    width: 84px;
+    height: 18.75px;
+    padding-left: 0;
   }
 
   .nav_logo svg {
-    width: 70px;
-    height: 16px;
+    width: 84px;
+    height: 18.75px;
+  }
+
+  .nav_menu {
+    display: none;
   }
 
   .nav_cta-wrap {
@@ -676,5 +683,24 @@
   .info-title {
     font-size: 20px;
     line-height: 26px;
+  }
+}
+
+@media (max-width: 479px) {
+  .nav_container {
+    padding-top: 17.5px;
+    padding-bottom: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .nav_logo {
+    width: 77px;
+    height: 17.2px;
+  }
+
+  .nav_logo svg {
+    width: 77px;
+    height: 17.2px;
   }
 }
