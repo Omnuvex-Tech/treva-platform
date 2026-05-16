@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ReadMoreOverlay } from '../ReadMoreOverlay';
 
 export type HomeLiveCardItem = {
   title: string;
@@ -21,11 +22,7 @@ export const HomeLiveCard = ({ item }: HomeLiveCardProps) => (
         <div className="news_middle-img-holder">
           <img src={item.img} loading="lazy" alt={item.title} className="fullwidth-img" />
         </div>
-        <div className="projects_overlay hide-tablet">
-          <div className="news_btn">
-            <div>Məqaləni oxu</div>
-          </div>
-        </div>
+        <ReadMoreOverlay />
       </div>
       <div className="news-header_middle-content-wrap">
         <div className="news_middle-content">

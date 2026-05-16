@@ -184,7 +184,7 @@ export const HomeHeroSection = () => {
                 const setX = gsap.quickSetter(track, 'x', 'px');
                 let blockWidth = firstBlockRef.current.offsetWidth;
                 let pos = 0;
-                const speed = 60; // px/saniyə — sürəti dəyişmək üçün
+                const speed = 80; // px/saniyə — sürəti dəyişmək üçün
 
                 const tick = (time: number, deltaTime: number) => {
                     pos -= (speed * deltaTime) / 1000;

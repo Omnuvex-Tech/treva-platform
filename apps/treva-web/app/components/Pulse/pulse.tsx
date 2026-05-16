@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ARTICLES, FEATURED_ARTICLE, WEEK_ARTICLE } from "@/lib/pulse-data";
 import { Article } from "@/lib/pulse.types";
 import "./pulse.css";
+import { ReadMoreOverlay } from "../ReadMoreOverlay";
 
 import { ButtonText } from '@/app/components/ButtonText';
 type PulseProps = {
@@ -70,11 +71,7 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
             <img src={article.image} loading="lazy" alt={article.title} className="fullwidth-img" />
           </div>
 
-          <div className="projects_overlay hide-tablet">
-            <div className="news_btn">
-              <div>Məqaləni oxu</div>
-            </div>
-          </div>
+          <ReadMoreOverlay className="hide-tablet" />
         </div>
 
         <div className={variant === "left" ? "news_leftcol-content" : "news-header_middle-content-wrap"}>
@@ -132,11 +129,7 @@ function PulseHeaderSection({ locale }: { locale: string }) {
                             />
                           </div>
 
-                          <div className="projects_overlay hide-tablet">
-                            <div className="news_btn">
-                              <div>Məqaləni oxu</div>
-                            </div>
-                          </div>
+                          <ReadMoreOverlay className="hide-tablet" />
                         </div>
 
                         <div className="news-header_middle-content-wrap">

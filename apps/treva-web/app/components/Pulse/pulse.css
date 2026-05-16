@@ -243,16 +243,18 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transform: scale(0.8);
+  transform: scale(0.9);
   transition: all 0.3s ease;
   background-color: rgba(255, 255, 255, 0.3) !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
   color: white !important;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  padding: 0.65rem 1.35rem;
   border-radius: 2rem;
   white-space: nowrap;
+  font-weight: 400;
+  letter-spacing: 0.05em;
 }
 
 .news_middle-img-wrap:hover .news_btn,
@@ -391,3 +393,5 @@
     aspect-ratio: 16/9;
   }
 }
+
+.news_btn { font-weight: 400 !important; }
