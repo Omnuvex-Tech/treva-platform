@@ -1,10 +1,15 @@
+@font-face {
+  font-family: 'Helveticanowdisplay';
+  src: url('https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68908bd9d6a08ad4a2ee21dc_HelveticaNowDisplay-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ==========================================================================
    PULSE SECTION SAFE LAYOUT FIX
-   Problem: bloglar yuxarı çıxanda başqa section-ların içinə girirdi.
-   Həll: bütün Pulse news layout normal document flow-da qalır.
    ========================================================================== */
 
-/* Section özü normal axında qalsın və footer/başqa section-larla qarışmasın */
 .section_news {
   position: relative;
   z-index: 1;
@@ -15,7 +20,6 @@
   padding-bottom: 7rem;
 }
 
-/* Container-lər normal blok kimi davransın */
 .section_news .global-padding,
 .section_news .container-large,
 .section_news .news_component {
@@ -24,10 +28,6 @@
   max-width: none;
 }
 
-/* ƏSAS LAYOUT:
-   1-ci sıra: Həftənin seçimi + Filter
-   2-ci sıra: Bloglar tam en
-*/
 .section_news .news_wrap {
   position: relative;
   width: 100%;
@@ -41,38 +41,28 @@
   overflow: visible;
 }
 
-/* Webflow-un köhnə grid node placement-lərini sıfırlayır */
 .section_news .news_week-col,
 .section_news .news_middle-wrap,
 .section_news .news_filters-col,
 .section_news #all-articles {
   position: relative !important;
-  inset: auto !important;
-  top: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  transform: none !important;
   width: 100%;
   max-width: none;
   min-width: 0;
 }
 
-/* Həftənin seçimi yuxarı solda */
 .section_news .news_week-col {
   grid-area: week !important;
   display: block !important;
   align-self: start;
 }
 
-/* Filter yuxarı sağda */
 .section_news .news_filters-col {
   grid-area: filters !important;
   display: block !important;
   align-self: start;
 }
 
-/* Bloglar aşağıda bütün eni tutur */
 .section_news #all-articles,
 .section_news .news_middle-wrap {
   grid-area: articles !important;
@@ -81,7 +71,6 @@
   align-self: start;
 }
 
-/* Blog list tam enə yayılsın */
 .section_news .news_middle-list {
   position: relative !important;
   width: 100%;
@@ -92,62 +81,32 @@
   gap: 2rem;
 }
 
-/* Kartlar normal flow-da qalsın */
 .section_news .news_middle-list .news_header-item {
   position: relative !important;
   width: 100%;
   max-width: none;
   min-width: 0;
   margin: 0;
-  transform: none;
 }
 
-/* Link kartın tam enini tutsun */
-.section_news .news_middle-list .news_middle-link {
-  width: 100%;
-  max-width: none;
+.news_middle-title, .news_leftcol-title, .news_rightcol-title, .news-header_middle-title {
+  font-family: 'Helveticanowdisplay', Arial, sans-serif;
+  text-transform: none;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
-/* Şəkillər mövcud dizaynla tam eni tutsun */
-.section_news .news_middle-list .news_middle-img-wrap,
-.section_news .news_middle-list .news_middle-img-holder,
-.section_news .news_middle-list .fullwidth-img {
-  width: 100%;
-}
-
-/* Yuxarı bloklar normal hündürlük yaratsın */
-.section_news .news_week-list,
-.section_news .news_week-link,
-.section_news .news_filters-holder,
-.section_news .news_filters-form {
-  position: relative;
-  width: 100%;
-  max-width: none;
-}
-
-/* Footer və növbəti section-lar blogların altından başlasın */
-.section_news + * {
-  position: relative;
-  z-index: 0;
-  clear: both;
+.news_middle-title {
+  font-size: 1.25rem;
 }
 
 /* Tablet */
 @media screen and (max-width: 991px) {
-  .section_news {
-    padding-top: 2.5rem;
-    padding-bottom: 5rem;
-  }
-
   .section_news .news_wrap {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "week"
-      "filters"
-      "articles";
+    grid-template-areas: "week" "filters" "articles";
     gap: 1.75rem;
   }
-
   .section_news .news_middle-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.5rem;
@@ -156,66 +115,29 @@
 
 /* Mobile */
 @media screen and (max-width: 767px) {
-  .section_news {
-    padding-top: 2rem;
-    padding-bottom: 4rem;
-  }
-
-  .section_news .news_wrap {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "week"
-      "filters"
-      "articles";
-    gap: 1.5rem;
-  }
-
   .section_news .news_middle-list {
     grid-template-columns: 1fr;
     gap: 1.25rem;
   }
 }
 
-/* ==========================================================================
-   ARTICLE CARD HOVER EFFECTS
-   ========================================================================== */
-
-/* Pulse Page & Continue Reading Section */
-.news_middle-img-wrap, 
-.news_leftcol-img-wrap, 
-.news_week-img-wrap,
-.news-header_middle-img-wrap,
-.f-articles_img-wrap {
+/* Hover Effects */
+.news_middle-img-wrap, .news_leftcol-img-wrap, .news_week-img-wrap, .news-header_middle-img-wrap {
   position: relative;
   overflow: hidden;
   cursor: pointer;
 }
 
-.news_middle-img-wrap:hover .news_middle-img-holder,
-.news_leftcol-img-wrap:hover .news_leftcol-img-holder,
-.news_week-img-wrap:hover img,
-.news-header_middle-img-wrap:hover .news_middle-img-holder,
-.f-articles_img-wrap:hover img {
+.news_middle-img-wrap:hover img, .news_leftcol-img-wrap:hover img, .news_week-img-wrap:hover img, .news-header_middle-img-wrap:hover img {
   transform: scale(1.05);
   transition: transform 0.4s ease;
 }
 
-.news_middle-img-wrap .news_middle-img-holder,
-.news_leftcol-img-wrap .news_leftcol-img-holder,
-.news_week-img-wrap img,
-.news-header_middle-img-wrap .news_middle-img-holder,
-.f-articles_img-wrap img {
-  transition: transform 0.4s ease;
-}
-
-/* Overlay and Button */
-.projects_overlay,
-.projects_overlay.hide-tablet {
+.projects_overlay {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 10;
   opacity: 0;
-  visibility: visible !important;
   background-color: rgba(23, 25, 28, 0.4);
   transition: opacity 0.3s ease;
   display: flex !important;
@@ -223,26 +145,14 @@
   align-items: center;
 }
 
-.news_middle-img-wrap:hover .projects_overlay,
-.news_leftcol-img-wrap:hover .projects_overlay,
-.news_week-img-wrap:hover .projects_overlay,
-.news-header_middle-img-wrap:hover .projects_overlay,
-.f-articles_img-wrap:hover .projects_overlay,
-.news_middle-link:hover .projects_overlay,
-.news_leftcol-link:hover .projects_overlay,
-.news_week-link:hover .projects_overlay,
-.news-header_middle-link:hover .projects_overlay,
-.f-articles_link:hover .projects_overlay {
-  display: flex !important;
+.news_middle-img-wrap:hover .projects_overlay, .news_leftcol-img-wrap:hover .projects_overlay, .news_week-img-wrap:hover .projects_overlay, .news-header_middle-img-wrap:hover .projects_overlay {
   opacity: 1 !important;
-  visibility: visible !important;
 }
 
 .news_btn {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  opacity: 0;
   transform: scale(0.6);
   transition: all 0.4s ease;
   background-color: rgba(255, 255, 255, 0.3) !important;
@@ -257,19 +167,7 @@
   letter-spacing: 0.05em;
 }
 
-.news_middle-img-wrap:hover .news_btn,
-.news_leftcol-img-wrap:hover .news_btn,
-.news_week-img-wrap:hover .news_btn,
-.news-header_middle-img-wrap:hover .news_btn,
-.f-articles_img-wrap:hover .news_btn,
-.news_middle-link:hover .news_btn,
-.news_leftcol-link:hover .news_btn,
-.news_week-link:hover .news_btn,
-.news-header_middle-link:hover .news_btn,
-.f-articles_link:hover .news_btn {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+.news_middle-img-wrap:hover .news_btn, .news_leftcol-img-wrap:hover .news_btn, .news_week-img-wrap:hover .news_btn, .news-header_middle-img-wrap:hover .news_btn {
   transform: scale(1) !important;
 }
 
@@ -277,121 +175,10 @@
   background-color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Continue Reading Section (section_f-articles) */
-.section_f-articles {
-  background-color: #f7f7f7;
-  padding-top: 6rem;
-  padding-bottom: 6rem;
-}
-
-.f-articles_intro {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 4rem;
-}
-
-.f-articles_intro h2 {
-  font-size: 3.5rem;
-  text-transform: uppercase;
-  max-width: 40rem;
-  line-height: 1.1;
-}
-
-.f-articles_intro .text-size-small {
-  text-transform: uppercase;
-  color: rgba(23, 25, 28, 0.6);
-}
-
-.f-articles_list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid #e4e4e4;
-}
-
-.f-articles_item {
-  border-right: 1px solid #e4e4e4;
-  border-bottom: 1px solid #e4e4e4;
-  padding: 1.5rem;
-  transition: background-color 0.3s ease;
-}
-
-.f-articles_item:nth-child(3n) {
-  border-right: none;
-}
-
-.f-articles_item:hover {
-  background-color: #efefef;
-}
-
-.f-articles_link {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.f-articles_img-wrap {
-  flex: none;
-  width: 8rem;
-  height: 8rem;
-  border-radius: 0.5rem;
-}
-
-.f-articles_content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
 .f-articles_title {
+  font-family: 'Helveticanowdisplay', Arial, sans-serif;
   font-size: 1.25rem;
   line-height: 1.2;
   font-weight: 400;
   color: #17191c;
 }
-
-.author_mini-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.author_mini-avatar {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-@media screen and (max-width: 991px) {
-  .f-articles_list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .f-articles_item:nth-child(2n) {
-    border-right: none;
-  }
-  .f-articles_item:nth-child(3n) {
-    border-right: 1px solid #e4e4e4;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  .f-articles_list {
-    grid-template-columns: 1fr;
-  }
-  .f-articles_item {
-    border-right: none;
-  }
-  .f-articles_link {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .f-articles_img-wrap {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16/9;
-  }
-}
-
-.news_btn { font-weight: 400 !important; }
