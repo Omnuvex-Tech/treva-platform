@@ -291,54 +291,56 @@ export default function Navbar({ locale }: { locale: string }) {
     <>
       <header className="header">
         <div className="nav">
-          <div className="nav_container">
-            <Link
-              href={homeHref}
-              className="nav_logo"
-              aria-label={secondary.homeLabel}
-            >
-              <TrevaLogoSvg />
-            </Link>
+          <div className="global-padding">
+            <div className="nav_container">
+              <Link
+                href={homeHref}
+                className="nav_logo"
+                aria-label={secondary.homeLabel}
+              >
+                <TrevaLogoSvg />
+              </Link>
 
-              <nav className="nav_menu" aria-label="Primary navigation">
-                {localizedLinks.map((link) => (
-                  <Link key={link.name} href={link.href} className="nav_link">
-                    {link.hasDot && <RedDot />}
-                    <span className="nav_link-mask">
-                      <span className="nav_link-content">
-                        <span className="nav_link-text">{link.name}</span>
-                        <span className="nav_link-text">{link.name}</span>
+                <nav className="nav_menu" aria-label="Primary navigation">
+                  {localizedLinks.map((link) => (
+                    <Link key={link.name} href={link.href} className="nav_link">
+                      {link.hasDot && <RedDot />}
+                      <span className="nav_link-mask">
+                        <span className="nav_link-content">
+                          <span className="nav_link-text">{link.name}</span>
+                          <span className="nav_link-text">{link.name}</span>
+                        </span>
                       </span>
-                    </span>
-                  </Link>
-                ))}
-              </nav>
+                    </Link>
+                  ))}
+                </nav>
 
-              <div className="nav_cta-wrap">
-                <LanguageDropdown
-                  currentLang={currentLang}
-                  onLangChange={handleLangChange}
-                />
+                <div className="nav_cta-wrap">
+                  <LanguageDropdown
+                    currentLang={currentLang}
+                    onLangChange={handleLangChange}
+                  />
 
-                <a
-                  href={secondary.partnerHref}
-                  target="_blank"
-                  className="button"
-                  rel="noreferrer"
-                >
-                  <UserIcon />
-                  <ButtonText as="span" textAs="span">{secondary.login}</ButtonText>
-                </a>
+                  <a
+                    href={secondary.partnerHref}
+                    target="_blank"
+                    className="button"
+                    rel="noreferrer"
+                  >
+                    <UserIcon />
+                    <ButtonText as="span" textAs="span">{secondary.login}</ButtonText>
+                  </a>
 
-                <button
-                  className="nav_menu-btn"
-                  onClick={() => setIsMenuOpen(true)}
-                  type="button"
-                  aria-label="Open menu"
-                >
-                  <MenuIcon />
-                </button>
-              </div>
+                  <button
+                    className="nav_menu-btn"
+                    onClick={() => setIsMenuOpen(true)}
+                    type="button"
+                    aria-label="Open menu"
+                  >
+                    <MenuIcon />
+                  </button>
+                </div>
+            </div>
           </div>
         </div>
       </header>
@@ -353,40 +355,38 @@ export default function Navbar({ locale }: { locale: string }) {
 
         <aside className="nav_burger-side">
           <div className="nav_burger-content-wrap">
-            <div>
-              <div className="nav_burger-top">
+            <div className="nav_burger-top">
+              <Link
+                href={homeHref}
+                className="nav_burger-logo"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <TrevaLogoSvg light />
+                <span>{secondary.realEstate}</span>
+              </Link>
+
+              <button
+                className="nav_burger-close"
+                onClick={() => setIsMenuOpen(false)}
+                type="button"
+                aria-label="Close menu"
+              >
+                <ArrowLeftIcon />
+              </button>
+            </div>
+
+            <nav className="nav_burger-body" aria-label="Mobile navigation">
+              {localizedLinks.map((link) => (
                 <Link
-                  href={homeHref}
-                  className="nav_burger-logo"
+                  key={link.name}
+                  href={link.href}
+                  className="nav_burger-link"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <TrevaLogoSvg light />
-                  <span>{secondary.realEstate}</span>
+                  <span>{link.name}</span>
+                  {link.hasDot && <RedDot />}
                 </Link>
-
-                <button
-                  className="nav_burger-close"
-                  onClick={() => setIsMenuOpen(false)}
-                  type="button"
-                  aria-label="Close menu"
-                >
-                  <ArrowLeftIcon />
-                </button>
-              </div>
-
-              <nav className="nav_burger-body" aria-label="Mobile navigation">
-                {localizedLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className="nav_burger-link"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <span>{link.name}</span>
-                    {link.hasDot && <RedDot />}
-                  </Link>
-                ))}
-              </nav>
+              ))}
 
               <div className="nav_burger-contact-wrap">
                 <a
@@ -405,7 +405,7 @@ export default function Navbar({ locale }: { locale: string }) {
                   {secondary.shortPhone}
                 </a>
               </div>
-            </div>
+            </nav>
 
             <a
               href={secondary.partnerHref}
