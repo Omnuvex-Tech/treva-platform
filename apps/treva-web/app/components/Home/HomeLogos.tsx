@@ -65,6 +65,12 @@ const productionStyles = `
     text-transform: uppercase !important;
   }
 
+  @media screen and (min-width: 992px) {
+    .home-logos-note-text {
+      font-size: 14.5px !important;
+    }
+  }
+
   .n-testimonials_card {
     grid-column-gap: 43.75px !important;
     grid-row-gap: 43.75px !important;
