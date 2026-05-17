@@ -65,7 +65,7 @@ const FALLBACK_PHONE_PREFIX = '+994'
 const INITIAL_CONTACT_FIELDS: ContactFields = {
   name: '',
   email: '',
-  phone: FALLBACK_PHONE_PREFIX,
+  phone: '',
   message: '',
 }
 
@@ -91,6 +91,18 @@ function ContactForm() {
   const [fields, setFields] = useState<ContactFields>(INITIAL_CONTACT_FIELDS)
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<ContactStatus>('idle')
+  const [phonePrefix, setPhonePrefix] = useState('+994')
+
+  useEffect(() => {
+    fetch('https://ipwho.is/')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.calling_code) {
+          setPhonePrefix('+' + data.calling_code)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const validate = () => {
     const errs: ContactErrors = {}
@@ -102,18 +114,30 @@ function ContactForm() {
     return errs
   }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     const fieldName = name as keyof ContactFields
     setFields(f => ({ ...f, [name]: value }))
     if (errors[fieldName]) setErrors(er => ({ ...er, [fieldName]: '' }))
   }
 
-  const handlePhoneInput = (e: ChangeEvent<HTMLInputElement>) => {
-    let digits = e.target.value.replace(/\D/g, '')
-    if (digits.startsWith('994')) digits = digits.slice(3)
-    if (digits.startsWith('0')) digits = digits.slice(1)
-    setFields(f => ({ ...f, phone: `${FALLBACK_PHONE_PREFIX}${digits.slice(0, 9)}` }))
+  const handlePhoneFocus = () => {
+    if (!fields.phone.startsWith(phonePrefix)) {
+      setFields(f => ({
+        ...f,
+        phone: phonePrefix + f.phone.replace(/^\+*/, '').replace(/^(\d+)/, '')
+      }))
+    }
+  }
+
+  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const clean = e.target.value.replace(/[^\d+]/g, '')
+    const firstPlus = clean.indexOf('+')
+    const filtered = clean
+      .split('')
+      .filter((char, i) => char !== '+' || i === firstPlus)
+      .join('')
+    setFields(f => ({ ...f, phone: filtered }))
     if (errors.phone) setErrors(er => ({ ...er, phone: '' }))
   }
 
@@ -158,73 +182,64 @@ function ContactForm() {
   return (
     <div className="connect_form-wrap animate-up">
       <form id="email-form" name="email-form" onSubmit={handleSubmit} className="connect_form contact_form" noValidate>
-        <div className="contact_form-row contact_form-row--split">
-          <div className="field_wrap">
-            <input
-              className={`connect_input-field${errors.name ? ' error' : ''}`}
-              name="name"
-              maxLength={256}
-              placeholder="Tam ad *"
-              type="text"
-              value={fields.name}
-              onChange={handleChange}
-            />
-            {errors.name && <div className="connect_error" style={{ display: 'block' }}>{errors.name}</div>}
-          </div>
-
-          <div className="field_wrap">
-            <input
-              className={`connect_input-field${errors.email ? ' error' : ''}`}
-              name="email"
-              maxLength={256}
-              placeholder="Email ünvanı *"
-              type="email"
-              value={fields.email}
-              onChange={handleChange}
-            />
-            {errors.email && <div className="connect_error" style={{ display: 'block' }}>{errors.email}</div>}
-          </div>
+        <div className="field_wrap">
+          <input
+            className={`connect_input-field${errors.name ? ' error' : ''}`}
+            name="name"
+            maxLength={256}
+            placeholder="Tam ad *"
+            type="text"
+            value={fields.name}
+            onChange={handleChange}
+          />
+          {errors.name && <div className="connect_error" style={{ display: 'block' }}>{errors.name}</div>}
         </div>
 
-        <div className="contact_form-row">
-          <div className="field_wrap">
-            <input
-              className={`connect_input-field${errors.phone ? ' error' : ''}`}
-              name="phone"
-              maxLength={13}
-              placeholder="Telefon nömrəsi (+994...) *"
-              type="tel"
-              value={fields.phone}
-              onChange={handlePhoneInput}
-            />
-            {errors.phone && <div className="connect_error" style={{ display: 'block' }}>{errors.phone}</div>}
-          </div>
+        <div className="field_wrap">
+          <input
+            className={`connect_input-field${errors.email ? ' error' : ''}`}
+            name="email"
+            maxLength={256}
+            placeholder="Email ünvanı *"
+            type="email"
+            value={fields.email}
+            onChange={handleChange}
+          />
+          {errors.email && <div className="connect_error" style={{ display: 'block' }}>{errors.email}</div>}
         </div>
 
-        <div className="contact_form-row">
-          <div className="field_wrap">
-            <textarea
-              className="connect_input-field contact_message-field"
-              name="message"
-              maxLength={500}
-              placeholder="Mesajınızı yazın..."
-              rows={4}
-              value={fields.message}
-              onChange={handleChange}
-            />
-          </div>
+        <div className="field_wrap phone-field-wrap">
+          <input
+            className={`connect_input-field${errors.phone ? ' error' : ''}`}
+            name="phone"
+            maxLength={256}
+            placeholder="Telefon nömrəsi *"
+            type="tel"
+            value={fields.phone}
+            onFocus={handlePhoneFocus}
+            onChange={handlePhoneChange}
+          />
+          {errors.phone && <div className="connect_error" style={{ display: 'block' }}>{errors.phone}</div>}
         </div>
 
-        <div className="contact_form-row contact_form-row--submit">
-          <button
-            type="submit"
-            className="button white"
-            disabled={status === 'loading'}
-            style={{ cursor: status === 'loading' ? 'wait' : 'pointer' }}
-          >
-            {status === 'loading' ? 'Göndərilir...' : 'Mesaj göndər'}
-          </button>
-        </div>
+        <input
+          className="connect_input-field message-field"
+          name="message"
+          maxLength={256}
+          placeholder="Mesaj"
+          type="text"
+          value={fields.message}
+          onChange={handleChange}
+        />
+
+        <button
+          type="submit"
+          className="button white"
+          disabled={status === 'loading'}
+          style={{ cursor: status === 'loading' ? 'wait' : 'pointer' }}
+        >
+          {status === 'loading' ? 'Göndərilir...' : 'MESAJ GÖNDƏR'}
+        </button>
       </form>
 
       {status === 'error' && (
@@ -491,7 +506,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                     <div className="connect_wrap">
                       <div className="connect_title-wrap">
                         <p className="text-color-white60">TREVA ilə əlaqədə qalın</p>
-                        <h2 className="text-color-white contact_heading-az no-animate">Bizimlə Əlaqə saxlayın</h2>
+                        <h2 className="text-color-white contact_heading-az no-animate">Bizimlə Əlaqə <br /> saxlayın</h2>
                       </div>
                       <ContactForm />
                     </div>
