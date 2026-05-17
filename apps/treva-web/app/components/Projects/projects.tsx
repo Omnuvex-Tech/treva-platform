@@ -191,7 +191,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                         </h1>
                       </div>
                       <div className="projects_bio">
-                        <p>
+                        <p className="contact-p-technology">
                           <span>Biz qabaqcıl texnologiyanı sənaye bilikləri ilə birləşdirərək, sizə müqavilələri daha sürətli bağlamağa və daha geniş auditoriyaya çatmağa kömək edirik.</span>
                         </p>
                       </div>
