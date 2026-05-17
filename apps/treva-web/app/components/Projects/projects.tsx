@@ -321,6 +321,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                       </svg>
                                     </div>
                                   </div>
+                                  <div className="projects_caption">Panorama by Elie Saab</div>
                                 </div>
                                 <div className="img-cover"></div>
                               </div>
@@ -347,6 +348,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                       </svg>
                                     </div>
                                   </div>
+                                  <div className="projects_caption">Reportage Heights</div>
                                 </div>
                                 <div className="img-cover"></div>
                               </div>
@@ -373,6 +375,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                       </svg>
                                     </div>
                                   </div>
+                                  <div className="projects_caption">Arabian Ranches</div>
                                 </div>
                                 <div className="img-cover"></div>
                               </div>
@@ -399,6 +402,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                       </svg>
                                     </div>
                                   </div>
+                                  <div className="projects_caption">Marina Village</div>
                                 </div>
                                 <div className="img-cover"></div>
                               </div>
@@ -425,6 +429,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                       </svg>
                                     </div>
                                   </div>
+                                  <div className="projects_caption">Villa Siena</div>
                                 </div>
                                 <div className="img-cover"></div>
                               </div>
@@ -451,6 +456,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                       </svg>
                                     </div>
                                   </div>
+                                  <div className="projects_caption">Sabah Residence</div>
                                 </div>
                                 <div className="img-cover"></div>
                               </div>

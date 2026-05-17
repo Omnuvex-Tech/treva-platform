@@ -49,12 +49,13 @@
   left: 50%;
   width: 4rem;
   height: 4rem;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 0.8px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 
   transform: translate(-50%, -50%) scale(0.5);
   opacity: 0;
@@ -67,42 +68,36 @@
 }
 
 .projects_btn:hover {
-  background-color: white;
-  border-color: white;
-  transform: translate(-50%, -50%) scale(1.05) !important;
+  background-color: rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .projects_btn:hover svg path {
-  fill: var(--_color---blue-100, #17191c);
+  transition: fill 0.3s ease;
 }
 
-/* OVAL RING EFFECT */
-.projects_item::before {
-  content: "";
+/* CAPTION HOVER EFFECT */
+.projects_caption {
   position: absolute;
-  top: 50%;
-  left: 50%;
-
-  width: 140px;
-  height: 140px;
-
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-
-  transform: translate(-50%, -50%) scale(0.6);
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: white;
+  font-size: 15.75px;
+  font-weight: 500;
   opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.4s ease 0.15s, opacity 0.4s ease 0.15s;
+}
 
-  transition: all 0.3s ease;
-  pointer-events: none;
+.projects_item:hover .projects_caption {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* HOVER EFFECT */
 .projects_item:hover .projects_btn {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-}
-
-.projects_item:hover::before {
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
 }
@@ -384,10 +379,6 @@ body {
   cursor: pointer;
   color: var(--_color---blue-400, #17191c);
   border-bottom: 1px solid currentColor;
-}
-
-.projects_clear-link:hover {
-  color: var(--_color---blue-400-60, #17191c99);
 }
 
 /* clear-content: flex column container for sliding animation */
