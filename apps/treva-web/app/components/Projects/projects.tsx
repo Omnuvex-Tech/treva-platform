@@ -13,7 +13,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [selectedLocation, setSelectedLocation] = useState<string>('')
-  
+
   const smoothWrapRef = useRef<HTMLDivElement | null>(null)
   const gsapReady = useRef(false)
 
@@ -49,11 +49,11 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
       const smoother =
         window.innerWidth > 768
           ? ScrollSmoother.create({
-              wrapper: '#smooth-wrapper',
-              content: '#smooth-content',
-              smooth: 1.6,
-              effects: true,
-            })
+            wrapper: '#smooth-wrapper',
+            content: '#smooth-content',
+            smooth: 1.6,
+            effects: true,
+          })
           : null
 
       gsap.to('body', { autoAlpha: 1, duration: 0.3 })
@@ -176,13 +176,13 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
       <div id="smooth-wrapper" className="smooth-wrapper" ref={smoothWrapRef}>
         <div id="smooth-content" className="page-wrapper">
           <Navbar locale={locale} />
-          
+
           <main className="main-wrapper">
             <section id="projects" className="section_projects">
               <div className="global-padding padding-section-medium">
                 <div className="container-large">
                   <div className="projects_component">
-                    
+
                     <div className="projects_intro-wrap">
                       <div className="max-width-34rem">
                         <h1>
@@ -200,17 +200,17 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                     <div className="projects_form-block animate-up w-form">
                       <form id="email-form" name="email-form" fs-list-element="filters" className="projects_filters-wrap">
                         <div className="projects_filters-block">
-                          
+
                           {/* Status Dropdown */}
                           <div className="projects_drodpown w-dropdown">
-                            <div 
+                            <div
                               className={`projects_toggle w-dropdown-toggle ${openDropdown === 'status' ? 'w--open' : ''}`}
                               onClick={() => toggleDropdown('status')}
                             >
-                              <div>{selectedStatus || 'status'}</div>
+                              <div>status</div>
                               <div className="icon-regular ease0-3 w-embed">
                                 <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M13.354 6.85403L8.35403 11.854C8.30759 11.9005 8.25245 11.9374 8.19175 11.9626C8.13105 11.9877 8.06599 12.0007 8.00028 12.0007C7.93457 12.0007 7.86951 11.9877 7.80881 11.9626C7.74811 11.9374 7.69296 11.9005 7.64653 11.854L2.64653 6.85403C2.55271 6.76021 2.5 6.63296 2.5 6.50028C2.5 6.3676 2.55271 6.24035 2.64653 6.14653C2.74035 6.05271 2.8676 6 3.00028 6C3.13296 6 3.26021 6.05271 3.35403 6.14653L8.00028 10.7934L12.6465 6.14653C12.693 6.10007 12.7481 6.06322 12.8088 6.03808C12.8695 6.01294 12.9346 6 13.0003 6C13.066 6 13.131 6.01294 13.1917 6.03808C13.2524 6.06322 13.3076 6.10007 13.354 6.14653C13.4005 6.19298 13.4373 6.24813 13.4625 6.30883C13.4876 6.36953 13.5006 6.43458 13.5006 6.50028C13.5006 6.56598 13.4876 6.63103 13.4625 6.69173C13.4373 6.75242 13.4005 6.80757 13.354 6.85403Z" fill="currentcolor"/>
+                                  <path d="M13.354 6.85403L8.35403 11.854C8.30759 11.9005 8.25245 11.9374 8.19175 11.9626C8.13105 11.9877 8.06599 12.0007 8.00028 12.0007C7.93457 12.0007 7.86951 11.9877 7.80881 11.9626C7.74811 11.9374 7.69296 11.9005 7.64653 11.854L2.64653 6.85403C2.55271 6.76021 2.5 6.63296 2.5 6.50028C2.5 6.3676 2.55271 6.24035 2.64653 6.14653C2.74035 6.05271 2.8676 6 3.00028 6C3.13296 6 3.26021 6.05271 3.35403 6.14653L8.00028 10.7934L12.6465 6.14653C12.693 6.10007 12.7481 6.06322 12.8088 6.03808C12.8695 6.01294 12.9346 6 13.0003 6C13.066 6 13.131 6.01294 13.1917 6.03808C13.2524 6.06322 13.3076 6.10007 13.354 6.14653C13.4005 6.19298 13.4373 6.24813 13.4625 6.30883C13.4876 6.36953 13.5006 6.43458 13.5006 6.50028C13.5006 6.56598 13.4876 6.63103 13.4625 6.69173C13.4373 6.75242 13.4005 6.80757 13.354 6.85403Z" fill="currentcolor" />
                                 </svg>
                               </div>
                             </div>
@@ -230,14 +230,14 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Location Dropdown */}
                           <div className="projects_drodpown w-dropdown">
-                            <div 
+                            <div
                               className={`projects_toggle w-dropdown-toggle ${openDropdown === 'location' ? 'w--open' : ''}`}
                               onClick={() => toggleDropdown('location')}
                             >
-                              <div>{selectedLocation || 'məkan'}</div>
+                              <div>məkan</div>
                               <div className="icon-regular ease0-3 w-embed">
                                 <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M13.354 6.85403L8.35403 11.854C8.30759 11.9005 8.25245 11.9374 8.19175 11.9626C8.13105 11.9877 8.06599 12.0007 8.00028 12.0007C7.93457 12.0007 7.86951 11.9877 7.80881 11.9626C7.74811 11.9374 7.69296 11.9005 7.64653 11.854L2.64653 6.85403C2.55271 6.76021 2.5 6.63296 2.5 6.50028C2.5 6.3676 2.55271 6.24035 2.64653 6.14653C2.74035 6.05271 2.8676 6 3.00028 6C3.13296 6 3.26021 6.05271 3.35403 6.14653L8.00028 10.7934L12.6465 6.14653C12.693 6.10007 12.7481 6.06322 12.8088 6.03808C12.8695 6.01294 12.9346 6 13.0003 6C13.066 6 13.131 6.01294 13.1917 6.03808C13.2524 6.06322 13.3076 6.10007 13.354 6.14653C13.4005 6.19298 13.4373 6.24813 13.4625 6.30883C13.4876 6.36953 13.5006 6.43458 13.5006 6.50028C13.5006 6.56598 13.4876 6.63103 13.4625 6.69173C13.4373 6.75242 13.4005 6.80757 13.354 6.85403Z" fill="currentcolor"/>
+                                  <path d="M13.354 6.85403L8.35403 11.854C8.30759 11.9005 8.25245 11.9374 8.19175 11.9626C8.13105 11.9877 8.06599 12.0007 8.00028 12.0007C7.93457 12.0007 7.86951 11.9877 7.80881 11.9626C7.74811 11.9374 7.69296 11.9005 7.64653 11.854L2.64653 6.85403C2.55271 6.76021 2.5 6.63296 2.5 6.50028C2.5 6.3676 2.55271 6.24035 2.64653 6.14653C2.74035 6.05271 2.8676 6 3.00028 6C3.13296 6 3.26021 6.05271 3.35403 6.14653L8.00028 10.7934L12.6465 6.14653C12.693 6.10007 12.7481 6.06322 12.8088 6.03808C12.8695 6.01294 12.9346 6 13.0003 6C13.066 6 13.131 6.01294 13.1917 6.03808C13.2524 6.06322 13.3076 6.10007 13.354 6.14653C13.4005 6.19298 13.4373 6.24813 13.4625 6.30883C13.4876 6.36953 13.5006 6.43458 13.5006 6.50028C13.5006 6.56598 13.4876 6.63103 13.4625 6.69173C13.4373 6.75242 13.4005 6.80757 13.354 6.85403Z" fill="currentcolor" />
                                 </svg>
                               </div>
                             </div>
@@ -257,7 +257,47 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                         </div>
 
-                        <div className="projects_tags-block hide">
+                        <div className={`projects_tags-block${(selectedStatus || selectedLocation) ? '' : ' hide'}`}>
+                          <div className="projects_tags-wrap">
+                            {selectedStatus && (
+                              <div className="projects_tag-item">
+                                <div
+                                  type="button"
+                                  className="projects_tag-remove"
+                                  onClick={() => setSelectedStatus('')}
+                                >
+                                  <div className="icon w-embed">
+                                    <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M9.37276 8.62821C9.41341 8.66886 9.44566 8.71712 9.46765 8.77023C9.48965 8.82334 9.50098 8.88026 9.50098 8.93774C9.50098 8.99523 9.48965 9.05215 9.46765 9.10526C9.44566 9.15837 9.41341 9.20663 9.37276 9.24728C9.33212 9.28792 9.28386 9.32017 9.23075 9.34217C9.17764 9.36416 9.12072 9.37549 9.06323 9.37549C9.00575 9.37549 8.94882 9.36416 8.89571 9.34217C8.84261 9.32017 8.79435 9.28792 8.7537 9.24728L5.12573 5.61876L1.49776 9.24728C1.41567 9.32937 1.30433 9.37549 1.18823 9.37549C1.07213 9.37549 0.960793 9.32937 0.8787 9.24728C0.796607 9.16518 0.750488 9.05384 0.750488 8.93774C0.750488 8.82165 0.796608 8.71031 0.8787 8.62821L4.50722 5.00024L0.8787 1.37227C0.796607 1.29018 0.750488 1.17884 0.750488 1.06274C0.750488 0.946647 0.796607 0.835305 0.8787 0.753212C0.960793 0.671119 1.07213 0.625 1.18823 0.625C1.30433 0.625 1.41567 0.671119 1.49776 0.753212L5.12573 4.38173L8.7537 0.753212C8.83579 0.671119 8.94714 0.625 9.06323 0.625C9.17933 0.625 9.29067 0.671119 9.37276 0.753212C9.45486 0.835305 9.50098 0.946647 9.50098 1.06274C9.50098 1.17884 9.45486 1.29018 9.37276 1.37227L5.74425 5.00024L9.37276 8.62821Z" fill="currentColor" />
+                                     </svg>
+                                  </div>
+                                </div>
+                                <div className="projects_tag-value">{selectedStatus}</div>
+                              </div>
+                            )}
+                            {selectedLocation && (
+                              <div className="projects_tag-item">
+                                <div
+                                  type="button"
+                                  className="projects_tag-remove"
+                                  onClick={() => setSelectedLocation('')}
+                                >
+                                  <div className="icon w-embed">
+                                    <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M9.37276 8.62821C9.41341 8.66886 9.44566 8.71712 9.46765 8.77023C9.48965 8.82334 9.50098 8.88026 9.50098 8.93774C9.50098 8.99523 9.48965 9.05215 9.46765 9.10526C9.44566 9.15837 9.41341 9.20663 9.37276 9.24728C9.33212 9.28792 9.28386 9.32017 9.23075 9.34217C9.17764 9.36416 9.12072 9.37549 9.06323 9.37549C9.00575 9.37549 8.94882 9.36416 8.89571 9.34217C8.84261 9.32017 8.79435 9.28792 8.7537 9.24728L5.12573 5.61876L1.49776 9.24728C1.41567 9.32937 1.30433 9.37549 1.18823 9.37549C1.07213 9.37549 0.960793 9.32937 0.8787 9.24728C0.796607 9.16518 0.750488 9.05384 0.750488 8.93774C0.750488 8.82165 0.796608 8.71031 0.8787 8.62821L4.50722 5.00024L0.8787 1.37227C0.796607 1.29018 0.750488 1.17884 0.750488 1.06274C0.750488 0.946647 0.796607 0.835305 0.8787 0.753212C0.960793 0.671119 1.07213 0.625 1.18823 0.625C1.30433 0.625 1.41567 0.671119 1.49776 0.753212L5.12573 4.38173L8.7537 0.753212C8.83579 0.671119 8.94714 0.625 9.06323 0.625C9.17933 0.625 9.29067 0.671119 9.37276 0.753212C9.45486 0.835305 9.50098 0.946647 9.50098 1.06274C9.50098 1.17884 9.45486 1.29018 9.37276 1.37227L5.74425 5.00024L9.37276 8.62821Z" fill="currentColor" />
+                                     </svg>
+                                  </div>
+                                </div>
+                                <div className="projects_tag-value">{selectedLocation}</div>
+                              </div>
+                            )}
+                          </div>
+                          <a href="#" className="projects_clear-link w-inline-block" onClick={(e) => { e.preventDefault(); clearFilters(); }}>
+                            <div className="projects_clear-content">
+                              <div className="projects_clear-text">filtrləri sıfırla</div>
+                              <div className="projects_clear-text">filtrləri sıfırla</div>
+                            </div>
+                          </a>
                         </div>
                       </form>
                     </div>
@@ -265,19 +305,19 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                     <div className="projects_wrap">
                       <div className="w-dyn-list">
                         <div fs-list-element="list" role="list" className="projects_list w-dyn-items">
-                          
+
                           {/* Project Item 1 */}
                           <div role="listitem" className="w-dyn-item">
                             <a aria-label="go to project" href={`/${locale}/project/panorama-by-elie-saab`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
-                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie saab sekil kesilmis.avif" loading="lazy" alt="Panorama by Elie Saab" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis-p-800.avif 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis.avif 1306w" className="fullwidth-img"/>
+                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie saab sekil kesilmis.avif" loading="lazy" alt="Panorama by Elie Saab" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis-p-800.avif 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis.avif 1306w" className="fullwidth-img" />
                                 </div>
                                 <div className="projects_overlay hide-tablet">
                                   <div className="projects_btn is-large">
                                     <div className="icon-xlarge w-embed">
                                       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white" />
                                       </svg>
                                     </div>
                                   </div>
@@ -297,13 +337,13 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                             <a aria-label="go to project" href={`/${locale}/project/reportage-heights`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
-                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif" loading="lazy" alt="Reportage Heights" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-800.avif 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-1080.avif 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif 2000w" className="fullwidth-img"/>
+                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif" loading="lazy" alt="Reportage Heights" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-800.avif 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-1080.avif 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif 2000w" className="fullwidth-img" />
                                 </div>
                                 <div className="projects_overlay">
                                   <div className="projects_btn is-large">
                                     <div className="icon-xlarge w-embed">
                                       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white" />
                                       </svg>
                                     </div>
                                   </div>
@@ -323,13 +363,13 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                             <a aria-label="go to project" href={`/${locale}/project/arabian-ranches`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
-                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp" loading="lazy" alt="Arabian Ranches" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-500.webp 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-800.webp 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1080.webp 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1600.webp 1600w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-2000.webp 2000w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp 2602w" className="fullwidth-img"/>
+                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp" loading="lazy" alt="Arabian Ranches" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-500.webp 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-800.webp 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1080.webp 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1600.webp 1600w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-2000.webp 2000w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp 2602w" className="fullwidth-img" />
                                 </div>
                                 <div className="projects_overlay">
                                   <div className="projects_btn is-large">
                                     <div className="icon-xlarge w-embed">
                                       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white" />
                                       </svg>
                                     </div>
                                   </div>
@@ -349,13 +389,13 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                             <a aria-label="go to project" href={`/${locale}/project/marina-village`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
-                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif" loading="lazy" alt="Marina Village" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif 700w" className="fullwidth-img"/>
+                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif" loading="lazy" alt="Marina Village" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif 700w" className="fullwidth-img" />
                                 </div>
                                 <div className="projects_overlay">
                                   <div className="projects_btn is-large">
                                     <div className="icon-xlarge w-embed">
                                       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white" />
                                       </svg>
                                     </div>
                                   </div>
@@ -375,13 +415,13 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                             <a aria-label="go to project" href={`/${locale}/project/villa-siena`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
-                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif" loading="lazy" alt="Villa Siena" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif 700w" className="fullwidth-img"/>
+                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif" loading="lazy" alt="Villa Siena" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif 700w" className="fullwidth-img" />
                                 </div>
                                 <div className="projects_overlay">
                                   <div className="projects_btn is-large">
                                     <div className="icon-xlarge w-embed">
                                       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white" />
                                       </svg>
                                     </div>
                                   </div>
@@ -401,13 +441,13 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                             <a aria-label="go to project" href={`/${locale}/project/sabah-residence`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
-                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/692d30a5de9b28406e24d70b_sabah4.jpg" loading="lazy" alt="Sabah Residence" className="fullwidth-img"/>
+                                  <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/692d30a5de9b28406e24d70b_sabah4.jpg" loading="lazy" alt="Sabah Residence" className="fullwidth-img" />
                                 </div>
                                 <div className="projects_overlay">
                                   <div className="projects_btn is-large">
                                     <div className="icon-xlarge w-embed">
                                       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.48003C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.48003C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white" />
                                       </svg>
                                     </div>
                                   </div>
@@ -423,7 +463,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                           </div>
 
                         </div>
-                        
+
                         <div fs-list-element="empty" className="projects_empty-state hide">
                           <div>No results found.</div>
                         </div>

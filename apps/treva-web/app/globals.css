@@ -14,8 +14,14 @@
 /* 1. BUTTONS & LINKS (perfect vertical slide alignment and centering) */
 .button-text-wrap,
 .button-text,
-.projects_clear-text,
 .news_btn {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* projects clear-link text: separate rule to avoid !important conflicts */
+.projects_clear-text {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
