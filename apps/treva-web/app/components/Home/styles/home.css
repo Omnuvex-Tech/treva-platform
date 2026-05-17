@@ -1624,65 +1624,7 @@ body.gsap-hidden {
   line-height: 22.4px !important;
 }
 
-/* Button text wrap default — needed for hover slide */
-.section_header .button .button-text-wrap,
-.section_services .button .button-text-wrap,
-.section_projects-prev .button .button-text-wrap,
-.section_logos .button .button-text-wrap {
-  display: inline-flex;
-  flex-direction: column;
-  height: 22.4px;
-  overflow: hidden;
-  line-height: 22.4px !important;
-}
 
-.section_header .button .button-text,
-.section_services .button .button-text,
-.section_projects-prev .button .button-text,
-.section_logos .button .button-text {
-  display: block;
-  flex: 0 0 22.4px;
-  height: 22.4px;
-  line-height: 22.4px !important;
-}
-
-.section_services .services_cta-wrap .button .button-text-wrap {
-  position: relative;
-  height: 22px !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  line-height: 22px !important;
-  backface-visibility: visible !important;
-  -webkit-backface-visibility: visible !important;
-  transform-style: flat !important;
-  transform: none !important;
-  will-change: auto !important;
-}
-
-.section_services .services_cta-wrap .button .button-text {
-  position: relative;
-  top: 0;
-  flex: 0 0 22px;
-  height: 22px;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  line-height: 22px !important;
-  backface-visibility: visible !important;
-  -webkit-backface-visibility: visible !important;
-  transform-style: flat !important;
-  transform: none !important;
-  transition: top 0.3s ease;
-  will-change: auto !important;
-}
-
-.section_services .services_cta-wrap .button:hover .button-text {
-  top: -22px;
-  transform: none !important;
-}
 
 @media screen and (min-width: 992px) {
   .home-offices-bio-text {

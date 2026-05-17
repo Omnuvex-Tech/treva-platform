@@ -9,32 +9,57 @@
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
 /* GLOBAL FIX: Prevent clipping of Azerbaijani/Turkish characters (Ş, İ, Ö, Ç, Ğ, Ü, Q)
-   Separate rules for Buttons, Toggles, and Lines to avoid interdependencies. */
+   and enforce absolute vertical centering for all button slide hover animations. */
 
-/* 1. BUTTONS & LINKS (footer_link-text styled in Home/styles/home.css) */
+/* 1. BUTTONS & LINKS (perfect vertical slide alignment and centering) */
 .button-text-wrap,
 .button-text,
 .projects_clear-text,
 .news_btn {
-    padding-top: 0.1em !important;
-    padding-bottom: 0.1em !important;
-    margin-top: -0.1em !important;
-    margin-bottom: -0.1em !important;
-    line-height: 1.8 !important;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
 }
 
 .button-text-wrap {
-    height: 1.8em !important; /* Increased to accommodate vertical glyphs and descenders */
+    display: inline-flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    position: relative !important;
+    vertical-align: middle !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 1.8em !important;
+    /* Standard Webflow line size */
+}
+
+.button-text {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    flex: 0 0 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transform: translateY(0) !important;
+    white-space: nowrap !important;
+}
+
+/* Ensure subsequent sibling text layer sits perfectly in flow below the first one */
+.button-text+.button-text {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
 }
 
 /* 2. ACCORDION / FEATURES TOGGLES */
 .features_toggle-title {
     overflow: hidden !important;
     display: block !important;
-    height: 1.6em !important; /* Fixed height to match line-height and show only one line */
+    height: 1.6em !important;
+    /* Fixed height to match line-height and show only one line */
     position: relative !important;
     /* Vertical bleed trick to prevent clipping within the overflow:hidden container */
     padding-top: 0.3em !important;
@@ -71,3 +96,36 @@
     -webkit-backface-visibility: hidden;
 }
 
+/* ==========================================================================
+   GLOBAL OVERRIDES: Absolutely Centered layout & Jitter-Free Hover Animations
+   ========================================================================== */
+
+/* 1. Ensure all button parents display inline-flex and center their contents perfectly */
+.button,
+.news_btn,
+.logos-partnership-button,
+.contact_cta-action-button,
+.project_back-btn,
+.cs_scroll-wrap {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+}
+
+/* 2. Perfect vertical hover slide animation for all buttons and scroll triggers */
+.button:hover .button-text,
+.nav .button:hover .button-text,
+.section_header .button:hover .button-text,
+.section_services .button:hover .button-text,
+.section_projects-prev .button:hover .button-text,
+.section_logos .button:hover .button-text,
+.cs_scroll-wrap:hover .button-text,
+.section_footer .footer_specs-wrap .cs_scroll-wrap:hover .button-text,
+.section_services .services_cta-wrap .button:hover .button-text,
+.section_cta .contact_cta-button--primary:hover .button-text,
+.section_cta .button.contact_cta-action-button:hover .button-text,
+.project_back-btn:hover .button-text,
+.logos-partnership-button:hover .button-text {
+    transform: translateY(-100%) !important;
+}
