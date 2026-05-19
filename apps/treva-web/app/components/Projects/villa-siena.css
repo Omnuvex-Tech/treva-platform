@@ -153,3 +153,9 @@ body.gsap-hidden {
     }
 }
 
+
+/* --- Disable hero image hover zoom --- */
+.header_video-wrap:hover .fullwidth-img {
+  transform: none !important;
+}
+
