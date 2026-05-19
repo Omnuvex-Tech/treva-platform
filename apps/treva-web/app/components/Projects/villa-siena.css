@@ -97,7 +97,7 @@ body.gsap-hidden {
     width: auto !important;
     min-width: 0 !important;
     min-height: auto !important;
-    padding: 0.3rem 0.875rem !important;
+    padding: 5.8px 37px !important;
     border-radius: 80px !important;
     justify-content: center;
     align-items: center;
@@ -145,7 +145,7 @@ body.gsap-hidden {
 
 @media (min-width: 992px) {
     .button.contact_cta-action-button {
-        padding: 1.0rem 0.875rem !important;
+        padding: 5.8px 37px !important;
         font-size: 0.875rem !important;
         border-radius: 80px !important;
         line-height: 1.5 !important;
