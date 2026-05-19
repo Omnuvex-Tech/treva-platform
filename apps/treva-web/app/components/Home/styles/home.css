@@ -853,15 +853,18 @@ html.disable-smooth-scroll {
 
 .live_title {
   font-family: 'Helveticanowdisplay', Arial, sans-serif !important;
-  font-size: 1.25rem;
-  line-height: 1.2;
-  margin-top: 3.5px;
-  font-weight: 200;
-  text-transform: none;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 1.25rem !important;
+  line-height: 1.2 !important;
+  margin-top: 3.5px !important;
+  font-weight: 400 !important;
+  color: var(--_color---blue-300, #2e3139) !important;
+  text-transform: none !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
 .news_specs-wrap {
