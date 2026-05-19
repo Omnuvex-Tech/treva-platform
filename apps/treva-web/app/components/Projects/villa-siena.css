@@ -159,3 +159,46 @@ body.gsap-hidden {
   transform: none !important;
 }
 
+/* --- Project Overview Bio Styles --- */
+.project-overview_bio {
+    color: var(--_color---blue-100, #4c525e);
+    font-family: 'Helveticanowdisplay', Arial, sans-serif;
+    font-size: 15px; /* Font size set to 15px */
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    padding-bottom: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* --- Overview Accordion Titles --- */
+.project-overview_title .services_item-title {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+.project-overview_title .project-overview_number {
+    font-family: 'Helveticanowdisplay', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--_color---blue-100, #4c525e);
+    letter-spacing: 0.02em;
+}
+.project-overview_title .text-color-blue400 {
+    font-family: 'Helveticanowdisplay', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--_color---blue-400, #17191c);
+}
+
+/* --- Project Overview Intro H2 Title --- */
+.project-overview_intro h2 {
+    font-size: 43px !important;
+    line-height: 1.2 !important;
+}
+
+
