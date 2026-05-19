@@ -82,7 +82,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
                         <ButtonText>bütün layihələr</ButtonText>
                       </Link>
                       <div className="header_cta-wrap">
-                        <a href={project.externalLink} target="_blank" className="button w-inline-block">
+                        <a href={project.externalLink} target="_blank" rel="noreferrer" className="button project_external-btn w-inline-block">
                           <div className="button-icon-wrap w-embed">
                             <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M8.30995 0.807353V6.8088C8.30995 6.93124 8.26131 7.04866 8.17474 7.13524C8.08816 7.22181 7.97074 7.27045 7.8483 7.27045C7.72587 7.27045 7.60844 7.22181 7.52187 7.13524C7.43529 7.04866 7.38665 6.93124 7.38665 6.8088L7.38665 1.92166L0.788524 8.52036C0.701899 8.60699 0.584412 8.65566 0.461906 8.65566C0.339401 8.65566 0.221913 8.60699 0.135289 8.52036C0.048665 8.43374 0 8.31625 0 8.19375C0 8.07124 0.048665 7.95376 0.135289 7.86713L6.73399 1.269L1.84686 1.269C1.72442 1.269 1.607 1.22036 1.52042 1.13379C1.43384 1.04721 1.38521 0.92979 1.38521 0.807353C1.38521 0.684916 1.43384 0.567493 1.52042 0.480917C1.607 0.394341 1.72442 0.345703 1.84686 0.345703L7.8483 0.345703C7.97074 0.345703 8.08816 0.394341 8.17474 0.480917C8.26131 0.567493 8.30995 0.684916 8.30995 0.807353Z" fill="currentcolor"/>
@@ -190,7 +190,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
                     <div>Sosial media</div>
                     <div className="connect_list-wrap">
                       {project.socialLinks.instagram && (
-                        <a aria-label="go to instagram" href={project.socialLinks.instagram} target="_blank" className="connect_link-wrap w-inline-block">
+                        <a aria-label="go to instagram" href={project.socialLinks.instagram} target="_blank" rel="noreferrer" className="connect_link-wrap w-inline-block">
                           <div className="connect_link-text">Instagram</div>
                           <div className="icon-slide-wrap">
                             <div className="icon-slide icon-large w-embed">
@@ -202,7 +202,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
                         </a>
                       )}
                       {project.socialLinks.tiktok && (
-                        <a aria-label="go to tiktok" href={project.socialLinks.tiktok} target="_blank" className="connect_link-wrap w-inline-block">
+                        <a aria-label="go to tiktok" href={project.socialLinks.tiktok} target="_blank" rel="noreferrer" className="connect_link-wrap w-inline-block">
                           <div className="connect_link-text">tiktok</div>
                           <div className="icon-slide-wrap">
                             <div className="icon-slide icon-large w-embed">
