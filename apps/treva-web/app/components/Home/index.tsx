@@ -1,4 +1,3 @@
-
 import Navbar from "@/app/components/Navbar/navbar";
 import { HomeHeroSection } from "./HomeHeroSection";
 import { HomeServices } from "./HomeServices";
@@ -13,7 +12,7 @@ type HomeProps = {
 
 const Home = ({ locale }: HomeProps) => {
   return (
-    <main className="page-wrapper home-page" data-locale={locale}>
+    <div className="page-wrapper home-page" data-locale={locale}>
       <Navbar locale={locale} />
       <HomeHeroSection />
       <HomeServices />
@@ -21,7 +20,7 @@ const Home = ({ locale }: HomeProps) => {
       <HomeLogos />
       <HomeOffices />
       <HomeFooter locale={locale} />
-    </main>
+    </div>
   );
 };
 

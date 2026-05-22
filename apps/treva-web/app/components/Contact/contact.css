@@ -55,7 +55,7 @@
 /* --- Input Field styling (Webflow Parity) --- */
 .connect_input-field {
   width: 100%;
-  color: var(--_color---grey-400);
+  color: #ffffff;
   text-transform: none;
   background-color: transparent;
   border: 0;
@@ -189,7 +189,7 @@
 /* --- Heading fixes --- */
 .contact_heading-az {
     overflow: visible !important;
-    line-height: 1.11 !important;
+    line-height: 0.96 !important;
     letter-spacing: -1;
     font-family: var(--font-inter), Arial, sans-serif;
     text-rendering: geometricPrecision;
@@ -201,15 +201,33 @@
     overflow: visible !important;
 }
 
+.section_contact .offices_bio-wrap p {
+  font-size: 15.25px;
+}
+
+@media (max-width: 991px) {
+  .section_contact .offices_bio-wrap p {
+    font-size: 14.25px;
+  }
+}
+
 
 /* --- Text Color White 60% --- */
 .text-color-white60 {
   color: rgba(255, 255, 255, 0.6);
 }
 
+.section_connect .connect_title-wrap .text-color-white60 {
+  font-size: 14.5px;
+}
+
 @media (min-width: 992px) {
   .text-color-white60 {
     font-size: 17.5px;
+  }
+
+  .section_connect .connect_title-wrap .text-color-white60 {
+    font-size: 15.5px;
   }
 }
 

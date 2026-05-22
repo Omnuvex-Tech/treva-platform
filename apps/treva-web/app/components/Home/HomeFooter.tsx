@@ -3,7 +3,6 @@ import Link from "next/link";
 import "./styles/home.css";
 
 import { ButtonText } from "@/app/components/ButtonText";
-import { FooterPulseLottie } from "./FooterPulseLottie";
 
 const ArrowUpIcon = () => (
   <svg
@@ -35,6 +34,13 @@ const ArrowUpIconCurrent = () => (
       fill="currentcolor"
     />
   </svg>
+);
+
+const FooterRedDot = () => (
+  <span className="red-dot" aria-hidden="true">
+    <span className="red-dot__ping" />
+    <span className="red-dot__core" />
+  </span>
 );
 
 type FooterNavLinkProps = {
@@ -102,12 +108,12 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
                       <FooterNavLink href={`/${locale}/projects`} label="Layihələr" />
                       <FooterNavLink href={`/${locale}/developers`} label="Developerlər" />
                       <FooterNavLink href={`/${locale}/brokers`} label="Brokerlər" />
-                      <Link href={pulseHref} className="footer_link-wrap w-inline-block">
+                      <Link href={pulseHref} className="footer_link-wrap w-inline-block footer_pulse-link">
                         <div className="footer_link-content">
                           <div className="footer_link-text">pulse</div>
                           <div className="footer_link-text">pulse</div>
                         </div>
-                        <FooterPulseLottie />
+                        <FooterRedDot />
                       </Link>
                       <FooterNavLink href={contactHref} label="Əlaqə" />
                       <FooterNavLink href={`/${locale}/privacy-policy`} label="Məxfilik Siyasəti" />

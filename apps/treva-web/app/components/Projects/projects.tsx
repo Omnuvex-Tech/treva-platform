@@ -14,7 +14,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>('')
   const [selectedLocation, setSelectedLocation] = useState<string>('')
 
-  const smoothWrapRef = useRef<HTMLDivElement | null>(null)
   const gsapReady = useRef(false)
 
   useEffect(() => {
@@ -35,26 +34,16 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
     const initGSAP = async () => {
       if (typeof window === 'undefined' || gsapReady.current) return
 
-      const [{ gsap }, { ScrollTrigger }, { ScrollSmoother }, { SplitText }] = await Promise.all([
+      const [{ gsap }, { ScrollTrigger }, { SplitText }] = await Promise.all([
         import('gsap'),
         import('gsap/ScrollTrigger'),
-        import('gsap/ScrollSmoother'),
         import('gsap/SplitText'),
       ])
 
       if (isCancelled) return
 
-      gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText)
+      gsap.registerPlugin(ScrollTrigger, SplitText)
       const splitInstances: any[] = []
-      const smoother =
-        window.innerWidth > 768
-          ? ScrollSmoother.create({
-            wrapper: '#smooth-wrapper',
-            content: '#smooth-content',
-            smooth: 1.6,
-            effects: true,
-          })
-          : null
 
       gsap.to('body', { autoAlpha: 1, duration: 0.3 })
 
@@ -122,7 +111,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
       gsapReady.current = true
       cleanupGSAP = () => {
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
-        smoother?.kill()
         splitInstances.forEach((split) => split.revert())
         gsapReady.current = false
       }
@@ -173,8 +161,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
   return (
     <>
-      <div id="smooth-wrapper" className="smooth-wrapper" ref={smoothWrapRef}>
-        <div id="smooth-content" className="page-wrapper">
+      <div className="page-wrapper">
           <Navbar locale={locale} />
 
           <main className="main-wrapper">
@@ -483,7 +470,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
             </section>
           </main>
           <HomeFooter locale={locale} />
-        </div>
       </div>
     </>
   )

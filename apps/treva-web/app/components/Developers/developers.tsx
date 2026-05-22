@@ -23,7 +23,6 @@ type DevelopersPageProps = {
 }
 
 export function DevelopersPage({ locale }: DevelopersPageProps) {
-  const smoothWrapRef = useRef<HTMLDivElement | null>(null)
   const gsapReady = useRef(false)
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(0)
@@ -38,7 +37,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     if (!window.gsap || !window.ScrollTrigger) return
     gsapReady.current = true
 
-    const { gsap, ScrollTrigger, ScrollSmoother, SplitText } = window
+    const { gsap, ScrollTrigger, SplitText } = window
 
     if (ScrollTrigger) gsap.registerPlugin(ScrollTrigger)
     if (SplitText)     gsap.registerPlugin(SplitText)
@@ -46,29 +45,6 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     gsap.to('body', { autoAlpha: 1, duration: 0.3 })
 
     const isMobile  = window.matchMedia('(max-width: 768px)').matches
-    const noSmooth  = window.location.pathname.includes('/treva-live')
-
-    if (!isMobile && !noSmooth && ScrollSmoother) {
-      const smoother = ScrollSmoother.create({
-        wrapper:  '#smooth-wrapper',
-        content:  '#smooth-content',
-        smooth:   1.6,
-        effects:  true,
-      })
-      const hash = window.location.hash
-      if (hash) {
-        setTimeout(() => {
-          const target = document.querySelector(hash)
-          if (target) smoother.scrollTo(target, true)
-        }, 500)
-      }
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', () => {
-          document.documentElement.classList.add('disable-smooth-scroll')
-          setTimeout(() => document.documentElement.classList.remove('disable-smooth-scroll'), 100)
-        })
-      })
-    }
 
     function getAttr(el: Element, name: string, fallback: number) {
       return el.hasAttribute(name) ? parseFloat(el.getAttribute(name) ?? `${fallback}`) : fallback
@@ -197,16 +173,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
         strategy="afterInteractive"
         onLoad={() => window.dispatchEvent(new Event('gsap-ready'))}
       />
-      <Script
-        src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollSmoother.min.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          setTimeout(initGSAP, 100)
-        }}
-      />
-
-      <div id="smooth-wrapper" className="smooth-wrapper" ref={smoothWrapRef}>
-        <div id="smooth-content" className="page-wrapper">
+      <div className="page-wrapper">
           <Navbar locale={locale} />
           
           <main className="main-wrapper">
@@ -705,7 +672,6 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
           </main>
 
           <HomeFooter locale={locale} />
-        </div>
       </div>
     </>
   )
