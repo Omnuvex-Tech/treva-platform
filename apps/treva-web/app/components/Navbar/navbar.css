@@ -28,11 +28,9 @@
 }
 
 .nav_container {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  grid-column-gap: 2rem;
-  grid-row-gap: 2rem;
-  justify-content: space-between;
+  display: flex;
+  gap: clamp(1.25rem, 2.7vw, 2.75rem);
+  justify-content: space-around;
   align-items: center;
   width: 100%;
   margin: 0 auto;
@@ -67,16 +65,14 @@
 }
 
 .nav_menu {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: contents;
 }
 
 .nav .nav_link {
   display: inline-flex !important;
   align-items: stretch !important;
   height: 1.3rem !important;
-  padding: 0 1.5rem !important;
+  padding: 0 !important;
   color: var(--_color---blue-100) !important;
   text-decoration: none !important;
   font-size: 0.875rem !important;
@@ -114,10 +110,7 @@
 }
 
 .nav_cta-wrap {
-  display: flex;
-  align-items: center;
-  justify-self: end;
-  gap: 20px;
+  display: contents;
 }
 
 .nav_lang-dropdown {
@@ -637,6 +630,8 @@
   }
 
   .nav_cta-wrap {
+    display: flex;
+    align-items: center;
     grid-column-gap: 1rem;
     grid-row-gap: 1rem;
   }
@@ -670,6 +665,8 @@
   }
 
   .nav_cta-wrap {
+    display: flex;
+    align-items: center;
     gap: 14px;
   }
 
