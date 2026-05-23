@@ -375,7 +375,7 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 var(--treva-hero-padding-x) var(--treva-hero-padding-b);
+  padding-bottom: var(--treva-hero-padding-b);
   max-width: 58rem;
 }
 
@@ -569,7 +569,6 @@ a {
 @media (max-width: 1024px) {
   :root {
     --treva-hero-heading-size: 38px;
-    --treva-hero-padding-x: 32px;
   }
   .treva-hero-content {
     max-width: 560px;
@@ -625,7 +624,6 @@ a {
 @media (max-width: 768px) {
   :root {
     --treva-hero-heading-size: 32px;
-    --treva-hero-padding-x: 20px;
     --treva-hero-padding-b: 36px;
   }
   .treva-hero-content {

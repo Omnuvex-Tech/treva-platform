@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown, Home } from 'lucide-react';
 import './treva-hero.css';
+import PageContainer from '@/app/components/Container/PageContainer';
 
 type PillButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isPressed?: boolean;
@@ -227,7 +228,7 @@ export default function TrevaHero() {
           <div className="treva-hero-bg__overlay" />
         </div>
 
-        <main className="treva-hero-content">
+        <PageContainer as="main" className="treva-hero-content">
           <h1 className="treva-hero-title">
             Your Gateway To The <br />
             World's ExclusIve <br />
@@ -284,7 +285,7 @@ export default function TrevaHero() {
               <Home size={24} strokeWidth={2} />
             </PillButton>
           </div>
-        </main>
+        </PageContainer>
       </div>
     </>
   );
