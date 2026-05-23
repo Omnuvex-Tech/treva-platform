@@ -17,6 +17,38 @@ function PillButton({ className = '', isPressed = false, ...props }: PillButtonP
   );
 }
 
+function TrevaNavbarLogo() {
+  return (
+    <svg
+      width="110"
+      height="27"
+      viewBox="0 0 121 27"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <pattern
+          id="treva-navbar-logo-pattern"
+          patternContentUnits="objectBoundingBox"
+          width="1"
+          height="1"
+        >
+          <image
+            href="/images/treva-logo.png"
+            width="594"
+            height="420"
+            preserveAspectRatio="none"
+            transform="matrix(0.00281244 0 0 0.0126485 -0.335294 -1.889)"
+          />
+        </pattern>
+      </defs>
+      <rect width="121" height="27" fill="url(#treva-navbar-logo-pattern)" />
+    </svg>
+  );
+}
+
 export default function TrevaHero() {
   // Mobile menyu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -100,8 +132,9 @@ export default function TrevaHero() {
     <>
       {/* ========== NAVBAR ========== */}
       <header className="treva-navbar" role="banner">
+        <div className="treva-navbar__inner">
         <a href="#" className="treva-navbar__logo" aria-label="TREVA – Home">
-          TREVA
+          <TrevaNavbarLogo />
         </a>
 
         <nav className="treva-navbar__nav" aria-label="Primary navigation">
@@ -115,13 +148,14 @@ export default function TrevaHero() {
           <a href="#" className="treva-navbar__link">Pulse</a>
         </nav>
 
+        <div className="treva-navbar__controls">
         <div className="treva-navbar__actions">
           <PillButton className="treva-navbar__search-btn" aria-label="Open search">
             <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <circle cx="5.8" cy="5.8" r="4.4" stroke="#ffffff" strokeWidth="1.4" />
               <line x1="9.2" y1="9.2" x2="13" y2="13" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" />
             </svg>
-            Search
+            <span className="treva-navbar__search-text">Search</span>
           </PillButton>
 
           <button className="treva-navbar__lang" aria-label="Language: English" aria-haspopup="listbox">
@@ -144,6 +178,8 @@ export default function TrevaHero() {
           <span className="treva-navbar__hamburger__bar"></span>
           <span className="treva-navbar__hamburger__bar"></span>
         </button>
+        </div>
+        </div>
       </header>
 
       <nav
@@ -205,8 +241,8 @@ export default function TrevaHero() {
           <div className="treva-filter-bar">
             <div className="treva-filter-bar__input-group">
               <svg width="21" height="21" viewBox="0 0 23 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="treva-filter-bar__icon">
-                <path d="M11.5 30C17.3333 22.1923 22 15.5 22 11.0385C22 8.3761 20.8938 5.82277 18.9246 3.9402C16.9555 2.05762 14.2848 1 11.5 1C8.71523 1 6.04451 2.05762 4.07538 3.9402C2.10625 5.82277 1 8.3761 1 11.0385C1 15.5 5.66667 22.1923 11.5 30Z" stroke="#ffffff" stroke-width="2"/>
-                <path d="M15 11.5C15 12.4283 14.6313 13.3185 13.9749 13.9749C13.3185 14.6313 12.4283 15 11.5 15C10.5717 15 9.6815 14.6313 9.02513 13.9749C8.36875 13.3185 8 12.4283 8 11.5C8 10.5717 8.36875 9.6815 9.02513 9.02513C9.6815 8.36875 10.5717 8 11.5 8C12.4283 8 13.3185 8.36875 13.9749 9.02513C14.6313 9.6815 15 10.5717 15 11.5Z" stroke="#ffffff" stroke-width="2"/>
+                <path d="M11.5 30C17.3333 22.1923 22 15.5 22 11.0385C22 8.3761 20.8938 5.82277 18.9246 3.9402C16.9555 2.05762 14.2848 1 11.5 1C8.71523 1 6.04451 2.05762 4.07538 3.9402C2.10625 5.82277 1 8.3761 1 11.0385C1 15.5 5.66667 22.1923 11.5 30Z" stroke="#ffffff" strokeWidth="2"/>
+                <path d="M15 11.5C15 12.4283 14.6313 13.3185 13.9749 13.9749C13.3185 14.6313 12.4283 15 11.5 15C10.5717 15 9.6815 14.6313 9.02513 13.9749C8.36875 13.3185 8 12.4283 8 11.5C8 10.5717 8.36875 9.6815 9.02513 9.02513C9.6815 8.36875 10.5717 8 11.5 8C12.4283 8 13.3185 8.36875 13.9749 9.02513C14.6313 9.6815 15 10.5717 15 11.5Z" stroke="#ffffff" strokeWidth="2"/>
               </svg>
               <span className="treva-filter-bar__location-text">LOCATION</span>
             </div>

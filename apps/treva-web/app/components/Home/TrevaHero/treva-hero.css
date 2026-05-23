@@ -7,7 +7,7 @@
   --treva-nav-bg: #ffffff;
   --treva-nav-border: rgba(0, 0, 0, 0.07);
   --treva-logo-color: #0a0a0a;
-  --treva-logo-size: 26px;
+  --treva-logo-size: 22px;
   --treva-link-color: #1c1c1c;
   --treva-link-size: 11px;
   --treva-link-letter-spacing: 1.9px;
@@ -97,15 +97,24 @@ a {
   padding: 0 32px;
 }
 
+.treva-navbar__inner,
+.treva-navbar__controls {
+  display: contents;
+}
+
 .treva-navbar__logo {
-  font-family: var(--treva-font-display);
-  font-size: var(--treva-logo-size);
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
   color: #ffffff;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   flex-shrink: 0;
-  line-height: 1;
+  width: 112px;
+  height: 25px;
+}
+
+.treva-navbar__logo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .treva-navbar__nav {
@@ -235,16 +244,71 @@ a {
 
 @media (max-width: 1024px) {
   .treva-navbar {
-    padding: 0 32px;
-    justify-content: space-between;
+    padding: 0;
+    justify-content: center;
     gap: 0;
   }
-  .treva-navbar__nav,
-  .treva-navbar__actions {
+  .treva-navbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 370px;
+    padding: 0 8px;
+  }
+  .treva-navbar__logo {
+    width: 74px;
+    height: 17px;
+  }
+  .treva-navbar__nav {
     display: none;
+  }
+  .treva-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .treva-navbar__controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+  }
+  .treva-navbar__search-btn {
+    width: 50px;
+    height: 30px;
+    padding: 0;
+    border-radius: 999px;
+    justify-content: center;
+  }
+  .treva-navbar__search-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+  .treva-navbar__search-text {
+    display: none;
+  }
+  .treva-navbar__lang {
+    gap: 5px;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.3px;
+  }
+  .treva-navbar__lang svg {
+    width: 9px;
+    height: 6px;
   }
   .treva-navbar__hamburger {
     display: flex;
+    width: 20px;
+    height: 30px;
+    margin-left: 0;
+    gap: 4px;
+  }
+  .treva-navbar__hamburger__bar {
+    width: 15px;
+    height: 1.5px;
   }
   .treva-navbar__mobile {
     display: block;
@@ -252,10 +316,18 @@ a {
 }
 @media (max-width: 768px) {
   .treva-navbar {
-    padding: 0 20px;
+    padding: 0;
   }
   .treva-navbar__logo {
-    font-size: 22px;
+    width: 61px;
+    height: 14px;
+  }
+  .treva-navbar__inner {
+    padding: 0 6px;
+  }
+  .treva-navbar__actions,
+  .treva-navbar__controls {
+    gap: 12px;
   }
   .treva-navbar__mobile__inner {
     padding: 20px;
@@ -359,12 +431,13 @@ a {
 
 /* Location ikonu */
 .treva-filter-bar__icon {
-  width: 21px !important;
-  height: 21px !important;
+  width: 18px !important;
+  height: 18px !important;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  stroke: #ffffff;
 }
 
 .treva-filter-bar__location-text {
@@ -551,7 +624,7 @@ a {
 
 @media (max-width: 768px) {
   :root {
-    --treva-hero-heading-size: 26px;
+    --treva-hero-heading-size: 32px;
     --treva-hero-padding-x: 20px;
     --treva-hero-padding-b: 36px;
   }
