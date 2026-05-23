@@ -1,33 +1,22 @@
 :root {
-  /* Colors */
-  --color-primary: #1e293b;
-  --color-text-main: #334155;
-  --color-text-muted: #64748b;
+  --color-primary: #000000;
+  --color-secondary: #4e525d;
+  --color-text-muted: #4e525d;
   --color-bg-icon: #f4f3ef;
   --color-border: #e2e8f0;
   --color-white: #ffffff;
-  
-  /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Ümumi Konteyner */
 .about-container {
   font-family: var(--font-family);
-  color: var(--color-text-main);
+  color: var(--color-secondary);
   background-color: var(--color-white);
   padding: 80px 0;
   box-sizing: border-box;
 }
 
-/* Helper Class: Sətir qırılmasını idarə etmək üçün */
-.desktop-only {
-  display: inline;
-}
-
-/* ==========================================
-   DESKTOP STYLES (Default 1:1)
-   ========================================== */
+/* --- Hero Section --- */
 .about-hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -45,17 +34,22 @@
 
 .about-hero__title {
   font-size: 48px;
-  font-weight: 300;
-  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: -1px;
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   line-height: 1.2;
 }
 
-.about-hero__title span {
-  font-weight: 600;
+.about-hero__title-about {
+  font-weight: 300;
+  color: var(--color-primary);
+}
+
+.about-hero__title-us {
+  font-weight: 500;
+  color: var(--color-secondary);
+  margin-left: 0.2em; /* İki söz arası boşluq */
 }
 
 .about-hero__description {
@@ -66,36 +60,19 @@
 }
 
 .about-hero__description p {
-  font-size: 16px;
-  font-weight: 400;
-  color: var(--color-text-muted);
-  line-height: 1.65;
+  font-size: 21px;
+  font-weight: 300; 
+  color: var(--color-secondary);
+  line-height: 1.6;
   margin: 0;
-  padding-bottom: 12px;
+  text-transform: none; 
 }
 
-.about-hero__description p:last-child {
-  padding-bottom: 0;
-}
+.about-hero__image-wrapper { width: 100%; display: flex; }
+.about-hero__image { width: 100%; height: 100%; max-height: 380px; display: block; border-radius: 4px; object-fit: cover; }
 
-.about-hero__image-wrapper {
-  width: 100%;
-  display: flex;
-}
-
-.about-hero__image {
-  width: 100%;
-  height: 100%;
-  max-height: 380px;
-  display: block;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.services-list {
-  display: flex;
-  flex-direction: column;
-}
+/* --- Services Section --- */
+.services-list { display: flex; flex-direction: column; }
 
 .services-list__item {
   display: grid;
@@ -106,162 +83,57 @@
   border-top: 1px solid var(--color-border);
 }
 
-.services-list__item:last-child {
-  border-bottom: 1px solid var(--color-border);
+.services-list__item:first-child { border-top: none; }
+.services-list__item:last-child { border-bottom: none; }
+
+.services-list__left-side { display: flex; align-items: center; gap: 24px; }
+.services-list__icon-container { width: 56px; height: 56px; background-color: var(--color-bg-icon); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.services-list__icon { display: block; max-width: 24px; max-height: 24px; }
+.services-list__title { font-size: 18px; font-weight: 600; color: var(--color-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
+.services-list__right-side { width: 100%; }
+
+.services-list__desc-text { 
+  font-size: 20px; 
+  color: var(--color-text-muted); 
+  line-height: 1.6; 
+  margin: 0; 
+  font-weight: 300; 
+  text-transform: none; 
 }
 
-.services-list__left-side {
-  display: flex;
-  align-items: center;
-  gap: 24px;
+/* --- Responsive --- */
+@media (min-width: 769px) {
+  .about-hero__description p:nth-child(1) { max-width: 630px; }
+  .about-hero__description p:nth-child(2) { max-width: 100%; }
+  .about-hero__description p:nth-child(3) { max-width: 620px; }
+  
+  .services-list__item:nth-child(1) .services-list__right-side { max-width: 500px; }
+  .services-list__item:nth-child(2) .services-list__right-side { max-width: 510px; }
+  .services-list__item:nth-child(3) .services-list__right-side { max-width: 600px; }
+  .services-list__item:nth-child(4) .services-list__right-side { max-width: 510px; }
 }
 
-.services-list__icon-container {
-  width: 56px;
-  height: 56px;
-  background-color: var(--color-bg-icon);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.services-list__icon {
-  display: block;
-  max-width: 24px;
-  max-height: 24px;
-  width: auto;
-  height: auto;
-}
-
-.services-list__title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0;
-}
-
-.services-list__right-side {
-  width: 100%;
-  max-width: 540px; /* Desktopda mətnin daşmaması üçün limit */
-}
-
-/* TƏLƏB OLUNAN LOWERCASE CSS APPARATI */
-.services-list__description {
-  font-size: 21px; /* Şrift ölçüsü skrinşotdakı kimi normala gətirildi */
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  margin: 0;
-  text-transform: lowercase; /* Bütün mətni kiçik hərf edir */
-  font-weight: 300;
-}
-
-.services-list__description::first-letter {
-  text-transform: uppercase; /* Yalnız ilk hərfi böyük saxlayır */
-}
-
-/* ==========================================
-   TABLET LAYOUT (max-width: 1024px)
-   ========================================== */
 @media (max-width: 1024px) {
-  .about-hero {
-    gap: 32px;
-  }
-  .about-hero__title {
-    font-size: 40px;
-  }
-  .about-hero__image {
-    max-height: 340px;
-  }
+  .about-hero { gap: 32px; }
+  .about-hero__title { font-size: 40px; }
+  .about-hero__image { max-height: 340px; }
 }
 
-/* ==========================================
-   MOBILE LAYOUT (max-width: 768px)
-   ========================================== */
 @media (max-width: 768px) {
-  .about-container {
-    padding: 44px 0;
-  }
-
-  .desktop-only {
-    display: none; /* Mobildə məcburi <br /> qırılmalarını ləğv edirik ki, mətn təbii axsın */
-  }
-
-  .about-hero {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    margin-bottom: 48px;
-  }
-
-  .about-hero__content {
-    display: block;
-    height: auto;
-  }
-
-  .about-hero__title {
-    font-size: 36px;
-    text-align: left;
-    margin-bottom: 24px;
-  }
-
-  .about-hero__description {
-    display: block;
-  }
-
-  .about-hero__description p {
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    padding-bottom: 0;
-  }
-
-  .about-hero__image-wrapper {
-    margin-top: 12px;
-  }
-
-  .about-hero__image {
-    max-height: 260px;
-  }
-
-  .services-list__item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 28px 0;
-  }
-
-  .services-list__left-side {
-    gap: 16px;
-    width: 100%;
-  }
-
-  .services-list__icon-container {
-    width: 48px;
-    height: 48px;
-  }
-
-  .services-list__icon {
-    max-width: 20px;
-    max-height: 20px;
-  }
-
-  .services-list__title {
-    font-size: 16px;
-    line-height: 1.3;
-  }
-
-  .services-list__right-side {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .services-list__description {
-    font-size: 17.5px;
-    line-height: 1.5;
-  }
+  .desktop-br { display: none; }
+  
+  .about-container { padding: 44px 0; }
+  .about-hero { display: flex; flex-direction: column; gap: 32px; margin-bottom: 48px; }
+  .about-hero__content { display: block; height: auto; }
+  .about-hero__title { font-size: 36px; margin-bottom: 24px; }
+  .about-hero__description { display: block; }
+  .about-hero__description p { font-size: 15px; line-height: 1.6; margin-bottom: 20px; max-width: 100% !important; }
+  .about-hero__image-wrapper { margin-top: 12px; }
+  .about-hero__image { max-height: 260px; }
+  .services-list__item { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding: 28px 0; }
+  .services-list__left-side { gap: 16px; width: 100%; }
+  .services-list__icon-container { width: 48px; height: 48px; }
+  .services-list__icon { max-width: 20px; max-height: 20px; }
+  .services-list__title { font-size: 16px; }
+  .services-list__desc-text { font-size: 16.5px; line-height: 1.5; }
 }
