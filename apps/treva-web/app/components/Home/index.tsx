@@ -6,6 +6,7 @@ import { HomeLogos } from "./HomeLogos";
 import { HomeOffices } from "./HomeOffices";
 import { HomeFooter } from "./HomeFooter";
 import TrevaHero from "./TrevaHero/TrevaHero";
+import AboutUs from "./AboutUs/AboutUs";
 
 type HomeProps = {
   locale: string;
@@ -19,14 +20,16 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
         <>
           <Navbar locale={locale} />
           <HomeHeroSection />
-        </>
-      ) : (
-        <TrevaHero />
-      )}
-      <HomeServices />
+            <HomeServices />
       <HomeProjects />
       <HomeLogos />
       <HomeOffices />
+        </>
+      ) : (
+        <TrevaHero />
+        
+      )}
+      <AboutUs/>
       <HomeFooter locale={locale} />
     </div>
   );

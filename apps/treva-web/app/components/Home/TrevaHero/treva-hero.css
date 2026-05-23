@@ -466,7 +466,7 @@ a {
   height: 48px;
   width: 100%;
   font-family: var(--treva-font-oak);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 15px;
   line-height: 110%;
   letter-spacing: -3%;
@@ -692,5 +692,9 @@ a {
   }
   .treva-filter-bar__input-group {
     width: 100%;
+  }
+
+  .treva-hero-title{
+    font-size: 29px;
   }
 }
