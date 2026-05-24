@@ -7,6 +7,8 @@ import { HomeOffices } from "./HomeOffices";
 import { HomeFooter } from "./HomeFooter";
 import TrevaHero from "./TrevaHero/TrevaHero";
 import AboutUs from "./AboutUs/AboutUs";
+import TrevaPage from "./FeaturesProperties/FeaturesProperties";
+import FeaturedProperties from "./FeaturesProperties/FeaturesProperties";
 
 type HomeProps = {
   locale: string;
@@ -30,6 +32,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
         
       )}
       <AboutUs/>
+      <FeaturedProperties/>
       <HomeFooter locale={locale} />
     </div>
   );
