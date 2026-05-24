@@ -9,14 +9,22 @@ const FeaturedProperties: React.FC = () => {
     <main>
       <PageContainer>
         <section className="featured">
-          <div className="featured__header">
+          
+          {/* ========================================================
+              1. DESKTOP STRUKTURU
+             ======================================================== */}
+          <div className="featured__header d-desktop">
+            {/* Sol tərəf: Alt mətn */}
             <p className="featured__subtitle">
-              Strategic portfolio of the city's top venues. Our focus remains on architectural landmarks and
-              long-term capital growth for investors.
+              Strategic portfolio of the city's top venues. Our focus <br />
+              remains on architectural landmarks and long-term <br />
+              capital growth for investors.
             </p>
+
+            {/* Sağ tərəf: Başlıq və altındakı mövqeləndirilmiş düymə */}
             <div className="featured__title-wrapper">
               <h2 className="featured__title">
-                <span className="featured__title-featured">FEATURED</span>
+                <span className="featured__title-featured">FEATURED</span>{" "}
                 <span className="featured__title-properties">PROPERTIES</span>
               </h2>
               <a href="#" className="featured__view-all">
@@ -24,8 +32,39 @@ const FeaturedProperties: React.FC = () => {
               </a>
             </div>
           </div>
+
+
+          {/* ========================================================
+              2. MOBİL STRUKTUR (Tamamilə fərqli ardıcıllıq)
+             ======================================================== */}
+          <div className="featured__header-mobile d-mobile">
+            {/* 1. Ən üstdə: Başlıq - SAĞDA */}
+            <h2 className="featured__title-mobile">
+              <span className="featured__title-mobile-featured">FEATURED</span><br />
+              <span className="featured__title-mobile-properties">PROPERTIES</span>
+            </h2>
+
+            {/* 2. Ortada: Alt mətn - SOLDA */}
+            <p className="featured__subtitle-mobile">
+              Strategic portfolio of the city’s top <br />
+              venues. Our focus remains on <br />
+              architectural landmarks and long- <br />
+              term capital growth for investors.
+            </p>
+
+            {/* 3. Ən altdada: View All Düyməsi - SAĞDA */}
+            <a href="#" className="featured__view-all-mobile">
+              View All
+            </a>
+          </div>
+
+
+          {/* ========================================================
+              3. SLIDER & CARDS GRID (Dəyişilməz stabil blok)
+             ======================================================== */}
           <div className="featured__slider-container">
             <div className="featured__grid">
+              {/* Card 1 */}
               <a href="#" className="property-card">
                 <img
                   className="property-card__bg"
@@ -52,6 +91,7 @@ const FeaturedProperties: React.FC = () => {
                 </span>
               </a>
 
+              {/* Card 2 */}
               <a href="#" className="property-card">
                 <img
                   className="property-card__bg"
@@ -78,6 +118,7 @@ const FeaturedProperties: React.FC = () => {
                 </span>
               </a>
 
+              {/* Card 3 */}
               <a href="#" className="property-card">
                 <img
                   className="property-card__bg"
@@ -104,6 +145,7 @@ const FeaturedProperties: React.FC = () => {
                 </span>
               </a>
 
+              {/* Card 4 */}
               <a href="#" className="property-card property-card--highlighted">
                 <img
                   className="property-card__bg"
@@ -131,6 +173,7 @@ const FeaturedProperties: React.FC = () => {
               </a>
             </div>
 
+            {/* Slider Naviqasiya Kontrolları */}
             <div className="featured__controls">
               <button className="featured__btn" aria-label="Previous property">
                 <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
