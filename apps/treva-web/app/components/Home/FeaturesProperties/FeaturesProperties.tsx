@@ -2,6 +2,7 @@
 
 import React from 'react';
 import PageContainer from '@/app/components/Container/PageContainer';
+import { DirectionButton, ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
 import './features-properties.css';
 
 const FeaturedProperties: React.FC = () => {
@@ -28,9 +29,7 @@ const FeaturedProperties: React.FC = () => {
             </div>
 
             <div className="featured__title-wrapper">
-              <a href="#" className="featured__view-all">
-                vIew all
-              </a>
+              <ViewAllButton className="featured__view-all" />
             </div>
           </div>
 
@@ -51,9 +50,7 @@ const FeaturedProperties: React.FC = () => {
               term capital growth for investors.
             </p>
 
-            <a href="#" className="featured__view-all-mobile">
-              vIew all
-            </a>
+            <ViewAllButton mobile className="featured__view-all-mobile" />
           </div>
 
 
@@ -203,28 +200,8 @@ const FeaturedProperties: React.FC = () => {
 
             {/* Slider Naviqasiya Oxları */}
             <div className="featured__controls">
-              <button className="featured__btn" aria-label="Previous property">
-                <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M7 13L1 7M1 7L7 1M1 7H17"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-              <button className="featured__btn" aria-label="Next property">
-                <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M11 13L17 7M17 7L11 1M17 7H1"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+              <DirectionButton direction="previous" label="Previous property" />
+              <DirectionButton direction="next" label="Next property" />
             </div>
           </div>
 
