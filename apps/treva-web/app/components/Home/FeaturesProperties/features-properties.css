@@ -23,18 +23,23 @@
 }
 
 /* ========================================================
-    A. DESKTOP STRUKTURU (Yalnız Desktop üçün təmizlənmiş)
+    A. DESKTOP STRUKTURU (Tam şəkildəki kimi horizontal hiza)
    ======================================================== */
 .featured__header {
-  display: grid;
-  grid-template-columns: auto max-content;
-  justify-content: space-between;
-  align-items: start;
   margin-bottom: 72px;
+  width: 100%;
+}
+
+/* Şəkildəki kimi elementləri eyni sətirdə və mərkəzləşdirilmiş saxlayan əsas div */
+.featured__desktop-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Mətnlərin mərkəz oxlarını eyni xəttə gətirir */
+  width: 100%;
   gap: 48px;
 }
 
-/* Desktop Sol tərəf Alt Mətn */
+/* Desktop Sol tərəf Alt Mətn (Daha böyük/hündür yer tutur) */
 .featured__subtitle {
   color: var(--color-text-muted);
   text-transform: none;
@@ -42,10 +47,14 @@
   font-size: 20px;
   font-weight: 300;
   line-height: 1.6;
-  max-width: 580px;
+  max-width: 580px; /* Yazının 3 sətirə bölünməsini təmin edir */
+  margin-top: 35px;
+    /* letter-spacing: 0.1px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
 }
 
-/* Desktop Sağ tərəf Başlıq və Düymə qutusu */
+/* Desktop Sağ tərəf Başlıq qutusu */
 .featured__title-wrapper {
   display: flex;
   flex-direction: column;
@@ -59,6 +68,7 @@
   line-height: 1.2;
   text-align: right;
   margin: 0;
+  white-space: nowrap; /* Başlığın tək sətirdə şəkildəki kimi qalması üçün */
 }
 
 .featured__title-featured {
@@ -79,7 +89,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* DESKTOP: Başlıq və Mətn blokundan aşağıda olması üçün margin-top verildı */
+/* DESKTOP: View All düyməsi */
 .featured__view-all {
   display: inline-flex;
   align-items: center;
@@ -100,7 +110,7 @@
   font-size: 21px;
   line-height: 120%;
   
-  margin-top: 40px; /* İstədiyiniz boşluq (Mətn və başlıqdan aralı olması üçün) */
+  margin-top: 40px;
 }
 
 .featured__view-all:hover {
@@ -110,7 +120,7 @@
 }
 
 /* ========================================================
-    B. CARDS & SLIDER (Dəyişilməz qalan ümumi hissə)
+    B. CARDS & SLIDER (Sabit de-facto hissə)
    ======================================================== */
 .featured__slider-container {
   position: relative;
@@ -227,7 +237,7 @@
   height: 44px;
   border-radius: 50%;
   border: 1px solid var(--color-border);
-  background-color: var(--white);
+  background-color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -246,6 +256,9 @@
   .featured__title {
     font-size: 40px;
   }
+  .featured__desktop-row {
+    gap: 24px;
+  }
   .featured__grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
@@ -253,7 +266,7 @@
 }
 
 /* ========================================================
-    C. MOBİL STRUKTUR (Full Fixed - Yalnız istədiyiniz ardıcıllıq)
+    C. MOBİL STRUKTUR (Dizayn tam qorundu + Premium şriftlər)
    ======================================================== */
 @media (max-width: 768px) {
   .d-desktop {
@@ -267,7 +280,6 @@
     padding: 44px 0;
   }
   
-  /* Mobil Başlıq Konteyneri */
   .featured__header-mobile {
     display: flex;
     flex-direction: column;
@@ -276,41 +288,54 @@
     margin-bottom: 36px;
   }
 
-  /* 1. Element: FEATURED PROPERTIES Başlığı - SAĞDA */
+  /* Mobil Başlıq - SAĞDA */
   .featured__title-mobile {
     font-size: 36px;
     text-transform: uppercase;
     line-height: 1.2;
-    text-align: right; /* Sağ tərəfdə */
+    text-align: right;
     margin: 0;
     letter-spacing: -0.5px;
     width: 100%;
   }
 
+  /* Desktopdakı bütün zəriflik klassları mobil siniflərə tam əlavə olundu */
   .featured__title-mobile-featured {
-    font-weight: 300;
+    font-family: var(--font-family);
+    font-weight: 300 !important;
     color: #1a1a1a;
+    letter-spacing: 0.03em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .featured__title-mobile-properties {
-    font-weight: 500;
+    font-family: var(--font-family);
+    font-weight: 500 !important;
     color: var(--color-secondary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
-  /* 2. Element: Alt Mətn - SOLDA (margin-top istifadə olundu) */
+  /* Mobil Alt Mətn - Tam lowercase, Lakin ilk sözün ilk hərfi böyük */
   .featured__subtitle-mobile {
     color: var(--color-text-muted);
     font-size: 16.5px;
     line-height: 1.5;
-    text-align: left; /* Sol tərəfdən */
+    text-align: left;
     font-weight: 300;
     max-width: 100%;
     width: 100%;
     margin: 0;
-    margin-top: 32px; /* Başlıq ilə arasındakı boşluq */
+    margin-top: 32px;
+    text-transform: lowercase !important; 
   }
 
-  /* 3. Element: View All Düyməsi - SAĞDA (margin-top istifadə olundu) */
+  .featured__subtitle-mobile::first-letter {
+    text-transform: uppercase !important;
+  }
+
+  /* Mobil View All Düyməsi */
   .featured__view-all-mobile {
     display: inline-flex;
     align-items: center;
@@ -325,15 +350,15 @@
     color: var(--color-primary);
     text-decoration: none;
     
-    align-self: flex-end; /* Düyməni sağa sıxır */
-    margin-top: 32px; /* Alt mətn ilə arasındakı boşluq */
+    align-self: flex-end;
+    margin-top: 32px;
     
     font-family: 'Oak Sans', var(--font-family);
     font-weight: 600;
     font-size: 14px;
     text-transform: uppercase;
     line-height: 1;
-    white-space: nowrap; /* Daşmanın qarşısını tam alır */
+    white-space: nowrap;
   }
   
   .featured__grid {

@@ -11,22 +11,26 @@ const FeaturedProperties: React.FC = () => {
         <section className="featured">
           
           {/* ========================================================
-              1. DESKTOP STRUKTURU
+              1. DESKTOP STRUKTURU (Vahid Div, Mükəmməl Horizontal Hiza)
              ======================================================== */}
           <div className="featured__header d-desktop">
-            {/* Sol tərəf: Alt mətn */}
-            <p className="featured__subtitle">
-              Strategic portfolio of the city's top venues. Our focus <br />
-              remains on architectural landmarks and long-term <br />
-              capital growth for investors.
-            </p>
+            {/* Şəkildəki görüntünü verən əsas vahid div bloku */}
+            <div className="featured__desktop-row">
+              {/* Sol tərəf: Daha hündür dayanan 3 sətirlik alt mətn */}
+              <p className="featured__subtitle">
+                Strategic portfolio of the city's top venues. Our focus <br />
+                remains on architectural landmarks and long-term <br />
+                capital growth for investors.
+              </p>
 
-            {/* Sağ tərəf: Başlıq və altındakı mövqeləndirilmiş düymə */}
-            <div className="featured__title-wrapper">
+              {/* Sağ tərəf: Başlıq */}
               <h2 className="featured__title">
                 <span className="featured__title-featured">FEATURED</span>{" "}
                 <span className="featured__title-properties">PROPERTIES</span>
               </h2>
+            </div>
+
+            <div className="featured__title-wrapper">
               <a href="#" className="featured__view-all">
                 View All
               </a>
@@ -35,16 +39,16 @@ const FeaturedProperties: React.FC = () => {
 
 
           {/* ========================================================
-              2. MOBİL STRUKTUR (Tamamilə fərqli ardıcıllıq)
+              2. MOBİL STRUKTUR (Dizayn qorundu + Premium Şrift tənzimləməsi)
              ======================================================== */}
           <div className="featured__header-mobile d-mobile">
-            {/* 1. Ən üstdə: Başlıq - SAĞDA */}
+            {/* 1. Başlıq - SAĞDA (Desktopdakı bütün font-weight və zəriflik xüsusiyyətləri ilə) */}
             <h2 className="featured__title-mobile">
               <span className="featured__title-mobile-featured">FEATURED</span><br />
               <span className="featured__title-mobile-properties">PROPERTIES</span>
             </h2>
 
-            {/* 2. Ortada: Alt mətn - SOLDA */}
+            {/* 2. Alt mətn - SOLDA (Mətn kiçik hərf, ilk hərfi böyük) */}
             <p className="featured__subtitle-mobile">
               Strategic portfolio of the city’s top <br />
               venues. Our focus remains on <br />
@@ -52,7 +56,7 @@ const FeaturedProperties: React.FC = () => {
               term capital growth for investors.
             </p>
 
-            {/* 3. Ən altdada: View All Düyməsi - SAĞDA */}
+            {/* 3. View All Düyməsi - SAĞDA */}
             <a href="#" className="featured__view-all-mobile">
               View All
             </a>
