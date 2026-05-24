@@ -11,36 +11,36 @@ const blogData = [
     title: "Why Some Developers Outpace the Market?",
     category: "BLOG",
     date: "29.04.2026",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600",
+    image: "/images/treva-pulse/tp1.png",
     author: "Tural Najafov",
-    avatar: "https://i.pravatar.cc/150?u=tural"
+    avatar: "/images/treva-pulse/tural-najafov.png"
   },
   {
     id: 2,
     title: "Apartment Prices in Baku 2026: Best Value Projects",
     category: "BLOG",
     date: "23.04.2026",
-    image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=600",
+    image: "/images/treva-pulse/tp2.png",
     author: "Leyla Baghirzada",
-    avatar: "https://i.pravatar.cc/150?u=leyla"
+    avatar: "/images/treva-pulse/leyla-bagirzade.png"
   },
   {
     id: 3,
     title: "Mastering Baku's Real Estate Through Professional Sales.",
     category: "BLOG",
     date: "17.04.2026",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600",
+    image: "/images/treva-pulse/tp3.png",
     author: "Javid Akhundov",
-    avatar: "https://i.pravatar.cc/150?u=javid"
+    avatar: "/images/treva-pulse/cavid-axundov.png"
   },
   {
     id: 4,
     title: "How Much to Downpay for an Apartment?",
     category: "BLOG",
     date: "08.05.2026",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600",
+    image: "/images/treva-pulse/tp4.png",
     author: "Emil Gurbanov",
-    avatar: "https://i.pravatar.cc/150?u=emil"
+    avatar: "/images/treva-pulse/emil-qurbanov.png"
   }
 ];
 
