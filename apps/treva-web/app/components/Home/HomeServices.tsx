@@ -219,14 +219,14 @@ export const HomeServices = () => {
                                 <div className="services_block home-services-block">
                                     <div ref={imgWrapRef} className="services_img-wrap home-services-image-wrap img-reveal">
                                         <img
-                                            className="services_img home-services-image home-services-image-sales-marketing _1 active"
-                                            src="/cdn-assets/8e8382ba3f-6878d8559bf006e7ed8f4aa8_SALE&MARKETING.avif"
+                                            className="services_img home-services-image home-services-image-sales-marketIng _1 active"
+                                            src="/cdn-assets/8e8382ba3f-6878d8559bf006e7ed8f4aa8_SALE&marketIng.avif"
                                             width="313"
                                             alt="A black and white photo of a model of a city."
                                             data-index="1"
                                             sizes="(max-width: 479px) 100vw, 313px"
                                             loading="lazy"
-                                            srcSet="/cdn-assets/3338834a9c-6878d8559bf006e7ed8f4aa8_SALE&MARKETING-p-500.avif 500w, /cdn-assets/f45df44ded-6878d8559bf006e7ed8f4aa8_SALE&MARKETING-p-800.avif 800w, /cdn-assets/dccaba2a20-6878d8559bf006e7ed8f4aa8_SALE&MARKETING-p-1080.avif 1080w, /cdn-assets/116aad6b33-6878d8559bf006e7ed8f4aa8_SALE&MARKETING-p-1600.avif 1600w, /cdn-assets/8e8382ba3f-6878d8559bf006e7ed8f4aa8_SALE&MARKETING.avif 3000w"
+                                            srcSet="/cdn-assets/3338834a9c-6878d8559bf006e7ed8f4aa8_SALE&marketIng-p-500.avif 500w, /cdn-assets/f45df44ded-6878d8559bf006e7ed8f4aa8_SALE&marketIng-p-800.avif 800w, /cdn-assets/dccaba2a20-6878d8559bf006e7ed8f4aa8_SALE&marketIng-p-1080.avif 1080w, /cdn-assets/116aad6b33-6878d8559bf006e7ed8f4aa8_SALE&marketIng-p-1600.avif 1600w, /cdn-assets/8e8382ba3f-6878d8559bf006e7ed8f4aa8_SALE&marketIng.avif 3000w"
                                         />
                                         <img
                                             className="services_img home-services-image home-services-image-crm _2"
@@ -240,28 +240,28 @@ export const HomeServices = () => {
                                         />
                                         <img
                                             className="services_img home-services-image home-services-image-broker-network _3"
-                                            src="/cdn-assets/99731f464c-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION.avif"
+                                            src="/cdn-assets/99731f464c-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-actIvatIon.avif"
                                             width="600"
                                             alt="A couple of people shaking hands over a table."
                                             data-index="3"
                                             sizes="(max-width: 767px) 100vw, 600px"
                                             loading="lazy"
-                                            srcSet="/cdn-assets/9db9a9ae65-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION-p-500.avif 500w, /cdn-assets/b3609042b5-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION-p-800.avif 800w, /cdn-assets/cb1b8bd6d9-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION-p-1080.avif 1080w, /cdn-assets/99731f464c-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-ACTIVATION.avif 3000w"
+                                            srcSet="/cdn-assets/9db9a9ae65-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-actIvatIon-p-500.avif 500w, /cdn-assets/b3609042b5-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-actIvatIon-p-800.avif 800w, /cdn-assets/cb1b8bd6d9-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-actIvatIon-p-1080.avif 1080w, /cdn-assets/99731f464c-6878d8556de5fcd8ff72dc34_BROKER-NETWORK-actIvatIon.avif 3000w"
                                         />
                                         <img
                                             className="services_img home-services-image home-services-image-investment _4"
-                                            src="/cdn-assets/1b70c5fed4-6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY.avif"
+                                            src="/cdn-assets/1b70c5fed4-6878d8558e4caaaacfa6814a_INVESTMENT-advIsory.avif"
                                             width="313"
                                             alt="A group of people sitting around a table with a tablet."
                                             data-index="4"
                                             sizes="(max-width: 479px) 100vw, 313px"
                                             loading="lazy"
-                                            srcSet="/cdn-assets/23072616d7-6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY-p-500.avif 500w, /cdn-assets/ccd35ab189-6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY-p-800.avif 800w, /cdn-assets/dcfc9ddc84-6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY-p-1080.avif 1080w, /cdn-assets/f7cae59c3d-6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY-p-1600.avif 1600w, /cdn-assets/1b70c5fed4-6878d8558e4caaaacfa6814a_INVESTMENT-ADVISORY.avif 3000w"
+                                            srcSet="/cdn-assets/23072616d7-6878d8558e4caaaacfa6814a_INVESTMENT-advIsory-p-500.avif 500w, /cdn-assets/ccd35ab189-6878d8558e4caaaacfa6814a_INVESTMENT-advIsory-p-800.avif 800w, /cdn-assets/dcfc9ddc84-6878d8558e4caaaacfa6814a_INVESTMENT-advIsory-p-1080.avif 1080w, /cdn-assets/f7cae59c3d-6878d8558e4caaaacfa6814a_INVESTMENT-advIsory-p-1600.avif 1600w, /cdn-assets/1b70c5fed4-6878d8558e4caaaacfa6814a_INVESTMENT-advIsory.avif 3000w"
                                         />
                                         <div className="img-cover home-services-image-cover"></div>
                                     </div>
                                     <div ref={listRef} className="services_list home-services-list">
-                                        <Link data-index="1" href="/developers" className="services_item home-services-item home-services-item-sales-marketing animate-right w-inline-block">
+                                        <Link data-index="1" href="/developers" className="services_item home-services-item home-services-item-sales-marketIng animate-right w-inline-block">
                                             <div className="services_item-title home-services-item-title-wrap">
                                                 <div className="home-services-item-number">(01)</div>
                                                 <div className="text-color-blue400 home-services-item-title">Satış və Marketinq</div>

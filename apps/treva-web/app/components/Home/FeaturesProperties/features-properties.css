@@ -23,38 +23,33 @@
 }
 
 /* ========================================================
-    A. DESKTOP STRUKTURU (Tam şəkildəki kimi horizontal hiza)
+    A. DESKTOP HEADER (Horizontal Hiza)
    ======================================================== */
 .featured__header {
   margin-bottom: 72px;
   width: 100%;
 }
 
-/* Şəkildəki kimi elementləri eyni sətirdə və mərkəzləşdirilmiş saxlayan əsas div */
 .featured__desktop-row {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Mətnlərin mərkəz oxlarını eyni xəttə gətirir */
+  align-items: center; 
   width: 100%;
   gap: 48px;
 }
 
-/* Desktop Sol tərəf Alt Mətn (Daha böyük/hündür yer tutur) */
 .featured__subtitle {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--color-text-muted);
   text-transform: none;
   margin: 0;
   font-size: 20px;
   font-weight: 300;
   line-height: 1.6;
-  max-width: 580px; /* Yazının 3 sətirə bölünməsini təmin edir */
+  max-width: 510px;
   margin-top: 35px;
-    /* letter-spacing: 0.1px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; */
 }
 
-/* Desktop Sağ tərəf Başlıq qutusu */
 .featured__title-wrapper {
   display: flex;
   flex-direction: column;
@@ -68,7 +63,7 @@
   line-height: 1.2;
   text-align: right;
   margin: 0;
-  white-space: nowrap; /* Başlığın tək sətirdə şəkildəki kimi qalması üçün */
+  white-space: nowrap;
 }
 
 .featured__title-featured {
@@ -76,8 +71,6 @@
   font-weight: 300 !important;
   color: #1a1a1a;
   letter-spacing: 0.03em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .featured__title-properties {
@@ -85,11 +78,8 @@
   font-weight: 500 !important;
   color: var(--color-secondary);
   margin-left: 0.1em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* DESKTOP: View All düyməsi */
 .featured__view-all {
   display: inline-flex;
   align-items: center;
@@ -109,7 +99,6 @@
   font-style: normal;
   font-size: 21px;
   line-height: 120%;
-  
   margin-top: 40px;
 }
 
@@ -120,7 +109,7 @@
 }
 
 /* ========================================================
-    B. CARDS & SLIDER (Sabit de-facto hissə)
+    B. CARDS GRID & LOQO STRUKTURU (Tam Simmetrik Dizayn)
    ======================================================== */
 .featured__slider-container {
   position: relative;
@@ -144,7 +133,9 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 32px 24px;
+  
+  /* Üstdən və altdan eyni simmetrik məsafə (LEARN MORE ilə Loqo bərabərliyi üçün) */
+  padding: 36px 24px; 
   text-decoration: none;
 }
 
@@ -174,35 +165,76 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.65) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.65) 100%);
   z-index: 2;
 }
 
-.property-card__brand {
+/* --------------------------------------------------------
+    YENİ: Mətn Formatında Ağ Brend Loqoları (Böyük və Simmetrik)
+   -------------------------------------------------------- */
+.property-card__brand-text {
   position: relative;
   z-index: 3;
   color: var(--color-white);
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.9;
   text-align: center;
+  width: 100%;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  text-transform: none !important;
+  
 }
 
+/* Sea Breeze üçün xüsusi lüks serif font stili */
+.brand-seabreeze {
+  font-family: 'Times New Roman', Times, serif, var(--font-family);
+  font-size: 21px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.brand-seabreeze span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 4px;
+  margin-top: 2px;
+  opacity: 0.9;
+}
+
+/* Reportage üçün modern san-serif font stili */
+.brand-reportage {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.brand-reportage span {
+  display: block;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  margin-top: -1px;
+  opacity: 0.85;
+}
+
+/* --------------------------------------------------------
+    Ortadakı Böyük Başlıqlar (Tam yerində sabit qalır)
+   -------------------------------------------------------- */
 .property-card__title {
   position: relative;
   z-index: 3;
   color: var(--color-white);
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.25;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: center;
-  margin: auto 0;
+  margin: auto 0 !important; /* Başlığı şaquli olaraq tam mərkəzdə saxlayır */
 }
 
+/* --------------------------------------------------------
+    Learn More Bölməsi (Dəyilmədi, Alt məsafə qorundu)
+   -------------------------------------------------------- */
 .property-card__action {
   position: relative;
   z-index: 3;
@@ -226,6 +258,7 @@
   transform: translateX(4px);
 }
 
+/* Naviqasiya oxları */
 .featured__controls {
   display: flex;
   justify-content: flex-end;
@@ -253,42 +286,28 @@
 
 /* --- Responsive Planşet --- */
 @media (max-width: 1024px) {
-  .featured__title {
-    font-size: 40px;
-  }
-  .featured__desktop-row {
-    gap: 24px;
-  }
-  .featured__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
+  .featured__title { font-size: 40px; }
+  .featured__desktop-row { gap: 24px; }
+  .featured__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .brand-seabreeze { font-size: 19px; }
+  .brand-reportage { font-size: 21px; }
 }
 
 /* ========================================================
-    C. MOBİL STRUKTUR (Dizayn tam qorundu + Premium şriftlər)
+    C. MOBİL STRUKTUR
    ======================================================== */
 @media (max-width: 768px) {
-  .d-desktop {
-    display: none !important;
-  }
-  .d-mobile {
-    display: flex !important;
-  }
-
-  .featured {
-    padding: 44px 0;
-  }
+  .d-desktop { display: none !important; }
+  .d-mobile { display: flex !important; }
+  .featured { padding: 44px 0; }
   
   .featured__header-mobile {
     display: flex;
     flex-direction: column;
     width: 100%;
-    box-sizing: border-box;
     margin-bottom: 36px;
   }
 
-  /* Mobil Başlıq - SAĞDA */
   .featured__title-mobile {
     font-size: 36px;
     text-transform: uppercase;
@@ -296,52 +315,37 @@
     text-align: right;
     margin: 0;
     letter-spacing: -0.5px;
-    width: 100%;
   }
 
-  /* Desktopdakı bütün zəriflik klassları mobil siniflərə tam əlavə olundu */
   .featured__title-mobile-featured {
     font-family: var(--font-family);
     font-weight: 300 !important;
     color: #1a1a1a;
-    letter-spacing: 0.03em;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   .featured__title-mobile-properties {
     font-family: var(--font-family);
     font-weight: 500 !important;
     color: var(--color-secondary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
   
-  /* Mobil Alt Mətn - Tam lowercase, Lakin ilk sözün ilk hərfi böyük */
   .featured__subtitle-mobile {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--color-text-muted);
     font-size: 16.5px;
     line-height: 1.5;
     text-align: left;
     font-weight: 300;
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
     margin-top: 32px;
-    text-transform: lowercase !important; 
+    text-transform: none;
+
   }
 
-  .featured__subtitle-mobile::first-letter {
-    text-transform: uppercase !important;
-  }
-
-  /* Mobil View All Düyməsi */
   .featured__view-all-mobile {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    
     width: 124px; 
     height: 44px;
     border-radius: 24px;
@@ -349,26 +353,15 @@
     padding: 0 16px;
     color: var(--color-primary);
     text-decoration: none;
-    
     align-self: flex-end;
     margin-top: 32px;
-    
     font-family: 'Oak Sans', var(--font-family);
     font-weight: 600;
     font-size: 14px;
     text-transform: uppercase;
-    line-height: 1;
-    white-space: nowrap;
   }
   
-  .featured__grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .property-card {
-    padding: 28px 20px;
-  }
-  .property-card__title {
-    font-size: 22px;
-  }
+  .featured__grid { grid-template-columns: 1fr; gap: 16px; }
+  .property-card { padding: 32px 20px; }
+  .property-card__title { font-size: 23px; }
 }

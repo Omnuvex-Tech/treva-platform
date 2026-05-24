@@ -11,19 +11,16 @@ const FeaturedProperties: React.FC = () => {
         <section className="featured">
           
           {/* ========================================================
-              1. DESKTOP STRUKTURU (Vahid Div, Mükəmməl Horizontal Hiza)
+              1. DESKTOP HEADER (Vahid sətir, mərkəzləşdirilmiş hiza)
              ======================================================== */}
           <div className="featured__header d-desktop">
-            {/* Şəkildəki görüntünü verən əsas vahid div bloku */}
             <div className="featured__desktop-row">
-              {/* Sol tərəf: Daha hündür dayanan 3 sətirlik alt mətn */}
               <p className="featured__subtitle">
                 Strategic portfolio of the city's top venues. Our focus <br />
                 remains on architectural landmarks and long-term <br />
                 capital growth for investors.
               </p>
 
-              {/* Sağ tərəf: Başlıq */}
               <h2 className="featured__title">
                 <span className="featured__title-featured">FEATURED</span>{" "}
                 <span className="featured__title-properties">PROPERTIES</span>
@@ -32,23 +29,21 @@ const FeaturedProperties: React.FC = () => {
 
             <div className="featured__title-wrapper">
               <a href="#" className="featured__view-all">
-                View All
+                vIew all
               </a>
             </div>
           </div>
 
 
           {/* ========================================================
-              2. MOBİL STRUKTUR (Dizayn qorundu + Premium Şrift tənzimləməsi)
+              2. MOBİL HEADER
              ======================================================== */}
           <div className="featured__header-mobile d-mobile">
-            {/* 1. Başlıq - SAĞDA (Desktopdakı bütün font-weight və zəriflik xüsusiyyətləri ilə) */}
             <h2 className="featured__title-mobile">
               <span className="featured__title-mobile-featured">FEATURED</span><br />
               <span className="featured__title-mobile-properties">PROPERTIES</span>
             </h2>
 
-            {/* 2. Alt mətn - SOLDA (Mətn kiçik hərf, ilk hərfi böyük) */}
             <p className="featured__subtitle-mobile">
               Strategic portfolio of the city’s top <br />
               venues. Our focus remains on <br />
@@ -56,31 +51,38 @@ const FeaturedProperties: React.FC = () => {
               term capital growth for investors.
             </p>
 
-            {/* 3. View All Düyməsi - SAĞDA */}
             <a href="#" className="featured__view-all-mobile">
-              View All
+              vIew all
             </a>
           </div>
 
 
           {/* ========================================================
-              3. SLIDER & CARDS GRID (Dəyişilməz stabil blok)
+              3. SLIDER & CARDS GRID (Yenilənmiş Mətn Tipli Loqolar)
              ======================================================== */}
           <div className="featured__slider-container">
             <div className="featured__grid">
-              {/* Card 1 */}
+              
+              {/* Card 1 - Sea Breeze */}
               <a href="#" className="property-card">
                 <img
                   className="property-card__bg"
-                  src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80"
-                  alt="Marina Village Tower"
+                  src="/images/features-pro/feat1.jpg"
+                  alt="Marina Village background"
                 />
                 <div className="property-card__overlay"></div>
-                <span className="property-card__brand">Sea Breeze Real Estate</span>
+                
+                {/* Şəkildəki kimi Böyük Ağ Mətn Loqo */}
+                <div className="property-card__brand-text brand-seabreeze">
+                  SEA BREEZE
+                  <span>REAL ESTATE</span>
+                </div>
+
                 <h3 className="property-card__title">
                   Marina <br />
                   Village
                 </h3>
+
                 <span className="property-card__action">
                   Learn More
                   <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -95,19 +97,26 @@ const FeaturedProperties: React.FC = () => {
                 </span>
               </a>
 
-              {/* Card 2 */}
+              {/* Card 2 - Reportage */}
               <a href="#" className="property-card">
                 <img
                   className="property-card__bg"
-                  src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=600&q=80"
-                  alt="Panorama Skyscraper"
+                  src="/images/features-pro/feat2.jpg"
+                  alt="Panorama background"
                 />
                 <div className="property-card__overlay"></div>
-                <span className="property-card__brand">Reportage. Properties</span>
+                
+                {/* Şəkildəki kimi Böyük Ağ Mətn Loqo */}
+                <div className="property-card__brand-text brand-reportage">
+                  Reportage.
+                  <span>Properties</span>
+                </div>
+
                 <h3 className="property-card__title">
                   Panorama By <br />
                   Elie Saab
                 </h3>
+
                 <span className="property-card__action">
                   Learn More
                   <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,19 +131,26 @@ const FeaturedProperties: React.FC = () => {
                 </span>
               </a>
 
-              {/* Card 3 */}
+              {/* Card 3 - Reportage */}
               <a href="#" className="property-card">
                 <img
                   className="property-card__bg"
-                  src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80"
-                  alt="Brabus Island Waterfront"
+                  src="/images/features-pro/feat3.jpg"
+                  alt="Brabus Island background"
                 />
                 <div className="property-card__overlay"></div>
-                <span className="property-card__brand">Reportage. Properties</span>
+                
+                {/* Şəkildəki kimi Böyük Ağ Mətn Loqo */}
+                <div className="property-card__brand-text brand-reportage">
+                  Reportage.
+                  <span>Properties</span>
+                </div>
+
                 <h3 className="property-card__title">
                   Brabus <br />
                   Island
                 </h3>
+
                 <span className="property-card__action">
                   Learn More
                   <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -149,19 +165,26 @@ const FeaturedProperties: React.FC = () => {
                 </span>
               </a>
 
-              {/* Card 4 */}
+              {/* Card 4 - Sea Breeze */}
               <a href="#" className="property-card property-card--highlighted">
                 <img
                   className="property-card__bg"
-                  src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=600&q=80"
-                  alt="Arabian Ranches Luxury Complex"
+                  src="/images/features-pro/feat4.jpg"
+                  alt="Arabian Ranches background"
                 />
                 <div className="property-card__overlay"></div>
-                <span className="property-card__brand">Sea Breeze Real Estate</span>
+                
+                {/* Şəkildəki kimi Böyük Ağ Mətn Loqo */}
+                <div className="property-card__brand-text brand-seabreeze">
+                  SEA BREEZE
+                  <span>REAL ESTATE</span>
+                </div>
+
                 <h3 className="property-card__title">
                   Arabian <br />
                   Ranches
                 </h3>
+
                 <span className="property-card__action">
                   Learn More
                   <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,9 +198,10 @@ const FeaturedProperties: React.FC = () => {
                   </svg>
                 </span>
               </a>
+
             </div>
 
-            {/* Slider Naviqasiya Kontrolları */}
+            {/* Slider Naviqasiya Oxları */}
             <div className="featured__controls">
               <button className="featured__btn" aria-label="Previous property">
                 <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -203,6 +227,7 @@ const FeaturedProperties: React.FC = () => {
               </button>
             </div>
           </div>
+
         </section>
       </PageContainer>
     </main>

@@ -398,7 +398,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-MARKETING.avif" loading="eager" sizes="(max-width: 1500px) 100vw, 1500px" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-MARKETING-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-MARKETING-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-MARKETING.avif 1500w" alt="A group of people sitting at desks working on computers." className="fullwidth-img"/>
+                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-marketIng.avif" loading="eager" sizes="(max-width: 1500px) 100vw, 1500px" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-marketIng-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-marketIng-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878cb7f612a5ffa7693ec49_FULL-marketIng.avif 1500w" alt="A group of people sitting at desks working on computers." className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
@@ -442,7 +442,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-activation.avif" loading="eager" sizes="(max-width: 1500px) 100vw, 1500px" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-activation-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-activation-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-activation.avif 1500w" alt="A group of people sitting around a wooden table." className="fullwidth-img"/>
+                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-actIvatIon.avif" loading="eager" sizes="(max-width: 1500px) 100vw, 1500px" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-actIvatIon-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-actIvatIon-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688362eb9e4fdee54a214bfe_developers-pageBrokers-actIvatIon.avif 1500w" alt="A group of people sitting around a wooden table." className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
