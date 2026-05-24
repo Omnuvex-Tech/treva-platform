@@ -23,7 +23,7 @@
 .pulse__desktop-row {
   display: flex;
   justify-content: space-between;
-  align-items: center; 
+  align-items: center;
   width: 100%;
   gap: 48px;
 }
@@ -89,11 +89,18 @@
   letter-spacing: 0%;
 }
 
+/* Desktop üçün düymə qrupu və aralarındakı lazımi gap boşluğu */
+.pulse__btn-group {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Desktopda düymələr arası boşluq */
+}
+
 .pulse__filter-btn {
   box-sizing: border-box;
-  min-width: 73px;
-  height: 47px;
-  padding: 11px 15px;
+  min-width: 68px;
+  height: 38px;
+  padding: 11px 12px;
   border-radius: 30px;
   border: 2px solid var(--color-btn-inactive);
   background: transparent;
@@ -118,6 +125,10 @@
 .pulse__view-all-wrapper {
   display: flex;
   align-items: center;
+}
+
+.pulse__mobile-view-all {
+  display: none;
 }
 
 /* ========================================================
@@ -167,13 +178,13 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 82px;
-  height: 38px;
+  width: 69px;
+  height: 32px;
   border-radius: 15px;
   background-color: #F2EFE8;
   color: #4E525D;
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -198,7 +209,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 68px;
-  text-transform: none; 
+  text-transform: none;
 }
 
 .blog-card__author {
@@ -240,7 +251,7 @@
 }
 
 /* ========================================================
-    E. RESPONSIVE (MOBİLDƏ BİRE-BİR EYNİ DÜZÜLÜŞ)
+    E. RESPONSIVE (MOBİLDƏ DETALLI VURĞULANMIŞ PRO-AYARLAR)
    ======================================================== */
 @media (max-width: 1024px) {
   .pulse__desktop-row { flex-direction: column; align-items: flex-start; gap: 24px; }
@@ -251,74 +262,87 @@
 
 @media (max-width: 768px) {
   .pulse { padding: 44px 0; }
-  
+
   .d-desktop { display: none !important; }
   .d-mobile { display: flex !important; }
 
-  /* Başlıq və alt mətn mobil şəkildəki kimi: başlıq solda, alt mətn sağa çəkilmiş */
-  .pulse__desktop-row {
-    display: block; /* yan-yana düzülüş ləğv edilir */
+  .pulse__mobile-view-all {
+    justify-content: flex-end;
+    margin-top: 32px;
     width: 100%;
   }
-  
+
+  .pulse__desktop-row {
+    display: block;
+    width: 100%;
+  }
+
   .pulse__title {
     font-size: 38px;
     letter-spacing: -0.5px;
     text-align: left;
-    margin-bottom: 12px;
+    margin-bottom: 28px; /* Yuxarıdakı mətnlə ara məsafəsi bir qədər də artırıldı */
   }
 
+  /* Alt mətnin həm yuxarı həm də aşağı filter bloku ilə məsafəsi artırıldı */
   .pulse__subtitle {
     font-size: 17px;
     line-height: 1.5;
     text-align: left;
-    max-width: 80%; /* Şəkildəki kimi sağ tərəfdə bloklanması üçün */
-    margin-left: auto; /* Mətni sağa doğru itələyir */
+    max-width: 85%;
+    margin-left: auto;
     padding-left: 15px;
+    margin-bottom: 44px; /* Aşağıdakı text/filter bloku ilə ara məsafəsi bir qədər də artırıldı */
   }
 
-  /* Filter mətni və düymələrin şəkildəki xüsusi düzülüşü */
   .pulse__controls-row {
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Hər şeyi sağa söykəyir */
-    gap: 16px;
-    margin-top: 48px;
+    align-items: flex-end;
+    gap: 0px;
+    margin-top: 0px;
     width: 100%;
   }
 
   .pulse__filters {
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* "Filter by category" mətni sağda dursun */
+    align-items: flex-end;
     width: 100%;
-    gap: 16px;
+    gap: 0px;
   }
 
+  /* Filter mətni ilə aşağıdakı düymələr arasına alt boşluq (margin-bottom) verildi */
   .pulse__filter-label {
     width: auto;
     margin-right: 0;
-    font-size: 16px; /* Mobildə bir az daha kompakt */
+    font-size: 16px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-align: right;
+    margin-bottom: 23px; /* Yazı ilə düymələr arasındakı xüsusi boşluq */
   }
 
-  /* Düymə konteyneri mobildə sağa yığılır */
+  /* Düymə konteyneri mobildə şəkildəki kimi 4px gap saxlayır */
   .pulse__btn-group {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 2px;
+    gap: 4px;
     width: 100%;
   }
-  
-  .pulse__grid { 
-    grid-template-columns: 1fr; 
-    gap: 40px; 
-    margin-top: 32px;
+
+  .pulse__filter-btn {
+    padding: 11px 10px;
+    font-size: 13px;
   }
-  
+
+  .pulse__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-top: 36px;
+  }
+
   .blog-card__title {
     font-size: 24px;
     min-height: auto;

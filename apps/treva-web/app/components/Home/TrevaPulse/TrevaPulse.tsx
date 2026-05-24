@@ -44,8 +44,47 @@ const blogData = [
   }
 ];
 
+type PulseFilterButtonProps = {
+  category: string;
+  isActive: boolean;
+  onClick: (category: string) => void;
+};
+
+function PulseFilterButton({ category, isActive, onClick }: PulseFilterButtonProps) {
+  return (
+    <button
+      type="button"
+      className={`pulse__filter-btn ${isActive ? 'pulse__filter-btn--active' : ''}`}
+      onClick={() => onClick(category)}
+    >
+      {category}
+    </button>
+  );
+}
+
+type PulseCategoryFiltersProps = {
+  categories: string[];
+  activeFilter: string;
+  onFilterChange: (category: string) => void;
+};
+
+function PulseCategoryFilters({ categories, activeFilter, onFilterChange }: PulseCategoryFiltersProps) {
+  return (
+    <div className="pulse__btn-group">
+      {categories.map((category) => (
+        <PulseFilterButton
+          key={category}
+          category={category}
+          isActive={activeFilter === category}
+          onClick={onFilterChange}
+        />
+      ))}
+    </div>
+  );
+}
+
 const TrevaPulse: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState('Blog'); // Şəkildə 'Blog' seçilidir
+  const [activeFilter, setActiveFilter] = useState('Blog');
 
   const categories = ['All', 'Events', 'Blog', 'Highlights'];
 
@@ -55,7 +94,7 @@ const TrevaPulse: React.FC = () => {
         <section className="pulse">
           
           {/* ========================================================
-              1. HEADER SECTION (Başlıq və Text Düzülüşü)
+              1. HEADER SECTION
              ======================================================== */}
           <div className="pulse__header">
             <div className="pulse__desktop-row">
@@ -64,28 +103,24 @@ const TrevaPulse: React.FC = () => {
                 <span className="pulse__title-bold">PULSE</span>
               </h2>
               
+              {/* İstədiyiniz sətir ardıcıllığı ilə tam tənzimlənmiş alt mətn */}
               <p className="pulse__subtitle">
-                Your curated source for industry news, expert <br />
-                insights, and events. Stay connected to the pulse of <br />
+                Your curated source for industry <br />
+                news, expert insights, and events. <br />
+                Stay connected to the pulse of <br />
                 Baku’s premium real estate market.
               </p>
             </div>
 
-            {/* Filters & View All Bölməsi (Mobildə şəkillə tam eyni strukturdadır) */}
+            {/* Filters & View All Bölməsi */}
             <div className="pulse__controls-row">
               <div className="pulse__filters">
                 <span className="pulse__filter-label">Filter by category</span>
-                <div className="pulse__btn-group">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      className={`pulse__filter-btn ${activeFilter === category ? 'pulse__filter-btn--active' : ''}`}
-                      onClick={() => setActiveFilter(category)}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
+                <PulseCategoryFilters
+                  categories={categories}
+                  activeFilter={activeFilter}
+                  onFilterChange={setActiveFilter}
+                />
               </div>
               
               {/* Desktop View All Düyməsi */}
@@ -121,12 +156,12 @@ const TrevaPulse: React.FC = () => {
           </div>
 
           {/* Mobil üçün aşağıda çıxan View All */}
-          <div className="d-mobile" style={{ marginTop: '32px', justifyContent: 'center' }}>
+          <div className="pulse__mobile-view-all d-mobile">
             <ViewAllButton mobile />
           </div>
 
           {/* ========================================================
-              3. NAVIGATION BUTTONS (Sağ alt küncdə tam sabitlənib)
+              3. NAVIGATION BUTTONS (Sağ alt küncdə tam sabit)
              ======================================================== */}
           <div className="pulse__controls-wrapper d-desktop">
             <div className="pulse__controls">
