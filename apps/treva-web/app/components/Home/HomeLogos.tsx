@@ -468,13 +468,12 @@ export const HomeLogos = () => {
                 We focus on visionary design and long-term asset<br /> growth for our global clients.
               </p>
 
-              {/* Mobil versiyası — İstədiyiniz sətir keçidləri ilə düzəldildi */}
+              {/* Mobil versiyası — DÜZƏLDİ: tələb olunan 3 ədəd <br/> ilə */}
               <p className="logos-left-description logos-left-description-mobile">
                 Global network of world-leading <br />
-                developers.<br />
-                We focus on visionary <br />
-                design and long-term asset<br />
-                growth for our global clients.
+                developers. We focus on visionary <br />
+                design and long-term asset growth <br />
+                for our global clients.
               </p>
 
               {/* Başlıq */}

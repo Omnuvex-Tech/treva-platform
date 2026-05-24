@@ -1,0 +1,254 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 960px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Başlıq sahəsi və arxadakı xətlər */
+.headerContainer {
+  position: relative;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.bgLineTop {
+  position: absolute;
+  top: 35%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  z-index: 1;
+}
+
+.bgLineBottom {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  z-index: 1;
+}
+
+.title {
+  position: relative;
+  z-index: 2;
+  font-size: 72px;
+  font-weight: 500;
+  color: #4a505e;
+  text-transform: uppercase;
+  line-height: 1.1;
+  letter-spacing: 2px;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.titleTop {
+  display: block;
+  margin-right: 140px;
+}
+
+.titleBottom {
+  display: block;
+  margin-left: 180px;
+}
+
+/* Alt başlıq mətni */
+.subtitle {
+  font-size: 24px;
+  color: #666666;
+  font-weight: 300;
+  margin-top: 16px;
+  margin-bottom: 40px;
+  max-width: 800px;
+  line-height: 1.4;
+}
+
+/* Rolların (Client, Developer, Broker) seçilməsi düymələri */
+.roleSelector {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.roleButton {
+  padding: 10px 28px;
+  font-size: 18px;
+  font-weight: 400;
+  border-radius: 25px;
+  border: 1px solid #a0a5b0;
+  background-color: transparent;
+  color: #4a505e;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.activeRole {
+  background-color: #4e5362;
+  color: #ffffff;
+  border-color: #4e5362;
+}
+
+/* Input sahələri */
+.inputGroup {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+  max-width: 760px;
+  margin-bottom: 48px;
+}
+
+.inputField {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #a0a5b0;
+  padding: 12px 4px;
+  font-size: 20px;
+  color: #333333;
+  background-color: transparent;
+  outline: none;
+  font-weight: 300;
+}
+
+.inputField::placeholder {
+  color: #999999;
+}
+
+.inputField:focus {
+  border-bottom-color: #4e5362;
+}
+
+/* Əsas Təsdiq Düyməsi */
+.submitButton {
+  width: 100%;
+  max-width: 760px;
+  background-color: #4e5362;
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 18px 0;
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-bottom: 24px;
+}
+
+.submitButton:hover {
+  background-color: #3d414d;
+}
+
+/* Hüquqi xəbərdarlıq mətni */
+.disclaimer {
+  font-size: 14px;
+  color: #888888;
+  max-width: 600px;
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+.disclaimer strong {
+  color: #444444;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE DIZAYN (Şəkil 2 üçün konfiqurasiya)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .container {
+    padding: 30px 24px;
+  }
+
+  .headerContainer {
+    margin-bottom: 30px;
+  }
+
+  /* Mobildə arxa fondakı üfüqi xətlər itir (Şəkil 2-də göründüyü kimi) */
+  .bgLineTop,
+  .bgLineBottom {
+    display: none;
+  }
+
+  .title {
+    font-size: 42px;
+    letter-spacing: 1px;
+    text-align: center;
+    line-height: 1.15;
+  }
+
+  .titleTop {
+    margin-right: 0;
+    display: inline;
+  }
+
+  .titleBottom {
+    margin-left: 0;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    margin-top: 20px;
+    margin-bottom: 35px;
+    padding: 0 10px;
+  }
+
+  .roleSelector {
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .roleButton {
+    padding: 8px 20px;
+    font-size: 16px;
+    flex: 1;
+    max-width: 110px;
+    text-align: center;
+  }
+
+  /* Giriş sahələri mobildə tam alt-alta sıralanır */
+  .inputGroup {
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 40px;
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .inputField {
+    font-size: 18px;
+    padding: 10px 2px;
+  }
+
+  .submitButton {
+    border-radius: 40px;
+    padding: 20px 0;
+    font-size: 18px;
+    width: calc(100% - 20px);
+  }
+
+  .disclaimer {
+    font-size: 13px;
+    padding: 0 15px;
+  }
+}
