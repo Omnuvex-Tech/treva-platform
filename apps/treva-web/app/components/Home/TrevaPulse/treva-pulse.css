@@ -71,7 +71,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 48px;
+  margin-top: 100px;
   width: 100%;
 }
 
@@ -194,8 +194,8 @@
 /* Yenilənmiş xüsusi Blog Başlıq mətni */
 .blog-card__title {
   font-family: 'Oak Sans', var(--font-family);
-  font-weight: 500;
-  font-size: 28px;
+  font-weight: 400;
+  font-size: 25px;
   line-height: 120%;
   letter-spacing: 0%;
   color: #000000;
@@ -204,7 +204,8 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 68px; /* İki sətirlik başlıq hündürlüyünü qorumaq üçün */
+  min-height: 68px;
+  text-transform: none; 
 }
 
 .blog-card__author {
@@ -229,16 +230,24 @@
   letter-spacing: 0.5px;
 }
 
-/* Alt sağ küncdəki naviqasiya oxları */
+/* ========================================================
+    D. NAVIGATION CONTROLS (MÜKƏMMƏL SAĞA HİZALAMA)
+   ======================================================== */
+.pulse__controls-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 40px;
+}
+
 .pulse__controls {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 40px;
 }
 
 /* ========================================================
-    D. RESPONSIVE (MOBILE VIEW)
+    E. RESPONSIVE (MOBILE VIEW)
    ======================================================== */
 @media (max-width: 1024px) {
   .pulse__desktop-row { flex-direction: column; align-items: flex-start; gap: 24px; }

@@ -1,3 +1,13 @@
+:root {
+  --color-primary: #000000;
+  --color-secondary: #4e525d;
+  --color-text-muted: #4e525d;
+  --color-bg-icon: #f4f3ef;
+  --color-border: #e2e8f0;
+  --color-white: #ffffff;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 .portfolio-view-all {
   display: inline-flex;
   align-items: center;
@@ -37,19 +47,17 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid #2E30374D;
+  border: 1px solid var(--color-border);
   background-color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #2E30374D;
+  color: var(--color-primary);
   transition: all 0.2s ease;
 }
 
-.portfolio-direction-button:hover,
-.portfolio-direction-button:active {
-  border-color: #000000;
-  color: #000000;
-  background-color: var(--color-white);
+.portfolio-direction-button:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-icon);
 }

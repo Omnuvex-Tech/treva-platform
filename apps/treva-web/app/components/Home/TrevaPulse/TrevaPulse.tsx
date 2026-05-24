@@ -45,7 +45,6 @@ const blogData = [
 ];
 
 const TrevaPulse: React.FC = () => {
-  // Aktiv filter düyməsini idarə etmək üçün state
   const [activeFilter, setActiveFilter] = useState('All');
 
   const categories = ['All', 'Events', 'Blog', 'Highlights'];
@@ -105,12 +104,10 @@ const TrevaPulse: React.FC = () => {
                 </div>
                 
                 <div className="blog-card__meta">
-                  {/* Yenilənmiş Xüsusi Dizaynlı Blog Etiketi */}
                   <span className="blog-card__category">{post.category}</span>
                   <span className="blog-card__date">{post.date}</span>
                 </div>
                 
-                {/* Yenilənmiş 28px Oak Sans Başlıq */}
                 <h3 className="blog-card__title">{post.title}</h3>
                 
                 <div className="blog-card__author">
@@ -127,11 +124,13 @@ const TrevaPulse: React.FC = () => {
           </div>
 
           {/* ========================================================
-              3. NAVIGATION BUTTONS (Sağ alt küncdəki oxlar)
+              3. NAVIGATION BUTTONS (Tam Sağ Küncdə Sabit Oxlar)
              ======================================================== */}
-          <div className="pulse__controls d-desktop">
-            <DirectionButton direction="previous" label="Previous" />
-            <DirectionButton direction="next" label="Next" />
+          <div className="pulse__controls-wrapper d-desktop">
+            <div className="pulse__controls">
+              <DirectionButton direction="previous" label="Previous" />
+              <DirectionButton direction="next" label="Next" />
+            </div>
           </div>
 
         </section>
