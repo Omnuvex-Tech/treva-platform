@@ -45,7 +45,7 @@ const blogData = [
 ];
 
 const TrevaPulse: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('Blog'); // Şəkildə 'Blog' seçilidir
 
   const categories = ['All', 'Events', 'Blog', 'Highlights'];
 
@@ -55,7 +55,7 @@ const TrevaPulse: React.FC = () => {
         <section className="pulse">
           
           {/* ========================================================
-              1. HEADER SECTION (Başlıq və Text Desktopda d:flex Qarşı-qarşıya)
+              1. HEADER SECTION (Başlıq və Text Düzülüşü)
              ======================================================== */}
           <div className="pulse__header">
             <div className="pulse__desktop-row">
@@ -71,19 +71,21 @@ const TrevaPulse: React.FC = () => {
               </p>
             </div>
 
-            {/* Filters & View All Bölməsi */}
+            {/* Filters & View All Bölməsi (Mobildə şəkillə tam eyni strukturdadır) */}
             <div className="pulse__controls-row">
               <div className="pulse__filters">
                 <span className="pulse__filter-label">Filter by category</span>
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    className={`pulse__filter-btn ${activeFilter === category ? 'pulse__filter-btn--active' : ''}`}
-                    onClick={() => setActiveFilter(category)}
-                  >
-                    {category}
-                  </button>
-                ))}
+                <div className="pulse__btn-group">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      className={`pulse__filter-btn ${activeFilter === category ? 'pulse__filter-btn--active' : ''}`}
+                      onClick={() => setActiveFilter(category)}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
               </div>
               
               {/* Desktop View All Düyməsi */}
@@ -119,12 +121,12 @@ const TrevaPulse: React.FC = () => {
           </div>
 
           {/* Mobil üçün aşağıda çıxan View All */}
-          <div className="d-mobile" style={{ marginTop: '32px' }}>
+          <div className="d-mobile" style={{ marginTop: '32px', justifyContent: 'center' }}>
             <ViewAllButton mobile />
           </div>
 
           {/* ========================================================
-              3. NAVIGATION BUTTONS (Tam Sağ Küncdə Sabit Oxlar)
+              3. NAVIGATION BUTTONS (Sağ alt küncdə tam sabitlənib)
              ======================================================== */}
           <div className="pulse__controls-wrapper d-desktop">
             <div className="pulse__controls">
