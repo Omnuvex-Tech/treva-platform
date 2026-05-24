@@ -9,6 +9,7 @@ import TrevaHero from "./TrevaHero/TrevaHero";
 import AboutUs from "./AboutUs/AboutUs";
 import TrevaPage from "./FeaturesProperties/FeaturesProperties";
 import FeaturedProperties from "./FeaturesProperties/FeaturesProperties";
+import TrevaPulse from "./TrevaPulse/TrevaPulse";
 
 type HomeProps = {
   locale: string;
@@ -33,6 +34,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
       )}
       <AboutUs/>
       <FeaturedProperties/>
+      <TrevaPulse/>
       <HomeFooter locale={locale} />
     </div>
   );
