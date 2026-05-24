@@ -10,7 +10,7 @@ import 'swiper/css/navigation';
 
 import { ButtonText } from '@/app/components/ButtonText';
 
-// Production-parity CSS overrides
+// Production-parity CSS overrides including the new layout typography
 const productionStyles = `
   @font-face {
     font-family: Helveticanowdisplay;
@@ -20,12 +20,41 @@ const productionStyles = `
     font-display: swap;
   }
 
+  /* Intro Section Desktop Grid Layout */
   .section_logos .logos_intro {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-end !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 40px !important;
+    align-items: flex-start !important;
     margin-bottom: 63px !important;
     width: 100% !important;
+  }
+
+  /* Left Paragraph Style matching Treva Pulse description style */
+  .logos-left-description {
+    font-family: Helveticanowdisplay, sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 300 !important;
+    line-height: 1.4 !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-transform: none !important;
+    margin: 0 !important;
+    max-width: 450px !important;
+    letter-spacing: 0.3px;
+  }
+
+  /* Right Heading Style matching requested Oak Sans specifications */
+  .logos-right-heading {
+    font-family: 'Oak Sans', sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    font-size: 53px !important;
+    line-height: 100% !important;
+    letter-spacing: -0.03em !important;
+    text-transform: uppercase !important;
+    color: #ffffff !important;
+    margin: 0 !important;
+    text-align: left !important;
   }
   
   .text-color-white60 {
@@ -54,15 +83,6 @@ const productionStyles = `
     font-size: 14px !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
-  }
-
-  .section_logos h2 {
-    text-transform: uppercase !important;
-  }
-
-  .text-color-white60 {
-    color: rgba(255, 255, 255, 0.6) !important;
-    text-transform: uppercase !important;
   }
 
   @media screen and (min-width: 992px) {
@@ -137,7 +157,7 @@ const productionStyles = `
     justify-content: center !important;
     align-items: center !important;
     box-sizing: border-box !important;
-    width: 240px !important;
+    width: 200px !important;
     min-width: 0 !important;
     max-width: 100% !important;
     height: 29px !important;
@@ -189,11 +209,70 @@ const productionStyles = `
     transform: translateY(-17px) !important;
   }
 
+  /* ==========================================================================
+     YENİ MOBİL RESPONSIVE STİLLƏR (MÖVCUD STRUKTURU QORUYARAQ 3 SÜTUN GRID)
+     ========================================================================== */
   @media screen and (max-width: 991px) {
+    /* Başlıq yuxarıda, təsvir mətni aşağıda olacaq şəkildə sıralama */
     .section_logos .logos_intro {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 21px !important;
+      display: flex !important;
+      flex-direction: column !important; 
+      align-items: stretch !important;
+      gap: 24px !important;
+      margin-bottom: 40px !important;
+    }
+
+    /* Başlıq: Mobildə sağa sıxılmış və böyük hərflərlə */
+    .logos-right-heading {
+      font-size: 32px !important;
+      text-align: right !important;
+      line-height: 1.2 !important;
+      width: 100% !important;
+    }
+
+    /* Təsvir Mətni: Mobildə sola sıxılmış */
+    .logos-left-description {
+      font-size: 14px !important;
+      text-align: left !important;
+      max-width: 100% !important;
+      line-height: 1.5 !important;
+    }
+
+    /* Masaüstü çərçivə quruluşunu mobildə gizlədirik ki, qarışıqlıq olmasın */
+    .home-logos-grid-wrap {
+      display: none !important;
+    }
+
+    /* Yeni Mobil Grid: Slaydersiz, hər sətirdə tam 3 loqo */
+    .logos_mobile.home-logos-mobile {
+      display: block !important;
+      width: 100% !important;
+      margin-bottom: 40px !important;
+    }
+
+    .mobile-partners-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 1px !important; /* İncə ayırıcı xətt effekti */
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .mobile-partner-cell {
+      background-color: #4A505C !important; /* Fon rəngi */
+      aspect-ratio: 1 / 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 12px !important;
+    }
+
+    .mobile-partner-cell img {
+      max-width: 85% !important;
+      max-height: 50% !important;
+      object-fit: contain !important;
+      filter: brightness(1.2) !important;
+      opacity: 0.85 !important;
     }
     
     .n-testimonials_quote {
@@ -207,6 +286,13 @@ const productionStyles = `
     .swiper-nav-testimonials {
       right: 28px !important;
       bottom: 28px !important;
+    }
+  }
+
+  /* Desktopda mobil gridi gizlət */
+  @media screen and (min-width: 992px) {
+    .logos_mobile.home-logos-mobile {
+      display: none !important;
     }
   }
 `;
@@ -253,6 +339,19 @@ const testimonials = [
   }
 ];
 
+// Mobil cihazlarda alt-alta və hər sətirdə 3 ədəd çıxacaq şirkət loqolarının təmiz massivi
+const mobilePartners = [
+  { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" },
+  { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" },
+  { alt: "reportage", src: "/cdn-assets/38b92121c7-6880c7cfb2730b05a0143175_reportage-4.png" },
+  { alt: "trident", src: "/cdn-assets/8def5f3166-6880c7cadbe0002df55f8ea0_Logo-Trident-1.png" },
+  { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" },
+  { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" },
+  { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" },
+  { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" },
+  { alt: "sea breeze footer", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" }
+];
+
 export const HomeLogos = () => {
   useEffect(() => {
     const swiper = new Swiper('.swiper-testimonials', {
@@ -262,7 +361,7 @@ export const HomeLogos = () => {
       autoplay: {
         delay: 5000,
         disableOnInteraction: false,
-          stopOnLastSlide: true,        // optional: autoplay stops at last slide
+        stopOnLastSlide: true,
       },
       navigation: {
         nextEl: '.swiper-testimonials-next',
@@ -281,17 +380,34 @@ export const HomeLogos = () => {
       <div className="global-padding home-logos-padding padding-section-medium">
         <div className="container-large home-logos-container">
           <div className="logos_component home-logos-component">
-            {/* Intro Section */}
+            
+            {/* New Layout Configured Intro Section */}
             <div className="logos_intro home-logos-intro">
-              <div className="home-logos-title-wrap">
-                <h2 className="text-color-white home-logos-title">
-                  Sahə üzrə etibarlı tərəfdaş şəbəkəsi tərəfindən dəstəklənir.
-                </h2>
-              </div>
-              <div className="text-color-white60 home-logos-label first-child">(etibarlı tərəfdaşlar)</div>
+              
+              {/* Masaüstündə normal, Mobildə isə yuxarıda və Sağda (text-right) yerləşən başlıq */}
+              <h2 className="logos-right-heading">
+                <span className="block md:hidden">
+                  Powered by <br />
+                  a network <br />
+                  of trusted <br />
+                  partners <br />
+                  across the <br />
+                  industry
+                </span>
+                <span className="hidden md:block">
+                  Powered by a network<br /> of trusted partners<br /> across the industry
+                </span>
+              </h2>
+
+              {/* Masaüstündə sağda, Mobildə isə başlığın altında və Solda (text-left) yerləşən təsvir */}
+              <p className="logos-left-description">
+                Global network of world-leading developers.<br />
+                We focus on visionary design and long-term asset<br /> growth for our global clients.
+              </p>
+              
             </div>
 
-            {/* Logos Grid */}
+            {/* Desktop Logos Grid (Mobildə CSS ilə gizlədilir) */}
             <div className="logos_wrap home-logos-grid-wrap">
               {/* Row 1 */}
               <div className="n-testimonials_row">
@@ -468,7 +584,7 @@ export const HomeLogos = () => {
                     <div className="swiper-wrapper swiper-wrapper-testimonials">
                       {testimonials.map((item, idx) => (
                         <div key={idx} className="swiper-slide swiper-slide-testimonials">
-                        <div className="n-testimonials_card home-logos-testimonial-card">
+                          <div className="n-testimonials_card home-logos-testimonial-card">
                             <p className="n-testimonials_quote home-logos-testimonial-quote">{item.quote}</p>
                             <div className="n-testimonials_specs home-logos-testimonial-specs">
                               <div className="n-testimonials_author-wrap home-logos-testimonial-author-wrap">
@@ -489,7 +605,7 @@ export const HomeLogos = () => {
                           <path
                             fillRule="evenodd"
                             clipRule="evenodd"
-                            d="M9.78299 1.78543C9.96665 1.97554 9.96142 2.27853 9.77131 2.46219L4.71543 7.3466C4.52067 7.53475 4.52067 7.84688 4.71543 8.03503L9.77131 12.9194C9.96142 13.1031 9.96664 13.4061 9.78299 13.5962L8.6718 14.7464C8.48814 14.9365 8.18515 14.9417 7.99504 14.7581L1.03599 8.03503C0.841227 7.84688 0.841227 7.53475 1.03599 7.3466L7.99504 0.62356C8.18515 0.439901 8.48814 0.445128 8.6718 0.635234L9.78299 1.78543Z"
+                            d="M9.78299 1.78543C9.96665 1.97554 9.96142 2.27853 9.77131 2.46219L4.71543 7.3466C4.52067 7.53475 4.52067 7.84688 4.71543 8.03503L9.77131 12.9194C9.96142 13.1031 9.96664 13.4061 9.78299 13.5962L8.6718 14.7464C8.48814 14.9365 8.18515 14.9417 7.99504 14.7581L1.03599 8.03503C0.841227 7.84688 0.841227 7.53475 1.03599 7.3466L7.99504 0.62356C8.18515 0.439901 8.48814 0.445128 8.6718 0.635234L9.78299 1.78543ZM2.37996 14.7573C2.18985 14.941 1.88686 14.9357 1.7032 14.7456L0.592012 13.5954Z"
                             fill="white"
                           />
                         </svg>
@@ -501,7 +617,7 @@ export const HomeLogos = () => {
                           <path
                             fillRule="evenodd"
                             clipRule="evenodd"
-                            d="M0.592012 13.5954C0.408353 13.4053 0.41358 13.1023 0.603685 12.9187L5.65956 8.03426C5.85432 7.84611 5.85432 7.53398 5.65956 7.34583L0.603685 2.46142C0.413579 2.27776 0.408352 1.97477 0.59201 1.78466L1.7032 0.634465C1.88686 0.44436 2.18985 0.439133 2.37996 0.622791L9.33901 7.34583C9.53377 7.53398 9.53377 7.84611 9.33901 8.03426L2.37996 14.7573C2.18985 14.941 1.88686 14.9357 1.7032 14.7456L0.592012 13.5954Z"
+                            d="M0.592012 13.5954C0.408353 13.4053 0.41358 13.1023 0.603685 12.9187L5.65956 8.03426C5.85432 7.84611 5.85432 7.53398 5.65956 7.34583L0.603685 2.46142C0.413579 2.27776 0.408352 1.97477 0.59201 1.78466L1.7032 0.634465C1.88686 0.44436 2.18985 0.439913 2.37996 0.622791L9.33901 7.34583C9.53377 7.53398 9.53377 7.84611 9.33901 8.03426L2.37996 14.7573C2.18985 14.941 1.88686 14.9357 1.7032 14.7456L0.592012 13.5954Z"
                             fill="white"
                           />
                         </svg>
@@ -516,10 +632,10 @@ export const HomeLogos = () => {
                 <div className="logos_cell-holder no-bottom">
                   <div className="logos_cell is-half"></div>
                 </div>
-                <div className="logos_cell-holder no-bottom">
+                <div className="logos_cell-holder">
                   <div className="logos_cell"></div>
                 </div>
-                <div className="logos_cell-holder no-bottom">
+                <div className="logos_cell-holder">
                   <div className="logos_cell">
                     <div className="logos_img-wrap">
                       <img
@@ -532,7 +648,7 @@ export const HomeLogos = () => {
                     </div>
                   </div>
                 </div>
-                <div className="logos_cell-holder no-bottom">
+                <div className="logos_cell-holder">
                   <div className="logos_cell">
                     <div className="logos_img-wrap">
                       <img
@@ -550,7 +666,7 @@ export const HomeLogos = () => {
                     </div>
                   </div>
                 </div>
-                <div className="logos_cell-holder no-bottom">
+                <div className="logos_cell-holder">
                   <div className="logos_cell">
                     <div className="logos_img-wrap">
                       <img
@@ -568,7 +684,7 @@ export const HomeLogos = () => {
                     </div>
                   </div>
                 </div>
-                <div className="logos_cell-holder no-bottom">
+                <div className="logos_cell-holder">
                   <div className="logos_cell"></div>
                 </div>
                 <div className="logos_cell-holder no-left no-bottom">
@@ -582,24 +698,30 @@ export const HomeLogos = () => {
               <div className="n-testimonials_black-gradient is-bottom"></div>
             </div>
 
-            {/* Mobile Logos (simplified, kept as original) */}
+            {/* ==========================================================================
+               YENİ MOBİL LOGOS PANELİ (SLIDER YOXDUR - 3 SÜTUN GRID ARXITEKTURASI)
+               ========================================================================== */}
             <div className="logos_mobile home-logos-mobile">
-              <div data-w-id="3667447e-bb70-d435-2c4e-2b618901377f" className="n-testimonials_holder-mob">
-                {/* Keeping original structure for brevity */}
+              <div className="mobile-partners-grid">
+                {mobilePartners.map((partner, index) => (
+                  <div key={index} className="mobile-partner-cell">
+                    <img src={partner.src} alt={partner.alt} loading="lazy" />
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* CTA */}
             <div className="logos_cta-wrap home-logos-cta-wrap">
               <div className="note_wrap home-logos-note-wrap is-white">
-                <div className="text-color-white60 home-logos-note-text">Tərəfdaş şəbəkəmizə qoşulmaq istəyirsiniz?</div>
+                <div className="text-color-white60 home-logos-note-text">Looking to join our network of partners? </div>
               </div>
               <Link
                 data-wf--button--variant="white"
                 href="brokers#broker-registration"
                 className="button logos-partnership-button w-variant-9209f11a-9939-4a4b-c66f-ac91791c56bc w-inline-block"
               >
-                <ButtonText>TREVA ilə tərəfdaşlıq edin</ButtonText>
+                <ButtonText>Partner with TREVA</ButtonText>
               </Link>
             </div>
           </div>

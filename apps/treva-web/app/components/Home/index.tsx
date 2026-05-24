@@ -25,7 +25,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
           <HomeHeroSection />
             <HomeServices />
       <HomeProjects />
-      <HomeLogos />
+
       <HomeOffices />
         </>
       ) : (
@@ -35,6 +35,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
       <AboutUs/>
       <FeaturedProperties/>
       <TrevaPulse/>
+            <HomeLogos />
       <HomeFooter locale={locale} />
     </div>
   );
