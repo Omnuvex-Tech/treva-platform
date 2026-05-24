@@ -30,7 +30,7 @@ const productionStyles = `
     width: 100% !important;
   }
 
-  /* Left Paragraph Style matching Treva Pulse description style */
+  /* Left Paragraph Style */
   .logos-left-description {
     font-family: Helveticanowdisplay, sans-serif !important;
     font-size: 18px !important;
@@ -41,9 +41,11 @@ const productionStyles = `
     margin: 0 !important;
     max-width: 450px !important;
     letter-spacing: 0.3px;
+    text-align: left !important;
+    order: 1 !important;
   }
 
-  /* Right Heading Style matching requested Oak Sans specifications */
+  /* Right Heading Style */
   .logos-right-heading {
     font-family: 'Oak Sans', sans-serif !important;
     font-weight: 400 !important;
@@ -55,6 +57,7 @@ const productionStyles = `
     color: #ffffff !important;
     margin: 0 !important;
     text-align: left !important;
+    order: 2 !important;
   }
   
   .text-color-white60 {
@@ -209,62 +212,89 @@ const productionStyles = `
     transform: translateY(-17px) !important;
   }
 
+  .logos-left-description-mobile {
+    display: none !important;
+  }
+
   /* ==========================================================================
-     YENİ MOBİL RESPONSIVE STİLLƏR (MÖVCUD STRUKTURU QORUYARAQ 3 SÜTUN GRID)
+     RESPONSIVE MOBİL STİLLƏR (DƏYİŞİKLİKLƏR YALNIZ MOBİLDƏ)
      ========================================================================== */
   @media screen and (max-width: 991px) {
-    /* Başlıq yuxarıda, təsvir mətni aşağıda olacaq şəkildə sıralama */
     .section_logos .logos_intro {
       display: flex !important;
-      flex-direction: column !important; 
+      flex-direction: column !important;
       align-items: stretch !important;
-      gap: 24px !important;
+      gap: 36px !important; 
       margin-bottom: 40px !important;
     }
 
-    /* Başlıq: Mobildə sağa sıxılmış və böyük hərflərlə */
     .logos-right-heading {
       font-size: 32px !important;
       text-align: right !important;
       line-height: 1.2 !important;
       width: 100% !important;
+      order: 1 !important;
     }
 
-    /* Təsvir Mətni: Mobildə sola sıxılmış */
     .logos-left-description {
       font-size: 14px !important;
       text-align: left !important;
       max-width: 100% !important;
       line-height: 1.5 !important;
+      order: 2 !important;
     }
 
-    /* Masaüstü çərçivə quruluşunu mobildə gizlədirik ki, qarışıqlıq olmasın */
+    .logos-left-description-desktop {
+      display: none !important;
+    }
+
+    .logos-left-description-mobile {
+      display: block !important;
+    }
+
     .home-logos-grid-wrap {
       display: none !important;
     }
 
-    /* Yeni Mobil Grid: Slaydersiz, hər sətirdə tam 3 loqo */
     .logos_mobile.home-logos-mobile {
       display: block !important;
       width: 100% !important;
       margin-bottom: 40px !important;
     }
 
+    /* Nisbi konteyner - naxışların kənar çıxıntıları kəsilməsin deyə overflow vermirik */
+    .mobile-partners-grid-wrapper {
+      position: relative !important;
+      width: 100% !important;
+    }
+
     .mobile-partners-grid {
       display: grid !important;
       grid-template-columns: repeat(3, 1fr) !important;
-      gap: 1px !important; /* İncə ayırıcı xətt effekti */
-      background-color: rgba(255, 255, 255, 0.1) !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      background-color: transparent !important;
+      position: relative !important;
     }
 
     .mobile-partner-cell {
-      background-color: #4A505C !important; /* Fon rəngi */
+      background-color: #4A505C !important;
       aspect-ratio: 1 / 1 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       padding: 12px !important;
+      position: relative !important;
+      border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* 3-cü sütunun sağ xətləri yoxdur */
+    .mobile-partner-cell:nth-child(3n) {
+      border-right: none !important;
+    }
+
+    /* Son sətirin alt xətləri yoxdur */
+    .mobile-partner-cell:nth-child(n+16) {
+      border-bottom: none !important;
     }
 
     .mobile-partner-cell img {
@@ -274,6 +304,33 @@ const productionStyles = `
       filter: brightness(1.2) !important;
       opacity: 0.85 !important;
     }
+
+    /* ── KƏSİŞMƏ NÖQTƏLƏRİNDƏKİ NAXIŞLARIN ABSOLUTE METODU ── */
+    .mobile-grid-decor {
+      position: absolute !important;
+      width: 21px !important;
+      height: 21px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      pointer-events: none !important;
+      z-index: 5 !important;
+      transform: translate(-50%, -50%) !important;
+    }
+
+    /* 1-ci daxili şaquli xətt üzərindəki kəsişmələr (33.33%) */
+    .decor-x1-y1 { left: 33.33%; top: 16.66%; }
+    .decor-x1-y2 { left: 33.33%; top: 33.33%; }
+    .decor-x1-y3 { left: 33.33%; top: 50%; }
+    .decor-x1-y4 { left: 33.33%; top: 66.66%; }
+    .decor-x1-y5 { left: 33.33%; top: 83.33%; }
+
+    /* 2-ci daxili şaquli xətt üzərindəki kəsişmələr (66.66%) */
+    .decor-x2-y1 { left: 66.66%; top: 16.66%; }
+    .decor-x2-y2 { left: 66.66%; top: 33.33%; }
+    .decor-x2-y3 { left: 66.66%; top: 50%; }
+    .decor-x2-y4 { left: 66.66%; top: 66.66%; }
+    .decor-x2-y5 { left: 66.66%; top: 83.33%; }
     
     .n-testimonials_quote {
       font-size: 21px !important;
@@ -289,7 +346,6 @@ const productionStyles = `
     }
   }
 
-  /* Desktopda mobil gridi gizlət */
   @media screen and (min-width: 992px) {
     .logos_mobile.home-logos-mobile {
       display: none !important;
@@ -297,7 +353,6 @@ const productionStyles = `
   }
 `;
 
-// Reusable decorative SVG icon
 const DecorativeIcon = () => (
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -310,46 +365,69 @@ const DecorativeIcon = () => (
 
 const testimonials = [
   {
-    quote: "“TREVA ilə əməkdaşlıq etdiyimiz hər bir layihədə onlar operativ intizamı təmin edirlər. Strukturlaşdırılmış, daim yenilənən siyahılar və brokerlər üçün hazır alətlərlə Bakıdakı daşınmaz əmlak satış prosesi daha sürətli, daha şəffaf və idarəolunması asan olur.”",
+    quote: 'TREVA ilə əməkdaşlıq etdiyimiz hər bir layihədə onlar operativ intizamı təmin edirlər. Strukturlaşdırılmış, daim yenilənən siyahılar və broker lər üçün hazır alətlərlə Bakıdakı daşınmaz əmlak satış prosesi daha sürətli, daha şəffaf və idarəolunması asan olur.',
     author: "ETAGI azerbaijan"
   },
   {
-    quote: "“TREVA ilə aramızda formalaşan etimad hər bir layihədə daha da möhkəmlənir. Onlar qiymət strategiyasından tutmuş müştəri axınına qədər hər detala dəqiqliklə yanaşmışdırlar. Onların yaradıcı dəstəyi, layihələrin düzgün paketlənməsi və ardıcıl izləmələri bizə güclü marağı təsirli nəticələrə çevirməyə kömək etmişdir.”",
+    quote: 'TREVA ilə aramızda formalaşan etimad hər bir layihədə daha da möhkəmlənir. Onlar qiymət strategiyasından tutmuş müştəri axınına qədər hər detala dəqiqliklə yanaşmışdırlar. Onların yaradıcı dəstəyi, layihələrin düzgün paketlənməsi və ardıcıl izləmələri bizə güclü marağı təsirli nəticələrə çevirməyə kömək etmişdir.',
     author: "TRIDENT Investment"
   },
   {
-    quote: "“TREVA-nı digərlərindən fərqləndirən iş prosesindəki aydınlıq və davamlılıqdır. Broker olaraq hər zaman məlumatlısınız: elanlar aktualdır, əlaqə çevikdir, və bütün alətlər satış prosesini asanlaşdırır.”",
+    quote: 'TREVA-nı digərlərindən fərqləndirən iş prosesindəki aydınlıq və davamlılıqdır. Broker olaraq hər zaman məlumatlısınız: elanlar aktualdır, əlaqə çevikdir, və bütün alətlər satış prosesini asanlaşdırır.',
     author: "rnS estate"
   },
   {
-    quote: "“TREVA brokerlərə lazım olan hər şeyi təqdim edir: yüksək keyfiyyətli vizuallar və effektiv lead sistemi. Biz artıq sadəcə obyekt göstərmirik, onu düzgün təqdim edirik.”",
+    quote: 'TREVA brokerlərə lazım olan hər şeyi təqdim edir: yüksək keyfiyyətli vizuallar və effektiv lead sistemi. Biz artıq sadəcə obyekt göstərmirik, onu düzgün təqdim edirik.',
     author: "bazis real estate"
   },
   {
-    quote: "“TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkanı yaradır.”",
+    quote: 'TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkaanları yaradır.',
     author: "AUF Invest"
   },
   {
-    quote: "“TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.”",
+    quote: 'TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.',
     author: "megapolis estate"
   },
   {
-    quote: "“TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.”",
+    quote: 'TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.',
     author: "Sabah Investment Group"
   }
 ];
 
-// Mobil cihazlarda alt-alta və hər sətirdə 3 ədəd çıxacaq şirkət loqolarının təmiz massivi
-const mobilePartners = [
-  { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" },
-  { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" },
-  { alt: "reportage", src: "/cdn-assets/38b92121c7-6880c7cfb2730b05a0143175_reportage-4.png" },
-  { alt: "trident", src: "/cdn-assets/8def5f3166-6880c7cadbe0002df55f8ea0_Logo-Trident-1.png" },
-  { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" },
-  { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" },
-  { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" },
-  { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" },
-  { alt: "sea breeze footer", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" }
+// Mobil massiv təmizləndi, yalnız loqolar və boş xanalar saxlanıldı (3 sütun x 6 sətir = 18 xana)
+type MobilePartnerCell = {
+  order: number;
+  logo?: {
+    alt: string;
+    src: string;
+  };
+};
+
+const mobilePartners: MobilePartnerCell[] = [
+  /* Sətir 1 */
+  { order: 1, logo: { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" } },
+  /* Sətir 2 */
+  { order: 2, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
+  /* Sətir 3 */
+  { order: 3, logo: { alt: "reportage", src: "/cdn-assets/38b92121c7-6880c7cfb2730b05a0143175_reportage-4.png" } },
+  /* Sətir 4 */
+  { order: 4, logo: { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" } },
+  /* Sətir 5 */
+  { order: 5, logo: { alt: "trident", src: "/cdn-assets/8def5f3166-6880c7cadbe0002df55f8ea0_Logo-Trident-1.png" } },
+  /* Sətir 6 */
+  { order: 6, logo: { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" } },
+  { order: 7, logo: { alt: "auf invest", src: "/cdn-assets/7a685b68a5-688c5e4e39e6dc2ebee591e2_AUF-1.png" } },
+  { order: 8, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
+  { order: 9, logo: { alt: "villa az", src: "/cdn-assets/94147fe51b-6887158e4499458c3bafba1f_villa-1.png" } },
+  { order: 10, logo: { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" } },
+  { order: 11 },
+  { order: 12 },
+  { order: 13 },
+  { order: 14 },
+  { order: 15 },
+  { order: 16 },
+  { order: 17 },
+  { order: 18 }
 ];
 
 export const HomeLogos = () => {
@@ -381,10 +459,25 @@ export const HomeLogos = () => {
         <div className="container-large home-logos-container">
           <div className="logos_component home-logos-component">
             
-            {/* New Layout Configured Intro Section */}
+            {/* Intro Section */}
             <div className="logos_intro home-logos-intro">
               
-              {/* Masaüstündə normal, Mobildə isə yuxarıda və Sağda (text-right) yerləşən başlıq */}
+              {/* Desktop versiyası */}
+              <p className="logos-left-description logos-left-description-desktop">
+                Global network of world-leading developers.<br />
+                We focus on visionary design and long-term asset<br /> growth for our global clients.
+              </p>
+
+              {/* Mobil versiyası — İstədiyiniz sətir keçidləri ilə düzəldildi */}
+              <p className="logos-left-description logos-left-description-mobile">
+                Global network of world-leading <br />
+                developers.<br />
+                We focus on visionary <br />
+                design and long-term asset<br />
+                growth for our global clients.
+              </p>
+
+              {/* Başlıq */}
               <h2 className="logos-right-heading">
                 <span className="block md:hidden">
                   Powered by <br />
@@ -398,16 +491,10 @@ export const HomeLogos = () => {
                   Powered by a network<br /> of trusted partners<br /> across the industry
                 </span>
               </h2>
-
-              {/* Masaüstündə sağda, Mobildə isə başlığın altında və Solda (text-left) yerləşən təsvir */}
-              <p className="logos-left-description">
-                Global network of world-leading developers.<br />
-                We focus on visionary design and long-term asset<br /> growth for our global clients.
-              </p>
               
             </div>
 
-            {/* Desktop Logos Grid (Mobildə CSS ilə gizlədilir) */}
+            {/* Desktop Logos Grid */}
             <div className="logos_wrap home-logos-grid-wrap">
               {/* Row 1 */}
               <div className="n-testimonials_row">
@@ -605,7 +692,7 @@ export const HomeLogos = () => {
                           <path
                             fillRule="evenodd"
                             clipRule="evenodd"
-                            d="M9.78299 1.78543C9.96665 1.97554 9.96142 2.27853 9.77131 2.46219L4.71543 7.3466C4.52067 7.53475 4.52067 7.84688 4.71543 8.03503L9.77131 12.9194C9.96142 13.1031 9.96664 13.4061 9.78299 13.5962L8.6718 14.7464C8.48814 14.9365 8.18515 14.9417 7.99504 14.7581L1.03599 8.03503C0.841227 7.84688 0.841227 7.53475 1.03599 7.3466L7.99504 0.62356C8.18515 0.439901 8.48814 0.445128 8.6718 0.635234L9.78299 1.78543ZM2.37996 14.7573C2.18985 14.941 1.88686 14.9357 1.7032 14.7456L0.592012 13.5954Z"
+                            d="M9.78299 1.78543C9.96665 1.97554 9.96142 2.27853 9.77131 2.46219L4.71543 7.3466C4.52067 7.53475 4.52067 7.84688 4.71543 8.03503L9.77131 12.9194C9.96142 13.1031 9.96664 13.4061 9.78299 13.5962L8.6718 14.7464C8.48814 14.9365 8.18515 14.941 7.99504 14.7581L1.03599 8.03503C0.841227 7.84688 0.841227 7.53475 1.03599 7.3466L7.99504 0.62356C8.18515 0.439901 8.48814 0.445128 8.6718 0.635234L9.78299 1.78543ZM2.37996 14.7573C2.18985 14.941 1.88686 14.9357 1.7032 14.7456L0.592012 13.5954Z"
                             fill="white"
                           />
                         </svg>
@@ -698,16 +785,35 @@ export const HomeLogos = () => {
               <div className="n-testimonials_black-gradient is-bottom"></div>
             </div>
 
-            {/* ==========================================================================
-               YENİ MOBİL LOGOS PANELİ (SLIDER YOXDUR - 3 SÜTUN GRID ARXITEKTURASI)
-               ========================================================================== */}
+            {/* Responsive Mobile Partners Grid */}
             <div className="logos_mobile home-logos-mobile">
-              <div className="mobile-partners-grid">
-                {mobilePartners.map((partner, index) => (
-                  <div key={index} className="mobile-partner-cell">
-                    <img src={partner.src} alt={partner.alt} loading="lazy" />
-                  </div>
-                ))}
+              <div className="mobile-partners-grid-wrapper">
+                <div className="mobile-partners-grid">
+                  {[...mobilePartners]
+                    .sort((a, b) => a.order - b.order)
+                    .map((item) => (
+                      <div key={item.order} className="mobile-partner-cell" style={{ order: item.order }}>
+                        {item.logo && (
+                          <img src={item.logo.src} alt={item.logo.alt} loading="lazy" />
+                        )}
+                      </div>
+                    ))}
+                </div>
+
+                {/* MOBİL GRİDDƏ KƏSİŞƏN BÜTÜN DAXİLİ XƏTLƏRİN ÜZƏRİNƏ YERLƏŞDİRİLƏN 10 ƏDƏD NAXIŞ */}
+                {/* 1-ci sütun kəsişmə xətti üzrə naxışlar */}
+                <div className="mobile-grid-decor decor-x1-y1"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x1-y2"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x1-y3"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x1-y4"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x1-y5"><DecorativeIcon /></div>
+
+                {/* 2-ci sütun kəsişmə xətti üzrə naxışlar */}
+                <div className="mobile-grid-decor decor-x2-y1"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x2-y2"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x2-y3"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x2-y4"><DecorativeIcon /></div>
+                <div className="mobile-grid-decor decor-x2-y5"><DecorativeIcon /></div>
               </div>
             </div>
 
