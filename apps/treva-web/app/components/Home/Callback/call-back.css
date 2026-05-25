@@ -1,4 +1,4 @@
-.container {
+.callbackContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6,7 +6,8 @@
   min-height: 100vh;
   background-color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding: 40px 20px;
+  padding-top: 40px;
+  padding-bottom: 40px;
   box-sizing: border-box;
 }
 
@@ -155,12 +156,26 @@
   color: #ffffff;
   border: none;
   border-radius: 30px;
-  padding: 18px 0;
+  padding: 12px 0;
   font-size: 18px;
   font-weight: 400;
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin-bottom: 24px;
+}
+
+.submitButton .button-text-wrap {
+  height: 22px;
+  line-height: 22px;
+}
+
+.submitButton .button-text {
+  height: 22px;
+  line-height: 22px;
+}
+
+.submitButton:hover .button-text {
+  transform: translateY(-100%);
 }
 
 .submitButton:hover {
@@ -191,8 +206,9 @@
    MOBILE RESPONSIVE DIZAYN (Desktop effektləri qorunmaqla)
    ========================================================================== */
 @media (max-width: 768px) {
-  .container {
-    padding: 30px 16px;
+  .callbackContainer {
+    padding-top: 30px;
+    padding-bottom: 30px;
   }
 
   .headerContainer {

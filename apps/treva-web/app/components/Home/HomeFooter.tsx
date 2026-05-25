@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./styles/home.css";
 
 import { ButtonText } from "@/app/components/ButtonText";
+import PageContainer from "@/app/components/Container/PageContainer";
 
 const ArrowUpIcon = () => (
   <svg
@@ -79,6 +80,37 @@ type HomeFooterProps = {
   locale?: string;
 };
 
+type FooterContactLinkProps = {
+  href: string;
+  label: string;
+  className?: string;
+};
+
+function FooterContactLink({ href, label, className = "" }: FooterContactLinkProps) {
+  return (
+    <a href={href} className="footer_link-wrap is-large w-inline-block">
+      <div className="footer_link-content">
+        <div className={`footer_link-text${className ? ` ${className}` : ""}`}>{label}</div>
+        <div className={`footer_link-text${className ? ` ${className}` : ""}`}>{label}</div>
+      </div>
+    </a>
+  );
+}
+
+type FooterActionLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  label: string;
+  icon?: React.ReactNode;
+};
+
+function FooterActionLink({ label, icon, ...props }: FooterActionLinkProps) {
+  return (
+    <a className="cs_scroll-wrap is-alternate w-inline-block" {...props}>
+      <ButtonText>{label}</ButtonText>
+      {icon}
+    </a>
+  );
+}
+
 export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
   const homeHref = `/${locale}`;
   const contactHref = `/${locale}/contact`;
@@ -87,8 +119,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
   return (
     <footer className="footer">
       <section className="section_footer bg-color-blue100 parallax-reveal">
-        <div className="global-padding">
-          <div className="container-large">
+        <PageContainer>
             <div className="footer_component">
               <div className="footer_wrap">
                 <div className="footer_nav-wrap">
@@ -148,27 +179,13 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                 </div>
 
                 <div className="footer_contact-wrap">
-                  <a href="tel:2662" className="footer_link-wrap is-large w-inline-block">
-                    <div className="footer_link-content">
-                      <div className="footer_link-text">*2662</div>
-                      <div className="footer_link-text">*2662</div>
-                    </div>
-                  </a>
-                  <a href="tel:+994502772662" className="footer_link-wrap is-large w-inline-block">
-                    <div className="footer_link-content">
-                      <div className="footer_link-text">050-277-2662</div>
-                      <div className="footer_link-text">050-277-2662</div>
-                    </div>
-                  </a>
-                  <a
+                  <FooterContactLink href="tel:2662" label="*2662" />
+                  <FooterContactLink href="tel:+994502772662" label="050-277-2662" />
+                  <FooterContactLink
                     href="mailto:info@treva.realestate"
-                    className="footer_link-wrap is-large w-inline-block"
-                  >
-                    <div className="footer_link-content">
-                      <div className="footer_link-text small-caps">info@treva.realestate</div>
-                      <div className="footer_link-text small-caps">info@treva.realestate</div>
-                    </div>
-                  </a>
+                    label="info@treva.realestate"
+                    className="small-caps"
+                  />
                 </div>
               </div>
 
@@ -190,23 +207,25 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                   >
                     <ButtonText>Head office — Ziya Yusifzade 10, Sabah Residence</ButtonText>
                   </a>
-                  <a href="#top" className="cs_scroll-wrap is-alternate w-inline-block">
-                    <ButtonText>BACK TO TOP</ButtonText>
-                    <div className="button-icon-wrap is-small">
-                      <div className="button-icon w-embed">
-                        <ArrowUpIcon />
+                  <FooterActionLink
+                    href="#top"
+                    label="BACK TO TOP"
+                    icon={
+                      <div className="button-icon-wrap is-small">
+                        <div className="button-icon w-embed">
+                          <ArrowUpIcon />
+                        </div>
+                        <div className="button-icon w-embed">
+                          <ArrowUpIconCurrent />
+                        </div>
                       </div>
-                      <div className="button-icon w-embed">
-                        <ArrowUpIconCurrent />
-                      </div>
-                    </div>
-                  </a>
+                    }
+                  />
                   <div>©treva 2025</div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+        </PageContainer>
       </section>
     </footer>
   );

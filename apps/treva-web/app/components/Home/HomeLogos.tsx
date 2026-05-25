@@ -9,6 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 import { ButtonText } from '@/app/components/ButtonText';
+import PageContainer from '@/app/components/Container/PageContainer';
 
 // Production-parity CSS overrides including the new layout typography
 const productionStyles = `
@@ -403,11 +404,11 @@ type MobilePartnerCell = {
 
 const mobilePartners: MobilePartnerCell[] = [
   /* Sətir 1 */
-  { order: 1, logo: { alt: "", src: "" } },
+  { order: 1 },
   /* Sətir 2 */
   { order: 2, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
   /* Sətir 3 */
-  { order: 3, logo: { alt: "", src: "" } },
+  { order: 3 },
   /* Sətir 4 */
   { order: 4, logo: { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" } },
   /* Sətir 5 */
@@ -417,13 +418,35 @@ const mobilePartners: MobilePartnerCell[] = [
   { order: 7, logo: { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" } },
   { order: 8, logo: { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" } },
   { order: 9, logo: { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" } },
-  { order: 10, logo: { alt: "", src: "" } },
+  { order: 10 },
   { order: 11 },
   { order: 12, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
   { order: 13 },
   { order: 14, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
   { order: 15 }
 ];
+
+type LogosPartnershipButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  href: string;
+  label: string;
+};
+
+function LogosPartnershipButton({
+  href,
+  label,
+  ...props
+}: LogosPartnershipButtonProps) {
+  return (
+    <Link
+      data-wf--button--variant="white"
+      href={href}
+      className="button logos-partnership-button w-variant-9209f11a-9939-4a4b-c66f-ac91791c56bc w-inline-block"
+      {...props}
+    >
+      <ButtonText>{label}</ButtonText>
+    </Link>
+  );
+}
 
 export const HomeLogos = () => {
   useEffect(() => {
@@ -450,8 +473,7 @@ export const HomeLogos = () => {
   return (
     <section className="section_logos home-logos-section bg-color-blue100 parallax-reveal">
       <style dangerouslySetInnerHTML={{ __html: productionStyles }} />
-      <div className="global-padding home-logos-padding padding-section-medium">
-        <div className="container-large home-logos-container">
+      <PageContainer className="home-logos-padding padding-section-medium">
           <div className="logos_component home-logos-component">
             
             {/* Intro Section */}
@@ -787,7 +809,7 @@ export const HomeLogos = () => {
                     .sort((a, b) => a.order - b.order)
                     .map((item) => (
                       <div key={item.order} className="mobile-partner-cell" style={{ order: item.order }}>
-                        {item.logo && (
+                        {item.logo?.src && (
                           <img src={item.logo.src} alt={item.logo.alt} loading="lazy" />
                         )}
                       </div>
@@ -814,17 +836,13 @@ export const HomeLogos = () => {
               <div className="note_wrap home-logos-note-wrap is-white">
                 <div className="text-color-white60 home-logos-note-text">Looking to join our network of partners? </div>
               </div>
-              <Link
-                data-wf--button--variant="white"
+              <LogosPartnershipButton
                 href="brokers#broker-registration"
-                className="button logos-partnership-button w-variant-9209f11a-9939-4a4b-c66f-ac91791c56bc w-inline-block"
-              >
-                <ButtonText>Partner with TREVA</ButtonText>
-              </Link>
+                label="Partner with TREVA"
+              />
             </div>
           </div>
-        </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

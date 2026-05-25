@@ -2,8 +2,39 @@
 
 import React, { useState } from 'react';
 import './call-back.css';
+import PageContainer from '@/app/components/Container/PageContainer';
+import { ButtonText } from '@/app/components/ButtonText';
 
 type RoleType = 'Client' | 'Developer' | 'Broker';
+
+type RoleButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  label: RoleType;
+  isActive: boolean;
+};
+
+function RoleButton({ label, isActive, ...props }: RoleButtonProps) {
+  return (
+    <button
+      type="button"
+      className={`roleButton ${isActive ? 'activeRole' : ''}`}
+      {...props}
+    >
+      {label}
+    </button>
+  );
+}
+
+type CallbackSubmitButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  label: string;
+};
+
+function CallbackSubmitButton({ label, ...props }: CallbackSubmitButtonProps) {
+  return (
+    <button type="submit" className="submitButton" {...props}>
+      <ButtonText>{label}</ButtonText>
+    </button>
+  );
+}
 
 export default function CallbackForm() {
   const [activeRole, setActiveRole] = useState<RoleType>('Client');
@@ -20,7 +51,7 @@ export default function CallbackForm() {
   };
 
   return (
-    <main className="container">
+    <PageContainer as="main" className="callbackContainer">
       <form onSubmit={handleSubmit} className="formWrapper">
         
         {/* Şəkildəki dizayna tam uyğun Başlıq Bloku */}
@@ -41,14 +72,12 @@ export default function CallbackForm() {
         {/* Rol Seçimi */}
         <div className="roleSelector">
           {(['Client', 'Developer', 'Broker'] as RoleType[]).map((role) => (
-            <button
+            <RoleButton
               key={role}
-              type="button"
-              className={`roleButton ${activeRole === role ? 'activeRole' : ''}`}
+              label={role}
+              isActive={activeRole === role}
               onClick={() => setActiveRole(role)}
-            >
-              {role}
-            </button>
+            />
           ))}
         </div>
 
@@ -73,9 +102,7 @@ export default function CallbackForm() {
         </div>
 
         {/* Təsdiq Düyməsi */}
-        <button type="submit" className="submitButton">
-          Contact me
-        </button>
+        <CallbackSubmitButton label="Contact me" />
 
         {/* Hüquqi Məlumat */}
         <p className="disclaimer">
@@ -83,6 +110,6 @@ export default function CallbackForm() {
         </p>
 
       </form>
-    </main>
+    </PageContainer>
   );
 }
