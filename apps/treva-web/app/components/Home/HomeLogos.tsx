@@ -405,25 +405,25 @@ type MobilePartnerCell = {
 
 const mobilePartners: MobilePartnerCell[] = [
   /* Sətir 1 */
-  { order: 1, logo: { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" } },
+  { order: 1, logo: { alt: "", src: "" } },
   /* Sətir 2 */
   { order: 2, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
   /* Sətir 3 */
-  { order: 3, logo: { alt: "reportage", src: "/cdn-assets/38b92121c7-6880c7cfb2730b05a0143175_reportage-4.png" } },
+  { order: 3, logo: { alt: "", src: "" } },
   /* Sətir 4 */
-  { order: 4, logo: { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" } },
+  { order: 4, logo: { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" } },
   /* Sətir 5 */
-  { order: 5, logo: { alt: "trident", src: "/cdn-assets/8def5f3166-6880c7cadbe0002df55f8ea0_Logo-Trident-1.png" } },
+  { order: 5, logo: { alt: "reportage", src: "/cdn-assets/38b92121c7-6880c7cfb2730b05a0143175_reportage-4.png" } },
   /* Sətir 6 */
-  { order: 6, logo: { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" } },
-  { order: 7, logo: { alt: "auf invest", src: "/cdn-assets/7a685b68a5-688c5e4e39e6dc2ebee591e2_AUF-1.png" } },
-  { order: 8, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
-  { order: 9, logo: { alt: "villa az", src: "/cdn-assets/94147fe51b-6887158e4499458c3bafba1f_villa-1.png" } },
-  { order: 10, logo: { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" } },
+  { order: 6, logo: { alt: "trident", src: "/cdn-assets/8def5f3166-6880c7cadbe0002df55f8ea0_Logo-Trident-1.png" } },
+  { order: 7, logo: { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" } },
+  { order: 8, logo: { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" } },
+  { order: 9, logo: { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" } },
+  { order: 10, logo: { alt: "", src: "" } },
   { order: 11 },
-  { order: 12 },
+  { order: 12, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
   { order: 13 },
-  { order: 14 },
+  { order: 14, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
   { order: 15 },
   { order: 16 },
   { order: 17 },

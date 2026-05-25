@@ -79,7 +79,7 @@ type HomeFooterProps = {
   locale?: string;
 };
 
-export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
+export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
   const homeHref = `/${locale}`;
   const contactHref = `/${locale}/contact`;
   const pulseHref = `/${locale}/pulse`;
@@ -93,7 +93,7 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
               <div className="footer_wrap">
                 <div className="footer_nav-wrap">
                   <div className="footer_col">
-                    <div className="text-color-white60">sayt xəritəsi</div>
+                    <div className="text-color-white60">sitemap</div>
                     <div className="footer_nav">
                       <Link
                         href={homeHref}
@@ -101,13 +101,13 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
                         className="footer_link-wrap w-inline-block w--current"
                       >
                         <div className="footer_link-content">
-                          <div className="footer_link-text">Ana səhifə</div>
-                          <div className="footer_link-text">Ana səhifə</div>
+                          <div className="footer_link-text">Home</div>
+                          <div className="footer_link-text">Home</div>
                         </div>
                       </Link>
-                      <FooterNavLink href={`/${locale}/projects`} label="Layihələr" />
-                      <FooterNavLink href={`/${locale}/developers`} label="Developerlər" />
-                      <FooterNavLink href={`/${locale}/brokers`} label="Brokerlər" />
+                      <FooterNavLink href={`/${locale}/projects`} label="Projects" />
+                      <FooterNavLink href={`/${locale}/developers`} label="Developers" />
+                      <FooterNavLink href={`/${locale}/brokers`} label="Brokers" />
                       <Link href={pulseHref} className="footer_link-wrap w-inline-block footer_pulse-link">
                         <div className="footer_link-content">
                           <div className="footer_link-text">pulse</div>
@@ -115,13 +115,13 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
                         </div>
                         <FooterRedDot />
                       </Link>
-                      <FooterNavLink href={contactHref} label="Əlaqə" />
-                      <FooterNavLink href={`/${locale}/privacy-policy`} label="Məxfilik Siyasəti" />
+                      <FooterNavLink href={contactHref} label="Contact" />
+                      <FooterNavLink href={`/${locale}/privacy-policy`} label="Privacy Policy" />
                     </div>
                   </div>
 
                   <div className="footer_col">
-                    <div className="text-color-white60">Sosial media</div>
+                    <div className="text-color-white60">Social media</div>
                     <div lang="en" className="footer_nav">
                       <FooterExternalLink
                         href="https://www.linkedin.com/company/trevarealestate"
@@ -183,15 +183,15 @@ export const HomeFooter = ({ locale = "az" }: HomeFooterProps) => {
                 <div className="footer_specs-wrap">
                   <a
                     id="w-node-d6b5acf9-ec8f-922c-e881-4fd1904497b0-9044974f"
-                    href="https://www.google.com/maps/place/TREVA+Real+Estate/@40.3517196,49.827273,17z/data=!3m1!4b1!4m6!3m5!1s0x40307dfdbff258c3:0xbf7d738965fd51c4!8m2!3d40.3517197!4d49.8321386!16s%2Fg%2F11xvq3cxhy?entry=ttu&g_ep=EgoyMDI1MDgzMC4wIKXMDSoASAFQAw%3D%3D"
+                    href="https://maps.google.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="cs_scroll-wrap is-alternate w-inline-block"
                   >
-                    <ButtonText>Baş ofis — Ziya Yusifzade 10, Sabah Residence</ButtonText>
+                    <ButtonText>Head office — Ziya Yusifzade 10, Sabah Residence</ButtonText>
                   </a>
                   <a href="#top" className="cs_scroll-wrap is-alternate w-inline-block">
-                    <ButtonText>YUXARIYA QAYIT</ButtonText>
+                    <ButtonText>BACK TO TOP</ButtonText>
                     <div className="button-icon-wrap is-small">
                       <div className="button-icon w-embed">
                         <ArrowUpIcon />
