@@ -86,7 +86,7 @@ function PulseCategoryFilters({ categories, activeFilter, onFilterChange }: Puls
 const TrevaPulse: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('Blog');
 
-  const categories = ['All', 'Events', 'Blog', 'Highlights'];
+  const categories = ['All', 'Events', 'Blog', 'HIghlIghts'];
 
   return (
     <main>
@@ -115,7 +115,7 @@ const TrevaPulse: React.FC = () => {
             {/* Filters & View All Bölməsi */}
             <div className="pulse__controls-row">
               <div className="pulse__filters">
-                <span className="pulse__filter-label">Filter by category</span>
+                <span className="pulse__filter-label">FIlter by category</span>
                 <PulseCategoryFilters
                   categories={categories}
                   activeFilter={activeFilter}

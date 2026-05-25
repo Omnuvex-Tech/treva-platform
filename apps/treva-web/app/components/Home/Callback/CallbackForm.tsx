@@ -60,7 +60,7 @@ export default function CallbackForm() {
           <div className="bgLineBottom"></div>
           <h1 className="title">
             <span className="titleTop">Ready to take</span>
-            <span className="titleBottom">the first step?</span>
+            <span className="titleBottom">the fIrst step?</span>
           </h1>
         </div>
 

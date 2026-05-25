@@ -504,7 +504,7 @@ export const HomeLogos = () => {
                   industry
                 </span>
                 <span className="hidden md:block">
-                  Powered by a network<br /> of trusted partners<br /> across the industry
+                  Powered by a network<br /> of trusted partners<br /> across the Industry
                 </span>
               </h2>
               
@@ -834,11 +834,11 @@ export const HomeLogos = () => {
             {/* CTA */}
             <div className="logos_cta-wrap home-logos-cta-wrap">
               <div className="note_wrap home-logos-note-wrap is-white">
-                <div className="text-color-white60 home-logos-note-text">Looking to join our network of partners? </div>
+                <div className="text-color-white60 home-logos-note-text">LookIng to joIn our network of partners? </div>
               </div>
               <LogosPartnershipButton
                 href="brokers#broker-registration"
-                label="Partner with TREVA"
+                label="Partner wIth TREVA"
               />
             </div>
           </div>
