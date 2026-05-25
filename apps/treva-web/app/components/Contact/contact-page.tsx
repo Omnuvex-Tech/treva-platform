@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
-import Header from '@/app/components/Navbar/navbar'
+import Header from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import './contact.css'  // ayrıca CSS faylı
 

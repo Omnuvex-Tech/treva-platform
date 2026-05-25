@@ -5,7 +5,7 @@ import { ButtonText } from '@/app/components/ButtonText';
 import { useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
-import Navbar from '@/app/components/Navbar/navbar'
+import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import './developers.css'
 

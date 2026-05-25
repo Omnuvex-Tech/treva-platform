@@ -48,11 +48,12 @@ function TrevaNavbarLogo() {
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLElement>(null);
+  const routeHref = (path: string) => `/${locale}${path}`;
 
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -127,19 +128,19 @@ export default function Navbar() {
         role="banner"
       >
         <div className="treva-navbar__inner">
-        <a href="#" className="treva-navbar__logo" aria-label="TREVA - Home">
+        <a href={`/${locale}`} className="treva-navbar__logo" aria-label="TREVA - Home">
           <TrevaNavbarLogo />
         </a>
 
         <nav className="treva-navbar__nav" aria-label="Primary navigation">
-          <a href="#" className="treva-navbar__link">Projects</a>
-          <a href="#" className="treva-navbar__link">About Us</a>
-          <a href="#" className="treva-navbar__link">Contact Us</a>
-          <a href="#" className="treva-navbar__link">Developers</a>
-          <a href="#" className="treva-navbar__link">Brokers</a>
-          <a href="#" className="treva-navbar__link">Off-Plan</a>
-          <a href="#" className="treva-navbar__link">Resale</a>
-          <a href="#" className="treva-navbar__link">Pulse</a>
+          <a href={routeHref('/projects')} className="treva-navbar__link">Projects</a>
+          <a href={routeHref('/about-us')} className="treva-navbar__link">About Us</a>
+          <a href={routeHref('/contact')} className="treva-navbar__link">Contact Us</a>
+          <a href={routeHref('/developers')} className="treva-navbar__link">Developers</a>
+          <a href={routeHref('/brokers')} className="treva-navbar__link">Brokers</a>
+          <a href={routeHref('/projects')} className="treva-navbar__link">Off-Plan</a>
+          <a href={routeHref('/projects')} className="treva-navbar__link">Resale</a>
+          <a href={routeHref('/pulse')} className="treva-navbar__link">Pulse</a>
         </nav>
 
         <div className="treva-navbar__controls">
@@ -184,14 +185,14 @@ export default function Navbar() {
         aria-hidden="true"
       >
         <div className="treva-navbar__mobile__inner">
-          <a href="#" className="treva-navbar__mobile__link">Projects</a>
-          <a href="#" className="treva-navbar__mobile__link">About Us</a>
-          <a href="#" className="treva-navbar__mobile__link">Contact Us</a>
-          <a href="#" className="treva-navbar__mobile__link">Developers</a>
-          <a href="#" className="treva-navbar__mobile__link">Brokers</a>
-          <a href="#" className="treva-navbar__mobile__link">Off-Plan</a>
-          <a href="#" className="treva-navbar__mobile__link">Resale</a>
-          <a href="#" className="treva-navbar__mobile__link">Pulse</a>
+          <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Projects</a>
+          <a href={routeHref('/about-us')} className="treva-navbar__mobile__link">About Us</a>
+          <a href={routeHref('/contact')} className="treva-navbar__mobile__link">Contact Us</a>
+          <a href={routeHref('/developers')} className="treva-navbar__mobile__link">Developers</a>
+          <a href={routeHref('/brokers')} className="treva-navbar__mobile__link">Brokers</a>
+          <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Off-Plan</a>
+          <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Resale</a>
+          <a href={routeHref('/pulse')} className="treva-navbar__mobile__link">Pulse</a>
           <div className="treva-navbar__mobile__footer">
             <PillButton className="treva-navbar__search-btn" aria-label="Open search">
               <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

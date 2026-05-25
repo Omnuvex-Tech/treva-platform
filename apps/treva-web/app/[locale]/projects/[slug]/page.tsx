@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ProjectDetail from "@/app/components/Projects/ProjectDetail";
+import ProjectDetail from "@/app/components/Design1/Projects/ProjectDetail";
 import { getProjectBySlug } from "@/lib/project-data";
 
 type Props = {

@@ -1,4 +1,4 @@
-import Navbar from "@/app/components/Navbar/navbar";
+import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import Link from "next/link";
 import { ARTICLES, FEATURED_ARTICLE, WEEK_ARTICLE } from "@/lib/pulse-data";

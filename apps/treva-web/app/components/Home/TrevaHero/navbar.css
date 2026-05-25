@@ -1,3 +1,27 @@
+/* ===== NAVBAR DESIGN TOKENS (standalone — treva-hero.css olmadan da işləyir) ===== */
+:root {
+  --treva-nav-height: 64px;
+  --treva-pill-bg: #3F4249;
+  --treva-pill-hover-bg: #2F3134;
+  --treva-pill-pressed-bg: #000000;
+  --treva-pill-text: #ffffff;
+  --treva-search-radius: 22px;
+  --treva-muted-text: #B2B3B6;
+}
+
+/* Pill button base — treva-hero.css yüklənmədikdə (məs. Projects səhifəsindəki Navbar) */
+.treva-pill-button {
+  background: var(--treva-pill-bg);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.treva-pill-button:hover {
+  background: var(--treva-pill-hover-bg);
+}
+.treva-pill-button:active,
+.treva-pill-button--pressed {
+  background: var(--treva-pill-pressed-bg);
+}
+
 /* ===== NAVBAR ===== */
 .treva-navbar {
   position: fixed;

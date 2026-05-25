@@ -1,0 +1,243 @@
+/* ==========================================================================
+   ƏSAS KONTEYNER VƏ ARXAFON
+   ========================================================================== */
+.vision-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.vision-hero * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.vision-hero__bg-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.vision-hero__bg-img {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* YENİLƏNMİŞ QRADİYENT FON QATI (#000000 və #DDDDDD) */
+.vision-hero__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(221, 221, 221, 0.15) 100%);
+  z-index: 2;
+}
+
+/* Məzmunu mərkəzləmək üçün konteyner */
+.vision-hero__container {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center; 
+  justify-content: space-between;
+  padding: 0 54px;
+  padding-top: var(--treva-nav-height, 20px); 
+}
+
+/* ==========================================================================
+   HERO CONTENT (ƏSAS MƏZMUN) - DESKTOP
+   ========================================================================== */
+.vision-hero__content {
+  max-width: 800px;
+  width: 100%;
+}
+
+.vision-hero__title {
+  font-size: 54px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.vision-hero__description {
+  font-size: 24px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+  margin-bottom: 36px;
+}
+
+.lowercase-text {
+  text-transform: lowercase;
+}
+
+.vision-hero__description--mobile {
+  display: none;
+}
+
+/* Konsultasiya Düyməsi */
+.vision-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  background-color: #3F4249; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 10px 12px 10px 24px;
+  border-radius: 40px;
+  color: #ffffff; 
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease;
+}
+
+.vision-hero__cta:hover {
+  background-color: #2f3136;
+}
+
+.vision-hero__cta-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background-color: #ffffff; 
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   DESKTOP NAVİQASİYA DÜYMƏLƏRİ (SAĞDA MƏRKƏZƏ YAXIN VƏ YA AYRI)
+   ========================================================================== */
+.vision-hero__slider-arrows {
+  display: flex;
+  gap: 12px;
+  align-self: flex-end;
+  margin-bottom: 80px; 
+}
+
+.vision-hero__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.vision-hero__arrow:hover {
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   SƏTİR ÜZRƏ BƏRABƏR BÖLÜNƏN TAM GENİŞLİKDƏ XƏTLƏR (DESKTOP)
+   ========================================================================== */
+.vision-hero__bottom-timeline {
+  position: absolute;
+  left: 0;
+  bottom: 40px; 
+  width: 100%;
+  display: flex;
+  gap: 16px; 
+  padding: 0 54px; 
+  z-index: 5;
+}
+
+.vision-hero__segment {
+  flex: 1; 
+  height: 3px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+.vision-hero__segment--active {
+  background-color: #2E3037; 
+  opacity: 1;
+}
+
+/* ==========================================================================
+   RESPONSIVE NİZAMLAMALAR
+   ========================================================================== */
+@media (max-width: 1199px) {
+  .vision-hero__title {
+    font-size: 46px;
+  }
+}
+
+@media (max-width: 991px) {
+  .vision-hero__container {
+    padding: 0 32px;
+    padding-top: var(--treva-nav-height, 15px);
+  }
+  .vision-hero__bottom-timeline {
+    padding: 0 32px;
+  }
+}
+
+/* Mobil Ekran Rejimi */
+@media (max-width: 767px) {
+  .vision-hero {
+    height: auto;
+    min-height: auto;
+  }
+
+  .vision-hero__container {
+    padding: 0 24px;
+    padding-top: 120px; 
+    padding-bottom: 60px;  
+    height: auto;
+    display: block;
+  }
+
+  .vision-hero__slider-arrows,
+  .vision-hero__bottom-timeline {
+    display: none;
+  }
+
+  .vision-hero__title {
+    font-size: 29px;
+    line-height: 1.15;
+    letter-spacing: -0.2px;
+    margin-bottom: 16px;
+  }
+
+  .vision-hero__description--desktop {
+    display: none;
+  }
+
+  .vision-hero__description--mobile {
+    display: block;
+    font-size: 20px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 32px;
+    font-weight: 400;
+  }
+
+  .vision-hero__cta {
+    padding: 8px 8px 8px 20px;
+  }
+}

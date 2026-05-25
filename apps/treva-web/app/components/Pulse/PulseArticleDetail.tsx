@@ -4,7 +4,7 @@ import { ButtonText } from '@/app/components/ButtonText';
 /* eslint-disable @next/next/no-img-element, react/no-unknown-property */
 
 import React from "react";
-import Navbar from "@/app/components/Navbar/navbar";
+import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import { Article } from "@/lib/pulse.types";
 import { SIDEBAR_ARTICLES, FEATURED_ARTICLES_DETAIL } from "@/lib/pulse-data";

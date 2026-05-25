@@ -1,4 +1,4 @@
-import Navbar from "@/app/components/Navbar/navbar";
+import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeHeroSection } from "./HomeHeroSection";
 import { HomeServices } from "./HomeServices";
 import { HomeProjects } from "./HomeProjects";
