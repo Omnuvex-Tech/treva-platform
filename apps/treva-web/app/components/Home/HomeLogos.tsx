@@ -160,7 +160,7 @@ const productionStyles = `
     justify-content: center !important;
     align-items: center !important;
     box-sizing: border-box !important;
-    width: 200px !important;
+    width: 186px !important;
     min-width: 0 !important;
     max-width: 100% !important;
     height: 29px !important;
@@ -292,8 +292,8 @@ const productionStyles = `
       border-right: none !important;
     }
 
-    /* Son sətirin alt xətləri yoxdur */
-    .mobile-partner-cell:nth-child(n+16) {
+    /* Son sətirin alt xətləri yoxdur (indekslər 13, 14, 15) */
+    .mobile-partner-cell:nth-child(n+13) {
       border-bottom: none !important;
     }
 
@@ -305,7 +305,7 @@ const productionStyles = `
       opacity: 0.85 !important;
     }
 
-    /* ── KƏSİŞMƏ NÖQTƏLƏRİNDƏKİ NAXIŞLARIN ABSOLUTE METODU ── */
+    /* ── KƏSİŞMƏ NÖQTƏLƏRİNDƏKİ NAXIŞLAR (yalnız 4 daxili üfüqi xətt üçün) ── */
     .mobile-grid-decor {
       position: absolute !important;
       width: 21px !important;
@@ -323,14 +323,12 @@ const productionStyles = `
     .decor-x1-y2 { left: 33.33%; top: 33.33%; }
     .decor-x1-y3 { left: 33.33%; top: 50%; }
     .decor-x1-y4 { left: 33.33%; top: 66.66%; }
-    .decor-x1-y5 { left: 33.33%; top: 83.33%; }
 
     /* 2-ci daxili şaquli xətt üzərindəki kəsişmələr (66.66%) */
     .decor-x2-y1 { left: 66.66%; top: 16.66%; }
     .decor-x2-y2 { left: 66.66%; top: 33.33%; }
     .decor-x2-y3 { left: 66.66%; top: 50%; }
     .decor-x2-y4 { left: 66.66%; top: 66.66%; }
-    .decor-x2-y5 { left: 66.66%; top: 83.33%; }
     
     .n-testimonials_quote {
       font-size: 21px !important;
@@ -394,7 +392,7 @@ const testimonials = [
   }
 ];
 
-// Mobil massiv təmizləndi, yalnız loqolar və boş xanalar saxlanıldı (3 sütun x 6 sətir = 18 xana)
+// Mobil massiv – yalnız 15 xana (5 sətir x 3 sütun). 16, 17, 18-ci xanalar silindi.
 type MobilePartnerCell = {
   order: number;
   logo?: {
@@ -424,10 +422,7 @@ const mobilePartners: MobilePartnerCell[] = [
   { order: 12, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
   { order: 13 },
   { order: 14, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
-  { order: 15 },
-  { order: 16 },
-  { order: 17 },
-  { order: 18 }
+  { order: 15 }
 ];
 
 export const HomeLogos = () => {
@@ -468,7 +463,7 @@ export const HomeLogos = () => {
                 We focus on visionary design and long-term asset<br /> growth for our global clients.
               </p>
 
-              {/* Mobil versiyası — DÜZƏLDİ: tələb olunan 3 ədəd <br/> ilə */}
+              {/* Mobil versiyası — tələb olunan 3 ədəd <br/> ilə */}
               <p className="logos-left-description logos-left-description-mobile">
                 Global network of world-leading <br />
                 developers. We focus on visionary <br />
@@ -799,20 +794,18 @@ export const HomeLogos = () => {
                     ))}
                 </div>
 
-                {/* MOBİL GRİDDƏ KƏSİŞƏN BÜTÜN DAXİLİ XƏTLƏRİN ÜZƏRİNƏ YERLƏŞDİRİLƏN 10 ƏDƏD NAXIŞ */}
+                {/* MOBİL GRİDDƏ KƏSİŞƏN BÜTÜN DAXİLİ XƏTLƏRİN ÜZƏRİNƏ YERLƏŞDİRİLƏN 8 ƏDƏD NAXIŞ (yalnız 4 üfüqi xətt üçün) */}
                 {/* 1-ci sütun kəsişmə xətti üzrə naxışlar */}
                 <div className="mobile-grid-decor decor-x1-y1"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y2"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y3"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y4"><DecorativeIcon /></div>
-                <div className="mobile-grid-decor decor-x1-y5"><DecorativeIcon /></div>
 
                 {/* 2-ci sütun kəsişmə xətti üzrə naxışlar */}
                 <div className="mobile-grid-decor decor-x2-y1"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y2"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y3"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y4"><DecorativeIcon /></div>
-                <div className="mobile-grid-decor decor-x2-y5"><DecorativeIcon /></div>
               </div>
             </div>
 
@@ -834,4 +827,4 @@ export const HomeLogos = () => {
       </div>
     </section>
   );
-};
+}
