@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-// CSS-i birbaşa obyektə mənimsətmədən, qlobal şəkildə import edirik
 import './call-back.css';
 
 type RoleType = 'Client' | 'Developer' | 'Broker';
@@ -24,7 +23,7 @@ export default function CallbackForm() {
     <main className="container">
       <form onSubmit={handleSubmit} className="formWrapper">
         
-        {/* Başlıq Bloku */}
+        {/* Başlıq Bloku (Orijinal dizaynına qaytarıldı) */}
         <div className="headerContainer">
           <div className="bgLineTop"></div>
           <div className="bgLineBottom"></div>
@@ -34,7 +33,7 @@ export default function CallbackForm() {
           </h1>
         </div>
 
-        {/* Alt Başlıq */}
+        {/* Alt Başlıq (Yalnız ilk sözün ilk hərfi böyük, qalanları kiçik) */}
         <p className="subtitle">
           Request a callback. One of our managers will be happy to assist you.
         </p>

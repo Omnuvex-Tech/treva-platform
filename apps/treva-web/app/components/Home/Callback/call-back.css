@@ -19,7 +19,7 @@
   align-items: center;
 }
 
-/* Başlıq sahəsi və arxadakı xətlər */
+/* Başlıq sahəsi və arxadakı xətlər (Orijinal dizayn) */
 .headerContainer {
   position: relative;
   width: 100%;
@@ -52,7 +52,7 @@
   font-size: 72px;
   font-weight: 500;
   color: #4a505e;
-  text-transform: uppercase;
+  text-transform: uppercase; /* Orijinal böyük hərf dizaynına geri qaytarıldı */
   line-height: 1.1;
   letter-spacing: 2px;
   margin: 0;
@@ -69,7 +69,7 @@
   margin-left: 180px;
 }
 
-/* Alt başlıq mətni */
+/* Alt başlıq mətni (Lowercase və İlk hərf Böyük) */
 .subtitle {
   font-size: 24px;
   color: #666666;
@@ -78,9 +78,14 @@
   margin-bottom: 40px;
   max-width: 800px;
   line-height: 1.4;
+  text-transform: lowercase; /* Bütün mətni kiçik hərf edir */
 }
 
-/* Rolların (Client, Developer, Broker) seçilməsi düymələri */
+.subtitle::first-letter {
+  text-transform: uppercase; /* Yalnız cümlənin ilk hərfi böyük olur */
+}
+
+/* Rolların seçilməsi düymələri */
 .roleSelector {
   display: flex;
   gap: 16px;
@@ -161,15 +166,21 @@
   max-width: 600px;
   line-height: 1.5;
   font-weight: 300;
+  text-transform: lowercase;
+}
+
+.disclaimer::first-letter {
+  text-transform: uppercase;
 }
 
 .disclaimer strong {
   color: #444444;
   font-weight: 400;
+  text-transform: lowercase;
 }
 
 /* ==========================================================================
-   MOBILE RESPONSIVE DIZAYN (Şəkil 2 üçün konfiqurasiya)
+   MOBILE RESPONSIVE DIZAYN
    ========================================================================== */
 @media (max-width: 768px) {
   .container {
@@ -180,7 +191,6 @@
     margin-bottom: 30px;
   }
 
-  /* Mobildə arxa fondakı üfüqi xətlər itir (Şəkil 2-də göründüyü kimi) */
   .bgLineTop,
   .bgLineBottom {
     display: none;
@@ -226,7 +236,6 @@
     text-align: center;
   }
 
-  /* Giriş sahələri mobildə tam alt-alta sıralanır */
   .inputGroup {
     flex-direction: column;
     gap: 24px;
