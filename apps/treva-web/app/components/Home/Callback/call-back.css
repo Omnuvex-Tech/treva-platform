@@ -19,70 +19,80 @@
   align-items: center;
 }
 
-/* Başlıq sahəsi və arxadakı xətlər (Orijinal dizayn) */
+/* Başlıq konteyneri və şəkildəki xətlərin koordinatları */
 .headerContainer {
   position: relative;
   width: 100%;
-  margin-bottom: 24px;
+  max-width: 850px; /* Şəkildəki sıxlığı qorumaq üçün en məhdudlaşdırıldı */
+  margin-bottom: 35px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Birinci xətt - tam olaraq "READY TO TAKE" sözünün alt kənarını kəsir */
 .bgLineTop {
   position: absolute;
-  top: 35%;
+  top: 64px; 
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: #e0e0e0;
+  background-color: #d1d5db;
   z-index: 1;
 }
 
+/* İkinci xətt - tam olaraq "THE FIRST STEP?" sözünün alt kənarını kəsir */
 .bgLineBottom {
   position: absolute;
-  bottom: 20%;
+  top: 138px; 
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: #e0e0e0;
+  background-color: #d1d5db;
   z-index: 1;
 }
 
 .title {
   position: relative;
   z-index: 2;
-  font-size: 72px;
+  font-size: 68px; /* Şəkildəki proporsiyaya uyğun şrift ölçüsü */
   font-weight: 500;
   color: #4a505e;
-  text-transform: uppercase; /* Orijinal böyük hərf dizaynına geri qaytarıldı */
+  text-transform: uppercase; /* Şəkildəki kimi tam böyük hərflər */
   line-height: 1.1;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   margin: 0;
-  padding: 0 10px;
+  padding: 0;
+  text-align: left; /* Sürüşmələri dəqiq idarə etmək üçün sola nizamlandı */
+  width: 100%;
 }
 
+/* Şəkildəki sola sürüşmə məsafəsi */
 .titleTop {
   display: block;
-  margin-right: 140px;
+  padding-left: 60px; 
 }
 
+/* Şəkildəki sağa sürüşmə məsafəsi */
 .titleBottom {
   display: block;
-  margin-left: 180px;
+  padding-left: 260px; 
+  margin-top: 4px;
 }
 
-/* Alt başlıq mətni (Lowercase və İlk hərf Böyük) */
+/* Alt başlıq mətni (Yalnız ilk hərf böyük, qalanları kiçik) */
 .subtitle {
   font-size: 24px;
   color: #666666;
   font-weight: 300;
-  margin-top: 16px;
+  margin-top: 24px;
   margin-bottom: 40px;
   max-width: 800px;
   line-height: 1.4;
-  text-transform: lowercase; /* Bütün mətni kiçik hərf edir */
+  text-transform: lowercase;
 }
 
 .subtitle::first-letter {
-  text-transform: uppercase; /* Yalnız cümlənin ilk hərfi böyük olur */
+  text-transform: uppercase;
 }
 
 /* Rolların seçilməsi düymələri */
@@ -189,29 +199,31 @@
 
   .headerContainer {
     margin-bottom: 30px;
+    max-width: 100%;
   }
 
+  /* Mobildə xətlər gizlənir */
   .bgLineTop,
   .bgLineBottom {
     display: none;
   }
 
   .title {
-    font-size: 42px;
+    font-size: 38px;
     letter-spacing: 1px;
     text-align: center;
-    line-height: 1.15;
+    line-height: 1.2;
   }
 
   .titleTop {
-    margin-right: 0;
-    display: inline;
+    padding-left: 0;
+    display: block;
   }
 
   .titleBottom {
-    margin-left: 0;
+    padding-left: 0;
     display: block;
-    margin-top: 4px;
+    margin-top: 8px;
   }
 
   .subtitle {

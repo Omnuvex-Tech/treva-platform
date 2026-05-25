@@ -23,7 +23,7 @@ export default function CallbackForm() {
     <main className="container">
       <form onSubmit={handleSubmit} className="formWrapper">
         
-        {/* Başlıq Bloku (Orijinal dizaynına qaytarıldı) */}
+        {/* Şəkildəki dizayna tam uyğun Başlıq Bloku */}
         <div className="headerContainer">
           <div className="bgLineTop"></div>
           <div className="bgLineBottom"></div>
@@ -33,12 +33,12 @@ export default function CallbackForm() {
           </h1>
         </div>
 
-        {/* Alt Başlıq (Yalnız ilk sözün ilk hərfi böyük, qalanları kiçik) */}
+        {/* Alt Başlıq */}
         <p className="subtitle">
           Request a callback. One of our managers will be happy to assist you.
         </p>
 
-        {/* Rol Seçimi (Client, Developer, Broker) */}
+        {/* Rol Seçimi */}
         <div className="roleSelector">
           {(['Client', 'Developer', 'Broker'] as RoleType[]).map((role) => (
             <button
