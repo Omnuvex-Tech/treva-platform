@@ -3,7 +3,7 @@ import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import PageContainer from "@/app/components/Container/PageContainer";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import ProjectOverview, { ProjectsGrid } from "@/app/components/Projects/ProjectOverview";
-import ProjectDetails, { ProjectsHero } from "@/app/components/Projects/ProjectsHero";
+import ProjectDetails, { ProjectsHero } from "@/app/components/Projects/ProjectDetails";
 import { config } from "@/config";
 import VisionHero from "@/app/components/Projects/VisionHero.tsx";
 import PropertyLocation from "@/app/components/Projects/PropertyLocation";

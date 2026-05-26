@@ -19,24 +19,29 @@ export default function ProjectOverview(): React.ReactElement {
 
           <div className="po-intro-col">
             <p className="po-brand-heading">
-              <span className="po-brand-row-top">
-                <span className="po-brand-name">Panorama by ELIE SAAB</span>{" "}
-                <span className="po-brand-debut">marks the debut of</span>
-              </span>
-              <span className="po-brand-row-bottom">
-                <span className="po-brand-debut">Azerbaijan’s </span>
-                <span className="po-brand-location">first branded residences</span>{" "}
-                <span className="po-brand-debut">at Sea Breeze.</span>
-              </span>
+              <span className="po-brand-name">Panorama by ELIE SAAB</span>
+              <br className="mobile-br" />
+              <span className="po-brand-debut"> marks the debut of </span>
+              <br className="desktop-br" />
+              <span className="po-brand-debut">Azerbaijan&apos;s first </span>
+              <br className="mobile-br" />
+              <span className="po-brand-location">branded residences</span>{" "}
+              <span className="po-brand-debut">at Sea Breeze.</span>
             </p>
 
             <div className="po-divider" />
 
             <p className="po-description">
-              This landmark project translates the legendary designer's <br className="desktop-br" />
-              "timeless elegance" from Haute Couture into exclusive <br className="desktop-br" />
-              coastal living. Every detail is meticulously crafted to <br className="desktop-br" />
-              define a new global standard of sophisticated lifestyle.
+              This landmark project translates <br className="mobile-br" />
+              the legendary designer's <br className="desktop-br" />
+              "timeless <br className="mobile-br" />
+              elegance" from Haute Couture <br className="mobile-br" />
+              into exclusive <br className="desktop-br" />
+              coastal living. Every <br className="mobile-br" />
+              detail is meticulously crafted to <br className="desktop-br" />
+              <br className="mobile-br" />
+              define a new global standard of <br className="mobile-br" />
+              sophisticated lifestyle.
             </p>
           </div>
         </div>
@@ -94,7 +99,7 @@ export default function ProjectOverview(): React.ReactElement {
           <div className="po-data-row">
             <span className="po-data-key">Price Range</span>
             <span className="po-data-val">
-              MIN &mdash; 188 874 USD,&nbsp;&nbsp;MAX &mdash; 849 849 USD
+              MIN &mdash; 188 874 USD,<br className="mobile-br" />&nbsp;&nbsp;MAX &mdash; 849 849 USD
             </span>
           </div>
         </div>

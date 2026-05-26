@@ -86,18 +86,6 @@
   line-height: 1.5;
   margin: 0 0 24px 0;
   text-transform: none;
-  display: flex;
-  flex-direction: column;
-}
-
-.po-brand-row-top {
-  display: block;
-  white-space: nowrap;
-}
-
-.po-brand-row-bottom {
-  display: block;
-  margin-top: 4px;
 }
 
 .po-brand-name {
@@ -137,6 +125,10 @@
 
 .desktop-br {
   display: block;
+}
+
+.mobile-br {
+  display: none;
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -264,31 +256,35 @@
     padding-left: 0;
   }
 
-  /* Fix: same weight for both words, remove margin on second word */
-  .po-title-light,
+  /* Keep desktop font weights (300 light, 500 bold) for PROJECT OVERVIEW on mobile */
+  .po-title-light {
+    font-weight: 300;
+  }
+
   .po-title-bold {
-    font-weight: 400;   /* identical weight → same visual size */
-    margin-left: 0;     /* removes the 0.15em desktop margin */
+    font-weight: 500;
+    margin-left: 0;     /* removes the 0.15em desktop margin on mobile */
   }
 
   .po-brand-heading {
     font-size: 14px;
     margin-bottom: 16px;
-    display: flex;
   }
 
   .po-brand-name {
-    font-size: 18px;
+    font-size: 23px;
   }
 
-  .po-brand-row-top,
-  .po-brand-row-bottom {
+  .desktop-br {
+    display: none;
+  }
+
+  .mobile-br {
     display: block;
-    white-space: nowrap;
   }
 
   .po-description {
-    font-size: 11px;
+    font-size: 14px;
     white-space: nowrap;
   }
 
@@ -303,11 +299,16 @@
     margin-bottom: 28px;
   }
 
-  .po-card-large,
+  .po-card-large {
+    flex: unset;
+    width: 100%;
+  }
+
   .po-card-medium,
   .po-card-small {
     flex: unset;
-    width: 100%;
+    width: 65%;
+    margin-left: auto;
   }
 
   .po-image-label {
@@ -318,24 +319,29 @@
   }
 
   .po-card-large  .po-image-wrapper { height: 240px; }
-  .po-card-medium .po-image-wrapper { height: 220px; }
-  .po-card-small  .po-image-wrapper { height: 220px; }
+  .po-card-medium .po-image-wrapper { height: 160px; }
+  .po-card-small  .po-image-wrapper { height: 160px; }
 
   .po-data-section {
     margin-top: 32px;
   }
 
   .po-data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     padding: 18px 0;
   }
 
   .po-data-key {
-    flex: 0 0 45%;
+    flex: none;
     font-size: 16px;
   }
 
   .po-data-val {
+    flex: none;
     font-size: 16px;
+    text-align: right;
   }
 }
 
