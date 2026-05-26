@@ -71,13 +71,11 @@ export default function ProjectDetails() {
         <div className="pd-header">
           <div className="pd-header-left">
             <p className="pd-header-main">
-              The project's architecture is harmoniously complemented by a
-              world-class infrastructure designed to anticipate your every need.
+              The project&apos;s architecture is <br className="mobile-br" /> harmoniously complemented by a <br className="mobile-br" /> world-class infrastructure designed to <br className="mobile-br" /> anticipate your every need.
             </p>
             <hr className="pd-divider" />
             <p className="pd-header-sub">
-              From high-tech security to premium leisure zones, every technical
-              specification is engineered for absolute comfort and peace of mind.
+              From high-tech security to <br className="mobile-br" /> premium leisure zones, every <br className="mobile-br" /> technical specification is <br className="mobile-br" /> engineered for absolute comfort and peace of mind.
             </p>
           </div>
           <div className="pd-header-right">
