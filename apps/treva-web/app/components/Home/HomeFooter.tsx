@@ -124,7 +124,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
               <div className="footer_wrap">
                 <div className="footer_nav-wrap">
                   <div className="footer_col">
-                    <div className="text-color-white60">sitemap</div>
+                    <div className="text-color-white60">sItemap</div>
                     <div className="footer_nav">
                       <Link
                         href={homeHref}
@@ -152,7 +152,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                   </div>
 
                   <div className="footer_col">
-                    <div className="text-color-white60">Social media</div>
+                    <div className="text-color-white60">SocIal medIa</div>
                     <div lang="en" className="footer_nav">
                       <FooterExternalLink
                         href="https://www.linkedin.com/company/trevarealestate"

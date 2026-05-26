@@ -30,7 +30,7 @@
   color: #1a1a1a;
   margin: 0 0 20px 0;
   text-transform: none;
-    font-family: 'Oak Sans', sans-serif;
+  font-family: 'Oak Sans', sans-serif;
 }
 
 .pd-divider {
@@ -47,15 +47,13 @@
   font-family: 'Oak Sans', sans-serif;
   margin: 0;
   text-transform: none;
-
-  
 }
 
 .pd-header-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 32px;
+  gap: 138px; /* Separates title from download button on desktop */
   flex: 1;
 }
 
@@ -236,34 +234,31 @@
     gap: 16px;
   }
 
+  /* display:contents makes pd-header-right "invisible" as a container —
+     its children (h2 and button) become direct flex children of pd-header
+     so we can freely order them with the order property */
+  .pd-header-right {
+    display: contents;
+  }
+
   .pd-header-left {
-    order: 2; /* Main text and sub text go below title */
+    order: 2; /* Descriptions go second, after the title */
     width: 100%;
     max-width: 100%;
     flex: unset;
   }
 
-  .pd-header-right {
-    order: 1; /* Title and download button wrapper on top */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Title on the right */
-    width: fit-content;
-    max-width: 100%;
-    flex: unset;
-    margin-left: auto; /* Aligns to right */
-    gap: 16px;
-  }
-
   .pd-section-title {
+    order: 1; /* Title goes first, at the top */
     font-size: 39px;
-    display: flex;
-    flex-direction: row; /* Horizontal layout on mobile */
+    display:flex;
+    justify-content: flex-end;
+    flex-direction: row;
     gap: 8px;
     line-height: 1.0;
     text-transform: uppercase;
-    margin-left: 0;
-    padding-left: 0;
+    margin-left: auto; /* Pushes title to the right */
+    width: fit-content;
   }
 
   /* Match light/bold typography colors for title span items */
@@ -276,14 +271,12 @@
     margin-left: 0;
   }
 
-  /* Make sure download button is aligned to the right, under main texts */
+  /* Button goes last, aligned to the right */
   .pd-download-btn {
-    order: 3; /* Rendered below description texts */
-    margin: 16px 0 0 auto; /* Ensure space above and align right */
+    order: 3;
     font-size: 10px;
     padding: 10px 18px;
-    align-self: flex-end;
-    display: block; /* Make sure it blocks appropriately for right-align */
+    margin-left: auto;
   }
 
   .pd-header-main {

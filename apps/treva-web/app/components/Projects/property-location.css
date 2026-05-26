@@ -21,14 +21,41 @@
 }
 
 .property-section-title {
-  color: #2d3139;
-  font-family: var(--font-sans, "Inter", sans-serif);
-  text-transform: uppercase;
+  font-family: var(--font-family);
+  font-size: 44px;
+  letter-spacing: -0.5px;
   margin: 0;
+  line-height: 1.1;
+  text-transform: none;
 }
 
-.property-section-title .title-bold {
-  color: #4a505c;
+.po-title-light {
+  font-weight: 300;
+  color: var(--color-secondary, #2d3139);
+  text-transform: uppercase;
+}
+
+.po-title-bold {
+  font-weight: 500;
+  color: var(--color-secondary, #2d3139);
+  margin-left: 0.15em;
+  text-transform: uppercase;
+}
+
+.desktop-br {
+  display: block;
+}
+
+.mobile-br {
+  display: none;
+}
+
+.desktop-comma {
+  display: inline;
+}
+
+.mobile-comma {
+  display: none;
 }
 
 .property-description-wrapper {
@@ -40,6 +67,7 @@
   color: #2d3139;
   font-family: var(--font-sans, "Inter", sans-serif);
   margin: 0;
+  text-transform: none;
 }
 
 .property-main-lead .lead-light {
@@ -59,6 +87,7 @@
   color: #6b7280;
   font-family: var(--font-sans, "Inter", sans-serif);
   margin: 0;
+  text-transform: none;
 }
 
 /* --- MAP INTERFACE --- */
@@ -87,6 +116,7 @@
   color: #9ca3af;
   font-family: var(--font-sans, "Inter", sans-serif);
   margin: 0;
+  text-transform: none;
 }
 
 
@@ -113,24 +143,16 @@
   }
 
   .property-section-title {
-    font-size: 48px;
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    white-space: nowrap;
-  }
-
-  .property-section-title .title-bold {
-    font-weight: 600;
+    /* Keep base styles (44px, etc.) for desktop or add overrides if needed */
   }
 
   .property-description-wrapper {
     max-width: 540px;
-    text-align: right;
+    text-align: left;
   }
 
   .property-main-lead {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     line-height: 1.4;
   }
@@ -147,7 +169,7 @@
   }
 
   .property-sub-text {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 300;
     line-height: 1.6;
   }
@@ -177,18 +199,35 @@
   }
 
   .property-section-title {
-    font-size: 36px;
-    font-weight: 300;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
-    text-align: left;
+    font-size: 39px;
     display: flex;
-    flex-direction: column; /* PROPERTY və LOCATION alt-bata düşür */
+    flex-direction: column;
+    line-height: 1.0;
+    text-transform: uppercase;
+    text-align: left;
+    margin-left: auto;
+    width: fit-content;
   }
 
-  .property-section-title .title-bold {
-    font-weight: 600;
-    margin-top: -4px;
+  .po-title-light {
+    font-weight: 300;
+  }
+
+  .po-title-bold {
+    font-weight: 500;
+    margin-left: 0;
+  }
+
+  .desktop-br, .desktop-comma {
+    display: none;
+  }
+  
+  .mobile-br {
+    display: block;
+  }
+
+  .mobile-comma {
+    display: inline;
   }
 
   .property-description-wrapper {
@@ -225,5 +264,7 @@
     font-weight: 300;
     text-align: left;
     margin-top: 16px;
+    margin-left: auto;
+    width: fit-content;
   }
 }

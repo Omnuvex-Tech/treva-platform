@@ -7,6 +7,7 @@ import ProjectDetails, { ProjectsHero } from "@/app/components/Projects/ProjectD
 import { config } from "@/config";
 import VisionHero from "@/app/components/Projects/VisionHero.tsx";
 import PropertyLocation from "@/app/components/Projects/PropertyLocation";
+import UnitLayout from "@/app/components/Projects/UnitLayout";
 
 export const dynamicParams = false;
 
@@ -35,6 +36,7 @@ export default async function ProjectsRoute({ params }: { params: Promise<{ loca
                 <PropertyLocation/>
                 {/* <ProjectsGrid /> */}
             {/* </PageContainer> */}
+            <UnitLayout/>
             <HomeFooter locale={locale} />
         </div>
           
