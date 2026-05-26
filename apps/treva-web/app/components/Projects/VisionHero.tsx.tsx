@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import PageContainer from "@/app/components/Container/PageContainer";
 import "./vision-hero.css";
 
 export default function VisionHero() {
@@ -24,7 +25,7 @@ export default function VisionHero() {
       <div className="vision-hero__overlay"></div>
 
       {/* Əsas Hero Məzmunu */}
-      <div className="vision-hero__container">
+      <PageContainer className="vision-hero__container">
         <div className="vision-hero__content">
           <h1 className="vision-hero__title">
             PANORAMA BY ELIE SAAB
@@ -64,7 +65,7 @@ export default function VisionHero() {
             </svg>
           </button>
         </div>
-      </div>
+      </PageContainer>
 
       {/* SƏTİR ÜZRƏ BÜTÜN EKRANI TUTAN 3 SEQMNTLİ XƏTT (YALNIZ DESKTOP) */}
       <div className="vision-hero__bottom-timeline">

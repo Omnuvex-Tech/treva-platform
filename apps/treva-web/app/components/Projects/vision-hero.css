@@ -209,12 +209,12 @@
     padding-top: 120px; 
     padding-bottom: 60px;  
     height: auto;
-    display: block;
+    display: block !important; 
   }
 
   .vision-hero__slider-arrows,
-  .vision-hero__bottom-timeline {
-    display: none;
+  .vision-hero__timeline-container {
+    display: none !important;
   }
 
   .vision-hero__title {

@@ -1,0 +1,229 @@
+/* --- PROPERTY LOCATION - PREMIUM MINIMALIST STYLE --- */
+
+.property-location-section {
+  width: 100%;
+  background-color: #ffffff;
+  color: #2d3139;
+  box-sizing: border-box;
+}
+
+.property-location-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* --- HEADERS & TEXTS --- */
+.property-header-block {
+  display: flex;
+  box-sizing: border-box;
+}
+
+.property-section-title {
+  color: #2d3139;
+  font-family: var(--font-sans, "Inter", sans-serif);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.property-section-title .title-bold {
+  color: #4a505c;
+}
+
+.property-description-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.property-main-lead {
+  color: #2d3139;
+  font-family: var(--font-sans, "Inter", sans-serif);
+  margin: 0;
+}
+
+.property-main-lead .lead-light {
+  color: #6b7280;
+}
+
+.property-main-lead .lead-italic {
+  font-style: italic;
+}
+
+.property-divider-line {
+  width: 100%;
+  background-color: #e5e7eb;
+}
+
+.property-sub-text {
+  color: #6b7280;
+  font-family: var(--font-sans, "Inter", sans-serif);
+  margin: 0;
+}
+
+/* --- MAP INTERFACE --- */
+.property-map-wrapper {
+  width: 100%;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.property-map-container {
+  width: 100%;
+  position: relative;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.property-real-map {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.property-footer-address {
+  color: #9ca3af;
+  font-family: var(--font-sans, "Inter", sans-serif);
+  margin: 0;
+}
+
+
+/* ==========================================
+   MEDIA QUERIES (DESKTOP / MOBILE SEPARATION)
+   ========================================== */
+
+/* --- 1. DESKTOP CONFIGURATION (Şəkil 5e8c46) --- */
+@media (min-width: 768px) {
+  .property-location-section {
+    padding: 64px 64px;
+  }
+  
+  .property-location-container {
+    max-width: 1400px;
+  }
+
+  .property-header-block {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 64px;
+    margin-bottom: 48px;
+  }
+
+  .property-section-title {
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .property-section-title .title-bold {
+    font-weight: 600;
+  }
+
+  .property-description-wrapper {
+    max-width: 540px;
+    text-align: right;
+  }
+
+  .property-main-lead {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .property-main-lead .lead-light {
+    font-weight: 300;
+  }
+
+  .property-divider-line {
+    height: 1px;
+    margin: 16px 0;
+    margin-left: auto;
+    width: 100%;
+  }
+
+  .property-sub-text {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .property-map-container {
+    aspect-ratio: 21 / 9; /* Geniş ekran premium xəritə görünüşü */
+  }
+
+  .property-footer-address {
+    font-size: 12px;
+    font-weight: 300;
+    text-align: right;
+    margin-top: 16px;
+  }
+}
+
+/* --- 2. MOBILE CONFIGURATION (Şəkil 5e936f) --- */
+@media (max-width: 767px) {
+  .property-location-section {
+    padding: 40px 16px;
+  }
+
+  .property-header-block {
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .property-section-title {
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    text-align: left;
+    display: flex;
+    flex-direction: column; /* PROPERTY və LOCATION alt-bata düşür */
+  }
+
+  .property-section-title .title-bold {
+    font-weight: 600;
+    margin-top: -4px;
+  }
+
+  .property-description-wrapper {
+    text-align: left;
+  }
+
+  .property-main-lead {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  .property-main-lead .lead-light {
+    font-weight: 300;
+  }
+
+  .property-divider-line {
+    height: 1px;
+    margin: 20px 0;
+  }
+
+  .property-sub-text {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .property-map-container {
+    aspect-ratio: 16 / 10; /* Mobildə şaquli hündürlüyün qorunması */
+  }
+
+  .property-footer-address {
+    font-size: 12px;
+    font-weight: 300;
+    text-align: left;
+    margin-top: 16px;
+  }
+}
