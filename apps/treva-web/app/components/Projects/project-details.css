@@ -53,18 +53,12 @@
 }
 
 .pd-section-title {
-  font-family: "DM Sans", sans-serif;
-  font-size: 36px;
-  font-weight: 300;
-  letter-spacing: 0.12em;
-  color: #1a1a1a;
+  font-family: var(--font-family);
+  font-size: 44px;
+  letter-spacing: -0.5px;
   margin: 0;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.pd-section-title strong {
-  font-weight: 700;
+  line-height: 1.1;
+  text-transform: none;
 }
 
 .pd-download-btn {
@@ -233,7 +227,13 @@
   }
 
   .pd-section-title {
-    font-size: 26px;
+    font-size: 39px;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.0;
+    text-transform: uppercase;
+    margin-left: 0;
+    padding-left: 0;
   }
 
   .pd-download-btn {

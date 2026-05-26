@@ -82,7 +82,8 @@ export default function ProjectDetails() {
           </div>
           <div className="pd-header-right">
             <h2 className="pd-section-title">
-              PROJECT <strong>DETAILS</strong>
+              <span className="po-title-light">Project </span>
+              <span className="po-title-bold">Details</span>
             </h2>
             <button className="pd-download-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
