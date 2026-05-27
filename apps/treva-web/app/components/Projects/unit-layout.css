@@ -92,17 +92,24 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: transparent;
-    border: 1px solid var(--color-border);
+    background: #3F4249;
+    border: 1px solid #3F4249;
     padding: 12px 24px;
     border-radius: 20px;
     cursor: pointer;
-    color: var(--color-text-main);
-    transition: all 0.2s ease;
+    color: #ffffff;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .layouts-controls__view-all:hover {
-    background-color: var(--color-text-main);
+    background-color: #2F3134;
+    border-color: #2F3134;
+    color: #ffffff;
+}
+
+.layouts-controls__view-all:active {
+    background-color: #000000;
+    border-color: #000000;
     color: #ffffff;
 }
 

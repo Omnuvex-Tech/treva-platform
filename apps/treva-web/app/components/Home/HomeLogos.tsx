@@ -218,7 +218,7 @@ const productionStyles = `
   }
 
   /* ==========================================================================
-     RESPONSIVE MOBİL STİLLƏR (DƏYİŞİKLİKLƏR YALNIZ MOBİLDƏ)
+     RESPONSIVE MOBIL STILLƏR (DƏYİŞİKLİKLƏR YALNIZ MOBİLDƏ)
      ========================================================================== */
   @media screen and (max-width: 991px) {
     .section_logos .logos_intro {
@@ -274,6 +274,7 @@ const productionStyles = `
       grid-template-columns: repeat(3, 1fr) !important;
       background-color: transparent !important;
       position: relative !important;
+      gap: 0 !important;          /* Ensure no gap between cells */
     }
 
     .mobile-partner-cell {
@@ -286,6 +287,7 @@ const productionStyles = `
       position: relative !important;
       border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-sizing: border-box !important;   /* ← FIX: borders included in aspect-ratio */
     }
 
     /* 3-cü sütunun sağ xətləri yoxdur */
@@ -306,7 +308,7 @@ const productionStyles = `
       opacity: 0.85 !important;
     }
 
-    /* ── KƏSİŞMƏ NÖQTƏLƏRİNDƏKİ NAXIŞLAR (yalnız 4 daxili üfüqi xətt üçün) ── */
+    /* ── KƏSİŞMƏ NÖQTƏLƏRİNDƏKİ NAXIŞLAR – DÜZGÜN MÖVQELƏR ── */
     .mobile-grid-decor {
       position: absolute !important;
       width: 21px !important;
@@ -319,17 +321,17 @@ const productionStyles = `
       transform: translate(-50%, -50%) !important;
     }
 
-    /* 1-ci daxili şaquli xətt üzərindəki kəsişmələr (33.33%) */
-    .decor-x1-y1 { left: 33.33%; top: 16.66%; }
-    .decor-x1-y2 { left: 33.33%; top: 33.33%; }
-    .decor-x1-y3 { left: 33.33%; top: 50%; }
-    .decor-x1-y4 { left: 33.33%; top: 66.66%; }
+    /* Daxili şaquli xətlər: 33.33% və 66.66% */
+    /* Daxili üfüqi xətlər: 20%, 40%, 60%, 80% (5 sıra üçün) */
+    .decor-x1-y1 { left: 33.33%; top: 20%; }
+    .decor-x1-y2 { left: 33.33%; top: 40%; }
+    .decor-x1-y3 { left: 33.33%; top: 60%; }
+    .decor-x1-y4 { left: 33.33%; top: 80%; }
 
-    /* 2-ci daxili şaquli xətt üzərindəki kəsişmələr (66.66%) */
-    .decor-x2-y1 { left: 66.66%; top: 16.66%; }
-    .decor-x2-y2 { left: 66.66%; top: 33.33%; }
-    .decor-x2-y3 { left: 66.66%; top: 50%; }
-    .decor-x2-y4 { left: 66.66%; top: 66.66%; }
+    .decor-x2-y1 { left: 66.66%; top: 20%; }
+    .decor-x2-y2 { left: 66.66%; top: 40%; }
+    .decor-x2-y3 { left: 66.66%; top: 60%; }
+    .decor-x2-y4 { left: 66.66%; top: 80%; }
     
     .n-testimonials_quote {
       font-size: 21px !important;
@@ -393,7 +395,7 @@ const testimonials = [
   }
 ];
 
-// Mobil massiv – yalnız 15 xana (5 sətir x 3 sütun). 16, 17, 18-ci xanalar silindi.
+// Mobil massiv – yalnız 15 xana (5 sətir x 3 sütun)
 type MobilePartnerCell = {
   order: number;
   logo?: {
@@ -816,14 +818,11 @@ export const HomeLogos = () => {
                     ))}
                 </div>
 
-                {/* MOBİL GRİDDƏ KƏSİŞƏN BÜTÜN DAXİLİ XƏTLƏRİN ÜZƏRİNƏ YERLƏŞDİRİLƏN 8 ƏDƏD NAXIŞ (yalnız 4 üfüqi xətt üçün) */}
-                {/* 1-ci sütun kəsişmə xətti üzrə naxışlar */}
+                {/* MOBİL GRİDDƏ KƏSİŞƏN BÜTÜN DAXİLİ XƏTLƏRİN ÜZƏRİNƏ YERLƏŞDİRİLƏN 8 ƏDƏD NAXIŞ */}
                 <div className="mobile-grid-decor decor-x1-y1"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y2"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y3"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y4"><DecorativeIcon /></div>
-
-                {/* 2-ci sütun kəsişmə xətti üzrə naxışlar */}
                 <div className="mobile-grid-decor decor-x2-y1"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y2"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y3"><DecorativeIcon /></div>

@@ -1,4 +1,4 @@
-/* ===== NAVBAR DESIGN TOKENS (standalone — treva-hero.css olmadan da işləyir) ===== */
+/* ===== NAVBAR DESIGN TOKENS ===== */
 :root {
   --treva-nav-height: 64px;
   --treva-link-size: 12px;
@@ -11,9 +11,11 @@
   --treva-muted-text: #B2B3B6;
 }
 
-/* Pill button base — treva-hero.css yüklənmədikdə (məs. Projects səhifəsindəki Navbar) */
+/* Pill button base */
 .treva-pill-button {
   background: var(--treva-pill-bg);
+  border: none;
+  cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 .treva-pill-button:hover {
@@ -90,6 +92,7 @@
   text-transform: uppercase;
   letter-spacing: 1.9px;
   white-space: nowrap;
+  text-decoration: none;
   transition: opacity 0.18s ease;
 }
 .treva-navbar__link:hover {
@@ -119,6 +122,12 @@
   height: 13px;
 }
 
+/* Dynamic Language Dropdown Styles */
+.treva-navbar__lang-container {
+  position: relative;
+  display: inline-block;
+}
+
 .treva-navbar__lang {
   display: inline-flex;
   align-items: center;
@@ -129,6 +138,9 @@
   letter-spacing: 0.6px;
   text-transform: uppercase;
   cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 .treva-navbar__lang:hover {
   opacity: 0.6;
@@ -137,35 +149,74 @@
   width: 10px;
   height: 10px;
   stroke: #ffffff;
+  transition: transform 0.22s ease;
+}
+
+.treva-navbar__lang--open svg {
+  transform: rotate(180deg);
+}
+
+.treva-navbar__lang-list {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 76px;
+  padding: 4px 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 300;
+}
+
+.treva-navbar__lang-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.treva-navbar__lang-item:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .treva-navbar__hamburger {
   display: none;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 5px;
   width: 36px;
   height: 36px;
-  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10000;
+  position: relative;
+  outline: none;
 }
-.treva-navbar__hamburger__bar {
-  width: 22px;
-  height: 1.8px;
-  background: #ffffff;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s ease;
-  transform-origin: center;
+
+.treva-navbar__hamburger-icon {
+  width: 26px;
+  height: 26px;
+  color: #ffffff;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
-.treva-navbar__hamburger[aria-expanded="true"] .treva-navbar__hamburger__bar:nth-child(1) {
-  transform: translateY(6.8px) rotate(45deg);
-}
-.treva-navbar__hamburger[aria-expanded="true"] .treva-navbar__hamburger__bar:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-.treva-navbar__hamburger[aria-expanded="true"] .treva-navbar__hamburger__bar:nth-child(3) {
-  transform: translateY(-6.8px) rotate(-45deg);
+
+.treva-navbar__hamburger:hover .treva-navbar__hamburger-icon {
+  opacity: 0.8;
 }
 
 /* Mobile menu */
@@ -175,18 +226,17 @@
   top: var(--treva-nav-height);
   left: 0;
   right: 0;
-  z-index: 201;
+  z-index: 9999;
   font-family: var(--font-inter), Arial, sans-serif;
-  background: rgba(0,0,0,0.86);
+  background: rgba(0,0,0,0.92);
   backdrop-filter: blur(14px);
   border-bottom: none;
-  overflow: hidden;
+  overflow-y: auto;
   max-height: 0;
-  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .treva-navbar__mobile.treva-navbar__mobile--open {
   max-height: calc(100dvh - var(--treva-nav-height));
-  overflow-y: auto;
 }
 .treva-navbar__mobile__inner {
   padding: 28px 32px 32px;
@@ -201,7 +251,14 @@
   padding: 13px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
+  text-decoration: none;
 }
+
+/* ✅ YENİLİK: Sonuncu linkin (Pulse) altındakı xətt yığışdırıldı */
+.treva-navbar__mobile__link:last-of-type {
+  border-bottom: none;
+}
+
 .treva-navbar__mobile__footer {
   display: flex;
   align-items: center;
@@ -209,6 +266,7 @@
   margin-top: 24px;
 }
 
+/* Responsive media queries */
 @media (min-width: 1025px) and (max-width: 1280px) {
   .treva-navbar {
     gap: clamp(0.6rem, 1.25vw, 1.05rem);
@@ -239,12 +297,12 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 720px;
+    max-width: 100%;
     padding: 0;
   }
   .treva-navbar__logo {
-    width: 74px;
-    height: 17px;
+    width: 90px;
+    height: 22px;
   }
   .treva-navbar__nav {
     display: none;
@@ -262,15 +320,15 @@
     margin-left: auto;
   }
   .treva-navbar__search-btn {
-    width: 50px;
-    height: 30px;
+    width: 44px;
+    height: 32px;
     padding: 0;
     border-radius: 999px;
     justify-content: center;
   }
   .treva-navbar__search-btn svg {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
   }
   .treva-navbar__search-text {
     display: none;
@@ -285,16 +343,9 @@
     width: 9px;
     height: 6px;
   }
+  
   .treva-navbar__hamburger {
     display: flex;
-    width: 20px;
-    height: 30px;
-    margin-left: 0;
-    gap: 4px;
-  }
-  .treva-navbar__hamburger__bar {
-    width: 15px;
-    height: 1.5px;
   }
   .treva-navbar__mobile {
     display: block;
@@ -303,19 +354,18 @@
 
 @media (max-width: 768px) {
   .treva-navbar {
+    padding: 0 16px;
+  }
+  .treva-navbar__inner {
     padding: 0;
   }
   .treva-navbar__logo {
-    width: 61px;
-    height: 14px;
-  }
-  .treva-navbar__inner {
-    max-width: 370px;
-    padding: 0 6px;
+    width: 80px;
+    height: 20px;
   }
   .treva-navbar__actions,
   .treva-navbar__controls {
-    gap: 16px;
+    gap: 14px;
   }
   .treva-navbar__mobile__inner {
     padding: 20px;

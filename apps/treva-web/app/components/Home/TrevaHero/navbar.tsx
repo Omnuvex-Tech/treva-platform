@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from "next/navigation";
 import './navbar.css';
+import { IoMdClose, IoMdMenu } from 'react-icons/io';
 
 type PillButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isPressed?: boolean;
@@ -49,6 +51,18 @@ function TrevaNavbarLogo() {
   );
 }
 
+const languageLabels = {
+  az: "AZE",
+  en: "ENG",
+  ru: "RUS",
+} as const;
+
+const labelToLocale = {
+  AZE: "az",
+  ENG: "en",
+  RUS: "ru",
+} as const;
+
 type NavbarProps = {
   locale?: string;
   variant?: 'overlay' | 'solid';
@@ -57,13 +71,42 @@ type NavbarProps = {
 export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  
+  const router = useRouter();
+  const pathname = usePathname();
+  
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLElement>(null);
-  const routeHref = (path: string) => `/${locale}${path}`;
+  const langDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileLangDropdownRef = useRef<HTMLDivElement>(null);
 
+  const detectedLocale = pathname?.split("/")[1];
+  const activeLocale = (detectedLocale && detectedLocale in languageLabels) 
+    ? detectedLocale 
+    : (locale in languageLabels ? locale : "az");
+
+  const currentLang = languageLabels[activeLocale as keyof typeof languageLabels];
+  const languages = ["AZE", "ENG", "RUS"] as const;
+
+  const routeHref = (path: string) => `/${activeLocale}${path}`;
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
   const closeMobileMenu = () => setMobileMenuOpen(false);
   const shouldShowScrolled = variant === 'overlay' && (isScrolled || mobileMenuOpen);
+
+  const handleLangChange = (lang: typeof languages[number]) => {
+    const nextLocale = labelToLocale[lang];
+    if (!nextLocale) return;
+
+    const segments = pathname ? pathname.split("/").filter(Boolean) : [];
+    if (segments.length === 0) {
+      router.push(`/${nextLocale}`);
+      return;
+    }
+
+    segments[0] = nextLocale;
+    router.push(`/${segments.join("/")}`);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,12 +129,23 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
       ) {
         closeMobileMenu();
       }
+
+      const target = event.target as Node;
+      const clickedInsideDesktop = langDropdownRef.current?.contains(target);
+      const clickedInsideMobile = mobileLangDropdownRef.current?.contains(target);
+
+      if (!clickedInsideDesktop && !clickedInsideMobile) {
+        setIsLangOpen(false);
+      }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && mobileMenuOpen) {
-        closeMobileMenu();
-        hamburgerRef.current?.focus();
+      if (event.key === 'Escape') {
+        if (mobileMenuOpen) {
+          closeMobileMenu();
+          hamburgerRef.current?.focus();
+        }
+        setIsLangOpen(false);
       }
     };
 
@@ -101,16 +155,14 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
       }
     };
 
-    if (mobileMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscapeKey);
-      window.addEventListener('resize', handleResize);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+    window.addEventListener('resize', handleResize);
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
-      window.removeEventListener('resize', handleResize);
+      window.addEventListener('resize', handleResize);
     };
   }, [mobileMenuOpen]);
 
@@ -135,56 +187,92 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
         role="banner"
       >
         <div className="treva-navbar__inner">
-        <a href={`/${locale}`} className="treva-navbar__logo" aria-label="TREVA - Home">
-          <TrevaNavbarLogo />
-        </a>
+          <a href={`/${activeLocale}`} className="treva-navbar__logo" aria-label="TREVA - Home">
+            <TrevaNavbarLogo />
+          </a>
 
-        <nav className="treva-navbar__nav" aria-label="Primary navigation">
-          <a href={routeHref('/projects')} className="treva-navbar__link">Projects</a>
-          <a href={routeHref('/about-us')} className="treva-navbar__link">About Us</a>
-          <a href={routeHref('/contact')} className="treva-navbar__link">Contact Us</a>
-          <a href={routeHref('/developers')} className="treva-navbar__link">Developers</a>
-          <a href={routeHref('/brokers')} className="treva-navbar__link">Brokers</a>
-          <a href={routeHref('/off-plan')} className="treva-navbar__link">Off-Plan</a>
-          <a href={routeHref('/resale')} className="treva-navbar__link">Resale</a>
-          <a href={routeHref('/pulse')} className="treva-navbar__link">Pulse</a>
-        </nav>
+          <nav className="treva-navbar__nav" aria-label="Primary navigation">
+            <a href={routeHref('/projects')} className="treva-navbar__link">Projects</a>
+            <a href={routeHref('/about-us')} className="treva-navbar__link">About Us</a>
+            <a href={routeHref('/contact')} className="treva-navbar__link">Contact Us</a>
+            <a href={routeHref('/developers')} className="treva-navbar__link">Developers</a>
+            <a href={routeHref('/brokers')} className="treva-navbar__link">Brokers</a>
+            <a href={routeHref('/off-plan')} className="treva-navbar__link">Off-Plan</a>
+            <a href={routeHref('/resale')} className="treva-navbar__link">Resale</a>
+            <a href={routeHref('/pulse')} className="treva-navbar__link">Pulse</a>
+          </nav>
 
-        <div className="treva-navbar__controls">
-        <div className="treva-navbar__actions">
-          <PillButton className="treva-navbar__search-btn" aria-label="Open search">
-            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="5.8" cy="5.8" r="4.4" stroke="#ffffff" strokeWidth="1.4" />
-              <line x1="9.2" y1="9.2" x2="13" y2="13" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-            <span className="treva-navbar__search-text">Search</span>
-          </PillButton>
+          <div className="treva-navbar__controls">
+            <div className="treva-navbar__actions">
+              <PillButton className="treva-navbar__search-btn" aria-label="Open search">
+                <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <circle cx="5.8" cy="5.8" r="4.4" stroke="#ffffff" strokeWidth="1.4" />
+                  <line x1="9.2" y1="9.2" x2="13" y2="13" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
+                <span className="treva-navbar__search-text">Search</span>
+              </PillButton>
 
-          <button className="treva-navbar__lang" aria-label="Language: English" aria-haspopup="listbox" suppressHydrationWarning>
-            ENG
-            <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
+              {/* Desktop Language Switcher */}
+              <div className="treva-navbar__lang-container" ref={langDropdownRef}>
+                <button 
+                  className={`treva-navbar__lang ${isLangOpen ? 'treva-navbar__lang--open' : ''}`} 
+                  onClick={() => setIsLangOpen((prev) => !prev)}
+                  aria-label={`Language switcher. Current: ${currentLang}`} 
+                  aria-haspopup="listbox"
+                  aria-expanded={isLangOpen}
+                  type="button"
+                  suppressHydrationWarning
+                >
+                  {currentLang}
+                  <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
 
-        <button
-          ref={hamburgerRef}
-          className="treva-navbar__hamburger"
-          aria-label="Open navigation menu"
-          aria-expanded="false"
-          aria-controls="mobile-nav"
-          onClick={toggleMobileMenu}
-          suppressHydrationWarning
-        >
-          <span className="treva-navbar__hamburger__bar"></span>
-          <span className="treva-navbar__hamburger__bar"></span>
-          <span className="treva-navbar__hamburger__bar"></span>
-        </button>
-        </div>
+                {isLangOpen && (
+                  <div className="treva-navbar__lang-list" role="listbox">
+                    {languages
+                      .filter((lang) => lang !== currentLang)
+                      .map((lang) => (
+                        <button
+                          key={lang}
+                          className="treva-navbar__lang-item"
+                          role="option"
+                          aria-selected={false}
+                          onClick={() => {
+                            handleLangChange(lang);
+                            setIsLangOpen(false);
+                          }}
+                          type="button"
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ✅ DÜZƏLİŞ: React-icons ilə Dinamik Menyu Düyməsi */}
+            <button
+              ref={hamburgerRef}
+              className={`treva-navbar__hamburger ${mobileMenuOpen ? 'treva-navbar__hamburger--open' : ''}`}
+              aria-controls="mobile-nav"
+              onClick={toggleMobileMenu}
+              suppressHydrationWarning
+              type="button"
+            >
+              {mobileMenuOpen ? (
+                <IoMdClose className="treva-navbar__hamburger-icon" />
+              ) : (
+                <IoMdMenu className="treva-navbar__hamburger-icon" />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
+      {/* ========== MOBILE MENU ========== */}
       <nav
         ref={mobileNavRef}
         className={`treva-navbar__mobile ${mobileMenuOpen ? 'treva-navbar__mobile--open' : ''}`}
@@ -201,21 +289,6 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
           <a href={routeHref('/off-plan')} className="treva-navbar__mobile__link">Off-Plan</a>
           <a href={routeHref('/resale')} className="treva-navbar__mobile__link">Resale</a>
           <a href={routeHref('/pulse')} className="treva-navbar__mobile__link">Pulse</a>
-          <div className="treva-navbar__mobile__footer">
-            <PillButton className="treva-navbar__search-btn" aria-label="Open search">
-              <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <circle cx="5.8" cy="5.8" r="4.4" stroke="#ffffff" strokeWidth="1.4" />
-                <line x1="9.2" y1="9.2" x2="13" y2="13" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" />
-              </svg>
-              Search
-            </PillButton>
-            <button className="treva-navbar__lang" aria-label="Language: English" suppressHydrationWarning>
-              ENG
-              <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
         </div>
       </nav>
     </>

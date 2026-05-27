@@ -70,10 +70,10 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  border: 1.5px solid #1a1a1a;
+  border: 1.5px solid #3F4249;
   border-radius: 100px;
-  background: transparent;
-  color: #1a1a1a;
+  background: #3F4249;
+  color: #ffffff;
   font-family: "DM Sans", sans-serif;
   font-size: 11px;
   font-weight: 500;
@@ -81,12 +81,19 @@
   text-transform: uppercase;
   padding: 12px 24px;
   cursor: pointer;
-  transition: background 0.22s ease, color 0.22s ease;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   white-space: nowrap;
 }
 
 .pd-download-btn:hover {
-  background: #1a1a1a;
+  background: #2F3134;
+  border-color: #2F3134;
+  color: #ffffff;
+}
+
+.pd-download-btn:active {
+  background: #000000;
+  border-color: #000000;
   color: #ffffff;
 }
 

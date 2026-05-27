@@ -1797,4 +1797,34 @@ body.gsap-hidden {
     width: auto !important;   /* Proporsiyanın qorunması */
     margin-left: 0 !important;
   }
+
+  .section_footer .footer_bottom-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 32px !important;
+  }
+
+  .section_footer .footer_specs-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    gap: 24px !important;
+  }
+
+  .footer_bottom-links {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+}
+
+/* Desktop üçün wrapper-i gizlət (əvvəlki kimi flex item kimi davransınlar) */
+@media (min-width: 769px) {
+  .footer_bottom-links {
+    display: contents;
+  }
 }

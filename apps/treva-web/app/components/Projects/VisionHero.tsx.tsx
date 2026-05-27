@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import PageContainer from "@/app/components/Container/PageContainer";
+import { DirectionButton } from "@/app/components/Buttons/PortfolioButtons";
 import "./vision-hero.css";
 
 export default function VisionHero() {
@@ -54,16 +55,8 @@ export default function VisionHero() {
 
         {/* Slayder Oxları (Sağ tərəfdə) */}
         <div className="vision-hero__slider-arrows">
-          <button className="vision-hero__arrow vision-hero__arrow--prev" aria-label="Previous slide">
-            <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 11L1 6M1 6L6 1M1 6H17" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <button className="vision-hero__arrow vision-hero__arrow--next" aria-label="Next slide">
-            <svg width="18" height="12" viewBox="0 0 18 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 1L17 6M17 6L12 11M17 6H1" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          <DirectionButton direction="previous" label="Previous slide" />
+          <DirectionButton direction="next" label="Next slide" />
         </div>
       </PageContainer>
 

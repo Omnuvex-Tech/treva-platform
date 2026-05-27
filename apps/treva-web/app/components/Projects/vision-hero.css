@@ -106,11 +106,15 @@
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.5px;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.18s ease, color 0.18s ease;
 }
 
 .vision-hero__cta:hover {
-  background-color: #2f3136;
+  background-color: #2F3134;
+}
+
+.vision-hero__cta:active {
+  background-color: #000000;
 }
 
 .vision-hero__cta-icon {
@@ -134,22 +138,7 @@
   margin-bottom: 80px; 
 }
 
-.vision-hero__arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background-color: #ffffff;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
 
-.vision-hero__arrow:hover {
-  opacity: 0.85;
-}
 
 /* ==========================================================================
    SƏTİR ÜZRƏ BƏRABƏR BÖLÜNƏN TAM GENİŞLİKDƏ XƏTLƏR (DESKTOP)

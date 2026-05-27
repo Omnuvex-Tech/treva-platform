@@ -203,25 +203,27 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                     href="https://maps.google.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="cs_scroll-wrap is-alternate w-inline-block"
+                    className="cs_scroll-wrap is-alternate w-inline-block footer_head-office"
                   >
-                    <ButtonText>Head office — Ziya Yusifzade 10, Sabah Residence</ButtonText>
+                    <ButtonText>HEADQUARTERS — Ziya Yusifzade 10, Sabah Residence</ButtonText>
                   </a>
-                  <FooterActionLink
-                    href="#top"
-                    label="BACK TO TOP"
-                    icon={
-                      <div className="button-icon-wrap is-small">
-                        <div className="button-icon w-embed">
-                          <ArrowUpIcon />
+                  <div className="footer_bottom-links">
+                    <FooterActionLink
+                      href="#top"
+                      label="BACK TO TOP"
+                      icon={
+                        <div className="button-icon-wrap is-small">
+                          <div className="button-icon w-embed">
+                            <ArrowUpIcon />
+                          </div>
+                          <div className="button-icon w-embed">
+                            <ArrowUpIconCurrent />
+                          </div>
                         </div>
-                        <div className="button-icon w-embed">
-                          <ArrowUpIconCurrent />
-                        </div>
-                      </div>
-                    }
-                  />
-                  <div>©treva 2025</div>
+                      }
+                    />
+                    <div>TREVA 2025</div>
+                  </div>
                 </div>
               </div>
             </div>

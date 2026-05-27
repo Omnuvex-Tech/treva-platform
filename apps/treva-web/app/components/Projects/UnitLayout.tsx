@@ -1,18 +1,10 @@
 'use client';
 
-import React, { MouseEvent } from 'react';
+import React from 'react';
+import { DirectionButton } from '@/app/components/Buttons/PortfolioButtons';
 import './unit-layout.css';
 
 export default function UnitLayout() {
-  
-  const handleBtnClick = (e: MouseEvent<HTMLButtonElement>) => {
-    const button = e.currentTarget;
-    button.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      button.style.transform = 'none';
-    }, 100);
-  };
-
   return (
     <main className="layouts-section">
       {/* Header Controls */}
@@ -23,24 +15,8 @@ export default function UnitLayout() {
         
         <div className="layouts-controls">
           <nav className="layouts-controls__nav" aria-label="Carousel Navigation">
-            <button 
-              className="layouts-controls__btn" 
-              aria-label="Previous layout"
-              onClick={handleBtnClick}
-            >
-              <svg viewBox="0 0 24 24">
-                <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button 
-              className="layouts-controls__btn" 
-              aria-label="Next layout"
-              onClick={handleBtnClick}
-            >
-              <svg viewBox="0 0 24 24">
-                <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+            <DirectionButton direction="previous" label="Previous layout" />
+            <DirectionButton direction="next" label="Next layout" />
           </nav>
           <button className="layouts-controls__view-all">View All</button>
         </div>

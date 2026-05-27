@@ -92,7 +92,7 @@ const TrevaPulse: React.FC = () => {
   return (
     <main>
       <PageContainer>
-        <section className="pulse">
+        <section className="pulse my-10">
           
           {/* ========================================================
               1. HEADER SECTION
