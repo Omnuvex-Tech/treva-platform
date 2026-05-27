@@ -162,7 +162,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
   return (
     <>
       <div className="page-wrapper">
-          <Navbar locale={locale} />
+          <Navbar locale={locale} variant="solid" />
 
           <main className="main-wrapper">
             <section id="projects" className="section_projects">

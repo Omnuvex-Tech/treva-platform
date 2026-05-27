@@ -14,7 +14,7 @@ type PulseProps = {
 const Pulse = ({ locale }: PulseProps) => {
   return (
     <main className="page-wrapper" data-locale={locale}>
-      <Navbar locale={locale} />
+      <Navbar locale={locale} variant="solid" />
       <PulseHeaderSection locale={locale} />
       <PulseNewsSection locale={locale} />
       <HomeFooter locale={locale} />

@@ -174,7 +174,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
         onLoad={() => window.dispatchEvent(new Event('gsap-ready'))}
       />
       <div className="page-wrapper">
-          <Navbar locale={locale} />
+          <Navbar locale={locale} variant="solid" />
           
           <main className="main-wrapper">
             <section className="section_header-services">

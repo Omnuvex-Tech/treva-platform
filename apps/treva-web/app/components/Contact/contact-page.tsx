@@ -376,7 +376,7 @@ export function ContactPage({ locale }: ContactPageProps) {
       />
       <div className="page-wrapper">
 
-          <Header locale={locale} />
+          <Header locale={locale} variant="solid" />
 
           <main className="main-wrapper">
 

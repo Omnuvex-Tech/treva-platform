@@ -207,7 +207,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
 const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article }) => {
   return (
     <div className="page-wrapper">
-      <Navbar locale={locale} />
+      <Navbar locale={locale} variant="solid" />
       <ArticleBanner />
       <style jsx global>{`
         .section_f-articles .f-articles_img-wrap { position: relative; overflow: hidden; cursor: pointer; }

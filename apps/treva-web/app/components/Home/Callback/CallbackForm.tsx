@@ -17,6 +17,7 @@ function RoleButton({ label, isActive, ...props }: RoleButtonProps) {
     <button
       type="button"
       className={`roleButton ${isActive ? 'activeRole' : ''}`}
+      suppressHydrationWarning
       {...props}
     >
       {label}
@@ -30,7 +31,7 @@ type CallbackSubmitButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
 
 function CallbackSubmitButton({ label, ...props }: CallbackSubmitButtonProps) {
   return (
-    <button type="submit" className="submitButton" {...props}>
+    <button type="submit" className="submitButton" suppressHydrationWarning {...props}>
       <ButtonText>{label}</ButtonText>
     </button>
   );
@@ -90,6 +91,7 @@ export default function CallbackForm() {
             onChange={(e) => setName(e.target.value)}
             className="inputField"
             required
+            suppressHydrationWarning
           />
           <input
             type="tel"
@@ -98,6 +100,7 @@ export default function CallbackForm() {
             onChange={(e) => setPhone(e.target.value)}
             className="inputField"
             required
+            suppressHydrationWarning
           />
         </div>
 

@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import AboutUs from "@/app/components/Home/AboutUs/AboutUs";
+import Navbar from "@/app/components/Home/TrevaHero/navbar";
+import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import { config } from "@/config";
 
 export const dynamicParams = false;
@@ -18,5 +20,11 @@ export default async function AboutUsRoute({ params }: { params: Promise<{ local
         notFound();
     }
 
-    return <AboutUs />;
+    return (
+        <div data-locale={locale}>
+            <Navbar locale={locale} variant="solid" />
+            <AboutUs />
+            <HomeFooter locale={locale} />
+        </div>
+    );
 }

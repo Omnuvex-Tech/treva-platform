@@ -22,7 +22,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
     <div className="page-wrapper home-page" data-locale={locale}>
       {design === 1 ? (
         <>
-          <Navbar locale={locale} />
+          <Navbar locale={locale} variant="solid" />
           <HomeHeroSection />
             <HomeServices />
       <HomeProjects />

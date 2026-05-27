@@ -11,6 +11,7 @@ function PillButton({ className = '', isPressed = false, ...props }: PillButtonP
   return (
     <button
       className={`treva-pill-button ${isPressed ? 'treva-pill-button--pressed' : ''} ${className}`}
+      suppressHydrationWarning
       {...props}
     />
   );
@@ -48,7 +49,12 @@ function TrevaNavbarLogo() {
   );
 }
 
-export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
+type NavbarProps = {
+  locale?: string;
+  variant?: 'overlay' | 'solid';
+};
+
+export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
@@ -57,6 +63,7 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
 
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
   const closeMobileMenu = () => setMobileMenuOpen(false);
+  const shouldShowScrolled = variant === 'overlay' && (isScrolled || mobileMenuOpen);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -124,7 +131,7 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
     <>
       {/* ========== NAVBAR ========== */}
       <header
-        className={`treva-navbar ${isScrolled || mobileMenuOpen ? 'treva-navbar--scrolled' : ''}`}
+        className={`treva-navbar${variant === 'solid' ? ' treva-navbar--solid' : ''}${shouldShowScrolled ? ' treva-navbar--scrolled' : ''}`}
         role="banner"
       >
         <div className="treva-navbar__inner">
@@ -138,8 +145,8 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
           <a href={routeHref('/contact')} className="treva-navbar__link">Contact Us</a>
           <a href={routeHref('/developers')} className="treva-navbar__link">Developers</a>
           <a href={routeHref('/brokers')} className="treva-navbar__link">Brokers</a>
-          <a href={routeHref('/projects')} className="treva-navbar__link">Off-Plan</a>
-          <a href={routeHref('/projects')} className="treva-navbar__link">Resale</a>
+          <a href={routeHref('/off-plan')} className="treva-navbar__link">Off-Plan</a>
+          <a href={routeHref('/resale')} className="treva-navbar__link">Resale</a>
           <a href={routeHref('/pulse')} className="treva-navbar__link">Pulse</a>
         </nav>
 
@@ -153,7 +160,7 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
             <span className="treva-navbar__search-text">Search</span>
           </PillButton>
 
-          <button className="treva-navbar__lang" aria-label="Language: English" aria-haspopup="listbox">
+          <button className="treva-navbar__lang" aria-label="Language: English" aria-haspopup="listbox" suppressHydrationWarning>
             ENG
             <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -168,6 +175,7 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
           aria-expanded="false"
           aria-controls="mobile-nav"
           onClick={toggleMobileMenu}
+          suppressHydrationWarning
         >
           <span className="treva-navbar__hamburger__bar"></span>
           <span className="treva-navbar__hamburger__bar"></span>
@@ -190,8 +198,8 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
           <a href={routeHref('/contact')} className="treva-navbar__mobile__link">Contact Us</a>
           <a href={routeHref('/developers')} className="treva-navbar__mobile__link">Developers</a>
           <a href={routeHref('/brokers')} className="treva-navbar__mobile__link">Brokers</a>
-          <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Off-Plan</a>
-          <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Resale</a>
+          <a href={routeHref('/off-plan')} className="treva-navbar__mobile__link">Off-Plan</a>
+          <a href={routeHref('/resale')} className="treva-navbar__mobile__link">Resale</a>
           <a href={routeHref('/pulse')} className="treva-navbar__mobile__link">Pulse</a>
           <div className="treva-navbar__mobile__footer">
             <PillButton className="treva-navbar__search-btn" aria-label="Open search">
@@ -201,7 +209,7 @@ export default function Navbar({ locale = 'az' }: { locale?: string } = {}) {
               </svg>
               Search
             </PillButton>
-            <button className="treva-navbar__lang" aria-label="Language: English">
+            <button className="treva-navbar__lang" aria-label="Language: English" suppressHydrationWarning>
               ENG
               <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M1 1L5 5L9 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />

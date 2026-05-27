@@ -56,6 +56,7 @@ function PulseFilterButton({ category, isActive, onClick }: PulseFilterButtonPro
       type="button"
       className={`pulse__filter-btn ${isActive ? 'pulse__filter-btn--active' : ''}`}
       onClick={() => onClick(category)}
+      suppressHydrationWarning
     >
       {category}
     </button>

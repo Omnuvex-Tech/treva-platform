@@ -1,6 +1,8 @@
 /* ===== NAVBAR DESIGN TOKENS (standalone — treva-hero.css olmadan da işləyir) ===== */
 :root {
   --treva-nav-height: 64px;
+  --treva-link-size: 12px;
+  --treva-link-letter-spacing: 1.9px;
   --treva-pill-bg: #3F4249;
   --treva-pill-hover-bg: #2F3134;
   --treva-pill-pressed-bg: #000000;
@@ -30,6 +32,7 @@
   right: 0;
   z-index: 200;
   height: var(--treva-nav-height);
+  font-family: var(--font-inter), Arial, sans-serif;
   background: transparent;
   border-bottom: none;
   display: flex;
@@ -45,9 +48,20 @@
   backdrop-filter: blur(14px);
 }
 
+.treva-navbar--solid {
+  background: linear-gradient(90deg, rgba(64, 67, 74, 0.94) 0%, rgba(197, 203, 209, 0.88) 100%);
+  backdrop-filter: blur(14px);
+}
+
 .treva-navbar__inner,
 .treva-navbar__controls {
   display: contents;
+}
+
+.treva-navbar__controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .treva-navbar__logo {
@@ -70,11 +84,11 @@
 }
 
 .treva-navbar__link {
-  font-size: var(--treva-link-size);
+  font-size: 12px;
   font-weight: 500;
   color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: var(--treva-link-letter-spacing);
+  letter-spacing: 1.9px;
   white-space: nowrap;
   transition: opacity 0.18s ease;
 }
@@ -83,16 +97,18 @@
 }
 
 .treva-navbar__actions {
-  display: contents;
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
 .treva-navbar__search-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--treva-muted-text);
+  color: #ffffff;
   border-radius: var(--treva-search-radius);
-  padding: 8px 16px 8px 14px;
+  padding: 8px 20px 8px 18px;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -160,6 +176,7 @@
   left: 0;
   right: 0;
   z-index: 201;
+  font-family: var(--font-inter), Arial, sans-serif;
   background: rgba(0,0,0,0.86);
   backdrop-filter: blur(14px);
   border-bottom: none;
@@ -235,13 +252,13 @@
   .treva-navbar__actions {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 18px;
     flex-shrink: 0;
   }
   .treva-navbar__controls {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     margin-left: auto;
   }
   .treva-navbar__search-btn {
@@ -298,7 +315,7 @@
   }
   .treva-navbar__actions,
   .treva-navbar__controls {
-    gap: 12px;
+    gap: 16px;
   }
   .treva-navbar__mobile__inner {
     padding: 20px;

@@ -14,6 +14,7 @@ function PillButton({ className = '', isPressed = false, ...props }: PillButtonP
   return (
     <button
       className={`treva-pill-button ${isPressed ? 'treva-pill-button--pressed' : ''} ${className}`}
+      suppressHydrationWarning
       {...props}
     />
   );

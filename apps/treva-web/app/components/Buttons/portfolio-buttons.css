@@ -5,6 +5,7 @@
   --color-bg-icon: #f4f3ef;
   --color-border: #e2e8f0;
   --color-white: #ffffff;
+  --color-btn-active-bg: #4e525d;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -29,9 +30,9 @@
 }
 
 .portfolio-view-all:hover {
-  background-color: var(--color-primary);
+  background-color: var(--color-btn-active-bg);
   color: var(--color-white);
-  border-color: var(--color-primary);
+  border-color: var(--color-btn-active-bg);
 }
 
 .portfolio-view-all--mobile {

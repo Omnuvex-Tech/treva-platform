@@ -1,7 +1,7 @@
 /* =====================================================
    DESIGN TOKENS
 ===================================================== */
-:root {
+.treva-hero-container {
   /* Navbar */
   --treva-nav-height: 64px;
   --treva-nav-bg: #ffffff;
@@ -9,7 +9,7 @@
   --treva-logo-color: #0a0a0a;
   --treva-logo-size: 22px;
   --treva-link-color: #1c1c1c;
-  --treva-link-size: 11px;
+  --treva-link-size: 12px;
   --treva-link-letter-spacing: 1.9px;
 
   /* Buttons & Pills */
@@ -41,42 +41,40 @@
 }
 
 /* ===== RESET ===== */
-*,
-*::before,
-*::after {
+.treva-hero-container,
+.treva-hero-container *,
+.treva-hero-container *::before,
+.treva-hero-container *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
-body {
+.treva-hero-container {
   font-family: var(--treva-font-body);
-  background: var(--treva-nav-bg);
   -webkit-font-smoothing: antialiased;
 }
 
-button {
+.treva-hero-container button {
   cursor: pointer;
   border: none;
   background: none;
   font-family: inherit;
 }
-a {
+.treva-hero-container a {
   text-decoration: none;
   color: inherit;
 }
 
-.treva-pill-button {
+.treva-hero-container .treva-pill-button {
   background: var(--treva-pill-bg);
   transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
-.treva-pill-button:hover {
+.treva-hero-container .treva-pill-button:hover {
   background: var(--treva-pill-hover-bg);
 }
 
-.treva-pill-button:active,
-.treva-pill-button--pressed {
+.treva-hero-container .treva-pill-button:active,
+.treva-hero-container .treva-pill-button--pressed {
   background: var(--treva-pill-pressed-bg);
 }
 
@@ -127,17 +125,18 @@ a {
 
 .treva-hero-title {
   font-family: var(--treva-font-oak), sans-serif;
-  font-size: 46px;
+  font-size: 52px;
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 110%;
   text-transform: uppercase;
   color: var(--treva-hero-heading-color);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0;
 }
 
 .treva-hero-subtitle {
-  margin-top: 18px;
+  margin: 18px 0 0;
   font-size: var(--treva-hero-sub-size);
   font-weight: 400;
   letter-spacing: 0.02em;
@@ -163,11 +162,12 @@ a {
   gap: 14px;
   background: var(--treva-pill-bg);
   border-radius: 20px;
-  padding: 6px 6px 6px 20px;
+  padding: 0 16px 0 20px;
   height: 48px;
   width: 260px;
   box-shadow: var(--treva-shadow);
   min-width: auto;
+  cursor: pointer;
 }
 
 .treva-filter-bar__deal {
@@ -187,17 +187,20 @@ a {
 }
 
 .treva-filter-bar__location-text {
-  display: block;
+  display: flex;
+  align-items: center;
   flex: 1;
+  height: 100%;
   font-family: var(--treva-font-oak);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 15px;
-  line-height: 110%;
+  line-height: 1;
   letter-spacing: 0;
   text-align: left;
-  color: #B2B3B6;
+  color: #ffffff;
   text-transform: uppercase;
   user-select: none;
+  transform: translateY(1px);
 }
 
 /* BUY BUTTON */
@@ -208,13 +211,13 @@ a {
   gap: 10px;
   color: white;
   border-radius: 20px;
-  padding: 10px 18px;
+  padding: 0 18px;
   height: 48px;
   width: 100%;
   font-family: var(--treva-font-oak);
   font-weight: 400;
   font-size: 15px;
-  line-height: 110%;
+  line-height: 1;
   letter-spacing: -3%;
   text-transform: uppercase;
   box-shadow: var(--treva-shadow);
@@ -223,8 +226,10 @@ a {
   z-index: 22;
 }
 .treva-filter-bar__dropdown-btn span {
-  display: block;
+  display: flex;
+  align-items: center;
   flex: 1 1 auto;
+  height: 100%;
   min-width: 0;
   font-family: inherit;
   font-size: inherit;
@@ -234,11 +239,13 @@ a {
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transform: translateY(1px);
 }
 .treva-filter-bar__dropdown-btn svg {
   width: 14px !important;
   height: 14px !important;
   flex: 0 0 14px;
+  margin-left: -6px;
   stroke-width: 2px !important;
   transition: transform 0.2s ease;
 }
@@ -323,7 +330,7 @@ a {
     width: auto;
     min-width: 220px;
     flex: 1;
-    padding-left: 16px;
+    padding: 0 14px 0 16px;
     gap: 12px;
     height: 44px;
     border-radius: 18px;
@@ -331,7 +338,7 @@ a {
   .treva-filter-bar__dropdown-btn {
     width: auto;
     min-width: 90px;
-    padding: 8px 16px;
+    padding: 0 16px;
     height: 44px;
     border-radius: 18px;
   }
