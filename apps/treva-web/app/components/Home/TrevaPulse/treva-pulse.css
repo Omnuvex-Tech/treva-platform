@@ -116,10 +116,17 @@
   transition: all 0.2s ease;
 }
 
+.pulse__filter-btn:hover {
+  background-color: #2F3134;
+  color: #ffffff;
+  border-color: #2F3134;
+}
+
+.pulse__filter-btn:active,
 .pulse__filter-btn--active {
-  background-color: var(--color-btn-active-bg) !important;
+  background-color: #000000 !important;
   color: var(--color-white) !important;
-  border-color: var(--color-btn-active-bg) !important;
+  border-color: #000000 !important;
 }
 
 .pulse__view-all-wrapper {

@@ -30,9 +30,15 @@
 }
 
 .portfolio-view-all:hover {
-  background-color: var(--color-btn-active-bg);
+  background-color: #2F3134;
   color: var(--color-white);
-  border-color: var(--color-btn-active-bg);
+  border-color: #2F3134;
+}
+
+.portfolio-view-all:active {
+  background-color: #000000;
+  color: var(--color-white);
+  border-color: #000000;
 }
 
 .portfolio-view-all--mobile {

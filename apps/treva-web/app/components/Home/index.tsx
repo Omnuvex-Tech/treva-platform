@@ -33,6 +33,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
         <TrevaHero />
         
       )}
+      
       <AboutUs/>
       <FeaturedProperties/>
       <TrevaPulse/>
