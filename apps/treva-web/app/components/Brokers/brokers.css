@@ -35,6 +35,10 @@
 }
 
 /* LIGHTBOXES */
+.section_gallery .gallery_block {
+  will-change: transform;
+}
+
 .gallery_lightbox:hover .gallery_overlay {
   opacity: 1;
   transition-delay: 0.05s;

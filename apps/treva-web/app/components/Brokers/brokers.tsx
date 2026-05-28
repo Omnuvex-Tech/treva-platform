@@ -155,6 +155,26 @@ export function BrokersPage({ locale }: BrokersPageProps) {
           ease: "none"
       });
     });
+
+    document.querySelectorAll('.section_gallery').forEach((section) => {
+      const galleryBlocks = section.querySelectorAll('.gallery_block')
+      if (!galleryBlocks.length) return
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom',
+        once: true,
+        onEnter: () => {
+          gsap.set(galleryBlocks, { yPercent: -20 })
+          gsap.to(galleryBlocks, {
+            yPercent: -120,
+            duration: 80,
+            ease: 'none',
+            repeat: -1,
+          })
+        },
+      })
+    })
   }
 
   useEffect(() => {
