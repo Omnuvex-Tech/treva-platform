@@ -20,16 +20,22 @@ export default async function OffPlanRoute({ params }: { params: Promise<{ local
     }
 
     return (
-        <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }} data-locale={locale}>
+        <div
+            style={{
+                paddingTop: "var(--treva-nav-height, 64px)",
+                boxSizing: "border-box",
+            }}
+            data-locale={locale}
+        >
             <Navbar locale={locale} variant="solid" />
             <main
                 style={{
-                    flex: 1,
-                    marginTop: "var(--treva-nav-height, 64px)",
+                    minHeight: "clamp(160px, 28vh, 360px)",
+                    boxSizing: "border-box",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "24px",
+                    padding: "8px 16px 56px",
                     textAlign: "center",
                 }}
             >

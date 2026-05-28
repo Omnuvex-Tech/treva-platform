@@ -345,7 +345,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="partners_benefits-item animate-right">
                           <div className="partners_benefits-content">
                             <div className="partners_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_marketIng-Assets.avif" loading="lazy" sizes="100vw" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_marketIng-Assets-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_marketIng-Assets-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_marketIng-Assets.avif 1920w" alt="A group of people working on computers in an office." className="fullwidth-img"/>
+                              <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets.avif" loading="lazy" sizes="100vw" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets.avif 1920w" alt="A group of people working on computers in an office." className="fullwidth-img"/>
                             </div>
                             <div className="partners_title">Marketinq Materialları</div>
                           </div>

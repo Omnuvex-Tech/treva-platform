@@ -1,11 +1,11 @@
 import { normalizer } from "@repo/shared/utils";
 
 export const project = {
-    url: normalizer.string(process.env.NEXT_PUBLIC_APP_URL, "http://localhost:3000"),
-    name: normalizer.string(process.env.NEXT_PUBLIC_APP_NAME, "Treva"),
-    projectName: "Treva",
-    projectDescription: "Treva",
-    keywords: ["Treva"],
+    url: normalizer.string(process.env.NEXT_PUBLIC_APP_URL, "https://www.treva.realestate"),
+    name: normalizer.string(process.env.NEXT_PUBLIC_APP_NAME, "TREVA Real Estate"),
+    projectName: "TREVA Real Estate",
+    projectDescription: "Azərbaycanda ən böyük daşınmaz əmlak platforması. Developer və brokerləri birləşdirərək, satış və marketinq həlləri təqdim edirik.",
+    keywords: ["TREVA Real Estate", "Treva", "daşımaz əmlak", "real estate", "Azerbaijan", "Bakı", "developer", "broker", "satış", "marketinq"],
     defLang: "az",
     staticLanguages: [
         {
