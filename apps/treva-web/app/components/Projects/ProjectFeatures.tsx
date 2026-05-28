@@ -2,68 +2,14 @@
 
 import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
+import { ProjectFeaturesData } from "@/lib/projects.types";
 import "./project-details.css";
 
-const sections = [
-  {
-    id: "01",
-    title: { italic: "Comfort", rest: " and Safety" },
-    subtitle: "Excellence in every detail.",
-    items: [
-      "Underground parking space",
-      "24/7 Security system",
-      "Business center and workspaces",
-      "Lounge and relaxation areas",
-    ],
-    dark: true,
-    image: "/images/project-details/pd1.jpg",
-    imageLeft: true,
-  },
-  {
-    id: "02",
-    title: { italic: "Wellness", rest: " and Leisure" },
-    subtitle: "An oasis of tranquility and relaxation.",
-    items: [
-      'Two spacious "infinity" pools',
-      "Private SPA and wellness zone",
-      "Water sports center",
-      "Landscaped gardens and fountains",
-    ],
-    dark: false,
-    image: "/images/project-details/pd2.jpg",
-    imageLeft: false,
-  },
-  {
-    id: "03",
-    title: { italic: "Sports", rest: " and Activity" },
-    subtitle: "Energy and movement in every space.",
-    items: [
-      "Fully equipped gym & fitness center",
-      "Professional squash court",
-      "Table tennis area",
-      "Kids' entertainment and play zones",
-    ],
-    dark: true,
-    image: "/images/project-details/pd3.jpg",
-    imageLeft: true,
-  },
-  {
-    id: "04",
-    title: { italic: "Location", rest: " Highlights" },
-    subtitle: "The perfect balance of city and sea.",
-    items: [
-      "Crescent Island  —  within walking distance",
-      "Dream Arena  —  within walking distance",
-      "Sea Breeze Casino  —  within walking distance",
-      "Baku Airport (GYD)  —  easily accessible",
-    ],
-    dark: false,
-    image: "/images/project-details/pd4.jpg",
-    imageLeft: false,
-  },
-];
+interface Props {
+  data: ProjectFeaturesData;
+}
 
-export default function ProjectDetails() {
+export default function ProjectFeatures({ data }: Props) {
   return (
     <section className="pd-wrapper">
       <PageContainer>
@@ -71,17 +17,17 @@ export default function ProjectDetails() {
         <div className="pd-header">
           <div className="pd-header-left">
             <p className="pd-header-main">
-              The project&apos;s architecture is <br className="mobile-br" /> harmoniously complemented by a <br className="mobile-br" /> world-class infrastructure designed to <br className="mobile-br" /> anticipate your every need.
+              {data.headerMain}
             </p>
             <hr className="pd-divider" />
             <p className="pd-header-sub">
-              From high-tech security to <br className="mobile-br" /> premium leisure zones, every <br className="mobile-br" /> technical specification is <br className="mobile-br" /> engineered for absolute comfort and peace of mind.
+              {data.headerSub}
             </p>
           </div>
           <div className="pd-header-right">
             <h2 className="pd-section-title">
-              <span className="po-title-light">Project </span>
-              <span className="po-title-bold">DetaIls</span>
+              <span className="po-title-light">{data.titleLight}</span>
+              <span className="po-title-bold">{data.titleBold}</span>
             </h2>
             <button className="pd-download-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -96,7 +42,7 @@ export default function ProjectDetails() {
 
         {/* SECTIONS */}
         <div className="pd-grid">
-          {sections.map((sec) => {
+          {data.sections.map((sec) => {
             const card = (
               <div key={sec.id + "-card"} className={`pd-card ${sec.dark ? "pd-card--dark" : "pd-card--light"}`}>
                 <div className="pd-card-header">

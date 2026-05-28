@@ -4,27 +4,65 @@ import ProjectDetail from "@/app/components/Design1/Projects/ProjectDetail";
 import { getProjectBySlug } from "@/lib/project-data";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import VisionHero from "@/app/components/Projects/VisionHero.tsx";
-import ProjectOverview from "@/app/components/Projects/ProjectOverview";
-import ProjectDetails from "@/app/components/Projects/ProjectDetails";
-import PropertyLocation from "@/app/components/Projects/PropertyLocation";
-import UnitLayout from "@/app/components/Projects/UnitLayout";
+import {
+  ProjectFeatures,
+  ProjectHero,
+  ProjectLayouts,
+  ProjectLocation,
+  ProjectOverview,
+} from "@/app/components/Projects";
+import { getProjectModelBySlug } from "@/lib/projects";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-const FALLBACK_SLUG = "villa-siena";
+const FALLBACK_DETAIL_SLUG = "villa-siena";
+const FALLBACK_MODEL_SLUG = "panorama-by-elie-saab";
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const project = getProjectBySlug(slug) ?? getProjectBySlug(FALLBACK_SLUG);
+  const design = typeof searchParams?.design === "string" ? searchParams.design : undefined;
+  const variant = typeof searchParams?.variant === "string" ? searchParams.variant : undefined;
 
-  if (!project) return {};
+  if (design === "2" || variant === "2") {
+    const detail = getProjectBySlug(slug) ?? getProjectBySlug(FALLBACK_DETAIL_SLUG);
+    if (!detail) return {};
 
-  const title = project.seoTitle[locale] || project.seoTitle.az;
-  const description = project.seoDescription[locale] || project.seoDescription.az;
+    const title = detail.seoTitle[locale] || detail.seoTitle.en;
+    const description = detail.seoDescription[locale] || detail.seoDescription.en;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: detail.ogImage,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [detail.ogImage],
+      },
+    };
+  }
+
+  const model = getProjectModelBySlug(slug) ?? getProjectModelBySlug(FALLBACK_MODEL_SLUG);
+  if (!model) return {};
+
+  const title = model.seoTitle[locale] ?? model.seoTitle.en ?? Object.values(model.seoTitle)[0];
+  const description =
+    model.seoDescription[locale] ?? model.seoDescription.en ?? Object.values(model.seoDescription)[0];
 
   return {
     title,
@@ -34,10 +72,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       images: [
         {
-          url: project.ogImage,
+          url: model.ogImage,
           width: 1200,
           height: 630,
-          alt: project.title,
+          alt: title,
         },
       ],
     },
@@ -45,34 +83,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [project.ogImage],
+      images: [model.ogImage],
     },
   };
 }
 
 export default async function DynamicProjectPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
-  const project = getProjectBySlug(slug) ?? getProjectBySlug(FALLBACK_SLUG);
-
-  if (!project) {
-    notFound();
-  }
 
   const design = typeof searchParams?.design === "string" ? searchParams.design : undefined;
   const variant = typeof searchParams?.variant === "string" ? searchParams.variant : undefined;
 
   if (design === "2" || variant === "2") {
-    return <ProjectDetail locale={locale} project={project} />;
+    const detail = getProjectBySlug(slug) ?? getProjectBySlug(FALLBACK_DETAIL_SLUG);
+    if (!detail) notFound();
+    return <ProjectDetail locale={locale} project={detail} />;
   }
+
+  const model = getProjectModelBySlug(slug) ?? getProjectModelBySlug(FALLBACK_MODEL_SLUG);
+  if (!model) notFound();
 
   return (
     <div data-locale={locale}>
       <Navbar locale={locale} />
-      <VisionHero />
-      <ProjectOverview />
-      <ProjectDetails />
-      <PropertyLocation />
-      <UnitLayout />
+      <ProjectHero data={model.hero} />
+      <ProjectOverview data={model.overview} />
+      <ProjectFeatures data={model.features} />
+      <ProjectLocation data={model.location} />
+      <ProjectLayouts layouts={model.layouts} />
       <HomeFooter locale={locale} />
     </div>
   );
