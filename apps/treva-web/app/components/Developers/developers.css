@@ -37,6 +37,10 @@
   overflow: hidden;
 }
 
+.section_cta .cta_img-wrap {
+  will-change: transform;
+}
+
 .header-services_video-wrap .header_bg-video,
 .header-services_video-wrap .header_bg-video video {
   position: absolute;
