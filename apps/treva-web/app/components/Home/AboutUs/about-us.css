@@ -12,7 +12,7 @@
   font-family: var(--font-family);
   color: var(--color-secondary);
   background-color: var(--color-white);
-  padding: 80px 0 0;
+  padding: calc(var(--treva-nav-height, 64px) + 64px) 0 120px;
   box-sizing: border-box;
 }
 
@@ -123,7 +123,7 @@
 @media (max-width: 768px) {
   .desktop-br { display: none; }
   
-  .about-container { padding: 44px 0 0; }
+  .about-container { padding: calc(var(--treva-nav-height, 64px) + 32px) 0 96px; }
   .about-hero { display: flex; flex-direction: column; gap: 32px; margin-bottom: 48px; }
   .about-hero__content { display: block; height: auto; }
   .about-hero__title { font-size: 36px; margin-bottom: 24px; }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Navbar from '@/app/components/Design1/Navbar/navbar'
+import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import './projects.css'
 
@@ -293,7 +293,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Project Item 1 */}
                           <div role="listitem" className="w-dyn-item">
-                            <a aria-label="go to project" href={`/${locale}/project/panorama-by-elie-saab`} className="projects_item w-inline-block">
+                            <a aria-label="go to project" href={`/${locale}/projects/panorama-by-elie-saab?design=2`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
                                   <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie saab sekil kesilmis.avif" loading="lazy" alt="Panorama by Elie Saab" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis-p-800.avif 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69280b7104d977e586a79fc0_elie%20saab%20sekil%20kesilmis.avif 1306w" className="fullwidth-img" />
@@ -320,7 +320,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Project Item 2 */}
                           <div role="listitem" className="w-dyn-item">
-                            <a aria-label="go to project" href={`/${locale}/project/reportage-heights`} className="projects_item w-inline-block">
+                            <a aria-label="go to project" href={`/${locale}/projects/reportage-heights?design=2`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
                                   <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif" loading="lazy" alt="Reportage Heights" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-800.avif 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final-p-1080.avif 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6926c88132426adc45a95ee0_9744a_reportage_uae_reportage_heights_exteriors_EXT3_final.avif 2000w" className="fullwidth-img" />
@@ -347,7 +347,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Project Item 3 */}
                           <div role="listitem" className="w-dyn-item">
-                            <a aria-label="go to project" href={`/${locale}/project/arabian-ranches`} className="projects_item w-inline-block">
+                            <a aria-label="go to project" href={`/${locale}/projects/arabian-ranches?design=2`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
                                   <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp" loading="lazy" alt="Arabian Ranches" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-500.webp 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-800.webp 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1080.webp 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1600.webp 1600w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-2000.webp 2000w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp 2602w" className="fullwidth-img" />
@@ -374,7 +374,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Project Item 4 */}
                           <div role="listitem" className="w-dyn-item">
-                            <a aria-label="go to project" href={`/${locale}/project/marina-village`} className="projects_item w-inline-block">
+                            <a aria-label="go to project" href={`/${locale}/projects/marina-village?design=2`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
                                   <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif" loading="lazy" alt="Marina Village" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif 700w" className="fullwidth-img" />
@@ -401,7 +401,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Project Item 5 */}
                           <div role="listitem" className="w-dyn-item">
-                            <a aria-label="go to project" href={`/${locale}/project/villa-siena`} className="projects_item w-inline-block">
+                            <a aria-label="go to project" href={`/${locale}/projects/villa-siena?design=2`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
                                   <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif" loading="lazy" alt="Villa Siena" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif 700w" className="fullwidth-img" />
@@ -428,7 +428,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
                           {/* Project Item 6 */}
                           <div role="listitem" className="w-dyn-item">
-                            <a aria-label="go to project" href={`/${locale}/project/sabah-residence`} className="projects_item w-inline-block">
+                            <a aria-label="go to project" href={`/${locale}/projects/sabah-residence?design=2`} className="projects_item w-inline-block">
                               <div className="projects_img-wrap">
                                 <div className="projects_img-holder">
                                   <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/692d30a5de9b28406e24d70b_sabah4.jpg" loading="lazy" alt="Sabah Residence" className="fullwidth-img" />

@@ -13,7 +13,8 @@ const PlusIcon = () => (
   </svg>
 );
 
-export const HomeProjects = () => {
+export const HomeProjects = ({ locale }: { locale: string }) => {
+  const baseHref = `/${locale}`;
   return (
     <section className="section_projects-prev home-projects-section">
       <div className="global-padding home-projects-padding padding-section-medium">
@@ -54,7 +55,7 @@ export const HomeProjects = () => {
                     </div>
                     <Link
                       aria-label="go to project"
-                      href="/project/panorama-by-elie-saab"
+                      href={`${baseHref}/projects/panorama-by-elie-saab?design=2`}
                       className="projects_overlay home-projects-card-overlay w-inline-block"
                     >
                       <div className="projects_btn home-projects-card-overlay-button">
@@ -70,7 +71,7 @@ export const HomeProjects = () => {
                   </div>
                   <Link
                     aria-label="go to project"
-                    href="/project/panorama-by-elie-saab"
+                    href={`${baseHref}/projects/panorama-by-elie-saab?design=2`}
                     className="projects_content-wrap home-projects-card-content show-landscape w-inline-block"
                   >
                     <div fs-list-field="location" className="heading-style-h3 home-projects-card-title text-color-blue400">
@@ -103,7 +104,7 @@ export const HomeProjects = () => {
                     </div>
                     <Link
                       aria-label="go to project"
-                      href="/project/reportage-heights"
+                      href={`${baseHref}/projects/reportage-heights?design=2`}
                       className="projects_overlay home-projects-card-overlay w-inline-block"
                     >
                       <div className="projects_btn home-projects-card-overlay-button">
@@ -119,7 +120,7 @@ export const HomeProjects = () => {
                   </div>
                   <Link
                     aria-label="go to project"
-                    href="/project/reportage-heights"
+                    href={`${baseHref}/projects/reportage-heights?design=2`}
                     className="projects_content-wrap home-projects-card-content show-landscape w-inline-block"
                   >
                     <div fs-list-field="location" className="heading-style-h3 home-projects-card-title text-color-blue400">
@@ -154,7 +155,7 @@ export const HomeProjects = () => {
                     </div>
                     <Link
                       aria-label="go to project"
-                      href="/project/arabian-ranches"
+                      href={`${baseHref}/projects/arabian-ranches?design=2`}
                       className="projects_overlay home-projects-card-overlay w-inline-block"
                     >
                       <div className="projects_btn home-projects-card-overlay-button">
@@ -170,7 +171,7 @@ export const HomeProjects = () => {
                   </div>
                   <Link
                     aria-label="go to project"
-                    href="/project/arabian-ranches"
+                    href={`${baseHref}/projects/arabian-ranches?design=2`}
                     className="projects_content-wrap home-projects-card-content show-landscape w-inline-block"
                   >
                     <div fs-list-field="location" className="heading-style-h3 home-projects-card-title text-color-blue400">
@@ -201,7 +202,7 @@ export const HomeProjects = () => {
                     </div>
                     <Link
                       aria-label="go to project"
-                      href="/project/marina-village"
+                      href={`${baseHref}/projects/marina-village?design=2`}
                       className="projects_overlay home-projects-card-overlay w-inline-block"
                     >
                       <div className="projects_btn home-projects-card-overlay-button">
@@ -217,7 +218,7 @@ export const HomeProjects = () => {
                   </div>
                   <Link
                     aria-label="go to project"
-                    href="/project/marina-village"
+                    href={`${baseHref}/projects/marina-village?design=2`}
                     className="projects_content-wrap home-projects-card-content show-landscape w-inline-block"
                   >
                     <div fs-list-field="location" className="heading-style-h3 home-projects-card-title text-color-blue400">
@@ -237,7 +238,7 @@ export const HomeProjects = () => {
               <div className="projects-prev_cta-title home-projects-cta-title-wrap">
                 <div className="home-projects-cta-title">Növbəti investisiya fürsətinizi tapmaq üçün layihələrimizi kəşf edin.</div>
               </div>
-              <Link data-wf--button--variant="blue" href="/projects" className="button home-projects-cta-button w-inline-block">
+              <Link data-wf--button--variant="blue" href={`${baseHref}/projects`} className="button home-projects-cta-button w-inline-block">
                 <ButtonText>Seçilmiş Layihələri Kəşf Edin</ButtonText>
               </Link>
             </div>

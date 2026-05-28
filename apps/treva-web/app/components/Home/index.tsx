@@ -25,7 +25,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
           <Navbar locale={locale} variant="solid" />
           <HomeHeroSection />
             <HomeServices />
-      <HomeProjects />
+      <HomeProjects locale={locale} />
 
       <HomeOffices />
         </>

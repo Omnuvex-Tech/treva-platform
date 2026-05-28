@@ -1,13 +1,6 @@
 import { notFound } from "next/navigation";
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import PageContainer from "@/app/components/Container/PageContainer";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import ProjectOverview, { ProjectsGrid } from "@/app/components/Projects/ProjectOverview";
-import ProjectDetails, { ProjectsHero } from "@/app/components/Projects/ProjectDetails";
 import { config } from "@/config";
-import VisionHero from "@/app/components/Projects/VisionHero.tsx";
-import PropertyLocation from "@/app/components/Projects/PropertyLocation";
-import UnitLayout from "@/app/components/Projects/UnitLayout";
+import { ProjectsPage } from "@/app/components/Design1/Projects/projects";
 
 export const dynamicParams = false;
 
@@ -25,21 +18,5 @@ export default async function ProjectsRoute({ params }: { params: Promise<{ loca
         notFound();
     }
 
-    return (
-        <>
-        <div className="" data-locale={locale}>
-  <Navbar locale={locale} />
-            {/* <PageContainer as="main"> */}
-                <VisionHero />
-                <ProjectOverview/>
-                <ProjectDetails/>
-                <PropertyLocation/>
-                {/* <ProjectsGrid /> */}
-            {/* </PageContainer> */}
-            <UnitLayout/>
-            <HomeFooter locale={locale} />
-        </div>
-          
-        </>
-    );
+    return <ProjectsPage locale={locale} />;
 }

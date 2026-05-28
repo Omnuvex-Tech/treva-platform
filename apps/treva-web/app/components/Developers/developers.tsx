@@ -5,6 +5,7 @@ import { ButtonText } from '@/app/components/ButtonText';
 import { useEffect, useRef, useState } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
+import { Plus } from 'lucide-react'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import './developers.css'
@@ -24,12 +25,35 @@ type DevelopersPageProps = {
 
 export function DevelopersPage({ locale }: DevelopersPageProps) {
   const gsapReady = useRef(false)
+  const dropdownNavRefs = useRef<Array<HTMLDivElement | null>>([])
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(0)
 
   const toggleDropdown = (index: number) => {
     setOpenDropdown(openDropdown === index ? null : index)
   }
+
+  useEffect(() => {
+    dropdownNavRefs.current.forEach((el, idx) => {
+      if (!el) return
+
+      const isOpen = openDropdown === idx
+
+      if (isOpen) {
+        el.style.height = '0px'
+        requestAnimationFrame(() => {
+          const target = el.scrollHeight
+          el.style.height = `${target}px`
+        })
+      } else {
+        const current = el.scrollHeight
+        el.style.height = `${current}px`
+        requestAnimationFrame(() => {
+          el.style.height = '0px'
+        })
+      }
+    })
+  }, [openDropdown])
 
   const initGSAP = () => {
     if (gsapReady.current) return
@@ -106,7 +130,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
       gsap.timeline({
         scrollTrigger: { trigger: wrapper, start: 'top 95%', toggleActions: 'play none none none' },
       }).to(cover, {
-        yPercent: -100,
+        yPercent: -110,
         duration: getAttr(wrapper, 'data-gsap-duration', 1),
         delay:    getAttr(wrapper, 'data-gsap-delay', 0.1),
         ease:     'power2.out',
@@ -184,9 +208,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                     <div className="header-services_wrap is-services">
                       <div className="header-services_title">
                         <p>(xidmətlərimiz)</p>
-                        <div className="max-width-60rem">
-                          <h1>
-                            <span className="heading-gap-h1"> &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <div className="developers-header-title">
+                          <h1 className="developers-header-h1 no-animate">
                             Əmlak Satışlarını Gücləndiririk — Strategiyadan işin icrasına qədər
                           </h1>
                         </div>
@@ -195,7 +218,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                         <div className="header-services_video-wrap img-reveal">
                           <div className="header-services_img-wrap">
                             <div className="header_bg-video w-embed">
-                              <video id="myVideo" width="100%" height="100%" style={{ objectFit: 'cover' }} src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c%2F68ca8e5a67ef60d728ebc041_video-transcode.mp4" autoPlay muted playsInline loop preload="auto"></video>
+                              <video id="myVideo" width="100%" height="100%" style={{ objectFit: 'cover', width: '100%', height: '100%', display: 'block' }} src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c%2F68ca8e5a67ef60d728ebc041_video-transcode.mp4" autoPlay muted playsInline loop preload="auto"></video>
                             </div>
                           </div>
                           <div className="header-services_video-overlay"></div>
@@ -235,12 +258,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_toggle-text is-bottom">Bazara çıxış planlaması</div>
                           </div>
                           <div className="features_plus w-embed">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M27.998 16C27.998 16.2652 27.8927 16.5196 27.7052 16.7071C27.5176 16.8946 27.2633 17 26.998 17H16.998V27C16.998 27.2652 16.8927 27.5196 16.7052 27.7071C16.5176 27.8946 16.2633 28 15.998 28C15.7328 28 15.4785 27.8946 15.2909 27.7071C15.1034 27.5196 14.998 27.2652 14.998 27V17H4.99805C4.73283 17 4.47848 16.8946 4.29094 16.7071C4.1034 16.5196 3.99805 16.2652 3.99805 16C3.99805 15.7348 4.1034 15.4804 4.29094 15.2929C4.47848 15.1054 4.73283 15 4.99805 15H14.998V5C14.998 4.73478 15.1034 4.48043 15.2909 4.29289C15.4785 4.10536 15.7328 4 15.998 4C16.2633 4 16.5176 4.10536 16.7052 4.29289C16.8927 4.48043 16.998 4.73478 16.998 5V15H26.998C27.2633 15 27.5176 15.1054 27.7052 15.2929C27.8927 15.4804 27.998 15.7348 27.998 16Z" fill="white"/>
-                            </svg>
+                            <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         </div>
-                        <div className="features_dropdown-nav" style={{ height: openDropdown === 0 ? 'auto' : '0px' }}>
+                        <div className="features_dropdown-nav" ref={(el) => { dropdownNavRefs.current[0] = el }}>
                           <div className="features_content-holder">
                             <div className="features_number">(01)</div>
                             <div className="features_content-wrap">
@@ -280,12 +301,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_toggle-text is-bottom">Satışın İcrası</div>
                           </div>
                           <div className="features_plus w-embed">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M27.998 16C27.998 16.2652 27.8927 16.5196 27.7052 16.7071C27.5176 16.8946 27.2633 17 26.998 17H16.998V27C16.998 27.2652 16.8927 27.5196 16.7052 27.7071C16.5176 27.8946 16.2633 28 15.998 28C15.7328 28 15.4785 27.8946 15.2909 27.7071C15.1034 27.5196 14.998 27.2652 14.998 27V17H4.99805C4.73283 17 4.47848 16.8946 4.29094 16.7071C4.1034 16.5196 3.99805 16.2652 3.99805 16C3.99805 15.7348 4.1034 15.4804 4.29094 15.2929C4.47848 15.1054 4.73283 15 4.99805 15H14.998V5C14.998 4.73478 15.1034 4.48043 15.2909 4.29289C15.4785 4.10536 15.7328 4 15.998 4C16.2633 4 16.5176 4.10536 16.7052 4.29289C16.8927 4.48043 16.998 4.73478 16.998 5V15H26.998C27.2633 15 27.5176 15.1054 27.7052 15.2929C27.8927 15.4804 27.998 15.7348 27.998 16Z" fill="white"/>
-                            </svg>
+                            <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         </div>
-                        <div className="features_dropdown-nav" style={{ height: openDropdown === 1 ? 'auto' : '0px' }}>
+                        <div className="features_dropdown-nav" ref={(el) => { dropdownNavRefs.current[1] = el }}>
                           <div className="features_content-holder">
                             <div className="features_number">(02)</div>
                             <div className="features_content-wrap">
@@ -324,12 +343,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_toggle-text is-bottom">CRM + Lead Axını</div>
                           </div>
                           <div className="features_plus w-embed">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M27.998 16C27.998 16.2652 27.8927 16.5196 27.7052 16.7071C27.5176 16.8946 27.2633 17 26.998 17H16.998V27C16.998 27.2652 16.8927 27.5196 16.7052 27.7071C16.5176 27.8946 16.2633 28 15.998 28C15.7328 28 15.4785 27.8946 15.2909 27.7071C15.1034 27.5196 14.998 27.2652 14.998 27V17H4.99805C4.73283 17 4.47848 16.8946 4.29094 16.7071C4.1034 16.5196 3.99805 16.2652 3.99805 16C3.99805 15.7348 4.1034 15.4804 4.29094 15.2929C4.47848 15.1054 4.73283 15 4.99805 15H14.998V5C14.998 4.73478 15.1034 4.48043 15.2909 4.29289C15.4785 4.10536 15.7328 4 15.998 4C16.2633 4 16.5176 4.10536 16.7052 4.29289C16.8927 4.48043 16.998 4.73478 16.998 5V15H26.998C27.2633 15 27.5176 15.1054 27.7052 15.2929C27.8927 15.4804 27.998 15.7348 27.998 16Z" fill="white"/>
-                            </svg>
+                            <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         </div>
-                        <div className="features_dropdown-nav" style={{ height: openDropdown === 2 ? 'auto' : '0px' }}>
+                        <div className="features_dropdown-nav" ref={(el) => { dropdownNavRefs.current[2] = el }}>
                           <div className="features_content-holder">
                             <div className="features_number">(03)</div>
                             <div className="features_content-wrap">
@@ -368,12 +385,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_toggle-text is-bottom">Tam marketinq dəstəyi</div>
                           </div>
                           <div className="features_plus w-embed">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M27.998 16C27.998 16.2652 27.8927 16.5196 27.7052 16.7071C27.5176 16.8946 27.2633 17 26.998 17H16.998V27C16.998 27.2652 16.8927 27.5196 16.7052 27.7071C16.5176 27.8946 16.2633 28 15.998 28C15.7328 28 15.4785 27.8946 15.2909 27.7071C15.1034 27.5196 14.998 27.2652 14.998 27V17H4.99805C4.73283 17 4.47848 16.8946 4.29094 16.7071C4.1034 16.5196 3.99805 16.2652 3.99805 16C3.99805 15.7348 4.1034 15.4804 4.29094 15.2929C4.47848 15.1054 4.73283 15 4.99805 15H14.998V5C14.998 4.73478 15.1034 4.48043 15.2909 4.29289C15.4785 4.10536 15.7328 4 15.998 4C16.2633 4 16.5176 4.10536 16.7052 4.29289C16.8927 4.48043 16.998 4.73478 16.998 5V15H26.998C27.2633 15 27.5176 15.1054 27.7052 15.2929C27.8927 15.4804 27.998 15.7348 27.998 16Z" fill="white"/>
-                            </svg>
+                            <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         </div>
-                        <div className="features_dropdown-nav" style={{ height: openDropdown === 3 ? 'auto' : '0px' }}>
+                        <div className="features_dropdown-nav" ref={(el) => { dropdownNavRefs.current[3] = el }}>
                           <div className="features_content-holder">
                             <div className="features_number">(04)</div>
                             <div className="features_content-wrap">
@@ -412,12 +427,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_toggle-text is-bottom">BROKER ŞƏBƏKƏSİNİN AKTİVLƏŞDİRİLMƏSİ</div>
                           </div>
                           <div className="features_plus w-embed">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M27.998 16C27.998 16.2652 27.8927 16.5196 27.7052 16.7071C27.5176 16.8946 27.2633 17 26.998 17H16.998V27C16.998 27.2652 16.8927 27.5196 16.7052 27.7071C16.5176 27.8946 16.2633 28 15.998 28C15.7328 28 15.4785 27.8946 15.2909 27.7071C15.1034 27.5196 14.998 27.2652 14.998 27V17H4.99805C4.73283 17 4.47848 16.8946 4.29094 16.7071C4.1034 16.5196 3.99805 16.2652 3.99805 16C3.99805 15.7348 4.1034 15.4804 4.29094 15.2929C4.47848 15.1054 4.73283 15 4.99805 15H14.998V5C14.998 4.73478 15.1034 4.48043 15.2909 4.29289C15.4785 4.10536 15.7328 4 15.998 4C16.2633 4 16.5176 4.10536 16.7052 4.29289C16.8927 4.48043 16.998 4.73478 16.998 5V15H26.998C27.2633 15 27.5176 15.1054 27.7052 15.2929C27.8927 15.4804 27.998 15.7348 27.998 16Z" fill="white"/>
-                            </svg>
+                            <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         </div>
-                        <div className="features_dropdown-nav" style={{ height: openDropdown === 4 ? 'auto' : '0px' }}>
+                        <div className="features_dropdown-nav" ref={(el) => { dropdownNavRefs.current[4] = el }}>
                           <div className="features_content-holder">
                             <div className="features_number">(05)</div>
                             <div className="features_content-wrap">
@@ -456,12 +469,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_toggle-text is-bottom">İnvestisiya Konsultasiyası</div>
                           </div>
                           <div className="features_plus w-embed">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M27.998 16C27.998 16.2652 27.8927 16.5196 27.7052 16.7071C27.5176 16.8946 27.2633 17 26.998 17H16.998V27C16.998 27.2652 16.8927 27.5196 16.7052 27.7071C16.5176 27.8946 16.2633 28 15.998 28C15.7328 28 15.4785 27.8946 15.2909 27.7071C15.1034 27.5196 14.998 27.2652 14.998 27V17H4.99805C4.73283 17 4.47848 16.8946 4.29094 16.7071C4.1034 16.5196 3.99805 16.2652 3.99805 16C3.99805 15.7348 4.1034 15.4804 4.29094 15.2929C4.47848 15.1054 4.73283 15 4.99805 15H14.998V5C14.998 4.73478 15.1034 4.48043 15.2909 4.29289C15.4785 4.10536 15.7328 4 15.998 4C16.2633 4 16.5176 4.10536 16.7052 4.29289C16.8927 4.48043 16.998 4.73478 16.998 5V15H26.998C27.2633 15 27.5176 15.1054 27.7052 15.2929C27.8927 15.4804 27.998 15.7348 27.998 16Z" fill="white"/>
-                            </svg>
+                            <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         </div>
-                        <div className="features_dropdown-nav" style={{ height: openDropdown === 5 ? 'auto' : '0px' }}>
+                        <div className="features_dropdown-nav" ref={(el) => { dropdownNavRefs.current[5] = el }}>
                           <div className="features_content-holder is-last">
                             <div className="features_number">(06)</div>
                             <div className="features_content-wrap">

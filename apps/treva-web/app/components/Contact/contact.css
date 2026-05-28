@@ -2,6 +2,19 @@
    CONTACT PAGE SPECIFIC STYLES
    ============================================= */
 
+/* --- Navbar / Footer spacing --- */
+.page-wrapper .main-wrapper {
+  padding-top: calc(var(--treva-nav-height, 64px) + 32px);
+  padding-bottom: 64px;
+}
+
+@media (max-width: 768px) {
+  .page-wrapper .main-wrapper {
+    padding-top: calc(var(--treva-nav-height, 64px) + 16px);
+    padding-bottom: 52px;
+  }
+}
+
 /* --- Connect section layout --- */
 .connect_wrap {
   grid-column-gap: 3rem;
