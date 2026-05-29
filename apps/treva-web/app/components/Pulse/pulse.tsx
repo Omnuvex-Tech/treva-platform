@@ -5,8 +5,8 @@ import { ARTICLES, FEATURED_ARTICLE, WEEK_ARTICLE } from "@/lib/pulse-data";
 import { Article } from "@/lib/pulse.types";
 import "./pulse.css";
 import { ReadMoreOverlay } from "../ReadMoreOverlay";
-
 import { ButtonText } from '@/app/components/ButtonText';
+
 type PulseProps = {
   locale: string;
 };
@@ -70,7 +70,6 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
           <div className={variant === "left" ? "news_leftcol-img-holder" : "news_middle-img-holder"}>
             <img src={article.image} loading="lazy" alt={article.title} className="fullwidth-img" />
           </div>
-
           <ReadMoreOverlay className="hide-tablet" />
         </div>
 
@@ -79,7 +78,6 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
             <ArticleMeta category={article.category} date={article.date} />
             <h2 className={titleClass}>{article.title}</h2>
           </div>
-
           {variant !== "left" && <AuthorBlock author={article.author} authorImage={article.authorImage} />}
         </div>
       </Link>
@@ -129,7 +127,6 @@ function PulseHeaderSection({ locale }: { locale: string }) {
                                 className="fullwidth-img"
                               />
                             </div>
-
                             <ReadMoreOverlay className="hide-tablet" />
                           </div>
 
@@ -138,7 +135,6 @@ function PulseHeaderSection({ locale }: { locale: string }) {
                               <ArticleMeta category={FEATURED_ARTICLE.category} date={FEATURED_ARTICLE.date} />
                               <h2 className="news-header_middle-title no-animate">{FEATURED_ARTICLE.title}</h2>
                             </div>
-
                             <AuthorBlock author={FEATURED_ARTICLE.author} authorImage={FEATURED_ARTICLE.authorImage} />
                           </div>
                         </Link>
@@ -185,31 +181,36 @@ function PulseNewsSection({ locale }: { locale: string }) {
         <div className="container-large">
           <div className="news_component">
             <div className="news_wrap">
-              <div className="news_week-col self-start">
+              
+              {/* 1. ÜST HİSSƏ: Bütün eni tutan Kampaniya Baneri */}
+              <div className="news_top-full-banner-container">
+                <div className="news_top-full-banner">
+                  <img 
+                    src="/images/pulse/treva-flag.png" 
+                    alt="Reportage Heights 30/70 Kampaniyası" 
+                    className="fullwidth-img"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+
+              {/* 2. SOL SÜTUN: Həftənin seçimi (Filtrlərlə eyni səviyyədə paralel) */}
+              <div className="news_week-col">
                 <div className="news_week-title">
                   <div>Həftənin seçimi</div>
                 </div>
 
                 <div className="news-header_right-col">
                   <div className="news_rightcol-list-wrap w-dyn-list">
-                      <div role="list" className="news_week-list w-dyn-items">
-                        {WEEK_ARTICLE && <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />}
+                    <div role="list" className="news_week-list w-dyn-items">
+                      {WEEK_ARTICLE && <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div id="all-articles" className="news_middle-wrap">
-                <div className="w-dyn-list">
-                  <div role="list" className="news_middle-list w-dyn-items">
-                    {ARTICLES.map((article) => (
-                      <NewsCard key={article.slug} article={article} locale={locale} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="news_filters-col self-start">
+              {/* 3. SAĞ SÜTUN: Axtarış və Kateqoriyalar */}
+              <div className="news_filters-col">
                 <div className="news_filters-holder w-form">
                   <form className="news_filters-form">
                     <div className="news_filters-search-wrap">
@@ -233,6 +234,18 @@ function PulseNewsSection({ locale }: { locale: string }) {
                   </form>
                 </div>
               </div>
+
+              {/* 4. ALT HİSSƏ: Bütün Məqalələr */}
+              <div id="all-articles" className="news_middle-wrap">
+                <div className="w-dyn-list">
+                  <div role="list" className="news_middle-list w-dyn-items">
+                    {ARTICLES.map((article) => (
+                      <NewsCard key={article.slug} article={article} locale={locale} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
