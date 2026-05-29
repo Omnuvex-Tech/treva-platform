@@ -10,14 +10,19 @@
    PULSE SECTION SAFE LAYOUT FIX
    ========================================================================== */
 
+.section_news-header {
+  padding-top: calc(var(--treva-nav-height, 64px) + 64px);
+  padding-bottom: 64px;
+}
+
 .section_news {
   position: relative;
   z-index: 1;
   width: 100%;
   clear: both;
   overflow: visible;
-  padding-top: 3rem;
-  padding-bottom: 7rem;
+  padding-top: 0;
+  padding-bottom: 120px;
 }
 
 .section_news .global-padding,
