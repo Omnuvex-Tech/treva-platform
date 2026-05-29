@@ -67,18 +67,23 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
     <div role="listitem" className={`news_header-item w-dyn-item ${isWeek ? "is-week-card" : ""}`}>
       <Link href={`/${locale}/pulse/${article.slug}`} className={linkClass}>
         <div className={imgWrapClass}>
-          <div className={variant === "left" ? "news_leftcol-img-holder" : "news_middle-img-holder"}>
+          <div className={variant === "left" ? "news_leftcol-img-holder" : isWeek ? "news_week-img-holder" : "news_middle-img-holder"}>
             <img src={article.image} loading="lazy" alt={article.title} className="fullwidth-img" />
           </div>
-          <ReadMoreOverlay className="hide-tablet" />
+          {!isWeek && (
+            <>
+              <ReadMoreOverlay />
+              <div className="img-cover"></div>
+            </>
+          )}
         </div>
 
-        <div className={variant === "left" ? "news_leftcol-content" : "news-header_middle-content-wrap"}>
+        <div className={isWeek ? "news_week-content-wrap" : variant === "left" ? "news_leftcol-content" : "news-header_middle-content-wrap"}>
           <div className="news_middle-content">
             <ArticleMeta category={article.category} date={article.date} />
             <h2 className={titleClass}>{article.title}</h2>
           </div>
-          {variant !== "left" && <AuthorBlock author={article.author} authorImage={article.authorImage} />}
+          {variant !== "left" && !isWeek && <AuthorBlock author={article.author} authorImage={article.authorImage} />}
         </div>
       </Link>
     </div>
@@ -127,7 +132,8 @@ function PulseHeaderSection({ locale }: { locale: string }) {
                                 className="fullwidth-img"
                               />
                             </div>
-                            <ReadMoreOverlay className="hide-tablet" />
+                            <ReadMoreOverlay />
+                            <div className="img-cover"></div>
                           </div>
 
                           <div className="news-header_middle-content-wrap">
@@ -150,7 +156,7 @@ function PulseHeaderSection({ locale }: { locale: string }) {
                     {rightArticles.map((article) => (
                       <div key={article.slug} role="listitem" className="news_rightcol-item w-dyn-item">
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_rightcol-link w-inline-block">
-                          <div className="news_rightcol-content">
+                          <div className="news_rightcol-link-content">
                             <h2 className="news_rightcol-title no-animate">{article.title}</h2>
                             <ArticleMeta category={article.category} date={article.date} />
                           </div>
@@ -182,7 +188,7 @@ function PulseNewsSection({ locale }: { locale: string }) {
           <div className="news_component">
             <div className="news_wrap">
               
-              {/* 1. ÜST HİSSƏ: Bütün eni tutan Kampaniya Baneri */}
+              {/* 1. ÜST HİSSƏ: Kampaniya Baneri */}
               <div className="news_top-full-banner-container">
                 <div className="news_top-full-banner">
                   <img 
@@ -194,17 +200,15 @@ function PulseNewsSection({ locale }: { locale: string }) {
                 </div>
               </div>
 
-              {/* 2. SOL SÜTUN: Həftənin seçimi (Filtrlərlə eyni səviyyədə paralel) */}
+              {/* 2. SOL SÜTUN: Həftənin seçimi */}
               <div className="news_week-col">
                 <div className="news_week-title">
-                  <div>Həftənin seçimi</div>
+                  <div>HƏFTƏNİN SEÇİMİ</div>
                 </div>
 
-                <div className="news-header_right-col">
-                  <div className="news_rightcol-list-wrap w-dyn-list">
-                    <div role="list" className="news_week-list w-dyn-items">
-                      {WEEK_ARTICLE && <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />}
-                    </div>
+                <div className="w-dyn-list">
+                  <div role="list" className="news_week-list w-dyn-items">
+                    {WEEK_ARTICLE && <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />}
                   </div>
                 </div>
               </div>

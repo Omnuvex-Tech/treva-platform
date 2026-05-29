@@ -2269,6 +2269,12 @@ input:focus::placeholder, textarea:focus::placeholder {
   transition-delay: 0.15s;
 }
 
+.projects_item:hover .news_btn {
+  transform: scale(1);
+  opacity: 1;
+  transition-delay: 0.15s;
+}
+
 .projects_item:hover .projects_img-wrap {
   transform: scale(0.98);
   transition-delay: 0.15s;

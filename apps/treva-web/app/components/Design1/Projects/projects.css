@@ -1,0 +1,99 @@
+.projects_img-wrap {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.projects_img-holder,
+.projects_img-holder img {
+  width: 100%;
+  height: 100%;
+}
+
+.projects_img-holder img {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.projects_img-wrap .projects_overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: visible !important;
+  background-color: rgba(23, 25, 28, 0.4);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.projects_img-wrap .news_btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: visible !important;
+  transform: scale(0.6);
+  transition: transform 0.4s ease, opacity 0.3s ease, background-color 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 80px;
+  color: #fff !important;
+  font-size: 0.94rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  padding: 0.4rem 0.875rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.projects_img-wrap .img-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.projects_item:hover .projects_img-wrap .projects_overlay,
+.projects_img-wrap:hover .projects_overlay {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.projects_item:hover .projects_img-wrap .news_btn,
+.projects_img-wrap:hover .news_btn {
+  display: inline-flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: scale(1) !important;
+}
+
+.projects_item:hover .projects_img-holder img,
+.projects_img-wrap:hover .projects_img-holder img {
+  transform: scale(1.05);
+}
+
+.projects_img-wrap .news_btn:hover {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.projects_tag-remove {
+  flex: none;
+  cursor: pointer;
+}
+
+.projects_tag-remove .icon,
+.projects_tag-remove svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+@media screen and (max-width: 991px) {
+  .projects_img-wrap .projects_overlay {
+    display: none !important;
+  }
+}

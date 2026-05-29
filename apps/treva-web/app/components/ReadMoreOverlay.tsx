@@ -5,7 +5,7 @@ type ReadMoreOverlayProps = {
   className?: string;
 };
 
-export const ReadMoreOverlay = ({ text = "Məqaləni oxu", className = "" }: ReadMoreOverlayProps) => {
+export const ReadMoreOverlay = ({ text = 'M\u0259qal\u0259ni oxu', className = '' }: ReadMoreOverlayProps) => {
   return (
     <div className={`projects_overlay ${className}`}>
       <div className="news_btn">
