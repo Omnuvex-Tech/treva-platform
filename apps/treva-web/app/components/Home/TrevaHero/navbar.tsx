@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from "next/navigation";
 import './navbar.css';
 import { IoMdClose, IoMdMenu } from 'react-icons/io';
+import { createPortal } from "react-dom";
 
 type PillButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isPressed?: boolean;
@@ -72,6 +73,8 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  const [solidBgReady, setSolidBgReady] = useState(false);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -92,7 +95,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   const routeHref = (path: string) => `/${activeLocale}${path}`;
   const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
   const closeMobileMenu = () => setMobileMenuOpen(false);
-  const shouldShowScrolled = variant === 'overlay' && (isScrolled || mobileMenuOpen);
+  const shouldShowScrolled = isScrolled || mobileMenuOpen || (variant === "solid" && solidBgReady);
 
   const handleLangChange = (lang: typeof languages[number]) => {
     const nextLocale = labelToLocale[lang];
@@ -109,13 +112,47 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 16);
+    setPortalTarget(document.getElementById("treva-navbar-layer"));
+  }, []);
+
+  useEffect(() => {
+    if (variant !== "solid") {
+      setSolidBgReady(false);
+      return;
+    }
+
+    const id = window.requestAnimationFrame(() => setSolidBgReady(true));
+    return () => window.cancelAnimationFrame(id);
+  }, [variant]);
+
+  useEffect(() => {
+    const readScrollTop = () => {
+      const smoother = window.ScrollSmoother?.get?.();
+      const smootherScrollTop = smoother?.scrollTop?.();
+      if (typeof smootherScrollTop === "number") return smootherScrollTop;
+
+      return (
+        window.scrollY ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0
+      );
     };
 
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    let frameId = 0;
+    let last = false;
+
+    const tick = () => {
+      const next = readScrollTop() > 16;
+      if (next !== last) {
+        last = next;
+        setIsScrolled(next);
+      }
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    tick();
+    return () => window.cancelAnimationFrame(frameId);
   }, []);
 
   useEffect(() => {
@@ -162,7 +199,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
-      window.addEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, [mobileMenuOpen]);
 
@@ -179,7 +216,9 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
     }
   }, [mobileMenuOpen]);
 
-  return (
+  if (!portalTarget) return null;
+
+  return createPortal(
     <>
       {/* ========== NAVBAR ========== */}
       <header
@@ -193,7 +232,6 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
 
           <nav className="treva-navbar__nav" aria-label="Primary navigation">
             <a href={routeHref('/projects')} className="treva-navbar__link">Projects</a>
-            <a href={routeHref('/about-us')} className="treva-navbar__link">About Us</a>
             <a href={routeHref('/contact')} className="treva-navbar__link">Contact Us</a>
             <a href={routeHref('/developers')} className="treva-navbar__link">Developers</a>
             <a href={routeHref('/brokers')} className="treva-navbar__link">Brokers</a>
@@ -251,6 +289,14 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
                   </div>
                 )}
               </div>
+              <a
+                href="https://partner.treva.realestate/"
+                className="treva-pill-button treva-navbar__login-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Login
+              </a>
             </div>
 
             {/* ✅ DÜZƏLİŞ: React-icons ilə Dinamik Menyu Düyməsi */}
@@ -282,7 +328,6 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
       >
         <div className="treva-navbar__mobile__inner">
           <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Projects</a>
-          <a href={routeHref('/about-us')} className="treva-navbar__mobile__link">About Us</a>
           <a href={routeHref('/contact')} className="treva-navbar__mobile__link">Contact Us</a>
           <a href={routeHref('/developers')} className="treva-navbar__mobile__link">Developers</a>
           <a href={routeHref('/brokers')} className="treva-navbar__mobile__link">Brokers</a>
@@ -291,6 +336,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
           <a href={routeHref('/pulse')} className="treva-navbar__mobile__link">Pulse</a>
         </div>
       </nav>
-    </>
+    </>,
+    portalTarget
   );
 }

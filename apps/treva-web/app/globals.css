@@ -8,6 +8,21 @@
 @import "./components/Container/container.css";
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
+body {
+    position: relative;
+}
+
+#treva-navbar-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+#treva-navbar-layer > * {
+    pointer-events: auto;
+}
+
 /* GLOBAL FIX: Prevent clipping of Azerbaijani/Turkish characters (Ş, İ, Ö, Ç, Ğ, Ü, Q)
    and enforce absolute vertical centering for all button slide hover animations. */
 

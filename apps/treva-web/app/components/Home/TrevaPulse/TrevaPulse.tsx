@@ -134,6 +134,30 @@ const TrevaPulse: React.FC = () => {
           {/* ========================================================
               2. BLOG CARDS GRID
              ======================================================== */}
+          <div className="pulse__marquee" aria-hidden="true">
+            <div className="pulse__marquee-track">
+              {[...blogData, ...blogData].map((post, index) => (
+                <a href="#" key={`${post.id}-${index}`} className="blog-card">
+                  <div className="blog-card__img-wrapper">
+                    <img src={post.image} alt={post.title} className="blog-card__img" />
+                  </div>
+                  
+                  <div className="blog-card__meta">
+                    <span className="blog-card__category">{post.category}</span>
+                    <span className="blog-card__date">{post.date}</span>
+                  </div>
+                  
+                  <h3 className="blog-card__title">{post.title}</h3>
+                  
+                  <div className="blog-card__author">
+                    <img src={post.avatar} alt={post.author} className="blog-card__avatar" />
+                    <span className="blog-card__author-name">{post.author}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
           <div className="pulse__grid">
             {blogData.map((post) => (
               <a href="#" key={post.id} className="blog-card">

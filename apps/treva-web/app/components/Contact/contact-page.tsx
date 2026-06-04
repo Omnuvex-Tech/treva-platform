@@ -342,6 +342,71 @@ export function ContactPage({ locale }: ContactPageProps) {
         ease:     'power2.out',
       })
     })
+
+    document.querySelectorAll(".parallax-reveal").forEach((el) => {
+      gsap.from(el, {
+          scrollTrigger: {
+              trigger: el,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true
+          },
+          y: 50,
+          ease: "none"
+      });
+    });
+
+    if (window.innerWidth <= 991) {
+      gsap.utils.toArray(".projects_overlay").forEach((el: any) => {
+        gsap.to(el, {
+          opacity: 1,
+          duration: 0.5,
+          delay: 0.5,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 90%",
+            once: true
+          }
+        });
+      });
+    }
+
+    const ctaSection = document.querySelector('.section_cta')
+    if (ctaSection) {
+      const mm = gsap.matchMedia()
+      mm.add('(min-width: 768px)', () => {
+        const q = gsap.utils.selector(ctaSection)
+        const scrollProgress = { value: 0 }
+        const ctaTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: ctaSection,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 0.93,
+          },
+          defaults: { ease: 'none' },
+        })
+
+        gsap.set(q('.cta_img-wrap.is-top-left'), { y: '4rem' })
+        gsap.set(q('.cta_img-wrap.is-top-right'), { y: '0rem' })
+        gsap.set(q('.cta_img-wrap.is-middle-right'), { y: '0rem' })
+        gsap.set(q('.cta_img-wrap.is-bottom-left'), { y: '4rem' })
+        gsap.set(q('.cta_img-wrap.is-bottom-right'), { y: '-2rem' })
+
+        ctaTimeline
+          .to(scrollProgress, { value: 1, duration: 1 }, 0)
+          .to(q('.cta_img-wrap.is-top-left'), { y: '-1rem', duration: 0.52 }, 0.12)
+          .to(q('.cta_img-wrap.is-top-right'), { y: '5rem', duration: 0.52 }, 0.12)
+          .to(q('.cta_img-wrap.is-middle-right'), { y: '-6rem', duration: 0.55 }, 0.2)
+          .to(q('.cta_img-wrap.is-bottom-left'), { y: '-1rem', duration: 0.6 }, 0.3)
+          .to(q('.cta_img-wrap.is-bottom-right'), { y: '2rem', duration: 0.6 }, 0.3)
+
+        return () => {
+          ctaTimeline.kill()
+        }
+      })
+    }
   }
 
   useEffect(() => {

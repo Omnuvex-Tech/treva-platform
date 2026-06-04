@@ -96,6 +96,7 @@ export default function RootLayout({
             <body className={inter.variable} suppressHydrationWarning>
                 <QueryProvider>
                     <NotifyProvider>
+                        <div id="treva-navbar-layer" />
                         <SmoothScrollRoot>
                             <main>{children}</main>
                         </SmoothScrollRoot>
