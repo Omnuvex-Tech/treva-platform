@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useState } from 'react';
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import Link from "next/link";
@@ -17,10 +20,37 @@ const Pulse = ({ locale }: PulseProps) => {
       <Navbar locale={locale} variant="solid" />
       <PulseHeaderSection locale={locale} />
       <PulseNewsSection locale={locale} />
+      <PulseKeywordsSection />
       <HomeFooter locale={locale} />
     </main>
   );
 };
+
+function PulseKeywordsSection() {
+  const keywords = [
+    "Daşınmaz əmlak", "Baku real estate", "Sea Breeze mənzillər",
+    "Kreditlə evlər", "İpoteka", "Bakıda yeni tikililər",
+    "Lux mənzillər", "Əmlak agentliyi", "Treva Pulse",
+    "İnvestisiya", "Dubayda evlər", "Tərəfdaş broker",
+    "Daşınmaz əmlak satışı", "Bakı mənzil qiymətləri"
+  ];
+  return (
+    <section className="section_keywords">
+      <div className="global-padding">
+        <div className="container-large">
+          <div className="keywords_component">
+            <h3 className="keywords_title">Açar sözlər / Keywords</h3>
+            <div className="keywords_list">
+              {keywords.map((kw, i) => (
+                <span key={i} className="keyword_tag">#{kw}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function ArticleMeta({ category, date }: Pick<Article, "category" | "date">) {
   return (
@@ -181,6 +211,11 @@ function PulseHeaderSection({ locale }: { locale: string }) {
 }
 
 function PulseNewsSection({ locale }: { locale: string }) {
+  const [visibleCount, setVisibleCount] = useState(6);
+  const handleViewMore = () => {
+    setVisibleCount(prev => prev + 6);
+  };
+
   return (
     <section className="section_news">
       <div className="global-padding">
@@ -243,11 +278,19 @@ function PulseNewsSection({ locale }: { locale: string }) {
               <div id="all-articles" className="news_middle-wrap">
                 <div className="w-dyn-list">
                   <div role="list" className="news_middle-list w-dyn-items">
-                    {ARTICLES.map((article) => (
+                    {ARTICLES.slice(0, visibleCount).map((article) => (
                       <NewsCard key={article.slug} article={article} locale={locale} />
                     ))}
                   </div>
                 </div>
+
+                {visibleCount < ARTICLES.length && (
+                  <div className="news_view-more-container">
+                    <button onClick={handleViewMore} className="button is-view-more">
+                      <ButtonText>Daha çox göstər</ButtonText>
+                    </button>
+                  </div>
+                )}
               </div>
 
             </div>

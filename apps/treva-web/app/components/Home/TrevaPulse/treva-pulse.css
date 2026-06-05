@@ -145,8 +145,8 @@
   width: 100%;
   overflow: hidden;
   margin-bottom: 40px;
-  --pulse-marquee-gap: 20px;
-  --pulse-marquee-card-width: calc((100vw - 96px - 60px) / 4);
+  --pulse-marquee-gap: 32px;
+  --pulse-marquee-card-width: calc((100vw - 96px - 64px) / 3);
 }
 
 .pulse__marquee-track {
@@ -177,8 +177,8 @@
 
 .pulse__grid {
   display: none;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
   margin-bottom: 40px;
 }
 
@@ -186,14 +186,27 @@
   text-decoration: none;
   display: flex;
   flex-direction: column;
+  background-color: #ffffff;
+  border: 1px solid rgba(23, 25, 28, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  height: 100%;
+}
+
+.blog-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  border-color: rgba(23, 25, 28, 0.15);
 }
 
 .blog-card__img-wrapper {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 4px;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .blog-card__img {
