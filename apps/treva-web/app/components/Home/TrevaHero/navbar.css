@@ -41,7 +41,7 @@
   align-items: center;
   justify-content: space-around;
   gap: clamp(1rem, 2vw, 1.75rem);
-  padding: 0 32px;
+  padding: 0 2.5rem;
   transition: background 0.22s ease, backdrop-filter 0.22s ease;
   isolation: isolate;
 }
@@ -282,7 +282,7 @@
   max-height: calc(100dvh - var(--treva-nav-height));
 }
 .treva-navbar__mobile__inner {
-  padding: 28px 32px 32px;
+  padding: 28px 2.5rem 32px;
   display: flex;
   flex-direction: column;
 }
@@ -313,7 +313,8 @@
 @media (min-width: 1025px) and (max-width: 1280px) {
   .treva-navbar {
     gap: clamp(0.6rem, 1.25vw, 1.05rem);
-    padding: 0 24px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
   }
   .treva-navbar__logo {
     width: 96px;
@@ -329,9 +330,10 @@
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 991px) {
   .treva-navbar {
-    padding: 0 24px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
     justify-content: center;
     gap: 0;
   }
@@ -395,9 +397,10 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 479px) {
   .treva-navbar {
-    padding: 0 16px;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
   .treva-navbar__inner {
     padding: 0;
