@@ -204,6 +204,37 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
   </section>
 );
 
+const ArticleAuthorBlock: React.FC<{ locale: string; article: Article }> = ({ locale, article }) => (
+  <div className="article-author-block">
+    {article.author && (
+      <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
+        <div className="article_author-avatar">
+          <img src={article.authorImage} loading="lazy" alt={article.author} className="fullwidth-img" />
+        </div>
+        <div className="article_author-content">
+          <div className="text-color-blue400">{article.author}</div>
+          <div className="text-size-small">{article.authorTitle || "Ekspert"}</div>
+        </div>
+      </a>
+    )}
+  </div>
+);
+
+const ArticleKeywordsBlock: React.FC = () => (
+  <div className="article-keywords-block">
+    <div className="article-keywords-label">
+      Açar sözlər / Keywords
+    </div>
+    <div className="article-keywords-list">
+      {["#dasinmazemlak", "#bakidaevler", "#seabreeze", "#investisiya", "#premiumemlak"].map((tag) => (
+        <span key={tag} className="article-keyword-tag">
+          {tag}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
 const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article }) => {
   return (
     <div className="page-wrapper">
@@ -232,46 +263,11 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
           <div className="global-padding padding-section-medium">
             <div className="container-large">
               <div className="article_component">
-        <div className="article_wrap">
+                <div className="article_wrap">
                   <div className="article_col">
                     <ArticleHero article={article} />
 
                     <div className="article_body">
-                      <div className="article_specs-sticky">
-                        {article.author && (
-                          <div className="w-dyn-list">
-                            <div role="list" className="w-dyn-items">
-                              <div role="listitem" className="w-dyn-item">
-                                <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
-                                  <div className="article_author-avatar">
-                                    <img src={article.authorImage} loading="lazy" alt={article.author} className="fullwidth-img" />
-                                  </div>
-                                  <div className="article_author-content">
-                                    <div className="text-color-blue400">{article.author}</div>
-                                    <div className="text-size-small">{article.authorTitle || "Ekspert"}</div>
-                                  </div>
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="article_detail-keywords" style={{ marginTop: "2rem", borderTop: "1px solid rgba(23, 25, 28, 0.1)", paddingTop: "1.5rem" }}>
-                          <div style={{ fontSize: "0.75rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em", color: "rgba(23, 25, 28, 0.4)", marginBottom: "0.75rem" }}>
-                            Açar sözlər / Keywords
-                          </div>
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                            {["#dasinmazemlak", "#bakidaevler", "#seabreeze", "#investisiya", "#premiumemlak"].map((tag) => (
-                              <span key={tag} style={{ fontSize: "0.8rem", color: "#4e525d", fontWeight: "500", backgroundColor: "#ededed", padding: "0.25rem 0.5rem", borderRadius: "4px" }}>
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div fs-copyclip-element="copy-this" className="article_copy-text">This is some text inside of a div block.</div>
-                      </div>
-
                       <div>
                         <div className="article_richtext no-animate w-richtext">
                           {article.content}
@@ -279,6 +275,9 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                         <SliderEmptyState />
                       </div>
                     </div>
+
+                    <ArticleAuthorBlock locale={locale} article={article} />
+                    <ArticleKeywordsBlock />
                   </div>
 
                   <ArticleSidebar locale={locale} articles={SIDEBAR_ARTICLES} />
