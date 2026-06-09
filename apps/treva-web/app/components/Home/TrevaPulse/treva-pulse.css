@@ -13,7 +13,7 @@
 }
 
 /* ========================================================
-    A. DESKTOP & MOBILE HEADER (Flex Qarşı-Qarşıya)
+   HEADER & FILTERS
    ======================================================== */
 .pulse__header {
   margin-bottom: 72px;
@@ -62,9 +62,6 @@
   max-width: 510px;
 }
 
-/* --------------------------------------------------------
-    B. FILTER SECTIONS (Kateqoriya bölməsi)
-   -------------------------------------------------------- */
 .pulse__controls-row {
   display: flex;
   justify-content: space-between;
@@ -89,11 +86,10 @@
   letter-spacing: 0%;
 }
 
-/* Desktop üçün düymə qrupu və aralarındakı lazımi gap boşluğu */
 .pulse__btn-group {
   display: flex;
   align-items: center;
-  gap: 10px; /* Desktopda düymələr arası boşluq */
+  gap: 10px;
 }
 
 .pulse__filter-btn {
@@ -139,66 +135,55 @@
 }
 
 /* ========================================================
-    C. BLOG GRID & CARDS
+   SLIDER (ANIMATION & ALIGNMENT FIXES)
    ======================================================== */
-.pulse__marquee {
+.pulse__slider-wrapper {
   width: 100%;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   overflow: hidden;
   margin-bottom: 40px;
-  --pulse-marquee-gap: 32px;
-  --pulse-marquee-card-width: calc((100vw - 96px - 64px) / 3);
+  box-sizing: border-box;
 }
 
-.pulse__marquee-track {
+.pulse__slider-track {
   display: flex;
-  gap: var(--pulse-marquee-gap);
-  width: max-content;
-  animation: pulse-marquee 32s linear infinite;
+  animation: infinite-scroll var(--scroll-speed, 10s) linear infinite;
   will-change: transform;
 }
 
-.pulse__marquee:hover .pulse__marquee-track {
+.pulse__slider-track:hover {
   animation-play-state: paused;
 }
 
-.pulse__marquee .blog-card {
-  flex: 0 0 auto;
-  width: var(--pulse-marquee-card-width);
-}
-
-@keyframes pulse-marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.pulse__grid {
-  display: none;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  margin-bottom: 40px;
+@keyframes infinite-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } 
 }
 
 .blog-card {
+  box-sizing: border-box;
+  border-right: 1px solid #ccc;
   text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  border: 1px solid rgba(23, 25, 28, 0.08);
-  border-radius: 12px;
-  padding: 24px;
-  transition: none !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-  height: 100%;
+  background-color: transparent;
+  transition: opacity 0.3s ease;
+  min-width: 0; /* Mobildə kartların sıxılıb əzilməsinin qarşısını alan qızıl qayda */
 }
 
-.blog-card:hover {
-  transform: none !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-  border-color: rgba(23, 25, 28, 0.08);
+.blog-card__inner {
+  padding: 32px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.pulse__no-data {
+  padding: 60px;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: var(--color-text-muted);
 }
 
 .blog-card__img-wrapper {
@@ -213,11 +198,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: none !important;
+  transition: transform 0.3s ease;
 }
 
 .blog-card:hover .blog-card__img {
-  transform: none !important;
+  transform: scale(1.02);
 }
 
 .blog-card__meta {
@@ -232,7 +217,7 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 69px;
+  padding: 0 16px;
   height: 32px;
   border-radius: 15px;
   background-color: #F2EFE8;
@@ -255,14 +240,13 @@
   font-weight: 400;
   font-size: 25px;
   line-height: 120%;
-  letter-spacing: 0%;
   color: #000000;
   margin: 0 0 20px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 68px;
+  min-height: 60px;
   text-transform: none;
 }
 
@@ -289,30 +273,12 @@
 }
 
 /* ========================================================
-    D. NAVIGATION CONTROLS (Sağ tərəfdə qorunur)
-   ======================================================== */
-.pulse__controls-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-top: 40px;
-}
-
-.pulse__controls {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-/* ========================================================
-    E. RESPONSIVE (MOBİLDƏ DETALLI VURĞULANMIŞ PRO-AYARLAR)
+   RESPONSIVE (ANTI-CALAMITY FIXES)
    ======================================================== */
 @media (max-width: 1024px) {
   .pulse__desktop-row { flex-direction: column; align-items: flex-start; gap: 24px; }
   .pulse__title { font-size: 40px; }
-  .pulse__grid { grid-template-columns: repeat(2, 1fr); }
   .blog-card__title { font-size: 24px; }
-  .pulse__marquee { --pulse-marquee-card-width: calc((100vw - 64px - 20px) / 2); }
 }
 
 @media (max-width: 768px) {
@@ -327,35 +293,26 @@
     width: 100%;
   }
 
-  .pulse__desktop-row {
-    display: block;
-    width: 100%;
-  }
-
+  .pulse__desktop-row { display: block; width: 100%; }
+  
   .pulse__title {
     font-size: 38px;
     letter-spacing: -0.5px;
-    text-align: left;
-    margin-bottom: 28px; /* Yuxarıdakı mətnlə ara məsafəsi bir qədər də artırıldı */
+    margin-bottom: 28px;
   }
 
-  /* Alt mətnin həm yuxarı həm də aşağı filter bloku ilə məsafəsi artırıldı */
   .pulse__subtitle {
     font-size: 17px;
     line-height: 1.5;
-    text-align: left;
     max-width: 100%;
-    margin-left: 0;
-    padding-left: 0;
-    margin-bottom: 44px; /* Aşağıdakı text/filter bloku ilə ara məsafəsi bir qədər də artırıldı */
+    margin-bottom: 44px;
   }
 
   .pulse__controls-row {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0px;
-    margin-top: 0px;
+    margin-top: 0;
     width: 100%;
   }
 
@@ -364,58 +321,44 @@
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
-    gap: 0px;
   }
 
-  /* Filter mətni ilə aşağıdakı düymələr arasına alt boşluq (margin-bottom) verildi */
   .pulse__filter-label {
-    width: auto;
-    margin-right: 0;
     font-size: 16px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-align: left;
-    margin-bottom: 23px; /* Yazı ilə düymələr arasındakı xüsusi boşluq */
+    margin-bottom: 23px;
   }
 
-  /* Düymə konteyneri mobildə şəkildəki kimi 4px gap saxlayır */
   .pulse__btn-group {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 4px;
+    gap: 6px;
     width: 100%;
   }
 
-  .pulse__filter-btn {
-    padding: 11px 10px;
-    font-size: 13px;
+  .pulse__filter-btn { padding: 10px; font-size: 13px; }
+
+  /* Mobildə borderlər qorunur və kart ölçüləri bir az kiçildilir */
+  .blog-card {
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc; /* Mobildə tək kart olduqda alt sərhəd də nizamlı göstərir */
   }
 
-  .pulse__marquee {
-    display: none;
+  .blog-card__inner { 
+    padding: 19px 12px; /* Daxili boşluqlar kiçildildi (əvvəl 24px 16px idi) */
   }
-
-  .pulse__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 40px;
-    margin-top: 36px;
+  
+  .blog-card__img-wrapper {
+    margin-bottom: 14px; /* Şəklin alt boşluğu azaldıldı */
   }
-
+  
   .blog-card__title {
-    font-size: 24px;
+    font-size: 19px; /* Başlıq şrift ölçüsü bir az azaldıldı */
     min-height: auto;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pulse__marquee {
-    display: none;
-  }
-
-  .pulse__grid {
-    display: grid;
+  
+  .blog-card__meta {
+    margin-bottom: 10px;
   }
 }

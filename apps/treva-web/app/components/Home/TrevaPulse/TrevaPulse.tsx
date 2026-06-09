@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageContainer from '@/app/components/Container/PageContainer';
-import { DirectionButton, ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
+import { ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
 import './treva-pulse.css';
 
 const blogData = [
@@ -63,40 +63,55 @@ function PulseFilterButton({ category, isActive, onClick }: PulseFilterButtonPro
   );
 }
 
-type PulseCategoryFiltersProps = {
-  categories: string[];
-  activeFilter: string;
-  onFilterChange: (category: string) => void;
-};
-
-function PulseCategoryFilters({ categories, activeFilter, onFilterChange }: PulseCategoryFiltersProps) {
-  return (
-    <div className="pulse__btn-group">
-      {categories.map((category) => (
-        <PulseFilterButton
-          key={category}
-          category={category}
-          isActive={activeFilter === category}
-          onClick={onFilterChange}
-        />
-      ))}
-    </div>
-  );
-}
-
 const TrevaPulse: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('Blog');
+  const [itemsVisible, setItemsVisible] = useState(3);
 
-  const categories = ['All', 'Events', 'Blog', 'HIghlIghts'];
+  const categories = ['All', 'Events', 'Blog', 'Highlights'];
+
+  const filteredData = activeFilter === 'All' 
+    ? blogData 
+    : blogData.filter(post => post.category.toLowerCase() === activeFilter.toLowerCase());
+
+  // Ekran ölçüsünə görə görünən kart sayı
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setItemsVisible(1); // Mobildə dəqiq 1 kart
+      } else if (window.innerWidth <= 1024) {
+        setItemsVisible(2); // Planşetdə 2 kart
+      } else {
+        setItemsVisible(3); // Desktopda 3 kart
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Sonsuz fırlanma (Infinite) üçün datanı nizamlayırıq
+  let baseData = [...filteredData];
+  if (baseData.length > 0) {
+    while (baseData.length <= itemsVisible) {
+      baseData = [...baseData, ...filteredData];
+    }
+  }
+  
+  const duplicatedData = [...baseData, ...baseData];
+  const totalItems = duplicatedData.length;
+
+  // Genişlik hesablamaları (Mobildə sıxılmanın qarşısını alır)
+  const trackWidth = totalItems === 0 ? "100%" : `${(totalItems / itemsVisible) * 100}%`;
+  const cardWidth = totalItems === 0 ? "100%" : `${100 / totalItems}%`;
+  
+  // SÜRATLƏNDİRİLDİ: "baseData.length * 2" saniyəyə endirildi (Əvvəl 4 idi)
+  const scrollSpeed = `${baseData.length * 2}s`; 
 
   return (
     <main>
       <PageContainer>
         <section className="pulse my-10">
           
-          {/* ========================================================
-              1. HEADER SECTION
-             ======================================================== */}
           <div className="pulse__header">
             <div className="pulse__desktop-row">
               <h2 className="pulse__title">
@@ -104,7 +119,6 @@ const TrevaPulse: React.FC = () => {
                 <span className="pulse__title-bold">PULSE</span>
               </h2>
               
-              {/* İstədiyiniz sətir ardıcıllığı ilə tam tənzimlənmiş alt mətn */}
               <p className="pulse__subtitle">
                 Your curated source for industry <br />
                 news, expert insights, and events. <br />
@@ -113,86 +127,71 @@ const TrevaPulse: React.FC = () => {
               </p>
             </div>
 
-            {/* Filters & View All Bölməsi */}
             <div className="pulse__controls-row">
               <div className="pulse__filters">
-                <span className="pulse__filter-label">FIlter by category</span>
-                <PulseCategoryFilters
-                  categories={categories}
-                  activeFilter={activeFilter}
-                  onFilterChange={setActiveFilter}
-                />
+                <span className="pulse__filter-label">Filter by category</span>
+                <div className="pulse__btn-group">
+                  {categories.map((category) => (
+                    <PulseFilterButton
+                      key={category}
+                      category={category}
+                      isActive={activeFilter === category}
+                      onClick={setActiveFilter}
+                    />
+                  ))}
+                </div>
               </div>
               
-              {/* Desktop View All Düyməsi */}
               <div className="pulse__view-all-wrapper d-desktop">
                 <ViewAllButton />
               </div>
             </div>
           </div>
 
-          {/* ========================================================
-              2. BLOG CARDS GRID
-             ======================================================== */}
-          <div className="pulse__marquee" aria-hidden="true">
-            <div className="pulse__marquee-track">
-              {[...blogData, ...blogData].map((post, index) => (
-                <a href="#" key={`${post.id}-${index}`} className="blog-card">
-                  <div className="blog-card__img-wrapper">
-                    <img src={post.image} alt={post.title} className="blog-card__img" />
-                  </div>
-                  
-                  <div className="blog-card__meta">
-                    <span className="blog-card__category">{post.category}</span>
-                    <span className="blog-card__date">{post.date}</span>
-                  </div>
-                  
-                  <h3 className="blog-card__title">{post.title}</h3>
-                  
-                  <div className="blog-card__author">
-                    <img src={post.avatar} alt={post.author} className="blog-card__avatar" />
-                    <span className="blog-card__author-name">{post.author}</span>
-                  </div>
-                </a>
-              ))}
-            </div>
+          {/* SLIDER CONTAINER */}
+          <div className="pulse__slider-wrapper">
+            {totalItems > 0 ? (
+              <div 
+                className="pulse__slider-track"
+                style={{ 
+                  width: trackWidth,
+                  '--scroll-speed': scrollSpeed 
+                } as React.CSSProperties}
+              >
+                {duplicatedData.map((post, index) => (
+                  <a 
+                    href="#" 
+                    key={`${post.id}-${index}`} 
+                    className="blog-card"
+                    style={{ flex: `0 0 ${cardWidth}`, width: cardWidth }}
+                  >
+                    <div className="blog-card__inner">
+                      <div className="blog-card__img-wrapper">
+                        <img src={post.image} alt={post.title} className="blog-card__img" />
+                      </div>
+                      
+                      <div className="blog-card__meta">
+                        <span className="blog-card__category">{post.category}</span>
+                        <span className="blog-card__date">{post.date}</span>
+                      </div>
+                      
+                      <h3 className="blog-card__title">{post.title}</h3>
+                      
+                      <div className="blog-card__author">
+                        <img src={post.avatar} alt={post.author} className="blog-card__avatar" />
+                        <span className="blog-card__author-name">{post.author}</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="pulse__no-data">No articles found in this category.</div>
+            )}
           </div>
 
-          <div className="pulse__grid">
-            {blogData.map((post) => (
-              <a href="#" key={post.id} className="blog-card">
-                <div className="blog-card__img-wrapper">
-                  <img src={post.image} alt={post.title} className="blog-card__img" />
-                </div>
-                
-                <div className="blog-card__meta">
-                  <span className="blog-card__category">{post.category}</span>
-                  <span className="blog-card__date">{post.date}</span>
-                </div>
-                
-                <h3 className="blog-card__title">{post.title}</h3>
-                
-                <div className="blog-card__author">
-                  <img src={post.avatar} alt={post.author} className="blog-card__avatar" />
-                  <span className="blog-card__author-name">{post.author}</span>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          {/* Mobil üçün aşağıda çıxan View All */}
           <div className="pulse__mobile-view-all d-mobile">
             <ViewAllButton mobile />
-          </div>
-
-          {/* ========================================================
-              3. NAVIGATION BUTTONS (Sağ alt küncdə tam sabit)
-             ======================================================== */}
-          <div className="pulse__controls-wrapper d-desktop">
-            <div className="pulse__controls">
-              <DirectionButton direction="previous" label="Previous" />
-              <DirectionButton direction="next" label="Next" />
-            </div>
           </div>
 
         </section>
