@@ -301,16 +301,25 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch; 
   gap: 0px; 
-  border-top: 1px solid rgba(23, 25, 28, 0.1);
-  border-left: 1px solid rgba(23, 25, 28, 0.1);
+  border-top: none;
+  border-left: none;
 }
 
 .section_news .news_middle-list .news_header-item {
   position: relative !important;
   width: 100%;
   display: flex;
-  border-right: 1px solid rgba(23, 25, 28, 0.1);
-  border-bottom: 1px solid rgba(23, 25, 28, 0.1);
+  border-right: none;
+  border-bottom: none;
+}
+
+.section_news .news_middle-list .news_header-item * {
+  transition: none !important;
+  transform: none !important;
+}
+
+.section_news .news_middle-list .news_header-item:hover * {
+  transform: none !important;
 }
 
 .news_middle-link {
@@ -324,11 +333,15 @@
   padding: 1.5rem; 
   box-sizing: border-box;
   text-decoration: none;
+  transition: none !important;
 }
 
-.news_middle-link:hover {
+.news_middle-link:hover,
+.news_middle-link:active {
   border-color: transparent !important;
   box-shadow: none !important;
+  background: transparent !important;
+  transform: none !important;
 }
 
 .news-header_middle-content-wrap, .news_leftcol-content {
@@ -482,18 +495,21 @@
   }
 }
 
-/* Hover effekti */
+/* Hover effekti - disabled for news_middle cards */
 .section_news-header .news-header_middle-img-wrap,
 .section_news-header .news_leftcol-img-wrap,
-.section_news .news_middle-img-wrap,
 .section_news .news_week-img-wrap {
   position: relative;
   cursor: pointer;
 }
 
+.section_news .news_middle-img-wrap {
+  position: relative;
+  cursor: default;
+}
+
 .section_news-header .news-header_middle-img-wrap .projects_overlay,
 .section_news-header .news_leftcol-img-wrap .projects_overlay,
-.section_news .news_middle-img-wrap .projects_overlay,
 .section_news .news_week-img-wrap .projects_overlay {
   position: absolute;
   inset: 0;
@@ -508,9 +524,12 @@
   visibility: visible !important;
 }
 
+.section_news .news_middle-img-wrap .projects_overlay {
+  display: none !important;
+}
+
 .section_news-header .news-header_middle-img-wrap .news_btn,
 .section_news-header .news_leftcol-img-wrap .news_btn,
-.section_news .news_middle-img-wrap .news_btn,
 .section_news .news_week-img-wrap .news_btn {
   display: inline-flex !important;
   align-items: center;
@@ -532,9 +551,12 @@
   visibility: visible !important;
 }
 
+.section_news .news_middle-img-wrap .news_btn {
+  display: none !important;
+}
+
 .section_news-header .news-header_middle-img-wrap .img-cover,
 .section_news-header .news_leftcol-img-wrap .img-cover,
-.section_news .news_middle-img-wrap .img-cover,
 .section_news .news_week-img-wrap .img-cover {
   position: absolute;
   inset: 0;
@@ -542,9 +564,12 @@
   pointer-events: none;
 }
 
+.section_news .news_middle-img-wrap .img-cover {
+  display: none !important;
+}
+
 .section_news-header .news-header_middle-img-wrap:hover .projects_overlay,
 .section_news-header .news_leftcol-img-wrap:hover .projects_overlay,
-.section_news .news_middle-img-wrap:hover .projects_overlay,
 .section_news .news_week-img-wrap:hover .projects_overlay {
   display: flex !important;
   opacity: 1 !important;
@@ -553,7 +578,6 @@
 
 .section_news-header .news-header_middle-img-wrap:hover .news_btn,
 .section_news-header .news_leftcol-img-wrap:hover .news_btn,
-.section_news .news_middle-img-wrap:hover .news_btn,
 .section_news .news_week-img-wrap:hover .news_btn {
   display: inline-flex !important;
   opacity: 1 !important;
@@ -563,21 +587,27 @@
 
 .section_news-header .news-header_middle-img-wrap:hover .news_btn:hover,
 .section_news-header .news_leftcol-img-wrap:hover .news_btn:hover,
-.section_news .news_middle-img-wrap:hover .news_btn:hover,
 .section_news .news_week-img-wrap:hover .news_btn:hover {
   background-color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .section_news-header .news-header_middle-img-wrap img,
 .section_news-header .news_leftcol-img-wrap img,
-.section_news .news_middle-img-wrap img,
 .section_news .news_week-img-wrap img {
   transition: transform 0.4s ease;
 }
 
+.section_news .news_middle-img-wrap img {
+  transition: none !important;
+  transform: none !important;
+}
+
+.section_news .news_middle-img-wrap:hover img {
+  transform: none !important;
+}
+
 .section_news-header .news-header_middle-img-wrap:hover img,
 .section_news-header .news_leftcol-img-wrap:hover img,
-.section_news .news_middle-img-wrap:hover img,
 .section_news .news_week-img-wrap:hover img {
   transform: scale(1.05);
 }
