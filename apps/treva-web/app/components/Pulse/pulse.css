@@ -690,3 +690,48 @@
   background-color: #17191c;
   color: #ffffff;
 }
+
+/* Pulse article grid cards */
+.section_news .news_middle-list {
+  border-top: 1px solid rgba(23, 25, 28, 0.12);
+  border-left: 1px solid rgba(23, 25, 28, 0.12);
+}
+
+.section_news .news_middle-list .news_header-item {
+  min-width: 0;
+  border-right: 1px solid rgba(23, 25, 28, 0.12);
+  border-bottom: 1px solid rgba(23, 25, 28, 0.12);
+}
+
+.section_news .news_middle-list .news_middle-link {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: none;
+  min-height: 100%;
+  padding: 1.5rem;
+}
+
+.section_news .news_middle-list .news_middle-img-wrap {
+  width: 100%;
+  max-width: none;
+  aspect-ratio: 16 / 10;
+  flex: none;
+}
+
+.section_news .news_middle-list .news_middle-img-holder,
+.section_news .news_middle-list .news_middle-img-wrap img {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  display: block;
+}
+
+.section_news .news_middle-list .news_middle-img-wrap img {
+  object-fit: cover;
+}
+
+.section_news .news_middle-list .news-header_middle-content-wrap {
+  width: 100%;
+}
