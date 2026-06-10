@@ -42,16 +42,18 @@
   background-color: var(--sand-bg); 
   display: flex;
   width: 100%;
+  max-width: 1120px; /* Şəkildəki ideal proporsiyanı qorumaq üçün maksimal en */
+  margin: 0 auto;
   box-sizing: border-box;
-  padding: 55px 65px; /* Şəkildəki kənar boşluqlar */
-  gap: 40px;
-  align-items: center; /* Şəkildəki kimi şaquli mərkəzləmə */
+  padding: 55px 65px; 
+  gap: 65px; /* İki blok arasındakı mükəmməl məsafə */
+  align-items: stretch; /* Sağ panelin hündürlüyünü şəklə tam bərabərləşdirir */
   justify-content: space-between;
 }
 
 /* Left Side: Blueprint */
 .apt-image-section {
-  flex: 1.3;
+  flex: 1.25;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,34 +68,34 @@
 }
 
 .apt-plan-img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
+  width: 100%;
+  max-width: 582px; /* Şəklin həddindən artıq böyüməsinin qarşısını alan dəqiq ölçü */
   height: auto;
   object-fit: contain;
   display: block;
 }
 
-/* Right Side: Details Pane (Bire-bir eyni en və düzülüş) */
+/* Right Side: Details Pane */
 .apt-details-section {
   width: 100%;
-  max-width: 340px; /* Sətirlərin və kvadratların qısa qalmasını təmin edən əsas kod */
+  max-width: 325px; /* Sətirlərin qısalığını şəkildəki kimi saxlayan dəqiq en */
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* Elementləri yuxarıdan aşağıya tam bərabər hizada bölür */
   box-sizing: border-box;
+  padding: 2px 0; /* Şaquli hizanı sıfırlamaq üçün */
 }
 
 .apt-header {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Başlıq və badge-ləri sağa sıxır */
-  margin-bottom: 24px;
+  align-items: flex-end; 
 }
 
-/* Typography - Sağa tam bitişik və iki sətirli */
+/* Typography */
 .apt-title {
-  font-size: 43px;
+  font-size: 42px;
   font-weight: 500;
   line-height: 1.12;
   color: #4e525d;
@@ -141,32 +143,32 @@
 
 /* Dairəvi Share Butonu */
 .apt-share-btn {
-  background-color: #4E525D;
+  background-color: #6d717a;
   color: #ffffff;
   border: none;
-  height: 41px;
-  padding: 0 16px;
-  border-radius: 30px;
+  height: 38px;
+  width: 38px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0.8;
 }
 
-/* Specs Table - Sətir məsafələri və xətlər */
+/* Specs Table */
 .apt-specs-list {
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 28px;
+  margin: auto 0; /* Şəkildəki kimi mərkəzdə tam balanslı qalması üçün */
+  padding: 20px 0;
 }
 
 .apt-spec-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 13px 0; /* Şəkildəki sətir məsafəsi (pixel-perfect) */
+  padding: 13px 0; 
   border-bottom: 1px solid var(--line-gray);
 }
 
