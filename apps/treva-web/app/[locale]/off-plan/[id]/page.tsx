@@ -28,7 +28,7 @@ export default function ApartmentCard() {
               <div className="apt-image-section">
                 <div className="apt-blueprint-box">
                   <img 
-                    src="/images/floorplan.png" 
+                    src="/images/offplan-details/eliesaab.jpg" 
                     alt="1 Bedroom Junior Apartment Floor Plan" 
                     className="apt-plan-img"
                   />

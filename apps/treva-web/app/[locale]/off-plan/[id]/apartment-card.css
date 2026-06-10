@@ -19,19 +19,22 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 17px;
   color: #000000;
   margin-bottom: 32px;
   font-weight: 500;
+  text-transform: none;
 }
 
 .apt-separator {
   color: var(--text-gray);
   font-weight: 300;
+  text-transform: none;
 }
 
 .apt-crumb-active {
   color: var(--text-gray);
+  text-transform: none;
 }
 
 /* MAIN CARD CONTAINER */
@@ -64,6 +67,8 @@
 
 .apt-plan-img {
   max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
   object-fit: contain;
   display: block;
@@ -88,7 +93,7 @@
 
 /* Typography - Sağa tam bitişik və iki sətirli */
 .apt-title {
-  font-size: 37px;
+  font-size: 43px;
   font-weight: 500;
   line-height: 1.12;
   color: #4e525d;
@@ -96,11 +101,13 @@
   letter-spacing: -0.5px;
   text-align: right;
   width: 100%;
+  text-transform: none;
 }
 
 .apt-title-sub {
   display: block;
   text-align: right;
+  text-transform: none;
 }
 
 /* Badges Row */
@@ -167,12 +174,14 @@
   font-size: 16px;
   color: var(--slate-gray);
   font-weight: 400;
+  text-transform: none;
 }
 
 .apt-value {
   font-size: 16px;
   color: var(--dark-charcoal);
   font-weight: 400;
+  text-transform: none;
 }
 
 /* Footer Pricing */
@@ -194,6 +203,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  text-transform: none;
 }
 
 .apt-price {
@@ -201,6 +211,7 @@
   font-weight: 400;
   color: var(--dark-charcoal);
   letter-spacing: -0.5px;
+  text-transform: none;
 }
 
 /* Responsive (Mobil) */
