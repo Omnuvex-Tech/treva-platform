@@ -1,0 +1,180 @@
+/* Panorama Section */
+.panorama-section {
+  margin-top: 48px;
+  width: 100%;
+}
+
+/* Banner */
+.panorama-banner {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: url('/images/offplan-details/eliesaab.jpg') center/cover no-repeat;
+  background-color: #2c3539;
+  box-sizing: border-box;
+  aspect-ratio: 3.5 / 1;
+}
+
+.panorama-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.panorama-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.panorama-title {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.5px;
+  text-transform: none;
+}
+
+.panorama-button-group {
+  display: flex;
+  flex-direction: row;
+  width: auto;
+  gap: 12px;
+}
+
+.panorama-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #f3f0ea;
+  color: #000000;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  width: auto;
+  box-sizing: border-box;
+  text-transform: none;
+}
+
+.panorama-btn:hover {
+  background-color: #eae6dc;
+}
+
+.panorama-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+/* Info Table */
+.panorama-info-table {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panorama-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #e5e5e5;
+  gap: 0;
+}
+
+.panorama-label {
+  color: #767676;
+  font-size: 18px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.panorama-value {
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+  text-transform: none;
+}
+
+/* Mobile - same as unit layouts banner */
+@media (max-width: 768px) {
+  .panorama-banner {
+    height: auto;
+    padding: 32px 20px;
+    aspect-ratio: unset;
+  }
+
+  .panorama-overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .panorama-content {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 24px;
+  }
+
+  .panorama-title {
+    font-size: 23px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .panorama-button-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .panorama-btn {
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+    height: 52px;
+    padding: 0 28px;
+    border-radius: 100px;
+    font-size: 15px;
+  }
+
+  .panorama-info-table {
+    margin-top: 24px;
+  }
+
+  .panorama-row {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 0;
+    gap: 4px;
+  }
+
+  .panorama-label {
+    font-size: 16px;
+  }
+
+  .panorama-value {
+    font-size: 16px;
+    text-align: left;
+    max-width: 100%;
+  }
+}
