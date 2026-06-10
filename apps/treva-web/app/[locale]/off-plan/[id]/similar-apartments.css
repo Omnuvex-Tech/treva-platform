@@ -1,0 +1,179 @@
+/* Similar Apartments Section */
+.similar-section {
+  margin-top: 60px;
+  width: 100%;
+}
+
+.similar-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+}
+
+.similar-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 48px;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.similar-title-thin {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 300;
+  color: #1a1a1a;
+  letter-spacing: 0.03em;
+}
+
+.similar-title-bold {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
+  color: #4e525d;
+  margin-left: 0.1em;
+}
+
+.similar-grid {
+  --color-card-bg: #f4f0ea;
+  --color-text-main: #2b3541;
+  --color-text-muted: #8e949a;
+  --card-border-radius: 4px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.similar-grid .layout-card {
+  background-color: var(--color-card-bg);
+  border-radius: var(--card-border-radius);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 520px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.similar-grid .layout-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.similar-grid .layout-card__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.similar-grid .layout-card__code {
+  font-size: 18px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.similar-grid .layout-card__floor {
+  font-size: 16px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.similar-grid .layout-card__number-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.similar-grid .layout-card__number {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.similar-grid .layout-card__status {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  text-transform: none;
+}
+
+.similar-grid .layout-card__visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  margin: 20px 0;
+  min-height: 260px;
+}
+
+.similar-grid .layout-card__blueprint {
+  max-width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+}
+
+.similar-grid .layout-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.similar-grid .layout-card__name {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--color-text-main);
+}
+
+.similar-grid .layout-card__price {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .similar-title {
+    font-size: 36px;
+  }
+
+  .similar-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .similar-section {
+    margin-top: 40px;
+  }
+
+  .similar-header {
+    margin-bottom: 24px;
+  }
+
+  .similar-title {
+    font-size: 28px;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .similar-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .similar-grid .layout-card {
+    min-height: auto;
+    padding: 24px;
+  }
+}

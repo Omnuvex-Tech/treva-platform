@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import './unit-filter.css';
 
 interface Apartment {
@@ -582,9 +583,37 @@ export default function UnitLayout() {
                   <span className="layout-card__price">{apt.price}</span>
                 </div>
               </div>
-              <button type="button" className="layout-card__cta">View Apartment Details</button>
+              <Link href={`/az/off-plan/${apt.id}`} className="layout-card__cta">View Apartment Details</Link>
             </div>
           ))}
+        </div>
+
+        {/* DESKTOP PAGINATION */}
+        <div className="pagination-desktop">
+          <div className="pagination-numbers">
+            <span className="pagination-num pagination-num--active">1</span>
+            <span className="pagination-num">2</span>
+            <span className="pagination-num">3</span>
+            <span className="pagination-num">4</span>
+            <span className="pagination-num">5</span>
+            <span className="pagination-dots">...</span>
+            <span className="pagination-num">40</span>
+          </div>
+          <button type="button" className="pagination-next-btn" aria-label="Next page">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* MOBILE PAGINATION */}
+        <div className="pagination-mobile">
+          <span className="pagination-shown">Shown 12 out of 24</span>
+          <div className="pagination-progress">
+            <div className="pagination-progress__fill"></div>
+          </div>
+          <button type="button" className="pagination-show-more">Show more</button>
         </div>
     </section>
   );
