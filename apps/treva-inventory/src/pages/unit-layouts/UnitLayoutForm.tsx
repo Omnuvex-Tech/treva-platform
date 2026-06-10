@@ -12,7 +12,7 @@ import { categoriesApi, Category } from "../../api/categories";
 import { Layout } from "../../components/Layout";
 import { FileUpload } from "../../components/FileUpload";
 
-type Tab = "basic" | "area" | "location" | "documents" | "gallery";
+type Tab = "basic" | "area" | "location" | "documents" | "gallery" | "similar";
 
 type ApiError = {
     response?: {
@@ -29,6 +29,7 @@ const tabs: { key: Tab; label: string }[] = [
     { key: "location", label: "Location & Building" },
     { key: "documents", label: "Documents" },
     { key: "gallery", label: "Gallery" },
+    { key: "similar", label: "Similar Apartments" },
 ];
 
 export function UnitLayoutForm() {
@@ -71,6 +72,14 @@ export function UnitLayoutForm() {
         queryKey: ["categories"],
         queryFn: () => categoriesApi.getAll(),
     });
+
+    const { data: allLayoutsResponse } = useQuery({
+        queryKey: ["unit-layouts-all"],
+        queryFn: () => unitLayoutsApi.getAll({ limit: 200 }),
+        enabled: activeTab === "similar" && isEdit,
+    });
+
+    const [similarSearch, setSimilarSearch] = useState("");
 
     useEffect(() => {
         if (existing?.data) {
@@ -198,6 +207,28 @@ export function UnitLayoutForm() {
         setForm((prev) => ({
             ...prev,
             documents: prev.documents?.filter((_, i) => i !== index) || [],
+        }));
+    };
+
+    const toggleSimilarApartment = (layoutId: string) => {
+        setForm((prev) => {
+            const current = prev.similarApartmentIds || [];
+            const exists = current.includes(layoutId);
+            return {
+                ...prev,
+                similarApartmentIds: exists
+                    ? current.filter((id) => id !== layoutId)
+                    : [...current, layoutId],
+            };
+        });
+    };
+
+    const removeSimilarApartment = (layoutId: string) => {
+        setForm((prev) => ({
+            ...prev,
+            similarApartmentIds: (prev.similarApartmentIds || []).filter(
+                (id) => id !== layoutId
+            ),
         }));
     };
 
@@ -678,6 +709,136 @@ export function UnitLayoutForm() {
                                             )}
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "similar" && isEdit && (
+                            <div className="flex flex-col gap-6">
+                                {/* Selected Similar Apartments */}
+                                <div>
+                                    <label className="mb-3 block text-xs font-medium text-white/70">
+                                        Selected Similar Apartments ({(form.similarApartmentIds || []).length})
+                                    </label>
+                                    {(form.similarApartmentIds || []).length === 0 ? (
+                                        <p className="text-sm text-white/40">No similar apartments selected yet.</p>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            {(Array.isArray(allLayoutsResponse?.data?.data) ? allLayoutsResponse.data.data : [])
+                                                .filter((l: any) => (form.similarApartmentIds || []).includes(l.id))
+                                                .map((layout: any) => (
+                                                    <div
+                                                        key={layout.id}
+                                                        className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            {layout.mainImage ? (
+                                                                <img
+                                                                    src={layout.mainImage.url}
+                                                                    alt={layout.mainImage.alt || layout.title}
+                                                                    className="h-10 w-10 rounded object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-10 w-10 items-center justify-center rounded bg-white/10 text-xs text-white/40">
+                                                                    No img
+                                                                </div>
+                                                            )}
+                                                            <div>
+                                                                <div className="text-sm font-medium text-white">
+                                                                    {layout.title}
+                                                                </div>
+                                                                <div className="text-xs text-white/50">
+                                                                    Floor {layout.floor} · {layout.totalArea} m² · ${layout.priceUsd?.toLocaleString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeSimilarApartment(layout.id)}
+                                                            className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Available Apartments */}
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        Available Apartments
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={similarSearch}
+                                        onChange={(e) => setSimilarSearch(e.target.value)}
+                                        placeholder="Search apartments..."
+                                        className="mb-3 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                    />
+                                    <div className="flex max-h-96 flex-col gap-2 overflow-y-auto pr-1">
+                                        {(Array.isArray(allLayoutsResponse?.data?.data) ? allLayoutsResponse.data.data : [])
+                                            .filter((l: any) => l.id !== id)
+                                            .filter((l: any) => {
+                                                if (!similarSearch) return true;
+                                                const q = similarSearch.toLowerCase();
+                                                return (
+                                                    l.title?.toLowerCase().includes(q) ||
+                                                    l.name?.toLowerCase().includes(q) ||
+                                                    l.slug?.toLowerCase().includes(q)
+                                                );
+                                            })
+                                            .map((layout: any) => {
+                                                const isSelected = (form.similarApartmentIds || []).includes(layout.id);
+                                                return (
+                                                    <div
+                                                        key={layout.id}
+                                                        onClick={() => toggleSimilarApartment(layout.id)}
+                                                        className={`flex cursor-pointer items-center justify-between rounded-lg border px-4 py-3 transition-colors ${
+                                                            isSelected
+                                                                ? "border-white/30 bg-white/15"
+                                                                : "border-white/10 bg-white/5 hover:bg-white/10"
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div
+                                                                className={`flex h-5 w-5 items-center justify-center rounded border ${
+                                                                    isSelected
+                                                                        ? "border-white/40 bg-white/20"
+                                                                        : "border-white/20"
+                                                                }`}
+                                                            >
+                                                                {isSelected && (
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-white">
+                                                                        <polyline points="20 6 9 17 4 12"/>
+                                                                    </svg>
+                                                                )}
+                                                            </div>
+                                                            {layout.mainImage ? (
+                                                                <img
+                                                                    src={layout.mainImage.url}
+                                                                    alt={layout.mainImage.alt || layout.title}
+                                                                    className="h-10 w-10 rounded object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-10 w-10 items-center justify-center rounded bg-white/10 text-xs text-white/40">
+                                                                    No img
+                                                                </div>
+                                                            )}
+                                                            <div>
+                                                                <div className="text-sm font-medium text-white">
+                                                                    {layout.title}
+                                                                </div>
+                                                                <div className="text-xs text-white/50">
+                                                                    Floor {layout.floor} · {layout.totalArea} m² · ${layout.priceUsd?.toLocaleString()} · {layout.status}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
                                 </div>
                             </div>
                         )}

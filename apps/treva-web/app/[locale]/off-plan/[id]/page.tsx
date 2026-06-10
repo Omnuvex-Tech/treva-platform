@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
@@ -20,6 +20,20 @@ export default function ApartmentCard() {
   const locale = params?.locale || 'az';
 
   const { data: layout, isLoading, error } = useUnitLayout(id);
+
+  const [currency, setCurrency] = useState<'USD' | 'AZN'>('USD');
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const currencyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (currencyRef.current && !currencyRef.current.contains(event.target as Node)) {
+        setCurrencyOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const formatNumber = (num: number) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -146,13 +160,39 @@ export default function ApartmentCard() {
                 </div>
 
                 <div className="apt-footer">
-                  <div className="apt-currency-select">
-                    <span>USD</span>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
+                  <div className="apt-currency-wrapper" ref={currencyRef}>
+                    <button
+                      type="button"
+                      onClick={() => setCurrencyOpen((prev) => !prev)}
+                      aria-haspopup="listbox"
+                      aria-expanded={currencyOpen}
+                      className="apt-currency-select"
+                    >
+                      <span>{currency}</span>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M6 9l6 6 6-6"/>
+                      </svg>
+                    </button>
+                    {currencyOpen && (
+                      <div className="apt-currency-dropdown" role="listbox">
+                        {(['USD', 'AZN'] as const).map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            role="option"
+                            aria-selected={currency === c}
+                            className={`apt-currency-option ${currency === c ? 'apt-currency-option--active' : ''}`}
+                            onClick={() => { setCurrency(c); setCurrencyOpen(false); }}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="apt-price">{formatNumber(layout.priceUsd)}</div>
+                  <div className="apt-price">
+                    {formatNumber(currency === 'USD' ? layout.priceUsd : layout.priceAzn)}
+                  </div>
                 </div>
 
               </div>
@@ -216,6 +256,61 @@ export default function ApartmentCard() {
               </div>
             </div>
           </div>
+
+          {/* Similar Apartments Section */}
+          {layout.similarApartments && layout.similarApartments.length > 0 && (
+            <div className="similar-section">
+              <div className="similar-header">
+                <h2 className="similar-title">
+                  <span className="similar-title-thin">SIMILAR</span>
+                  <span className="similar-title-bold">APARTMENTS</span>
+                </h2>
+              </div>
+
+              <div className="similar-grid">
+                {layout.similarApartments.map((apt) => (
+                  <Link
+                    key={apt.id}
+                    href={`/${locale}/off-plan/${apt.id}`}
+                    className="layout-card"
+                  >
+                    <div className="layout-card__header">
+                      <div className="layout-card__title-block">
+                        <span className="layout-card__code">{apt.title}</span>
+                        <span className="layout-card__floor">{apt.floor} floor</span>
+                      </div>
+                      <div className="layout-card__number-block">
+                        <span className="layout-card__number">N° {apt.number || '?'}</span>
+                        <span className="layout-card__status">{apt.status}</span>
+                      </div>
+                    </div>
+                    <div className="layout-card__visual">
+                      {apt.mainImage ? (
+                        <img
+                          src={getAssetUrl(apt.mainImage.url)}
+                          alt={apt.mainImage.alt || apt.title}
+                          style={{ maxWidth: '100%', maxHeight: 260, objectFit: 'contain' }}
+                        />
+                      ) : (
+                        <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
+                          <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
+                          <line x1="10" y1="110" x2="190" y2="110" stroke="#2b3541" strokeWidth="2"/>
+                          <line x1="190" y1="10" x2="190" y2="170" stroke="#2b3541" strokeWidth="2"/>
+                          <line x1="190" y1="170" x2="290" y2="170" stroke="#2b3541" strokeWidth="2"/>
+                          <text x="100" y="60" fontFamily="Inter" fontSize="11" fill="#2b3541" textAnchor="middle" fontWeight="500">{apt.title}</text>
+                          <text x="100" y="145" fontFamily="Inter" fontSize="10" fill="#8e949a" textAnchor="middle">{apt.totalArea} m²</text>
+                        </svg>
+                      )}
+                    </div>
+                    <div className="layout-card__footer">
+                      <h2 className="layout-card__name">{apt.title}, {apt.totalArea} m²</h2>
+                      <span className="layout-card__price">${formatNumber(apt.priceUsd)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </PageContainer>
       </main>
       <HomeFooter />

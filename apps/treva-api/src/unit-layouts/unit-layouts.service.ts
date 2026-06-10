@@ -130,7 +130,15 @@ export class UnitLayoutsService {
       throw new NotFoundException('Unit layout not found');
     }
 
-    return unitLayout;
+    let similarApartments: any[] = [];
+    if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
+      similarApartments = await this.prisma.unitLayout.findMany({
+        where: { id: { in: unitLayout.similarApartmentIds } },
+        include: { category: true },
+      });
+    }
+
+    return { ...unitLayout, similarApartments };
   }
 
   async findBySlug(slug: string) {
@@ -143,7 +151,15 @@ export class UnitLayoutsService {
       throw new NotFoundException('Unit layout not found');
     }
 
-    return unitLayout;
+    let similarApartments: any[] = [];
+    if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
+      similarApartments = await this.prisma.unitLayout.findMany({
+        where: { id: { in: unitLayout.similarApartmentIds } },
+        include: { category: true },
+      });
+    }
+
+    return { ...unitLayout, similarApartments };
   }
 
   async update(id: string, updateDto: UpdateUnitLayoutDto) {

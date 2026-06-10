@@ -43,6 +43,7 @@ export interface UnitLayout {
     numberOfFloors: UnitLayoutNumberOfFloors;
     view?: string;
     similarApartmentIds: string[];
+    similarApartments?: UnitLayout[];
     mainImage?: UnitLayoutImage;
     gallery: UnitLayoutImage[];
     documents: UnitLayoutDocument[];
