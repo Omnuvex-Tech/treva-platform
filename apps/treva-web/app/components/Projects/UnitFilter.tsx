@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import './unit-filter.css';
 
 interface Apartment {
@@ -561,27 +560,30 @@ export default function UnitLayout() {
         {/* APARTMENT CARDS GRID */}
         <div className="cards-grid">
           {apartments.map((apt) => (
-            <Link key={apt.id} href={`/az/off-plan/${apt.id}`} className="layout-card">
-              <div className="layout-card__header">
-                <div className="layout-card__title-block">
-                  <span className="layout-card__code">{apt.code}</span>
-                  <span className="layout-card__floor">{apt.floor}</span>
+            <div key={apt.id} className="layout-card-wrapper">
+              <div className="layout-card">
+                <div className="layout-card__header">
+                  <div className="layout-card__title-block">
+                    <span className="layout-card__code">{apt.code}</span>
+                    <span className="layout-card__floor">{apt.floor}</span>
+                  </div>
+                  <div className="layout-card__number-block">
+                    <span className="layout-card__number">{apt.number}</span>
+                    <span className="layout-card__status">{apt.status}</span>
+                  </div>
                 </div>
-                <div className="layout-card__number-block">
-                  <span className="layout-card__number">{apt.number}</span>
-                  <span className="layout-card__status">{apt.status}</span>
+                
+                <div className="layout-card__visual">
+                  {apt.svgBlueprint}
                 </div>
-              </div>
-              
-              <div className="layout-card__visual">
-                {apt.svgBlueprint}
-              </div>
 
-              <div className="layout-card__footer">
-                <h2 className="layout-card__name">{apt.title}</h2>
-                <span className="layout-card__price">{apt.price}</span>
+                <div className="layout-card__footer">
+                  <h2 className="layout-card__name">{apt.title}</h2>
+                  <span className="layout-card__price">{apt.price}</span>
+                </div>
               </div>
-            </Link>
+              <button type="button" className="layout-card__cta">View Apartment Details</button>
+            </div>
           ))}
         </div>
     </section>
