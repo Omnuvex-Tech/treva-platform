@@ -15,6 +15,7 @@ export default function ApartmentCard() {
         <PageContainer>
           <div className="apt-wrapper">
             {/* Breadcrumbs */}
+            {/* Breadcrumbs - above card */}
             <nav className="apt-breadcrumbs">
               <span>Main</span> <span className="apt-separator">/</span>
               <span>Panorama by ELIE SAAB</span> <span className="apt-separator">/</span>
