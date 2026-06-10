@@ -1,101 +1,54 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useUnitLayouts } from '@/hooks/use-unit-layouts';
+import { getAssetUrl } from '@/lib/asset-url';
+import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
 
-interface Apartment {
-  id: string;
-  code: string;
-  floor: string;
-  number: string;
-  status: string;
-  title: string;
-  price: string;
-  image: string;
-}
-
-const apartments: Apartment[] = [
-  {
-    id: '1', code: '1BR Junior', floor: '23 floor', number: 'N° 1', status: 'Avaible',
-    title: '1 Bedroom Junior, 50.5 m²', price: '$186 004',
-    image: '/images/offplan-details/a1.png'
-  },
-  {
-    id: '2', code: '1BR-A', floor: '23 floor', number: 'N° 2', status: 'Reserved',
-    title: '1 Bedroom Type A, 67.8 m²', price: '$230 214',
-    image: '/images/offplan-details/a2.png'
-  },
-  {
-    id: '3', code: '1BR-B', floor: '1 floor', number: 'N° 3', status: 'Avaible',
-    title: '1 Bedroom Type B, 67.8 m²', price: '$224 103',
-    image: '/images/offplan-details/a3.png'
-  },
-  {
-    id: '4', code: '2BR-A', floor: '15 floor', number: 'N° 4', status: 'Reserved',
-    title: '2 Bedroom Type A, 95.2 m²', price: '$312 500',
-    image: '/images/offplan-details/2br-a.jpg'
-  },
-  {
-    id: '5', code: '2BR-B', floor: '18 floor', number: 'N° 5', status: 'Avaible',
-    title: '2 Bedroom Type B, 112.5 m²', price: '$378 000',
-    image: '/images/offplan-details/2br-b.jpg'
-  },
-  {
-    id: '6', code: '2BR-C', floor: '20 floor', number: 'N° 6', status: 'Reserved',
-    title: '2 Bedroom Type C, 128.0 m²', price: '$425 000',
-    image: '/images/offplan-details/2br-c.jpg'
-  },
-  {
-    id: '7', code: '3BR-A', floor: '25 floor', number: 'N° 7', status: 'Avaible',
-    title: '3 Bedroom Type A, 165.0 m²', price: '$542 000',
-    image: '/images/offplan-details/3br-a.jpg'
-  },
-  {
-    id: '8', code: '3BR-B', floor: '28 floor', number: 'N° 8', status: 'Reserved',
-    title: '3 Bedroom Type B, 185.0 m²', price: '$612 000',
-    image: '/images/offplan-details/3br-b.jpg'
-  },
-  {
-    id: '9', code: '4BR', floor: '30 floor', number: 'N° 9', status: 'Avaible',
-    title: '4 Bedroom, 245.0 m²', price: '$849 000',
-    image: '/images/offplan-details/4br.jpg'
-  },
-  {
-    id: '10', code: '1BR-D', floor: '5 floor', number: 'N° 10', status: 'Reserved',
-    title: '1 Bedroom Type D, 55.0 m²', price: '$198 000',
-    image: '/images/offplan-details/1br-d.jpg'
-  },
-  {
-    id: '11', code: '2BR-D', floor: '12 floor', number: 'N° 11', status: 'Avaible',
-    title: '2 Bedroom Type D, 108.0 m²', price: '$355 000',
-    image: '/images/offplan-details/2br-d.jpg'
-  },
-  {
-    id: '12', code: '3BR-C', floor: '22 floor', number: 'N° 12', status: 'Reserved',
-    title: '3 Bedroom Type C, 172.0 m²', price: '$568 000',
-    image: '/images/offplan-details/3br-c.jpg'
-  },
-];
-
 export default function UnitLayout() {
-  const [currency, setCurrency] = useState('USD');
-  const [floor, setFloor] = useState('3');
-  const [view, setView] = useState('Sea view');
-  const [status, setStatus] = useState('Available');
-  const [selectedRooms, setSelectedRooms] = useState<string>('1');
+  const params = useParams();
+  const locale = params?.locale || 'az';
 
-  const [priceMin, setPriceMin] = useState(188874);
-  const [priceMax, setPriceMax] = useState(849849);
-  const totalPriceMin = 50000;
+  const [currency, setCurrency] = useState('USD');
+  const [floor, setFloor] = useState('');
+  const [view, setView] = useState('');
+  const [status, setStatus] = useState('');
+  const [selectedRooms, setSelectedRooms] = useState<string>('');
+
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(1500000);
+  const totalPriceMin = 0;
   const totalPriceMax = 1500000;
 
-  const [areaMin, setAreaMin] = useState(35);
-  const [areaMax, setAreaMax] = useState(430);
-  const totalAreaMin = 10;
+  const [areaMin, setAreaMin] = useState(0);
+  const [areaMax, setAreaMax] = useState(600);
+  const totalAreaMin = 0;
   const totalAreaMax = 600;
 
+  const [page, setPage] = useState(1);
+  const limit = 12;
+
   const roomOptions = ['S', '1', '2', '3', '4+'];
+
+  const filters = useMemo(() => ({
+    page,
+    limit,
+    ...(floor && { floor: parseInt(floor) }),
+    ...(view && { view }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(priceMin > 0 && { minPrice: priceMin }),
+    ...(priceMax < totalPriceMax && { maxPrice: priceMax }),
+    ...(areaMin > 0 && { minArea: areaMin }),
+    ...(areaMax < totalAreaMax && { maxArea: areaMax }),
+  }), [page, floor, view, status, priceMin, priceMax, areaMin, areaMax]);
+
+  const { data: response, isLoading } = useUnitLayouts(filters);
+
+  const layouts = response?.data || [];
+  const pagination = response?.pagination;
 
   const priceLeftPercent = ((priceMin - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
   const priceRightPercent = 100 - ((priceMax - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
@@ -107,6 +60,26 @@ export default function UnitLayout() {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
+  const formatPrice = (price: number) => {
+    return `$${formatNumber(price)}`;
+  };
+
+  const handleReset = () => {
+    setFloor('');
+    setView('');
+    setStatus('');
+    setSelectedRooms('');
+    setPriceMin(0);
+    setPriceMax(totalPriceMax);
+    setAreaMin(0);
+    setAreaMax(totalAreaMax);
+    setPage(1);
+  };
+
+  const getCardCode = (layout: UnitLayout) => {
+    return layout.name || layout.title;
+  };
+
   return (
     <section className="layout-section">
         
@@ -115,7 +88,7 @@ export default function UnitLayout() {
           <h2 className="layout-title">
             <span className="layout-title-thin">UnIt</span>
             <span className="layout-title-bold">layouts</span>
-            <span className="layout-count">(124)</span>
+            <span className="layout-count">({pagination?.total || 0})</span>
           </h2>
         </div>
 
@@ -254,11 +227,13 @@ export default function UnitLayout() {
             <div className="filter-group filter-group--floor">
               <label className="filter-label">Floor</label>
               <div className="select-wrapper">
-                <select value={floor} onChange={(e) => setFloor(e.target.value)}>
+                <select value={floor} onChange={(e) => { setFloor(e.target.value); setPage(1); }}>
+                  <option value="">All</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
+                  <option value="5">5</option>
                 </select>
               </div>
             </div>
@@ -269,7 +244,8 @@ export default function UnitLayout() {
             <div className="filter-group filter-group--view">
               <label className="filter-label">View</label>
               <div className="select-wrapper">
-                <select value={view} onChange={(e) => setView(e.target.value)}>
+                <select value={view} onChange={(e) => { setView(e.target.value); setPage(1); }}>
+                  <option value="">All</option>
                   <option value="Sea view">Sea view</option>
                   <option value="City view">City view</option>
                   <option value="Garden view">Garden view</option>
@@ -280,10 +256,11 @@ export default function UnitLayout() {
             <div className="filter-group filter-group--status">
               <label className="filter-label">Status</label>
               <div className="select-wrapper">
-                <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                  <option value="Available">Available</option>
-                  <option value="Reserved">Reserved</option>
-                  <option value="Sold">Sold</option>
+                <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
+                  <option value="">All</option>
+                  <option value="available">Available</option>
+                  <option value="reserved">Reserved</option>
+                  <option value="sold">Sold</option>
                 </select>
               </div>
             </div>
@@ -298,7 +275,7 @@ export default function UnitLayout() {
                   key={room}
                   type="button"
                   className={`room-btn ${selectedRooms === room ? 'room-btn--active' : ''}`}
-                  onClick={() => setSelectedRooms(room)}
+                  onClick={() => setSelectedRooms(selectedRooms === room ? '' : room)}
                 >
                   {room}
                 </button>
@@ -310,8 +287,8 @@ export default function UnitLayout() {
 
         {/* RESULTS & RESET ROW */}
         <div className="results-row">
-          <span className="results-count">24 apartments found</span>
-          <button type="button" className="reset-btn">Reset filters</button>
+          <span className="results-count">{pagination?.total || 0} apartments found</span>
+          <button type="button" className="reset-btn" onClick={handleReset}>Reset filters</button>
         </div>
 
         {/* BANNER CARD */}
@@ -341,62 +318,113 @@ export default function UnitLayout() {
         </div>
 
         {/* APARTMENT CARDS GRID */}
-        <div className="cards-grid">
-          {apartments.map((apt) => (
-            <div key={apt.id} className="layout-card-wrapper">
-              <div className="layout-card">
-                <div className="layout-card__header">
-                  <div className="layout-card__title-block">
-                    <span className="layout-card__code">{apt.code}</span>
-                    <span className="layout-card__floor">{apt.floor}</span>
+        {isLoading ? (
+          <div className="loading-state">
+            <p>Loading apartments...</p>
+          </div>
+        ) : (
+          <div className="cards-grid">
+            {layouts.map((layout: UnitLayout) => (
+              <div key={layout.id} className="layout-card-wrapper">
+                <div className="layout-card">
+                  <div className="layout-card__header">
+                    <div className="layout-card__title-block">
+                      <span className="layout-card__code">{getCardCode(layout)}</span>
+                      <span className="layout-card__floor">{layout.floor} floor</span>
+                    </div>
+                    <div className="layout-card__number-block">
+                      <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
+                      <span className="layout-card__status">{layout.status}</span>
+                    </div>
                   </div>
-                  <div className="layout-card__number-block">
-                    <span className="layout-card__number">{apt.number}</span>
-                    <span className="layout-card__status">{apt.status}</span>
+                  
+                  <div className="layout-card__visual">
+                    {layout.mainImage ? (
+                      <img src={getAssetUrl(layout.mainImage.url)} alt={layout.mainImage.alt || layout.title} className="layout-card__blueprint" />
+                    ) : (
+                      <div className="layout-card__blueprint layout-card__blueprint--placeholder">
+                        <span>No image</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                
-                <div className="layout-card__visual">
-                  <img src={apt.image} alt={apt.title} className="layout-card__blueprint" />
-                </div>
 
-                <div className="layout-card__footer">
-                  <h2 className="layout-card__name">{apt.title}</h2>
-                  <span className="layout-card__price">{apt.price}</span>
+                  <div className="layout-card__footer">
+                    <h2 className="layout-card__name">{layout.title}, {layout.totalArea} m²</h2>
+                    <span className="layout-card__price">{formatPrice(layout.priceUsd)}</span>
+                  </div>
                 </div>
+                <Link href={`/${locale}/off-plan/${layout.id}`} className="layout-card__cta">View Apartment Details</Link>
               </div>
-              <Link href={`/az/off-plan/${apt.id}`} className="layout-card__cta">View Apartment Details</Link>
-            </div>
-          ))}
-        </div>
+            ))}
+            {layouts.length === 0 && (
+              <div className="empty-state">
+                <p>No apartments found matching your filters.</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* DESKTOP PAGINATION */}
-        <div className="pagination-desktop">
-          <div className="pagination-numbers">
-            <span className="pagination-num pagination-num--active">1</span>
-            <span className="pagination-num">2</span>
-            <span className="pagination-num">3</span>
-            <span className="pagination-num">4</span>
-            <span className="pagination-num">5</span>
-            <span className="pagination-dots">...</span>
-            <span className="pagination-num">40</span>
+        {pagination && pagination.totalPages > 1 && (
+          <div className="pagination-desktop">
+            <div className="pagination-numbers">
+              {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map((p) => (
+                <span
+                  key={p}
+                  className={`pagination-num ${p === pagination.page ? 'pagination-num--active' : ''}`}
+                  onClick={() => setPage(p)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {p}
+                </span>
+              ))}
+              {pagination.totalPages > 5 && (
+                <>
+                  <span className="pagination-dots">...</span>
+                  <span
+                    className="pagination-num"
+                    onClick={() => setPage(pagination.totalPages)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {pagination.totalPages}
+                  </span>
+                </>
+              )}
+            </div>
+            <button
+              type="button"
+              className="pagination-next-btn"
+              aria-label="Next page"
+              onClick={() => setPage(Math.min(page + 1, pagination.totalPages))}
+              disabled={page >= pagination.totalPages}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
           </div>
-          <button type="button" className="pagination-next-btn" aria-label="Next page">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-              <polyline points="12 5 19 12 12 19"/>
-            </svg>
-          </button>
-        </div>
+        )}
 
         {/* MOBILE PAGINATION */}
-        <div className="pagination-mobile">
-          <span className="pagination-shown">Shown 12 out of 24</span>
-          <div className="pagination-progress">
-            <div className="pagination-progress__fill"></div>
+        {pagination && (
+          <div className="pagination-mobile">
+            <span className="pagination-shown">
+              Shown {Math.min(page * limit, pagination.total)} out of {pagination.total}
+            </span>
+            <div className="pagination-progress">
+              <div
+                className="pagination-progress__fill"
+                style={{ width: `${(pagination.page / pagination.totalPages) * 100}%` }}
+              ></div>
+            </div>
+            {page < pagination.totalPages && (
+              <button type="button" className="pagination-show-more" onClick={() => setPage(page + 1)}>
+                Show more
+              </button>
+            )}
           </div>
-          <button type="button" className="pagination-show-more">Show more</button>
-        </div>
+        )}
     </section>
   );
 }

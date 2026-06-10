@@ -19,4 +19,10 @@ export const endpoints = {
         detail: (slug: string) => `/products/${slug}`,
         categories: "/categories",
     },
+
+    offPlan: {
+        list: "/unit-layouts",
+        detail: (id: string) => `/unit-layouts/${id}`,
+        categories: "/categories",
+    },
 } as const;

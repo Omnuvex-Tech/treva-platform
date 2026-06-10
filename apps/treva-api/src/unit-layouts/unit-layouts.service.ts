@@ -1,0 +1,222 @@
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUnitLayoutDto } from './dto/create-unit-layout.dto';
+import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
+
+@Injectable()
+export class UnitLayoutsService {
+  constructor(private prisma: PrismaService) {}
+
+  async create(createDto: CreateUnitLayoutDto) {
+    const existingSlug = await this.prisma.unitLayout.findUnique({
+      where: { slug: createDto.slug },
+    });
+
+    if (existingSlug) {
+      throw new ConflictException('Unit layout with this slug already exists');
+    }
+
+    return this.prisma.unitLayout.create({
+      data: {
+        title: createDto.title,
+        name: createDto.name,
+        slug: createDto.slug,
+        status: (createDto.status as any) || 'available',
+        categoryId: createDto.categoryId,
+        floor: createDto.floor,
+        number: createDto.number,
+        totalArea: createDto.totalArea,
+        internalArea: createDto.internalArea,
+        balconyArea: createDto.balconyArea,
+        priceUsd: createDto.priceUsd,
+        priceAzn: createDto.priceAzn,
+        completionYear: createDto.completionYear,
+        numberOfFloors: createDto.numberOfFloors as any,
+        view: createDto.view,
+        similarApartmentIds: createDto.similarApartmentIds || [],
+        mainImage: createDto.mainImage as any,
+        gallery: createDto.gallery as any[] || [],
+        documents: createDto.documents as any[] || [],
+        location: createDto.location as any,
+      },
+      include: { category: true },
+    });
+  }
+
+  async findAll(query: {
+    page?: number;
+    limit?: number;
+    categoryId?: string;
+    status?: string;
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minArea?: number;
+    maxArea?: number;
+    floor?: number;
+    view?: string;
+  }) {
+    const page = query.page || 1;
+    const limit = query.limit || 12;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (query.categoryId) {
+      where.categoryId = query.categoryId;
+    }
+
+    if (query.status) {
+      where.status = query.status;
+    }
+
+    if (query.search) {
+      where.OR = [
+        { title: { contains: query.search, mode: 'insensitive' } },
+        { name: { contains: query.search, mode: 'insensitive' } },
+        { slug: { contains: query.search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (query.minPrice || query.maxPrice) {
+      where.priceUsd = {};
+      if (query.minPrice) where.priceUsd.gte = query.minPrice;
+      if (query.maxPrice) where.priceUsd.lte = query.maxPrice;
+    }
+
+    if (query.minArea || query.maxArea) {
+      where.totalArea = {};
+      if (query.minArea) where.totalArea.gte = query.minArea;
+      if (query.maxArea) where.totalArea.lte = query.maxArea;
+    }
+
+    if (query.floor) {
+      where.floor = query.floor;
+    }
+
+    if (query.view) {
+      where.view = { contains: query.view, mode: 'insensitive' };
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.unitLayout.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: { category: true },
+      }),
+      this.prisma.unitLayout.count({ where }),
+    ]);
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findOne(id: string) {
+    const unitLayout = await this.prisma.unitLayout.findUnique({
+      where: { id },
+      include: { category: true },
+    });
+
+    if (!unitLayout) {
+      throw new NotFoundException('Unit layout not found');
+    }
+
+    return unitLayout;
+  }
+
+  async findBySlug(slug: string) {
+    const unitLayout = await this.prisma.unitLayout.findUnique({
+      where: { slug },
+      include: { category: true },
+    });
+
+    if (!unitLayout) {
+      throw new NotFoundException('Unit layout not found');
+    }
+
+    return unitLayout;
+  }
+
+  async update(id: string, updateDto: UpdateUnitLayoutDto) {
+    const existing = await this.prisma.unitLayout.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Unit layout not found');
+    }
+
+    if (updateDto.slug && updateDto.slug !== existing.slug) {
+      const slugExists = await this.prisma.unitLayout.findUnique({
+        where: { slug: updateDto.slug },
+      });
+      if (slugExists) {
+        throw new ConflictException('Unit layout with this slug already exists');
+      }
+    }
+
+    const data: any = {};
+    if (updateDto.title !== undefined) data.title = updateDto.title;
+    if (updateDto.name !== undefined) data.name = updateDto.name;
+    if (updateDto.slug !== undefined) data.slug = updateDto.slug;
+    if (updateDto.status !== undefined) data.status = updateDto.status;
+    if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
+    if (updateDto.floor !== undefined) data.floor = updateDto.floor;
+    if (updateDto.number !== undefined) data.number = updateDto.number;
+    if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
+    if (updateDto.internalArea !== undefined) data.internalArea = updateDto.internalArea;
+    if (updateDto.balconyArea !== undefined) data.balconyArea = updateDto.balconyArea;
+    if (updateDto.priceUsd !== undefined) data.priceUsd = updateDto.priceUsd;
+    if (updateDto.priceAzn !== undefined) data.priceAzn = updateDto.priceAzn;
+    if (updateDto.completionYear !== undefined) data.completionYear = updateDto.completionYear;
+    if (updateDto.numberOfFloors !== undefined) data.numberOfFloors = updateDto.numberOfFloors;
+    if (updateDto.view !== undefined) data.view = updateDto.view;
+    if (updateDto.similarApartmentIds !== undefined) data.similarApartmentIds = updateDto.similarApartmentIds;
+    if (updateDto.mainImage !== undefined) data.mainImage = updateDto.mainImage;
+    if (updateDto.gallery !== undefined) data.gallery = updateDto.gallery;
+    if (updateDto.documents !== undefined) data.documents = updateDto.documents;
+    if (updateDto.location !== undefined) data.location = updateDto.location;
+
+    return this.prisma.unitLayout.update({
+      where: { id },
+      data,
+      include: { category: true },
+    });
+  }
+
+  async remove(id: string) {
+    const existing = await this.prisma.unitLayout.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Unit layout not found');
+    }
+
+    return this.prisma.unitLayout.delete({
+      where: { id },
+    });
+  }
+
+  async count() {
+    return this.prisma.unitLayout.count();
+  }
+
+  async countByStatus() {
+    const [available, sold, reserved] = await Promise.all([
+      this.prisma.unitLayout.count({ where: { status: 'available' } }),
+      this.prisma.unitLayout.count({ where: { status: 'sold' } }),
+      this.prisma.unitLayout.count({ where: { status: 'reserved' } }),
+    ]);
+    return { available, sold, reserved, total: available + sold + reserved };
+  }
+}

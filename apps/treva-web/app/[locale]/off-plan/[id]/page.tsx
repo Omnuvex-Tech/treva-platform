@@ -1,15 +1,74 @@
 'use client';
 
 import React from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
+import { useUnitLayout, useUnitLayouts } from '@/hooks/use-unit-layouts';
+import { getAssetUrl } from '@/lib/asset-url';
+import type { UnitLayout } from '@/lib/unit-layout.types';
 import "../off-plan.css";
 import "./apartment-card.css";
 import "./panorama-card.css";
 import "./similar-apartments.css";
 
 export default function ApartmentCard() {
+  const params = useParams();
+  const id = params?.id as string | undefined;
+  const locale = params?.locale || 'az';
+
+  const { data: layout, isLoading, error } = useUnitLayout(id);
+
+  const formatNumber = (num: number) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  };
+
+  const statusClass = (status: string) => {
+    switch (status) {
+      case 'available': return 'badge-available';
+      case 'sold': return 'badge-sold';
+      case 'reserved': return 'badge-reserved';
+      default: return '';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="page-wrapper">
+        <Navbar variant="solid" />
+        <main className="main-wrapper">
+          <PageContainer>
+            <div className="loading-state" style={{ padding: '64px 0', textAlign: 'center' }}>
+              <p style={{ color: '#6d717a' }}>Loading...</p>
+            </div>
+          </PageContainer>
+        </main>
+        <HomeFooter />
+      </div>
+    );
+  }
+
+  if (error || !layout) {
+    return (
+      <div className="page-wrapper">
+        <Navbar variant="solid" />
+        <main className="main-wrapper">
+          <PageContainer>
+            <div className="loading-state" style={{ padding: '64px 0', textAlign: 'center' }}>
+              <p style={{ color: '#6d717a' }}>Apartment not found</p>
+              <Link href={`/${locale}/off-plan`} style={{ color: '#3F4249', marginTop: 16, display: 'inline-block' }}>
+                ← Back to listings
+              </Link>
+            </div>
+          </PageContainer>
+        </main>
+        <HomeFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="page-wrapper">
       <Navbar variant="solid" />
@@ -17,11 +76,10 @@ export default function ApartmentCard() {
         <PageContainer>
           <div className="apt-wrapper">
             {/* Breadcrumbs */}
-            {/* Breadcrumbs - above card */}
             <nav className="apt-breadcrumbs">
-              <span>Main</span> <span className="apt-separator">/</span>
-              <span>Panorama by ELIE SAAB</span> <span className="apt-separator">/</span>
-              <span className="apt-crumb-active">N° 1</span>
+              <Link href={`/${locale}`}>Main</Link> <span className="apt-separator">/</span>
+              <Link href={`/${locale}/off-plan`}>{layout.category?.title || 'Off Plan'}</Link> <span className="apt-separator">/</span>
+              <span className="apt-crumb-active">N° {layout.number || layout.id.slice(-2)}</span>
             </nav>
 
             {/* Main Container */}
@@ -30,25 +88,32 @@ export default function ApartmentCard() {
               {/* Left Side: Blueprint Image Section */}
               <div className="apt-image-section">
                 <div className="apt-blueprint-box">
-                  <img 
-                    src="/images/offplan-details/a1.png" 
-                    alt="1 Bedroom Junior Apartment Floor Plan" 
-                    className="apt-plan-img"
-                  />
+                  {layout.mainImage ? (
+                    <img 
+                      src={getAssetUrl(layout.mainImage.url)} 
+                      alt={layout.mainImage.alt || layout.title} 
+                      className="apt-plan-img"
+                    />
+                  ) : (
+                    <div className="apt-plan-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f2eb', color: '#6d717a' }}>
+                      No image
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Right Side: Data and Details (Justified to End) */}
+              {/* Right Side: Data and Details */}
               <div className="apt-details-section">
                 <div className="apt-header">
                   <h1 className="apt-title">
-                    1 Bedroom Junior <span className="apt-title-sub">Apartment</span>
+                    {layout.title} <span className="apt-title-sub">Apartment</span>
                   </h1>
                   
-                  {/* Badges Row - Aligned to the Right */}
                   <div className="apt-badge-row">
-                    <span className="apt-badge badge-available">Available</span>
-                    <button type="button" className="apt-badge badge-btn">PDF</button>
+                    <span className={`apt-badge ${statusClass(layout.status)}`}>{layout.status}</span>
+                    {layout.documents && layout.documents.length > 0 && layout.documents[0] && (
+                      <a href={getAssetUrl(layout.documents[0].url)} target="_blank" rel="noopener noreferrer" className="apt-badge badge-btn">PDF</a>
+                    )}
                     <button type="button" className="apt-share-btn" aria-label="Share">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
@@ -59,27 +124,27 @@ export default function ApartmentCard() {
                   </div>
                 </div>
 
-                {/* Specs Table */}
                 <div className="apt-specs-list">
                   <div className="apt-spec-item">
                     <span className="apt-label">Floor</span>
-                    <span className="apt-value">23</span>
+                    <span className="apt-value">{layout.floor}</span>
                   </div>
                   <div className="apt-spec-item">
                     <span className="apt-label">Total Area</span>
-                    <span className="apt-value">50.5 m²</span>
+                    <span className="apt-value">{layout.totalArea} m²</span>
                   </div>
                   <div className="apt-spec-item">
                     <span className="apt-label">Internal Area</span>
-                    <span className="apt-value">43.0 m²</span>
+                    <span className="apt-value">{layout.internalArea} m²</span>
                   </div>
-                  <div className="apt-spec-item">
-                    <span className="apt-label">Balcony</span>
-                    <span className="apt-value">7.5 m²</span>
-                  </div>
+                  {layout.balconyArea && (
+                    <div className="apt-spec-item">
+                      <span className="apt-label">Balcony</span>
+                      <span className="apt-value">{layout.balconyArea} m²</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Footer Pricing - Aligned to the Right */}
                 <div className="apt-footer">
                   <div className="apt-currency-select">
                     <span>USD</span>
@@ -87,7 +152,7 @@ export default function ApartmentCard() {
                       <path d="M6 9l6 6 6-6"/>
                     </svg>
                   </div>
-                  <div className="apt-price">186 004</div>
+                  <div className="apt-price">{formatNumber(layout.priceUsd)}</div>
                 </div>
 
               </div>
@@ -100,7 +165,7 @@ export default function ApartmentCard() {
             <div className="panorama-banner">
               <div className="panorama-overlay"></div>
               <div className="panorama-content">
-                <h3 className="panorama-title">Panorama by ELIE SAAB</h3>
+                <h3 className="panorama-title">{layout.category?.title || 'Panorama'}</h3>
                 <div className="panorama-button-group">
                   <button className="panorama-btn">
                     <svg className="panorama-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -125,101 +190,29 @@ export default function ApartmentCard() {
               </div>
             </div>
 
-            {/* Info Table */}
             <div className="panorama-info-table">
-              <div className="panorama-row">
-                <span className="panorama-label">Location</span>
-                <span className="panorama-value">Sea Breeze Resort, Nardaran District, Baku, Azerbaijan</span>
-              </div>
+              {layout.location && (
+                <div className="panorama-row">
+                  <span className="panorama-label">Location</span>
+                  <span className="panorama-value">{layout.location.title}</span>
+                </div>
+              )}
               
-              <div className="panorama-row">
-                <span className="panorama-label">Real Estate Type</span>
-                <span className="panorama-value">Apartment</span>
-              </div>
+              {layout.location && (
+                <div className="panorama-row">
+                  <span className="panorama-label">Real Estate Type</span>
+                  <span className="panorama-value">{layout.location.type}</span>
+                </div>
+              )}
               
               <div className="panorama-row">
                 <span className="panorama-label">Year of Completion</span>
-                <span className="panorama-value">2030</span>
+                <span className="panorama-value">{layout.completionYear}</span>
               </div>
               
               <div className="panorama-row">
                 <span className="panorama-label">Number of Floors</span>
-                <span className="panorama-value">From 3 to 30 Floors</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Similar Apartments Section */}
-          <div className="similar-section">
-            <div className="similar-header">
-              <h2 className="similar-title">
-                <span className="similar-title-thin">SIMILAR</span>
-                <span className="similar-title-bold">APARTMENTS</span>
-              </h2>
-            </div>
-
-            <div className="similar-grid">
-              {/* Card 1 */}
-              <div className="layout-card">
-                <div className="layout-card__header">
-                  <div className="layout-card__title-block">
-                    <span className="layout-card__code">1BR Junior</span>
-                    <span className="layout-card__floor">23 floor</span>
-                  </div>
-                  <div className="layout-card__number-block">
-                    <span className="layout-card__number">N° 1</span>
-                    <span className="layout-card__status">Available</span>
-                  </div>
-                </div>
-                <div className="layout-card__visual">
-                  <img src="/images/offplan-details/a1.png" alt="1 Bedroom Junior" className="layout-card__blueprint" />
-                </div>
-                <div className="layout-card__footer">
-                  <h2 className="layout-card__name">1 Bedroom Junior, 50.5 m²</h2>
-                  <span className="layout-card__price">$186 004</span>
-                </div>
-              </div>
-
-              {/* Card 2 */}
-              <div className="layout-card">
-                <div className="layout-card__header">
-                  <div className="layout-card__title-block">
-                    <span className="layout-card__code">1BR-A</span>
-                    <span className="layout-card__floor">23 floor</span>
-                  </div>
-                  <div className="layout-card__number-block">
-                    <span className="layout-card__number">N° 2</span>
-                    <span className="layout-card__status">Reserved</span>
-                  </div>
-                </div>
-                <div className="layout-card__visual">
-                  <img src="/images/offplan-details/a2.png" alt="1 Bedroom Type A" className="layout-card__blueprint" />
-                </div>
-                <div className="layout-card__footer">
-                  <h2 className="layout-card__name">1 Bedroom Type A, 67.8 m²</h2>
-                  <span className="layout-card__price">$230 214</span>
-                </div>
-              </div>
-
-              {/* Card 3 */}
-              <div className="layout-card">
-                <div className="layout-card__header">
-                  <div className="layout-card__title-block">
-                    <span className="layout-card__code">2BR+A</span>
-                    <span className="layout-card__floor">24 floor</span>
-                  </div>
-                  <div className="layout-card__number-block">
-                    <span className="layout-card__number">N° 6</span>
-                    <span className="layout-card__status">Reserved</span>
-                  </div>
-                </div>
-                <div className="layout-card__visual">
-                  <img src="/images/offplan-details/a3.png" alt="2 Bedroom+ Type A" className="layout-card__blueprint" />
-                </div>
-                <div className="layout-card__footer">
-                  <h2 className="layout-card__name">2 Bedroom+ Type A, 148.7 m²</h2>
-                  <span className="layout-card__price">$369 180</span>
-                </div>
+                <span className="panorama-value">From {layout.numberOfFloors.start} to {layout.numberOfFloors.end} Floors</span>
               </div>
             </div>
           </div>

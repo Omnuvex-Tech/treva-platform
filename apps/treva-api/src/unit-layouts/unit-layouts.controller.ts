@@ -1,0 +1,112 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { UnitLayoutsService } from './unit-layouts.service';
+import { CreateUnitLayoutDto } from './dto/create-unit-layout.dto';
+import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+@ApiTags('unit-layouts')
+@Controller('api/v1/unit-layouts')
+export class UnitLayoutsController {
+  constructor(private readonly unitLayoutsService: UnitLayoutsService) {}
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new unit layout' })
+  @ApiResponse({ status: 201, description: 'Unit layout created successfully' })
+  async create(@Body() createDto: CreateUnitLayoutDto) {
+    return this.unitLayoutsService.create(createDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all unit layouts with filters and pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'categoryId', required: false })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'minPrice', required: false, type: Number })
+  @ApiQuery({ name: 'maxPrice', required: false, type: Number })
+  @ApiQuery({ name: 'minArea', required: false, type: Number })
+  @ApiQuery({ name: 'maxArea', required: false, type: Number })
+  @ApiQuery({ name: 'floor', required: false, type: Number })
+  @ApiQuery({ name: 'view', required: false })
+  async findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('status') status?: string,
+    @Query('search') search?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('minArea') minArea?: string,
+    @Query('maxArea') maxArea?: string,
+    @Query('floor') floor?: string,
+    @Query('view') view?: string,
+  ) {
+    return this.unitLayoutsService.findAll({
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      categoryId,
+      status,
+      search,
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      minArea: minArea ? parseFloat(minArea) : undefined,
+      maxArea: maxArea ? parseFloat(maxArea) : undefined,
+      floor: floor ? parseInt(floor, 10) : undefined,
+      view,
+    });
+  }
+
+  @Get('stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get unit layout statistics' })
+  async getStats() {
+    const counts = await this.unitLayoutsService.countByStatus();
+    return counts;
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get unit layout by ID' })
+  @ApiResponse({ status: 200, description: 'Unit layout retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Unit layout not found' })
+  async findOne(@Param('id') id: string) {
+    return this.unitLayoutsService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a unit layout' })
+  @ApiResponse({ status: 200, description: 'Unit layout updated successfully' })
+  @ApiResponse({ status: 404, description: 'Unit layout not found' })
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateUnitLayoutDto,
+  ) {
+    return this.unitLayoutsService.update(id, updateDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a unit layout' })
+  @ApiResponse({ status: 200, description: 'Unit layout deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Unit layout not found' })
+  async remove(@Param('id') id: string) {
+    return this.unitLayoutsService.remove(id);
+  }
+}

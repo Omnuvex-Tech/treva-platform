@@ -32,8 +32,9 @@ export class ApiClient {
                     ...init.headers,
                 },
             });
-            const body = await response.json() as ApiResponseBody<T>;
-            return new ApiResponse<T>(body);
+            const body = await response.json();
+            const normalizedBody = this.normalizeResponse<T>(body, response.ok);
+            return new ApiResponse<T>(normalizedBody);
         } catch (error) {
             const message = error instanceof Error ? error.message : "Request failed";
             return new ApiResponse<T>({
@@ -45,6 +46,26 @@ export class ApiClient {
         } finally {
             clearTimeout(timeout);
         }
+    }
+
+    private normalizeResponse<T>(body: unknown, ok: boolean): ApiResponseBody<T> {
+        if (body && typeof body === "object" && "success" in body) {
+            return body as ApiResponseBody<T>;
+        }
+
+        const message =
+            body && typeof body === "object" && "message" in body
+                ? String((body as { message?: unknown }).message)
+                : ok
+                  ? "OK"
+                  : "Request failed";
+
+        return {
+            success: ok,
+            message,
+            data: ok ? (body as T) : null,
+            errors: ok ? [] : [{ code: "request_failed", message }],
+        };
     }
 
     get<T>(endpoint: string, options?: RequestOptions) {
