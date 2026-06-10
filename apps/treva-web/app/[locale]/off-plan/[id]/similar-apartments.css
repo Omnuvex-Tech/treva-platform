@@ -1,6 +1,7 @@
 /* Similar Apartments Section */
 .similar-section {
   margin-top: 60px;
+  margin-bottom: 60px;
   width: 100%;
 }
 
@@ -101,7 +102,7 @@
 .similar-grid .layout-card__status {
   font-size: 18px;
   font-weight: 400;
-  color: var(--color-text-muted);
+  color: #4E525D;
   text-decoration: none;
   text-transform: none;
 }

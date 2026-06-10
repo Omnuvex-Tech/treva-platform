@@ -12,287 +12,69 @@ interface Apartment {
   status: string;
   title: string;
   price: string;
-  svgBlueprint: React.ReactNode;
+  image: string;
 }
 
 const apartments: Apartment[] = [
   {
     id: '1', code: '1BR Junior', floor: '23 floor', number: 'N° 1', status: 'Avaible',
     title: '1 Bedroom Junior, 50.5 m²', price: '$186 004',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="10" y1="110" x2="190" y2="110" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="190" y1="10" x2="190" y2="170" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="190" y1="170" x2="290" y2="170" stroke="#2b3541" strokeWidth="2"/>
-        <rect x="25" y="20" width="65" height="50" fill="none" stroke="#8e949a" strokeDasharray="2,2"/>
-        <circle cx="57" cy="45" r="3" fill="#8e949a"/>
-        <path d="M110,35 Q130,55 110,75" fill="none" stroke="#8e949a"/>
-        <text x="70" y="140" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living + Kitchen</text>
-        <text x="70" y="155" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">6.9 x 2.6</text>
-        <text x="70" y="45" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom</text>
-        <text x="70" y="60" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.4 x 2.6</text>
-        <text x="240" y="65" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bathroom</text>
-        <text x="240" y="78" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">2.4 x 1.8</text>
-        <rect x="20" y="170" width="80" height="30" fill="none" stroke="#8e949a"/>
-        <circle cx="190" cy="140" r="14" fill="none" stroke="#8e949a"/>
-        <rect x="255" y="125" width="25" height="35" fill="none" stroke="#8e949a"/>
-      </svg>
-    )
+    image: '/images/offplan-details/a1.png'
   },
   {
     id: '2', code: '1BR-A', floor: '23 floor', number: 'N° 2', status: 'Reserved',
     title: '1 Bedroom Type A, 67.8 m²', price: '$230 214',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="30" y="10" width="240" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="155" y1="10" x2="155" y2="150" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="155" y1="150" x2="270" y2="150" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="155" y1="170" x2="155" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <circle cx="90" cy="65" r="28" fill="none" stroke="#8e949a"/>
-        <text x="95" y="95" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="95" y="110" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">3.7 x 7.3</text>
-        <rect x="175" y="30" width="75" height="70" fill="none" stroke="#8e949a"/>
-        <text x="212" y="115" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom</text>
-        <text x="212" y="128" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">3.4 x 4.5</text>
-        <text x="245" y="180" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath</text>
-        <text x="245" y="192" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.0 x 2.2</text>
-        <text x="185" y="180" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Powder</text>
-        <text x="185" y="192" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">1.3 x 2.2</text>
-      </svg>
-    )
+    image: '/images/offplan-details/a2.png'
   },
   {
     id: '3', code: '1BR-B', floor: '1 floor', number: 'N° 3', status: 'Avaible',
     title: '1 Bedroom Type B, 67.8 m²', price: '$224 103',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <path d="M30,10 L270,10 C270,10 270,170 270,170 C270,170 240,200 190,160 L30,40 Z" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <path d="M30,10 L30,40 M270,10 L270,180 C270,195 250,210 230,195 L65,55" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="110" y1="10" x2="110" y2="75" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="110" y1="75" x2="270" y2="75" stroke="#2b3541" strokeWidth="2"/>
-        <text x="75" y="28" fontFamily="Inter" fontSize="8" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath</text>
-        <text x="75" y="38" fontFamily="Inter" fontSize="7" fill="#8e949a" textAnchor="middle">2.6 x 1.6</text>
-        <text x="75" y="60" fontFamily="Inter" fontSize="8" fill="#2b3541" textAnchor="middle" fontWeight="500">Powder</text>
-        <text x="75" y="70" fontFamily="Inter" fontSize="7" fill="#8e949a" textAnchor="middle">2.2 x 1.4</text>
-        <text x="210" y="32" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom</text>
-        <text x="210" y="44" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">4.7 x 3.1</text>
-        <text x="180" y="140" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="180" y="152" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">8.3 x 6.8</text>
-        <circle cx="165" cy="110" r="14" fill="none" stroke="#8e949a"/>
-        <rect x="185" y="85" width="65" height="25" fill="none" stroke="#8e949a"/>
-      </svg>
-    )
+    image: '/images/offplan-details/a3.png'
   },
   {
     id: '4', code: '2BR-A', floor: '15 floor', number: 'N° 4', status: 'Reserved',
     title: '2 Bedroom Type A, 95.2 m²', price: '$312 500',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="150" y1="10" x2="150" y2="130" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="130" x2="290" y2="130" stroke="#2b3541" strokeWidth="2"/>
-        <text x="80" y="70" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="80" y="85" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">5.5 x 4.2</text>
-        <text x="220" y="50" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="220" y="63" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.0 x 3.5</text>
-        <text x="220" y="100" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="220" y="113" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">3.8 x 3.2</text>
-        <text x="150" y="180" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath</text>
-        <text x="150" y="193" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">2.5 x 2.0</text>
-      </svg>
-    )
+    image: '/images/offplan-details/2br-a.jpg'
   },
   {
     id: '5', code: '2BR-B', floor: '18 floor', number: 'N° 5', status: 'Avaible',
     title: '2 Bedroom Type B, 112.5 m²', price: '$378 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="120" y1="10" x2="120" y2="100" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="120" y1="100" x2="290" y2="100" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="200" y1="100" x2="200" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="65" y="55" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="65" y="68" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">6.0 x 4.5</text>
-        <text x="160" y="55" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="160" y="68" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.2 x 3.8</text>
-        <text x="245" y="55" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="245" y="68" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.0 x 3.5</text>
-        <text x="155" y="160" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath</text>
-        <text x="155" y="173" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">2.8 x 2.2</text>
-        <text x="245" y="160" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Powder</text>
-        <text x="245" y="173" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">1.5 x 1.2</text>
-      </svg>
-    )
+    image: '/images/offplan-details/2br-b.jpg'
   },
   {
     id: '6', code: '2BR-C', floor: '20 floor', number: 'N° 6', status: 'Reserved',
     title: '2 Bedroom Type C, 128.0 m²', price: '$425 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="140" y1="10" x2="140" y2="110" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="110" x2="200" y2="110" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="200" y1="10" x2="200" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="75" y="60" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="75" y="73" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">7.2 x 5.0</text>
-        <text x="170" y="55" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="170" y="68" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.5 x 4.0</text>
-        <text x="170" y="100" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="170" y="113" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.2 x 3.6</text>
-        <text x="245" y="100" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 1</text>
-        <text x="245" y="112" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.5 x 2.0</text>
-        <text x="245" y="160" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 2</text>
-        <text x="245" y="172" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.0 x 1.8</text>
-      </svg>
-    )
+    image: '/images/offplan-details/2br-c.jpg'
   },
   {
     id: '7', code: '3BR-A', floor: '25 floor', number: 'N° 7', status: 'Avaible',
     title: '3 Bedroom Type A, 165.0 m²', price: '$542 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="100" y1="10" x2="100" y2="90" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="200" y1="10" x2="200" y2="90" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="90" x2="290" y2="90" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="150" y1="90" x2="150" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="55" y="50" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="55" y="63" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">5.0 x 4.2</text>
-        <text x="150" y="50" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="150" y="63" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.5 x 3.8</text>
-        <text x="245" y="50" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 3</text>
-        <text x="245" y="63" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.0 x 3.5</text>
-        <text x="80" y="155" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="80" y="168" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">8.0 x 5.5</text>
-        <text x="220" y="140" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 1</text>
-        <text x="220" y="152" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">3.0 x 2.5</text>
-        <text x="220" y="185" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 2</text>
-        <text x="220" y="197" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.5 x 2.0</text>
-      </svg>
-    )
+    image: '/images/offplan-details/3br-a.jpg'
   },
   {
     id: '8', code: '3BR-B', floor: '28 floor', number: 'N° 8', status: 'Reserved',
     title: '3 Bedroom Type B, 185.0 m²', price: '$612 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="100" y1="10" x2="100" y2="80" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="190" y1="10" x2="190" y2="80" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="80" x2="290" y2="80" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="100" y1="80" x2="100" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="200" y1="80" x2="200" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="55" y="45" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="55" y="58" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">5.5 x 4.5</text>
-        <text x="145" y="45" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="145" y="58" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.8 x 4.0</text>
-        <text x="240" y="45" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 3</text>
-        <text x="240" y="58" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.5 x 3.8</text>
-        <text x="55" y="145" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="55" y="158" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">9.0 x 6.0</text>
-        <text x="150" y="140" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 1</text>
-        <text x="150" y="152" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">3.2 x 2.8</text>
-        <text x="245" y="140" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 2</text>
-        <text x="245" y="152" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.8 x 2.2</text>
-        <text x="245" y="190" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Powder</text>
-        <text x="245" y="202" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">1.8 x 1.5</text>
-      </svg>
-    )
+    image: '/images/offplan-details/3br-b.jpg'
   },
   {
     id: '9', code: '4BR', floor: '30 floor', number: 'N° 9', status: 'Avaible',
     title: '4 Bedroom, 245.0 m²', price: '$849 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="80" y1="10" x2="80" y2="70" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="155" y1="10" x2="155" y2="70" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="230" y1="10" x2="230" y2="70" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="70" x2="290" y2="70" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="145" y1="70" x2="145" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="45" y="40" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="45" y="52" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">6.0 x 5.0</text>
-        <text x="118" y="40" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="118" y="52" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">5.0 x 4.5</text>
-        <text x="192" y="40" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 3</text>
-        <text x="192" y="52" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">4.8 x 4.2</text>
-        <text x="260" y="40" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 4</text>
-        <text x="260" y="52" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">4.5 x 4.0</text>
-        <text x="75" y="145" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="75" y="158" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">10.0 x 7.0</text>
-        <text x="220" y="120" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 1</text>
-        <text x="220" y="132" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">3.5 x 3.0</text>
-        <text x="220" y="165" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 2</text>
-        <text x="220" y="177" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">3.0 x 2.5</text>
-        <text x="220" y="200" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Powder</text>
-        <text x="220" y="210" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.0 x 1.8</text>
-      </svg>
-    )
+    image: '/images/offplan-details/4br.jpg'
   },
   {
     id: '10', code: '1BR-D', floor: '5 floor', number: 'N° 10', status: 'Reserved',
     title: '1 Bedroom Type D, 55.0 m²', price: '$198 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="160" y1="10" x2="160" y2="130" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="130" x2="290" y2="130" stroke="#2b3541" strokeWidth="2"/>
-        <text x="85" y="70" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="85" y="83" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">5.0 x 3.8</text>
-        <text x="225" y="55" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom</text>
-        <text x="225" y="68" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.2 x 3.5</text>
-        <text x="150" y="180" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath</text>
-        <text x="150" y="193" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">2.2 x 1.8</text>
-      </svg>
-    )
+    image: '/images/offplan-details/1br-d.jpg'
   },
   {
     id: '11', code: '2BR-D', floor: '12 floor', number: 'N° 11', status: 'Avaible',
     title: '2 Bedroom Type D, 108.0 m²', price: '$355 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="130" y1="10" x2="130" y2="110" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="110" x2="200" y2="110" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="200" y1="10" x2="200" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="70" y="60" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="70" y="73" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">6.5 x 4.8</text>
-        <text x="165" y="55" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="165" y="68" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.5 x 4.0</text>
-        <text x="165" y="100" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="165" y="113" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.2 x 3.6</text>
-        <text x="245" y="100" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath</text>
-        <text x="245" y="112" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.8 x 2.2</text>
-        <text x="245" y="160" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Powder</text>
-        <text x="245" y="172" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">1.6 x 1.4</text>
-      </svg>
-    )
+    image: '/images/offplan-details/2br-d.jpg'
   },
   {
     id: '12', code: '3BR-C', floor: '22 floor', number: 'N° 12', status: 'Reserved',
     title: '3 Bedroom Type C, 172.0 m²', price: '$568 000',
-    svgBlueprint: (
-      <svg className="layout-card__blueprint" viewBox="0 0 300 220" width="100%" height="100%">
-        <rect x="10" y="10" width="280" height="200" fill="none" stroke="#2b3541" strokeWidth="3"/>
-        <line x1="110" y1="10" x2="110" y2="85" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="210" y1="10" x2="210" y2="85" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="10" y1="85" x2="290" y2="85" stroke="#2b3541" strokeWidth="2"/>
-        <line x1="145" y1="85" x2="145" y2="210" stroke="#2b3541" strokeWidth="2"/>
-        <text x="60" y="48" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 1</text>
-        <text x="60" y="61" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">5.2 x 4.5</text>
-        <text x="160" y="48" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 2</text>
-        <text x="160" y="61" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.8 x 4.0</text>
-        <text x="250" y="48" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Bedroom 3</text>
-        <text x="250" y="61" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">4.5 x 3.8</text>
-        <text x="75" y="150" fontFamily="Inter" fontSize="10" fill="#2b3541" textAnchor="middle" fontWeight="500">Living & Kitchen</text>
-        <text x="75" y="163" fontFamily="Inter" fontSize="9" fill="#8e949a" textAnchor="middle">8.5 x 5.8</text>
-        <text x="220" y="135" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 1</text>
-        <text x="220" y="147" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">3.0 x 2.5</text>
-        <text x="220" y="180" fontFamily="Inter" fontSize="9" fill="#2b3541" textAnchor="middle" fontWeight="500">Bath 2</text>
-        <text x="220" y="192" fontFamily="Inter" fontSize="8" fill="#8e949a" textAnchor="middle">2.5 x 2.2</text>
-      </svg>
-    )
+    image: '/images/offplan-details/3br-c.jpg'
   },
 ];
 
@@ -575,7 +357,7 @@ export default function UnitLayout() {
                 </div>
                 
                 <div className="layout-card__visual">
-                  {apt.svgBlueprint}
+                  <img src={apt.image} alt={apt.title} className="layout-card__blueprint" />
                 </div>
 
                 <div className="layout-card__footer">
