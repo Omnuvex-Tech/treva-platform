@@ -48,6 +48,10 @@ export default function ApartmentCard() {
     }
   };
 
+  const formatStatus = (status: string) => {
+    return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+  };
+
   if (isLoading) {
     return (
       <div className="page-wrapper">
@@ -124,7 +128,7 @@ export default function ApartmentCard() {
                   </h1>
                   
                   <div className="apt-badge-row">
-                    <span className={`apt-badge ${statusClass(layout.status)}`}>{layout.status}</span>
+                    <span className={`apt-badge ${statusClass(layout.status)}`}>{formatStatus(layout.status)}</span>
                     {layout.documents && layout.documents.length > 0 && layout.documents[0] && (
                       <a href={getAssetUrl(layout.documents[0].url)} target="_blank" rel="noopener noreferrer" className="apt-badge badge-btn">PDF</a>
                     )}
@@ -226,6 +230,21 @@ export default function ApartmentCard() {
                     </svg>
                     More About the Residential Complex
                   </button>
+                  {layout.location?.url && (
+                    <a
+                      href={layout.location.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="panorama-btn"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <svg className="panorama-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      View on Map
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -234,7 +253,19 @@ export default function ApartmentCard() {
               {layout.location && (
                 <div className="panorama-row">
                   <span className="panorama-label">Location</span>
-                  <span className="panorama-value">{layout.location.title}</span>
+                  {layout.location.url ? (
+                    <a
+                      href={layout.location.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="panorama-value"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {layout.location.title}
+                    </a>
+                  ) : (
+                    <span className="panorama-value">{layout.location.title}</span>
+                  )}
                 </div>
               )}
               
@@ -281,7 +312,7 @@ export default function ApartmentCard() {
                       </div>
                       <div className="layout-card__number-block">
                         <span className="layout-card__number">N° {apt.number || '?'}</span>
-                        <span className="layout-card__status">{apt.status}</span>
+                        <span className="layout-card__status">{formatStatus(apt.status)}</span>
                       </div>
                     </div>
                     <div className="layout-card__visual">

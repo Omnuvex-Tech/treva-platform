@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -46,10 +46,10 @@ export function UnitLayoutForm() {
         status: "available",
         categoryId: "",
         floor: 1,
-        number: undefined,
+        number: 1,
         totalArea: 0,
         internalArea: 0,
-        balconyArea: undefined,
+        balconyArea: 0,
         priceUsd: 0,
         priceAzn: 0,
         completionYear: 2030,
@@ -59,7 +59,7 @@ export function UnitLayoutForm() {
         mainImage: undefined,
         gallery: [],
         documents: [],
-        location: { title: "", url: "", type: "apartment" },
+        location: { title: "", url: "", type: "" },
     });
 
     const { data: existing, isLoading: loadingExisting } = useQuery({
@@ -76,10 +76,23 @@ export function UnitLayoutForm() {
     const { data: allLayoutsResponse } = useQuery({
         queryKey: ["unit-layouts-all"],
         queryFn: () => unitLayoutsApi.getAll({ limit: 200 }),
-        enabled: activeTab === "similar" && isEdit,
+        enabled: activeTab === "similar",
     });
 
     const [similarSearch, setSimilarSearch] = useState("");
+    const [categoryOpen, setCategoryOpen] = useState(false);
+    const [statusOpen, setStatusOpen] = useState(false);
+    const categoryRef = useRef<HTMLDivElement>(null);
+    const statusRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setCategoryOpen(false);
+            if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     useEffect(() => {
         if (existing?.data) {
@@ -128,6 +141,20 @@ export function UnitLayoutForm() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!form.title.trim() || !form.name.trim() || !form.slug.trim() || !form.categoryId) {
+            setActiveTab("basic");
+            return;
+        }
+        if (!form.view.trim()) {
+            setActiveTab("basic");
+            return;
+        }
+        if (!form.location?.title.trim() || !form.location?.url.trim() || !form.location?.type.trim()) {
+            setActiveTab("location");
+            return;
+        }
+
         if (isEdit) {
             updateMutation.mutate(form);
         } else {
@@ -165,7 +192,7 @@ export function UnitLayoutForm() {
         }));
     };
 
-    const updateFloors = (key: "start" | "end", value: number) => {
+    const updateFloors = (key: "start" | "end", value: number | undefined) => {
         setForm((prev) => ({
             ...prev,
             numberOfFloors: { ...prev.numberOfFloors, [key]: value },
@@ -324,37 +351,77 @@ export function UnitLayoutForm() {
                                         <label className="mb-1.5 block text-xs font-medium text-white/70">
                                             Category
                                         </label>
-                                        <select
-                                            value={form.categoryId}
-                                            onChange={(e) =>
-                                                updateField("categoryId", e.target.value)
-                                            }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
-                                            required
-                                        >
-                                            <option value="">Select category</option>
-                                            {categories.map((cat) => (
-                                                <option key={cat.id} value={cat.id}>
-                                                    {cat.title}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <div ref={categoryRef} className="relative">
+                                            <button
+                                                type="button"
+                                                onClick={() => setCategoryOpen((p) => !p)}
+                                                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            >
+                                                <span className={form.categoryId ? "text-white" : "text-white/40"}>
+                                                    {categories.find((c) => c.id === form.categoryId)?.title || "Select category"}
+                                                </span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${categoryOpen ? "rotate-180" : ""}`}>
+                                                    <path d="M6 9l6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                            {categoryOpen && (
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                    {categories.map((cat) => (
+                                                        <button
+                                                            key={cat.id}
+                                                            type="button"
+                                                            onClick={() => { updateField("categoryId", cat.id); setCategoryOpen(false); }}
+                                                            className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                                form.categoryId === cat.id
+                                                                    ? "bg-white/15 text-white font-medium"
+                                                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                            }`}
+                                                        >
+                                                            {cat.title}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-xs font-medium text-white/70">
                                             Status
                                         </label>
-                                        <select
-                                            value={form.status}
-                                            onChange={(e) =>
-                                                updateField("status", e.target.value)
-                                            }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
-                                        >
-                                            <option value="available">Available</option>
-                                            <option value="sold">Sold</option>
-                                            <option value="reserved">Reserved</option>
-                                        </select>
+                                        <div ref={statusRef} className="relative">
+                                            <button
+                                                type="button"
+                                                onClick={() => setStatusOpen((p) => !p)}
+                                                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            >
+                                                <span>{form.status?.charAt(0).toUpperCase() + (form.status?.slice(1) || "")}</span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${statusOpen ? "rotate-180" : ""}`}>
+                                                    <path d="M6 9l6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                            {statusOpen && (
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                    {[
+                                                        { value: "available", label: "Available" },
+                                                        { value: "sold", label: "Sold" },
+                                                        { value: "reserved", label: "Reserved" },
+                                                    ].map((opt) => (
+                                                        <button
+                                                            key={opt.value}
+                                                            type="button"
+                                                            onClick={() => { updateField("status", opt.value); setStatusOpen(false); }}
+                                                            className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                                form.status === opt.value
+                                                                    ? "bg-white/15 text-white font-medium"
+                                                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                            }`}
+                                                        >
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
@@ -364,9 +431,9 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.floor}
+                                            value={form.floor ?? ""}
                                             onChange={(e) =>
-                                                updateField("floor", parseInt(e.target.value) || 1)
+                                                updateField("floor", e.target.value ? parseInt(e.target.value) : undefined)
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
                                             min={1}
@@ -388,6 +455,7 @@ export function UnitLayoutForm() {
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
                                             min={1}
+                                            required
                                         />
                                     </div>
                                     <div>
@@ -400,6 +468,7 @@ export function UnitLayoutForm() {
                                             onChange={(e) => updateField("view", e.target.value)}
                                             placeholder="e.g. Sea view"
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            required
                                         />
                                     </div>
                                 </div>
@@ -415,11 +484,11 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.totalArea}
+                                            value={form.totalArea || ""}
                                             onChange={(e) =>
                                                 updateField(
                                                     "totalArea",
-                                                    parseFloat(e.target.value) || 0
+                                                    e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -434,11 +503,11 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.internalArea}
+                                            value={form.internalArea || ""}
                                             onChange={(e) =>
                                                 updateField(
                                                     "internalArea",
-                                                    parseFloat(e.target.value) || 0
+                                                    e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -466,7 +535,7 @@ export function UnitLayoutForm() {
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                         min={0}
                                         step={0.1}
-                                        placeholder="Optional"
+                                        required
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -476,11 +545,11 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.priceUsd}
+                                            value={form.priceUsd || ""}
                                             onChange={(e) =>
                                                 updateField(
                                                     "priceUsd",
-                                                    parseFloat(e.target.value) || 0
+                                                    e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -494,11 +563,11 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.priceAzn}
+                                            value={form.priceAzn || ""}
                                             onChange={(e) =>
                                                 updateField(
                                                     "priceAzn",
-                                                    parseFloat(e.target.value) || 0
+                                                    e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -524,6 +593,7 @@ export function UnitLayoutForm() {
                                         }
                                         placeholder="e.g. Sea Breeze Resort, Nardaran District"
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        required
                                     />
                                 </div>
                                 <div>
@@ -536,8 +606,8 @@ export function UnitLayoutForm() {
                                         onChange={(e) =>
                                             updateLocation("url", e.target.value)
                                         }
-                                        placeholder="Optional"
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        required
                                     />
                                 </div>
                                 <div>
@@ -546,24 +616,26 @@ export function UnitLayoutForm() {
                                     </label>
                                     <input
                                         type="text"
-                                        value={form.location?.type || "apartment"}
+                                        value={form.location?.type || ""}
                                         onChange={(e) =>
                                             updateLocation("type", e.target.value)
                                         }
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                        placeholder="For example: Apartment"
+                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        required
                                     />
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-white/70">
                                         Completion Year
                                     </label>
-                                    <input
-                                        type="number"
-                                        value={form.completionYear}
-                                        onChange={(e) =>
-                                            updateField(
-                                                "completionYear",
-                                                parseInt(e.target.value) || 2030
+                                        <input
+                                            type="number"
+                                            value={form.completionYear || ""}
+                                            onChange={(e) =>
+                                                updateField(
+                                                    "completionYear",
+                                                    e.target.value ? parseInt(e.target.value) : 0
                                             )
                                         }
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -579,11 +651,11 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.numberOfFloors.start}
+                                            value={form.numberOfFloors.start ?? ""}
                                             onChange={(e) =>
                                                 updateFloors(
                                                     "start",
-                                                    parseInt(e.target.value) || 1
+                                                    e.target.value ? parseInt(e.target.value) : undefined
                                                 )
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -597,11 +669,11 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
-                                            value={form.numberOfFloors.end}
+                                            value={form.numberOfFloors.end ?? ""}
                                             onChange={(e) =>
                                                 updateFloors(
                                                     "end",
-                                                    parseInt(e.target.value) || 1
+                                                    e.target.value ? parseInt(e.target.value) : undefined
                                                 )
                                             }
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
@@ -713,7 +785,7 @@ export function UnitLayoutForm() {
                             </div>
                         )}
 
-                        {activeTab === "similar" && isEdit && (
+                        {activeTab === "similar" && (
                             <div className="flex flex-col gap-6">
                                 {/* Selected Similar Apartments */}
                                 <div>
@@ -723,42 +795,48 @@ export function UnitLayoutForm() {
                                     {(form.similarApartmentIds || []).length === 0 ? (
                                         <p className="text-sm text-white/40">No similar apartments selected yet.</p>
                                     ) : (
-                                        <div className="flex flex-col gap-2">
+                                        <div className="grid grid-cols-3 gap-3">
                                             {(Array.isArray(allLayoutsResponse?.data?.data) ? allLayoutsResponse.data.data : [])
                                                 .filter((l: any) => (form.similarApartmentIds || []).includes(l.id))
                                                 .map((layout: any) => (
                                                     <div
                                                         key={layout.id}
-                                                        className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3"
+                                                        className="relative overflow-hidden rounded-xl border border-white/10 bg-white/5"
                                                     >
-                                                        <div className="flex items-center gap-3">
-                                                            {layout.mainImage ? (
+                                                        <div className="relative h-32 w-full bg-white/5">
+                                                            {(layout.mainImage?.url || layout.gallery?.[0]?.url) ? (
                                                                 <img
-                                                                    src={layout.mainImage.url}
-                                                                    alt={layout.mainImage.alt || layout.title}
-                                                                    className="h-10 w-10 rounded object-cover"
+                                                                    src={layout.mainImage?.url || layout.gallery?.[0]?.url}
+                                                                    alt={layout.mainImage?.alt || layout.gallery?.[0]?.alt || layout.title}
+                                                                    className="h-full w-full object-cover"
                                                                 />
                                                             ) : (
-                                                                <div className="flex h-10 w-10 items-center justify-center rounded bg-white/10 text-xs text-white/40">
-                                                                    No img
+                                                                <div className="flex h-full w-full items-center justify-center text-xs text-white/30">
+                                                                    No image
                                                                 </div>
                                                             )}
-                                                            <div>
-                                                                <div className="text-sm font-medium text-white">
-                                                                    {layout.title}
-                                                                </div>
-                                                                <div className="text-xs text-white/50">
-                                                                    Floor {layout.floor} · {layout.totalArea} m² · ${layout.priceUsd?.toLocaleString()}
-                                                                </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeSimilarApartment(layout.id)}
+                                                                className="absolute top-2 right-2 rounded-full bg-red-500/80 p-1 text-white hover:bg-red-500"
+                                                            >
+                                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                                                </svg>
+                                                            </button>
+                                                            <span className="absolute top-2 left-2 rounded bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white">
+                                                                {layout.status}
+                                                            </span>
+                                                        </div>
+                                                        <div className="p-3">
+                                                            <div className="text-xs text-white/50">N° {layout.number || '?'} · {layout.floor} floor</div>
+                                                            <div className="mt-0.5 text-sm font-medium text-white">{layout.title}</div>
+                                                            <div className="mt-1 flex items-center justify-between">
+                                                                <span className="text-xs text-white/50">{layout.totalArea} m²</span>
+                                                                <span className="text-sm font-semibold text-white">${layout.priceUsd?.toLocaleString()}</span>
                                                             </div>
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeSimilarApartment(layout.id)}
-                                                            className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                                                        >
-                                                            Remove
-                                                        </button>
                                                     </div>
                                                 ))}
                                         </div>
@@ -777,7 +855,7 @@ export function UnitLayoutForm() {
                                         placeholder="Search apartments..."
                                         className="mb-3 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                     />
-                                    <div className="flex max-h-96 flex-col gap-2 overflow-y-auto pr-1">
+                                    <div className="grid max-h-[540px] grid-cols-3 gap-3 overflow-y-auto pr-1">
                                         {(Array.isArray(allLayoutsResponse?.data?.data) ? allLayoutsResponse.data.data : [])
                                             .filter((l: any) => l.id !== id)
                                             .filter((l: any) => {
@@ -795,18 +873,29 @@ export function UnitLayoutForm() {
                                                     <div
                                                         key={layout.id}
                                                         onClick={() => toggleSimilarApartment(layout.id)}
-                                                        className={`flex cursor-pointer items-center justify-between rounded-lg border px-4 py-3 transition-colors ${
+                                                        className={`relative cursor-pointer overflow-hidden rounded-xl border transition-all ${
                                                             isSelected
-                                                                ? "border-white/30 bg-white/15"
-                                                                : "border-white/10 bg-white/5 hover:bg-white/10"
+                                                                ? "border-blue-400/60 ring-2 ring-blue-400/30"
+                                                                : "border-white/10 hover:border-white/25"
                                                         }`}
                                                     >
-                                                        <div className="flex items-center gap-3">
+                                                        <div className="relative h-32 w-full bg-white/5">
+                                                            {(layout.mainImage?.url || layout.gallery?.[0]?.url) ? (
+                                                                <img
+                                                                    src={layout.mainImage?.url || layout.gallery?.[0]?.url}
+                                                                    alt={layout.mainImage?.alt || layout.gallery?.[0]?.alt || layout.title}
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-full w-full items-center justify-center text-xs text-white/30">
+                                                                    No image
+                                                                </div>
+                                                            )}
                                                             <div
-                                                                className={`flex h-5 w-5 items-center justify-center rounded border ${
+                                                                className={`absolute top-2 left-2 flex h-5 w-5 items-center justify-center rounded border transition-colors ${
                                                                     isSelected
-                                                                        ? "border-white/40 bg-white/20"
-                                                                        : "border-white/20"
+                                                                        ? "border-blue-400 bg-blue-500"
+                                                                        : "border-white/30 bg-black/30"
                                                                 }`}
                                                             >
                                                                 {isSelected && (
@@ -815,24 +904,16 @@ export function UnitLayoutForm() {
                                                                     </svg>
                                                                 )}
                                                             </div>
-                                                            {layout.mainImage ? (
-                                                                <img
-                                                                    src={layout.mainImage.url}
-                                                                    alt={layout.mainImage.alt || layout.title}
-                                                                    className="h-10 w-10 rounded object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="flex h-10 w-10 items-center justify-center rounded bg-white/10 text-xs text-white/40">
-                                                                    No img
-                                                                </div>
-                                                            )}
-                                                            <div>
-                                                                <div className="text-sm font-medium text-white">
-                                                                    {layout.title}
-                                                                </div>
-                                                                <div className="text-xs text-white/50">
-                                                                    Floor {layout.floor} · {layout.totalArea} m² · ${layout.priceUsd?.toLocaleString()} · {layout.status}
-                                                                </div>
+                                                            <span className="absolute top-2 right-2 rounded bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white">
+                                                                {layout.status}
+                                                            </span>
+                                                        </div>
+                                                        <div className="p-3">
+                                                            <div className="text-xs text-white/50">N° {layout.number || '?'} · {layout.floor} floor</div>
+                                                            <div className="mt-0.5 text-sm font-medium text-white">{layout.title}</div>
+                                                            <div className="mt-1 flex items-center justify-between">
+                                                                <span className="text-xs text-white/50">{layout.totalArea} m²</span>
+                                                                <span className="text-sm font-semibold text-white">${layout.priceUsd?.toLocaleString()}</span>
                                                             </div>
                                                         </div>
                                                     </div>

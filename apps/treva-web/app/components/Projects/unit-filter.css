@@ -759,3 +759,11 @@
     display: flex;
   }
 }
+
+.layout-card-wrapper,
+.layout-card-wrapper *,
+.cards-grid .layout-card,
+.cards-grid .layout-card *,
+.cards-grid .layout-card__cta {
+  text-transform: none !important;
+}

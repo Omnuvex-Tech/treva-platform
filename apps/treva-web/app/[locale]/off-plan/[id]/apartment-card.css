@@ -281,6 +281,13 @@
   background: rgba(0, 0, 0, 0.16);
 }
 
+.apt-wrapper,
+.apt-wrapper *,
+.apt-main-card,
+.apt-main-card * {
+  text-transform: none !important;
+}
+
 /* Responsive (Mobil) */
 @media (max-width: 768px) {
   .apt-main-card {

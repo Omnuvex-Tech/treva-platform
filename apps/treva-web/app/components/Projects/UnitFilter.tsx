@@ -64,6 +64,10 @@ export default function UnitLayout() {
     return `$${formatNumber(price)}`;
   };
 
+  const formatStatus = (status: string) => {
+    return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+  };
+
   const handleReset = () => {
     setFloor('');
     setView('');
@@ -334,7 +338,7 @@ export default function UnitLayout() {
                     </div>
                     <div className="layout-card__number-block">
                       <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
-                      <span className="layout-card__status">{layout.status}</span>
+                      <span className="layout-card__status">{formatStatus(layout.status)}</span>
                     </div>
                   </div>
                   

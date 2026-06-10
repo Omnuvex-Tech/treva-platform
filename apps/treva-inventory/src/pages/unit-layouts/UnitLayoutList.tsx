@@ -141,7 +141,7 @@ export function UnitLayoutList() {
                                                     statusColors[layout.status] || "bg-white/10 text-white/70"
                                                 }`}
                                             >
-                                                {layout.status}
+                                                {layout.status.charAt(0).toUpperCase() + layout.status.slice(1)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-right">

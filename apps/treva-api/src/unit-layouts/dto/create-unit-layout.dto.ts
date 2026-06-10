@@ -18,10 +18,10 @@ export class LocationDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiPropertyOptional({ example: 'https://seabreeze.az' })
-  @IsOptional()
+  @ApiProperty({ example: 'https://seabreeze.az' })
   @IsString()
-  url?: string;
+  @IsNotEmpty()
+  url: string;
 
   @ApiProperty({ example: 'apartment' })
   @IsString()
@@ -94,7 +94,6 @@ export class CreateUnitLayoutDto {
   slug: string;
 
   @ApiPropertyOptional({ enum: ['available', 'sold', 'reserved'], default: 'available' })
-  @IsOptional()
   @IsEnum(['available', 'sold', 'reserved'])
   status?: string;
 
@@ -108,11 +107,10 @@ export class CreateUnitLayoutDto {
   @Min(1)
   floor: number;
 
-  @ApiPropertyOptional({ example: 1 })
-  @IsOptional()
+  @ApiProperty({ example: 1 })
   @IsNumber()
   @Min(1)
-  number?: number;
+  number: number;
 
   @ApiProperty({ example: 50.5 })
   @IsNumber()
@@ -124,11 +122,10 @@ export class CreateUnitLayoutDto {
   @Min(0)
   internalArea: number;
 
-  @ApiPropertyOptional({ example: 7.5 })
-  @IsOptional()
+  @ApiProperty({ example: 7.5 })
   @IsNumber()
   @Min(0)
-  balconyArea?: number;
+  balconyArea: number;
 
   @ApiProperty({ example: 186004 })
   @IsNumber()
@@ -150,16 +147,15 @@ export class CreateUnitLayoutDto {
   @Type(() => NumberOfFloorsDto)
   numberOfFloors: NumberOfFloorsDto;
 
-  @ApiPropertyOptional({ example: 'Sea view' })
-  @IsOptional()
+  @ApiProperty({ example: 'Sea view' })
   @IsString()
-  view?: string;
+  @IsNotEmpty()
+  view: string;
 
-  @ApiPropertyOptional({ example: ['id1', 'id2'] })
-  @IsOptional()
+  @ApiProperty({ example: ['id1', 'id2'] })
   @IsArray()
   @IsString({ each: true })
-  similarApartmentIds?: string[];
+  similarApartmentIds: string[];
 
   @ApiPropertyOptional({ type: MainImageDto })
   @IsOptional()
@@ -168,24 +164,21 @@ export class CreateUnitLayoutDto {
   @Type(() => MainImageDto)
   mainImage?: MainImageDto;
 
-  @ApiPropertyOptional({ type: [GalleryImageDto] })
-  @IsOptional()
+  @ApiProperty({ type: [GalleryImageDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => GalleryImageDto)
-  gallery?: GalleryImageDto[];
+  gallery: GalleryImageDto[];
 
-  @ApiPropertyOptional({ type: [DocumentDto] })
-  @IsOptional()
+  @ApiProperty({ type: [DocumentDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DocumentDto)
-  documents?: DocumentDto[];
+  documents: DocumentDto[];
 
-  @ApiPropertyOptional({ type: LocationDto })
-  @IsOptional()
+  @ApiProperty({ type: LocationDto })
   @IsObject()
   @ValidateNested()
   @Type(() => LocationDto)
-  location?: LocationDto;
+  location: LocationDto;
 }
