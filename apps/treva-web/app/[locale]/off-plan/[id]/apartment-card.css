@@ -153,6 +153,12 @@
   justify-content: center;
   cursor: pointer;
   opacity: 0.8;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.apt-share-btn:hover {
+  opacity: 1;
+  background-color: #3F4249;
 }
 
 /* Specs Table */

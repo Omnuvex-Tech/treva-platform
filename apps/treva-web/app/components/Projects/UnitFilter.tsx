@@ -357,7 +357,7 @@ export default function UnitLayout() {
                     <span className="layout-card__price">{formatPrice(layout.priceUsd)}</span>
                   </div>
                 </div>
-                <Link href={`/${locale}/off-plan/${layout.id}`} className="layout-card__cta">View Apartment Details</Link>
+                <Link href={`/${locale}/off-plan/${layout.id}`} className="layout-card__cta">VIew Apartment DetaIls</Link>
               </div>
             ))}
             {layouts.length === 0 && (

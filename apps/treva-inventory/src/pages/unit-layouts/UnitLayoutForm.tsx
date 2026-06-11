@@ -32,6 +32,88 @@ const tabs: { key: Tab; label: string }[] = [
     { key: "similar", label: "Similar Apartments" },
 ];
 
+type ValidationError = {
+    field: string;
+    message: string;
+};
+
+type TabValidation = {
+    valid: boolean;
+    errors: ValidationError[];
+};
+
+const validateBasicTab = (form: CreateUnitLayoutData): TabValidation => {
+    const errors: ValidationError[] = [];
+    if (!form.title?.trim()) errors.push({ field: "Title", message: "Basic Info / Title is required" });
+    if (!form.name?.trim()) errors.push({ field: "Name", message: "Basic Info / Name is required" });
+    if (!form.slug?.trim()) errors.push({ field: "Slug", message: "Basic Info / Slug is required" });
+    if (!form.categoryId) errors.push({ field: "Category", message: "Basic Info / Category is required" });
+    if (!form.floor && form.floor !== 0) errors.push({ field: "Floor", message: "Basic Info / Floor is required" });
+    if (!form.number && form.number !== 0) errors.push({ field: "Number", message: "Basic Info / Number is required" });
+    if (!form.view?.trim()) errors.push({ field: "View", message: "Basic Info / View is required" });
+    return { valid: errors.length === 0, errors };
+};
+
+const validateAreaTab = (form: CreateUnitLayoutData): TabValidation => {
+    const errors: ValidationError[] = [];
+    if (!form.totalArea && form.totalArea !== 0) errors.push({ field: "Total Area", message: "Area & Pricing / Total Area is required" });
+    if (!form.internalArea && form.internalArea !== 0) errors.push({ field: "Internal Area", message: "Area & Pricing / Internal Area is required" });
+    if (!form.balconyArea && form.balconyArea !== 0) errors.push({ field: "Balcony Area", message: "Area & Pricing / Balcony Area is required" });
+    if (!form.priceUsd && form.priceUsd !== 0) errors.push({ field: "Price (USD)", message: "Area & Pricing / Price (USD) is required" });
+    if (!form.priceAzn && form.priceAzn !== 0) errors.push({ field: "Price (AZN)", message: "Area & Pricing / Price (AZN) is required" });
+    return { valid: errors.length === 0, errors };
+};
+
+const validateLocationTab = (form: CreateUnitLayoutData): TabValidation => {
+    const errors: ValidationError[] = [];
+    if (!form.location?.title?.trim()) errors.push({ field: "Location Title", message: "Location & Building / Location Title is required" });
+    if (!form.location?.url?.trim()) errors.push({ field: "Location URL", message: "Location & Building / Location URL is required" });
+    if (!form.location?.type?.trim()) errors.push({ field: "Location Type", message: "Location & Building / Location Type is required" });
+    if (!form.completionYear && form.completionYear !== 0) errors.push({ field: "Completion Year", message: "Location & Building / Completion Year is required" });
+    if (!form.numberOfFloors?.start && form.numberOfFloors?.start !== 0) errors.push({ field: "Floors From", message: "Location & Building / Floors From is required" });
+    if (!form.numberOfFloors?.end && form.numberOfFloors?.end !== 0) errors.push({ field: "Floors To", message: "Location & Building / Floors To is required" });
+    return { valid: errors.length === 0, errors };
+};
+
+const validateDocumentsTab = (form: CreateUnitLayoutData): TabValidation => {
+    const errors: ValidationError[] = [];
+    if (!form.documents || form.documents.length === 0) {
+        errors.push({ field: "Documents", message: "Documents / At least one PDF document is required" });
+    }
+    return { valid: errors.length === 0, errors };
+};
+
+const validateGalleryTab = (form: CreateUnitLayoutData): TabValidation => {
+    const errors: ValidationError[] = [];
+    if (!form.mainImage?.url) errors.push({ field: "Main Image", message: "Gallery / Main Image is required" });
+    if (!form.gallery || form.gallery.length === 0) {
+        errors.push({ field: "Gallery Images", message: "Gallery / At least one gallery image is required" });
+    }
+    return { valid: errors.length === 0, errors };
+};
+
+const validateSimilarTab = (form: CreateUnitLayoutData): TabValidation => {
+    const errors: ValidationError[] = [];
+    if (!form.similarApartmentIds || form.similarApartmentIds.length === 0) {
+        errors.push({ field: "Similar Apartments", message: "Similar Apartments / At least one similar apartment must be selected" });
+    }
+    return { valid: errors.length === 0, errors };
+};
+
+const validateTab = (tab: Tab, form: CreateUnitLayoutData): TabValidation => {
+    switch (tab) {
+        case "basic": return validateBasicTab(form);
+        case "area": return validateAreaTab(form);
+        case "location": return validateLocationTab(form);
+        case "documents": return validateDocumentsTab(form);
+        case "gallery": return validateGalleryTab(form);
+        case "similar": return validateSimilarTab(form);
+        default: return { valid: true, errors: [] };
+    }
+};
+
+const tabOrder: Tab[] = ["basic", "area", "location", "documents", "gallery", "similar"];
+
 export function UnitLayoutForm() {
     const { id } = useParams<{ id: string }>();
     const isEdit = !!id;
@@ -45,15 +127,15 @@ export function UnitLayoutForm() {
         slug: "",
         status: "available",
         categoryId: "",
-        floor: 1,
-        number: 1,
-        totalArea: 0,
-        internalArea: 0,
-        balconyArea: 0,
-        priceUsd: 0,
-        priceAzn: 0,
-        completionYear: 2030,
-        numberOfFloors: { start: 1, end: 1 },
+        floor: undefined as unknown as number,
+        number: undefined as unknown as number,
+        totalArea: undefined as unknown as number,
+        internalArea: undefined as unknown as number,
+        balconyArea: undefined as unknown as number,
+        priceUsd: undefined as unknown as number,
+        priceAzn: undefined as unknown as number,
+        completionYear: undefined as unknown as number,
+        numberOfFloors: { start: undefined as unknown as number, end: undefined as unknown as number },
         view: "",
         similarApartmentIds: [],
         mainImage: undefined,
@@ -82,6 +164,9 @@ export function UnitLayoutForm() {
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [statusOpen, setStatusOpen] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+    const [currentTabError, setCurrentTabError] = useState<ValidationError[]>([]);
+    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
     const statusRef = useRef<HTMLDivElement>(null);
 
@@ -142,18 +227,26 @@ export function UnitLayoutForm() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!form.title.trim() || !form.name.trim() || !form.slug.trim() || !form.categoryId) {
-            setActiveTab("basic");
+        const allErrors: ValidationError[] = [];
+        for (const tab of tabOrder) {
+            const result = validateTab(tab, form);
+            if (!result.valid) {
+                allErrors.push(...result.errors);
+            }
+        }
+
+        if (allErrors.length > 0) {
+            setValidationErrors(allErrors);
+            const firstInvalidTab = tabOrder.find((tab) => !validateTab(tab, form).valid);
+            if (firstInvalidTab) {
+                setActiveTab(firstInvalidTab);
+                setCurrentTabError(validateTab(firstInvalidTab, form).errors);
+            }
             return;
         }
-        if (!form.view.trim()) {
-            setActiveTab("basic");
-            return;
-        }
-        if (!form.location?.title.trim() || !form.location?.url.trim() || !form.location?.type.trim()) {
-            setActiveTab("location");
-            return;
-        }
+
+        setValidationErrors([]);
+        setCurrentTabError([]);
 
         if (isEdit) {
             updateMutation.mutate(form);
@@ -162,14 +255,33 @@ export function UnitLayoutForm() {
         }
     };
 
+    const handleTabClick = (tab: Tab) => {
+        const currentIndex = tabOrder.indexOf(activeTab);
+        const targetIndex = tabOrder.indexOf(tab);
+
+        if (targetIndex > currentIndex) {
+            const result = validateTab(activeTab, form);
+            if (!result.valid) {
+                setCurrentTabError(result.errors);
+                setValidationErrors(result.errors);
+                return;
+            }
+        }
+
+        setCurrentTabError([]);
+        setValidationErrors([]);
+        setActiveTab(tab);
+    };
+
     const handleSlugFromTitle = (title: string) => {
         setForm((prev) => ({
             ...prev,
             title,
-            slug:
-                prev.slug ||
-                title
+            slug: slugManuallyEdited
+                ? prev.slug
+                : title
                     .toLowerCase()
+                    .trim()
                     .replace(/[^a-z0-9]+/g, "-")
                     .replace(/(^-|-$)/g, ""),
         }));
@@ -180,6 +292,9 @@ export function UnitLayoutForm() {
         value: CreateUnitLayoutData[K]
     ) => {
         setForm((prev) => ({ ...prev, [key]: value }));
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes(String(key).toLowerCase())));
+        }
     };
 
     const updateLocation = (
@@ -190,6 +305,9 @@ export function UnitLayoutForm() {
             ...prev,
             location: { ...prev.location!, [key]: value },
         }));
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes(String(key).toLowerCase())));
+        }
     };
 
     const updateFloors = (key: "start" | "end", value: number | undefined) => {
@@ -197,6 +315,9 @@ export function UnitLayoutForm() {
             ...prev,
             numberOfFloors: { ...prev.numberOfFloors, [key]: value },
         }));
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes(key)));
+        }
     };
 
     const handleMainImageUpload = (result: UploadResponse) => {
@@ -204,6 +325,9 @@ export function UnitLayoutForm() {
             ...prev,
             mainImage: { url: result.url, alt: result.alt },
         }));
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("main")));
+        }
     };
 
     const handleGalleryUpload = (result: UploadResponse) => {
@@ -211,6 +335,9 @@ export function UnitLayoutForm() {
             ...prev,
             gallery: [...(prev.gallery || []), { url: result.url, alt: result.alt }],
         }));
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("gallery")));
+        }
     };
 
     const removeGalleryImage = (index: number) => {
@@ -228,6 +355,9 @@ export function UnitLayoutForm() {
                 { type: "pdf", url: result.url },
             ],
         }));
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("document")));
+        }
     };
 
     const removeDocument = (index: number) => {
@@ -248,6 +378,9 @@ export function UnitLayoutForm() {
                     : [...current, layoutId],
             };
         });
+        if (currentTabError.length > 0) {
+            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("similar")));
+        }
     };
 
     const removeSimilarApartment = (layoutId: string) => {
@@ -291,20 +424,31 @@ export function UnitLayoutForm() {
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4 flex gap-1 border-b border-white/10">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.key}
-                                type="button"
-                                onClick={() => setActiveTab(tab.key)}
-                                className={`px-4 py-2.5 text-sm transition-colors ${
-                                    activeTab === tab.key
-                                        ? "border-b-2 border-white text-white"
-                                        : "text-white/50 hover:text-white/80"
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+                        {tabs.map((tab) => {
+                            const tabResult = validateTab(tab.key, form);
+                            const isActive = activeTab === tab.key;
+                            const hasError = !tabResult.valid;
+                            return (
+                                <button
+                                    key={tab.key}
+                                    type="button"
+                                    onClick={() => handleTabClick(tab.key)}
+                                    className={`relative px-4 py-2.5 text-sm transition-colors ${
+                                        isActive
+                                            ? "border-b-2 border-white text-white"
+                                            : "text-white/50 hover:text-white/80"
+                                    }`}
+                                >
+                                    {tab.label}
+                                    {hasError && !isActive && (
+                                        <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff6767] opacity-75"></span>
+                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff6767]"></span>
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
 
                     <div className="rounded-xl border border-white/10 bg-white/3 p-6">
@@ -318,6 +462,7 @@ export function UnitLayoutForm() {
                                         type="text"
                                         value={form.title}
                                         onChange={(e) => handleSlugFromTitle(e.target.value)}
+                                        placeholder="e.g. Sea Breeze Residence"
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                         required
                                     />
@@ -330,6 +475,7 @@ export function UnitLayoutForm() {
                                         type="text"
                                         value={form.name}
                                         onChange={(e) => updateField("name", e.target.value)}
+                                        placeholder="e.g. Block A, Apartment 12"
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                         required
                                     />
@@ -341,7 +487,8 @@ export function UnitLayoutForm() {
                                     <input
                                         type="text"
                                         value={form.slug}
-                                        onChange={(e) => updateField("slug", e.target.value)}
+                                        onChange={(e) => { setSlugManuallyEdited(true); updateField("slug", e.target.value); }}
+                                        placeholder="e.g. sea-breeze-residence-a-12"
                                         className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                         required
                                     />
@@ -435,7 +582,8 @@ export function UnitLayoutForm() {
                                             onChange={(e) =>
                                                 updateField("floor", e.target.value ? parseInt(e.target.value) : undefined)
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 5"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={1}
                                             required
                                         />
@@ -453,7 +601,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : undefined
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 12"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={1}
                                             required
                                         />
@@ -491,7 +640,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 85.5"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
                                             step={0.1}
                                             required
@@ -510,7 +660,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 72.3"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
                                             step={0.1}
                                             required
@@ -521,22 +672,23 @@ export function UnitLayoutForm() {
                                     <label className="mb-1.5 block text-xs font-medium text-white/70">
                                         Balcony Area (m²)
                                     </label>
-                                    <input
-                                        type="number"
-                                        value={form.balconyArea ?? ""}
-                                        onChange={(e) =>
-                                            updateField(
-                                                "balconyArea",
-                                                e.target.value
-                                                    ? parseFloat(e.target.value)
-                                                    : undefined
-                                            )
-                                        }
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                        min={0}
-                                        step={0.1}
-                                        required
-                                    />
+                                        <input
+                                            type="number"
+                                            value={form.balconyArea ?? ""}
+                                            onChange={(e) =>
+                                                updateField(
+                                                    "balconyArea",
+                                                    e.target.value
+                                                        ? parseFloat(e.target.value)
+                                                        : undefined
+                                                )
+                                            }
+                                            placeholder="e.g. 8.5"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            min={0}
+                                            step={0.1}
+                                            required
+                                        />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
@@ -552,7 +704,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 120,000"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
                                             required
                                         />
@@ -570,7 +723,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 204,000"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
                                             required
                                         />
@@ -600,15 +754,16 @@ export function UnitLayoutForm() {
                                     <label className="mb-1.5 block text-xs font-medium text-white/70">
                                         Location URL
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={form.location?.url || ""}
-                                        onChange={(e) =>
-                                            updateLocation("url", e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                        required
-                                    />
+                                        <input
+                                            type="text"
+                                            value={form.location?.url || ""}
+                                            onChange={(e) =>
+                                                updateLocation("url", e.target.value)
+                                            }
+                                            placeholder="e.g. https://maps.google.com/..."
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            required
+                                        />
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-white/70">
@@ -638,11 +793,12 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : 0
                                             )
                                         }
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
-                                        min={2020}
-                                        max={2100}
-                                        required
-                                    />
+                                            placeholder="e.g. 2026"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            min={2020}
+                                            max={2100}
+                                            required
+                                        />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
@@ -658,7 +814,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : undefined
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 1"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={1}
                                             required
                                         />
@@ -676,7 +833,8 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : undefined
                                                 )
                                             }
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            placeholder="e.g. 15"
+                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={1}
                                             required
                                         />
@@ -924,6 +1082,31 @@ export function UnitLayoutForm() {
                             </div>
                         )}
                     </div>
+
+                    {currentTabError.length > 0 && (
+                        <div className="mt-4 overflow-hidden rounded-xl border border-[#ff6767]/20 bg-[#ff6767]/5">
+                            <div className="flex items-center gap-2 border-b border-[#ff6767]/10 bg-[#ff6767]/10 px-4 py-2.5">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff6767" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                                <span className="text-sm font-medium" style={{ color: '#ff6767', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                                    Please fill in all required fields
+                                </span>
+                            </div>
+                            <div className="px-4 py-3">
+                                <ul className="flex flex-col gap-1.5">
+                                    {currentTabError.map((err, i) => (
+                                        <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#ff6767', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                                            <span className="mt-1.5 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#ff6767]" />
+                                            {err.message}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
 
                     {mutationError && (
                         <div className="mt-4 rounded-lg bg-red-500/20 p-3 text-center text-sm text-red-300">
