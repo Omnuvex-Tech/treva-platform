@@ -93,11 +93,7 @@ const validateGalleryTab = (form: CreateUnitLayoutData): TabValidation => {
 };
 
 const validateSimilarTab = (form: CreateUnitLayoutData): TabValidation => {
-    const errors: ValidationError[] = [];
-    if (!form.similarApartmentIds || form.similarApartmentIds.length === 0) {
-        errors.push({ field: "Similar Apartments", message: "Similar Apartments / At least one similar apartment must be selected" });
-    }
-    return { valid: errors.length === 0, errors };
+    return { valid: true, errors: [] };
 };
 
 const validateTab = (tab: Tab, form: CreateUnitLayoutData): TabValidation => {
@@ -166,6 +162,7 @@ export function UnitLayoutForm() {
     const [statusOpen, setStatusOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
     const [currentTabError, setCurrentTabError] = useState<ValidationError[]>([]);
+    const [similarRecommendation, setSimilarRecommendation] = useState(false);
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
     const statusRef = useRef<HTMLDivElement>(null);
@@ -244,6 +241,9 @@ export function UnitLayoutForm() {
             }
             return;
         }
+
+        const hasSimilar = form.similarApartmentIds && form.similarApartmentIds.length > 0;
+        setSimilarRecommendation(!hasSimilar);
 
         setValidationErrors([]);
         setCurrentTabError([]);
@@ -378,6 +378,7 @@ export function UnitLayoutForm() {
                     : [...current, layoutId],
             };
         });
+        setSimilarRecommendation(false);
         if (currentTabError.length > 0) {
             setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("similar")));
         }
@@ -1111,6 +1112,21 @@ export function UnitLayoutForm() {
                     {mutationError && (
                         <div className="mt-4 rounded-lg bg-red-500/20 p-3 text-center text-sm text-red-300">
                             {mutationErrorMessage}
+                        </div>
+                    )}
+
+                    {similarRecommendation && (
+                        <div className="mt-4 overflow-hidden rounded-xl border border-yellow-500/20 bg-yellow-500/5">
+                            <div className="flex items-center gap-2 px-4 py-3">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="16" x2="12" y2="12"/>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                                </svg>
+                                <span className="text-sm" style={{ color: '#eab308', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                                    Selecting similar apartments is recommended for better user experience
+                                </span>
+                            </div>
                         </div>
                     )}
 
