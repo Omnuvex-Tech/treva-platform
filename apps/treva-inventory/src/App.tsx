@@ -1,5 +1,5 @@
-import { Component, type ReactNode } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Component, type ReactNode, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
@@ -8,6 +8,7 @@ import { CategoryCreate } from "./pages/categories/CategoryCreate";
 import { CategoryEdit } from "./pages/categories/CategoryEdit";
 import { UnitLayoutList } from "./pages/unit-layouts/UnitLayoutList";
 import { UnitLayoutForm } from "./pages/unit-layouts/UnitLayoutForm";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -40,13 +41,24 @@ class ErrorBoundary extends Component<
     }
 }
 
-function AuthGuard({ children }: { children: React.ReactNode }) {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        window.location.href = "/login";
-        return null;
-    }
-    return <>{children}</>;
+function AuthEventBridge() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const handler = () => {
+            if (location.pathname !== "/login") {
+                navigate("/login", { replace: true });
+            }
+        };
+
+        window.addEventListener("treva-inventory:unauthorized", handler);
+        return () => {
+            window.removeEventListener("treva-inventory:unauthorized", handler);
+        };
+    }, [location.pathname, navigate]);
+
+    return null;
 }
 
 function App() {
@@ -54,62 +66,63 @@ function App() {
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
+                    <AuthEventBridge />
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route
                             path="/"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <Dashboard />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/categories"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <CategoryList />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/categories/new"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <CategoryCreate />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/categories/:id/edit"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <CategoryEdit />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/unit-layouts"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <UnitLayoutList />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/unit-layouts/new"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <UnitLayoutForm />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route
                             path="/unit-layouts/:id/edit"
                             element={
-                                <AuthGuard>
+                                <ProtectedRoute>
                                     <UnitLayoutForm />
-                                </AuthGuard>
+                                </ProtectedRoute>
                             }
                         />
                         <Route

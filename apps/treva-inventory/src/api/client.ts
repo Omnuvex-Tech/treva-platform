@@ -24,10 +24,16 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const requestUrl =
+      typeof error.config?.url === "string" ? error.config.url : "";
+    const isLoginRequest = requestUrl.includes("/auth/login");
+
+    if (status === 401 && !isLoginRequest) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.dispatchEvent(new Event("treva-inventory:unauthorized"));
     }
+
     return Promise.reject(error);
   },
 );
