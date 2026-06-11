@@ -1,6 +1,7 @@
 /* Panorama Section */
 .panorama-section {
   margin-top: 48px;
+  margin-bottom: 0;
   width: 100%;
 }
 
@@ -91,8 +92,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
-  border-bottom: none;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e5e5;
   gap: 0;
 }
 
@@ -166,7 +167,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 16px 0;
+    padding: 10px 0;
     gap: 16px;
   }
 
