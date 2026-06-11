@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useUnitLayouts } from '@/hooks/use-unit-layouts';
@@ -18,6 +18,13 @@ export default function UnitLayout() {
   const [status, setStatus] = useState('');
   const [selectedRooms, setSelectedRooms] = useState<string>('');
 
+  const [floorOpen, setFloorOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const floorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLDivElement>(null);
+
   const [priceMin, setPriceMin] = useState(0);
   const [priceMax, setPriceMax] = useState(1500000);
   const totalPriceMin = 0;
@@ -32,6 +39,16 @@ export default function UnitLayout() {
   const limit = 12;
 
   const roomOptions = ['S', '1', '2', '3', '4+'];
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (floorRef.current && !floorRef.current.contains(e.target as Node)) setFloorOpen(false);
+      if (viewRef.current && !viewRef.current.contains(e.target as Node)) setViewOpen(false);
+      if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filters = useMemo(() => ({
     page,
@@ -230,15 +247,22 @@ export default function UnitLayout() {
 
             <div className="filter-group filter-group--floor">
               <label className="filter-label">Floor</label>
-              <div className="select-wrapper">
-                <select value={floor} onChange={(e) => { setFloor(e.target.value); setPage(1); }}>
-                  <option value="">All</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
+              <div className="custom-select" ref={floorRef}>
+                <button type="button" className="custom-select__trigger" onClick={() => setFloorOpen((p) => !p)}>
+                  <span>{floor || 'All'}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {floorOpen && (
+                  <div className="custom-select__dropdown">
+                    {[{ value: '', label: 'All' }, { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' }, { value: '4', label: '4' }, { value: '5', label: '5' }].map((opt) => (
+                      <button key={opt.value} type="button" className={`custom-select__option ${floor === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(opt.value); setPage(1); setFloorOpen(false); }}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -247,25 +271,43 @@ export default function UnitLayout() {
           <div className="mobile-flex-row filter-group--view-status">
             <div className="filter-group filter-group--view">
               <label className="filter-label">View</label>
-              <div className="select-wrapper">
-                <select value={view} onChange={(e) => { setView(e.target.value); setPage(1); }}>
-                  <option value="">All</option>
-                  <option value="Sea view">Sea view</option>
-                  <option value="City view">City view</option>
-                  <option value="Garden view">Garden view</option>
-                </select>
+              <div className="custom-select" ref={viewRef}>
+                <button type="button" className="custom-select__trigger" onClick={() => setViewOpen((p) => !p)}>
+                  <span>{view || 'All'}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {viewOpen && (
+                  <div className="custom-select__dropdown">
+                    {[{ value: '', label: 'All' }, { value: 'Sea view', label: 'Sea view' }, { value: 'City view', label: 'City view' }, { value: 'Garden view', label: 'Garden view' }].map((opt) => (
+                      <button key={opt.value} type="button" className={`custom-select__option ${view === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setView(opt.value); setPage(1); setViewOpen(false); }}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="filter-group filter-group--status">
               <label className="filter-label">Status</label>
-              <div className="select-wrapper">
-                <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
-                  <option value="">All</option>
-                  <option value="available">Available</option>
-                  <option value="reserved">Reserved</option>
-                  <option value="sold">Sold</option>
-                </select>
+              <div className="custom-select" ref={statusRef}>
+                <button type="button" className="custom-select__trigger" onClick={() => setStatusOpen((p) => !p)}>
+                  <span>{status ? status.charAt(0).toUpperCase() + status.slice(1) : 'All'}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {statusOpen && (
+                  <div className="custom-select__dropdown">
+                    {[{ value: '', label: 'All' }, { value: 'available', label: 'Available' }, { value: 'reserved', label: 'Reserved' }, { value: 'sold', label: 'Sold' }].map((opt) => (
+                      <button key={opt.value} type="button" className={`custom-select__option ${status === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setStatus(opt.value); setPage(1); setStatusOpen(false); }}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
