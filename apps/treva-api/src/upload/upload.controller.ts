@@ -7,15 +7,26 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-const uploadsDir = join(process.cwd(), 'uploads');
+const uploadsServeRoot = process.env.UPLOADS_SERVE_ROOT ?? '/uploads';
+const uploadsDir = join(process.cwd(), process.env.UPLOADS_DIR ?? 'uploads');
 const imagesDir = join(uploadsDir, 'images');
 const documentsDir = join(uploadsDir, 'documents');
+const maxFileSizeBytes = Number(
+  process.env.UPLOAD_MAX_FILE_SIZE_BYTES ?? 10 * 1024 * 1024,
+);
 
 [uploadsDir, imagesDir, documentsDir].forEach((dir) => {
   if (!existsSync(dir)) {
@@ -40,18 +51,31 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: (error: Error | null, accept: boolean) => void,
 ) => {
-  const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const allowedImageTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif',
+  ];
   const allowedDocTypes = ['application/pdf'];
 
-  if (allowedImageTypes.includes(file.mimetype) || allowedDocTypes.includes(file.mimetype)) {
+  if (
+    allowedImageTypes.includes(file.mimetype) ||
+    allowedDocTypes.includes(file.mimetype)
+  ) {
     cb(null, true);
   } else {
-    cb(new BadRequestException('Only images (JPEG, PNG, WebP, GIF) and PDFs are allowed'), false);
+    cb(
+      new BadRequestException(
+        'Only images (JPEG, PNG, WebP, GIF) and PDFs are allowed',
+      ),
+      false,
+    );
   }
 };
 
 @ApiTags('upload')
-@Controller('api/v1')
+@Controller()
 export class UploadController {
   @Post('upload')
   @UseGuards(JwtAuthGuard)
@@ -60,7 +84,7 @@ export class UploadController {
     FileInterceptor('file', {
       storage,
       fileFilter,
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: maxFileSizeBytes },
     }),
   )
   @ApiOperation({ summary: 'Upload a file (image or PDF)' })
@@ -80,7 +104,7 @@ export class UploadController {
     }
 
     const isImage = file.mimetype.startsWith('image/');
-    const url = `/uploads/${isImage ? 'images' : 'documents'}/${file.filename}`;
+    const url = `${uploadsServeRoot}/${isImage ? 'images' : 'documents'}/${file.filename}`;
 
     return {
       url,

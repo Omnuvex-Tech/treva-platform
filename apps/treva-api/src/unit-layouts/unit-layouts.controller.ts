@@ -9,14 +9,20 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UnitLayoutsService } from './unit-layouts.service';
 import { CreateUnitLayoutDto } from './dto/create-unit-layout.dto';
 import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('unit-layouts')
-@Controller('api/v1/unit-layouts')
+@Controller('unit-layouts')
 export class UnitLayoutsController {
   constructor(private readonly unitLayoutsService: UnitLayoutsService) {}
 
@@ -81,7 +87,10 @@ export class UnitLayoutsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get unit layout by ID' })
-  @ApiResponse({ status: 200, description: 'Unit layout retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Unit layout retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Unit layout not found' })
   async findOne(@Param('id') id: string) {
     return this.unitLayoutsService.findOne(id);

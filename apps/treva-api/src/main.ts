@@ -1,15 +1,46 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+
+function parseCsv(value?: string) {
+  return value
+    ?.split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const corsOrigins = parseCsv(configService.get<string>('CORS_ORIGINS'));
+  const apiPrefix = configService.get<string>('API_PREFIX');
+  const swaggerPath = configService.get<string>('SWAGGER_PATH');
+  const port = Number(configService.get<string>('PORT'));
+
+  if (!apiPrefix) {
+    throw new Error('API_PREFIX is not configured');
+  }
+
+  if (!swaggerPath) {
+    throw new Error('SWAGGER_PATH is not configured');
+  }
+
+  if (!Number.isInteger(port) || port <= 0) {
+    throw new Error('PORT is not configured');
+  }
+
+  if (!corsOrigins?.length) {
+    throw new Error('CORS_ORIGINS is not configured');
+  }
 
   app.enableCors({
-    origin: ['http://localhost:3003', 'http://localhost:3000'],
+    origin: corsOrigins,
     credentials: true,
   });
+
+  app.setGlobalPrefix(apiPrefix);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -27,8 +58,8 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup(swaggerPath, app, document);
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(port);
 }
 bootstrap();
