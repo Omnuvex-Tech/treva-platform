@@ -1,8 +1,0 @@
-⨯ Another next dev server is already running.
-
-- Local:        http://localhost:3000
-- PID:          32380
-- Dir:          C:\Users\ASUS\Desktop\treva-project\apps\treva-web
-- Log:          .next\dev\logs\next-development.log
-
-Run taskkill /PID 32380 /F to stop it.

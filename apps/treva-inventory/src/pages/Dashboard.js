@@ -1,5 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Layout } from "../components/Layout";
-export function Dashboard() {
-    return (_jsx(Layout, { children: _jsxs("div", { className: "grid grid-cols-3 gap-3", children: [_jsxs("div", { className: "rounded-xl border border-white/10 bg-white/3 p-3.5", children: [_jsx("div", { className: "text-xs text-white/60", children: "Categories" }), _jsx("div", { className: "mt-2.5 text-2xl font-bold", children: "\u2014" })] }), _jsxs("div", { className: "rounded-xl border border-white/10 bg-white/3 p-3.5", children: [_jsx("div", { className: "text-xs text-white/60", children: "Unit Layouts" }), _jsx("div", { className: "mt-2.5 text-2xl font-bold", children: "\u2014" })] }), _jsxs("div", { className: "rounded-xl border border-white/10 bg-white/3 p-3.5", children: [_jsx("div", { className: "text-xs text-white/60", children: "Total Listings" }), _jsx("div", { className: "mt-2.5 text-2xl font-bold", children: "\u2014" })] })] }) }));
-}
