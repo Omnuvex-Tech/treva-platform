@@ -296,6 +296,10 @@
 
 /* Responsive (Mobil) */
 @media (max-width: 768px) {
+  .apt-breadcrumbs {
+    margin-bottom: 16px;
+  }
+
   .apt-main-card {
     flex-direction: column;
     padding: 24px;

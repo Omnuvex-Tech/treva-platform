@@ -1,5 +1,5 @@
 .page-wrapper .main-wrapper {
-  padding-top: calc(var(--treva-nav-height, 64px) + 32px);
+  padding-top: calc(var(--treva-nav-height, 64px) + 24px);
   padding-bottom: 64px;
 }
 
