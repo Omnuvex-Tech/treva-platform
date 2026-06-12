@@ -6,7 +6,6 @@
 }
 
 .similar-header {
-  border-bottom: 1px solid #e0e0e0;
   padding-bottom: 20px;
   margin-bottom: 32px;
 }
@@ -70,6 +69,10 @@
   min-height: 520px;
   text-decoration: none;
   color: inherit;
+}
+
+.similar-spacer {
+  height: 80px;
 }
 
 .similar-grid .layout-card__header {
