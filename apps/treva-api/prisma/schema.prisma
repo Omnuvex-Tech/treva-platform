@@ -37,8 +37,7 @@ model UnitLayout {
   totalArea           Float
   internalArea        Float
   balconyArea         Float?
-  priceUsd            Float
-  priceAzn            Float
+  prices              Json         @default("{}")
   completionYear      Int
   numberOfFloors      Json
   similarApartmentIds String[]
@@ -74,6 +73,15 @@ model ViewOption {
   updatedAt DateTime     @updatedAt
 
   unitLayouts UnitLayout[]
+}
+
+model Currency {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Status {

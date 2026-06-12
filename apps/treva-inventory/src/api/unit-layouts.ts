@@ -44,8 +44,7 @@ export interface UnitLayout {
     totalArea: number;
     internalArea: number;
     balconyArea?: number;
-    priceUsd: number;
-    priceAzn: number;
+    prices: Record<string, number>;
     completionYear: number;
     numberOfFloors: NumberOfFloors;
     viewOptionId?: string;
@@ -93,8 +92,7 @@ export interface CreateUnitLayoutData {
     totalArea: number;
     internalArea: number;
     balconyArea: number;
-    priceUsd: number;
-    priceAzn: number;
+    prices: Record<string, number>;
     completionYear: number;
     numberOfFloors: NumberOfFloors;
     viewOptionId?: string;

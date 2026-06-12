@@ -132,15 +132,9 @@ export class CreateUnitLayoutDto {
   @Min(0)
   balconyArea: number;
 
-  @ApiProperty({ example: 186004 })
-  @IsNumber()
-  @Min(0)
-  priceUsd: number;
-
-  @ApiProperty({ example: 317000 })
-  @IsNumber()
-  @Min(0)
-  priceAzn: number;
+  @ApiProperty({ example: { USD: 150000, AZN: 255000 } })
+  @IsObject()
+  prices: Record<string, number>;
 
   @ApiProperty({ example: 2030 })
   @IsNumber()

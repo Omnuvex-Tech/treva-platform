@@ -7,6 +7,7 @@ import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { useUnitLayoutBySlug, useUnitLayouts } from '@/hooks/use-unit-layouts';
+import { useCurrencies } from '@/hooks/use-currencies';
 import { getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import "../off-plan.css";
@@ -20,8 +21,10 @@ export default function ApartmentCard() {
   const locale = params?.locale || 'az';
 
   const { data: layout, isLoading, error } = useUnitLayoutBySlug(id);
+  const { data: currenciesData } = useCurrencies();
+  const currencies = currenciesData || [];
 
-  const [currency, setCurrency] = useState<'USD' | 'AZN'>('USD');
+  const [currency, setCurrency] = useState('USD');
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
 
@@ -189,7 +192,19 @@ export default function ApartmentCard() {
                     </button>
                     {currencyOpen && (
                       <div className="apt-currency-dropdown" role="listbox">
-                        {(['USD', 'AZN'] as const).map((c) => (
+                        {currencies.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            role="option"
+                            aria-selected={currency === c.value}
+                            className={`apt-currency-option ${currency === c.value ? 'apt-currency-option--active' : ''}`}
+                            onClick={() => { setCurrency(c.value); setCurrencyOpen(false); }}
+                          >
+                            {c.value}
+                          </button>
+                        ))}
+                        {currencies.length === 0 && ['USD', 'AZN'].map((c) => (
                           <button
                             key={c}
                             type="button"
@@ -205,7 +220,7 @@ export default function ApartmentCard() {
                     )}
                   </div>
                   <div className="apt-price">
-                    {formatNumber(currency === 'USD' ? layout.priceUsd : layout.priceAzn)}
+                    {formatNumber(layout.prices?.[currency] || 0)}
                   </div>
                 </div>
 
@@ -318,7 +333,7 @@ export default function ApartmentCard() {
                     </div>
                     <div className="layout-card__footer">
                       <h2 className="layout-card__name">{apt.title}, {apt.totalArea} m²</h2>
-                      <span className="layout-card__price">${formatNumber(apt.priceUsd)}</span>
+                      <span className="layout-card__price">{currency} {formatNumber(apt.prices?.[currency] || 0)}</span>
                     </div>
                   </Link>
                 ))}

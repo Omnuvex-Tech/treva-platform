@@ -44,6 +44,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false, type: Number })
   @ApiQuery({ name: 'maxPrice', required: false, type: Number })
+  @ApiQuery({ name: 'currency', required: false })
   @ApiQuery({ name: 'minArea', required: false, type: Number })
   @ApiQuery({ name: 'maxArea', required: false, type: Number })
   @ApiQuery({ name: 'floor', required: false, type: Number })
@@ -57,6 +58,7 @@ export class UnitLayoutsController {
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
+    @Query('currency') currency?: string,
     @Query('minArea') minArea?: string,
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
@@ -71,6 +73,7 @@ export class UnitLayoutsController {
       search,
       minPrice: minPrice ? parseFloat(minPrice) : undefined,
       maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      currency,
       minArea: minArea ? parseFloat(minArea) : undefined,
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor, 10) : undefined,
@@ -81,8 +84,9 @@ export class UnitLayoutsController {
 
   @Get('range')
   @ApiOperation({ summary: 'Get price and area range from unit layouts' })
-  async getRange() {
-    return this.unitLayoutsService.findRange();
+  @ApiQuery({ name: 'currency', required: false })
+  async getRange(@Query('currency') currency?: string) {
+    return this.unitLayoutsService.findRange(currency || 'USD');
   }
 
   @Get('stats')

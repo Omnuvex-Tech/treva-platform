@@ -29,8 +29,7 @@ export class UnitLayoutsService {
         totalArea: createDto.totalArea,
         internalArea: createDto.internalArea,
         balconyArea: createDto.balconyArea,
-        priceUsd: createDto.priceUsd,
-        priceAzn: createDto.priceAzn,
+        prices: createDto.prices as any || {},
         completionYear: createDto.completionYear,
         numberOfFloors: createDto.numberOfFloors as any,
         viewOptionId: createDto.viewOptionId,
@@ -52,6 +51,7 @@ export class UnitLayoutsService {
     search?: string;
     minPrice?: number;
     maxPrice?: number;
+    currency?: string;
     minArea?: number;
     maxArea?: number;
     floor?: number;
@@ -61,6 +61,7 @@ export class UnitLayoutsService {
     const page = query.page || 1;
     const limit = query.limit || 12;
     const skip = (page - 1) * limit;
+    const currency = query.currency || 'USD';
 
     const where: any = {};
 
@@ -81,9 +82,46 @@ export class UnitLayoutsService {
     }
 
     if (query.minPrice || query.maxPrice) {
-      where.priceUsd = {};
-      if (query.minPrice) where.priceUsd.gte = query.minPrice;
-      if (query.maxPrice) where.priceUsd.lte = query.maxPrice;
+      where[`prices_${currency}`] = {};
+      const priceField = { path: [currency] };
+      where.OR = [
+        {
+          prices: {
+            path: [currency],
+            gte: query.minPrice || 0,
+            ...(query.maxPrice ? { lte: query.maxPrice } : {}),
+          },
+        },
+      ];
+      if (query.minPrice && query.maxPrice) {
+        where.OR = [
+          {
+            prices: {
+              path: [currency],
+              gte: query.minPrice,
+              lte: query.maxPrice,
+            },
+          },
+        ];
+      } else if (query.minPrice) {
+        where.OR = [
+          {
+            prices: {
+              path: [currency],
+              gte: query.minPrice,
+            },
+          },
+        ];
+      } else if (query.maxPrice) {
+        where.OR = [
+          {
+            prices: {
+              path: [currency],
+              lte: query.maxPrice,
+            },
+          },
+        ];
+      }
     }
 
     if (query.minArea || query.maxArea) {
@@ -202,8 +240,7 @@ export class UnitLayoutsService {
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
     if (updateDto.internalArea !== undefined) data.internalArea = updateDto.internalArea;
     if (updateDto.balconyArea !== undefined) data.balconyArea = updateDto.balconyArea;
-    if (updateDto.priceUsd !== undefined) data.priceUsd = updateDto.priceUsd;
-    if (updateDto.priceAzn !== undefined) data.priceAzn = updateDto.priceAzn;
+    if (updateDto.prices !== undefined) data.prices = updateDto.prices;
     if (updateDto.completionYear !== undefined) data.completionYear = updateDto.completionYear;
     if (updateDto.numberOfFloors) data.numberOfFloors = updateDto.numberOfFloors;
     if (updateDto.viewOptionId !== undefined) data.viewOptionId = updateDto.viewOptionId;
@@ -238,16 +275,30 @@ export class UnitLayoutsService {
     return this.prisma.unitLayout.count();
   }
 
-  async findRange() {
-    const result = await this.prisma.unitLayout.aggregate({
-      _max: { priceUsd: true, totalArea: true },
-      _min: { priceUsd: true, totalArea: true },
+  async findRange(currency: string = 'USD') {
+    const layouts = await this.prisma.unitLayout.findMany({
+      select: { prices: true, totalArea: true },
     });
+
+    let maxPrice = 0;
+    let minPrice = Infinity;
+    let maxTotalArea = 0;
+    let minTotalArea = Infinity;
+
+    for (const layout of layouts) {
+      const prices = layout.prices as Record<string, number>;
+      const price = prices?.[currency] || 0;
+      if (price > maxPrice) maxPrice = price;
+      if (price < minPrice && price > 0) minPrice = price;
+      if (layout.totalArea > maxTotalArea) maxTotalArea = layout.totalArea;
+      if (layout.totalArea < minTotalArea) minTotalArea = layout.totalArea;
+    }
+
     return {
-      maxPriceUsd: result._max.priceUsd || 0,
-      minPriceUsd: result._min.priceUsd || 0,
-      maxTotalArea: result._max.totalArea || 0,
-      minTotalArea: result._min.totalArea || 0,
+      maxPrice: maxPrice || 0,
+      minPrice: minPrice === Infinity ? 0 : minPrice,
+      maxTotalArea: maxTotalArea || 0,
+      minTotalArea: minTotalArea === Infinity ? 0 : minTotalArea,
     };
   }
 

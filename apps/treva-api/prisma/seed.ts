@@ -50,6 +50,25 @@ async function main() {
   });
   console.log('Category 2 created:', category2.title);
 
+  // Create default currencies
+  const currencies = [
+    { name: 'US Dollar', value: 'USD', order: 0 },
+    { name: 'Azerbaijani Manat', value: 'AZN', order: 1 },
+    { name: 'Euro', value: 'EUR', order: 2 },
+  ];
+
+  for (const currency of currencies) {
+    const existing = await prisma.currency.findUnique({
+      where: { value: currency.value },
+    });
+    if (!existing) {
+      await prisma.currency.create({ data: currency });
+      console.log(`Currency created: ${currency.value}`);
+    } else {
+      console.log(`Currency already exists: ${currency.value}`);
+    }
+  }
+
   console.log('Seeding completed!');
 }
 

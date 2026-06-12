@@ -43,12 +43,12 @@ export function useUnitLayout(id: string | undefined) {
     });
 }
 
-export function useUnitLayoutRange() {
+export function useUnitLayoutRange(currency: string = 'USD') {
     return useQuery({
-        queryKey: ["unit-layout-range"],
+        queryKey: ["unit-layout-range", currency],
         queryFn: async () => {
-            const response = await api.get<{ maxPriceUsd: number; minPriceUsd: number; maxTotalArea: number; minTotalArea: number }>(
-                `${endpoints.offPlan.list}/range`
+            const response = await api.get<{ maxPrice: number; minPrice: number; maxTotalArea: number; minTotalArea: number }>(
+                `${endpoints.offPlan.list}/range?currency=${currency}`
             );
             return response.data;
         },

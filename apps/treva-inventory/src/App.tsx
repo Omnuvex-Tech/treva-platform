@@ -10,6 +10,7 @@ import { UnitLayoutList } from "./pages/unit-layouts/UnitLayoutList";
 import { UnitLayoutForm } from "./pages/unit-layouts/UnitLayoutForm";
 import { RoomOptionList } from "./pages/room-options/RoomOptionList";
 import { ViewOptionList } from "./pages/view-options/ViewOptionList";
+import { CurrencyList } from "./pages/currencies/CurrencyList";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -140,6 +141,14 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <ViewOptionList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/currencies"
+                            element={
+                                <ProtectedRoute>
+                                    <CurrencyList />
                                 </ProtectedRoute>
                             }
                         />

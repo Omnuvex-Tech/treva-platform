@@ -50,9 +50,9 @@ export function UnitLayoutList() {
 
     const layouts = Array.isArray(response?.data?.data) ? response.data.data : [];
     const pagination = response?.data?.pagination;
-    const formatCurrency = (value: UnitLayout["priceUsd"]) => {
-        const amount = Number(value);
-        return Number.isFinite(amount) ? `$${amount.toLocaleString()}` : "-";
+    const formatPrices = (prices: Record<string, number> | undefined) => {
+        if (!prices || Object.keys(prices).length === 0) return "-";
+        return Object.entries(prices).map(([curr, price]) => `${curr} ${Number(price).toLocaleString()}`).join(' / ');
     };
     const formatArea = (value: UnitLayout["totalArea"]) => {
         const amount = Number(value);
@@ -109,7 +109,7 @@ export function UnitLayoutList() {
                                     <th className="px-4 py-3 font-medium">Category</th>
                                     <th className="px-4 py-3 font-medium">Floor</th>
                                     <th className="px-4 py-3 font-medium">Area</th>
-                                    <th className="px-4 py-3 font-medium">Price (USD)</th>
+                                    <th className="px-4 py-3 font-medium">Prices</th>
                                     <th className="px-4 py-3 font-medium">Status</th>
                                     <th className="px-4 py-3 font-medium text-right">
                                         Actions
@@ -133,7 +133,7 @@ export function UnitLayoutList() {
                                             {formatArea(layout.totalArea)}
                                         </td>
                                         <td className="px-4 py-3 text-white/70">
-                                            {formatCurrency(layout.priceUsd)}
+                                            {formatPrices(layout.prices)}
                                         </td>
                                         <td className="px-4 py-3">
                                             <span

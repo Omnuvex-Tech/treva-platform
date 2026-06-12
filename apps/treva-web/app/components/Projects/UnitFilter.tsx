@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
+import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
@@ -45,13 +46,16 @@ export default function UnitLayout() {
   const { data: viewOptionsData } = useViewOptions();
   const viewOptions = viewOptionsData || [];
 
-  const { data: rangeData } = useUnitLayoutRange();
-  const totalPriceMax = rangeData?.maxPriceUsd || 1500000;
+  const { data: currenciesData } = useCurrencies();
+  const currencies = currenciesData || [];
+
+  const { data: rangeData } = useUnitLayoutRange(currency);
+  const totalPriceMax = rangeData?.maxPrice || 1500000;
   const totalAreaMax = rangeData?.maxTotalArea || 10000;
 
   useEffect(() => {
     if (rangeData) {
-      setPriceMax(rangeData.maxPriceUsd);
+      setPriceMax(rangeData.maxPrice);
       setAreaMax(rangeData.maxTotalArea);
     }
   }, [rangeData]);
@@ -80,9 +84,10 @@ export default function UnitLayout() {
     ...(selectedRooms && { roomOptionId: selectedRooms }),
     ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
     ...(typeof debouncedPriceMax === 'number' && debouncedPriceMax < totalPriceMax && { maxPrice: debouncedPriceMax }),
+    currency,
     ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
     ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
-  }), [page, floor, selectedView, status, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax]);
+  }), [page, floor, selectedView, status, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
@@ -108,8 +113,9 @@ export default function UnitLayout() {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
-  const formatPrice = (price: number) => {
-    return `$${formatNumber(price)}`;
+  const formatPrice = (prices: Record<string, number>, curr: string) => {
+    const price = prices?.[curr] || 0;
+    return `${curr} ${formatNumber(price)}`;
   };
 
   const formatStatus = (status: string) => {
@@ -182,9 +188,15 @@ export default function UnitLayout() {
               
               <div className="select-wrapper currency-select">
                 <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-                  <option value="USD">USD</option>
-                  <option value="AZN">AZN</option>
-                  <option value="EUR">EUR</option>
+                  {currencies.map((c) => (
+                    <option key={c.id} value={c.value}>{c.value}</option>
+                  ))}
+                  {currencies.length === 0 && (
+                    <>
+                      <option value="USD">USD</option>
+                      <option value="AZN">AZN</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>
@@ -450,7 +462,7 @@ export default function UnitLayout() {
 
                   <div className="layout-card__footer">
                     <h2 className="layout-card__name">{layout.title}, {layout.totalArea} m²</h2>
-                    <span className="layout-card__price">{formatPrice(layout.priceUsd)}</span>
+                    <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
                   </div>
                 </div>
                 <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__cta">VIew Apartment DetaIls</Link>

@@ -61,8 +61,7 @@ const validateAreaTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.totalArea && form.totalArea !== 0) errors.push({ field: "Total Area", message: "Area & Pricing / Total Area is required" });
     if (!form.internalArea && form.internalArea !== 0) errors.push({ field: "Internal Area", message: "Area & Pricing / Internal Area is required" });
     if (!form.balconyArea && form.balconyArea !== 0) errors.push({ field: "Balcony Area", message: "Area & Pricing / Balcony Area is required" });
-    if (!form.priceUsd && form.priceUsd !== 0) errors.push({ field: "Price (USD)", message: "Area & Pricing / Price (USD) is required" });
-    if (!form.priceAzn && form.priceAzn !== 0) errors.push({ field: "Price (AZN)", message: "Area & Pricing / Price (AZN) is required" });
+    if (!form.prices || Object.keys(form.prices).length === 0) errors.push({ field: "Prices", message: "Area & Pricing / At least one price is required" });
     return { valid: errors.length === 0, errors };
 };
 
@@ -131,8 +130,7 @@ export function UnitLayoutForm() {
         totalArea: undefined as unknown as number,
         internalArea: undefined as unknown as number,
         balconyArea: undefined as unknown as number,
-        priceUsd: undefined as unknown as number,
-        priceAzn: undefined as unknown as number,
+        prices: {},
         completionYear: undefined as unknown as number,
         numberOfFloors: { start: undefined as unknown as number, end: undefined as unknown as number },
         viewOptionId: undefined,
@@ -169,6 +167,12 @@ export function UnitLayoutForm() {
         queryKey: ["view-options"],
         queryFn: () => viewOptionsApi.getAll(),
     });
+
+    const { data: currenciesResponse } = useQuery({
+        queryKey: ["currencies"],
+        queryFn: () => import("../../api/currencies").then(m => m.currenciesApi.getAll()),
+    });
+    const currencies = Array.isArray(currenciesResponse?.data) ? currenciesResponse.data : [];
 
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
@@ -209,8 +213,7 @@ export function UnitLayoutForm() {
                 totalArea: d.totalArea ?? 0,
                 internalArea: d.internalArea ?? 0,
                 balconyArea: d.balconyArea ?? undefined,
-                priceUsd: d.priceUsd ?? 0,
-                priceAzn: d.priceAzn ?? 0,
+                prices: d.prices || {},
                 completionYear: d.completionYear ?? 2030,
                 numberOfFloors: d.numberOfFloors || { start: 1, end: 1 },
                 viewOptionId: d.viewOptionId ?? undefined,
@@ -811,44 +814,75 @@ export function UnitLayoutForm() {
                                         />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                            Price (USD)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={form.priceUsd || ""}
-                                            onChange={(e) =>
-                                                updateField(
-                                                    "priceUsd",
-                                                    e.target.value ? parseFloat(e.target.value) : 0
-                                                )
-                                            }
-                                            placeholder="e.g. 120,000"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                            min={0}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                            Price (AZN)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={form.priceAzn || ""}
-                                            onChange={(e) =>
-                                                updateField(
-                                                    "priceAzn",
-                                                    e.target.value ? parseFloat(e.target.value) : 0
-                                                )
-                                            }
-                                            placeholder="e.g. 204,000"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                            min={0}
-                                            required
-                                        />
-                                    </div>
+                                    {currencies.map((curr) => (
+                                        <div key={curr.id}>
+                                            <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                                Price ({curr.value})
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={form.prices?.[curr.value] || ""}
+                                                onChange={(e) =>
+                                                    updateField(
+                                                        "prices",
+                                                        {
+                                                            ...form.prices,
+                                                            [curr.value]: e.target.value ? parseFloat(e.target.value) : 0,
+                                                        }
+                                                    )
+                                                }
+                                                placeholder={`e.g. 120,000`}
+                                                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                                min={0}
+                                            />
+                                        </div>
+                                    ))}
+                                    {currencies.length === 0 && (
+                                        <>
+                                            <div>
+                                                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                                    Price (USD)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={form.prices?.["USD"] || ""}
+                                                    onChange={(e) =>
+                                                        updateField(
+                                                            "prices",
+                                                            {
+                                                                ...form.prices,
+                                                                USD: e.target.value ? parseFloat(e.target.value) : 0,
+                                                            }
+                                                        )
+                                                    }
+                                                    placeholder="e.g. 120,000"
+                                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                                    min={0}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                                    Price (AZN)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={form.prices?.["AZN"] || ""}
+                                                    onChange={(e) =>
+                                                        updateField(
+                                                            "prices",
+                                                            {
+                                                                ...form.prices,
+                                                                AZN: e.target.value ? parseFloat(e.target.value) : 0,
+                                                            }
+                                                        )
+                                                    }
+                                                    placeholder="e.g. 204,000"
+                                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                                    min={0}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -1112,7 +1146,7 @@ export function UnitLayoutForm() {
                                                             <div className="mt-0.5 text-sm font-medium text-white">{layout.title}</div>
                                                             <div className="mt-1 flex items-center justify-between">
                                                                 <span className="text-xs text-white/50">{layout.totalArea} m²</span>
-                                                                <span className="text-sm font-semibold text-white">${layout.priceUsd?.toLocaleString()}</span>
+                                                                 <span className="text-sm font-semibold text-white">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1191,7 +1225,7 @@ export function UnitLayoutForm() {
                                                             <div className="mt-0.5 text-sm font-medium text-white">{layout.title}</div>
                                                             <div className="mt-1 flex items-center justify-between">
                                                                 <span className="text-xs text-white/50">{layout.totalArea} m²</span>
-                                                                <span className="text-sm font-semibold text-white">${layout.priceUsd?.toLocaleString()}</span>
+                                                                 <span className="text-sm font-semibold text-white">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
                                                             </div>
                                                         </div>
                                                     </div>
