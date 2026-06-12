@@ -134,9 +134,13 @@ export default function ApartmentCard() {
                   </h1>
                   
                   <div className="apt-badge-row">
-                    <span className={`apt-badge ${statusClass(layout.status)}`}>{formatStatus(layout.status)}</span>
+                    <span className={`apt-badge ${statusClass(layout.status)}`}>
+                      <span className="apt-badge__text">{formatStatus(layout.status)}</span>
+                    </span>
                     {layout.documents && layout.documents.length > 0 && layout.documents[0] && (
-                      <a href={getAssetUrl(layout.documents[0].url)} target="_blank" rel="noopener noreferrer" className="apt-badge badge-btn">PDF</a>
+                      <a href={getAssetUrl(layout.documents[0].url)} target="_blank" rel="noopener noreferrer" className="apt-badge badge-btn">
+                        <span className="apt-badge__text">PDF</span>
+                      </a>
                     )}
                     <button type="button" className="apt-share-btn" aria-label="Share" onClick={handleShare}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -178,7 +182,7 @@ export default function ApartmentCard() {
                       aria-expanded={currencyOpen}
                       className="apt-currency-select"
                     >
-                      <span>{currency}</span>
+                      <span className="apt-currency-text">{currency}</span>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                         <path d="M6 9l6 6 6-6"/>
                       </svg>

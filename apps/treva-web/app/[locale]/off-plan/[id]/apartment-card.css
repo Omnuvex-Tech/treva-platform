@@ -139,6 +139,14 @@
   text-transform: none;
 }
 
+.apt-badge__text,
+.apt-currency-text {
+  display: block;
+  line-height: 1;
+  position: relative;
+  top: -0.04em;
+}
+
 .badge-btn {
   cursor: pointer;
   transition: background-color 0.2s;
@@ -173,6 +181,8 @@
 .apt-share-btn svg {
   display: block;
   flex: 0 0 auto;
+  position: relative;
+  top: -1px;
 }
 
 /* Specs Table */
@@ -254,6 +264,8 @@
 .apt-currency-select svg {
   display: block;
   flex: 0 0 auto;
+  position: relative;
+  top: 0px;
   transition: transform 0.2s ease;
   width: 20px;
   height: 20px;
