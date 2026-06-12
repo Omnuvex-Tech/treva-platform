@@ -27,11 +27,11 @@ model Category {
 }
 
 model UnitLayout {
-  id                  String   @id @default(cuid())
+  id                  String      @id @default(cuid())
   title               String
   name                String
-  slug                String   @unique
-  status              Status   @default(available)
+  slug                String      @unique
+  status              Status      @default(available)
   floor               Int
   number              Int?
   totalArea           Float
@@ -41,7 +41,6 @@ model UnitLayout {
   priceAzn            Float
   completionYear      Int
   numberOfFloors      Json
-  view                String?
   similarApartmentIds String[]
   mainImage           Json?
   gallery             Json[]
@@ -51,6 +50,8 @@ model UnitLayout {
   category            Category    @relation(fields: [categoryId], references: [id])
   roomOptionId        String?
   roomOption          RoomOption? @relation(fields: [roomOptionId], references: [id])
+  viewOptionId        String?
+  viewOption          ViewOption? @relation(fields: [viewOptionId], references: [id])
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
 }
@@ -61,6 +62,16 @@ model RoomOption {
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  unitLayouts UnitLayout[]
+}
+
+model ViewOption {
+  id        String       @id @default(cuid())
+  value     String       @unique
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   unitLayouts UnitLayout[]
 }

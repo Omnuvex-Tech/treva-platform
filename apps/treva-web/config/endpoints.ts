@@ -29,4 +29,8 @@ export const endpoints = {
     roomOptions: {
         list: "/room-options",
     },
+
+    viewOptions: {
+        list: "/view-options",
+    },
 } as const;

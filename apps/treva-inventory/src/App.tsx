@@ -9,6 +9,7 @@ import { CategoryEdit } from "./pages/categories/CategoryEdit";
 import { UnitLayoutList } from "./pages/unit-layouts/UnitLayoutList";
 import { UnitLayoutForm } from "./pages/unit-layouts/UnitLayoutForm";
 import { RoomOptionList } from "./pages/room-options/RoomOptionList";
+import { ViewOptionList } from "./pages/view-options/ViewOptionList";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -131,6 +132,14 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <RoomOptionList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/view-options"
+                            element={
+                                <ProtectedRoute>
+                                    <ViewOptionList />
                                 </ProtectedRoute>
                             }
                         />

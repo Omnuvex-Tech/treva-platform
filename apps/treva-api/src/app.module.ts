@@ -10,6 +10,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { UnitLayoutsModule } from './unit-layouts/unit-layouts.module';
 import { UploadModule } from './upload/upload.module';
 import { RoomOptionsModule } from './room-options/room-options.module';
+import { ViewOptionsModule } from './view-options/view-options.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RoomOptionsModule } from './room-options/room-options.module';
     UnitLayoutsModule,
     UploadModule,
     RoomOptionsModule,
+    ViewOptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

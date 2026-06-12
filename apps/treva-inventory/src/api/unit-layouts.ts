@@ -48,7 +48,7 @@ export interface UnitLayout {
     priceAzn: number;
     completionYear: number;
     numberOfFloors: NumberOfFloors;
-    view?: string;
+    viewOptionId?: string;
     similarApartmentIds: string[];
     mainImage?: MainImage;
     gallery: GalleryImage[];
@@ -58,6 +58,7 @@ export interface UnitLayout {
     category: Category;
     roomOptionId?: string;
     roomOption?: { id: string; value: string; order: number };
+    viewOption?: { id: string; value: string; order: number };
     createdAt: string;
     updatedAt: string;
 }
@@ -96,7 +97,7 @@ export interface CreateUnitLayoutData {
     priceAzn: number;
     completionYear: number;
     numberOfFloors: NumberOfFloors;
-    view: string;
+    viewOptionId?: string;
     similarApartmentIds: string[];
     mainImage?: MainImage;
     gallery?: GalleryImage[];
@@ -116,7 +117,8 @@ export interface UnitLayoutFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    view?: string;
+    viewOptionId?: string;
+    roomOptionId?: string;
 }
 
 export interface UploadResponse {

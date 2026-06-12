@@ -156,10 +156,10 @@ export class CreateUnitLayoutDto {
   @Type(() => NumberOfFloorsDto)
   numberOfFloors: NumberOfFloorsDto;
 
-  @ApiProperty({ example: 'Sea view' })
+  @ApiProperty({ example: 'clq1234567890abcdefg', required: false })
   @IsString()
-  @IsNotEmpty()
-  view: string;
+  @IsOptional()
+  viewOptionId?: string;
 
   @ApiProperty({ example: ['id1', 'id2'] })
   @IsArray()

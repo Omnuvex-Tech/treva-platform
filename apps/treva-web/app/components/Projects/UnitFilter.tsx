@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useUnitLayouts } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
+import { useViewOptions } from '@/hooks/use-view-options';
 import { getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
@@ -15,7 +16,7 @@ export default function UnitLayout() {
 
   const [currency, setCurrency] = useState('USD');
   const [floor, setFloor] = useState('');
-  const [view, setView] = useState('');
+  const [selectedView, setSelectedView] = useState('');
   const [status, setStatus] = useState('');
   const [selectedRooms, setSelectedRooms] = useState<string>('');
 
@@ -42,6 +43,9 @@ export default function UnitLayout() {
   const { data: roomOptionsData } = useRoomOptions();
   const roomOptions = roomOptionsData || [];
 
+  const { data: viewOptionsData } = useViewOptions();
+  const viewOptions = viewOptionsData || [];
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (floorRef.current && !floorRef.current.contains(e.target as Node)) setFloorOpen(false);
@@ -56,14 +60,14 @@ export default function UnitLayout() {
     page,
     limit,
     ...(floor && { floor: parseInt(floor) }),
-    ...(view && { view }),
+    ...(selectedView && { viewOptionId: selectedView }),
     ...(status && { status: status.toLowerCase() }),
     ...(selectedRooms && { roomOptionId: selectedRooms }),
     ...(typeof priceMin === 'number' && priceMin > 0 && { minPrice: priceMin }),
     ...(typeof priceMax === 'number' && priceMax < totalPriceMax && { maxPrice: priceMax }),
     ...(typeof areaMin === 'number' && areaMin > 0 && { minArea: areaMin }),
     ...(typeof areaMax === 'number' && areaMax < totalAreaMax && { maxArea: areaMax }),
-  }), [page, floor, view, status, selectedRooms, priceMin, priceMax, areaMin, areaMax]);
+  }), [page, floor, selectedView, status, selectedRooms, priceMin, priceMax, areaMin, areaMax]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
@@ -96,7 +100,7 @@ export default function UnitLayout() {
 
   const handleReset = () => {
     setFloor('');
-    setView('');
+    setSelectedView('');
     setStatus('');
     setSelectedRooms('');
     setPriceMin(0);
@@ -290,16 +294,19 @@ export default function UnitLayout() {
               <label className="filter-label">View</label>
               <div className="custom-select" ref={viewRef}>
                 <button type="button" className="custom-select__trigger" onClick={() => setViewOpen((p) => !p)}>
-                  <span>{view || 'All'}</span>
+                  <span>{viewOptions.find(v => v.id === selectedView)?.value || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
                 {viewOpen && (
                   <div className="custom-select__dropdown">
-                    {[{ value: '', label: 'All' }, { value: 'Sea view', label: 'Sea view' }, { value: 'City view', label: 'City view' }, { value: 'Garden view', label: 'Garden view' }].map((opt) => (
-                      <button key={opt.value} type="button" className={`custom-select__option ${view === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setView(opt.value); setPage(1); setViewOpen(false); }}>
-                        {opt.label}
+                    <button type="button" className={`custom-select__option ${!selectedView ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(''); setPage(1); setViewOpen(false); }}>
+                      All
+                    </button>
+                    {viewOptions.map((opt) => (
+                      <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setPage(1); setViewOpen(false); }}>
+                        {opt.value}
                       </button>
                     ))}
                   </div>

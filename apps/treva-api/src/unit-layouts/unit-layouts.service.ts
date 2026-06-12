@@ -33,7 +33,7 @@ export class UnitLayoutsService {
         priceAzn: createDto.priceAzn,
         completionYear: createDto.completionYear,
         numberOfFloors: createDto.numberOfFloors as any,
-        view: createDto.view,
+        viewOptionId: createDto.viewOptionId,
         similarApartmentIds: createDto.similarApartmentIds || [],
         mainImage: createDto.mainImage as any,
         gallery: createDto.gallery as any[] || [],
@@ -55,7 +55,7 @@ export class UnitLayoutsService {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    view?: string;
+    viewOptionId?: string;
     roomOptionId?: string;
   }) {
     const page = query.page || 1;
@@ -96,8 +96,8 @@ export class UnitLayoutsService {
       where.floor = query.floor;
     }
 
-    if (query.view) {
-      where.view = { contains: query.view, mode: 'insensitive' };
+    if (query.viewOptionId) {
+      where.viewOptionId = query.viewOptionId;
     }
 
     if (query.roomOptionId) {
@@ -110,7 +110,11 @@ export class UnitLayoutsService {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: { category: true, roomOption: true },
+        include: {
+          category: true,
+          roomOption: true,
+          viewOption: true,
+        },
       }),
       this.prisma.unitLayout.count({ where }),
     ]);
@@ -129,7 +133,7 @@ export class UnitLayoutsService {
   async findOne(id: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { id },
-      include: { category: true, roomOption: true },
+      include: { category: true, roomOption: true, viewOption: true },
     });
 
     if (!unitLayout) {
@@ -150,7 +154,7 @@ export class UnitLayoutsService {
   async findBySlug(slug: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { slug },
-      include: { category: true, roomOption: true },
+      include: { category: true, roomOption: true, viewOption: true },
     });
 
     if (!unitLayout) {
@@ -201,9 +205,9 @@ export class UnitLayoutsService {
     if (updateDto.priceUsd !== undefined) data.priceUsd = updateDto.priceUsd;
     if (updateDto.priceAzn !== undefined) data.priceAzn = updateDto.priceAzn;
     if (updateDto.completionYear !== undefined) data.completionYear = updateDto.completionYear;
-    if (updateDto.numberOfFloors !== undefined) data.numberOfFloors = updateDto.numberOfFloors;
-    if (updateDto.view !== undefined) data.view = updateDto.view;
-    if (updateDto.similarApartmentIds !== undefined) data.similarApartmentIds = updateDto.similarApartmentIds;
+    if (updateDto.numberOfFloors) data.numberOfFloors = updateDto.numberOfFloors;
+    if (updateDto.viewOptionId !== undefined) data.viewOptionId = updateDto.viewOptionId;
+    if (updateDto.similarApartmentIds) data.similarApartmentIds = updateDto.similarApartmentIds;
     if (updateDto.mainImage !== undefined) data.mainImage = updateDto.mainImage;
     if (updateDto.gallery !== undefined) data.gallery = updateDto.gallery;
     if (updateDto.documents !== undefined) data.documents = updateDto.documents;

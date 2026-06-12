@@ -10,6 +10,7 @@ import {
 } from "../../api/unit-layouts";
 import { categoriesApi, Category } from "../../api/categories";
 import { roomOptionsApi, RoomOption } from "../../api/room-options";
+import { viewOptionsApi, ViewOption } from "../../api/view-options";
 import { Layout } from "../../components/Layout";
 import { FileUpload } from "../../components/FileUpload";
 
@@ -51,7 +52,7 @@ const validateBasicTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.categoryId) errors.push({ field: "Category", message: "Basic Info / Category is required" });
     if (!form.floor && form.floor !== 0) errors.push({ field: "Floor", message: "Basic Info / Floor is required" });
     if (!form.number && form.number !== 0) errors.push({ field: "Number", message: "Basic Info / Number is required" });
-    if (!form.view?.trim()) errors.push({ field: "View", message: "Basic Info / View is required" });
+    // if (!form.viewOptionId) errors.push({ field: "View", message: "Basic Info / View Option is required" }); // Optional if required
     return { valid: errors.length === 0, errors };
 };
 
@@ -134,7 +135,7 @@ export function UnitLayoutForm() {
         priceAzn: undefined as unknown as number,
         completionYear: undefined as unknown as number,
         numberOfFloors: { start: undefined as unknown as number, end: undefined as unknown as number },
-        view: "",
+        viewOptionId: undefined,
         similarApartmentIds: [],
         mainImage: undefined,
         gallery: [],
@@ -164,9 +165,15 @@ export function UnitLayoutForm() {
         queryFn: () => roomOptionsApi.getAll(),
     });
 
+    const { data: viewOptionsResponse } = useQuery({
+        queryKey: ["view-options"],
+        queryFn: () => viewOptionsApi.getAll(),
+    });
+
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [roomOptionOpen, setRoomOptionOpen] = useState(false);
+    const [viewOptionOpen, setViewOptionOpen] = useState(false);
     const [statusOpen, setStatusOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
     const [currentTabError, setCurrentTabError] = useState<ValidationError[]>([]);
@@ -174,12 +181,14 @@ export function UnitLayoutForm() {
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
     const roomOptionRef = useRef<HTMLDivElement>(null);
+    const viewOptionRef = useRef<HTMLDivElement>(null);
     const statusRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setCategoryOpen(false);
             if (roomOptionRef.current && !roomOptionRef.current.contains(e.target as Node)) setRoomOptionOpen(false);
+            if (viewOptionRef.current && !viewOptionRef.current.contains(e.target as Node)) setViewOptionOpen(false);
             if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -204,7 +213,7 @@ export function UnitLayoutForm() {
                 priceAzn: d.priceAzn ?? 0,
                 completionYear: d.completionYear ?? 2030,
                 numberOfFloors: d.numberOfFloors || { start: 1, end: 1 },
-                view: d.view || "",
+                viewOptionId: d.viewOptionId ?? undefined,
                 similarApartmentIds: d.similarApartmentIds || [],
                 mainImage: d.mainImage ?? undefined,
                 gallery: Array.isArray(d.gallery) ? d.gallery : [],
@@ -409,6 +418,9 @@ export function UnitLayoutForm() {
         : [];
     const roomOptions = Array.isArray(roomOptionsResponse?.data)
         ? (roomOptionsResponse.data as RoomOption[])
+        : [];
+    const viewOptions = Array.isArray(viewOptionsResponse?.data)
+        ? (viewOptionsResponse.data as ViewOption[])
         : [];
     const mutationError =
         createMutation.error || updateMutation.error;
@@ -677,16 +689,56 @@ export function UnitLayoutForm() {
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                            View
+                                            View Option
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={form.view || ""}
-                                            onChange={(e) => updateField("view", e.target.value)}
-                                            placeholder="e.g. Sea view"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                            required
-                                        />
+                                        <div ref={viewOptionRef} className="relative">
+                                            <button
+                                                type="button"
+                                                onClick={() => setViewOptionOpen((p) => !p)}
+                                                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            >
+                                                <span className={form.viewOptionId ? "text-white" : "text-white/40"}>
+                                                    {viewOptions.find((v) => v.id === form.viewOptionId)?.value || "Select view option (optional)"}
+                                                </span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${viewOptionOpen ? "rotate-180" : ""}`}>
+                                                    <path d="M6 9l6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                            {viewOptionOpen && (
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { updateField("viewOptionId", undefined); setViewOptionOpen(false); }}
+                                                        className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                            !form.viewOptionId
+                                                                ? "bg-white/15 text-white font-medium"
+                                                                : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                        }`}
+                                                    >
+                                                        — None
+                                                    </button>
+                                                    {viewOptions.map((opt) => (
+                                                        <button
+                                                            key={opt.id}
+                                                            type="button"
+                                                            onClick={() => { updateField("viewOptionId", opt.id); setViewOptionOpen(false); }}
+                                                            className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                                form.viewOptionId === opt.id
+                                                                    ? "bg-white/15 text-white font-medium"
+                                                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                            }`}
+                                                        >
+                                                            {opt.value}
+                                                        </button>
+                                                    ))}
+                                                    {viewOptions.length === 0 && (
+                                                        <div className="px-4 py-3 text-sm text-white/40">
+                                                            No view options yet. Add them in View Options.
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
