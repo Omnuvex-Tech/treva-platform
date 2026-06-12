@@ -72,6 +72,7 @@
   max-width: 725px; /* Şəklin həddindən artıq böyüməsinin qarşısını alan dəqiq ölçü */
   height: auto;
   object-fit: contain;
+  object-position: left center; /* Şəklin sol tərəfdəki boşluğunu silir */
   display: block;
 }
 
@@ -319,9 +320,9 @@
   .apt-main-card {
     min-height: 0;
     padding: clamp(44px, 4vw, 72px) clamp(32px, 3.4vw, 56px) clamp(44px, 4vw, 72px);
-    gap: clamp(40px, 5vw, 96px);
+    gap: clamp(0px, 0vw, 96px);
     align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: space-between;
     border-radius: 0;
   }
 
@@ -345,8 +346,9 @@
     width: 100%;
     max-width: none;
     height: auto;
-    aspect-ratio: 1072 / 670;
+    aspect-ratio: 1072 / 650;
     object-fit: contain;
+    object-position: left center;
   }
 
   .apt-details-section {
@@ -360,7 +362,7 @@
   }
 
   .apt-title {
-    font-size: clamp(48px, 5vw, 70px);
+    font-size: clamp(48px, 6vw, 80px);
     line-height: 1.1;
     margin: 0 0 clamp(12px, 1.2vw, 20px) 0;
     letter-spacing: clamp(-2.5px, -0.15vw, -1.5px);
