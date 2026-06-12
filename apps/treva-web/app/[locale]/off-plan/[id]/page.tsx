@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
-import { useUnitLayout, useUnitLayouts } from '@/hooks/use-unit-layouts';
+import { useUnitLayoutBySlug, useUnitLayouts } from '@/hooks/use-unit-layouts';
 import { getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import "../off-plan.css";
@@ -19,7 +19,7 @@ export default function ApartmentCard() {
   const id = params?.id as string | undefined;
   const locale = params?.locale || 'az';
 
-  const { data: layout, isLoading, error } = useUnitLayout(id);
+  const { data: layout, isLoading, error } = useUnitLayoutBySlug(id);
 
   const [currency, setCurrency] = useState<'USD' | 'AZN'>('USD');
   const [currencyOpen, setCurrencyOpen] = useState(false);
@@ -281,7 +281,7 @@ export default function ApartmentCard() {
                 {layout.similarApartments.map((apt) => (
                   <Link
                     key={apt.id}
-                    href={`/${locale}/off-plan/${apt.id}`}
+                    href={`/${locale}/off-plan/${apt.slug}`}
                     className="layout-card"
                   >
                     <div className="layout-card__header">

@@ -88,6 +88,17 @@ export class UnitLayoutsController {
     return counts;
   }
 
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Get unit layout by slug' })
+  @ApiResponse({
+    status: 200,
+    description: 'Unit layout retrieved successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Unit layout not found' })
+  async findBySlug(@Param('slug') slug: string) {
+    return this.unitLayoutsService.findBySlug(slug);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get unit layout by ID' })
   @ApiResponse({
