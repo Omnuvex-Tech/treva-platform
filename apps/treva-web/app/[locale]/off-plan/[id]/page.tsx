@@ -268,7 +268,7 @@ export default function ApartmentCard() {
           </div>
 
           {/* Similar Apartments Section */}
-          {layout.similarApartments && layout.similarApartments.length > 0 && (
+          {layout.similarApartments && layout.similarApartments.length > 0 ? (
             <div className="similar-section">
               <div className="similar-header">
                 <h2 className="similar-title">
@@ -320,6 +320,8 @@ export default function ApartmentCard() {
                 ))}
               </div>
             </div>
+          ) : (
+            <div className="similar-section" />
           )}
         </PageContainer>
       </main>
