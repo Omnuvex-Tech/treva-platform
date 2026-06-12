@@ -67,6 +67,7 @@
   width: auto;
   box-sizing: border-box;
   text-transform: none;
+  text-decoration: none;
 }
 
 .panorama-btn:hover {
