@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useUnitLayouts } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
+import { useDebounce } from '@/hooks/use-debounce';
 import { getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
@@ -56,6 +57,11 @@ export default function UnitLayout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const debouncedPriceMin = useDebounce(priceMin, 1000);
+  const debouncedPriceMax = useDebounce(priceMax, 1000);
+  const debouncedAreaMin = useDebounce(areaMin, 1000);
+  const debouncedAreaMax = useDebounce(areaMax, 1000);
+
   const filters = useMemo(() => ({
     page,
     limit,
@@ -63,13 +69,16 @@ export default function UnitLayout() {
     ...(selectedView && { viewOptionId: selectedView }),
     ...(status && { status: status.toLowerCase() }),
     ...(selectedRooms && { roomOptionId: selectedRooms }),
-    ...(typeof priceMin === 'number' && priceMin > 0 && { minPrice: priceMin }),
-    ...(typeof priceMax === 'number' && priceMax < totalPriceMax && { maxPrice: priceMax }),
-    ...(typeof areaMin === 'number' && areaMin > 0 && { minArea: areaMin }),
-    ...(typeof areaMax === 'number' && areaMax < totalAreaMax && { maxArea: areaMax }),
-  }), [page, floor, selectedView, status, selectedRooms, priceMin, priceMax, areaMin, areaMax]);
+    ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
+    ...(typeof debouncedPriceMax === 'number' && debouncedPriceMax < totalPriceMax && { maxPrice: debouncedPriceMax }),
+    ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
+    ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
+  }), [page, floor, selectedView, status, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
+
+  const isDebouncing = priceMin !== debouncedPriceMin || priceMax !== debouncedPriceMax || areaMin !== debouncedAreaMin || areaMax !== debouncedAreaMax;
+  const showSpinner = isLoading || isFetching || isDebouncing;
 
   const layouts = response?.data || [];
   const pagination = response?.pagination;
@@ -138,7 +147,7 @@ export default function UnitLayout() {
                   <span>from</span>
                   <input 
                     type="text" 
-                    value={formatNumber(priceMin)} 
+                    value={priceMin} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setPriceMin(''); return; }
@@ -151,7 +160,7 @@ export default function UnitLayout() {
                   <span>to</span>
                   <input 
                     type="text" 
-                    value={formatNumber(priceMax)} 
+                    value={priceMax} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setPriceMax(''); return; }
@@ -399,13 +408,13 @@ export default function UnitLayout() {
             .spinner-icon { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3F4249; border-radius: 50%; animation: spin 1s linear infinite; }
           `}</style>
           
-          {(isLoading || isFetching) && (
+          {showSpinner && (
             <div className="spinner-overlay">
               <div className="spinner-icon"></div>
             </div>
           )}
           
-          <div className="cards-grid" style={{ opacity: (isLoading || isFetching) ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
+          <div className="cards-grid" style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
             {layouts.map((layout: UnitLayout) => (
               <div key={layout.id} className="layout-card-wrapper">
                 <div className="layout-card">
@@ -438,7 +447,7 @@ export default function UnitLayout() {
                 <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__cta">VIew Apartment DetaIls</Link>
               </div>
             ))}
-            {layouts.length === 0 && !isLoading && !isFetching && (
+            {layouts.length === 0 && !showSpinner && (
               <div className="empty-state">
                 <p>No apartments found matching your filters.</p>
               </div>
