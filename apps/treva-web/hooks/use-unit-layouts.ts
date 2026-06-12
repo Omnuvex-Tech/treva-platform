@@ -55,6 +55,18 @@ export function useUnitLayoutRange(currency: string = 'USD') {
     });
 }
 
+export function useUnitLayoutFloors() {
+    return useQuery({
+        queryKey: ["unit-layout-floors"],
+        queryFn: async () => {
+            const response = await api.get<number[]>(
+                `${endpoints.offPlan.list}/floors`
+            );
+            return response.data;
+        },
+    });
+}
+
 export function useUnitLayoutBySlug(slug: string | undefined) {
     return useQuery({
         queryKey: ["unit-layout-slug", slug],

@@ -275,6 +275,15 @@ export class UnitLayoutsService {
     return this.prisma.unitLayout.count();
   }
 
+  async findFloors() {
+    const result = await this.prisma.unitLayout.findMany({
+      select: { floor: true },
+      distinct: ['floor'],
+      orderBy: { floor: 'asc' },
+    });
+    return result.map(r => r.floor);
+  }
+
   async findRange(currency: string = 'USD') {
     const layouts = await this.prisma.unitLayout.findMany({
       select: { prices: true, totalArea: true },

@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useUnitLayouts, useUnitLayoutRange } from '@/hooks/use-unit-layouts';
+import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
 import { useCurrencies } from '@/hooks/use-currencies';
@@ -48,6 +48,9 @@ export default function UnitLayout() {
 
   const { data: currenciesData } = useCurrencies();
   const currencies = currenciesData || [];
+
+  const { data: floorsData } = useUnitLayoutFloors();
+  const floors = floorsData || [];
 
   const { data: rangeData } = useUnitLayoutRange(currency);
   const totalPriceMax = rangeData?.maxPrice || 1500000;
@@ -307,7 +310,7 @@ export default function UnitLayout() {
                 </button>
                 {floorOpen && (
                   <div className="custom-select__dropdown">
-                    {[{ value: '', label: 'All' }, { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' }, { value: '4', label: '4' }, { value: '5', label: '5' }].map((opt) => (
+                    {[{ value: '', label: 'All' }, ...floors.map((f) => ({ value: String(f), label: String(f) }))].map((opt) => (
                       <button key={opt.value} type="button" className={`custom-select__option ${floor === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(opt.value); setPage(1); setFloorOpen(false); }}>
                         {opt.label}
                       </button>

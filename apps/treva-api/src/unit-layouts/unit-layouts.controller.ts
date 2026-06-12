@@ -82,6 +82,12 @@ export class UnitLayoutsController {
     });
   }
 
+  @Get('floors')
+  @ApiOperation({ summary: 'Get distinct floor values' })
+  async getFloors() {
+    return this.unitLayoutsService.findFloors();
+  }
+
   @Get('range')
   @ApiOperation({ summary: 'Get price and area range from unit layouts' })
   @ApiQuery({ name: 'currency', required: false })
