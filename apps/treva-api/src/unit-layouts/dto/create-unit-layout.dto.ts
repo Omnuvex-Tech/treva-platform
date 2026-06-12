@@ -8,7 +8,6 @@ import {
   ValidateNested,
   IsObject,
   Min,
-  Max,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -118,22 +117,19 @@ export class CreateUnitLayoutDto {
   @Min(1)
   number: number;
 
-  @ApiProperty({ example: 50.5, maximum: 10000 })
+  @ApiProperty({ example: 50.5 })
   @IsNumber()
   @Min(0)
-  @Max(10000)
   totalArea: number;
 
-  @ApiProperty({ example: 43.0, maximum: 10000 })
+  @ApiProperty({ example: 43.0 })
   @IsNumber()
   @Min(0)
-  @Max(10000)
   internalArea: number;
 
-  @ApiProperty({ example: 7.5, maximum: 10000 })
+  @ApiProperty({ example: 7.5 })
   @IsNumber()
   @Min(0)
-  @Max(10000)
   balconyArea: number;
 
   @ApiProperty({ example: 186004 })
