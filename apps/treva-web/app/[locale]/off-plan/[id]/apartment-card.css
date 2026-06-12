@@ -68,7 +68,7 @@
 
 .apt-plan-img {
   width: 100%;
-  max-width: 735px; /* Şəklin həddindən artıq böyüməsinin qarşısını alan dəqiq ölçü */
+  max-width: 725px; /* Şəklin həddindən artıq böyüməsinin qarşısını alan dəqiq ölçü */
   height: auto;
   object-fit: contain;
   display: block;
@@ -94,9 +94,9 @@
 
 /* Typography */
 .apt-title {
-  font-size: 64px;
+  font-size: 70px;
   font-weight: 400;
-  line-height: 1.13;
+  line-height: 1.10;
   color: #4e525d;
   margin: 0 0 18px 0;
   letter-spacing: -3px;
