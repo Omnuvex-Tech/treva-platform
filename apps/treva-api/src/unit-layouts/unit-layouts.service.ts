@@ -21,7 +21,6 @@ export class UnitLayoutsService {
         title: createDto.title,
         name: createDto.name,
         slug: createDto.slug,
-        status: (createDto.status as any) || 'available',
         categoryId: createDto.categoryId,
         roomOptionId: createDto.roomOptionId,
         floor: createDto.floor,
@@ -33,6 +32,7 @@ export class UnitLayoutsService {
         completionYear: createDto.completionYear,
         numberOfFloors: createDto.numberOfFloors as any,
         viewOptionId: createDto.viewOptionId,
+        statusOptionId: createDto.statusOptionId,
         similarApartmentIds: createDto.similarApartmentIds || [],
         mainImage: createDto.mainImage as any,
         gallery: createDto.gallery as any[] || [],
@@ -47,7 +47,7 @@ export class UnitLayoutsService {
     page?: number;
     limit?: number;
     categoryId?: string;
-    status?: string;
+    statusOptionId?: string;
     search?: string;
     minPrice?: number;
     maxPrice?: number;
@@ -69,8 +69,8 @@ export class UnitLayoutsService {
       where.categoryId = query.categoryId;
     }
 
-    if (query.status) {
-      where.status = query.status;
+    if (query.statusOptionId) {
+      where.statusOptionId = query.statusOptionId;
     }
 
     if (query.search) {
@@ -152,6 +152,7 @@ export class UnitLayoutsService {
           category: true,
           roomOption: true,
           viewOption: true,
+          statusOption: true,
         },
       }),
       this.prisma.unitLayout.count({ where }),
@@ -171,7 +172,7 @@ export class UnitLayoutsService {
   async findOne(id: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { id },
-      include: { category: true, roomOption: true, viewOption: true },
+      include: { category: true, roomOption: true, viewOption: true, statusOption: true },
     });
 
     if (!unitLayout) {
@@ -192,7 +193,7 @@ export class UnitLayoutsService {
   async findBySlug(slug: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { slug },
-      include: { category: true, roomOption: true, viewOption: true },
+      include: { category: true, roomOption: true, viewOption: true, statusOption: true },
     });
 
     if (!unitLayout) {
@@ -232,7 +233,7 @@ export class UnitLayoutsService {
     if (updateDto.title !== undefined) data.title = updateDto.title;
     if (updateDto.name !== undefined) data.name = updateDto.name;
     if (updateDto.slug !== undefined) data.slug = updateDto.slug;
-    if (updateDto.status !== undefined) data.status = updateDto.status;
+    if (updateDto.statusOptionId !== undefined) data.statusOptionId = updateDto.statusOptionId;
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
     if (updateDto.roomOptionId !== undefined) data.roomOptionId = updateDto.roomOptionId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
@@ -253,7 +254,7 @@ export class UnitLayoutsService {
     return this.prisma.unitLayout.update({
       where: { id },
       data,
-      include: { category: true, roomOption: true },
+      include: { category: true, roomOption: true, statusOption: true },
     });
   }
 
@@ -313,9 +314,9 @@ export class UnitLayoutsService {
 
   async countByStatus() {
     const [available, sold, reserved] = await Promise.all([
-      this.prisma.unitLayout.count({ where: { status: 'available' } }),
-      this.prisma.unitLayout.count({ where: { status: 'sold' } }),
-      this.prisma.unitLayout.count({ where: { status: 'reserved' } }),
+      this.prisma.unitLayout.count({ where: { statusOption: { value: 'Available' } } }),
+this.prisma.unitLayout.count({ where: { statusOption: { value: 'Sold' } } }),
+this.prisma.unitLayout.count({ where: { statusOption: { value: 'Reserved' } } }),
     ]);
     return { available, sold, reserved, total: available + sold + reserved };
   }

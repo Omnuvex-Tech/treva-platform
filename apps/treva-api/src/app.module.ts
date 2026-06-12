@@ -12,6 +12,7 @@ import { UploadModule } from './upload/upload.module';
 import { RoomOptionsModule } from './room-options/room-options.module';
 import { ViewOptionsModule } from './view-options/view-options.module';
 import { CurrenciesModule } from './currencies/currencies.module';
+import { StatusOptionsModule } from './status-options/status-options.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CurrenciesModule } from './currencies/currencies.module';
     RoomOptionsModule,
     ViewOptionsModule,
     CurrenciesModule,
+    StatusOptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

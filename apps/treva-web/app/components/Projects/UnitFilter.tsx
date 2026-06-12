@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
+import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getAssetUrl } from '@/lib/asset-url';
@@ -19,7 +20,7 @@ export default function UnitLayout() {
   const [currency, setCurrency] = useState('USD');
   const [floor, setFloor] = useState('');
   const [selectedView, setSelectedView] = useState('');
-  const [status, setStatus] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedRooms, setSelectedRooms] = useState<string>('');
 
   const [floorOpen, setFloorOpen] = useState(false);
@@ -45,6 +46,9 @@ export default function UnitLayout() {
 
   const { data: viewOptionsData } = useViewOptions();
   const viewOptions = viewOptionsData || [];
+
+  const { data: statusOptionsData } = useStatusOptions();
+  const statusOptions = statusOptionsData || [];
 
   const { data: currenciesData } = useCurrencies();
   const currencies = currenciesData || [];
@@ -83,14 +87,14 @@ export default function UnitLayout() {
     limit,
     ...(floor && { floor: parseInt(floor) }),
     ...(selectedView && { viewOptionId: selectedView }),
-    ...(status && { status: status.toLowerCase() }),
+    ...(selectedStatus && { statusOptionId: selectedStatus }),
     ...(selectedRooms && { roomOptionId: selectedRooms }),
     ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
     ...(typeof debouncedPriceMax === 'number' && debouncedPriceMax < totalPriceMax && { maxPrice: debouncedPriceMax }),
     currency,
     ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
     ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
-  }), [page, floor, selectedView, status, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
+  }), [page, floor, selectedView, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
@@ -128,7 +132,7 @@ export default function UnitLayout() {
   const handleReset = () => {
     setFloor('');
     setSelectedView('');
-    setStatus('');
+    setSelectedStatus('');
     setSelectedRooms('');
     setPriceMin(0);
     setPriceMax(totalPriceMax);
@@ -351,18 +355,24 @@ export default function UnitLayout() {
               <label className="filter-label">Status</label>
               <div className="custom-select" ref={statusRef}>
                 <button type="button" className="custom-select__trigger" onClick={() => setStatusOpen((p) => !p)}>
-                  <span>{status ? status.charAt(0).toUpperCase() + status.slice(1) : 'All'}</span>
+                  <span>{statusOptions.find(s => s.id === selectedStatus)?.value || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
                 {statusOpen && (
                   <div className="custom-select__dropdown">
-                    {[{ value: '', label: 'All' }, { value: 'available', label: 'Available' }, { value: 'reserved', label: 'Reserved' }, { value: 'sold', label: 'Sold' }].map((opt) => (
-                      <button key={opt.value} type="button" className={`custom-select__option ${status === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setStatus(opt.value); setPage(1); setStatusOpen(false); }}>
-                        {opt.label}
+                    <button type="button" className={`custom-select__option ${!selectedStatus ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(''); setPage(1); setStatusOpen(false); }}>
+                      All
+                    </button>
+                    {statusOptions.map((opt) => (
+                      <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(opt.id); setPage(1); setStatusOpen(false); }}>
+                        {opt.value}
                       </button>
                     ))}
+                    {statusOptions.length === 0 && (
+                      <span className="custom-select__option" style={{ color: '#9ca3af', cursor: 'default' }}>Status yoxdur</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -374,7 +384,7 @@ export default function UnitLayout() {
             <label className="filter-label">Number of rooms</label>
             <div className="rooms-group">
               {roomOptions.length === 0 ? (
-                <span style={{ fontSize: 13, color: '#9ca3af' }}>Loading...</span>
+                <span style={{ fontSize: 13, color: '#9ca3af' }}>Otaq yoxdur</span>
               ) : (
                 roomOptions.map((room) => (
                   <button
@@ -449,7 +459,7 @@ export default function UnitLayout() {
                     </div>
                     <div className="layout-card__number-block">
                       <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
-                      <span className="layout-card__status">{formatStatus(layout.status)}</span>
+                      <span className="layout-card__status">{formatStatus(layout.statusOption?.value || '')}</span>
                     </div>
                   </div>
                   

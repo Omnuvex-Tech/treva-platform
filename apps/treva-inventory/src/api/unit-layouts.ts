@@ -38,7 +38,8 @@ export interface UnitLayout {
     title: string;
     name: string;
     slug: string;
-    status: "available" | "sold" | "reserved";
+    statusOptionId?: string;
+    statusOption?: { id: string; value: string; order: number };
     floor: number;
     number?: number;
     totalArea: number;
@@ -85,7 +86,7 @@ export interface CreateUnitLayoutData {
     title: string;
     name: string;
     slug: string;
-    status?: string;
+    statusOptionId?: string;
     categoryId: string;
     floor: number;
     number: number;
@@ -108,7 +109,7 @@ export interface UnitLayoutFilters {
     page?: number;
     limit?: number;
     categoryId?: string;
-    status?: string;
+    statusOptionId?: string;
     search?: string;
     minPrice?: number;
     maxPrice?: number;

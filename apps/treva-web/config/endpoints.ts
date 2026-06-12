@@ -33,4 +33,8 @@ export const endpoints = {
     viewOptions: {
         list: "/view-options",
     },
+
+    statusOptions: {
+        list: "/status-options",
+    },
 } as const;

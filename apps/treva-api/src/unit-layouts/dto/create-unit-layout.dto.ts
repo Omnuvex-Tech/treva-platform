@@ -93,9 +93,10 @@ export class CreateUnitLayoutDto {
   @IsNotEmpty()
   slug: string;
 
-  @ApiPropertyOptional({ enum: ['available', 'sold', 'reserved'], default: 'available' })
-  @IsEnum(['available', 'sold', 'reserved'])
-  status?: string;
+  @ApiPropertyOptional({ example: 'clq1234567890' })
+  @IsOptional()
+  @IsString()
+  statusOptionId?: string;
 
   @ApiProperty({ example: 'clx1234567890' })
   @IsString()

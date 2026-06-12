@@ -31,7 +31,6 @@ model UnitLayout {
   title               String
   name                String
   slug                String      @unique
-  status              Status      @default(available)
   floor               Int
   number              Int?
   totalArea           Float
@@ -51,6 +50,8 @@ model UnitLayout {
   roomOption          RoomOption? @relation(fields: [roomOptionId], references: [id])
   viewOptionId        String?
   viewOption          ViewOption? @relation(fields: [viewOptionId], references: [id])
+  statusOptionId      String?
+  statusOption        StatusOption? @relation(fields: [statusOptionId], references: [id])
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
 }
@@ -84,8 +85,12 @@ model Currency {
   updatedAt DateTime @updatedAt
 }
 
-enum Status {
-  available
-  sold
-  reserved
+model StatusOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unitLayouts UnitLayout[]
 }

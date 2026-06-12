@@ -31,7 +31,6 @@ export interface UnitLayout {
     title: string;
     name: string;
     slug: string;
-    status: "available" | "sold" | "reserved";
     floor: number;
     number?: number;
     totalArea: number;
@@ -41,6 +40,8 @@ export interface UnitLayout {
     completionYear: number;
     numberOfFloors: UnitLayoutNumberOfFloors;
     view?: string;
+    statusOptionId?: string;
+    statusOption?: { id: string; value: string; order: number };
     similarApartmentIds: string[];
     similarApartments?: UnitLayout[];
     mainImage?: UnitLayoutImage;
@@ -67,7 +68,7 @@ export interface UnitLayoutFilters {
     page?: number;
     limit?: number;
     categoryId?: string;
-    status?: string;
+    statusOptionId?: string;
     search?: string;
     minPrice?: number;
     maxPrice?: number;

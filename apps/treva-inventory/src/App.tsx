@@ -11,6 +11,7 @@ import { UnitLayoutForm } from "./pages/unit-layouts/UnitLayoutForm";
 import { RoomOptionList } from "./pages/room-options/RoomOptionList";
 import { ViewOptionList } from "./pages/view-options/ViewOptionList";
 import { CurrencyList } from "./pages/currencies/CurrencyList";
+import { StatusOptionList } from "./pages/status-options/StatusOptionList";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -149,6 +150,14 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <CurrencyList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/status-options"
+                            element={
+                                <ProtectedRoute>
+                                    <StatusOptionList />
                                 </ProtectedRoute>
                             }
                         />

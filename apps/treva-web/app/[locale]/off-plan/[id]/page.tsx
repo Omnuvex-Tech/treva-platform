@@ -42,8 +42,8 @@ export default function ApartmentCard() {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
-  const statusClass = (status: string) => {
-    switch (status) {
+  const statusClass = (statusValue: string) => {
+    switch (statusValue?.toLowerCase()) {
       case 'available': return 'badge-available';
       case 'sold': return 'badge-sold';
       case 'reserved': return 'badge-reserved';
@@ -51,8 +51,8 @@ export default function ApartmentCard() {
     }
   };
 
-  const formatStatus = (status: string) => {
-    return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+  const formatStatus = (statusValue: string) => {
+    return statusValue ? statusValue.charAt(0).toUpperCase() + statusValue.slice(1) : '';
   };
 
   const handleShare = () => {
@@ -137,8 +137,8 @@ export default function ApartmentCard() {
                   </h1>
                   
                   <div className="apt-badge-row">
-                    <span className={`apt-badge ${statusClass(layout.status)}`}>
-                      <span className="apt-badge__text">{formatStatus(layout.status)}</span>
+                    <span className={`apt-badge ${statusClass(layout.statusOption?.value || '')}`}>
+                      <span className="apt-badge__text">{formatStatus(layout.statusOption?.value || '')}</span>
                     </span>
                     {layout.documents && layout.documents.length > 0 && layout.documents[0] && (
                       <a href={getAssetUrl(layout.documents[0].url)} target="_blank" rel="noopener noreferrer" className="apt-badge badge-btn">
@@ -310,7 +310,7 @@ export default function ApartmentCard() {
                       </div>
                       <div className="layout-card__number-block">
                         <span className="layout-card__number">N° {apt.number || '?'}</span>
-                        <span className="layout-card__status">{formatStatus(apt.status)}</span>
+                        <span className="layout-card__status">{formatStatus(apt.statusOption?.value || '')}</span>
                       </div>
                     </div>
                     <div className="layout-card__visual">

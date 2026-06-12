@@ -11,6 +11,7 @@ import {
 import { categoriesApi, Category } from "../../api/categories";
 import { roomOptionsApi, RoomOption } from "../../api/room-options";
 import { viewOptionsApi, ViewOption } from "../../api/view-options";
+import { statusOptionsApi, StatusOption } from "../../api/status-options";
 import { Layout } from "../../components/Layout";
 import { FileUpload } from "../../components/FileUpload";
 
@@ -122,9 +123,9 @@ export function UnitLayoutForm() {
         title: "",
         name: "",
         slug: "",
-        status: "available",
         categoryId: "",
         roomOptionId: undefined,
+        statusOptionId: undefined,
         floor: undefined as unknown as number,
         number: undefined as unknown as number,
         totalArea: undefined as unknown as number,
@@ -168,6 +169,11 @@ export function UnitLayoutForm() {
         queryFn: () => viewOptionsApi.getAll(),
     });
 
+    const { data: statusOptionsResponse } = useQuery({
+        queryKey: ["status-options"],
+        queryFn: () => statusOptionsApi.getAll(),
+    });
+
     const { data: currenciesResponse } = useQuery({
         queryKey: ["currencies"],
         queryFn: () => import("../../api/currencies").then(m => m.currenciesApi.getAll()),
@@ -206,8 +212,8 @@ export function UnitLayoutForm() {
                 title: d.title,
                 name: d.name,
                 slug: d.slug,
-                status: d.status || "available",
                 categoryId: d.categoryId,
+                statusOptionId: d.statusOptionId ?? undefined,
                 floor: d.floor ?? 1,
                 number: d.number ?? undefined,
                 totalArea: d.totalArea ?? 0,
@@ -425,6 +431,9 @@ export function UnitLayoutForm() {
     const viewOptions = Array.isArray(viewOptionsResponse?.data)
         ? (viewOptionsResponse.data as ViewOption[])
         : [];
+    const statusOptions = Array.isArray(statusOptionsResponse?.data)
+        ? (statusOptionsResponse.data as StatusOption[])
+        : [];
     const mutationError =
         createMutation.error || updateMutation.error;
     const mutationErrorMessage = (() => {
@@ -571,31 +580,45 @@ export function UnitLayoutForm() {
                                                 onClick={() => setStatusOpen((p) => !p)}
                                                 className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
                                             >
-                                                <span>{form.status?.charAt(0).toUpperCase() + (form.status?.slice(1) || "")}</span>
+                                                <span className={form.statusOptionId ? "text-white" : "text-white/40"}>
+                                                    {statusOptions.find((s) => s.id === form.statusOptionId)?.value || "Select status (optional)"}
+                                                </span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${statusOpen ? "rotate-180" : ""}`}>
                                                     <path d="M6 9l6 6 6-6" />
                                                 </svg>
                                             </button>
                                             {statusOpen && (
                                                 <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
-                                                    {[
-                                                        { value: "available", label: "Available" },
-                                                        { value: "sold", label: "Sold" },
-                                                        { value: "reserved", label: "Reserved" },
-                                                    ].map((opt) => (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { updateField("statusOptionId", undefined); setStatusOpen(false); }}
+                                                        className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                            !form.statusOptionId
+                                                                ? "bg-white/15 text-white font-medium"
+                                                                : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                        }`}
+                                                    >
+                                                        — None
+                                                    </button>
+                                                    {statusOptions.map((opt) => (
                                                         <button
-                                                            key={opt.value}
+                                                            key={opt.id}
                                                             type="button"
-                                                            onClick={() => { updateField("status", opt.value); setStatusOpen(false); }}
+                                                            onClick={() => { updateField("statusOptionId", opt.id); setStatusOpen(false); }}
                                                             className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                                form.status === opt.value
+                                                                form.statusOptionId === opt.id
                                                                     ? "bg-white/15 text-white font-medium"
                                                                     : "text-white/70 hover:bg-white/10 hover:text-white"
                                                             }`}
                                                         >
-                                                            {opt.label}
+                                                            {opt.value}
                                                         </button>
                                                     ))}
+                                                    {statusOptions.length === 0 && (
+                                                        <div className="px-4 py-3 text-sm text-white/40">
+                                                            No status options yet. Add them in Status Options.
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>

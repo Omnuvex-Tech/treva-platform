@@ -138,10 +138,10 @@ export function UnitLayoutList() {
                                         <td className="px-4 py-3">
                                             <span
                                                 className={`inline-block rounded-full px-2 py-0.5 text-xs ${
-                                                    statusColors[layout.status] || "bg-white/10 text-white/70"
+                                                    statusColors[layout.statusOption?.value?.toLowerCase() || ""] || "bg-white/10 text-white/70"
                                                 }`}
                                             >
-                                                {layout.status.charAt(0).toUpperCase() + layout.status.slice(1)}
+                                                {layout.statusOption?.value || "—"}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-right">
