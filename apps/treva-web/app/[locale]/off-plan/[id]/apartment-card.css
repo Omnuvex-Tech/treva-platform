@@ -48,6 +48,7 @@
   /* gap: 10px; */
   align-items: center;
   justify-content: space-around;
+  border-radius: 5px;
 }
 
 /* Left Side: Blueprint */
@@ -123,11 +124,16 @@
 .apt-badge {
   background-color: var(--slate-gray);
   color: #ffffff;
-  padding: 7px 19px;
+  height: 42px;
+  padding: 0 19px;
   border-radius: 20px;
   font-size: 17px;
   font-weight: 500;
   border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   text-transform: none;
 }
 
@@ -154,11 +160,17 @@
   cursor: pointer;
   opacity: 0.8;
   transition: opacity 0.2s, background-color 0.2s;
+  line-height: 1;
 }
 
 .apt-share-btn:hover {
   opacity: 1;
   background-color: #3F4249;
+}
+
+.apt-share-btn svg {
+  display: block;
+  flex: 0 0 auto;
 }
 
 /* Specs Table */
@@ -304,6 +316,7 @@
     flex-direction: column;
     padding: 24px;
     gap: 24px;
+    /* border-radius: 5px; */
   }
 
   .apt-details-section {
