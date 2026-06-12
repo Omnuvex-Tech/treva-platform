@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useUnitLayouts } from '@/hooks/use-unit-layouts';
+import { useRoomOptions } from '@/hooks/use-room-options';
 import { getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
@@ -25,20 +26,21 @@ export default function UnitLayout() {
   const viewRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
-  const [priceMin, setPriceMin] = useState(0);
-  const [priceMax, setPriceMax] = useState(1500000);
+  const [priceMin, setPriceMin] = useState<number | ''>(0);
+  const [priceMax, setPriceMax] = useState<number | ''>(1500000);
   const totalPriceMin = 0;
   const totalPriceMax = 1500000;
 
-  const [areaMin, setAreaMin] = useState(0);
-  const [areaMax, setAreaMax] = useState(600);
+  const [areaMin, setAreaMin] = useState<number | ''>(0);
+  const [areaMax, setAreaMax] = useState<number | ''>(10000);
   const totalAreaMin = 0;
-  const totalAreaMax = 600;
+  const totalAreaMax = 10000;
 
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  const roomOptions = ['S', '1', '2', '3', '4+'];
+  const { data: roomOptionsData } = useRoomOptions();
+  const roomOptions = roomOptionsData || [];
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -56,24 +58,31 @@ export default function UnitLayout() {
     ...(floor && { floor: parseInt(floor) }),
     ...(view && { view }),
     ...(status && { status: status.toLowerCase() }),
-    ...(priceMin > 0 && { minPrice: priceMin }),
-    ...(priceMax < totalPriceMax && { maxPrice: priceMax }),
-    ...(areaMin > 0 && { minArea: areaMin }),
-    ...(areaMax < totalAreaMax && { maxArea: areaMax }),
-  }), [page, floor, view, status, priceMin, priceMax, areaMin, areaMax]);
+    ...(selectedRooms && { roomOptionId: selectedRooms }),
+    ...(typeof priceMin === 'number' && priceMin > 0 && { minPrice: priceMin }),
+    ...(typeof priceMax === 'number' && priceMax < totalPriceMax && { maxPrice: priceMax }),
+    ...(typeof areaMin === 'number' && areaMin > 0 && { minArea: areaMin }),
+    ...(typeof areaMax === 'number' && areaMax < totalAreaMax && { maxArea: areaMax }),
+  }), [page, floor, view, status, selectedRooms, priceMin, priceMax, areaMin, areaMax]);
 
-  const { data: response, isLoading } = useUnitLayouts(filters);
+  const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
   const layouts = response?.data || [];
   const pagination = response?.pagination;
 
-  const priceLeftPercent = ((priceMin - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
-  const priceRightPercent = 100 - ((priceMax - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
+  const safePriceMin = typeof priceMin === 'number' ? priceMin : 0;
+  const safePriceMax = typeof priceMax === 'number' ? priceMax : totalPriceMax;
+  const safeAreaMin = typeof areaMin === 'number' ? areaMin : 0;
+  const safeAreaMax = typeof areaMax === 'number' ? areaMax : totalAreaMax;
 
-  const areaLeftPercent = ((areaMin - totalAreaMin) / (totalAreaMax - totalAreaMin)) * 100;
-  const areaRightPercent = 100 - ((areaMax - totalAreaMin) / (totalAreaMax - totalAreaMin)) * 100;
+  const priceLeftPercent = ((safePriceMin - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
+  const priceRightPercent = 100 - ((safePriceMax - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
 
-  const formatNumber = (num: number) => {
+  const areaLeftPercent = ((safeAreaMin - totalAreaMin) / (totalAreaMax - totalAreaMin)) * 100;
+  const areaRightPercent = 100 - ((safeAreaMax - totalAreaMin) / (totalAreaMax - totalAreaMin)) * 100;
+
+  const formatNumber = (num: number | '') => {
+    if (num === '') return '';
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
@@ -127,8 +136,10 @@ export default function UnitLayout() {
                     type="text" 
                     value={formatNumber(priceMin)} 
                     onChange={(e) => {
-                      const val = Number(e.target.value.replace(/\s+/g, ''));
-                      if (!isNaN(val)) setPriceMin(val);
+                      const raw = e.target.value.replace(/\s+/g, '');
+                      if (raw === '') { setPriceMin(''); return; }
+                      if (!/^\d+$/.test(raw)) return;
+                      setPriceMin(Number(raw));
                     }}
                   />
                 </div>
@@ -138,8 +149,10 @@ export default function UnitLayout() {
                     type="text" 
                     value={formatNumber(priceMax)} 
                     onChange={(e) => {
-                      const val = Number(e.target.value.replace(/\s+/g, ''));
-                      if (!isNaN(val)) setPriceMax(val);
+                      const raw = e.target.value.replace(/\s+/g, '');
+                      if (raw === '') { setPriceMax(''); return; }
+                      if (!/^\d+$/.test(raw)) return;
+                      setPriceMax(Number(raw));
                     }}
                   />
                 </div>
@@ -164,10 +177,10 @@ export default function UnitLayout() {
                 type="range" 
                 min={totalPriceMin} 
                 max={totalPriceMax} 
-                value={priceMin}
+                value={safePriceMin}
                 className="thumb thumb--left"
                 onChange={(e) => {
-                  const val = Math.min(Number(e.target.value), priceMax - 1000);
+                  const val = Math.min(Number(e.target.value), safePriceMax - 1000);
                   setPriceMin(val);
                 }}
               />
@@ -175,10 +188,10 @@ export default function UnitLayout() {
                 type="range" 
                 min={totalPriceMin} 
                 max={totalPriceMax} 
-                value={priceMax}
+                value={safePriceMax}
                 className="thumb thumb--right"
                 onChange={(e) => {
-                  const val = Math.max(Number(e.target.value), priceMin + 1000);
+                  const val = Math.max(Number(e.target.value), safePriceMin + 1000);
                   setPriceMax(val);
                 }}
               />
@@ -196,8 +209,10 @@ export default function UnitLayout() {
                     type="text" 
                     value={areaMin} 
                     onChange={(e) => {
-                      const val = Number(e.target.value);
-                      if (!isNaN(val)) setAreaMin(val);
+                      const raw = e.target.value.replace(/\s+/g, '');
+                      if (raw === '') { setAreaMin(''); return; }
+                      if (!/^\d+$/.test(raw)) return;
+                      setAreaMin(Number(raw));
                     }}
                   />
                 </div>
@@ -207,8 +222,10 @@ export default function UnitLayout() {
                     type="text" 
                     value={areaMax} 
                     onChange={(e) => {
-                      const val = Number(e.target.value);
-                      if (!isNaN(val)) setAreaMax(val);
+                      const raw = e.target.value.replace(/\s+/g, '');
+                      if (raw === '') { setAreaMax(''); return; }
+                      if (!/^\d+$/.test(raw)) return;
+                      setAreaMax(Number(raw));
                     }}
                   />
                 </div>
@@ -224,10 +241,10 @@ export default function UnitLayout() {
                   type="range" 
                   min={totalAreaMin} 
                   max={totalAreaMax} 
-                  value={areaMin}
+                  value={safeAreaMin}
                   className="thumb thumb--left"
                   onChange={(e) => {
-                    const val = Math.min(Number(e.target.value), areaMax - 5);
+                    const val = Math.min(Number(e.target.value), safeAreaMax - 5);
                     setAreaMin(val);
                   }}
                 />
@@ -235,10 +252,10 @@ export default function UnitLayout() {
                   type="range" 
                   min={totalAreaMin} 
                   max={totalAreaMax} 
-                  value={areaMax}
+                  value={safeAreaMax}
                   className="thumb thumb--right"
                   onChange={(e) => {
-                    const val = Math.max(Number(e.target.value), areaMin + 5);
+                    const val = Math.max(Number(e.target.value), safeAreaMin + 5);
                     setAreaMax(val);
                   }}
                 />
@@ -316,16 +333,20 @@ export default function UnitLayout() {
           <div className="filter-group filter-group--rooms">
             <label className="filter-label">Number of rooms</label>
             <div className="rooms-group">
-              {roomOptions.map((room) => (
-                <button
-                  key={room}
-                  type="button"
-                  className={`room-btn ${selectedRooms === room ? 'room-btn--active' : ''}`}
-                  onClick={() => setSelectedRooms(selectedRooms === room ? '' : room)}
-                >
-                  {room}
-                </button>
-              ))}
+              {roomOptions.length === 0 ? (
+                <span style={{ fontSize: 13, color: '#9ca3af' }}>Loading...</span>
+              ) : (
+                roomOptions.map((room) => (
+                  <button
+                    key={room.id}
+                    type="button"
+                    className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
+                    onClick={() => { setSelectedRooms(selectedRooms === room.id ? '' : room.id); setPage(1); }}
+                  >
+                    {room.value}
+                  </button>
+                ))
+              )}
             </div>
           </div>
 
@@ -364,12 +385,20 @@ export default function UnitLayout() {
         </div>
 
         {/* APARTMENT CARDS GRID */}
-        {isLoading ? (
-          <div className="loading-state">
-            <p>Loading apartments...</p>
-          </div>
-        ) : (
-          <div className="cards-grid">
+        <div style={{ position: 'relative', minHeight: '300px' }}>
+          <style>{`
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            .spinner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.6); display: flex; justify-content: center; align-items: flex-start; padding-top: 80px; z-index: 10; border-radius: 12px; }
+            .spinner-icon { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3F4249; border-radius: 50%; animation: spin 1s linear infinite; }
+          `}</style>
+          
+          {(isLoading || isFetching) && (
+            <div className="spinner-overlay">
+              <div className="spinner-icon"></div>
+            </div>
+          )}
+          
+          <div className="cards-grid" style={{ opacity: (isLoading || isFetching) ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
             {layouts.map((layout: UnitLayout) => (
               <div key={layout.id} className="layout-card-wrapper">
                 <div className="layout-card">
@@ -402,13 +431,13 @@ export default function UnitLayout() {
                 <Link href={`/${locale}/off-plan/${layout.id}`} className="layout-card__cta">VIew Apartment DetaIls</Link>
               </div>
             ))}
-            {layouts.length === 0 && (
+            {layouts.length === 0 && !isLoading && !isFetching && (
               <div className="empty-state">
                 <p>No apartments found matching your filters.</p>
               </div>
             )}
           </div>
-        )}
+        </div>
 
         {/* DESKTOP PAGINATION */}
         {pagination && pagination.totalPages > 1 && (

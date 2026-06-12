@@ -48,9 +48,21 @@ model UnitLayout {
   documents           Json[]
   location            Json?
   categoryId          String
-  category            Category @relation(fields: [categoryId], references: [id])
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  category            Category    @relation(fields: [categoryId], references: [id])
+  roomOptionId        String?
+  roomOption          RoomOption? @relation(fields: [roomOptionId], references: [id])
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model RoomOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unitLayouts UnitLayout[]
 }
 
 enum Status {

@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { UnitLayoutsModule } from './unit-layouts/unit-layouts.module';
 import { UploadModule } from './upload/upload.module';
+import { RoomOptionsModule } from './room-options/room-options.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UploadModule } from './upload/upload.module';
     CategoriesModule,
     UnitLayoutsModule,
     UploadModule,
+    RoomOptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -56,6 +56,8 @@ export interface UnitLayout {
     location?: Location;
     categoryId: string;
     category: Category;
+    roomOptionId?: string;
+    roomOption?: { id: string; value: string; order: number };
     createdAt: string;
     updatedAt: string;
 }
@@ -100,6 +102,7 @@ export interface CreateUnitLayoutData {
     gallery?: GalleryImage[];
     documents?: Document[];
     location?: Location;
+    roomOptionId?: string;
 }
 
 export interface UnitLayoutFilters {

@@ -23,6 +23,7 @@ export class UnitLayoutsService {
         slug: createDto.slug,
         status: (createDto.status as any) || 'available',
         categoryId: createDto.categoryId,
+        roomOptionId: createDto.roomOptionId,
         floor: createDto.floor,
         number: createDto.number,
         totalArea: createDto.totalArea,
@@ -55,6 +56,7 @@ export class UnitLayoutsService {
     maxArea?: number;
     floor?: number;
     view?: string;
+    roomOptionId?: string;
   }) {
     const page = query.page || 1;
     const limit = query.limit || 12;
@@ -98,13 +100,17 @@ export class UnitLayoutsService {
       where.view = { contains: query.view, mode: 'insensitive' };
     }
 
+    if (query.roomOptionId) {
+      where.roomOptionId = query.roomOptionId;
+    }
+
     const [data, total] = await Promise.all([
       this.prisma.unitLayout.findMany({
         where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: { category: true },
+        include: { category: true, roomOption: true },
       }),
       this.prisma.unitLayout.count({ where }),
     ]);
@@ -123,7 +129,7 @@ export class UnitLayoutsService {
   async findOne(id: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { id },
-      include: { category: true },
+      include: { category: true, roomOption: true },
     });
 
     if (!unitLayout) {
@@ -144,7 +150,7 @@ export class UnitLayoutsService {
   async findBySlug(slug: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { slug },
-      include: { category: true },
+      include: { category: true, roomOption: true },
     });
 
     if (!unitLayout) {
@@ -186,6 +192,7 @@ export class UnitLayoutsService {
     if (updateDto.slug !== undefined) data.slug = updateDto.slug;
     if (updateDto.status !== undefined) data.status = updateDto.status;
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
+    if (updateDto.roomOptionId !== undefined) data.roomOptionId = updateDto.roomOptionId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
@@ -205,7 +212,7 @@ export class UnitLayoutsService {
     return this.prisma.unitLayout.update({
       where: { id },
       data,
-      include: { category: true },
+      include: { category: true, roomOption: true },
     });
   }
 

@@ -25,4 +25,8 @@ export const endpoints = {
         detail: (id: string) => `/unit-layouts/${id}`,
         categories: "/categories",
     },
+
+    roomOptions: {
+        list: "/room-options",
+    },
 } as const;

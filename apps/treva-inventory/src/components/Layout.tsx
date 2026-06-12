@@ -4,6 +4,7 @@ const navItems = [
     { path: "/", label: "Dashboard", icon: "📊" },
     { path: "/categories", label: "Categories", icon: "📁" },
     { path: "/unit-layouts", label: "Unit Layouts", icon: "🏢" },
+    { path: "/room-options", label: "Room Options", icon: "🛏️" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

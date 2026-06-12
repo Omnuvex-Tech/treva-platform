@@ -76,4 +76,6 @@ export interface UnitLayoutFilters {
     maxArea?: number;
     floor?: number;
     view?: string;
+    rooms?: string;
+    roomOptionId?: string;
 }

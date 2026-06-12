@@ -48,6 +48,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'maxArea', required: false, type: Number })
   @ApiQuery({ name: 'floor', required: false, type: Number })
   @ApiQuery({ name: 'view', required: false })
+  @ApiQuery({ name: 'roomOptionId', required: false })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -60,6 +61,7 @@ export class UnitLayoutsController {
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
     @Query('view') view?: string,
+    @Query('roomOptionId') roomOptionId?: string,
   ) {
     return this.unitLayoutsService.findAll({
       page: page ? parseInt(page, 10) : undefined,
@@ -73,6 +75,7 @@ export class UnitLayoutsController {
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor, 10) : undefined,
       view,
+      roomOptionId,
     });
   }
 

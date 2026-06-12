@@ -9,6 +9,7 @@ import {
     GalleryImage,
 } from "../../api/unit-layouts";
 import { categoriesApi, Category } from "../../api/categories";
+import { roomOptionsApi, RoomOption } from "../../api/room-options";
 import { Layout } from "../../components/Layout";
 import { FileUpload } from "../../components/FileUpload";
 
@@ -123,6 +124,7 @@ export function UnitLayoutForm() {
         slug: "",
         status: "available",
         categoryId: "",
+        roomOptionId: undefined,
         floor: undefined as unknown as number,
         number: undefined as unknown as number,
         totalArea: undefined as unknown as number,
@@ -157,19 +159,27 @@ export function UnitLayoutForm() {
         enabled: activeTab === "similar",
     });
 
+    const { data: roomOptionsResponse } = useQuery({
+        queryKey: ["room-options"],
+        queryFn: () => roomOptionsApi.getAll(),
+    });
+
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
+    const [roomOptionOpen, setRoomOptionOpen] = useState(false);
     const [statusOpen, setStatusOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
     const [currentTabError, setCurrentTabError] = useState<ValidationError[]>([]);
     const [similarRecommendation, setSimilarRecommendation] = useState(false);
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
+    const roomOptionRef = useRef<HTMLDivElement>(null);
     const statusRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setCategoryOpen(false);
+            if (roomOptionRef.current && !roomOptionRef.current.contains(e.target as Node)) setRoomOptionOpen(false);
             if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -200,6 +210,7 @@ export function UnitLayoutForm() {
                 gallery: Array.isArray(d.gallery) ? d.gallery : [],
                 documents: Array.isArray(d.documents) ? d.documents : [],
                 location: d.location || { title: "", url: "", type: "apartment" },
+                roomOptionId: d.roomOptionId ?? undefined,
             });
         }
     }, [existing]);
@@ -396,6 +407,9 @@ export function UnitLayoutForm() {
     const categories = Array.isArray(categoriesResponse?.data)
         ? (categoriesResponse.data as Category[])
         : [];
+    const roomOptions = Array.isArray(roomOptionsResponse?.data)
+        ? (roomOptionsResponse.data as RoomOption[])
+        : [];
     const mutationError =
         createMutation.error || updateMutation.error;
     const mutationErrorMessage = (() => {
@@ -572,6 +586,59 @@ export function UnitLayoutForm() {
                                         </div>
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        Room Option
+                                    </label>
+                                    <div ref={roomOptionRef} className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setRoomOptionOpen((p) => !p)}
+                                            className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                        >
+                                            <span className={form.roomOptionId ? "text-white" : "text-white/40"}>
+                                                {roomOptions.find((r) => r.id === form.roomOptionId)?.value || "Select room option (optional)"}
+                                            </span>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${roomOptionOpen ? "rotate-180" : ""}`}>
+                                                <path d="M6 9l6 6 6-6" />
+                                            </svg>
+                                        </button>
+                                        {roomOptionOpen && (
+                                            <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { updateField("roomOptionId", undefined); setRoomOptionOpen(false); }}
+                                                    className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                        !form.roomOptionId
+                                                            ? "bg-white/15 text-white font-medium"
+                                                            : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                    }`}
+                                                >
+                                                    — None
+                                                </button>
+                                                {roomOptions.map((opt) => (
+                                                    <button
+                                                        key={opt.id}
+                                                        type="button"
+                                                        onClick={() => { updateField("roomOptionId", opt.id); setRoomOptionOpen(false); }}
+                                                        className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                            form.roomOptionId === opt.id
+                                                                ? "bg-white/15 text-white font-medium"
+                                                                : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                        }`}
+                                                    >
+                                                        {opt.value}
+                                                    </button>
+                                                ))}
+                                                {roomOptions.length === 0 && (
+                                                    <div className="px-4 py-3 text-sm text-white/40">
+                                                        No room options yet. Add them in Room Options.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                                 <div className="grid grid-cols-3 gap-4">
                                     <div>
                                         <label className="mb-1.5 block text-xs font-medium text-white/70">
@@ -644,6 +711,7 @@ export function UnitLayoutForm() {
                                             placeholder="e.g. 85.5"
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
+                                            max={10000}
                                             step={0.1}
                                             required
                                         />
@@ -664,6 +732,7 @@ export function UnitLayoutForm() {
                                             placeholder="e.g. 72.3"
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
+                                            max={10000}
                                             step={0.1}
                                             required
                                         />
@@ -687,6 +756,7 @@ export function UnitLayoutForm() {
                                             placeholder="e.g. 8.5"
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                             min={0}
+                                            max={10000}
                                             step={0.1}
                                             required
                                         />
