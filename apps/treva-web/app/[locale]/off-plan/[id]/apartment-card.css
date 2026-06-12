@@ -222,7 +222,8 @@
 .apt-currency-select {
   background-color: var(--slate-gray);
   color: #ffffff;
-  padding: 11px 18px;
+  height: 42px;
+  padding: 0 18px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
@@ -250,7 +251,13 @@
 }
 
 .apt-currency-select svg {
+  display: block;
+  flex: 0 0 auto;
   transition: transform 0.2s ease;
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  /* opacity: 0.7; */
 }
 
 .apt-price {
