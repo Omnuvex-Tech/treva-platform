@@ -43,6 +43,18 @@ export function useUnitLayout(id: string | undefined) {
     });
 }
 
+export function useUnitLayoutRange() {
+    return useQuery({
+        queryKey: ["unit-layout-range"],
+        queryFn: async () => {
+            const response = await api.get<{ maxPriceUsd: number; minPriceUsd: number; maxTotalArea: number; minTotalArea: number }>(
+                `${endpoints.offPlan.list}/range`
+            );
+            return response.data;
+        },
+    });
+}
+
 export function useUnitLayoutBySlug(slug: string | undefined) {
     return useQuery({
         queryKey: ["unit-layout-slug", slug],

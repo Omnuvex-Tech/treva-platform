@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useUnitLayouts } from '@/hooks/use-unit-layouts';
+import { useUnitLayouts, useUnitLayoutRange } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -29,14 +29,12 @@ export default function UnitLayout() {
   const statusRef = useRef<HTMLDivElement>(null);
 
   const [priceMin, setPriceMin] = useState<number | ''>(0);
-  const [priceMax, setPriceMax] = useState<number | ''>(1500000);
+  const [priceMax, setPriceMax] = useState<number | ''>('');
   const totalPriceMin = 0;
-  const totalPriceMax = 1500000;
 
   const [areaMin, setAreaMin] = useState<number | ''>(0);
-  const [areaMax, setAreaMax] = useState<number | ''>(10000);
+  const [areaMax, setAreaMax] = useState<number | ''>('');
   const totalAreaMin = 0;
-  const totalAreaMax = 10000;
 
   const [page, setPage] = useState(1);
   const limit = 12;
@@ -46,6 +44,17 @@ export default function UnitLayout() {
 
   const { data: viewOptionsData } = useViewOptions();
   const viewOptions = viewOptionsData || [];
+
+  const { data: rangeData } = useUnitLayoutRange();
+  const totalPriceMax = rangeData?.maxPriceUsd || 1500000;
+  const totalAreaMax = rangeData?.maxTotalArea || 10000;
+
+  useEffect(() => {
+    if (rangeData) {
+      setPriceMax(rangeData.maxPriceUsd);
+      setAreaMax(rangeData.maxTotalArea);
+    }
+  }, [rangeData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

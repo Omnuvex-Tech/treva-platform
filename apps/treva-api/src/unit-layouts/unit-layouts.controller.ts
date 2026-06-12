@@ -79,6 +79,12 @@ export class UnitLayoutsController {
     });
   }
 
+  @Get('range')
+  @ApiOperation({ summary: 'Get price and area range from unit layouts' })
+  async getRange() {
+    return this.unitLayoutsService.findRange();
+  }
+
   @Get('stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

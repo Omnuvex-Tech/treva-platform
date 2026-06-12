@@ -238,6 +238,19 @@ export class UnitLayoutsService {
     return this.prisma.unitLayout.count();
   }
 
+  async findRange() {
+    const result = await this.prisma.unitLayout.aggregate({
+      _max: { priceUsd: true, totalArea: true },
+      _min: { priceUsd: true, totalArea: true },
+    });
+    return {
+      maxPriceUsd: result._max.priceUsd || 0,
+      minPriceUsd: result._min.priceUsd || 0,
+      maxTotalArea: result._max.totalArea || 0,
+      minTotalArea: result._min.totalArea || 0,
+    };
+  }
+
   async countByStatus() {
     const [available, sold, reserved] = await Promise.all([
       this.prisma.unitLayout.count({ where: { status: 'available' } }),
