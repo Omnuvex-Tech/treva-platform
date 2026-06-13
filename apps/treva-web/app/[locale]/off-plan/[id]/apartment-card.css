@@ -44,47 +44,44 @@
   display: flex;
   width: 100%;
   box-sizing: border-box;
-  padding: 55px 5px;
-  /* gap: 10px; */
+  padding: 55px 24px;
   align-items: center;
   justify-content: space-around;
   border-radius: 5px;
 }
 
-/* Left Side: Blueprint */
+/* Blueprint Section */
 .apt-image-section {
-  /* flex: 1.25;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center; */
+  justify-content: center;
 }
 
 .apt-blueprint-box {
-  /* width: 100%; */
+  width: 100%;
   display: flex;
-  /* align-items: center;
-  justify-content: center; */
   box-sizing: border-box;
 }
 
 .apt-plan-img {
   width: 100%;
-  max-width: 725px; /* Şəklin həddindən artıq böyüməsinin qarşısını alan dəqiq ölçü */
+  max-width: 725px;
   height: auto;
   object-fit: contain;
-  object-position: left center; /* Şəklin sol tərəfdəki boşluğunu silir */
+  object-position: left center;
   display: block;
 }
 
-/* Right Side: Details Pane */
+/* Details Section */
 .apt-details-section {
   width: 100%;
-  max-width: 325px; /* Sətirlərin qısalığını şəkildəki kimi saxlayan dəqiq en */
+  max-width: 325px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Elementləri yuxarıdan aşağıya tam bərabər hizada bölür */
+  justify-content: space-between;
   box-sizing: border-box;
-  padding: 2px 0; /* Şaquli hizanı sıfırlamaq üçün */
+  padding: 2px 0;
 }
 
 .apt-header {
@@ -122,6 +119,7 @@
   width: 100%;
 }
 
+/* KOHNE OLÇU BERPA OLUNDU (Masaüstündə dəyişmir) */
 .apt-badge {
   background-color: var(--slate-gray);
   color: #ffffff;
@@ -156,7 +154,7 @@
   background-color: #555961;
 }
 
-/* Dairəvi Share Butonu */
+/* KOHNE OLÇU BERPA OLUNDU */
 .apt-share-btn {
   background-color: #4E525D;
   color: #ffffff;
@@ -190,7 +188,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin: auto 0; /* Şəkildəki kimi mərkəzdə tam balanslı qalması üçün */
+  margin: auto 0;
   padding: 20px 0;
 }
 
@@ -224,12 +222,13 @@
   width: 100%;
 }
 
-/* Currency Wrapper (container div for positioning dropdown) */
+/* Currency Wrapper & Dropdown */
 .apt-currency-wrapper {
   position: relative;
   display: inline-flex;
 }
 
+/* KOHNE OLÇU BERPA OLUNDU */
 .apt-currency-select {
   background-color: var(--slate-gray);
   color: #ffffff;
@@ -264,13 +263,10 @@
 .apt-currency-select svg {
   display: block;
   flex: 0 0 auto;
-  position: relative;
-  top: 0px;
   transition: transform 0.2s ease;
   width: 20px;
   height: 20px;
   stroke-width: 2;
-  /* opacity: 0.7; */
 }
 
 .apt-price {
@@ -281,17 +277,16 @@
   text-transform: none;
 }
 
-/* Currency Dropdown */
 .apt-currency-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  bottom: calc(100% + 6px); 
   left: 0;
   background: #3F4249;
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   overflow: hidden;
-  z-index: 50;
-  min-width: 80px;
+  z-index: 99;
+  min-width: 90px;
   padding: 6px 0;
 }
 
@@ -308,7 +303,7 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: inherit;
   text-transform: none;
   transition: background 0.18s ease;
 }
@@ -318,7 +313,7 @@
 }
 
 .apt-currency-option--active {
-  background: rgba(0, 0, 0, 0.16);
+  background: rgba(0, 0, 0, 0.24);
 }
 
 .apt-wrapper,
@@ -328,89 +323,106 @@
   text-transform: none !important;
 }
 
+/* ==========================================================================
+   DESKTOP NİZAMLAMASI (ŞƏKİL BÖYÜK, DÜYMƏLƏR SABİT KOHNE ÖLÇÜDƏ)
+   ========================================================================== */
 @media (min-width: 769px) {
   .apt-main-card {
-    min-height: 0;
-    padding: clamp(44px, 4vw, 72px) clamp(32px, 3.4vw, 56px) clamp(44px, 4vw, 72px);
-    gap: clamp(0px, 0vw, 96px);
-    align-items: flex-start;
+    min-height: 600px; /* Şəkil üçün əla olan böyük hündürlük saxlanıldı */
+    padding: clamp(48px, 1vw, 80px) clamp(32px, 3.4vw, 56px);
+    gap: clamp(32px, 4vw, 80px);
+    display: flex;
+    align-items: stretch; /* Hündürlükləri sol və sağ tərəfdə sinxron saxlayır */
     justify-content: space-between;
     border-radius: 0;
   }
 
+  /* Sol Hissə: Şəkil Bölməsi (İstədiyiniz böyük ölçü tam qorundu) */
   .apt-image-section {
     width: auto;
-    flex: 1 1 62%;
+    flex: 1 1 52%; 
     min-width: 0;
     display: flex;
-    align-items: flex-start;
+    align-items: center; 
     justify-content: flex-start;
   }
 
   .apt-blueprint-box {
     width: 100%;
+    height: 100%;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-start;
   }
 
   .apt-plan-img {
-    width: 100%;
-    max-width: none;
-    height: auto;
-    aspect-ratio: 1072 / 650;
-    object-fit: contain;
-    object-position: left center;
+        aspect-ratio: 4 / 3;
+        object-fit: contain;
+        object-position: left center;
+        width: 100%;
+        max-width: 677px;
+        height: 553px;
+        max-height: 917px;
   }
 
+  /* Sağ Hissə: Yazı Paneli (Sola-xəttə doğru geniş, lakin düymələri sabit) */
   .apt-details-section {
     width: auto;
-    max-width: 460px;
-    flex: 0 1 34%;
-    min-width: 320px;
-    height: auto;
-    justify-content: flex-start;
-    padding: 0;
+    max-width: 540px; 
+    flex: 0 1 44%;   
+    min-width: 340px;
+    height: auto;    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    padding: 12px 0;
+  }
+
+  .apt-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
   }
 
   .apt-title {
-    font-size: clamp(48px, 6vw, 80px);
-    line-height: 1.1;
+    font-size: clamp(48px, 9.2vw, 100px);
+    line-height: 1.05;
     margin: 0 0 clamp(12px, 1.2vw, 20px) 0;
-    letter-spacing: clamp(-2.5px, -0.15vw, -1.5px);
+    letter-spacing: -2px;
   }
 
-  .apt-badge-row {
-    gap: 8px;
-  }
-
+  /* Düymələrin desktopda clamp ilə böyüməsi ləğv edildi, köhnə ölçüləri kilidləndi */
   .apt-badge {
-    height: clamp(34px, 2.5vw, 42px);
-    padding: 0 clamp(14px, 1.2vw, 20px);
-    border-radius: 999px;
-    font-size: clamp(14px, 1.1vw, 18px);
-    letter-spacing: 0;
+    height: 42px !important;
+    padding: 0 19px !important;
+    font-size: 17px !important;
   }
 
   .apt-share-btn {
-    width: clamp(42px, 3vw, 48px);
-    height: clamp(34px, 2.5vw, 42px);
-    padding: 0;
-    border-radius: 999px;
+    height: 42px !important;
+    padding: 0 16px !important;
   }
 
-  .apt-share-btn svg {
-    width: clamp(18px, 1.3vw, 20px);
-    height: clamp(18px, 1.3vw, 20px);
+  .apt-currency-select {
+    height: 42px !important;
+    padding: 0 18px !important;
+    font-size: 14px !important;
+    border-radius: 20px !important;
   }
 
   .apt-specs-list {
-    margin: clamp(24px, 2.5vw, 36px) 0 0;
+    margin: 0; 
     padding: 0;
+    width: 100%;
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .apt-spec-item {
-    height: clamp(42px, 3vw, 52px);
+    height: clamp(44px, 3.2vw, 56px); 
     padding: 0;
     border-bottom-color: #b8b4ab;
   }
@@ -419,35 +431,21 @@
   .apt-value {
     font-size: clamp(15px, 1.2vw, 18px);
     line-height: 1;
-    color: var(--slate-gray);
   }
 
   .apt-footer {
-    margin-top: clamp(24px, 2.5vw, 36px);
-  }
-
-  .apt-currency-select {
-    height: clamp(34px, 2.5vw, 42px);
-    padding: 0 clamp(14px, 1.2vw, 20px);
-    border-radius: 999px;
-    font-size: clamp(15px, 1.2vw, 18px);
-    letter-spacing: 0;
-  }
-
-  .apt-currency-select svg {
-    width: clamp(16px, 1.1vw, 20px);
-    height: clamp(16px, 1.1vw, 20px);
+    margin-top: 28px; 
+    width: 100%;
   }
 
   .apt-price {
-    font-size: clamp(28px, 2vw, 34px);
+    font-size: clamp(28px, 2.2vw, 36px);
     line-height: 1;
-    color: #4e525d;
     letter-spacing: -1px;
   }
 }
 
-/* Responsive (Mobil) */
+/* Mobil Ekranlar */
 @media (max-width: 768px) {
   .apt-breadcrumbs {
     margin-bottom: 16px;
@@ -457,7 +455,6 @@
     flex-direction: column;
     padding: 24px;
     gap: 24px;
-    /* border-radius: 5px; */
   }
 
   .apt-details-section {
