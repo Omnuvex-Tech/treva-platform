@@ -119,7 +119,6 @@
   width: 100%;
 }
 
-/* KOHNE OLÇU BERPA OLUNDU (Masaüstündə dəyişmir) */
 .apt-badge {
   background-color: var(--slate-gray);
   color: #ffffff;
@@ -154,7 +153,7 @@
   background-color: #555961;
 }
 
-/* KOHNE OLÇU BERPA OLUNDU */
+/* Share Button */
 .apt-share-btn {
   background-color: #4E525D;
   color: #ffffff;
@@ -228,7 +227,6 @@
   display: inline-flex;
 }
 
-/* KOHNE OLÇU BERPA OLUNDU */
 .apt-currency-select {
   background-color: var(--slate-gray);
   color: #ffffff;
@@ -271,7 +269,7 @@
 
 .apt-price {
   font-size: 33px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--dark-charcoal);
   letter-spacing: -0.5px;
   text-transform: none;
@@ -324,26 +322,27 @@
 }
 
 /* ==========================================================================
-   DESKTOP NİZAMLAMASI (ŞƏKİL BÖYÜK, DÜYMƏLƏR SABİT KOHNE ÖLÇÜDƏ)
+   DESKTOP NİZAMLAMASI (103PX BAŞLIQ VƏ ŞƏKİL HİZALAMASI TAM SATURA UYĞUN)
    ========================================================================== */
 @media (min-width: 769px) {
   .apt-main-card {
-    min-height: 600px; /* Şəkil üçün əla olan böyük hündürlük saxlanıldı */
-    padding: clamp(48px, 1vw, 80px) clamp(32px, 3.4vw, 56px);
+    padding: clamp(48px, 5vw, 80px) clamp(32px, 3.4vw, 56px);
     gap: clamp(32px, 4vw, 80px);
     display: flex;
-    align-items: stretch; /* Hündürlükləri sol və sağ tərəfdə sinxron saxlayır */
+    /* align-items: stretch sağ və sol div-lərin hündürlüyünü kilidləyir. 
+       Bununla şəkil, böyüyən 103px-lik başlıq və alt USD düyməsi ilə tam eyni hizada açılır */
+    align-items: stretch; 
     justify-content: space-between;
     border-radius: 0;
   }
 
-  /* Sol Hissə: Şəkil Bölməsi (İstədiyiniz böyük ölçü tam qorundu) */
+  /* SOL BLOK: Şəkil sahəsi */
   .apt-image-section {
     width: auto;
-    flex: 1 1 52%; 
+    flex: 1 1 54%; 
     min-width: 0;
     display: flex;
-    align-items: center; 
+    align-items: stretch; 
     justify-content: flex-start;
   }
 
@@ -351,31 +350,30 @@
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
+    align-items: center; 
     justify-content: flex-start;
   }
 
+  /* Şəkil hündürlüyü sağdakı mətn blokunun hündürlüyünə (103px başlıq daxil) tam bərabərdir */
   .apt-plan-img {
-        aspect-ratio: 4 / 3;
-        object-fit: contain;
-        object-position: left center;
-        width: 100%;
-        max-width: 677px;
-        height: 553px;
-        max-height: 917px;
+    width: 100%;
+    max-width: 695px;
+    height: 100%; 
+    object-fit: contain; /* Şəkli sıxılmadan və kəsilmədən çərçivə daxilində saxlayır */
+    object-position: left center;
   }
 
-  /* Sağ Hissə: Yazı Paneli (Sola-xəttə doğru geniş, lakin düymələri sabit) */
+  /* SAĞ BLOK: Yazı sahəsi */
   .apt-details-section {
     width: auto;
     max-width: 540px; 
-    flex: 0 1 44%;   
+    flex: 0 1 42%;   
     min-width: 340px;
-    height: auto;    
+    height: auto; 
     display: flex;
     flex-direction: column;
-    justify-content: space-between; 
-    padding: 12px 0;
+    justify-content: space-between; /* Elementləri tam olaraq üst başlıq və alt düymə sərhədlərinə yayır */
+    padding: 0; 
   }
 
   .apt-header {
@@ -385,14 +383,15 @@
     align-items: flex-end;
   }
 
+  /* İstədiyiniz xüsusi böyük ölçü bura inteqrasiya olundu */
   .apt-title {
-    font-size: clamp(48px, 9.2vw, 100px);
+    font-size: clamp(48px, 9.5vw, 103px); 
     line-height: 1.05;
-    margin: 0 0 clamp(12px, 1.2vw, 20px) 0;
-    letter-spacing: -2px;
+    margin: 0 0 16px 0;
+    letter-spacing: -3px;
   }
 
-  /* Düymələrin desktopda clamp ilə böyüməsi ləğv edildi, köhnə ölçüləri kilidləndi */
+  /* Düymələrin ideal sabit ölçüləri (Böyüməyə qoymur) */
   .apt-badge {
     height: 42px !important;
     padding: 0 19px !important;
@@ -411,9 +410,10 @@
     border-radius: 20px !important;
   }
 
+  /* Spesifikasiya siyahısı */
   .apt-specs-list {
     margin: 0; 
-    padding: 0;
+    padding: 20px 0;
     width: 100%;
     flex-grow: 1; 
     display: flex;
@@ -422,7 +422,7 @@
   }
 
   .apt-spec-item {
-    height: clamp(44px, 3.2vw, 56px); 
+    height: 48px; 
     padding: 0;
     border-bottom-color: #b8b4ab;
   }
@@ -433,8 +433,9 @@
     line-height: 1;
   }
 
+  /* Footer - Tam şəklin bitdiyi alt künclə sıfırlanır */
   .apt-footer {
-    margin-top: 28px; 
+    margin-top: 0; 
     width: 100%;
   }
 
