@@ -207,7 +207,10 @@ export default function UnitLayout() {
                       setPriceMinInput(Number(raw));
                     }}
                     onBlur={() => {
-                      setPriceMin(priceMinInput === '' ? 0 : priceMinInput);
+                      const raw = priceMinInput === '' ? 0 : Number(priceMinInput);
+                      const val = Math.max(totalPriceMin, Math.min(raw, safePriceMax - 1000));
+                      setPriceMin(val);
+                      setPriceMinInput(val);
                     }}
                   />
                 </div>
@@ -223,7 +226,10 @@ export default function UnitLayout() {
                       setPriceMaxInput(Number(raw));
                     }}
                     onBlur={() => {
-                      setPriceMax(priceMaxInput === '' ? totalPriceMax : priceMaxInput);
+                      const raw = priceMaxInput === '' ? totalPriceMax : Number(priceMaxInput);
+                      const val = Math.max(safePriceMin + 1000, Math.min(raw, totalPriceMax));
+                      setPriceMax(val);
+                      setPriceMaxInput(val);
                     }}
                   />
                 </div>
@@ -307,7 +313,10 @@ export default function UnitLayout() {
                       setAreaMinInput(Number(raw));
                     }}
                     onBlur={() => {
-                      setAreaMin(areaMinInput === '' ? 0 : areaMinInput);
+                      const raw = areaMinInput === '' ? 0 : Number(areaMinInput);
+                      const val = Math.max(totalAreaMin, Math.min(raw, safeAreaMax - 5));
+                      setAreaMin(val);
+                      setAreaMinInput(val);
                     }}
                   />
                 </div>
@@ -323,7 +332,10 @@ export default function UnitLayout() {
                       setAreaMaxInput(Number(raw));
                     }}
                     onBlur={() => {
-                      setAreaMax(areaMaxInput === '' ? totalAreaMax : areaMaxInput);
+                      const raw = areaMaxInput === '' ? totalAreaMax : Number(areaMaxInput);
+                      const val = Math.max(safeAreaMin + 5, Math.min(raw, totalAreaMax));
+                      setAreaMax(val);
+                      setAreaMaxInput(val);
                     }}
                   />
                 </div>
