@@ -40,6 +40,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'categoryId', required: false })
+  @ApiQuery({ name: 'categorySlug', required: false })
   @ApiQuery({ name: 'statusOptionId', required: false })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false, type: Number })
@@ -54,6 +55,7 @@ export class UnitLayoutsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('categoryId') categoryId?: string,
+    @Query('categorySlug') categorySlug?: string,
     @Query('statusOptionId') statusOptionId?: string,
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
@@ -69,6 +71,7 @@ export class UnitLayoutsController {
       page: page ? parseInt(page, 10) : undefined,
       limit: limit ? parseInt(limit, 10) : undefined,
       categoryId,
+      categorySlug,
       statusOptionId,
       search,
       minPrice: minPrice ? parseFloat(minPrice) : undefined,

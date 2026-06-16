@@ -68,6 +68,7 @@ export interface UnitLayoutFilters {
     page?: number;
     limit?: number;
     categoryId?: string;
+    categorySlug?: string;
     statusOptionId?: string;
     search?: string;
     minPrice?: number;

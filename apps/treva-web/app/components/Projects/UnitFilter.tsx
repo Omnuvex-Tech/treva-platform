@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
@@ -15,7 +15,9 @@ import './unit-filter.css';
 
 export default function UnitLayout() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params?.locale || 'az';
+  const categorySlug = searchParams.get('category') || '';
 
   const [currency, setCurrency] = useState('USD');
   const [floor, setFloor] = useState('');
@@ -94,6 +96,7 @@ export default function UnitLayout() {
   const filters = useMemo(() => ({
     page,
     limit,
+    ...(categorySlug && { categorySlug }),
     ...(floor && { floor: parseInt(floor) }),
     ...(selectedView && { viewOptionId: selectedView }),
     ...(selectedStatus && { statusOptionId: selectedStatus }),
@@ -103,7 +106,7 @@ export default function UnitLayout() {
     currency,
     ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
     ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
-  }), [page, floor, selectedView, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
+  }), [page, limit, categorySlug, floor, selectedView, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 

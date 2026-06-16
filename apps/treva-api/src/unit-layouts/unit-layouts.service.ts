@@ -47,6 +47,7 @@ export class UnitLayoutsService {
     page?: number;
     limit?: number;
     categoryId?: string;
+    categorySlug?: string;
     statusOptionId?: string;
     search?: string;
     minPrice?: number;
@@ -67,6 +68,15 @@ export class UnitLayoutsService {
 
     if (query.categoryId) {
       where.categoryId = query.categoryId;
+    }
+
+    if (query.categorySlug) {
+      const category = await this.prisma.category.findUnique({
+        where: { slug: query.categorySlug },
+      });
+      if (category) {
+        where.categoryId = category.id;
+      }
     }
 
     if (query.statusOptionId) {
@@ -183,7 +193,7 @@ export class UnitLayoutsService {
     if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
       similarApartments = await this.prisma.unitLayout.findMany({
         where: { id: { in: unitLayout.similarApartmentIds } },
-        include: { category: true },
+        include: { category: true, statusOption: true },
       });
     }
 
@@ -204,7 +214,7 @@ export class UnitLayoutsService {
     if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
       similarApartments = await this.prisma.unitLayout.findMany({
         where: { id: { in: unitLayout.similarApartmentIds } },
-        include: { category: true },
+        include: { category: true, statusOption: true },
       });
     }
 
