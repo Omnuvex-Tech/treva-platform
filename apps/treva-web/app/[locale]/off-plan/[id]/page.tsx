@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
@@ -69,12 +69,17 @@ export default function ApartmentCard() {
 
   const similarIds = layout?.similarApartmentIds || [];
   const uniqueSimilarIds = Array.from(new Set(similarIds.filter(Boolean)));
+  const similarRequestedIds = uniqueSimilarIds.slice(0, similarPage * similarLimit);
   const similarQuery = useQuery({
-    queryKey: ["unit-layout-similar", uniqueSimilarIds],
+    queryKey: ["unit-layout-similar", layout?.id, similarRequestedIds],
     queryFn: async () => {
       const existing = layout?.similarApartments || [];
       const existingIds = new Set(existing.map((item) => item.id));
-      const idsToFetch = uniqueSimilarIds.filter((unitId) => !existingIds.has(unitId));
+      const idsToFetch = similarRequestedIds.filter((unitId) => !existingIds.has(unitId));
+
+      if (idsToFetch.length === 0) {
+        return existing;
+      }
 
       const results = await Promise.all(
         idsToFetch.map(async (unitId) => {
@@ -92,15 +97,17 @@ export default function ApartmentCard() {
       merged.forEach((item) => byId.set(item.id, item));
       return Array.from(byId.values());
     },
-    enabled: uniqueSimilarIds.length > 0 && (layout?.similarApartments?.length ?? 0) < uniqueSimilarIds.length,
+    enabled: similarRequestedIds.length > 0,
+    placeholderData: keepPreviousData,
   });
 
   const similarLayouts = (similarQuery.data?.length ? similarQuery.data : layout?.similarApartments) || [];
   const filteredSimilarLayouts = similarLayouts.filter((item) => item.slug !== layout?.slug);
-  const similarTotal = filteredSimilarLayouts.length;
+  const similarTotal = uniqueSimilarIds.filter((unitId) => unitId !== layout?.id).length;
   const similarTotalPages = Math.max(1, Math.ceil(similarTotal / similarLimit));
   const similarShown = Math.min(similarPage * similarLimit, similarTotal);
   const visibleSimilarLayouts = filteredSimilarLayouts.slice(0, similarShown);
+  const isLoadingMoreSimilar = similarQuery.isFetching && filteredSimilarLayouts.length > 0;
 
   useEffect(() => {
     setSimilarPage(1);
@@ -411,9 +418,17 @@ export default function ApartmentCard() {
                           <button
                             type="button"
                             className="pagination-show-more"
+                            disabled={isLoadingMoreSimilar}
                             onClick={() => setSimilarPage(Math.min(similarPage + 1, similarTotalPages))}
                           >
-                            Show more
+                            {isLoadingMoreSimilar ? (
+                              <>
+                                <span className="pagination-show-more__spinner" aria-hidden="true" />
+                                Loading...
+                              </>
+                            ) : (
+                              "Show more"
+                            )}
                           </button>
                         )}
                       </div>

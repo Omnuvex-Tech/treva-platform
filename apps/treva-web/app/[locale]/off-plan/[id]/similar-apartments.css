@@ -330,6 +330,10 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .similar-section .pagination-show-more:hover {
@@ -338,4 +342,18 @@
 
 .similar-section .pagination-show-more:active {
   background-color: #000000;
+}
+
+.similar-section .pagination-show-more:disabled {
+  cursor: wait;
+  opacity: 0.92;
+}
+
+.similar-section .pagination-show-more__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: apt-spin 0.85s linear infinite;
 }

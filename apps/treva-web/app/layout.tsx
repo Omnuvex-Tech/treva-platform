@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { NotifyProvider, NotifyContainer } from "@repo/ui";
 import { QueryProvider } from "@/app/providers";
 import { config } from "@/config";
+import { DevBfCacheReload } from "@/app/components/DevBfCacheReload";
 import { SmoothScrollRoot } from "@/app/components/SmoothScrollRoot";
 import "./globals.css";
 
@@ -95,6 +96,7 @@ export default function RootLayout({
             </head>
             <body className={inter.variable} suppressHydrationWarning>
                 <QueryProvider>
+                    <DevBfCacheReload />
                     <NotifyProvider>
                         <div id="treva-navbar-layer" />
                         <SmoothScrollRoot>
