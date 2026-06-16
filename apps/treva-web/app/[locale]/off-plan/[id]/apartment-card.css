@@ -14,6 +14,32 @@
   box-sizing: border-box;
 }
 
+.apt-loading-overlay {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  pointer-events: none;
+}
+
+.apt-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(63, 66, 73, 0.18);
+  border-top-color: #3F4249;
+  border-radius: 50%;
+  animation: apt-spin 0.85s linear infinite;
+}
+
+@keyframes apt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Breadcrumbs */
 .apt-breadcrumbs {
   display: flex;
@@ -95,7 +121,7 @@
 .apt-title {
   font-size: 70px;
   font-weight: 400;
-  line-height: 1.10;
+  line-height: 1.16;
   color: #4e525d;
   margin: 0 0 18px 0;
   letter-spacing: -3px;
@@ -386,7 +412,7 @@
   /* İstədiyiniz xüsusi böyük ölçü bura inteqrasiya olundu */
   .apt-title {
     font-size: clamp(32px, 5.5vw, 64px); 
-    line-height: 1.05;
+    line-height: 1.12;
     margin: 0 0 16px 0;
     letter-spacing: -3px;
   }

@@ -104,8 +104,25 @@ export default function UnitLayout() {
   const isDebouncing = priceMin !== debouncedPriceMin || priceMax !== debouncedPriceMax || areaMin !== debouncedAreaMin || areaMax !== debouncedAreaMax;
   const showSpinner = isLoading || isFetching || isDebouncing;
 
-  const layouts = response?.data || [];
+  const pageLayouts = response?.data || [];
   const pagination = response?.pagination;
+  const [layouts, setLayouts] = useState<UnitLayout[]>([]);
+
+  useEffect(() => {
+    if (!response?.data) return;
+
+    if (page === 1) {
+      setLayouts(pageLayouts);
+      return;
+    }
+
+    setLayouts((prev) => {
+      const merged = [...prev, ...pageLayouts];
+      const byId = new Map<string, UnitLayout>();
+      merged.forEach((item) => byId.set(item.id, item));
+      return Array.from(byId.values());
+    });
+  }, [page, response?.data]);
 
   const safePriceMin = typeof priceMin === 'number' ? priceMin : 0;
   const safePriceMax = typeof priceMax === 'number' ? priceMax : totalPriceMax;
@@ -505,62 +522,19 @@ export default function UnitLayout() {
           </div>
         </div>
 
-        {/* DESKTOP PAGINATION */}
-        {pagination && pagination.totalPages > 1 && (
-          <div className="pagination-desktop">
-            <div className="pagination-numbers">
-              {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map((p) => (
-                <span
-                  key={p}
-                  className={`pagination-num ${p === pagination.page ? 'pagination-num--active' : ''}`}
-                  onClick={() => setPage(p)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {p}
-                </span>
-              ))}
-              {pagination.totalPages > 5 && (
-                <>
-                  <span className="pagination-dots">...</span>
-                  <span
-                    className="pagination-num"
-                    onClick={() => setPage(pagination.totalPages)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {pagination.totalPages}
-                  </span>
-                </>
-              )}
-            </div>
-            <button
-              type="button"
-              className="pagination-next-btn"
-              aria-label="Next page"
-              onClick={() => setPage(Math.min(page + 1, pagination.totalPages))}
-              disabled={page >= pagination.totalPages}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
-          </div>
-        )}
-
-        {/* MOBILE PAGINATION */}
         {pagination && (
           <div className="pagination-mobile">
             <span className="pagination-shown">
-              Shown {Math.min(page * limit, pagination.total)} out of {pagination.total}
+              Shown {Math.min(layouts.length, pagination.total)} out of {pagination.total}
             </span>
             <div className="pagination-progress">
               <div
                 className="pagination-progress__fill"
-                style={{ width: `${(pagination.page / pagination.totalPages) * 100}%` }}
+                style={{ width: `${pagination.total ? (Math.min(layouts.length, pagination.total) / pagination.total) * 100 : 0}%` }}
               ></div>
             </div>
             {page < pagination.totalPages && (
-              <button type="button" className="pagination-show-more" onClick={() => setPage(page + 1)}>
+              <button type="button" className="pagination-show-more" onClick={() => setPage((p) => p + 1)}>
                 Show more
               </button>
             )}

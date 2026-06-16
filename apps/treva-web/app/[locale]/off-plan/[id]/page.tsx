@@ -31,6 +31,8 @@ export default function ApartmentCard() {
   const [currency, setCurrency] = useState('USD');
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
+  const [similarPage, setSimilarPage] = useState(1);
+  const similarLimit = 6;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -66,12 +68,16 @@ export default function ApartmentCard() {
   };
 
   const similarIds = layout?.similarApartmentIds || [];
+  const uniqueSimilarIds = Array.from(new Set(similarIds.filter(Boolean)));
   const similarQuery = useQuery({
-    queryKey: ["unit-layout-similar", similarIds],
+    queryKey: ["unit-layout-similar", uniqueSimilarIds],
     queryFn: async () => {
-      const ids = Array.from(new Set(similarIds.filter(Boolean))).slice(0, 6);
+      const existing = layout?.similarApartments || [];
+      const existingIds = new Set(existing.map((item) => item.id));
+      const idsToFetch = uniqueSimilarIds.filter((unitId) => !existingIds.has(unitId));
+
       const results = await Promise.all(
-        ids.map(async (unitId) => {
+        idsToFetch.map(async (unitId) => {
           try {
             const response = await api.get<UnitLayout>(endpoints.offPlan.detail(unitId));
             return response.data;
@@ -80,14 +86,29 @@ export default function ApartmentCard() {
           }
         })
       );
-      return results.filter(Boolean) as UnitLayout[];
+      const fetched = results.filter(Boolean) as UnitLayout[];
+      const merged = [...existing, ...fetched];
+      const byId = new Map<string, UnitLayout>();
+      merged.forEach((item) => byId.set(item.id, item));
+      return Array.from(byId.values());
     },
-    enabled: similarIds.length > 0 && !layout?.similarApartments?.length,
+    enabled: uniqueSimilarIds.length > 0 && (layout?.similarApartments?.length ?? 0) < uniqueSimilarIds.length,
   });
 
-  const similarLayouts = (layout?.similarApartments?.length
-    ? layout.similarApartments
-    : similarQuery.data) || [];
+  const similarLayouts = (similarQuery.data?.length ? similarQuery.data : layout?.similarApartments) || [];
+  const filteredSimilarLayouts = similarLayouts.filter((item) => item.slug !== layout?.slug);
+  const similarTotal = filteredSimilarLayouts.length;
+  const similarTotalPages = Math.max(1, Math.ceil(similarTotal / similarLimit));
+  const similarShown = Math.min(similarPage * similarLimit, similarTotal);
+  const visibleSimilarLayouts = filteredSimilarLayouts.slice(0, similarShown);
+
+  useEffect(() => {
+    setSimilarPage(1);
+  }, [layout?.id]);
+
+  useEffect(() => {
+    if (similarPage > similarTotalPages) setSimilarPage(similarTotalPages);
+  }, [similarPage, similarTotalPages]);
 
   if (isLoading) {
     return (
@@ -95,12 +116,13 @@ export default function ApartmentCard() {
         <Navbar variant="solid" />
         <main className="main-wrapper">
           <PageContainer>
-            <div className="loading-state" style={{ padding: '64px 0', textAlign: 'center' }}>
-              <p style={{ color: '#6d717a' }}>Loading...</p>
-            </div>
+            <div />
           </PageContainer>
         </main>
         <HomeFooter />
+        <div className="apt-loading-overlay" role="status" aria-live="polite" aria-busy="true">
+          <div className="apt-spinner" />
+        </div>
       </div>
     );
   }
@@ -326,16 +348,14 @@ export default function ApartmentCard() {
                   </h2>
                 </div>
 
-                {similarQuery.isLoading && similarLayouts.length === 0 ? (
+                {similarQuery.isLoading && filteredSimilarLayouts.length === 0 ? (
                   <div style={{ padding: "24px 0", color: "#6d717a" }}>Loading...</div>
-                ) : similarLayouts.length === 0 ? (
+                ) : filteredSimilarLayouts.length === 0 ? (
                   <div style={{ padding: "24px 0", color: "#6d717a" }}>No similar apartments found.</div>
                 ) : (
-                  <div className="similar-grid">
-                    {similarLayouts
-                      .filter((item) => item.slug !== layout.slug)
-                      .slice(0, 6)
-                      .map((item) => (
+                  <>
+                    <div className="similar-grid">
+                      {visibleSimilarLayouts.map((item) => (
                         <Link key={item.id} href={`/${locale}/off-plan/${item.slug}`} className="layout-card">
                           <div className="layout-card__header">
                             <div className="layout-card__title-block">
@@ -375,6 +395,30 @@ export default function ApartmentCard() {
                         </Link>
                       ))}
                   </div>
+
+                    {similarTotalPages > 1 && (
+                      <div className="pagination-mobile">
+                        <span className="pagination-shown">
+                          Shown {similarShown} out of {similarTotal}
+                        </span>
+                        <div className="pagination-progress">
+                          <div
+                            className="pagination-progress__fill"
+                            style={{ width: `${(similarShown / similarTotal) * 100}%` }}
+                          />
+                        </div>
+                        {similarShown < similarTotal && (
+                          <button
+                            type="button"
+                            className="pagination-show-more"
+                            onClick={() => setSimilarPage(Math.min(similarPage + 1, similarTotalPages))}
+                          >
+                            Show more
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </>
                 )}
               </section>
             )}
