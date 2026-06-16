@@ -461,7 +461,7 @@ export default function UnitLayout() {
                   <line x1="9" y1="16" x2="15" y2="16"/>
                   <path d="M9 6h.01M15 6h.01M9 10h.01M15 10h.01"/>
                 </svg>
-                <span>Get More Information</span>
+                <span>More About the Residential Complex</span>
               </a>
             </div>
           </div>

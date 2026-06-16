@@ -44,8 +44,8 @@ export default function ApartmentCard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const formatNumber = (num: number) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const formatNumber = (num: number | undefined | null) => {
+    return (num ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
   const statusClass = (statusValue: string) => {
@@ -294,55 +294,46 @@ export default function ApartmentCard() {
                       <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
-                      <span>Get a consultation</span>
+                      <span>Get a Consultation</span>
                     </a>
-                    <Link href={`/${locale}/contact`} className="panorama-btn">
+                    <a href="tel:+994502772662" className="panorama-btn">
                       <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M4 4h16v16H4z" />
-                        <path d="M22 6l-10 7L2 6" />
+                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+                        <line x1="9" y1="22" x2="9" y2="16"/>
+                        <line x1="15" y1="22" x2="15" y2="16"/>
+                        <line x1="9" y1="16" x2="15" y2="16"/>
+                        <path d="M9 6h.01"/>
+                        <path d="M15 6h.01"/>
+                        <path d="M9 10h.01"/>
+                        <path d="M15 10h.01"/>
                       </svg>
-                      <span>Contact</span>
-                    </Link>
-                    {layout.location?.url && (
-                      <a href={layout.location.url} target="_blank" rel="noopener noreferrer" className="panorama-btn">
-                        <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
-                          <circle cx="12" cy="10" r="3" />
-                        </svg>
-                        <span>Location</span>
-                      </a>
-                    )}
+                      <span>More About the Residential Complex</span>
+                    </a>
                   </div>
                 </div>
               </div>
 
               <div className="panorama-info-table">
+                {layout.location && (
+                  <div className="panorama-row">
+                    <span className="panorama-label">Location</span>
+                    <span className="panorama-value">{layout.location.title}</span>
+                  </div>
+                )}
+                {layout.location && (
+                  <div className="panorama-row">
+                    <span className="panorama-label">Real Estate Type</span>
+                    <span className="panorama-value">{layout.location.type}</span>
+                  </div>
+                )}
                 <div className="panorama-row">
-                  <div className="panorama-label">Completion year</div>
-                  <div className="panorama-value">{layout.completionYear}</div>
+                  <span className="panorama-label">Year of Completion</span>
+                  <span className="panorama-value">{layout.completionYear}</span>
                 </div>
                 <div className="panorama-row">
-                  <div className="panorama-label">Floors</div>
-                  <div className="panorama-value">{layout.numberOfFloors?.start}–{layout.numberOfFloors?.end}</div>
+                  <span className="panorama-label">Number of Floors</span>
+                  <span className="panorama-value">From {layout.numberOfFloors?.start} to {layout.numberOfFloors?.end} Floors</span>
                 </div>
-                {layout.view && (
-                  <div className="panorama-row">
-                    <div className="panorama-label">View</div>
-                    <div className="panorama-value">{layout.view}</div>
-                  </div>
-                )}
-                {layout.category?.title && (
-                  <div className="panorama-row">
-                    <div className="panorama-label">Category</div>
-                    <div className="panorama-value">{layout.category.title}</div>
-                  </div>
-                )}
-                {layout.location?.title && (
-                  <div className="panorama-row">
-                    <div className="panorama-label">Project</div>
-                    <div className="panorama-value">{layout.location.title}</div>
-                  </div>
-                )}
               </div>
             </section>
 
@@ -350,8 +341,8 @@ export default function ApartmentCard() {
               <section className="similar-section" aria-label="Similar apartments">
                 <div className="similar-header">
                   <h2 className="similar-title">
-                    <span className="similar-title-thin">Similar</span>
-                    <span className="similar-title-bold">apartments</span>
+                    <span className="similar-title-thin">SIMILAR</span>
+                    <span className="similar-title-bold">APARTMENTS</span>
                   </h2>
                 </div>
 
