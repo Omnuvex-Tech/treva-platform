@@ -326,8 +326,8 @@
    ========================================================================== */
 @media (min-width: 769px) {
   .apt-main-card {
-    padding: clamp(48px, 5vw, 80px) clamp(32px, 3.4vw, 56px);
-    gap: clamp(32px, 4vw, 80px);
+    padding: clamp(28px, 3vw, 48px) clamp(32px, 3vw, 52px);
+    gap: clamp(20px, 2.6vw, 48px);
     display: flex;
     /* align-items: stretch sağ və sol div-lərin hündürlüyünü kilidləyir. 
        Bununla şəkil, böyüyən 103px-lik başlıq və alt USD düyməsi ilə tam eyni hizada açılır */
@@ -385,7 +385,7 @@
 
   /* İstədiyiniz xüsusi böyük ölçü bura inteqrasiya olundu */
   .apt-title {
-    font-size: clamp(48px, 9.5vw, 103px); 
+    font-size: clamp(32px, 5.5vw, 64px); 
     line-height: 1.05;
     margin: 0 0 16px 0;
     letter-spacing: -3px;
@@ -413,7 +413,7 @@
   /* Spesifikasiya siyahısı */
   .apt-specs-list {
     margin: 0; 
-    padding: 20px 0;
+    padding: 12px 0;
     width: 100%;
     flex-grow: 1; 
     display: flex;
@@ -422,7 +422,7 @@
   }
 
   .apt-spec-item {
-    height: 48px; 
+    height: 42px; 
     padding: 0;
     border-bottom-color: #b8b4ab;
   }

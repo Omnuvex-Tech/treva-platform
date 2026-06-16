@@ -398,7 +398,8 @@
   padding: 32px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 16px;
   min-height: 520px;
   text-decoration: none;
   color: inherit;
@@ -412,7 +413,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .cards-grid .layout-card__title-block {
@@ -459,21 +460,36 @@
   justify-content: center;
   align-items: center;
   flex-grow: 1;
-  margin: 20px 0;
-  min-height: 260px;
+  margin: 12px 0;
+  min-height: 240px;
+  height: 240px;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .cards-grid .layout-card__blueprint {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
-  max-height: 260px;
-  object-fit: contain;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: #ffffff;
+}
+
+.cards-grid .layout-card__blueprint--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 .cards-grid .layout-card__footer {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: auto;
+  margin-top: 0;
 }
 
 .cards-grid .layout-card__name {

@@ -20,6 +20,8 @@ type SmoothScrollRootProps = {
 export function SmoothScrollRoot({ children }: SmoothScrollRootProps) {
   const baseReady = useRef(false);
   const smootherReady = useRef(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const refreshPendingRef = useRef(false);
   const pathname = usePathname();
 
   const shouldSmooth = () => {
@@ -102,6 +104,27 @@ export function SmoothScrollRoot({ children }: SmoothScrollRootProps) {
     window.ScrollSmoother?.get?.()?.refresh?.();
   }, [pathname]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!contentRef.current) return;
+    if (typeof window.ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(() => {
+      if (!shouldSmooth()) return;
+      if (refreshPendingRef.current) return;
+
+      refreshPendingRef.current = true;
+      requestAnimationFrame(() => {
+        refreshPendingRef.current = false;
+        window.ScrollTrigger?.refresh?.();
+        window.ScrollSmoother?.get?.()?.refresh?.();
+      });
+    });
+
+    observer.observe(contentRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <Script
@@ -128,7 +151,9 @@ export function SmoothScrollRoot({ children }: SmoothScrollRootProps) {
       />
 
       <div id="smooth-wrapper" className="smooth-wrapper">
-        <div id="smooth-content">{children}</div>
+        <div id="smooth-content" ref={contentRef}>
+          {children}
+        </div>
       </div>
     </>
   );

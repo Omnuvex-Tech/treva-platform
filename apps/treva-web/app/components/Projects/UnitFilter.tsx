@@ -23,9 +23,11 @@ export default function UnitLayout() {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedRooms, setSelectedRooms] = useState<string>('');
 
+  const [currencyOpen, setCurrencyOpen] = useState(false);
   const [floorOpen, setFloorOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
+  const currencyRef = useRef<HTMLDivElement>(null);
   const floorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
@@ -69,6 +71,7 @@ export default function UnitLayout() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
       if (floorRef.current && !floorRef.current.contains(e.target as Node)) setFloorOpen(false);
       if (viewRef.current && !viewRef.current.contains(e.target as Node)) setViewOpen(false);
       if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
@@ -193,18 +196,31 @@ export default function UnitLayout() {
                 </div>
               </div>
               
-              <div className="select-wrapper currency-select">
-                <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-                  {currencies.map((c) => (
-                    <option key={c.id} value={c.value}>{c.value}</option>
-                  ))}
-                  {currencies.length === 0 && (
-                    <>
-                      <option value="USD">USD</option>
-                      <option value="AZN">AZN</option>
-                    </>
-                  )}
-                </select>
+              <div className="custom-select currency-select" ref={currencyRef}>
+                <button type="button" className="custom-select__trigger" onClick={() => setCurrencyOpen((p) => !p)}>
+                  <span>{currency}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {currencyOpen && (
+                  <div className="custom-select__dropdown">
+                    {(currencies.length ? currencies.map((c) => ({ value: c.value, label: c.value })) : [{ value: "USD", label: "USD" }, { value: "AZN", label: "AZN" }]).map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`custom-select__option ${currency === opt.value ? "custom-select__option--active" : ""}`}
+                        onClick={() => {
+                          setCurrency(opt.value);
+                          setPage(1);
+                          setCurrencyOpen(false);
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -412,7 +428,7 @@ export default function UnitLayout() {
         <div className="complex-banner">
           <div className="banner-overlay"></div>
           <div className="banner-content">
-            <h3 className="banner-title">Panorama by ELIE SAAB</h3>
+            <h3 className="banner-title">Get More Information</h3>
             <div className="banner-actions">
               <a href="tel:+994502772662" className="action-btn">
                 <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -428,7 +444,7 @@ export default function UnitLayout() {
                   <line x1="9" y1="16" x2="15" y2="16"/>
                   <path d="M9 6h.01M15 6h.01M9 10h.01M15 10h.01"/>
                 </svg>
-                <span>More About the Residential Complex</span>
+                <span>Get More Information</span>
               </a>
             </div>
           </div>

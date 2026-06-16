@@ -3,12 +3,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useQuery } from "@tanstack/react-query";
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { useUnitLayoutBySlug } from '@/hooks/use-unit-layouts';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { getAssetUrl } from '@/lib/asset-url';
+import { api } from "@/lib/api";
+import { endpoints } from "@/config/endpoints";
+import type { UnitLayout } from "@/lib/unit-layout.types";
 import "../off-plan.css";
 import "./apartment-card.css";
 import "./panorama-card.css";
@@ -17,7 +21,8 @@ import "./similar-apartments.css";
 export default function ApartmentCard() {
   const params = useParams();
   const id = params?.id as string | undefined;
-  const locale = params?.locale || 'az';
+  const localeParam = (params as any)?.locale as string | string[] | undefined;
+  const locale = Array.isArray(localeParam) ? (localeParam[0] ?? "az") : (localeParam ?? "az");
 
   const { data: layout, isLoading, error } = useUnitLayoutBySlug(id);
   const { data: currenciesData } = useCurrencies();
@@ -59,6 +64,30 @@ export default function ApartmentCard() {
       window.open(layout.location.url, '_blank');
     }
   };
+
+  const similarIds = layout?.similarApartmentIds || [];
+  const similarQuery = useQuery({
+    queryKey: ["unit-layout-similar", similarIds],
+    queryFn: async () => {
+      const ids = Array.from(new Set(similarIds.filter(Boolean))).slice(0, 6);
+      const results = await Promise.all(
+        ids.map(async (unitId) => {
+          try {
+            const response = await api.get<UnitLayout>(endpoints.offPlan.detail(unitId));
+            return response.data;
+          } catch {
+            return null;
+          }
+        })
+      );
+      return results.filter(Boolean) as UnitLayout[];
+    },
+    enabled: similarIds.length > 0 && !layout?.similarApartments?.length,
+  });
+
+  const similarLayouts = (layout?.similarApartments?.length
+    ? layout.similarApartments
+    : similarQuery.data) || [];
 
   if (isLoading) {
     return (
@@ -132,7 +161,7 @@ export default function ApartmentCard() {
               <div className="apt-details-section">
                 <div className="apt-header">
                   <h1 className="apt-title">
-                    {layout.title} <span className="apt-title-sub">Apartment</span>
+                    {layout.title} <span className="apt-title-sub">{layout.category?.title || "Apartment"}</span>
                   </h1>
                   
                   <div className="apt-badge-row">
@@ -225,6 +254,130 @@ export default function ApartmentCard() {
 
               </div>
             </div>
+
+            <section className="panorama-section" aria-label="Apartment details">
+              <div className="panorama-banner">
+                <div className="panorama-overlay" />
+                <div className="panorama-content">
+                  <h2 className="panorama-title">{layout.category?.title || "More details"}</h2>
+                  <div className="panorama-button-group">
+                    <a href="tel:+994502772662" className="panorama-btn">
+                      <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                      <span>Get a consultation</span>
+                    </a>
+                    <Link href={`/${locale}/contact`} className="panorama-btn">
+                      <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M4 4h16v16H4z" />
+                        <path d="M22 6l-10 7L2 6" />
+                      </svg>
+                      <span>Contact</span>
+                    </Link>
+                    {layout.location?.url && (
+                      <a href={layout.location.url} target="_blank" rel="noopener noreferrer" className="panorama-btn">
+                        <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span>Location</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="panorama-info-table">
+                <div className="panorama-row">
+                  <div className="panorama-label">Completion year</div>
+                  <div className="panorama-value">{layout.completionYear}</div>
+                </div>
+                <div className="panorama-row">
+                  <div className="panorama-label">Floors</div>
+                  <div className="panorama-value">{layout.numberOfFloors?.start}–{layout.numberOfFloors?.end}</div>
+                </div>
+                {layout.view && (
+                  <div className="panorama-row">
+                    <div className="panorama-label">View</div>
+                    <div className="panorama-value">{layout.view}</div>
+                  </div>
+                )}
+                {layout.category?.title && (
+                  <div className="panorama-row">
+                    <div className="panorama-label">Category</div>
+                    <div className="panorama-value">{layout.category.title}</div>
+                  </div>
+                )}
+                {layout.location?.title && (
+                  <div className="panorama-row">
+                    <div className="panorama-label">Project</div>
+                    <div className="panorama-value">{layout.location.title}</div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {(similarIds.length > 0 || (layout.similarApartments?.length ?? 0) > 0) && (
+              <section className="similar-section" aria-label="Similar apartments">
+                <div className="similar-header">
+                  <h2 className="similar-title">
+                    <span className="similar-title-thin">Similar</span>
+                    <span className="similar-title-bold">apartments</span>
+                  </h2>
+                </div>
+
+                {similarQuery.isLoading && similarLayouts.length === 0 ? (
+                  <div style={{ padding: "24px 0", color: "#6d717a" }}>Loading...</div>
+                ) : similarLayouts.length === 0 ? (
+                  <div style={{ padding: "24px 0", color: "#6d717a" }}>No similar apartments found.</div>
+                ) : (
+                  <div className="similar-grid">
+                    {similarLayouts
+                      .filter((item) => item.slug !== layout.slug)
+                      .slice(0, 6)
+                      .map((item) => (
+                        <Link key={item.id} href={`/${locale}/off-plan/${item.slug}`} className="layout-card">
+                          <div className="layout-card__header">
+                            <div className="layout-card__title-block">
+                              <span className="layout-card__code">{item.name || item.title}</span>
+                              <span className="layout-card__floor">{item.floor} floor</span>
+                            </div>
+                            <div className="layout-card__number-block">
+                              <span className="layout-card__number">N° {item.number || item.id.slice(-2)}</span>
+                              <span className="layout-card__status">{formatStatus(item.statusOption?.value || "")}</span>
+                            </div>
+                          </div>
+
+                          <div className="layout-card__visual">
+                            {item.mainImage ? (
+                              <img
+                                src={getAssetUrl(item.mainImage.url)}
+                                alt={item.mainImage.alt || item.title}
+                                className="layout-card__blueprint"
+                              />
+                            ) : (
+                              <div className="layout-card__blueprint layout-card__blueprint--placeholder">
+                                <span>No image</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="layout-card__footer">
+                            <h3 className="layout-card__name">
+                              {item.title}, {item.totalArea} m²
+                            </h3>
+                            {typeof item.prices?.[currency] === "number" && item.prices[currency] > 0 && (
+                              <span className="layout-card__price">
+                                {currency} {formatNumber(item.prices[currency])}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                  </div>
+                )}
+              </section>
+            )}
           </div>
         </PageContainer>
       </main>
