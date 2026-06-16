@@ -21,7 +21,7 @@ interface Apartment {
 const apartmentData: Apartment[] = [
   {
     id: 1,
-    image: '/images/apt1.png',
+    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop',
     badge: 'MODERN RENOVATION',
     price: '175 000 AZN',
     pricePerM2: '2 917 AZN/m²',
@@ -30,7 +30,7 @@ const apartmentData: Apartment[] = [
   },
   {
     id: 2,
-    image: '/images/apt2.png',
+    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
     badge: 'EURO FURNISH',
     price: '270 000 AZN',
     pricePerM2: '2 967 AZN/m²',
@@ -39,7 +39,7 @@ const apartmentData: Apartment[] = [
   },
   {
     id: 3,
-    image: '/images/apt3.png',
+    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
     badge: 'COSMIC RENOVATION',
     price: '225 000 AZN',
     pricePerM2: '2 885 AZN/m²',
