@@ -162,7 +162,7 @@ export default function ApartmentCard() {
             {/* Breadcrumbs */}
             <nav className="apt-breadcrumbs">
               <Link href={`/${locale}`}>Main</Link> <span className="apt-separator">/</span>
-              <Link href={`/${locale}/off-plan`}>{layout.category?.title || 'Off Plan'}</Link> <span className="apt-separator">/</span>
+              <Link href={`/${locale}/off-plan?category=${layout.category?.slug || ''}`}>{layout.category?.title || 'Off Plan'}</Link> <span className="apt-separator">/</span>
               <span className="apt-crumb-active">N° {layout.number || layout.id.slice(-2)}</span>
             </nav>
 

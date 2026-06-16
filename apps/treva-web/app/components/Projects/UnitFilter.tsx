@@ -34,10 +34,14 @@ export default function UnitLayout() {
 
   const [priceMin, setPriceMin] = useState<number | ''>(0);
   const [priceMax, setPriceMax] = useState<number | ''>('');
+  const [priceMinInput, setPriceMinInput] = useState<number | ''>(0);
+  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>('');
   const totalPriceMin = 0;
 
   const [areaMin, setAreaMin] = useState<number | ''>(0);
   const [areaMax, setAreaMax] = useState<number | ''>('');
+  const [areaMinInput, setAreaMinInput] = useState<number | ''>(0);
+  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>('');
   const totalAreaMin = 0;
 
   const [page, setPage] = useState(1);
@@ -65,7 +69,9 @@ export default function UnitLayout() {
   useEffect(() => {
     if (rangeData) {
       setPriceMax(rangeData.maxPrice);
+      setPriceMaxInput(rangeData.maxPrice);
       setAreaMax(rangeData.maxTotalArea);
+      setAreaMaxInput(rangeData.maxTotalArea);
     }
   }, [rangeData]);
 
@@ -155,9 +161,13 @@ export default function UnitLayout() {
     setSelectedStatus('');
     setSelectedRooms('');
     setPriceMin(0);
+    setPriceMinInput(0);
     setPriceMax(totalPriceMax);
+    setPriceMaxInput(totalPriceMax);
     setAreaMin(0);
+    setAreaMinInput(0);
     setAreaMax(totalAreaMax);
+    setAreaMaxInput(totalAreaMax);
     setPage(1);
   };
 
@@ -189,12 +199,15 @@ export default function UnitLayout() {
                   <span>from</span>
                   <input 
                     type="text" 
-                    value={priceMin} 
+                    value={priceMinInput} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setPriceMin(''); return; }
+                      if (raw === '') { setPriceMinInput(''); return; }
                       if (!/^\d+$/.test(raw)) return;
-                      setPriceMin(Number(raw));
+                      setPriceMinInput(Number(raw));
+                    }}
+                    onBlur={() => {
+                      setPriceMin(priceMinInput === '' ? 0 : priceMinInput);
                     }}
                   />
                 </div>
@@ -202,12 +215,15 @@ export default function UnitLayout() {
                   <span>to</span>
                   <input 
                     type="text" 
-                    value={priceMax} 
+                    value={priceMaxInput} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setPriceMax(''); return; }
+                      if (raw === '') { setPriceMaxInput(''); return; }
                       if (!/^\d+$/.test(raw)) return;
-                      setPriceMax(Number(raw));
+                      setPriceMaxInput(Number(raw));
+                    }}
+                    onBlur={() => {
+                      setPriceMax(priceMaxInput === '' ? totalPriceMax : priceMaxInput);
                     }}
                   />
                 </div>
@@ -256,6 +272,7 @@ export default function UnitLayout() {
                 onChange={(e) => {
                   const val = Math.min(Number(e.target.value), safePriceMax - 1000);
                   setPriceMin(val);
+                  setPriceMinInput(val);
                 }}
               />
               <input 
@@ -267,6 +284,7 @@ export default function UnitLayout() {
                 onChange={(e) => {
                   const val = Math.max(Number(e.target.value), safePriceMin + 1000);
                   setPriceMax(val);
+                  setPriceMaxInput(val);
                 }}
               />
             </div>
@@ -281,12 +299,15 @@ export default function UnitLayout() {
                   <span>from</span>
                   <input 
                     type="text" 
-                    value={areaMin} 
+                    value={areaMinInput} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setAreaMin(''); return; }
+                      if (raw === '') { setAreaMinInput(''); return; }
                       if (!/^\d+$/.test(raw)) return;
-                      setAreaMin(Number(raw));
+                      setAreaMinInput(Number(raw));
+                    }}
+                    onBlur={() => {
+                      setAreaMin(areaMinInput === '' ? 0 : areaMinInput);
                     }}
                   />
                 </div>
@@ -294,12 +315,15 @@ export default function UnitLayout() {
                   <span>to</span>
                   <input 
                     type="text" 
-                    value={areaMax} 
+                    value={areaMaxInput} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setAreaMax(''); return; }
+                      if (raw === '') { setAreaMaxInput(''); return; }
                       if (!/^\d+$/.test(raw)) return;
-                      setAreaMax(Number(raw));
+                      setAreaMaxInput(Number(raw));
+                    }}
+                    onBlur={() => {
+                      setAreaMax(areaMaxInput === '' ? totalAreaMax : areaMaxInput);
                     }}
                   />
                 </div>
@@ -320,6 +344,7 @@ export default function UnitLayout() {
                   onChange={(e) => {
                     const val = Math.min(Number(e.target.value), safeAreaMax - 5);
                     setAreaMin(val);
+                    setAreaMinInput(val);
                   }}
                 />
                 <input 
@@ -331,6 +356,7 @@ export default function UnitLayout() {
                   onChange={(e) => {
                     const val = Math.max(Number(e.target.value), safeAreaMin + 5);
                     setAreaMax(val);
+                    setAreaMaxInput(val);
                   }}
                 />
               </div>
