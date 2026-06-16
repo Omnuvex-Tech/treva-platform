@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import { NotifyProvider, NotifyContainer } from "@repo/ui";
 import { QueryProvider } from "@/app/providers";
 import { config } from "@/config";
-import { DevBfCacheReload } from "@/app/components/DevBfCacheReload";
 import { SmoothScrollRoot } from "@/app/components/SmoothScrollRoot";
 import "./globals.css";
 
@@ -77,9 +76,21 @@ export default function RootLayout({
         ],
     };
 
+    const devBackForwardReloadScript =
+        process.env.NODE_ENV === "development"
+            ? `(function(){try{var KEY="__treva_dev_back_forward_reload__";var nav=performance.getEntriesByType("navigation")[0];if(nav&&nav.type==="back_forward"){if(sessionStorage.getItem(KEY)!=="1"){sessionStorage.setItem(KEY,"1");location.replace(location.href);return;}}sessionStorage.removeItem(KEY);window.addEventListener("popstate",function(){sessionStorage.removeItem(KEY);location.replace(location.href);});window.addEventListener("pagehide",function(){sessionStorage.removeItem(KEY);});window.addEventListener("beforeunload",function(){sessionStorage.removeItem(KEY);});}catch(e){}})();`
+            : null;
+
     return (
         <html lang="az">
             <head>
+                {devBackForwardReloadScript && (
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: devBackForwardReloadScript,
+                        }}
+                    />
+                )}
                 <link
                     rel="stylesheet"
                     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
@@ -96,7 +107,6 @@ export default function RootLayout({
             </head>
             <body className={inter.variable} suppressHydrationWarning>
                 <QueryProvider>
-                    <DevBfCacheReload />
                     <NotifyProvider>
                         <div id="treva-navbar-layer" />
                         <SmoothScrollRoot>
