@@ -1,0 +1,242 @@
+:root {
+  --sand-card-bg: #f5f2eb;
+  --dark-charcoal: #2e3035;
+  --slate-dark-gray: #4a4e57;
+  --text-muted-gray: #7e828a;
+  --input-border-color: #e1ded7;
+  --font-sans: 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ap-info-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  margin-top: 24px;
+}
+
+.ap-info-card {
+  background-color: var(--sand-card-bg);
+  border-radius: 12px;
+  padding: 30px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ap-info-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--dark-charcoal);
+  margin: 0 0 24px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ap-about-section {
+  margin-bottom: 20px;
+}
+
+.ap-about-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-muted-gray);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ap-emoji-icon {
+  font-size: 16px;
+}
+
+.ap-about-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--dark-charcoal);
+  margin: 0;
+}
+
+.ap-fade-content {
+  opacity: 0.85;
+}
+
+.ap-show-more-link {
+  background: transparent;
+  border: none;
+  color: var(--dark-charcoal);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 8px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.ap-show-more-link:hover {
+  opacity: 0.8;
+}
+
+.ap-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px 40px;
+}
+
+.ap-details-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ap-icon-box {
+  width: 44px;
+  height: 44px;
+  background-color: var(--slate-dark-gray);
+  color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ap-details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ap-details-label {
+  font-size: 14px;
+  color: var(--text-muted-gray);
+}
+
+.ap-details-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--dark-charcoal);
+}
+
+.ap-mobile-only {
+  display: none;
+}
+
+.ap-viewing-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--dark-charcoal);
+  margin: 0 0 24px 0;
+}
+
+.ap-viewing-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.ap-form-input {
+  background-color: #fcfbfa;
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 15px;
+  color: var(--dark-charcoal);
+  outline: none;
+  box-sizing: border-box;
+  flex: 1;
+  font-family: var(--font-sans);
+}
+
+.ap-form-input::placeholder {
+  color: var(--text-muted-gray);
+}
+
+.ap-phone-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  background-color: #fcfbfa;
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ap-phone-group .ap-form-input {
+  border: none;
+  background: transparent;
+}
+
+.ap-flag-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 16px;
+  border-right: 1px solid var(--input-border-color);
+  height: 100%;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-muted-gray);
+}
+
+.ap-flag-emoji {
+  font-size: 18px;
+}
+
+.ap-submit-btn {
+  background-color: var(--slate-dark-gray);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 15px 32px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+  font-family: var(--font-sans);
+}
+
+.ap-submit-btn:hover {
+  opacity: 0.93;
+}
+
+@media (max-width: 768px) {
+  .ap-info-card {
+    padding: 24px 16px;
+  }
+
+  .ap-details-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .ap-desktop-only {
+    display: none !important;
+  }
+
+  .ap-mobile-only {
+    display: inline-block;
+    margin-top: 16px;
+  }
+
+  .ap-viewing-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .ap-phone-group,
+  .ap-submit-btn {
+    width: 100%;
+  }
+
+  .ap-submit-btn {
+    text-align: center;
+    padding: 15px;
+  }
+}

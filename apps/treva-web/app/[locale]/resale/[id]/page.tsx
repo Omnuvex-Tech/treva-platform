@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
+import PropertyInfoCards from './PropertyInfoCards';
 import './resale-detail.css';
 
 export default function ResaleDetailPage() {
@@ -66,18 +67,6 @@ export default function ResaleDetailPage() {
                 </div>
               </div>
 
-              <div className="pdet-content-footer pdet-content-footer--mobile">
-                <div className="pdet-desc-block">
-                  <h1 className="pdet-main-title">2-ROOM FLAT, 60 M², 8/16 FLOOR</h1>
-                  <p className="pdet-address-line">Baku city, Murtuza Mukhtarov str, house 31</p>
-                </div>
-
-                <div className="pdet-price-block">
-                  <div className="pdet-price-tag">175 000 AZN</div>
-                  <div className="pdet-sqm-badge">2 917 AZN/m²</div>
-                </div>
-              </div>
-
               <div className="pdet-sidebar-pane">
                 <div className="pdet-action-widget">
                   <button type="button" className="pdet-widget-btn">
@@ -133,6 +122,20 @@ export default function ResaleDetailPage() {
                 </div>
               </div>
             </div>
+
+            <div className="pdet-content-footer pdet-content-footer--mobile">
+              <div className="pdet-desc-block">
+                <h1 className="pdet-main-title">2-ROOM FLAT, 60 M², 8/16 FLOOR</h1>
+                <p className="pdet-address-line">Baku city, Murtuza Mukhtarov str, house 31</p>
+              </div>
+
+              <div className="pdet-price-block">
+                <div className="pdet-price-tag">175 000 AZN</div>
+                <div className="pdet-sqm-badge">2 917 AZN/m²</div>
+              </div>
+            </div>
+
+            <PropertyInfoCards />
           </div>
         </PageContainer>
       </main>
