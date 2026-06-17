@@ -52,6 +52,18 @@ export default function ResaleDetailPage() {
                     <div className="pdet-overlay-text">+4 photos</div>
                   </div>
                 </div>
+
+                <div className="pdet-content-footer pdet-content-footer--desktop">
+                  <div className="pdet-desc-block">
+                    <h1 className="pdet-main-title">2-ROOM FLAT, 60 M², 8/16 FLOOR</h1>
+                    <p className="pdet-address-line">Baku city, Murtuza Mukhtarov str, house 31</p>
+                  </div>
+
+                  <div className="pdet-price-block">
+                    <div className="pdet-price-tag">175 000 AZN</div>
+                    <div className="pdet-sqm-badge">2 917 AZN/m²</div>
+                  </div>
+                </div>
               </div>
 
               <div className="pdet-content-footer pdet-content-footer--mobile">
@@ -119,18 +131,6 @@ export default function ResaleDetailPage() {
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="pdet-content-footer pdet-content-footer--desktop">
-              <div className="pdet-desc-block">
-                <h1 className="pdet-main-title">2-ROOM FLAT, 60 M², 8/16 FLOOR</h1>
-                <p className="pdet-address-line">Baku city, Murtuza Mukhtarov str, house 31</p>
-              </div>
-
-              <div className="pdet-price-block">
-                <div className="pdet-price-tag">175 000 AZN</div>
-                <div className="pdet-sqm-badge">2 917 AZN/m²</div>
               </div>
             </div>
           </div>

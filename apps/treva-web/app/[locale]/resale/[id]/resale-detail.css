@@ -239,9 +239,8 @@
 
 .pdet-content-footer {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: flex-start;
-  gap: 80px;
   width: 100%;
   margin-top: 16px;
 }
