@@ -23,12 +23,14 @@
   padding: 30px;
   box-sizing: border-box;
   width: 100%;
+  text-align: left;
 }
 
 .ap-info-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--dark-charcoal);
+  font-style: normal;
+  color: #000000CC;
   margin: 0 0 24px 0;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -41,11 +43,13 @@
 .ap-about-subtitle {
   font-size: 16px;
   font-weight: 500;
-  color: var(--text-muted-gray);
+  font-style: normal;
+  color: #0000008C;
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+  text-transform: none;
 }
 
 .ap-emoji-icon {
@@ -54,9 +58,12 @@
 
 .ap-about-text {
   font-size: 15px;
+  font-weight: 500;
+  font-style: normal;
   line-height: 1.5;
-  color: var(--dark-charcoal);
+  color: #0000008C;
   margin: 0;
+  text-transform: none;
 }
 
 .ap-fade-content {
@@ -66,14 +73,16 @@
 .ap-show-more-link {
   background: transparent;
   border: none;
-  color: var(--dark-charcoal);
+  color: #00000099;
   font-size: 15px;
   font-weight: 600;
+  font-style: normal;
   cursor: pointer;
   padding: 0;
   margin-top: 8px;
   text-decoration: none;
   display: inline-block;
+  text-transform: none;
 }
 
 .ap-show-more-link:hover {
@@ -84,6 +93,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px 40px;
+  justify-items: start;
 }
 
 .ap-details-item {
@@ -112,13 +122,18 @@
 
 .ap-details-label {
   font-size: 14px;
-  color: var(--text-muted-gray);
+  font-weight: 400;
+  font-style: normal;
+  color: #00000080;
+  text-transform: none;
 }
 
 .ap-details-value {
   font-size: 16px;
-  font-weight: 500;
-  color: var(--dark-charcoal);
+  font-weight: 400;
+  font-style: normal;
+  color: #000000BF;
+  text-transform: none;
 }
 
 .ap-mobile-only {
@@ -127,14 +142,17 @@
 
 .ap-viewing-desc {
   font-size: 15px;
+  font-weight: 400;
+  font-style: normal;
   line-height: 1.5;
-  color: var(--dark-charcoal);
+  color: #000000;
   margin: 0 0 24px 0;
+  text-transform: none;
 }
 
 .ap-viewing-form {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   width: 100%;
 }
@@ -145,11 +163,14 @@
   border-radius: 8px;
   padding: 14px 16px;
   font-size: 15px;
-  color: var(--dark-charcoal);
+  font-weight: 400;
+  font-style: normal;
+  color: #000000;
   outline: none;
   box-sizing: border-box;
   flex: 1;
   font-family: var(--font-sans);
+  text-transform: none;
 }
 
 .ap-form-input::placeholder {
@@ -180,7 +201,10 @@
   height: 100%;
   cursor: pointer;
   user-select: none;
-  color: var(--text-muted-gray);
+  color: #000000;
+  font-weight: 400;
+  font-style: normal;
+  text-transform: none;
 }
 
 .ap-flag-emoji {
@@ -189,16 +213,19 @@
 
 .ap-submit-btn {
   background-color: var(--slate-dark-gray);
-  color: #ffffff;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   padding: 15px 32px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
+  font-style: normal;
   cursor: pointer;
   white-space: nowrap;
   transition: opacity 0.2s;
   font-family: var(--font-sans);
+  align-self: flex-start;
+  text-transform: none;
 }
 
 .ap-submit-btn:hover {

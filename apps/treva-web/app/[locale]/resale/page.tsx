@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
+import ResaleFilter from './ResaleFilter';
 import './resale-listing.css';
 
 interface Apartment {
@@ -64,6 +65,8 @@ export default function ResalePage() {
       <Navbar variant="solid" />
       <main className="re-main-wrapper">
         <PageContainer>
+          <ResaleFilter />
+
           <header className="re-header">
             <h1 className="re-main-title">PURCHASE APARTMENTS IN BAKU</h1>
 

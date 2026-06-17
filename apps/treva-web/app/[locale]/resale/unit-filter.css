@@ -1,0 +1,865 @@
+/* ========================================================
+   BAZI REZERV VƏ ŞRİFT AYARLARI
+   ======================================================== */
+.layout-section {
+  width: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #333333;
+  background-color: #ffffff;
+  padding: 40px 0 64px;
+  box-sizing: border-box;
+}
+
+/* ========================================================
+   HEADER & TITLES (TREVA PULSE STYLE)
+   ======================================================== */
+.layout-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+}
+
+.layout-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 48px;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.layout-title-thin {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 300 !important;
+  color: #1a1a1a;
+  letter-spacing: 0.03em;
+}
+
+.layout-title-bold {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500 !important;
+  color: #4e525d;
+  margin-left: 0.1em;
+}
+
+.layout-count {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #8c929c;
+  margin-left: 4px;
+  position: relative;
+  top: -16px;
+}
+
+/* ========================================================
+   FILTERS GRID (DESKTOP: ALL IN ONE ROW / PARALLEL)
+   ======================================================== */
+.filters-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1.8fr 0.6fr 1.1fr 1.1fr 1.3fr;
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+.mobile-flex-row {
+  display: contents;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  text-transform: capitalize;
+}
+
+/* Dual Inputs Setup */
+.dual-inputs {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 42px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  flex: 1;
+}
+
+.input-with-prefix:first-child {
+  border-right: 1px solid #eee;
+}
+
+.input-with-prefix span {
+  font-size: 13px;
+  color: #b0b0b0;
+  margin-right: 4px;
+  text-transform: lowercase;
+}
+
+.input-with-prefix input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+  font-weight: 400;
+  padding: 0;
+  background: transparent;
+}
+
+.filter-inputs-wrapper {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.filter-inputs-wrapper .dual-inputs {
+  flex: 1;
+}
+
+/* Select Box Setup */
+.select-wrapper {
+  position: relative;
+  height: 42px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.select-wrapper select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 0 24px 0 10px;
+  font-size: 14px;
+  color: #333;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #555;
+  pointer-events: none;
+}
+
+.currency-select {
+  width: 75px;
+  flex-shrink: 0;
+}
+
+/* ========================================================
+   REAL INTERACTIVE RANGE SLIDERS (COLOR: #4E525D)
+   ======================================================== */
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  margin-top: 14px;
+}
+
+.slider-base-track {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #e2e2e2;
+  z-index: 1;
+}
+
+.slider-active-track {
+  position: absolute;
+  height: 100%;
+  background-color: #4E525D;
+  z-index: 2;
+}
+
+.thumb {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+  left: 0;
+  top: 0;
+  margin: 0;
+  z-index: 3;
+}
+
+.thumb::-webkit-slider-thumb {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #4E525D;
+  cursor: pointer;
+  -webkit-appearance: none;
+  pointer-events: auto;
+  z-index: 4;
+}
+
+.thumb::-moz-range-thumb {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #4E525D;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 4;
+}
+
+/* Number of Rooms Round Buttons */
+.rooms-group {
+  display: flex;
+  gap: 10px;
+  height: 42px;
+  align-items: center;
+}
+
+.room-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #00000073;
+  background: transparent;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e3037;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.room-btn:hover {
+  background-color: #2F3134;
+  color: #ffffff;
+  border-color: #2F3134;
+}
+
+.room-btn:active,
+.room-btn--active {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* Results Info Row */
+.results-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.results-count {
+  font-size: 14px;
+  color: #8c929c;
+  text-transform: none;
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  color: #8c929c;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ========================================================
+   COMPLEX BANNER CARD (DESKTOP MODE)
+   ======================================================== */
+.complex-banner {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: url('/images/unit-layout/eliesaab.jpg') center/cover no-repeat;
+  background-color: #2c3539;
+  box-sizing: border-box;
+}
+
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.banner-title {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 400;
+  margin: 0;
+  text-transform: none;
+}
+
+.banner-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 100px;
+  border: none;
+  font-size: 15px;
+  font-weight: 400;
+  color: #000000;
+  background-color: #F5F2EB;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  text-transform: none;
+  text-decoration: none;
+}
+
+.action-btn:hover {
+  background-color: #eae6dc;
+}
+
+.btn-icon {
+  flex-shrink: 0;
+}
+
+/* ========================================================
+   APARTMENT CARDS GRID
+   ======================================================== */
+.cards-grid {
+  --color-card-bg: #f4f0ea;
+  --color-text-main: #2b3541;
+  --color-text-muted: #8e949a;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+/* ========================================================
+   CARD WRAPPER
+   overflow: visible — card button-un üzərinə çıxa bilsin
+   ======================================================== */
+.layout-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  overflow: visible; /* critical: hidden olmamalıdır */
+}
+
+/* ========================================================
+   CARD — tam border-radius (bütün 4 küncü), button üzərinə çıxır
+   ======================================================== */
+.cards-grid .layout-card {
+  background-color: var(--color-card-bg);
+  border-radius: 4px; /* bütün 4 küncü — alt künclər button üzərini örtür */
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+  min-height: 520px;
+  text-decoration: none;
+  color: inherit;
+  /* Overlap effekti */
+  position: relative;
+  z-index: 2;
+  margin-bottom: -20px; /* button-un üzərinə 20px çıxır */
+}
+
+.cards-grid .layout-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.cards-grid .layout-card__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cards-grid .layout-card__code {
+  font-size: 18px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.cards-grid .layout-card__floor {
+  font-size: 16px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.cards-grid .layout-card__number {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.cards-grid .layout-card__number-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.cards-grid .layout-card__status {
+  font-size: 18px;
+  font-weight: 400;
+  color: #4E525D;
+  text-decoration: none;
+  text-transform: none;
+}
+
+.cards-grid .layout-card__visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  margin: 12px 0;
+  min-height: 240px;
+  height: 240px;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.cards-grid .layout-card__blueprint {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: #ffffff;
+}
+
+.cards-grid .layout-card__blueprint--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.cards-grid .layout-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.cards-grid .layout-card__name {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--color-text-main);
+}
+
+.cards-grid .layout-card__price {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+/* ========================================================
+   CTA BUTTON — card-ın altında qalır, üstdən padding artırılıb
+   ======================================================== */
+.cards-grid .layout-card__cta {
+  width: 100%;
+  padding: 36px 24px 18px;
+  border: none;
+  border-radius: 0 0 4px 4px;
+  background-color: #3F4249;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase !important;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.cards-grid .layout-card__cta:hover {
+  background-color: #2F3134;
+}
+
+.cards-grid .layout-card__cta:active {
+  background-color: #000000;
+}
+
+/* ========================================================
+   PAGINATION — DESKTOP
+   ======================================================== */
+.pagination-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.pagination-num {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #3F4249;
+  cursor: pointer;
+  transition: color 0.18s ease;
+  user-select: none;
+}
+
+.pagination-num:hover {
+  color: #2b3541;
+}
+
+.pagination-num--active {
+  color: #b5b9bc;
+  font-weight: 500;
+}
+
+.pagination-dots {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 20px;
+  color: #8e949a;
+  letter-spacing: 2px;
+}
+
+.pagination-next-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: none;
+  background-color: #3F4249;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.pagination-next-btn:hover {
+  background-color: #2F3134;
+}
+
+.pagination-next-btn:active {
+  background-color: #000000;
+}
+
+/* ========================================================
+   PAGINATION — MOBILE
+   ======================================================== */
+.pagination-mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.pagination-shown {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #8e949a;
+  text-transform: none;
+}
+
+.pagination-progress {
+  width: 100%;
+  max-width: 250px;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pagination-progress__fill {
+  width: 50%;
+  height: 100%;
+  background-color: #3F4249;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.pagination-show-more {
+  width: 100%;
+  max-width: 156px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 50px;
+  background-color: #3F4249;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.pagination-show-more:hover {
+  background-color: #2F3134;
+}
+
+.pagination-show-more:active {
+  background-color: #000000;
+}
+
+/* ========================================================
+   MOBILE RESPONSIVE MODE
+   ======================================================== */
+@media (max-width: 1024px) {
+  .layout-title {
+    font-size: 36px;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .filter-group--area-floor {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  .filter-group--area-floor .filter-group--area {
+    flex: 2;
+  }
+  .filter-group--area-floor .filter-group--floor {
+    flex: 1;
+  }
+
+  .filter-group--view-status {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  .filter-group--view-status .filter-group--view {
+    flex: 1;
+  }
+  .filter-group--view-status .filter-group--status {
+    flex: 1;
+  }
+
+  .rooms-group {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .room-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 15px;
+  }
+
+  .complex-banner {
+    height: auto;
+    padding: 32px 20px;
+  }
+
+  .banner-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 24px;
+  }
+
+  .banner-title {
+    font-size: 23px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .banner-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .action-btn {
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+    height: 52px;
+    padding: 0 28px;
+    border-radius: 100px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .cards-grid .layout-card {
+    min-height: auto;
+    padding: 24px;
+  }
+
+  .pagination-desktop {
+    display: none;
+  }
+}
+
+.layout-card-wrapper,
+.layout-card-wrapper *,
+.cards-grid .layout-card,
+.cards-grid .layout-card * {
+  text-transform: none !important;
+}
+
+/* Custom Select Dropdown */
+.custom-select {
+  position: relative;
+}
+
+.custom-select__trigger {
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  cursor: pointer;
+  text-transform: none;
+  transition: border-color 0.2s;
+}
+
+.custom-select__trigger:hover {
+  border-color: #999;
+}
+
+.custom-select__trigger svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: #555;
+}
+
+.custom-select__trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.custom-select__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #3F4249;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 50;
+  min-width: 100%;
+  padding: 6px 0;
+}
+
+.custom-select__option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-transform: none;
+  transition: background 0.18s ease;
+  text-align: left;
+}
+
+.custom-select__option:hover {
+  background: #2F3134;
+}
+
+.custom-select__option--active {
+  background: rgba(0, 0, 0, 0.16);
+}

@@ -145,14 +145,18 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: #2e3035;
+  color: #000000CC;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.1px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 4px;
   cursor: pointer;
+  text-transform: none;
 }
 
 .pdet-widget-btn.saved {
@@ -193,13 +197,18 @@
 .pdet-agent-name {
   font-size: 18px;
   font-weight: 600;
+  font-style: normal;
   margin: 0 0 2px 0;
-  color: #2e3035;
+  color: #000000;
+  text-transform: none;
 }
 
 .pdet-agent-role {
   font-size: 14px;
-  color: #6c717a;
+  font-weight: 400;
+  font-style: normal;
+  color: #000000;
+  text-transform: none;
 }
 
 .pdet-agent-actions {
@@ -210,31 +219,35 @@
 
 .pdet-btn-primary {
   background-color: #4a4e57;
-  color: #ffffff;
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   padding: 14px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
+  font-style: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   cursor: pointer;
   width: 100%;
+  text-transform: none;
 }
 
 .pdet-btn-secondary {
   background-color: transparent;
-  color: #2e3035;
+  color: #00000099;
   border: 1px solid #d8d5ce;
   border-radius: 8px;
   padding: 14px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
+  font-style: normal;
   cursor: pointer;
   width: 100%;
   text-align: center;
+  text-transform: none;
 }
 
 .pdet-content-footer {
@@ -256,15 +269,20 @@
 
 .pdet-main-title {
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 500;
+  font-style: normal;
   margin: 0;
   letter-spacing: -0.3px;
+  text-transform: uppercase;
+  color: #000000CC;
 }
 
 .pdet-address-line {
   font-size: 16px;
+  font-weight: 400;
   color: #6c717a;
   margin: 8px 0 0 0;
+  text-transform: uppercase;
 }
 
 .pdet-price-block {
@@ -277,18 +295,22 @@
 
 .pdet-price-tag {
   font-size: 32px;
-  font-weight: 700;
-  color: #2e3035;
-  line-height: 1;
+  font-weight: 600;
+  font-style: normal;
+  color: #000000CC;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .pdet-sqm-badge {
   font-size: 15px;
-  color: #6c717a;
+  font-weight: 400;
+  font-style: normal;
+  color: #00000099;
   border: 1px solid #d8d5ce;
   border-radius: 20px;
   padding: 6px 16px;
-  font-weight: 500;
+  text-transform: none;
 }
 
 @media (max-width: 768px) {

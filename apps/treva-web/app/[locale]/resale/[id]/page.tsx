@@ -65,6 +65,8 @@ export default function ResaleDetailPage() {
                     <div className="pdet-sqm-badge">2 917 AZN/m²</div>
                   </div>
                 </div>
+
+                <PropertyInfoCards />
               </div>
 
               <div className="pdet-sidebar-pane">
@@ -134,8 +136,6 @@ export default function ResaleDetailPage() {
                 <div className="pdet-sqm-badge">2 917 AZN/m²</div>
               </div>
             </div>
-
-            <PropertyInfoCards />
           </div>
         </PageContainer>
       </main>
