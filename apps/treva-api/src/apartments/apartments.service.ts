@@ -7,6 +7,13 @@ import { UpdateApartmentDto } from './dto/update-apartment.dto';
 export class ApartmentsService {
   constructor(private prisma: PrismaService) {}
 
+  private async resolveAttributes(attributeIds: string[]) {
+    if (!attributeIds || attributeIds.length === 0) return [];
+    return this.prisma.attribute.findMany({
+      where: { id: { in: attributeIds } },
+    });
+  }
+
   async create(dto: CreateApartmentDto) {
     const existing = await this.prisma.apartment.findUnique({
       where: { slug: dto.slug },
@@ -62,8 +69,19 @@ export class ApartmentsService {
       this.prisma.apartment.count({ where }),
     ]);
 
+    const allAttrIds = [...new Set(data.flatMap((a) => a.attributeIds))];
+    const allAttributes = allAttrIds.length > 0
+      ? await this.prisma.attribute.findMany({ where: { id: { in: allAttrIds } } })
+      : [];
+    const attrMap = new Map(allAttributes.map((a) => [a.id, a]));
+
+    const dataWithAttributes = data.map((apartment) => ({
+      ...apartment,
+      attributes: apartment.attributeIds.map((id) => attrMap.get(id)).filter(Boolean),
+    }));
+
     return {
-      data,
+      data: dataWithAttributes,
       pagination: {
         page,
         limit,
@@ -79,7 +97,8 @@ export class ApartmentsService {
       include: { apartmentType: true, owner: true },
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
-    return apartment;
+    const attributes = await this.resolveAttributes(apartment.attributeIds);
+    return { ...apartment, attributes };
   }
 
   async findBySlug(slug: string) {
@@ -88,7 +107,8 @@ export class ApartmentsService {
       include: { apartmentType: true, owner: true },
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
-    return apartment;
+    const attributes = await this.resolveAttributes(apartment.attributeIds);
+    return { ...apartment, attributes };
   }
 
   async update(id: string, dto: UpdateApartmentDto) {

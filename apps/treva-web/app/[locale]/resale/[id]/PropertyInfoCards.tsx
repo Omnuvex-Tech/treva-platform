@@ -40,65 +40,53 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
         <h2 className="ap-info-title">Apartment Details</h2>
         
         <div className="ap-details-grid">
-          <div className="ap-details-item">
-            <div className="ap-icon-box">
-              <img src="/images/resale/img1.png" alt="" width="18" height="18" />
-            </div>
-            <div className="ap-details-content">
-              <span className="ap-details-label">Object Code</span>
-              <span className="ap-details-value">{apartment.slug || '—'}</span>
-            </div>
-          </div>
-
-          <div className="ap-details-item">
-            <div className="ap-icon-box">
-              <img src="/images/resale/img2.png" alt="" width="18" height="18" />
-            </div>
-            <div className="ap-details-content">
-              <span className="ap-details-label">Property Size</span>
-              <span className="ap-details-value">{apartment.area} m²</span>
-            </div>
-          </div>
-
-          <div className="ap-details-item">
-            <div className="ap-icon-box">
-              <img src="/images/resale/img3.png" alt="" width="18" height="18" />
-            </div>
-            <div className="ap-details-content">
-              <span className="ap-details-label">Number of Floors</span>
-              <span className="ap-details-value">{apartment.floorFrom} out of {apartment.floorTo}</span>
-            </div>
-          </div>
-
-          <div className="ap-details-item">
-            <div className="ap-icon-box">
-              <img src="/images/resale/img4.png" alt="" width="18" height="18" />
-            </div>
-            <div className="ap-details-content">
-              <span className="ap-details-label">Renovation</span>
-              <span className="ap-details-value">{apartment.renovation || '—'}</span>
-            </div>
-          </div>
-
-          <div className="ap-details-item ap-desktop-only">
-            <div className="ap-icon-box">
-              <img src="/images/resale/img5.png" alt="" width="18" height="18" />
-            </div>
-            <div className="ap-details-content">
-              <span className="ap-details-label">Kitchen Size</span>
-              <span className="ap-details-value">{apartment.kitchenSize ? `${apartment.kitchenSize} m²` : '—'}</span>
-            </div>
-          </div>
-
-          <div className="ap-details-item ap-desktop-only">
-            <div className="ap-icon-box">
-              <img src="/images/resale/img6.png" alt="" width="18" height="18" />
-            </div>
-            <div className="ap-details-content">
-              <span className="ap-details-label">Wall Material</span>
-              <span className="ap-details-value">{apartment.wallMaterial || '—'}</span>
-            </div>
-          </div>
+          {apartment.attributes && apartment.attributes.length > 0 ? (
+            apartment.attributes.map((attr, idx) => (
+              <div key={attr.id} className={`ap-details-item ${idx >= 4 ? 'ap-desktop-only' : ''}`}>
+                <div className="ap-icon-box">
+                  {attr.icon ? (
+                    <img src={attr.icon} alt="" width="18" height="18" />
+                  ) : (
+                    <span className="ap-icon-hash">#</span>
+                  )}
+                </div>
+                <div className="ap-details-content">
+                  <span className="ap-details-label">{attr.title}</span>
+                  <span className="ap-details-value">{attr.value || '—'}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="ap-details-item">
+                <div className="ap-icon-box">
+                  <img src="/images/resale/img1.png" alt="" width="18" height="18" />
+                </div>
+                <div className="ap-details-content">
+                  <span className="ap-details-label">Object Code</span>
+                  <span className="ap-details-value">{apartment.slug || '—'}</span>
+                </div>
+              </div>
+              <div className="ap-details-item">
+                <div className="ap-icon-box">
+                  <img src="/images/resale/img2.png" alt="" width="18" height="18" />
+                </div>
+                <div className="ap-details-content">
+                  <span className="ap-details-label">Property Size</span>
+                  <span className="ap-details-value">{apartment.area} m²</span>
+                </div>
+              </div>
+              <div className="ap-details-item">
+                <div className="ap-icon-box">
+                  <img src="/images/resale/img3.png" alt="" width="18" height="18" />
+                </div>
+                <div className="ap-details-content">
+                  <span className="ap-details-label">Number of Floors</span>
+                  <span className="ap-details-value">{apartment.floorFrom} out of {apartment.floorTo}</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <button type="button" className="ap-show-more-link ap-mobile-only">

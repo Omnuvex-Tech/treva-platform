@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { apartmentsApi, CreateApartmentData, UploadResponse } from "../../api/apartments";
 import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
+import { attributesApi, Attribute } from "../../api/attributes";
 import { Layout } from "../../components/Layout";
 
 type TabKey = "basic" | "area" | "location" | "gallery" | "description";
@@ -42,6 +43,11 @@ export function ApartmentForm() {
     const { data: owners } = useQuery({
         queryKey: ["owners"],
         queryFn: () => ownersApi.getAll(),
+    });
+
+    const { data: attributes } = useQuery({
+        queryKey: ["attributes"],
+        queryFn: () => attributesApi.getAll(),
     });
 
     const { data: existing } = useQuery({
@@ -492,6 +498,40 @@ export function ApartmentForm() {
                                     placeholder="e.g. 2"
                                     min={1}
                                 />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="mb-1 block text-xs text-white/60">Attributes (Apartment Details)</label>
+                            <div className="flex flex-wrap gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                                {attributes?.data?.map((attr: Attribute) => {
+                                    const selected = form.attributeIds?.includes(attr.id);
+                                    return (
+                                        <button
+                                            key={attr.id}
+                                            type="button"
+                                            onClick={() => {
+                                                const current = form.attributeIds || [];
+                                                const next = selected
+                                                    ? current.filter((id) => id !== attr.id)
+                                                    : [...current, attr.id];
+                                                updateField("attributeIds", next);
+                                            }}
+                                            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                                                selected
+                                                    ? "bg-blue-500/20 text-blue-300 border border-blue-400/30"
+                                                    : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white/80"
+                                            }`}
+                                        >
+                                            {attr.icon && (
+                                                <img src={attr.icon} alt="" className="h-3.5 w-3.5 rounded-sm object-cover" />
+                                            )}
+                                            {attr.title}
+                                        </button>
+                                    );
+                                })}
+                                {(!attributes?.data || attributes.data.length === 0) && (
+                                    <span className="text-xs text-white/40">No attributes created yet</span>
+                                )}
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-4">

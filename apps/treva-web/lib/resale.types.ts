@@ -13,6 +13,14 @@ export interface ResaleOwner {
     phoneNumber: string;
 }
 
+export interface ResaleAttribute {
+    id: string;
+    name: string;
+    title: string;
+    value: string;
+    icon?: string;
+}
+
 export interface ResaleApartment {
     id: string;
     title: string;
@@ -32,6 +40,7 @@ export interface ResaleApartment {
     kitchenSize?: number;
     wallMaterial?: string;
     attributeIds: string[];
+    attributes?: ResaleAttribute[];
     requestIds: string[];
     apartmentTypeId: string;
     apartmentType?: ResaleApartmentType;

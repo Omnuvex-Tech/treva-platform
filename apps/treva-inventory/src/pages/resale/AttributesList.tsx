@@ -52,7 +52,13 @@ export function AttributesList() {
                                     key={attr.id}
                                     className="border-b border-white/5 transition-colors hover:bg-white/3"
                                 >
-                                    <td className="px-4 py-3">{attr.icon || "—"}</td>
+                                    <td className="px-4 py-3">
+                                        {attr.icon ? (
+                                            <img src={attr.icon} alt="" className="h-5 w-5 rounded object-cover" />
+                                        ) : (
+                                            <span className="text-white/40">—</span>
+                                        )}
+                                    </td>
                                     <td className="px-4 py-3 text-white/70">
                                         <span className="rounded bg-white/10 px-2 py-0.5 text-xs">
                                             {attr.name}
