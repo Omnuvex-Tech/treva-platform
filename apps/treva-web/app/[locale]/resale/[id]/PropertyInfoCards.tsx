@@ -42,10 +42,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
         <div className="ap-details-grid">
           <div className="ap-details-item">
             <div className="ap-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
-                <line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
-              </svg>
+              <img src="/images/resale/img1.png" alt="" width="18" height="18" />
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Object Code</span>
@@ -55,10 +52,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
 
           <div className="ap-details-item">
             <div className="ap-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-                <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-              </svg>
+              <img src="/images/resale/img2.png" alt="" width="18" height="18" />
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Property Size</span>
@@ -68,10 +62,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
 
           <div className="ap-details-item">
             <div className="ap-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="22 7 16 7 16 12 10 12 10 17 2 17"/>
-                <path d="M2 17v4h20v-14z" opacity="0.1" fill="currentColor"/>
-              </svg>
+              <img src="/images/resale/img3.png" alt="" width="18" height="18" />
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Number of Floors</span>
@@ -81,9 +72,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
 
           <div className="ap-details-item">
             <div className="ap-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-              </svg>
+              <img src="/images/resale/img4.png" alt="" width="18" height="18" />
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Renovation</span>
@@ -93,9 +82,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
 
           <div className="ap-details-item ap-desktop-only">
             <div className="ap-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
+              <img src="/images/resale/img5.png" alt="" width="18" height="18" />
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Kitchen Size</span>
@@ -105,11 +92,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
 
           <div className="ap-details-item ap-desktop-only">
             <div className="ap-icon-box">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>
-                <line x1="12" y1="3" x2="12" y2="21"/>
-              </svg>
+              <img src="/images/resale/img6.png" alt="" width="18" height="18" />
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Wall Material</span>
