@@ -257,14 +257,14 @@
 .pdet-main-title {
   font-size: 28px;
   font-weight: 600;
-  margin: 0 0 14px 0;
+  margin: 0;
   letter-spacing: -0.3px;
 }
 
 .pdet-address-line {
   font-size: 16px;
   color: #6c717a;
-  margin: 0;
+  margin: 8px 0 0 0;
 }
 
 .pdet-price-block {
@@ -272,7 +272,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  margin-top: 16px;
+  margin: 0;
 }
 
 .pdet-price-tag {
@@ -417,7 +417,7 @@
   }
 
   .pdet-btn-secondary {
-    background-color: #ffffff;
+    background-color: transparent;
     border-color: #d8d5ce;
   }
 }
