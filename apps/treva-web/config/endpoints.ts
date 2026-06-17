@@ -37,4 +37,32 @@ export const endpoints = {
     statusOptions: {
         list: "/status-options",
     },
+
+    currencies: {
+        list: "/currencies",
+    },
+
+    resale: {
+        apartments: {
+            list: "/apartments",
+            detail: (id: string) => `/apartments/${id}`,
+            bySlug: (slug: string) => `/apartments/slug/${slug}`,
+        },
+        apartmentTypes: {
+            list: "/apartment-types",
+            detail: (id: string) => `/apartment-types/${id}`,
+        },
+        owners: {
+            list: "/owners",
+            detail: (id: string) => `/owners/${id}`,
+        },
+        attributes: {
+            list: "/attributes",
+            detail: (id: string) => `/attributes/${id}`,
+        },
+        requests: {
+            list: "/requests",
+            detail: (id: string) => `/requests/${id}`,
+        },
+    },
 } as const;

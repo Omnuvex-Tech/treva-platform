@@ -12,6 +12,15 @@ import { RoomOptionList } from "./pages/room-options/RoomOptionList";
 import { ViewOptionList } from "./pages/view-options/ViewOptionList";
 import { CurrencyList } from "./pages/currencies/CurrencyList";
 import { StatusOptionList } from "./pages/status-options/StatusOptionList";
+import { ApartmentsList } from "./pages/resale/ApartmentsList";
+import { ApartmentForm } from "./pages/resale/ApartmentForm";
+import { ApartmentTypesList } from "./pages/resale/ApartmentTypesList";
+import { ApartmentTypeForm } from "./pages/resale/ApartmentTypeForm";
+import { OwnersList } from "./pages/resale/OwnersList";
+import { OwnerForm } from "./pages/resale/OwnerForm";
+import { AttributesList } from "./pages/resale/AttributesList";
+import { AttributeForm } from "./pages/resale/AttributeForm";
+import { RequestsList } from "./pages/resale/RequestsList";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -158,6 +167,110 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <StatusOptionList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/apartments"
+                            element={
+                                <ProtectedRoute>
+                                    <ApartmentsList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/apartments/new"
+                            element={
+                                <ProtectedRoute>
+                                    <ApartmentForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/apartments/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <ApartmentForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/apartment-types"
+                            element={
+                                <ProtectedRoute>
+                                    <ApartmentTypesList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/apartment-types/new"
+                            element={
+                                <ProtectedRoute>
+                                    <ApartmentTypeForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/apartment-types/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <ApartmentTypeForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/owners"
+                            element={
+                                <ProtectedRoute>
+                                    <OwnersList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/owners/new"
+                            element={
+                                <ProtectedRoute>
+                                    <OwnerForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/owners/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <OwnerForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/attributes"
+                            element={
+                                <ProtectedRoute>
+                                    <AttributesList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/attributes/new"
+                            element={
+                                <ProtectedRoute>
+                                    <AttributeForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/attributes/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <AttributeForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/requests"
+                            element={
+                                <ProtectedRoute>
+                                    <RequestsList />
                                 </ProtectedRoute>
                             }
                         />

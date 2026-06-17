@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useResaleApartmentRange } from '@/hooks/use-resale-apartments';
 import './unit-filter.css';
 
 const CURRENCIES = ['USD', 'AZN'];
@@ -9,7 +10,23 @@ const VIEW_OPTIONS = ['All', 'City', 'Sea', 'Mountain', 'Park', 'Courtyard'];
 const STATUS_OPTIONS = ['All', 'Renovated', 'Without renovation', 'Euro renovation', 'Cosmic renovation', 'Designer renovation'];
 const ROOM_OPTIONS = ['1', '2', '3', '4', '5+'];
 
-export default function ResaleFilter() {
+export interface ResaleFilterState {
+  minPrice?: number;
+  maxPrice?: number;
+  minArea?: number;
+  maxArea?: number;
+  floor?: number;
+  roomCount?: number;
+}
+
+export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number }) {
+  const { data: rangeData } = useResaleApartmentRange();
+
+  const totalPriceMax = rangeData?.maxPrice || 1500000;
+  const totalAreaMax = rangeData?.maxTotalArea || 500;
+  const totalPriceMin = 0;
+  const totalAreaMin = 0;
+
   const [currency, setCurrency] = useState('USD');
   const [floor, setFloor] = useState('All');
   const [selectedView, setSelectedView] = useState('All');
@@ -27,18 +44,23 @@ export default function ResaleFilter() {
   const statusRef = useRef<HTMLDivElement>(null);
 
   const [priceMin, setPriceMin] = useState<number | ''>(0);
-  const [priceMax, setPriceMax] = useState<number | ''>(1500000);
+  const [priceMax, setPriceMax] = useState<number | ''>(totalPriceMax);
   const [priceMinInput, setPriceMinInput] = useState<number | ''>(0);
-  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(1500000);
-  const totalPriceMin = 0;
-  const totalPriceMax = 1500000;
+  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(totalPriceMax);
 
   const [areaMin, setAreaMin] = useState<number | ''>(0);
-  const [areaMax, setAreaMax] = useState<number | ''>(500);
+  const [areaMax, setAreaMax] = useState<number | ''>(totalAreaMax);
   const [areaMinInput, setAreaMinInput] = useState<number | ''>(0);
-  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(500);
-  const totalAreaMin = 0;
-  const totalAreaMax = 500;
+  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(totalAreaMax);
+
+  useEffect(() => {
+    if (rangeData) {
+      setPriceMax(rangeData.maxPrice);
+      setPriceMaxInput(rangeData.maxPrice);
+      setAreaMax(rangeData.maxTotalArea);
+      setAreaMaxInput(rangeData.maxTotalArea);
+    }
+  }, [rangeData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -55,6 +77,23 @@ export default function ResaleFilter() {
   const safePriceMax = typeof priceMax === 'number' ? priceMax : totalPriceMax;
   const safeAreaMin = typeof areaMin === 'number' ? areaMin : 0;
   const safeAreaMax = typeof areaMax === 'number' ? areaMax : totalAreaMax;
+
+  const fireFilters = useCallback(() => {
+    if (!onFilterChange) return;
+    const f: ResaleFilterState = {};
+    if (safePriceMin > 0) f.minPrice = safePriceMin;
+    if (safePriceMax < totalPriceMax) f.maxPrice = safePriceMax;
+    if (safeAreaMin > 0) f.minArea = safeAreaMin;
+    if (safeAreaMax < totalAreaMax) f.maxArea = safeAreaMax;
+    if (floor !== 'All') f.floor = parseInt(floor);
+    if (selectedRooms) {
+      const rc = selectedRooms === '5+' ? 5 : parseInt(selectedRooms);
+      f.roomCount = rc;
+    }
+    onFilterChange(f);
+  }, [safePriceMin, safePriceMax, safeAreaMin, safeAreaMax, floor, selectedRooms, onFilterChange, totalPriceMax, totalAreaMax]);
+
+  useEffect(() => { fireFilters(); }, [fireFilters]);
 
   const priceLeftPercent = ((safePriceMin - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
   const priceRightPercent = 100 - ((safePriceMax - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
@@ -356,7 +395,7 @@ export default function ResaleFilter() {
 
       {/* RESULTS & RESET ROW */}
       <div className="results-row">
-        <span className="results-count">1072 apartments found</span>
+        <span className="results-count">{totalCount ?? 0} apartments found</span>
         <button type="button" className="reset-btn" onClick={handleReset}>Reset filters</button>
       </div>
     </section>

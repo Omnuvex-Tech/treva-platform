@@ -1,9 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import type { ResaleApartment } from '@/lib/resale.types';
 import './property-info-cards.css';
 
-export default function PropertyInfoCards() {
+interface PropertyInfoCardsProps {
+  apartment: ResaleApartment;
+}
+
+export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -19,25 +24,14 @@ export default function PropertyInfoCards() {
         <h2 className="ap-info-title">About the Apartment</h2>
         
         <div className="ap-about-section">
-          <div className="ap-about-subtitle">
-            <span className="ap-emoji-icon">📍</span> Location & Setting
-          </div>
-          <p className="ap-about-text">
-            Situated in one of the city&apos;s most established and sought-after residential districts, 
-            providing a perfect balance of prestige and urban connectivity.
-          </p>
+          <p className="ap-about-text"
+            dangerouslySetInnerHTML={{
+              __html: apartment.description || 'Situated in one of the city\'s most established and sought-after residential districts, providing a perfect balance of prestige and urban connectivity.'
+            }}
+          />
         </div>
 
-        <div className="ap-about-section ap-fade-content">
-          <div className="ap-about-subtitle">
-            <span className="ap-emoji-icon">🏢</span> Building & Residence
-          </div>
-          <p className="ap-about-text">
-            An exclusive high-end residential complex featuring sophisticated architecture and premium-grade management services.
-          </p>
-        </div>
-
-        <button type="button" className="ap-show-more-link">
+        <button type="button" className="ap-show-more-link" style={{ display: 'none' }}>
           Show more
         </button>
       </section>
@@ -55,7 +49,7 @@ export default function PropertyInfoCards() {
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Object Code</span>
-              <span className="ap-details-value">45274241</span>
+              <span className="ap-details-value">{apartment.slug || '—'}</span>
             </div>
           </div>
 
@@ -68,7 +62,7 @@ export default function PropertyInfoCards() {
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Property Size</span>
-              <span className="ap-details-value">60 m²</span>
+              <span className="ap-details-value">{apartment.area} m²</span>
             </div>
           </div>
 
@@ -81,7 +75,7 @@ export default function PropertyInfoCards() {
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Number of Floors</span>
-              <span className="ap-details-value">5 out of 5</span>
+              <span className="ap-details-value">{apartment.floorFrom} out of {apartment.floorTo}</span>
             </div>
           </div>
 
@@ -93,7 +87,7 @@ export default function PropertyInfoCards() {
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Renovation</span>
-              <span className="ap-details-value">Modern</span>
+              <span className="ap-details-value">{apartment.renovation || '—'}</span>
             </div>
           </div>
 
@@ -105,7 +99,7 @@ export default function PropertyInfoCards() {
             </div>
             <div className="ap-details-content">
               <span className="ap-details-label">Kitchen Size</span>
-              <span className="ap-details-value">5 m²</span>
+              <span className="ap-details-value">{apartment.kitchenSize ? `${apartment.kitchenSize} m²` : '—'}</span>
             </div>
           </div>
 
@@ -118,8 +112,8 @@ export default function PropertyInfoCards() {
               </svg>
             </div>
             <div className="ap-details-content">
-              <span className="ap-details-label">Wall material</span>
-              <span className="ap-details-value">monolith-brick</span>
+              <span className="ap-details-label">Wall Material</span>
+              <span className="ap-details-value">{apartment.wallMaterial || '—'}</span>
             </div>
           </div>
         </div>

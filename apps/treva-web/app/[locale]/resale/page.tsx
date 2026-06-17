@@ -1,77 +1,57 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
-import ResaleFilter from './ResaleFilter';
+import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
+import { useResaleApartments } from '@/hooks/use-resale-apartments';
 import './resale-listing.css';
-
-interface Apartment {
-  id: number;
-  image: string;
-  badge: string;
-  price: string;
-  pricePerM2: string;
-  tags: string[];
-  address: string;
-}
-
-const apartmentData: Apartment[] = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop',
-    badge: 'MODERN RENOVATION',
-    price: '175 000 AZN',
-    pricePerM2: '2 917 AZN/m²',
-    tags: ['2-room sq.', '60 m²', '8/16 floor'],
-    address: 'Baku city, Murtuza Mukhtarov str, house 31'
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
-    badge: 'EURO FURNISH',
-    price: '270 000 AZN',
-    pricePerM2: '2 967 AZN/m²',
-    tags: ['2-room sq.', '91 m²', '15/17 floor'],
-    address: 'Baku city, Sabit Rahman str, house 26'
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
-    badge: 'COSMIC RENOVATION',
-    price: '225 000 AZN',
-    pricePerM2: '2 885 AZN/m²',
-    tags: ['3-room sq.', '78 m²', '4/16 floor'],
-    address: 'Baku city, General Aliagha Shikhlinski str, house 30'
-  }
-];
 
 export default function ResalePage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'az';
-  const [savedItems, setSavedItems] = useState<number[]>([]);
+  const [savedItems, setSavedItems] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState<ResaleFilterState>({});
 
-  const toggleSave = (id: number) => {
+  const { data: response, isLoading } = useResaleApartments({
+    ...filters,
+    page,
+    limit: 12,
+  });
+
+  const apartments = response?.data ?? [];
+  const pagination = response?.pagination;
+
+  const toggleSave = (id: string) => {
     setSavedItems(prev =>
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
+
+  const handleFilterChange = useCallback((f: ResaleFilterState) => {
+    setFilters(f);
+    setPage(1);
+  }, []);
+
+  const formatPrice = (p: number) =>
+    p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
   return (
     <div className="re-page-wrapper">
       <Navbar variant="solid" />
       <main className="re-main-wrapper">
         <PageContainer>
-          <ResaleFilter />
+          <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} />
 
           <header className="re-header">
             <h1 className="re-main-title">PURCHASE APARTMENTS IN BAKU</h1>
 
             <div className="re-controls-row">
-              <div className="re-property-count">1072 properties</div>
+              <div className="re-property-count">{pagination?.total ?? 0} properties</div>
 
               <div className="re-sort-wrapper">
                 <span className="re-sort-label">Sort:</span>
@@ -85,68 +65,99 @@ export default function ResalePage() {
             </div>
           </header>
 
-          <main className="re-grid">
-            {apartmentData.map((apt) => (
-              <div key={apt.id} className="re-card-wrapper">
-                <article className="re-card">
-                  <div className="re-card-media">
-                    <img src={apt.image} alt={apt.address} className="re-card-img" />
-                  </div>
+          {isLoading ? (
+            <div className="py-16 text-center text-white/50">Loading...</div>
+          ) : apartments.length === 0 ? (
+            <div className="py-16 text-center text-white/50">No apartments found</div>
+          ) : (
+            <main className="re-grid">
+              {apartments.map((apt) => (
+                <div key={apt.id} className="re-card-wrapper">
+                  <article className="re-card">
+                    <div className="re-card-media">
+                      <img
+                        src={apt.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
+                        alt={apt.locationTitle || apt.title}
+                        className="re-card-img"
+                      />
+                    </div>
 
-                  <div className="re-card-body">
-                    <div className="re-card-meta-row">
-                      <span className="re-badge">{apt.badge}</span>
-                      <button
-                        type="button"
-                        className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
-                        onClick={() => toggleSave(apt.id)}
-                        aria-label="Save listing"
+                    <div className="re-card-body">
+                      <div className="re-card-meta-row">
+                        <span className="re-badge">{apt.apartmentType?.title || ''}</span>
+                        <button
+                          type="button"
+                          className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
+                          onClick={() => toggleSave(apt.id)}
+                          aria-label="Save listing"
+                        >
+                          <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="re-price-block">
+                        <h2 className="re-main-price">{formatPrice(apt.priceTotal)} AZN</h2>
+                        <div className="re-sqm-price">{formatPrice(apt.priceByArea)} AZN/m²</div>
+                      </div>
+
+                      <div className="re-tags-row">
+                        <span className="re-tag">{apt.roomCount}-room sq.</span>
+                        <span className="re-tag">{apt.area} m²</span>
+                        <span className="re-tag">{apt.floorFrom}/{apt.floorTo} floor</span>
+                      </div>
+
+                      <p className="re-address">{apt.locationTitle || '—'}</p>
+                    </div>
+                  </article>
+
+                  <Link href={`/${locale}/resale/${apt.slug}`} className="re-action-btn">
+                    VIew Apartment DetaIls
+                  </Link>
+                </div>
+              ))}
+            </main>
+          )}
+
+          {pagination && pagination.totalPages > 1 && (
+            <footer className="re-pagination">
+              <div className="re-pagination-numbers">
+                {page > 1 && (
+                  <span className="re-page-num" onClick={() => setPage(page - 1)}>
+                    &laquo;
+                  </span>
+                )}
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 2)
+                  .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && typeof arr[idx - 1] === 'number' && (p as number) - (arr[idx - 1] as number) > 1) {
+                      acc.push('...');
+                    }
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, idx) =>
+                    typeof p === 'string' ? (
+                      <span key={`e-${idx}`} className="re-page-ellipsis">{p}</span>
+                    ) : (
+                      <span
+                        key={p}
+                        className={`re-page-num ${page === p ? 're-page-active' : ''}`}
+                        onClick={() => setPage(p)}
                       >
-                        <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="re-price-block">
-                      <h2 className="re-main-price">{apt.price}</h2>
-                      <div className="re-sqm-price">{apt.pricePerM2}</div>
-                    </div>
-
-                    <div className="re-tags-row">
-                      {apt.tags.map((tag, idx) => (
-                        <span key={idx} className="re-tag">{tag}</span>
-                      ))}
-                    </div>
-
-                    <p className="re-address">{apt.address}</p>
-                  </div>
-                </article>
-
-                <Link href={`/${locale}/resale/${apt.id}`} className="re-action-btn">
-                  VIew Apartment DetaIls
-                </Link>
+                        {p}
+                      </span>
+                    )
+                  )}
+                {page < pagination.totalPages && (
+                  <span className="re-page-num" onClick={() => setPage(page + 1)}>
+                    &raquo;
+                  </span>
+                )}
               </div>
-            ))}
-          </main>
-
-          <footer className="re-pagination">
-            <div className="re-pagination-numbers">
-              <span className="re-page-num re-page-active">1</span>
-              <span className="re-page-num">2</span>
-              <span className="re-page-num">3</span>
-              <span className="re-page-num">5</span>
-              <span className="re-page-num">4</span>
-              <span className="re-page-ellipsis">...</span>
-              <span className="re-page-num">40</span>
-            </div>
-
-            <button type="button" className="re-next-btn" aria-label="Next Page">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </button>
-          </footer>
+            </footer>
+          )}
         </PageContainer>
       </main>
       <HomeFooter />

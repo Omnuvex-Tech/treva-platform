@@ -94,3 +94,74 @@ model StatusOption {
 
   unitLayouts UnitLayout[]
 }
+
+// ─── Resale Models ───────────────────────────────────────────
+
+model ApartmentType {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  apartments Apartment[]
+}
+
+model Owner {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  profession  String?
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  apartments Apartment[]
+}
+
+model Attribute {
+  id        String   @id @default(cuid())
+  name      String
+  title     String
+  value     String
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Request {
+  id          String   @id @default(cuid())
+  fullName    String
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Apartment {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  description     String?
+  image           String?
+  gallery         Json[]
+  priceTotal      Float
+  priceByArea     Float
+  roomCount       Int
+  area            Float
+  floorFrom       Int
+  floorTo         Int
+  locationTitle   String?
+  locationUrl     String?
+  renovation      String?
+  kitchenSize     Float?
+  wallMaterial    String?
+  attributeIds    String[]
+  requestIds      String[]
+  apartmentTypeId String
+  apartmentType   ApartmentType @relation(fields: [apartmentTypeId], references: [id])
+  ownerId         String?
+  owner           Owner?        @relation(fields: [ownerId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}

@@ -13,6 +13,11 @@ import { RoomOptionsModule } from './room-options/room-options.module';
 import { ViewOptionsModule } from './view-options/view-options.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { StatusOptionsModule } from './status-options/status-options.module';
+import { ApartmentTypesModule } from './apartment-types/apartment-types.module';
+import { ApartmentsModule } from './apartments/apartments.module';
+import { OwnersModule } from './owners/owners.module';
+import { AttributesModule } from './attributes/attributes.module';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
@@ -39,6 +44,11 @@ import { StatusOptionsModule } from './status-options/status-options.module';
     ViewOptionsModule,
     CurrenciesModule,
     StatusOptionsModule,
+    ApartmentTypesModule,
+    ApartmentsModule,
+    OwnersModule,
+    AttributesModule,
+    RequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
