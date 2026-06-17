@@ -212,10 +212,65 @@
   font-weight: 400;
   font-style: normal;
   text-transform: none;
+  position: relative;
 }
 
-.ap-flag-emoji {
-  font-size: 18px;
+.ap-flag-img {
+  width: 32px;
+  height: 22px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ap-country-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 280px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid var(--input-border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 100;
+}
+
+.ap-country-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ap-country-option:hover {
+  background: #f5f2eb;
+}
+
+.ap-country-flag-img {
+  width: 28px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ap-country-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  font-family: var(--font-sans);
+}
+
+.ap-country-code {
+  font-size: 14px;
+  font-weight: 400;
+  color: #00000080;
+  font-family: var(--font-sans);
 }
 
 .ap-submit-btn {
@@ -231,8 +286,9 @@
   white-space: nowrap;
   transition: opacity 0.2s;
   font-family: var(--font-sans);
-  align-self: flex-start;
   text-transform: none;
+  flex: 1;
+  text-align: center;
 }
 
 .ap-submit-btn:hover {
