@@ -119,10 +119,7 @@ export default function ResaleDetailPage() {
               <div className="pdet-sidebar-pane">
                 <div className="pdet-action-widget">
                   <button type="button" className="pdet-widget-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                    </svg>
+                    <img src="/images/resale/share.png" alt="" width="21" height="21" />
                     <span>Share</span>
                   </button>
                   <div className="pdet-widget-divider"></div>
@@ -131,9 +128,7 @@ export default function ResaleDetailPage() {
                     className={`pdet-widget-btn ${isSaved ? 'saved' : ''}`}
                     onClick={() => setIsSaved(!isSaved)}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                    </svg>
+                    <img src="/images/resale/save.png" alt="" width="21" height="21" />
                     <span>{isSaved ? 'Saved' : 'Save'}</span>
                   </button>
                 </div>
@@ -141,10 +136,7 @@ export default function ResaleDetailPage() {
                 <div className="pdet-agent-card">
                   <div className="pdet-agent-header">
                     <div className="pdet-agent-avatar">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                      </svg>
+                      <img src="/images/resale/person.png" alt="" width="48" height="48" />
                     </div>
                     <div className="pdet-agent-info">
                       <h3 className="pdet-agent-name">
@@ -160,7 +152,7 @@ export default function ResaleDetailPage() {
                       className="pdet-btn-primary"
                       onClick={() => setShowPhone(!showPhone)}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                       </svg>
                       <span>{showPhone ? (apartment.owner?.phoneNumber || '—') : 'View phone number'}</span>

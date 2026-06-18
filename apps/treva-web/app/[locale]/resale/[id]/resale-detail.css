@@ -136,6 +136,7 @@
   border-radius: 8px;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 12px 0;
   width: 100%;
 
@@ -184,15 +185,7 @@
   margin-bottom: 24px;
 }
 
-.pdet-agent-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: #7e828a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
 
 .pdet-agent-name {
   font-size: 18px;
@@ -209,6 +202,7 @@
   font-style: normal;
   color: #000000;
   text-transform: none;
+  letter-spacing: 0.1px;
 }
 
 .pdet-agent-actions {
@@ -223,7 +217,7 @@
   border: none;
   border-radius: 8px;
   padding: 14px;
-  font-size: 15px;
+  font-size: 25px;
   font-weight: 400;
   font-style: normal;
   display: flex;

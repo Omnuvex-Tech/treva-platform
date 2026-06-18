@@ -12,7 +12,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+994');
-  const [countryFlag, setCountryFlag] = useState('https://flagcdn.com/w40/az.png');
+  const [countryFlag, setCountryFlag] = useState('/images/flags/az.png');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const flagRef = useRef<HTMLDivElement>(null);
 
@@ -27,51 +27,56 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
   }, []);
 
   const countries = [
-    { code: '+994', flag: 'https://flagcdn.com/w40/az.png', name: 'Azerbaijan' },
-    { code: '+1', flag: 'https://flagcdn.com/w40/us.png', name: 'United States' },
-    { code: '+44', flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom' },
-    { code: '+7', flag: 'https://flagcdn.com/w40/ru.png', name: 'Russia' },
-    { code: '+90', flag: 'https://flagcdn.com/w40/tr.png', name: 'Turkey' },
-    { code: '+49', flag: 'https://flagcdn.com/w40/de.png', name: 'Germany' },
-    { code: '+33', flag: 'https://flagcdn.com/w40/fr.png', name: 'France' },
-    { code: '+39', flag: 'https://flagcdn.com/w40/it.png', name: 'Italy' },
-    { code: '+34', flag: 'https://flagcdn.com/w40/es.png', name: 'Spain' },
-    { code: '+971', flag: 'https://flagcdn.com/w40/ae.png', name: 'UAE' },
-    { code: '+966', flag: 'https://flagcdn.com/w40/sa.png', name: 'Saudi Arabia' },
-    { code: '+98', flag: 'https://flagcdn.com/w40/ir.png', name: 'Iran' },
-    { code: '+998', flag: 'https://flagcdn.com/w40/uz.png', name: 'Uzbekistan' },
-    { code: '+77', flag: 'https://flagcdn.com/w40/kz.png', name: 'Kazakhstan' },
-    { code: '+996', flag: 'https://flagcdn.com/w40/kg.png', name: 'Kyrgyzstan' },
-    { code: '+992', flag: 'https://flagcdn.com/w40/tj.png', name: 'Tajikistan' },
-    { code: '+993', flag: 'https://flagcdn.com/w40/tm.png', name: 'Turkmenistan' },
-    { code: '+995', flag: 'https://flagcdn.com/w40/ge.png', name: 'Georgia' },
-    { code: '+374', flag: 'https://flagcdn.com/w40/am.png', name: 'Armenia' },
-    { code: '+48', flag: 'https://flagcdn.com/w40/pl.png', name: 'Poland' },
-    { code: '+380', flag: 'https://flagcdn.com/w40/ua.png', name: 'Ukraine' },
-    { code: '+36', flag: 'https://flagcdn.com/w40/hu.png', name: 'Hungary' },
-    { code: '+381', flag: 'https://flagcdn.com/w40/rs.png', name: 'Serbia' },
-    { code: '+385', flag: 'https://flagcdn.com/w40/hr.png', name: 'Croatia' },
-    { code: '+420', flag: 'https://flagcdn.com/w40/cz.png', name: 'Czech Republic' },
-    { code: '+421', flag: 'https://flagcdn.com/w40/sk.png', name: 'Slovakia' },
-    { code: '+40', flag: 'https://flagcdn.com/w40/ro.png', name: 'Romania' },
-    { code: '+359', flag: 'https://flagcdn.com/w40/bg.png', name: 'Bulgaria' },
-    { code: '+30', flag: 'https://flagcdn.com/w40/gr.png', name: 'Greece' },
-    { code: '+86', flag: 'https://flagcdn.com/w40/cn.png', name: 'China' },
-    { code: '+81', flag: 'https://flagcdn.com/w40/jp.png', name: 'Japan' },
-    { code: '+82', flag: 'https://flagcdn.com/w40/kr.png', name: 'South Korea' },
-    { code: '+91', flag: 'https://flagcdn.com/w40/in.png', name: 'India' },
-    { code: '+20', flag: 'https://flagcdn.com/w40/eg.png', name: 'Egypt' },
-    { code: '+212', flag: 'https://flagcdn.com/w40/ma.png', name: 'Morocco' },
-    { code: '+234', flag: 'https://flagcdn.com/w40/ng.png', name: 'Nigeria' },
-    { code: '+27', flag: 'https://flagcdn.com/w40/za.png', name: 'South Africa' },
-    { code: '+61', flag: 'https://flagcdn.com/w40/au.png', name: 'Australia' },
-    { code: '+64', flag: 'https://flagcdn.com/w40/nz.png', name: 'New Zealand' },
-    { code: '+55', flag: 'https://flagcdn.com/w40/br.png', name: 'Brazil' },
-    { code: '+52', flag: 'https://flagcdn.com/w40/mx.png', name: 'Mexico' },
-    { code: '+54', flag: 'https://flagcdn.com/w40/ar.png', name: 'Argentina' },
-    { code: '+57', flag: 'https://flagcdn.com/w40/co.png', name: 'Colombia' },
-    { code: '+56', flag: 'https://flagcdn.com/w40/cl.png', name: 'Chile' },
-    { code: '+51', flag: 'https://flagcdn.com/w40/pe.png', name: 'Peru' },
+    { code: '+994', flag: '/images/flags/az.png', name: 'Azerbaijan' },
+    { code: '+90', flag: '/images/flags/tr.png', name: 'Turkey' },
+    { code: '+7', flag: '/images/flags/ru.png', name: 'Russia' },
+    { code: '+1', flag: '/images/flags/us.png', name: 'United States' },
+    { code: '+44', flag: '/images/flags/gb.png', name: 'United Kingdom' },
+    { code: '+49', flag: '/images/flags/de.png', name: 'Germany' },
+    { code: '+33', flag: '/images/flags/fr.png', name: 'France' },
+    { code: '+39', flag: '/images/flags/it.png', name: 'Italy' },
+    { code: '+34', flag: '/images/flags/es.png', name: 'Spain' },
+    { code: '+31', flag: '/images/flags/nl.png', name: 'Netherlands' },
+    { code: '+32', flag: '/images/flags/be.png', name: 'Belgium' },
+    { code: '+48', flag: '/images/flags/pl.png', name: 'Poland' },
+    { code: '+380', flag: '/images/flags/ua.png', name: 'Ukraine' },
+    { code: '+40', flag: '/images/flags/ro.png', name: 'Romania' },
+    { code: '+995', flag: '/images/flags/ge.png', name: 'Georgia' },
+    { code: '+7', flag: '/images/flags/kz.png', name: 'Kazakhstan' },
+    { code: '+998', flag: '/images/flags/uz.png', name: 'Uzbekistan' },
+    { code: '+98', flag: '/images/flags/ir.png', name: 'Iran' },
+    { code: '+964', flag: '/images/flags/iq.png', name: 'Iraq' },
+    { code: '+966', flag: '/images/flags/sa.png', name: 'Saudi Arabia' },
+    { code: '+971', flag: '/images/flags/ae.png', name: 'UAE' },
+    { code: '+974', flag: '/images/flags/qa.png', name: 'Qatar' },
+    { code: '+965', flag: '/images/flags/kw.png', name: 'Kuwait' },
+    { code: '+972', flag: '/images/flags/il.png', name: 'Israel' },
+    { code: '+20', flag: '/images/flags/eg.png', name: 'Egypt' },
+    { code: '+91', flag: '/images/flags/in.png', name: 'India' },
+    { code: '+86', flag: '/images/flags/cn.png', name: 'China' },
+    { code: '+81', flag: '/images/flags/jp.png', name: 'Japan' },
+    { code: '+82', flag: '/images/flags/kr.png', name: 'South Korea' },
+    { code: '+92', flag: '/images/flags/pk.png', name: 'Pakistan' },
+    { code: '+55', flag: '/images/flags/br.png', name: 'Brazil' },
+    { code: '+52', flag: '/images/flags/mx.png', name: 'Mexico' },
+    { code: '+54', flag: '/images/flags/ar.png', name: 'Argentina' },
+    { code: '+1', flag: '/images/flags/ca.png', name: 'Canada' },
+    { code: '+61', flag: '/images/flags/au.png', name: 'Australia' },
+    { code: '+27', flag: '/images/flags/za.png', name: 'South Africa' },
+    { code: '+234', flag: '/images/flags/ng.png', name: 'Nigeria' },
+    { code: '+212', flag: '/images/flags/ma.png', name: 'Morocco' },
+    { code: '+30', flag: '/images/flags/gr.png', name: 'Greece' },
+    { code: '+351', flag: '/images/flags/pt.png', name: 'Portugal' },
+    { code: '+36', flag: '/images/flags/hu.png', name: 'Hungary' },
+    { code: '+420', flag: '/images/flags/cz.png', name: 'Czech Republic' },
+    { code: '+43', flag: '/images/flags/at.png', name: 'Austria' },
+    { code: '+41', flag: '/images/flags/ch.png', name: 'Switzerland' },
+    { code: '+46', flag: '/images/flags/se.png', name: 'Sweden' },
+    { code: '+47', flag: '/images/flags/no.png', name: 'Norway' },
+    { code: '+45', flag: '/images/flags/dk.png', name: 'Denmark' },
+    { code: '+358', flag: '/images/flags/fi.png', name: 'Finland' },
+    { code: '+353', flag: '/images/flags/ie.png', name: 'Ireland' },
+    { code: '+359', flag: '/images/flags/bg.png', name: 'Bulgaria' },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -155,7 +160,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
                 <div className="ap-country-dropdown">
                   {countries.map((c) => (
                     <div
-                      key={c.code}
+                      key={`${c.code}-${c.name}`}
                       className="ap-country-option"
                       onClick={(e) => {
                         e.stopPropagation();
