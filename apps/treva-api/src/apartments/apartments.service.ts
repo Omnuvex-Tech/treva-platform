@@ -53,8 +53,8 @@ export class ApartmentsService {
               prices: {
                 create: prices.map((p) => ({
                   currencyId: p.currencyId,
-                  priceTotal: p.priceTotal,
-                  priceByArea: p.priceByArea,
+                  priceTotal: p.priceTotal ?? 0,
+                  priceByArea: p.priceByArea ?? 0,
                 })),
               },
             }
@@ -171,8 +171,8 @@ export class ApartmentsService {
           data: prices.map((p) => ({
             apartmentId: id,
             currencyId: p.currencyId,
-            priceTotal: p.priceTotal,
-            priceByArea: p.priceByArea,
+            priceTotal: p.priceTotal ?? 0,
+            priceByArea: p.priceByArea ?? 0,
           })),
         });
       }

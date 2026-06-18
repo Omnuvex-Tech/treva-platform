@@ -162,8 +162,14 @@ export function ApartmentForm() {
                 break;
             case "area":
                 if (!form.area || form.area <= 0) errors.push("Area is required");
-                if (!form.priceTotal || form.priceTotal <= 0) errors.push("Price Total is required");
-                if (!form.priceByArea || form.priceByArea <= 0) errors.push("Price per m² is required");
+                if (!form.prices || form.prices.length === 0) {
+                    errors.push("At least one currency price is required");
+                } else {
+                    const hasAnyTotal = form.prices.some((p) => p.priceTotal && p.priceTotal > 0);
+                    const hasAnyPerArea = form.prices.some((p) => p.priceByArea && p.priceByArea > 0);
+                    if (!hasAnyTotal) errors.push("Price Total is required");
+                    if (!hasAnyPerArea) errors.push("Price per m² is required");
+                }
                 break;
             case "location":
                 if (!form.locationTitle?.trim()) errors.push("Location Title is required");
@@ -629,9 +635,9 @@ export function ApartmentForm() {
                                                                 } else {
                                                                     const val = parseFloat(raw) || 0;
                                                                     if (idx >= 0) {
-                                                                        prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea || 0 };
+                                                                        prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea };
                                                                     } else {
-                                                                        prices.push({ currencyId: cur.id, priceTotal: val, priceByArea: 0 });
+                                                                        prices.push({ currencyId: cur.id, priceTotal: val, priceByArea: undefined });
                                                                     }
                                                                 }
                                                                 updateField("prices", prices);
@@ -655,9 +661,9 @@ export function ApartmentForm() {
                                                                 } else {
                                                                     const val = parseFloat(raw) || 0;
                                                                     if (idx >= 0) {
-                                                                        prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal || 0, priceByArea: val };
+                                                                        prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal, priceByArea: val };
                                                                     } else {
-                                                                        prices.push({ currencyId: cur.id, priceTotal: 0, priceByArea: val });
+                                                                        prices.push({ currencyId: cur.id, priceTotal: undefined, priceByArea: val });
                                                                     }
                                                                 }
                                                                 updateField("prices", prices);
@@ -676,7 +682,8 @@ export function ApartmentForm() {
                     </div>
                 )}
 
-                {/* ─── Tab: Location
+                {/* ─── Tab: Location ─────────────────────────── */}
+                {activeTab === "location" && (
                     <div className="space-y-4">
                         {renderTabErrors("location")}
                         <div>

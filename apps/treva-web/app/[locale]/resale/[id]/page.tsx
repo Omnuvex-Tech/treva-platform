@@ -87,7 +87,8 @@ export default function ResaleDetailPage() {
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
   const shareTitle = title;
-  const shareText = `Check out this apartment: ${title} — ${formatPrice(getPrice('total'))} ${getCurrencyValue()}`;
+  const locationLink = apartment.locationUrl || '';
+  const shareText = `Check out this apartment: ${title} — ${formatPrice(getPrice('total'))} ${getCurrencyValue()}${locationLink ? `\n📍 Location: ${locationLink}` : ''}`;
 
   const handleShare = (platform: string) => {
     const url = shareUrl;
@@ -108,7 +109,7 @@ export default function ResaleDetailPage() {
         window.open(`https://t.me/share/url?url=${encodedUrl}&text=${text}`, '_blank');
         break;
       case 'copy':
-        navigator.clipboard.writeText(url).then(() => {
+        navigator.clipboard.writeText(locationLink ? `${url}\n📍 ${locationLink}` : url).then(() => {
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         });
