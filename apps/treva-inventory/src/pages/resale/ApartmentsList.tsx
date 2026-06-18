@@ -25,39 +25,6 @@ export function ApartmentsList() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["apartments"] }),
     });
 
-    const copyMutation = useMutation({
-        mutationFn: async (sourceId: string) => {
-            const res = await apartmentsApi.getById(sourceId);
-            const source = res.data;
-            const newSlug = `${source.slug}-copy-${Math.random().toString(36).slice(2, 6)}`;
-            return apartmentsApi.create({
-                title: `${source.title} Copy`,
-                slug: newSlug,
-                description: source.description || undefined,
-                image: source.image || undefined,
-                gallery: source.gallery || [],
-                priceTotal: source.priceTotal,
-                priceByArea: source.priceByArea,
-                roomCount: source.roomCount,
-                area: source.area,
-                floorFrom: source.floorFrom,
-                floorTo: source.floorTo,
-                locationTitle: source.locationTitle || undefined,
-                locationUrl: source.locationUrl || undefined,
-                apartmentTypeId: source.apartmentTypeId,
-                ownerId: source.ownerId || undefined,
-                attributeIds: source.attributeIds || [],
-                requestIds: source.requestIds || [],
-            });
-        },
-        onSuccess: (res) => {
-            queryClient.invalidateQueries({ queryKey: ["apartments"] });
-            if (res?.data?.id) {
-                window.location.href = `/resale/apartments/${res.data.id}/edit`;
-            }
-        },
-    });
-
     const handleDelete = (id: string, title: string) => {
         if (window.confirm(`Delete "${title}"?`)) deleteMutation.mutate(id);
     };
@@ -157,13 +124,6 @@ export function ApartmentsList() {
                                             >
                                                 Edit
                                             </Link>
-                                            <button
-                                                disabled={copyMutation.isPending}
-                                                onClick={() => copyMutation.mutate(apt.id)}
-                                                className="mr-2 text-white/70 hover:text-white disabled:opacity-50"
-                                            >
-                                                {copyMutation.isPending ? "Copying..." : "Copy"}
-                                            </button>
                                             <button
                                                 onClick={() => handleDelete(apt.id, apt.title)}
                                                 className="text-red-400 hover:text-red-300"

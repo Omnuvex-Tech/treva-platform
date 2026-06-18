@@ -5,7 +5,6 @@ import {
     unitLayoutsApi,
     UnitLayout,
     UnitLayoutFilters,
-    CreateUnitLayoutData,
 } from "../../api/unit-layouts";
 import { Layout } from "../../components/Layout";
 
@@ -36,62 +35,9 @@ export function UnitLayoutList() {
         },
     });
 
-    const copyMutation = useMutation({
-        mutationFn: async (id: string) => {
-            const sourceResponse = await unitLayoutsApi.getById(id);
-            const source = sourceResponse.data;
-
-            if (!source.location?.title || !source.location?.type || !source.location?.url) {
-                throw new Error("Cannot copy: location (title/type/url) is missing on this unit layout.");
-            }
-
-            const suffix = Math.random().toString(36).slice(2, 6);
-            const nextSlug = `${source.slug}-copy-${suffix}`;
-
-            const payload: CreateUnitLayoutData = {
-                title: `${source.title} Copy`,
-                name: `${source.name}-copy`,
-                slug: nextSlug,
-                statusOptionId: source.statusOptionId,
-                categoryId: source.categoryId,
-                roomOptionId: source.roomOptionId,
-                floor: source.floor,
-                number: source.number || 1,
-                totalArea: source.totalArea,
-                internalArea: source.internalArea,
-                balconyArea: source.balconyArea ?? 0,
-                prices: source.prices || {},
-                completionYear: source.completionYear,
-                numberOfFloors: source.numberOfFloors,
-                viewOptionId: source.viewOptionId,
-                similarApartmentIds: source.similarApartmentIds || [],
-                mainImage: source.mainImage,
-                gallery: source.gallery || [],
-                documents: source.documents || [],
-                location: source.location,
-            };
-
-            return unitLayoutsApi.create(payload);
-        },
-        onSuccess: (created) => {
-            queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
-            navigate(`/unit-layouts/${created.data.id}/edit`);
-        },
-    });
-
     const handleDelete = (id: string, title: string) => {
         if (window.confirm(`Delete "${title}"?`)) {
             deleteMutation.mutate(id);
-        }
-    };
-
-    const handleCopy = (id: string, title: string) => {
-        if (window.confirm(`Create a copy of "${title}"?`)) {
-            copyMutation.mutate(id, {
-                onError: (err) => {
-                    window.alert((err as Error)?.message || "Copy failed.");
-                },
-            });
         }
     };
 
@@ -206,14 +152,6 @@ export function UnitLayoutList() {
                                             >
                                                 Edit
                                             </Link>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleCopy(layout.id, layout.title)}
-                                                className="mr-2 text-white/70 hover:text-white"
-                                                disabled={copyMutation.isPending}
-                                            >
-                                                {copyMutation.isPending ? "Copying..." : "Copy"}
-                                            </button>
                                             <button
                                                 onClick={() =>
                                                     handleDelete(layout.id, layout.title)
