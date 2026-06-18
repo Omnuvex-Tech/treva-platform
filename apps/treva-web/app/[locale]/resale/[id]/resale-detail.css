@@ -227,6 +227,19 @@
   cursor: pointer;
   width: 100%;
   text-transform: none;
+  line-height: 1;
+}
+
+.pdet-btn-primary img {
+  display: block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.pdet-btn-primary span {
+  display: flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .pdet-btn-secondary {
@@ -235,7 +248,7 @@
   border: 1px solid #d8d5ce;
   border-radius: 8px;
   padding: 14px;
-  font-size: 15px;
+  font-size: 25px;
   font-weight: 600;
   font-style: normal;
   cursor: pointer;
@@ -266,6 +279,8 @@
   font-weight: 500;
   font-style: normal;
   margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #cccccc;
   letter-spacing: -0.3px;
   text-transform: uppercase;
   color: #000000CC;
@@ -302,7 +317,7 @@
   font-style: normal;
   color: #00000099;
   border: 1px solid #d8d5ce;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 6px 16px;
   text-transform: none;
 }

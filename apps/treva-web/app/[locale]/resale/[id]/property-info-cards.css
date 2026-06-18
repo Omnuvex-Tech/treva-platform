@@ -103,8 +103,8 @@
 }
 
 .ap-icon-box {
-  width: 44px;
-  height: 44px;
+  width: 45px;
+  height: 45px;
   background-color: var(--slate-dark-gray);
   color: #ffffff;
   border-radius: 8px;
@@ -128,7 +128,7 @@
 }
 
 .ap-details-label {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   font-style: normal;
   color: #00000080;
@@ -159,7 +159,7 @@
 
 .ap-viewing-form {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 12px;
   width: 100%;
 }
@@ -279,11 +279,11 @@
 
 .ap-submit-btn {
   background-color: var(--slate-dark-gray);
-  color: #FFFFFF;
+  color: #dcdcdf;
   border: none;
   border-radius: 8px;
-  padding: 15px 32px;
-  font-size: 15px;
+  padding: 14px 32px;
+  font-size: 21px;
   font-weight: 400;
   font-style: normal;
   cursor: pointer;

@@ -119,7 +119,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
           {(apartment.attributes || []).map((attr, index) => (
             <div className={`ap-details-item ${index >= 4 ? 'ap-desktop-only' : ''}`} key={attr.id}>
               <div className="ap-icon-box">
-                <img src={attr.icon || fallbackIcons[index]} alt="" width="18" height="18" />
+                <img src={attr.icon || fallbackIcons[index]} alt="" width="19" height="19" />
               </div>
               <div className="ap-details-content">
                 <span className="ap-details-label">{attr.title}</span>
