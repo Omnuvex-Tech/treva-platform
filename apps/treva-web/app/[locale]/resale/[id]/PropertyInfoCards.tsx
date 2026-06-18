@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { ResaleApartment } from '@/lib/resale.types';
+import { useCreateRequest } from '@/hooks/use-resale-apartments';
 import './property-info-cards.css';
 
 interface PropertyInfoCardsProps {
@@ -14,7 +16,16 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
   const [countryCode, setCountryCode] = useState('+994');
   const [countryFlag, setCountryFlag] = useState('/images/flags/az.png');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const flagRef = useRef<HTMLDivElement>(null);
+  const createRequest = useCreateRequest();
+
+  useEffect(() => {
+    if (submitSuccess) {
+      const timer = setTimeout(() => setSubmitSuccess(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitSuccess]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -81,7 +92,20 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Viewing request submitted:', { name, phone });
+    setSubmitSuccess(false);
+    const fullName = name.trim();
+    const phoneNumber = `${countryCode}${phone.trim()}`;
+    if (!fullName || !phone.trim()) return;
+    createRequest.mutate(
+      { fullName, phoneNumber },
+      {
+        onSuccess: () => {
+          setSubmitSuccess(true);
+          setName('');
+          setPhone('');
+        },
+      }
+    );
   };
 
   const fallbackIcons = [
@@ -94,6 +118,7 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
   ];
 
   return (
+    <>
     <div className="ap-info-container">
       
       <section className="ap-info-card">
@@ -179,20 +204,54 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
             </div>
             <input 
               type="tel" 
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder={countryCode} 
               className="ap-form-input ap-phone-input"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
               required
             />
           </div>
 
-          <button type="submit" className="ap-submit-btn">
-            Send request
+          {createRequest.isError && (
+            <div className="ap-form-error">
+              Something went wrong. Please try again.
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="ap-submit-btn"
+            disabled={createRequest.isPending}
+          >
+            {createRequest.isPending ? 'Sending...' : 'Send request'}
           </button>
         </form>
       </section>
 
     </div>
+
+    {submitSuccess && createPortal(
+      <div className="treva-toast" role="alert">
+        <div className="treva-toast-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <div className="treva-toast-content">
+          <span className="treva-toast-title">Request Sent</span>
+          <span className="treva-toast-desc">We'll get in touch with you soon</span>
+        </div>
+        <button className="treva-toast-close" onClick={() => setSubmitSuccess(false)} aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>,
+      document.body
+    )}
+    </>
   );
 }

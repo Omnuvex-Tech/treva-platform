@@ -19,6 +19,7 @@ const resaleItems = [
     { path: "/resale/owners", label: "Owners", icon: "👤" },
     { path: "/resale/attributes", label: "Attributes", icon: "🔧" },
     { path: "/resale/requests", label: "Requests", icon: "📬" },
+    { path: "/resale/currencies", label: "Currencies", icon: "💰" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

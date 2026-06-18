@@ -11,8 +11,6 @@ export class RequestsController {
   constructor(private readonly service: RequestsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create request' })
   async create(@Body() dto: CreateRequestDto) {
     return this.service.create(dto);

@@ -3,6 +3,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateApartmentDto } from './dto/create-apartment.dto';
 import { UpdateApartmentDto } from './dto/update-apartment.dto';
 
+const APARTMENT_INCLUDE = {
+  apartmentType: true,
+  owner: true,
+  prices: { include: { currency: true } },
+};
+
 @Injectable()
 export class ApartmentsService {
   constructor(private prisma: PrismaService) {}
@@ -14,6 +20,21 @@ export class ApartmentsService {
     });
   }
 
+  private async resolveCurrencyId(currencyValue?: string): Promise<string | undefined> {
+    if (!currencyValue) return undefined;
+    const currency = await this.prisma.currency.findUnique({ where: { value: currencyValue } });
+    return currency?.id;
+  }
+
+  private buildPricesWhere(minPrice?: number, maxPrice?: number, currencyId?: string) {
+    if (!minPrice && !maxPrice && !currencyId) return undefined;
+    const priceFilter: any = {};
+    if (minPrice) priceFilter.priceTotal = { gte: minPrice };
+    if (maxPrice) priceFilter.priceTotal = { ...(priceFilter.priceTotal || {}), lte: maxPrice };
+    if (currencyId) priceFilter.currencyId = currencyId;
+    return { some: priceFilter };
+  }
+
   async create(dto: CreateApartmentDto) {
     const existing = await this.prisma.apartment.findUnique({
       where: { slug: dto.slug },
@@ -21,7 +42,26 @@ export class ApartmentsService {
     if (existing) {
       throw new ConflictException('Apartment with this slug already exists');
     }
-    return this.prisma.apartment.create({ data: dto });
+
+    const { prices, ...apartmentData } = dto;
+
+    return this.prisma.apartment.create({
+      data: {
+        ...apartmentData,
+        ...(prices && prices.length > 0
+          ? {
+              prices: {
+                create: prices.map((p) => ({
+                  currencyId: p.currencyId,
+                  priceTotal: p.priceTotal,
+                  priceByArea: p.priceByArea,
+                })),
+              },
+            }
+          : {}),
+      },
+      include: APARTMENT_INCLUDE,
+    });
   }
 
   async findAll(query: {
@@ -35,19 +75,21 @@ export class ApartmentsService {
     minArea?: number;
     maxArea?: number;
     floor?: number;
+    currency?: string;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, floor } = query;
+    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, floor, currency } = query;
     const skip = (page - 1) * limit;
+
+    const resolvedCurrencyId = await this.resolveCurrencyId(currency);
 
     const where: any = {};
     if (apartmentTypeId) where.apartmentTypeId = apartmentTypeId;
     if (ownerId) where.ownerId = ownerId;
     if (roomCount) where.roomCount = roomCount;
-    if (minPrice || maxPrice) {
-      where.priceTotal = {};
-      if (minPrice) where.priceTotal.gte = minPrice;
-      if (maxPrice) where.priceTotal.lte = maxPrice;
-    }
+
+    const pricesWhere = this.buildPricesWhere(minPrice, maxPrice, resolvedCurrencyId);
+    if (pricesWhere) where.prices = pricesWhere;
+
     if (minArea || maxArea) {
       where.area = {};
       if (minArea) where.area.gte = minArea;
@@ -61,7 +103,7 @@ export class ApartmentsService {
     const [data, total] = await Promise.all([
       this.prisma.apartment.findMany({
         where,
-        include: { apartmentType: true, owner: true },
+        include: APARTMENT_INCLUDE,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -94,7 +136,7 @@ export class ApartmentsService {
   async findOne(id: string) {
     const apartment = await this.prisma.apartment.findUnique({
       where: { id },
-      include: { apartmentType: true, owner: true },
+      include: APARTMENT_INCLUDE,
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
@@ -104,7 +146,7 @@ export class ApartmentsService {
   async findBySlug(slug: string) {
     const apartment = await this.prisma.apartment.findUnique({
       where: { slug },
-      include: { apartmentType: true, owner: true },
+      include: APARTMENT_INCLUDE,
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
@@ -120,10 +162,26 @@ export class ApartmentsService {
       if (existing) throw new ConflictException('Apartment with this slug already exists');
     }
 
+    const { prices, ...apartmentData } = dto;
+
+    if (prices) {
+      await this.prisma.apartmentPrice.deleteMany({ where: { apartmentId: id } });
+      if (prices.length > 0) {
+        await this.prisma.apartmentPrice.createMany({
+          data: prices.map((p) => ({
+            apartmentId: id,
+            currencyId: p.currencyId,
+            priceTotal: p.priceTotal,
+            priceByArea: p.priceByArea,
+          })),
+        });
+      }
+    }
+
     return this.prisma.apartment.update({
       where: { id },
-      data: dto,
-      include: { apartmentType: true, owner: true },
+      data: apartmentData,
+      include: APARTMENT_INCLUDE,
     });
   }
 
@@ -133,16 +191,29 @@ export class ApartmentsService {
     return this.prisma.apartment.delete({ where: { id } });
   }
 
-  async getRange() {
-    const result = await this.prisma.apartment.aggregate({
-      _max: { priceTotal: true, area: true },
-      _min: { priceTotal: true, area: true },
+  async getRange(currency?: string) {
+    const priceWhere: any = {};
+    if (currency) {
+      const resolvedId = await this.resolveCurrencyId(currency);
+      if (resolvedId) priceWhere.currencyId = resolvedId;
+    }
+
+    const result = await this.prisma.apartmentPrice.aggregate({
+      where: Object.keys(priceWhere).length > 0 ? priceWhere : undefined,
+      _max: { priceTotal: true },
+      _min: { priceTotal: true },
     });
+
+    const areaResult = await this.prisma.apartment.aggregate({
+      _max: { area: true },
+      _min: { area: true },
+    });
+
     return {
       maxPrice: result._max.priceTotal ?? 0,
       minPrice: result._min.priceTotal ?? 0,
-      maxTotalArea: result._max.area ?? 0,
-      minTotalArea: result._min.area ?? 0,
+      maxTotalArea: areaResult._max.area ?? 0,
+      minTotalArea: areaResult._min.area ?? 0,
     };
   }
 }

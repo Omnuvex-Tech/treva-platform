@@ -5,6 +5,7 @@ import { apartmentsApi, CreateApartmentData, UploadResponse } from "../../api/ap
 import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
+import { currenciesApi, Currency } from "../../api/currencies";
 import { Layout } from "../../components/Layout";
 
 type TabKey = "basic" | "area" | "location" | "gallery" | "description";
@@ -50,6 +51,11 @@ export function ApartmentForm() {
         queryFn: () => attributesApi.getAll(),
     });
 
+    const { data: currencies } = useQuery({
+        queryKey: ["currencies"],
+        queryFn: () => currenciesApi.getAll(),
+    });
+
     const { data: existing } = useQuery({
         queryKey: ["apartment", id],
         queryFn: () => apartmentsApi.getById(id!),
@@ -77,6 +83,7 @@ export function ApartmentForm() {
         ownerId: "",
         attributeIds: [],
         requestIds: [],
+        prices: [],
     });
 
     useEffect(() => {
@@ -103,6 +110,7 @@ export function ApartmentForm() {
                 ownerId: d.ownerId || "",
                 attributeIds: d.attributeIds || [],
                 requestIds: d.requestIds || [],
+                prices: (d.prices || []).map((p: any) => ({ currencyId: p.currencyId, priceTotal: p.priceTotal, priceByArea: p.priceByArea })),
             });
         }
     }, [existing?.data]);
@@ -181,10 +189,18 @@ export function ApartmentForm() {
             return;
         }
         setTabErrors({});
+        const submitData = {
+            ...form,
+            prices: (form.prices || []).map((p: any) => ({
+                currencyId: p.currencyId,
+                priceTotal: p.priceTotal,
+                priceByArea: p.priceByArea,
+            })),
+        };
         if (isEdit) {
-            updateMutation.mutate(form);
+            updateMutation.mutate(submitData);
         } else {
-            createMutation.mutate(form);
+            createMutation.mutate(submitData);
         }
     };
 
@@ -586,34 +602,81 @@ export function ApartmentForm() {
                                     min={0}
                                 />
                             </div>
-                            <div>
-                                <label className="mb-1 block text-xs text-white/60">Price Total (AZN)</label>
-                                <input
-                                    className={inputClass}
-                                    type="number"
-                                    value={form.priceTotal ?? ""}
-                                    onChange={(e) => updateField("priceTotal", parseFloat(e.target.value) || undefined)}
-                                    placeholder="e.g. 175,000"
-                                    min={0}
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1 block text-xs text-white/60">Price per m² (AZN)</label>
-                                <input
-                                    className={inputClass}
-                                    type="number"
-                                    value={form.priceByArea ?? ""}
-                                    onChange={(e) => updateField("priceByArea", parseFloat(e.target.value) || undefined)}
-                                    placeholder="e.g. 2,917"
-                                    min={0}
-                                />
-                            </div>
                         </div>
+
+                        {currencies?.data && currencies.data.length > 0 && (
+                            <div className="mt-4">
+                                <label className="mb-2 block text-sm font-semibold text-white/80">Prices by Currency</label>
+                                <div className="space-y-3">
+                                    {currencies.data.map((cur: Currency) => {
+                                        const existingPrice = form.prices?.find((p: any) => p.currencyId === cur.id);
+                                        return (
+                                            <div key={cur.id} className="rounded-lg border border-white/10 p-3">
+                                                <div className="mb-2 text-xs font-medium text-white/50">{cur.name} ({cur.value})</div>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label className="mb-1 block text-xs text-white/60">Price Total</label>
+                                                        <input
+                                                            className={inputClass}
+                                                            type="number"
+                                                            value={existingPrice?.priceTotal ?? ""}
+                                                            onChange={(e) => {
+                                                                const raw = e.target.value;
+                                                                const prices = [...(form.prices || [])];
+                                                                const idx = prices.findIndex((p: any) => p.currencyId === cur.id);
+                                                                if (raw === "" || raw === null) {
+                                                                    if (idx >= 0) prices.splice(idx, 1);
+                                                                } else {
+                                                                    const val = parseFloat(raw) || 0;
+                                                                    if (idx >= 0) {
+                                                                        prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea || 0 };
+                                                                    } else {
+                                                                        prices.push({ currencyId: cur.id, priceTotal: val, priceByArea: 0 });
+                                                                    }
+                                                                }
+                                                                updateField("prices", prices);
+                                                            }}
+                                                            placeholder="e.g. 175,000"
+                                                            min={0}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="mb-1 block text-xs text-white/60">Price per m²</label>
+                                                        <input
+                                                            className={inputClass}
+                                                            type="number"
+                                                            value={existingPrice?.priceByArea ?? ""}
+                                                            onChange={(e) => {
+                                                                const raw = e.target.value;
+                                                                const prices = [...(form.prices || [])];
+                                                                const idx = prices.findIndex((p: any) => p.currencyId === cur.id);
+                                                                if (raw === "" || raw === null) {
+                                                                    if (idx >= 0) prices.splice(idx, 1);
+                                                                } else {
+                                                                    const val = parseFloat(raw) || 0;
+                                                                    if (idx >= 0) {
+                                                                        prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal || 0, priceByArea: val };
+                                                                    } else {
+                                                                        prices.push({ currencyId: cur.id, priceTotal: 0, priceByArea: val });
+                                                                    }
+                                                                }
+                                                                updateField("prices", prices);
+                                                            }}
+                                                            placeholder="e.g. 2,917"
+                                                            min={0}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
-                {/* ─── Tab: Location ────────────────────────── */}
-                {activeTab === "location" && (
+                {/* ─── Tab: Location
                     <div className="space-y-4">
                         {renderTabErrors("location")}
                         <div>

@@ -1,9 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { endpoints } from "@/config/endpoints";
-import type { ResaleApartment, ResaleApartmentListResponse, ResaleFilters } from "@/lib/resale.types";
+import type { ResaleApartment, ResaleApartmentListResponse, ResaleFilters, ResaleCurrency } from "@/lib/resale.types";
 
 export function useResaleApartments(filters?: ResaleFilters) {
     return useQuery({
@@ -65,14 +65,43 @@ export function useResaleApartmentTypes() {
     });
 }
 
-export function useResaleApartmentRange() {
+export function useResaleApartmentRange(currency?: string) {
     return useQuery({
-        queryKey: ["resale-apartment-range"],
+        queryKey: ["resale-apartment-range", currency],
         queryFn: async () => {
+            const params = currency ? `?currency=${currency}` : '';
             const response = await api.get<{ maxPrice: number; minPrice: number; maxTotalArea: number; minTotalArea: number }>(
-                `${endpoints.resale.apartments.list}/range`
+                `${endpoints.resale.apartments.list}/range${params}`
             );
             return response.data;
+        },
+    });
+}
+
+export function useResaleCurrencies() {
+    return useQuery({
+        queryKey: ["resale-currencies"],
+        queryFn: async () => {
+            const response = await api.get<ResaleCurrency[]>(
+                endpoints.currencies.list
+            );
+            return response.data;
+        },
+    });
+}
+
+export function useCreateRequest() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (data: { fullName: string; phoneNumber: string }) => {
+            const response = await api.post<{ id: string }>(
+                endpoints.resale.requests.list,
+                data
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["resale-requests"] });
         },
     });
 }

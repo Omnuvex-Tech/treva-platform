@@ -30,6 +30,7 @@ export class ApartmentsController {
   @ApiQuery({ name: 'minArea', required: false })
   @ApiQuery({ name: 'maxArea', required: false })
   @ApiQuery({ name: 'floor', required: false })
+  @ApiQuery({ name: 'currency', required: false })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -41,6 +42,7 @@ export class ApartmentsController {
     @Query('minArea') minArea?: string,
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
+    @Query('currency') currency?: string,
   ) {
     return this.service.findAll({
       page: page ? parseInt(page) : 1,
@@ -53,13 +55,14 @@ export class ApartmentsController {
       minArea: minArea ? parseFloat(minArea) : undefined,
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor) : undefined,
+      currency,
     });
   }
 
   @Get('range')
   @ApiOperation({ summary: 'Get price and area range from apartments' })
-  async getRange() {
-    return this.service.getRange();
+  async getRange(@Query('currency') currency?: string) {
+    return this.service.getRange(currency);
   }
 
   @Get('slug/:slug')

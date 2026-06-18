@@ -21,6 +21,22 @@ export interface ResaleAttribute {
     icon?: string;
 }
 
+export interface ResaleCurrency {
+    id: string;
+    name: string;
+    value: string;
+    order: number;
+}
+
+export interface ResaleApartmentPrice {
+    id: string;
+    apartmentId: string;
+    currencyId: string;
+    priceTotal: number;
+    priceByArea: number;
+    currency?: ResaleCurrency;
+}
+
 export interface ResaleApartment {
     id: string;
     title: string;
@@ -46,6 +62,7 @@ export interface ResaleApartment {
     apartmentType?: ResaleApartmentType;
     ownerId?: string;
     owner?: ResaleOwner;
+    prices?: ResaleApartmentPrice[];
     createdAt: string;
     updatedAt: string;
 }
@@ -71,4 +88,5 @@ export interface ResaleFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
+    currency?: string;
 }

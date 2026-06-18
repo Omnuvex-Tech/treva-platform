@@ -1,5 +1,7 @@
-import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, ValidateNested } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { ApartmentPriceInput } from './create-apartment.dto';
 
 export class UpdateApartmentDto {
   @ApiPropertyOptional({ example: '2-Room Flat' })
@@ -101,4 +103,11 @@ export class UpdateApartmentDto {
   @IsOptional()
   @IsArray()
   requestIds?: string[];
+
+  @ApiPropertyOptional({ type: [ApartmentPriceInput] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ApartmentPriceInput)
+  prices?: ApartmentPriceInput[];
 }

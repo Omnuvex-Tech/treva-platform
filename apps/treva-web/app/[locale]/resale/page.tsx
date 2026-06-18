@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import PageContainer from '@/app/components/Container/PageContainer';
 import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
-import { useResaleApartments } from '@/hooks/use-resale-apartments';
+import { useResaleApartments, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
+import type { ResaleApartment } from '@/lib/resale.types';
 import './resale-listing.css';
 
 export default function ResalePage() {
@@ -16,9 +17,15 @@ export default function ResalePage() {
   const [savedItems, setSavedItems] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<ResaleFilterState>({});
+  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+  const typeDropdownRef = useRef<HTMLDivElement>(null);
+
+  const { data: apartmentTypes } = useResaleApartmentTypes();
 
   const { data: response, isLoading } = useResaleApartments({
     ...filters,
+    apartmentTypeId: selectedTypeId || undefined,
     page,
     limit: 12,
   });
@@ -37,8 +44,40 @@ export default function ResalePage() {
     setPage(1);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target as Node)) {
+        setTypeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const formatPrice = (p: number) =>
     p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+  const getAptPrice = (apt: ResaleApartment, type: 'total' | 'byArea') => {
+    const selectedCurrency = filters.currency;
+    if (selectedCurrency && apt.prices?.length) {
+      const match = apt.prices.find(p => p.currency?.value === selectedCurrency);
+      if (match) return type === 'total' ? (match.priceTotal ?? 0) : (match.priceByArea ?? 0);
+    }
+    if (apt.prices?.length) {
+      return type === 'total' ? (apt.prices[0]?.priceTotal ?? 0) : (apt.prices[0]?.priceByArea ?? 0);
+    }
+    return type === 'total' ? apt.priceTotal : apt.priceByArea;
+  };
+
+  const getAptCurrencyValue = (apt: ResaleApartment) => {
+    const selectedCurrency = filters.currency;
+    if (selectedCurrency && apt.prices?.length) {
+      const match = apt.prices.find(p => p.currency?.value === selectedCurrency);
+      if (match?.currency?.value) return match.currency.value;
+    }
+    if (apt.prices?.[0]?.currency?.value) return apt.prices[0].currency.value;
+    return 'AZN';
+  };
 
   return (
     <div className="re-page-wrapper">
@@ -55,11 +94,38 @@ export default function ResalePage() {
 
               <div className="re-sort-wrapper">
                 <span className="re-sort-label">Sort:</span>
-                <div className="re-sort-dropdown">
-                  <span>Recommended</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M6 9l6 6 6-6"/>
-                  </svg>
+                <div className="re-sort-dropdown" ref={typeDropdownRef}>
+                  <button
+                    type="button"
+                    className="re-sort-trigger"
+                    onClick={() => setTypeDropdownOpen((p) => !p)}
+                  >
+                    <span>{selectedTypeId ? (apartmentTypes?.find((t: any) => t.id === selectedTypeId)?.title || 'Type') : 'Recommended'}</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                  </button>
+                  {typeDropdownOpen && (
+                    <div className="re-sort-dropdown-menu">
+                      <button
+                        type="button"
+                        className={`re-sort-dropdown-item ${!selectedTypeId ? 're-sort-dropdown-item--active' : ''}`}
+                        onClick={() => { setSelectedTypeId(''); setTypeDropdownOpen(false); setPage(1); }}
+                      >
+                        Recommended
+                      </button>
+                      {apartmentTypes?.map((t: any) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          className={`re-sort-dropdown-item ${selectedTypeId === t.id ? 're-sort-dropdown-item--active' : ''}`}
+                          onClick={() => { setSelectedTypeId(t.id); setTypeDropdownOpen(false); setPage(1); }}
+                        >
+                          {t.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -98,8 +164,8 @@ export default function ResalePage() {
                       </div>
 
                       <div className="re-price-block">
-                        <h2 className="re-main-price">{formatPrice(apt.priceTotal)} AZN</h2>
-                        <div className="re-sqm-price">{formatPrice(apt.priceByArea)} AZN/m²</div>
+                        <h2 className="re-main-price">{formatPrice(getAptPrice(apt, 'total'))} {getAptCurrencyValue(apt)}</h2>
+                        <div className="re-sqm-price">{formatPrice(getAptPrice(apt, 'byArea'))} {getAptCurrencyValue(apt)}/m²</div>
                       </div>
 
                       <div className="re-tags-row">

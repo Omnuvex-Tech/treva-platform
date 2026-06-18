@@ -24,6 +24,9 @@ export interface Apartment {
     apartmentType: { id: string; title: string } | null;
     ownerId: string | null;
     owner: { id: string; firstName: string; lastName: string; phoneNumber?: string } | null;
+    currencyId: string | null;
+    currency: { id: string; name: string; value: string } | null;
+    prices: { id: string; currencyId: string; priceTotal: number; priceByArea: number; currency: { id: string; name: string; value: string } }[];
     createdAt: string;
     updatedAt: string;
 }
@@ -59,6 +62,8 @@ export interface CreateApartmentData {
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
+    currencyId?: string;
+    prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
 
 export interface UpdateApartmentData {
@@ -82,6 +87,8 @@ export interface UpdateApartmentData {
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
+    currencyId?: string;
+    prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
 
 export interface ApartmentFilters {

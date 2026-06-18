@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useResaleApartmentRange } from '@/hooks/use-resale-apartments';
+import { useResaleApartmentRange, useResaleCurrencies } from '@/hooks/use-resale-apartments';
 import './unit-filter.css';
 
-const CURRENCIES = ['USD', 'AZN'];
 const FLOOR_OPTIONS = ['All', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
 const VIEW_OPTIONS = ['All', 'City', 'Sea', 'Mountain', 'Park', 'Courtyard'];
 const STATUS_OPTIONS = ['All', 'Renovated', 'Without renovation', 'Euro renovation', 'Cosmic renovation', 'Designer renovation'];
@@ -17,17 +16,22 @@ export interface ResaleFilterState {
   maxArea?: number;
   floor?: number;
   roomCount?: number;
+  currency?: string;
 }
 
 export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number }) {
-  const { data: rangeData } = useResaleApartmentRange();
+  const { data: currenciesData } = useResaleCurrencies();
+
+  const currencies = currenciesData?.map(c => ({ value: c.value, name: c.name })) || [];
+
+  const [currency, setCurrency] = useState('');
+  const { data: rangeData } = useResaleApartmentRange(currency || undefined);
 
   const totalPriceMax = rangeData?.maxPrice || 1500000;
   const totalAreaMax = rangeData?.maxTotalArea || 500;
   const totalPriceMin = 0;
   const totalAreaMin = 0;
 
-  const [currency, setCurrency] = useState('USD');
   const [floor, setFloor] = useState('All');
   const [selectedView, setSelectedView] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -63,6 +67,12 @@ export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterC
   }, [rangeData]);
 
   useEffect(() => {
+    if (currenciesData?.length && !currency) {
+      setCurrency(currenciesData[0]?.value || '');
+    }
+  }, [currenciesData, currency]);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
       if (floorRef.current && !floorRef.current.contains(e.target as Node)) setFloorOpen(false);
@@ -90,8 +100,9 @@ export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterC
       const rc = selectedRooms === '5+' ? 5 : parseInt(selectedRooms);
       f.roomCount = rc;
     }
+    if (currency) f.currency = currency;
     onFilterChange(f);
-  }, [safePriceMin, safePriceMax, safeAreaMin, safeAreaMax, floor, selectedRooms, onFilterChange, totalPriceMax, totalAreaMax]);
+  }, [safePriceMin, safePriceMax, safeAreaMin, safeAreaMax, floor, selectedRooms, currency, onFilterChange, totalPriceMax, totalAreaMax]);
 
   useEffect(() => { fireFilters(); }, [fireFilters]);
 
@@ -175,21 +186,21 @@ export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterC
 
             <div className="custom-select currency-select" ref={currencyRef}>
               <button type="button" className="custom-select__trigger" onClick={() => setCurrencyOpen((p) => !p)}>
-                <span>{currency}</span>
+                <span>{currency || 'Select currency'}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {currencyOpen && (
                 <div className="custom-select__dropdown">
-                  {CURRENCIES.map((c) => (
+                  {currencies.map((c) => (
                     <button
-                      key={c}
+                      key={c.value}
                       type="button"
-                      className={`custom-select__option ${currency === c ? 'custom-select__option--active' : ''}`}
-                      onClick={() => { setCurrency(c); setCurrencyOpen(false); }}
+                      className={`custom-select__option ${currency === c.value ? 'custom-select__option--active' : ''}`}
+                      onClick={() => { setCurrency(c.value); setCurrencyOpen(false); }}
                     >
-                      {c}
+                      {c.name} ({c.value})
                     </button>
                   ))}
                 </div>

@@ -77,12 +77,14 @@ model ViewOption {
 }
 
 model Currency {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  value     String   @unique
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String           @id @default(cuid())
+  name            String           @unique
+  value           String           @unique
+  order           Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  apartmentPrices ApartmentPrice[]
 }
 
 model StatusOption {
@@ -145,8 +147,8 @@ model Apartment {
   description     String?
   image           String?
   gallery         Json[]
-  priceTotal      Float
-  priceByArea     Float
+  priceTotal      Float         @default(0)
+  priceByArea     Float         @default(0)
   roomCount       Int
   area            Float
   floorFrom       Int
@@ -159,9 +161,22 @@ model Apartment {
   attributeIds    String[]
   requestIds      String[]
   apartmentTypeId String
-  apartmentType   ApartmentType @relation(fields: [apartmentTypeId], references: [id])
+  apartmentType   ApartmentType  @relation(fields: [apartmentTypeId], references: [id])
   ownerId         String?
-  owner           Owner?        @relation(fields: [ownerId], references: [id])
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  owner           Owner?         @relation(fields: [ownerId], references: [id])
+  prices          ApartmentPrice[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model ApartmentPrice {
+  id          String   @id @default(cuid())
+  apartmentId String
+  currencyId  String
+  priceTotal  Float
+  priceByArea Float
+  currency    Currency @relation(fields: [currencyId], references: [id])
+  apartment   Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade)
+
+  @@unique([apartmentId, currencyId])
 }

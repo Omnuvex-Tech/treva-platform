@@ -275,6 +275,14 @@ function App() {
                             }
                         />
                         <Route
+                            path="/resale/currencies"
+                            element={
+                                <ProtectedRoute>
+                                    <CurrencyList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="*"
                             element={
                                 <div className="flex min-h-screen items-center justify-center bg-gray-900 text-white">

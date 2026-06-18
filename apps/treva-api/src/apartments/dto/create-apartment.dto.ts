@@ -1,5 +1,23 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+
+export class ApartmentPriceInput {
+  @ApiProperty({ example: 'currency-id' })
+  @IsString()
+  @IsNotEmpty()
+  currencyId: string;
+
+  @ApiProperty({ example: 175000 })
+  @IsNumber()
+  @IsNotEmpty()
+  priceTotal: number;
+
+  @ApiProperty({ example: 2917 })
+  @IsNumber()
+  @IsNotEmpty()
+  priceByArea: number;
+}
 
 export class CreateApartmentDto {
   @ApiProperty({ example: '2-Room Flat' })
@@ -101,4 +119,11 @@ export class CreateApartmentDto {
   @IsOptional()
   @IsArray()
   requestIds?: string[];
+
+  @ApiPropertyOptional({ type: [ApartmentPriceInput] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ApartmentPriceInput)
+  prices?: ApartmentPriceInput[];
 }
