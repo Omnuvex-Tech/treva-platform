@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useResaleApartmentRange, useResaleCurrencies } from '@/hooks/use-resale-apartments';
+import { useDebounce } from '@/hooks/use-debounce';
 import './unit-filter.css';
 
 const FLOOR_OPTIONS = ['All', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
@@ -19,7 +20,7 @@ export interface ResaleFilterState {
   currency?: string;
 }
 
-export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number }) {
+export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingChange }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number; onDebouncingChange?: (v: boolean) => void }) {
   const { data: currenciesData } = useResaleCurrencies();
 
   const currencies = currenciesData?.map(c => ({ value: c.value, name: c.name })) || [];
@@ -88,13 +89,24 @@ export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterC
   const safeAreaMin = typeof areaMin === 'number' ? areaMin : 0;
   const safeAreaMax = typeof areaMax === 'number' ? areaMax : totalAreaMax;
 
+  const debouncedPriceMin = useDebounce(safePriceMin, 1000);
+  const debouncedPriceMax = useDebounce(safePriceMax, 1000);
+  const debouncedAreaMin = useDebounce(safeAreaMin, 1000);
+  const debouncedAreaMax = useDebounce(safeAreaMax, 1000);
+
+  const isDebouncing = safePriceMin !== debouncedPriceMin || safePriceMax !== debouncedPriceMax || safeAreaMin !== debouncedAreaMin || safeAreaMax !== debouncedAreaMax;
+
+  useEffect(() => {
+    onDebouncingChange?.(isDebouncing);
+  }, [isDebouncing, onDebouncingChange]);
+
   const fireFilters = useCallback(() => {
     if (!onFilterChange) return;
     const f: ResaleFilterState = {};
-    if (safePriceMin > 0) f.minPrice = safePriceMin;
-    if (safePriceMax < totalPriceMax) f.maxPrice = safePriceMax;
-    if (safeAreaMin > 0) f.minArea = safeAreaMin;
-    if (safeAreaMax < totalAreaMax) f.maxArea = safeAreaMax;
+    if (debouncedPriceMin > 0) f.minPrice = debouncedPriceMin;
+    if (debouncedPriceMax < totalPriceMax) f.maxPrice = debouncedPriceMax;
+    if (debouncedAreaMin > 0) f.minArea = debouncedAreaMin;
+    if (debouncedAreaMax < totalAreaMax) f.maxArea = debouncedAreaMax;
     if (floor !== 'All') f.floor = parseInt(floor);
     if (selectedRooms) {
       const rc = selectedRooms === '5+' ? 5 : parseInt(selectedRooms);
@@ -102,7 +114,7 @@ export default function ResaleFilter({ onFilterChange, totalCount }: { onFilterC
     }
     if (currency) f.currency = currency;
     onFilterChange(f);
-  }, [safePriceMin, safePriceMax, safeAreaMin, safeAreaMax, floor, selectedRooms, currency, onFilterChange, totalPriceMax, totalAreaMax]);
+  }, [debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, floor, selectedRooms, currency, onFilterChange, totalPriceMax, totalAreaMax]);
 
   useEffect(() => { fireFilters(); }, [fireFilters]);
 

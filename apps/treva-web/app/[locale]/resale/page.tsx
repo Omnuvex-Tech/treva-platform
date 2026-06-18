@@ -20,10 +20,11 @@ export default function ResalePage() {
   const [selectedTypeId, setSelectedTypeId] = useState<string>('');
   const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
   const typeDropdownRef = useRef<HTMLDivElement>(null);
+  const [isDebouncing, setIsDebouncing] = useState(false);
 
   const { data: apartmentTypes } = useResaleApartmentTypes();
 
-  const { data: response, isLoading } = useResaleApartments({
+  const { data: response, isLoading, isFetching } = useResaleApartments({
     ...filters,
     apartmentTypeId: selectedTypeId || undefined,
     page,
@@ -32,6 +33,7 @@ export default function ResalePage() {
 
   const apartments = response?.data ?? [];
   const pagination = response?.pagination;
+  const showSpinner = isLoading || isFetching || isDebouncing;
 
   const toggleSave = (id: string) => {
     setSavedItems(prev =>
@@ -84,7 +86,7 @@ export default function ResalePage() {
       <Navbar variant="solid" />
       <main className="re-main-wrapper">
         <PageContainer>
-          <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} />
+          <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
 
           <header className="re-header">
             <h1 className="re-main-title">PURCHASE APARTMENTS IN BAKU</h1>
@@ -133,57 +135,74 @@ export default function ResalePage() {
 
           {isLoading ? (
             <div className="py-16 text-center text-white/50">Loading...</div>
-          ) : apartments.length === 0 ? (
+          ) : apartments.length === 0 && !showSpinner ? (
             <div className="py-16 text-center text-white/50">No apartments found</div>
           ) : (
-            <main className="re-grid">
-              {apartments.map((apt) => (
-                <div key={apt.id} className="re-card-wrapper">
-                  <article className="re-card">
-                    <div className="re-card-media">
-                      <img
-                        src={apt.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
-                        alt={apt.locationTitle || apt.title}
-                        className="re-card-img"
-                      />
-                    </div>
+            <div style={{ position: 'relative', minHeight: '300px' }}>
+              <style>{`
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                .re-spinner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+                  background: rgba(255, 255, 255, 0.6); display: flex; justify-content: center;
+                  align-items: flex-start; padding-top: 80px; z-index: 10; border-radius: 12px; }
+                .re-spinner-icon { width: 40px; height: 40px; border: 4px solid #f3f3f3;
+                  border-top: 4px solid #3F4249; border-radius: 50%; animation: spin 1s linear infinite; }
+              `}</style>
 
-                    <div className="re-card-body">
-                      <div className="re-card-meta-row">
-                        <span className="re-badge">{apt.apartmentType?.title || ''}</span>
-                        <button
-                          type="button"
-                          className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
-                          onClick={() => toggleSave(apt.id)}
-                          aria-label="Save listing"
-                        >
-                          <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="re-price-block">
-                        <h2 className="re-main-price">{formatPrice(getAptPrice(apt, 'total'))} {getAptCurrencyValue(apt)}</h2>
-                        <div className="re-sqm-price">{formatPrice(getAptPrice(apt, 'byArea'))} {getAptCurrencyValue(apt)}/m²</div>
-                      </div>
-
-                      <div className="re-tags-row">
-                        <span className="re-tag">{apt.roomCount}-room sq.</span>
-                        <span className="re-tag">{apt.area} m²</span>
-                        <span className="re-tag">{apt.floorFrom}/{apt.floorTo} floor</span>
-                      </div>
-
-                      <p className="re-address">{apt.locationTitle || '—'}</p>
-                    </div>
-                  </article>
-
-                  <Link href={`/${locale}/resale/${apt.slug}`} className="re-action-btn">
-                    VIew Apartment DetaIls
-                  </Link>
+              {showSpinner && (
+                <div className="re-spinner-overlay">
+                  <div className="re-spinner-icon"></div>
                 </div>
-              ))}
-            </main>
+              )}
+
+              <main className="re-grid" style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
+                {apartments.map((apt) => (
+                  <div key={apt.id} className="re-card-wrapper">
+                    <article className="re-card">
+                      <div className="re-card-media">
+                        <img
+                          src={apt.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
+                          alt={apt.locationTitle || apt.title}
+                          className="re-card-img"
+                        />
+                      </div>
+
+                      <div className="re-card-body">
+                        <div className="re-card-meta-row">
+                          <span className="re-badge">{apt.apartmentType?.title || ''}</span>
+                          <button
+                            type="button"
+                            className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
+                            onClick={() => toggleSave(apt.id)}
+                            aria-label="Save listing"
+                          >
+                            <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
+                            </svg>
+                          </button>
+                        </div>
+
+                        <div className="re-price-block">
+                          <h2 className="re-main-price">{formatPrice(getAptPrice(apt, 'total'))} {getAptCurrencyValue(apt)}</h2>
+                          <div className="re-sqm-price">{formatPrice(getAptPrice(apt, 'byArea'))} {getAptCurrencyValue(apt)}/m²</div>
+                        </div>
+
+                        <div className="re-tags-row">
+                          <span className="re-tag">{apt.roomCount}-room sq.</span>
+                          <span className="re-tag">{apt.area} m²</span>
+                          <span className="re-tag">{apt.floorFrom}/{apt.floorTo} floor</span>
+                        </div>
+
+                        <p className="re-address">{apt.locationTitle || '—'}</p>
+                      </div>
+                    </article>
+
+                    <Link href={`/${locale}/resale/${apt.slug}`} className="re-action-btn">
+                      VIew Apartment DetaIls
+                    </Link>
+                  </div>
+                ))}
+              </main>
+            </div>
           )}
 
           {pagination && pagination.totalPages > 1 && (

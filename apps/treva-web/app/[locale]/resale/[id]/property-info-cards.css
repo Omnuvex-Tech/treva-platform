@@ -430,6 +430,10 @@
     padding: 24px 16px;
   }
 
+  .ap-info-container {
+    padding-bottom: 52px;
+  }
+
   .ap-details-grid {
     grid-template-columns: 1fr;
     gap: 16px;
