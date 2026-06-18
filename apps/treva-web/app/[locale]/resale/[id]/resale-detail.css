@@ -321,6 +321,10 @@
   display: none;
 }
 
+.pdet-property-info-mobile {
+  display: none;
+}
+
 .pdet-desc-block {
   display: flex;
   flex-direction: column;
@@ -407,6 +411,17 @@
     gap: 0;
   }
 
+  .pdet-property-info-desktop {
+    display: none;
+  }
+
+  .pdet-property-info-mobile {
+    display: block;
+    margin-left: -20px;
+    margin-right: -20px;
+    width: calc(100% + 40px);
+  }
+
   .pdet-image-wrapper {
     border-radius: 0;
     width: 100%;
@@ -481,12 +496,14 @@
 
   .pdet-action-widget {
     display: flex;
+    order: 2;
     border-radius: 0;
     width: 100%;
     box-sizing: border-box;
   }
 
   .pdet-agent-card {
+    order: 1;
     background-color: #f4f1ea;
     border: none;
     border-radius: 0;

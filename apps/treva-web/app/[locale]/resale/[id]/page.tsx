@@ -177,7 +177,21 @@ export default function ResaleDetailPage() {
                   </div>
                 </div>
 
-                <PropertyInfoCards apartment={apartment} />
+                <div className="pdet-property-info-desktop">
+                  <PropertyInfoCards apartment={apartment} />
+                </div>
+              </div>
+
+              <div className="pdet-content-footer pdet-content-footer--mobile">
+                <div className="pdet-desc-block">
+                  <h1 className="pdet-main-title">{title}</h1>
+                  <p className="pdet-address-line">{apartment.locationTitle || '—'}</p>
+                </div>
+
+                <div className="pdet-price-block">
+                  <div className="pdet-price-tag">{formatPrice(getPrice('total'))} {getCurrencyValue()}</div>
+                  <div className="pdet-sqm-badge">{formatPrice(getPrice('byArea'))} {getCurrencyValue()}/m²</div>
+                </div>
               </div>
 
               <div className="pdet-sidebar-pane">
@@ -284,16 +298,8 @@ export default function ResaleDetailPage() {
               </div>
             </div>
 
-            <div className="pdet-content-footer pdet-content-footer--mobile">
-              <div className="pdet-desc-block">
-                <h1 className="pdet-main-title">{title}</h1>
-                <p className="pdet-address-line">{apartment.locationTitle || '—'}</p>
-              </div>
-
-              <div className="pdet-price-block">
-                <div className="pdet-price-tag">{formatPrice(getPrice('total'))} {getCurrencyValue()}</div>
-                <div className="pdet-sqm-badge">{formatPrice(getPrice('byArea'))} {getCurrencyValue()}/m²</div>
-              </div>
+            <div className="pdet-property-info-mobile">
+              <PropertyInfoCards apartment={apartment} />
             </div>
           </div>
         </PageContainer>
