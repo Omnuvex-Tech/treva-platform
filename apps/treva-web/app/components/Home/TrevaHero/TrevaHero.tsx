@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { ChevronDown, Home } from 'lucide-react';
 import './treva-hero.css';
 import PageContainer from '@/app/components/Container/PageContainer';
@@ -20,11 +21,58 @@ function PillButton({ className = '', isPressed = false, ...props }: PillButtonP
   );
 }
 
+const heroDictionary = {
+  az: {
+    title: (
+      <>
+        Daşınmaz Əmlak <br />
+        Dünyasında Etibarlı <br />
+        Bələdçiniz
+      </>
+    ),
+    subtitle: "Doğru investisiya seçimləri və fərdi həyat tərzi həlləri təqdim edən platforma.",
+    location: "MƏKAN",
+    dealOptions: ["Satınalma", "Kirayə", "Layihə"],
+  },
+  en: {
+    title: (
+      <>
+        Your Gateway To The <br />
+        World's ExclusIve <br />
+        PropertIes
+      </>
+    ),
+    subtitle: "Curated real estate investments and tailored lifestyle solutions.",
+    location: "LOCATION",
+    dealOptions: ["Buy", "Rent", "Off-Plan"],
+  },
+  ru: {
+    title: (
+      <>
+        Ваш Надёжный Путеводитель <br />
+        В Мире Эксклюзивной <br />
+        Недвижимости
+      </>
+    ),
+    subtitle: "Надёжная платформа для правильных инвестиций и индивидуальных решений для жизни.",
+    location: "МЕСТОПОЛОЖЕНИЕ",
+    dealOptions: ["Покупка", "Аренда", "Проект"],
+  },
+} as const;
+
 export default function TrevaHero() {
-  const [dealType, setDealType] = useState('Buy');
+  const pathname = usePathname();
+  const detectedLocale = pathname?.split("/")[1];
+  const locale = (detectedLocale && detectedLocale in heroDictionary) ? detectedLocale as keyof typeof heroDictionary : "az";
+  const content = heroDictionary[locale];
+
+  const [dealType, setDealType] = useState<string>(content.dealOptions[0]);
   const [dealMenuOpen, setDealMenuOpen] = useState(false);
   const dealDropdownRef = useRef<HTMLDivElement>(null);
-  const dealOptions = ['Buy', 'Rent', 'Off-Plan'];
+
+  useEffect(() => {
+    setDealType(content.dealOptions[0]);
+  }, [locale]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -57,13 +105,11 @@ export default function TrevaHero() {
 
         <PageContainer as="main" className="treva-hero-content">
           <h1 className="treva-hero-title">
-            Your Gateway To The <br />
-            World's ExclusIve <br />
-            PropertIes
+            {content.title}
           </h1>
 
           <p className="treva-hero-subtitle">
-            Curated real estate investments and tailored lifestyle solutions.
+            {content.subtitle}
           </p>
 
           <div className="treva-filter-bar">
@@ -72,7 +118,7 @@ export default function TrevaHero() {
                 <path d="M11.5 30C17.3333 22.1923 22 15.5 22 11.0385C22 8.3761 20.8938 5.82277 18.9246 3.9402C16.9555 2.05762 14.2848 1 11.5 1C8.71523 1 6.04451 2.05762 4.07538 3.9402C2.10625 5.82277 1 8.3761 1 11.0385C1 15.5 5.66667 22.1923 11.5 30Z" stroke="#ffffff" strokeWidth="2"/>
                 <path d="M15 11.5C15 12.4283 14.6313 13.3185 13.9749 13.9749C13.3185 14.6313 12.4283 15 11.5 15C10.5717 15 9.6815 14.6313 9.02513 13.9749C8.36875 13.3185 8 12.4283 8 11.5C8 10.5717 8.36875 9.6815 9.02513 9.02513C9.6815 8.36875 10.5717 8 11.5 8C12.4283 8 13.3185 8.36875 13.9749 9.02513C14.6313 9.6815 15 10.5717 15 11.5Z" stroke="#ffffff" strokeWidth="2"/>
               </svg>
-              <span className="treva-filter-bar__location-text">LOCATION</span>
+              <span className="treva-filter-bar__location-text">{content.location}</span>
             </div>
 
             <div className="treva-filter-bar__deal" ref={dealDropdownRef}>
@@ -89,7 +135,7 @@ export default function TrevaHero() {
 
               {dealMenuOpen && (
                 <div className="treva-filter-bar__deal-menu" role="listbox">
-                  {dealOptions.map((option) => (
+                  {content.dealOptions.map((option) => (
                     <button
                       key={option}
                       className="treva-filter-bar__deal-option"
