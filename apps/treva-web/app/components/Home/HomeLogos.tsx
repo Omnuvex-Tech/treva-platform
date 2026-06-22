@@ -26,7 +26,7 @@ const productionStyles = `
   .section_logos .logos_intro {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 80px !important;
+    gap: 40px !important;
     align-items: flex-start !important;
     margin-bottom: 63px !important;
     width: 100% !important;
@@ -52,7 +52,7 @@ const productionStyles = `
     font-family: 'Oak Sans', sans-serif !important;
     font-weight: 400 !important;
     font-style: normal !important;
-    font-size: 38px !important;
+    font-size: 53px !important;
     line-height: 100% !important;
     letter-spacing: -0.03em !important;
     text-transform: uppercase !important;
@@ -226,7 +226,7 @@ const productionStyles = `
       display: flex !important;
       flex-direction: column !important;
       align-items: stretch !important;
-      gap: 60px !important; 
+      gap: 36px !important; 
       margin-bottom: 40px !important;
     }
 
