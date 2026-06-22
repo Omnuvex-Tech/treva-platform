@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import "./styles/home.css";
 import { Swiper } from 'swiper';
 import { Navigation, Autoplay } from 'swiper/modules';
@@ -428,6 +429,87 @@ const mobilePartners: MobilePartnerCell[] = [
   { order: 15 }
 ];
 
+const logosDictionary = {
+  az: {
+    leftDescDesktop: [
+      "Biz qlobal miqyasda tanınan və layihələrində",
+      "keyfiyyət standartlarını əsas götürən",
+      "tikinti şirkətləri ilə əməkdaşlıq edirik.",
+    ],
+    leftDescMobile: [
+      "Biz qlobal miqyasda tanınan",
+      "və layihələrində keyfiyyət",
+      "standartlarını əsas götürən",
+      "tikinti şirkətləri ilə əməkdaşlıq edirik.",
+    ],
+    rightHeadingDesktop: "SAHƏNİN ETİBARLI REPUTASİYAYA MALİK TƏRƏFDAŞLARI İLƏ BİRLİKDƏ FƏALİYYƏT GÖSTƏRİRİK",
+    rightHeadingMobile: "SAHƏNİN ETİBARLI REPUTASİYAYA MALİK TƏRƏFDAŞLARI İLƏ BİRLİKDƏ FƏALİYYƏT GÖSTƏRİRİK",
+    ctaNote: "Tərəfdaş şəbəkəmizə qoşulmaq istəyirsiniz?",
+    ctaButton: "TREVA ilə TƏRƏFDAŞLIQ",
+    testimonials: [
+      { quote: 'TREVA ilə əməkdaşlıq etdiyimiz hər bir layihədə onlar operativ intizamı təmin edirlər. Strukturlaşdırılmış, daim yenilənən siyahılar və brokerlər üçün hazır alətlərlə Bakıdakı daşınmaz əmlak satış prosesi daha sürətli, daha şəffaf və idarəolunması asan olur.', author: "ETAGI azerbaijan" },
+      { quote: 'TREVA ilə aramızda formalaşan etimad hər bir layihədə daha da möhkəmlənir. Onlar qiymət strategiyasından tutmuş müştəri axınına qədər hər detala dəqiqliklə yanaşmışdırlar. Onların yaradıcı dəstəyi, layihələrin düzgün paketlənməsi və ardıcıl izləmələri bizə güclü marağı təsirli nəticələrə çevirməyə kömək etmişdir.', author: "TRIDENT Investment" },
+      { quote: 'TREVA-nı digərlərindən fərqləndirən iş prosesindəki aydınlıq və davamlılıqdır. Broker olaraq hər zaman məlumatlısınız: elanlar aktualdır, əlaqə çevikdir, və bütün alətlər satış prosesini asanlaşdırır.', author: "rnS estate" },
+      { quote: 'TREVA brokerlərə lazım olan hər şeyi təqdim edir: yüksək keyfiyyətli vizuallar və effektiv lead sistemi. Biz artıq sadəcə obyekt göstərmirik, onu düzgün təqdim edirik.', author: "bazis real estate" },
+      { quote: 'TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkaanları yaradır.', author: "AUF Invest" },
+      { quote: 'TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.', author: "megapolis estate" },
+      { quote: 'TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.', author: "Sabah Investment Group" },
+    ],
+  },
+  en: {
+    leftDescDesktop: [
+      "Global network of world-leading developers.",
+      "We focus on visionary design and long-term asset",
+      "growth for our global clients.",
+    ],
+    leftDescMobile: [
+      "Global network of world-leading",
+      "developers. We focus on visionary",
+      "design and long-term asset growth",
+      "for our global clients.",
+    ],
+    rightHeadingDesktop: "WE WORK TOGETHER WITH TRUSTED PARTNERS WITH STRONG REPUTATION IN THE INDUSTRY",
+    rightHeadingMobile: "WE WORK TOGETHER WITH TRUSTED PARTNERS WITH STRONG REPUTATION IN THE INDUSTRY",
+    ctaNote: "LookIng to joIn our network of partners?",
+    ctaButton: "Partner wIth TREVA",
+    testimonials: [
+      { quote: 'In every project we collaborated with TREVA, they ensure operational discipline. With structured, constantly updated lists and ready-to-use tools for brokers, the property sales process in Baku becomes faster, more transparent, and easier to manage.', author: "ETAGI azerbaijan" },
+      { quote: 'The trust formed between us and TREVA strengthens with every project. They approach every detail with precision, from pricing strategy to customer flow. Their creative support, proper packaging of projects, and consistent follow-ups have helped us turn strong interest into effective results.', author: "TRIDENT Investment" },
+      { quote: 'What sets TREVA apart from others is the clarity and consistency in their work process. As a broker, you are always informed: listings are up-to-date, communication is flexible, and all tools simplify the sales process.', author: "rnS estate" },
+      { quote: 'TREVA provides brokers with everything they need: high-quality visuals and an effective lead system. We no longer just show properties — we present them correctly.', author: "bazis real estate" },
+      { quote: 'Our partnership with TREVA brought complete structure to our workflow. Their strategic planning, coordination with brokers, and daily support create opportunities to work without hindering the sales process.', author: "AUF Invest" },
+      { quote: 'TREVA\'s campaigns are purposefully crafted, and their team actively supports brokers\' efforts by participating in follow-ups, face-to-face meetings, and smart positioning. This kind of partnership results in real sales.', author: "megapolis estate" },
+      { quote: 'TREVA is a partner we can trust in the sales process. Their team understands the needs of a construction company well — transparent reporting, strategy aligned with market demands, and real communication with buyers. We highly value their consistent and professional approach to every project.', author: "Sabah Investment Group" },
+    ],
+  },
+  ru: {
+    leftDescDesktop: [
+      "Мы сотрудничаем с ведущими строительными",
+      "компаниями мирового уровня, которые",
+      "ставят качество в основу своих проектов.",
+    ],
+    leftDescMobile: [
+      "Мы сотрудничаем с ведущими",
+      "строительными компаниями мирового",
+      "уровня, которые ставят качество",
+      "в основу своих проектов.",
+    ],
+    rightHeadingDesktop: "МЫ РАБОТАЕМ ВМЕСТЕ С НАДЕЖНЫМИ ПАРТНЁРАМИ С УТВЕРЖДЁННОЙ РЕПУТАЦИЕЙ В ОТРАСЛИ",
+    rightHeadingMobile: "МЫ РАБОТАЕМ ВМЕСТЕ С НАДЕЖНЫМИ ПАРТНЁРАМИ С УТВЕРЖДЁННОЙ РЕПУТАЦИЕЙ В ОТРАСЛИ",
+    ctaNote: "Хотите присоединиться к нашей сети партнёров?",
+    ctaButton: "СОТРУДНИЧАЙТЕ С TREVA",
+    testimonials: [
+      { quote: 'В каждом проекте, над которым мы работали с TREVA, они обеспечивают оперативную дисциплину. Структурированные, постоянно обновляемые списки и готовые инструменты для брокеров делают процесс продажи недвижимости в Баку более быстрым, прозрачным и простым в управлении.', author: "ETAGI azerbaijan" },
+      { quote: 'Доверие, сформированное между нами и TREVA, крепнет с каждым проектом. Они подходят к каждой детали с точностью — от ценообразования до потока клиентов. Их творческая поддержка, правильная упаковка проектов и постоянное сопровождение помогли нам превратить сильный интерес в результаты.', author: "TRIDENT Investment" },
+      { quote: 'То, что отличает TREVA от других — ясность и последовательность в работе. Как брокер, вы всегда в курсе: объявления актуальны, связь гибкая, а все инструменты упрощают процесс продажи.', author: "rnS estate" },
+      { quote: 'TREVA предоставляет брокерам всё необходимое: качественные визуалы и эффективную систему лидов. Мы больше не просто показываем объекты — мы правильно их презентуем.', author: "bazis real estate" },
+      { quote: 'Наше партнёрство с TREVA привнесло полную структуру в наш рабочий процесс. Их стратегическое планирование, координация с брокерами и ежедневная поддержка создают возможности для работы без помех в процессе продаж.', author: "AUF Invest" },
+      { quote: 'Кампании TREVA целенаправленно разработаны, а их команда активно поддерживает усилия брокеров, участвуя в сопровождении, личных встречах и грамотной позиционировании. Такое партнёрство приводит к реальным продажам.', author: "megapolis estate" },
+      { quote: 'TREVA — это партнёр, которому можно доверять в процессе продаж. Их команда хорошо понимает потребности строительной компании — прозрачная отчётность, стратегия, соответствующая требованиям рынка, и реальное общение с покупателями. Мы высоко ценим их последовательный и профессиональный подход к каждому проекту.', author: "Sabah Investment Group" },
+    ],
+  },
+} as const;
+
 type LogosPartnershipButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   href: string;
   label: string;
@@ -450,7 +532,18 @@ function LogosPartnershipButton({
   );
 }
 
-export const HomeLogos = () => {
+type HomeLogosProps = {
+  locale?: string;
+};
+
+export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
+  const pathname = usePathname();
+  const detectedLocale = pathname?.split('/')[1];
+  const activeLocale = (detectedLocale && detectedLocale in logosDictionary)
+    ? detectedLocale as keyof typeof logosDictionary
+    : locale as keyof typeof logosDictionary;
+  const content = logosDictionary[activeLocale];
+
   useEffect(() => {
     const swiper = new Swiper('.swiper-testimonials', {
       modules: [Navigation, Autoplay],
@@ -483,30 +576,25 @@ export const HomeLogos = () => {
               
               {/* Desktop versiyası */}
               <p className="logos-left-description logos-left-description-desktop">
-                Global network of world-leading developers.<br />
-                We focus on visionary design and long-term asset<br /> growth for our global clients.
+                {content.leftDescDesktop.map((line, i) => (
+                  <React.Fragment key={i}>{line}{i < content.leftDescDesktop.length - 1 && <br />}</React.Fragment>
+                ))}
               </p>
 
-              {/* Mobil versiyası — tələb olunan 3 ədəd <br/> ilə */}
+              {/* Mobil versiyası */}
               <p className="logos-left-description logos-left-description-mobile">
-                Global network of world-leading <br />
-                developers. We focus on visionary <br />
-                design and long-term asset growth <br />
-                for our global clients.
+                {content.leftDescMobile.map((line, i) => (
+                  <React.Fragment key={i}>{line}{i < content.leftDescMobile.length - 1 && <br />}</React.Fragment>
+                ))}
               </p>
 
               {/* Başlıq */}
               <h2 className="logos-right-heading">
                 <span className="block md:hidden">
-                  Powered by <br />
-                  a network <br />
-                  of trusted <br />
-                  partners <br />
-                  across the <br />
-                  industry
+                  {content.rightHeadingMobile}
                 </span>
                 <span className="hidden md:block">
-                  Powered by a network<br /> of trusted partners<br /> across the Industry
+                  {content.rightHeadingDesktop}
                 </span>
               </h2>
               
@@ -687,7 +775,7 @@ export const HomeLogos = () => {
                 <div id="w-node-_38e37002-95f4-8d06-cfd1-4ad5658a810d-82ace242" className="testimonials_slider">
                   <div className="swiper swiper-testimonials">
                     <div className="swiper-wrapper swiper-wrapper-testimonials">
-                      {testimonials.map((item, idx) => (
+                      {content.testimonials.map((item, idx) => (
                         <div key={idx} className="swiper-slide swiper-slide-testimonials">
                           <div className="n-testimonials_card home-logos-testimonial-card">
                             <p className="n-testimonials_quote home-logos-testimonial-quote">{item.quote}</p>
@@ -833,11 +921,11 @@ export const HomeLogos = () => {
             {/* CTA */}
             <div className="logos_cta-wrap home-logos-cta-wrap">
               <div className="note_wrap home-logos-note-wrap is-white">
-                <div className="text-color-white60 home-logos-note-text">LookIng to joIn our network of partners? </div>
+                <div className="text-color-white60 home-logos-note-text">{content.ctaNote}</div>
               </div>
               <LogosPartnershipButton
                 href="brokers#broker-registration"
-                label="Partner wIth TREVA"
+                label={content.ctaButton}
               />
             </div>
           </div>
