@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from "next/navigation";
 import './navbar.css';
 import { IoMdClose, IoMdMenu } from 'react-icons/io';
+import { ChevronDown } from 'lucide-react';
 import { createPortal } from "react-dom";
 
 type PillButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -64,6 +65,64 @@ const labelToLocale = {
   RUS: "ru",
 } as const;
 
+type NavItem = {
+  name: string;
+  href: string;
+};
+
+type NavDropdown = {
+  name: string;
+  children: NavItem[];
+};
+
+type NavEntry = NavItem | NavDropdown;
+
+function isDropdown(item: NavEntry): item is NavDropdown {
+  return 'children' in item;
+}
+
+const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
+  az: [
+    { name: "LAYİHƏLƏR", href: "/projects" },
+    { name: "İNVENTAR", children: [
+      { name: "Off-Plan", href: "/off-plan" },
+      { name: "Resale", href: "/resale" },
+    ]},
+    { name: "TƏRƏFDAŞLIQ", children: [
+      { name: "Developers", href: "/developers" },
+      { name: "Brokers", href: "/brokers" },
+    ]},
+    { name: "PULSE", href: "/pulse" },
+    { name: "ƏLAQƏ", href: "/contact" },
+  ],
+  en: [
+    { name: "PROJECTS", href: "/projects" },
+    { name: "INVENTORY", children: [
+      { name: "Off-Plan", href: "/off-plan" },
+      { name: "Resale", href: "/resale" },
+    ]},
+    { name: "PARTNERSHIP", children: [
+      { name: "Developers", href: "/developers" },
+      { name: "Brokers", href: "/brokers" },
+    ]},
+    { name: "PULSE", href: "/pulse" },
+    { name: "CONTACT", href: "/contact" },
+  ],
+  ru: [
+    { name: "ПРОЕКТЫ", href: "/projects" },
+    { name: "ИНВЕНТАРЬ", children: [
+      { name: "Off-Plan", href: "/off-plan" },
+      { name: "Resale", href: "/resale" },
+    ]},
+    { name: "ПАРТНЁРСТВО", children: [
+      { name: "Девелоперы", href: "/developers" },
+      { name: "Брокеры", href: "/brokers" },
+    ]},
+    { name: "PULSE", href: "/pulse" },
+    { name: "КОНТАКТ", href: "/contact" },
+  ],
+};
+
 type NavbarProps = {
   locale?: string;
   variant?: 'overlay' | 'solid';
@@ -73,6 +132,9 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isInventarOpen, setIsInventarOpen] = useState(false);
+  const [isPartnershipOpen, setIsPartnershipOpen] = useState(false);
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [solidBgReady, setSolidBgReady] = useState(false);
   
@@ -82,6 +144,8 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
+  const inventarDropdownRef = useRef<HTMLDivElement>(null);
+  const partnershipDropdownRef = useRef<HTMLDivElement>(null);
   const mobileLangDropdownRef = useRef<HTMLDivElement>(null);
 
   const detectedLocale = pathname?.split("/")[1];
@@ -170,9 +234,17 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
       const target = event.target as Node;
       const clickedInsideDesktop = langDropdownRef.current?.contains(target);
       const clickedInsideMobile = mobileLangDropdownRef.current?.contains(target);
+      const clickedInsideInventar = inventarDropdownRef.current?.contains(target);
+      const clickedInsidePartnership = partnershipDropdownRef.current?.contains(target);
 
       if (!clickedInsideDesktop && !clickedInsideMobile) {
         setIsLangOpen(false);
+      }
+      if (!clickedInsideInventar) {
+        setIsInventarOpen(false);
+      }
+      if (!clickedInsidePartnership) {
+        setIsPartnershipOpen(false);
       }
     };
 
@@ -183,6 +255,8 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
           hamburgerRef.current?.focus();
         }
         setIsLangOpen(false);
+        setIsInventarOpen(false);
+        setIsPartnershipOpen(false);
       }
     };
 
@@ -231,13 +305,56 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
           </a>
 
           <nav className="treva-navbar__nav" aria-label="Primary navigation">
-            <a href={routeHref('/projects')} className="treva-navbar__link">Projects</a>
-            <a href={routeHref('/contact')} className="treva-navbar__link">Contact Us</a>
-            <a href={routeHref('/developers')} className="treva-navbar__link">Developers</a>
-            <a href={routeHref('/brokers')} className="treva-navbar__link">Brokers</a>
-            <a href={routeHref('/off-plan')} className="treva-navbar__link">Off-Plan</a>
-            <a href={routeHref('/resale')} className="treva-navbar__link">Resale</a>
-            <a href={routeHref('/pulse')} className="treva-navbar__link">Pulse</a>
+            {(navDictionary[activeLocale as 'az' | 'en' | 'ru'] ?? navDictionary.az).map((item) => {
+              if (isDropdown(item)) {
+                const isOpen = item.name === "İNVENTAR" || item.name === "INVENTORY" || item.name === "ИНВЕНТАРЬ"
+                  ? isInventarOpen
+                  : isPartnershipOpen;
+                const setIsOpen = item.name === "İNVENTAR" || item.name === "INVENTORY" || item.name === "ИНВЕНТАРЬ"
+                  ? setIsInventarOpen
+                  : setIsPartnershipOpen;
+                const ref = item.name === "İNVENTAR" || item.name === "INVENTORY" || item.name === "ИНВЕНТАРЬ"
+                  ? inventarDropdownRef
+                  : partnershipDropdownRef;
+
+                return (
+                  <div key={item.name} className="treva-navbar__dropdown-container" ref={ref}>
+                    <button
+                      className={`treva-navbar__dropdown-trigger ${isOpen ? 'treva-navbar__dropdown-trigger--open' : ''}`}
+                      onClick={() => setIsOpen((prev) => !prev)}
+                      aria-haspopup="listbox"
+                      aria-expanded={isOpen}
+                      type="button"
+                      suppressHydrationWarning
+                    >
+                      {item.name}
+                      <ChevronDown size={14} strokeWidth={2} />
+                    </button>
+                    {isOpen && (
+                      <div className="treva-navbar__dropdown-list" role="listbox">
+                        {item.children.map((child) => (
+                          <a
+                            key={child.href}
+                            href={routeHref(child.href)}
+                            className="treva-navbar__dropdown-item"
+                            role="option"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {child.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <a key={item.href} href={routeHref(item.href)} className="treva-navbar__link">
+                  {item.name}
+                </a>
+              );
+            })}
           </nav>
 
           <div className="treva-navbar__controls">
@@ -327,13 +444,53 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
         aria-hidden="true"
       >
         <div className="treva-navbar__mobile__inner">
-          <a href={routeHref('/projects')} className="treva-navbar__mobile__link">Projects</a>
-          <a href={routeHref('/contact')} className="treva-navbar__mobile__link">Contact Us</a>
-          <a href={routeHref('/developers')} className="treva-navbar__mobile__link">Developers</a>
-          <a href={routeHref('/brokers')} className="treva-navbar__mobile__link">Brokers</a>
-          <a href={routeHref('/off-plan')} className="treva-navbar__mobile__link">Off-Plan</a>
-          <a href={routeHref('/resale')} className="treva-navbar__mobile__link">Resale</a>
-          <a href={routeHref('/pulse')} className="treva-navbar__mobile__link">Pulse</a>
+          {(navDictionary[activeLocale as 'az' | 'en' | 'ru'] ?? navDictionary.az).map((item) => {
+            if (isDropdown(item)) {
+              const isOpen = openMobileGroup === item.name;
+              return (
+                <div key={item.name} className="treva-navbar__mobile__group">
+                  <button
+                    className="treva-navbar__mobile__link treva-navbar__mobile__group-toggle"
+                    onClick={() => setOpenMobileGroup(isOpen ? null : item.name)}
+                    type="button"
+                    suppressHydrationWarning
+                  >
+                    {item.name}
+                    <ChevronDown
+                      size={14}
+                      strokeWidth={2}
+                      className={`treva-navbar__mobile__chevron ${isOpen ? 'treva-navbar__mobile__chevron--open' : ''}`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="treva-navbar__mobile__sub">
+                      {item.children.map((child) => (
+                        <a
+                          key={child.href}
+                          href={routeHref(child.href)}
+                          className="treva-navbar__mobile__link treva-navbar__mobile__sub-link"
+                          onClick={closeMobileMenu}
+                        >
+                          {child.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <a
+                key={item.href}
+                href={routeHref(item.href)}
+                className="treva-navbar__mobile__link"
+                onClick={closeMobileMenu}
+              >
+                {item.name}
+              </a>
+            );
+          })}
         </div>
       </nav>
     </>,
