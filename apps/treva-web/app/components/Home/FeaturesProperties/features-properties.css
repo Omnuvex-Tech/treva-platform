@@ -208,6 +208,19 @@
   margin: auto 0 !important; /* Başlığı şaquli olaraq tam mərkəzdə saxlayır */
 }
 
+/* Card Description */
+.property-card__desc {
+  position: relative;
+  z-index: 3;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  padding: 0 16px;
+  margin: 0 0 4px;
+}
+
 /* --------------------------------------------------------
     Learn More Bölməsi (Dəyilmədi, Alt məsafə qorundu)
    -------------------------------------------------------- */
