@@ -34,7 +34,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
         
       )}
       
-      <AboutUs/>
+      <AboutUs locale={locale}/>
       <FeaturedProperties/>
       <TrevaPulse/>
             <HomeLogos />
