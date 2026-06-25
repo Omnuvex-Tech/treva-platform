@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import Link from "next/link";
 import Navbar from "@/app/components/Design1/Navbar/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
+import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import { Project } from "@/lib/project.types";
 import "./villa-siena.css";
 
@@ -280,6 +281,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ locale, project }) => {
         </section>
       </main>
 
+      <CallbackForm />
       <HomeFooter locale={locale} />
     </div>
   );

@@ -4,6 +4,7 @@ import ProjectDetail from "@/app/components/Design1/Projects/ProjectDetail";
 import { getProjectBySlug } from "@/lib/project-data";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
+import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import {
   ProjectFeatures,
   ProjectHero,
@@ -111,6 +112,7 @@ export default async function DynamicProjectPage({ params, searchParams }: Props
       <ProjectFeatures data={model.features} />
       <ProjectLocation data={model.location} />
       <ProjectLayouts layouts={model.layouts} />
+      <CallbackForm />
       <HomeFooter locale={locale} />
     </div>
   );

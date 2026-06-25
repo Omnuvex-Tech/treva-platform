@@ -3,12 +3,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
   background-color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  padding-top: 40px;
-  padding-bottom: 40px;
+  /* padding-top: 40px; */
+  padding-bottom: 100px;
   box-sizing: border-box;
+}
+
+.home-page .callbackContainer {
+  margin-top: 80px;
+}
+
+.section_projects {
+  padding-bottom: 0;
 }
 
 .formWrapper {
@@ -238,6 +245,10 @@
   .callbackContainer {
     padding-top: 30px;
     padding-bottom: 30px;
+  }
+
+  .home-page .callbackContainer {
+    margin-top: 48px;
   }
 
   .headerContainer {

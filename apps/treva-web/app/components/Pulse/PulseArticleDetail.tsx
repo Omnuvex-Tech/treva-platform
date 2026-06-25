@@ -6,6 +6,7 @@ import { ButtonText } from '@/app/components/ButtonText';
 import React from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
+import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import { Article } from "@/lib/pulse.types";
 import { SIDEBAR_ARTICLES, FEATURED_ARTICLES_DETAIL } from "@/lib/pulse-data";
 import "./pulse-article.css";
@@ -290,6 +291,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
         <RelatedArticlesSection locale={locale} currentSlug={article.slug} articles={FEATURED_ARTICLES_DETAIL} />
       </main>
 
+      <CallbackForm />
       <HomeFooter locale={locale} />
     </div>
   );

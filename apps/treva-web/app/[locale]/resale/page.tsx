@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
+import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
 import { useResaleApartments, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
@@ -245,6 +246,7 @@ export default function ResalePage() {
           )}
         </PageContainer>
       </main>
+      <CallbackForm />
       <HomeFooter />
     </div>
   );

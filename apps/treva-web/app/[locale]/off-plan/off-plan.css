@@ -1,6 +1,6 @@
 .page-wrapper .main-wrapper {
   padding-top: calc(var(--treva-nav-height, 64px) + 24px);
-  padding-bottom: 64px;
+  /* padding-bottom: 64px; */
 }
 
 @media (max-width: 768px) {

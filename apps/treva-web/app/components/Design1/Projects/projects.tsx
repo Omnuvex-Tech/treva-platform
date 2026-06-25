@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
 import './projects.css'
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
@@ -412,6 +413,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
             </div>
           </section>
         </main>
+        <CallbackForm />
         <HomeFooter locale={locale} />
       </div>
     </>

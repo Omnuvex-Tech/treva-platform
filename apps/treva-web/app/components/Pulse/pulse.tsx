@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
+import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import Link from "next/link";
 import { ARTICLES, FEATURED_ARTICLE, WEEK_ARTICLE } from "@/lib/pulse-data";
 import { Article } from "@/lib/pulse.types";
@@ -21,6 +22,7 @@ const Pulse = ({ locale }: PulseProps) => {
       <PulseHeaderSection locale={locale} />
       <PulseNewsSection locale={locale} />
       <PulseKeywordsSection />
+      <CallbackForm />
       <HomeFooter locale={locale} />
     </main>
   );

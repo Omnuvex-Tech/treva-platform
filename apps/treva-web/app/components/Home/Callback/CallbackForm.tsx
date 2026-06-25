@@ -21,7 +21,7 @@ const callbackDictionary: Record<Locale, {
 }> = {
   az: {
     titleTop: "İLK ADDIMI",
-    titleBottom: " ATMAĞA HAZIRSINIZ?",
+    titleBottom: "ATMAĞA HAZIRSINIZ?",
     subtitle: "Mütəxəssislərimiz məmnuniyyətlə sizinlə əlaqə saxlayaraq lazımi dəstəyi göstərəcək.",
     roles: { client: "Müştəri", developer: "Developer", broker: "Broker" },
     namePlaceholder: "Adınız",

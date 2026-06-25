@@ -8,6 +8,7 @@ import Script from 'next/script'
 import Link from 'next/link'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
 import './brokers.css'
 
 declare global {
@@ -576,6 +577,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
             </section>
           </main>
           
+          <CallbackForm />
           <HomeFooter locale={locale} />
       </div>
     </>

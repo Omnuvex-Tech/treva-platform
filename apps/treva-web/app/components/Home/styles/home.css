@@ -30,6 +30,8 @@ body.gsap-hidden {
 
 
 
+
+
 .heading-span::after {
   content: "";
   display: inline-block;

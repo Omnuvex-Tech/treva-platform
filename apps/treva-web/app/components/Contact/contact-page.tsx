@@ -8,6 +8,7 @@ import Script from 'next/script'
 import Link from 'next/link'
 import Header from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
 import './contact.css'  // ayrıca CSS faylı
 
 declare global {
@@ -653,6 +654,7 @@ export function ContactPage({ locale }: ContactPageProps) {
 
           </main>
 
+          <CallbackForm />
           <HomeFooter locale={locale} />
       </div>
     </>

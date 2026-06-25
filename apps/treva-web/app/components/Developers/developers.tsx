@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
 import './developers.css'
 
 declare global {
@@ -718,6 +719,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
             </section>
           </main>
 
+          <CallbackForm />
           <HomeFooter locale={locale} />
       </div>
     </>

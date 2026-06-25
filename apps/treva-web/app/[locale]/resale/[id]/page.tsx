@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
+import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import PropertyInfoCards from './PropertyInfoCards';
 import { useResaleApartmentBySlug } from '@/hooks/use-resale-apartments';
@@ -44,6 +45,7 @@ export default function ResaleDetailPage() {
             <div className="py-16 text-center text-white/50">Loading...</div>
           </PageContainer>
         </main>
+        <CallbackForm />
         <HomeFooter />
       </div>
     );
@@ -58,6 +60,7 @@ export default function ResaleDetailPage() {
             <div className="py-16 text-center text-white/50">Apartment not found</div>
           </PageContainer>
         </main>
+        <CallbackForm />
         <HomeFooter />
       </div>
     );
@@ -305,6 +308,7 @@ export default function ResaleDetailPage() {
           </div>
         </PageContainer>
       </main>
+      <CallbackForm />
       <HomeFooter />
     </div>
   );

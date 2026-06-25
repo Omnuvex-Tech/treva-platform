@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
+import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import Link from "next/link";
 import { ARTICLES } from "@/lib/pulse-data";
 import { notFound } from "next/navigation";
@@ -147,6 +148,7 @@ export default async function AuthorPage({ params }: Props) {
         </section>
       </main>
 
+      <CallbackForm />
       <HomeFooter locale={locale} />
     </div>
   );
