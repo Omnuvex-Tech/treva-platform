@@ -326,7 +326,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                       </div>
                     </div>
                     <div className="partners_cover-wrap img-reveal">
-                      <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6891e2f9ecd2afd4b7a6c9ab_team.avif" loading="lazy" alt="Error, please try again after some time." className="fullwidth-img is-20-top"/>
+                      <img src="../images/brokers/partnership.jpg" loading="lazy" alt="Error, please try again after some time." className="fullwidth-img is-20-top"/>
                       <div className="img-cover bg-color-grey200"></div>
                     </div>
                     <div className="partners_benefits-wrap">
@@ -335,7 +335,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="partners_benefits-item animate-right">
                           <div className="partners_benefits-content">
                             <div className="partners_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883657a2197715430c59ad8_exclusive-listing-2222.avif" loading="lazy" alt="Two men sitting on couches in a living room." className="fullwidth-img"/>
+                              <img src="../images/brokers/brokers1.jpeg" loading="lazy" alt="Two men sitting on couches in a living room." className="fullwidth-img"/>
                             </div>
                             <div className="partners_title">Eksklüziv Elanlar</div>
                           </div>
@@ -346,7 +346,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="partners_benefits-item animate-right">
                           <div className="partners_benefits-content">
                             <div className="partners_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets.avif" loading="lazy" sizes="100vw" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6878d434984d431f34ac0936_Marketing-Assets.avif 1920w" alt="A group of people working on computers in an office." className="fullwidth-img"/>
+                              <img src="../images/brokers/brokers2.jpeg" loading="lazy" sizes="100vw"  alt="A group of people working on computers in an office." className="fullwidth-img"/>
                             </div>
                             <div className="partners_title">Marketinq Materialları</div>
                           </div>
@@ -357,7 +357,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="partners_benefits-item animate-right">
                           <div className="partners_benefits-content">
                             <div className="partners_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688361a94247e43c5532067b_sales-support.avif" loading="lazy" sizes="100vw" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688361a94247e43c5532067b_sales-support-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/688361a94247e43c5532067b_sales-support.avif 960w" alt="A man and a woman sitting at a table." className="fullwidth-img"/>
+                              <img src="../images/brokers/brokers3.avif" loading="lazy" sizes="100vw"  alt="A man and a woman sitting at a table." className="fullwidth-img"/>
                             </div>
                             <div className="partners_title">Satış Dəstəyi</div>
                           </div>
