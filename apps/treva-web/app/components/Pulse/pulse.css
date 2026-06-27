@@ -123,6 +123,12 @@
   letter-spacing: 0.05em;
 }
 
+.news_week-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .is-week-card .news_week-link {
   display: flex !important;
   flex-direction: row !important; 
