@@ -810,6 +810,10 @@
   transition: all 0.2s ease;
 }
 
+.is-view-more {
+  max-width: 300px;
+}
+
 .news-header_right-cta-holder .button:hover,
 .is-view-more:hover {
   background-color: transparent !important;
