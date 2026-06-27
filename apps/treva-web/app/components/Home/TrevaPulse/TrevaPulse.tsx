@@ -4,17 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
+import { Article } from '@/lib/pulse.types';
 import './treva-pulse.css';
-
-type BlogEntry = {
-  id: number;
-  title: string;
-  category: string;
-  date: string;
-  image: string;
-  author: string;
-  avatar: string;
-};
 
 const pulseDictionary = {
   az: {
@@ -28,12 +19,6 @@ const pulseDictionary = {
     categories: { all: "Hamısı", events: "Tədbirlər", blog: "Bloq", highlights: "Seçilmişlər" },
     viewAll: "BÜTÜNÜ",
     noData: "Bu kateqoriyada məqalə tapılmadı.",
-    blogs: [
-      { id: 1, title: "Niyə bəzi daşınmaz əmlak layihələri bazarı qabaqlayır?", category: "Bloq", date: "29.04.2026", image: "/images/treva-pulse/tp1.png", author: "Tural Najafov", avatar: "/images/treva-pulse/tural-najafov.png" },
-      { id: 2, title: "Bakıda mənzil qiymətləri 2026: Ən yaxşı layihələr", category: "Bloq", date: "23.04.2026", image: "/images/treva-pulse/tp2.png", author: "Leyla Baghirzada", avatar: "/images/treva-pulse/leyla-bagirzade.png" },
-      { id: 3, title: "Bakı daşınmaz əmlakını peşəkar satışla mənimsəyin.", category: "Bloq", date: "17.04.2026", image: "/images/treva-pulse/tp3.png", author: "Javid Akhundov", avatar: "/images/treva-pulse/cavid-axundov.png" },
-      { id: 4, title: "Mənzil üçün neçə qədər ilkin ödəniş etmək lazımdır?", category: "Bloq", date: "08.05.2026", image: "/images/treva-pulse/tp4.png", author: "Emil Gurbanov", avatar: "/images/treva-pulse/emil-qurbanov.png" },
-    ] as BlogEntry[],
   },
   en: {
     subtitle: [
@@ -44,14 +29,8 @@ const pulseDictionary = {
     ],
     filterLabel: "Filter by category",
     categories: { all: "All", events: "Events", blog: "Blog", highlights: "Highlights" },
-    viewAll: "vIew all",
+    viewAll: "view all",
     noData: "No articles found in this category.",
-    blogs: [
-      { id: 1, title: "Why Some Developers Outpace the Market?", category: "BLOG", date: "29.04.2026", image: "/images/treva-pulse/tp1.png", author: "Tural Najafov", avatar: "/images/treva-pulse/tural-najafov.png" },
-      { id: 2, title: "Apartment Prices in Baku 2026: Best Value Projects", category: "BLOG", date: "23.04.2026", image: "/images/treva-pulse/tp2.png", author: "Leyla Baghirzada", avatar: "/images/treva-pulse/leyla-bagirzade.png" },
-      { id: 3, title: "Mastering Baku's Real Estate Through Professional Sales.", category: "BLOG", date: "17.04.2026", image: "/images/treva-pulse/tp3.png", author: "Javid Akhundov", avatar: "/images/treva-pulse/cavid-axundov.png" },
-      { id: 4, title: "How Much to Downpay for an Apartment?", category: "BLOG", date: "08.05.2026", image: "/images/treva-pulse/tp4.png", author: "Emil Gurbanov", avatar: "/images/treva-pulse/emil-qurbanov.png" },
-    ] as BlogEntry[],
   },
   ru: {
     subtitle: [
@@ -64,12 +43,6 @@ const pulseDictionary = {
     categories: { all: "Все", events: "События", blog: "Блог", highlights: "Избранное" },
     viewAll: "ВСЕ",
     noData: "В этой категории статей не найдено.",
-    blogs: [
-      { id: 1, title: "Почему некоторые девелоперы опережают рынок?", category: "БЛОГ", date: "29.04.2026", image: "/images/treva-pulse/tp1.png", author: "Tural Najafov", avatar: "/images/treva-pulse/tural-najafov.png" },
-      { id: 2, title: "Цены на квартиры в Баку 2026: Лучшие проекты", category: "БЛОГ", date: "23.04.2026", image: "/images/treva-pulse/tp2.png", author: "Leyla Baghirzada", avatar: "/images/treva-pulse/leyla-bagirzade.png" },
-      { id: 3, title: "Освойте бакинскую недвижимость через профессиональные продажи.", category: "БЛОГ", date: "17.04.2026", image: "/images/treva-pulse/tp3.png", author: "Javid Akhundov", avatar: "/images/treva-pulse/cavid-axundov.png" },
-      { id: 4, title: "Сколько нужно внести за квартиру?", category: "БЛОГ", date: "08.05.2026", image: "/images/treva-pulse/tp4.png", author: "Emil Gurbanov", avatar: "/images/treva-pulse/emil-qurbanov.png" },
-    ] as BlogEntry[],
   },
 } as const;
 
@@ -97,9 +70,10 @@ function PulseFilterButton({ label, isActive, onClick, categoryKey }: PulseFilte
 
 type TrevaPulseProps = {
   locale?: string;
+  articles?: Article[];
 };
 
-const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az' }) => {
+const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] }) => {
   const pathname = usePathname();
   const detectedLocale = pathname?.split('/')[1];
   const activeLocale = (detectedLocale && detectedLocale in pulseDictionary)
@@ -113,8 +87,8 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az' }) => {
   const categoryKeys: CategoryKey[] = ['all', 'events', 'blog', 'highlights'];
 
   const filteredData = activeFilter === 'all'
-    ? [...content.blogs]
-    : content.blogs.filter(post => {
+    ? [...articles]
+    : articles.filter(post => {
         const categoryMap: Record<CategoryKey, string> = {
           all: '',
           events: 'Tədbir',
@@ -208,7 +182,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az' }) => {
                 {duplicatedData.map((post, index) => (
                   <a
                     href="#"
-                    key={`${post.id}-${index}`}
+                    key={`${post.slug}-${index}`}
                     className="blog-card"
                     style={{ flex: `0 0 ${cardWidth}`, width: cardWidth }}
                   >
@@ -225,7 +199,9 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az' }) => {
                       <h3 className="blog-card__title">{post.title}</h3>
 
                       <div className="blog-card__author">
-                        <img src={post.avatar} alt={post.author} className="blog-card__avatar" />
+                        {post.authorImage && (
+                          <img src={post.authorImage} alt={post.author ?? ''} className="blog-card__avatar" />
+                        )}
                         <span className="blog-card__author-name">{post.author}</span>
                       </div>
                     </div>

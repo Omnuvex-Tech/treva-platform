@@ -8,12 +8,15 @@ import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import { Article } from "@/lib/pulse.types";
-import { SIDEBAR_ARTICLES, FEATURED_ARTICLES_DETAIL } from "@/lib/pulse-data";
+import { BlockRenderer } from "./BlockRenderer";
+import { toAbsUrl } from "@/lib/pulse-api";
 import "./pulse-article.css";
 
 type PulseArticleDetailProps = {
   locale: string;
   article: Article;
+  sidebarArticles?: Article[];
+  relatedArticles?: Article[];
 };
 
 function ArticleBanner() {
@@ -86,7 +89,7 @@ const ArticleHero: React.FC<{ article: Article }> = ({ article }) => (
 
     <div className="article_cover-wrap img-reveal">
       <img
-        src={article.image}
+        src={toAbsUrl(article.image || "")}
         loading="lazy"
         alt={article.title}
         className="fullwidth-img"
@@ -108,7 +111,7 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
             <div key={item.slug} role="listitem" className="w-dyn-item">
               <a href={`/${locale}/pulse/${item.slug}`} className="article_sidebar-link w-inline-block">
                 <div className="article_sidebar-img">
-                  <img src={item.image} loading="lazy" alt="" className="fullwidth-img ease0-6" />
+                  <img src={toAbsUrl(item.image || "")} loading="lazy" alt="" className="fullwidth-img ease0-6" />
                 </div>
                 <div className="article_sidebar-content">
                   <h4 className="no-animate">{item.title}</h4>
@@ -165,7 +168,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                       <a href={`/${locale}/pulse/${item.slug}`} className={`f-articles_link w-inline-block${item.slug === currentSlug ? " w--current" : ""}`}>
                         <div className="f-articles_img-wrap">
                           <div className="news_middle-img-holder">
-                            <img src={item.image} loading="lazy" alt={item.title} className="fullwidth-img" />
+                            <img src={toAbsUrl(item.image || "")} loading="lazy" alt={item.title} className="fullwidth-img" />
                           </div>
                           <div className="projects_overlay hide-tablet">
                             <div className="news_btn">
@@ -186,7 +189,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                           {item.author && (
                             <div className="news_author-wrap">
                               <div className="news_author-headshot">
-                                <img src={item.authorImage || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg"} loading="lazy" alt={item.author} className="fullwidth-img" />
+                                <img src={toAbsUrl(item.authorImage || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg")} loading="lazy" alt={item.author} className="fullwidth-img" />
                               </div>
                               <div>{item.author}</div>
                             </div>
@@ -210,7 +213,7 @@ const ArticleAuthorBlock: React.FC<{ locale: string; article: Article }> = ({ lo
     {article.author && (
       <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
         <div className="article_author-avatar">
-          <img src={article.authorImage} loading="lazy" alt={article.author} className="fullwidth-img" />
+          <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
         </div>
         <div className="article_author-content">
           <div className="text-color-blue400">{article.author}</div>
@@ -221,22 +224,25 @@ const ArticleAuthorBlock: React.FC<{ locale: string; article: Article }> = ({ lo
   </div>
 );
 
-const ArticleKeywordsBlock: React.FC = () => (
-  <div className="article-keywords-block">
-    <div className="article-keywords-label">
-      Açar sözlər / Keywords
+const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; slug: string }[] }> = ({ keywords }) => {
+  if (!keywords || keywords.length === 0) return null;
+  return (
+    <div className="article-keywords-block">
+      <div className="article-keywords-label">
+        Açar sözlər / Keywords
+      </div>
+      <div className="article-keywords-list">
+        {keywords.map((kw) => (
+          <span key={kw.id} className="article-keyword-tag">
+            #{kw.name}
+          </span>
+        ))}
+      </div>
     </div>
-    <div className="article-keywords-list">
-      {["#dasinmazemlak", "#bakidaevler", "#seabreeze", "#investisiya", "#premiumemlak"].map((tag) => (
-        <span key={tag} className="article-keyword-tag">
-          {tag}
-        </span>
-      ))}
-    </div>
-  </div>
-);
+  );
+};
 
-const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article }) => {
+const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article, sidebarArticles = [], relatedArticles = [] }) => {
   return (
     <div className="page-wrapper">
       <Navbar locale={locale} variant="solid" />
@@ -268,27 +274,48 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                   <div className="article_col">
                     <ArticleHero article={article} />
 
-                    <div className="article_body">
-                      <div>
-                        <div className="article_richtext no-animate w-richtext">
-                          {article.content}
+                    <div className="article_content-row">
+                      {article.author && (
+                        <div className="article_content-author">
+                          <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
+                            <div className="article_author-avatar">
+                              <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
+                            </div>
+                            <div className="article_author-content">
+                              <div className="text-color-blue400">{article.author}</div>
+                              <div className="text-size-small">{article.authorTitle || "Ekspert"}</div>
+                            </div>
+                          </a>
                         </div>
-                        <SliderEmptyState />
+                      )}
+
+                      <div className="article_content-main">
+                        <div className="article_body">
+                          <div>
+                            <div className="article_richtext no-animate w-richtext">
+                              {article.blocks && article.blocks.length > 0 ? (
+                                <BlockRenderer blocks={article.blocks} />
+                              ) : (
+                                article.content
+                              )}
+                            </div>
+                            <SliderEmptyState />
+                          </div>
+                        </div>
+
+                        <ArticleKeywordsBlock keywords={article.keywords} />
                       </div>
                     </div>
-
-                    <ArticleAuthorBlock locale={locale} article={article} />
-                    <ArticleKeywordsBlock />
                   </div>
 
-                  <ArticleSidebar locale={locale} articles={SIDEBAR_ARTICLES} />
+                  <ArticleSidebar locale={locale} articles={sidebarArticles} />
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <RelatedArticlesSection locale={locale} currentSlug={article.slug} articles={FEATURED_ARTICLES_DETAIL} />
+        <RelatedArticlesSection locale={locale} currentSlug={article.slug} articles={relatedArticles} />
       </main>
 
       <CallbackForm />

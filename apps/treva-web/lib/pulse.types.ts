@@ -1,15 +1,36 @@
+import type { ArticleBlock } from "./pulse-api";
+
 export interface Article {
+  id?: string;
   slug: string;
   title: string;
   category: string;
   date: string;
-  image: string;
+  image?: string;
+  coverImage?: string;
   author?: string;
   authorImage?: string;
   authorTitle?: string;
-  content?: React.ReactNode; // For now, we can pass JSX, but in a real CMS it would be HTML/Markdown
+  authorId?: string;
+  authorObj?: {
+    id: string;
+    name: string;
+    slug: string;
+    title?: string;
+    avatar?: string;
+  };
+  keywords?: { id: string; name: string; slug: string }[];
+  content?: React.ReactNode;
+  blocks?: ArticleBlock[];
   description?: string;
+  excerpt?: string;
   srcSet?: string;
+  featured?: boolean;
+  published?: boolean;
+  headerPosition?: "left" | "center" | "right" | "week";
+  headerOrder?: number;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
-export interface ArticleCard extends Omit<Article, 'content'> {}
+export interface ArticleCard extends Omit<Article, 'content' | 'blocks'> {}

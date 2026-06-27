@@ -35,3 +35,34 @@
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
 }
+
+.article_content-row {
+  display: flex;
+  gap: 2rem;
+}
+
+.article_content-author {
+  flex: 0 0 210px;
+  position: sticky;
+  top: 6rem;
+  align-self: flex-start;
+}
+
+.article_content-author .text-size-small {
+  white-space: nowrap;
+}
+
+.article_content-main {
+  flex: 1;
+  min-width: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .article_content-row {
+    flex-direction: column;
+  }
+  .article_content-author {
+    flex: none;
+    position: static;
+  }
+}

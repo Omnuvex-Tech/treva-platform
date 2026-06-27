@@ -383,6 +383,10 @@
   overflow: hidden;
 }
 
+.news_rightcol-link-content .news_rightcol-title {
+  margin-top: 0.5rem;
+}
+
 .news_specs-wrap {
   display: flex;
   align-items: center;

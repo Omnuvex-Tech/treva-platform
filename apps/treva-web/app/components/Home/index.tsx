@@ -11,13 +11,15 @@ import TrevaPage from "./FeaturesProperties/FeaturesProperties";
 import FeaturedProperties from "./FeaturesProperties/FeaturesProperties";
 import TrevaPulse from "./TrevaPulse/TrevaPulse";
 import CallbackForm from "./Callback/CallbackForm";
+import { Article } from "@/lib/pulse.types";
 
 type HomeProps = {
   locale: string;
   design?: 1 | 2;
+  pulseArticles?: Article[];
 };
 
-const Home = ({ locale, design = 2 }: HomeProps) => {
+const Home = ({ locale, design = 2, pulseArticles = [] }: HomeProps) => {
   return (
     <div className="page-wrapper home-page" data-locale={locale}>
       {design === 1 ? (
@@ -36,7 +38,7 @@ const Home = ({ locale, design = 2 }: HomeProps) => {
       
       <AboutUs locale={locale}/>
       <FeaturedProperties locale={locale}/>
-      <TrevaPulse locale={locale}/>
+      <TrevaPulse locale={locale} articles={pulseArticles}/>
             <HomeLogos locale={locale}/>
             <CallbackForm/>
       <HomeFooter locale={locale} />

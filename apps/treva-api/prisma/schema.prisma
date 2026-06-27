@@ -180,3 +180,54 @@ model ApartmentPrice {
 
   @@unique([apartmentId, currencyId])
 }
+
+// ─── Pulse (Blog) Models ─────────────────────────────────────
+
+model Author {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  title       String?
+  avatar      String?
+  description String?
+  articles    Article[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Keyword {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  articles Article[]
+}
+
+model PulseCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Article {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  category        String
+  date            DateTime  @default(now())
+  coverImage      String?
+  excerpt         String?
+  authorId        String?
+  author          Author?   @relation(fields: [authorId], references: [id])
+  keywords        Keyword[]
+  blocks          Json      @default("[]")
+  metaTitle       String?
+  metaDescription String?
+  featured        Boolean   @default(false)
+  published       Boolean   @default(false)
+  headerPosition  String?   // null | "left" | "center" | "right"
+  headerOrder     Int?      // sort order within the section
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

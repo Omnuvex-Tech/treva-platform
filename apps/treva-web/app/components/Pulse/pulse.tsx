@@ -5,22 +5,28 @@ import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import Link from "next/link";
-import { ARTICLES, FEATURED_ARTICLE, WEEK_ARTICLE } from "@/lib/pulse-data";
 import { Article } from "@/lib/pulse.types";
+import { toAbsUrl } from "@/lib/pulse-api";
 import "./pulse.css";
 import { ReadMoreOverlay } from "../ReadMoreOverlay";
 import { ButtonText } from '@/app/components/ButtonText';
 
 type PulseProps = {
   locale: string;
+  articles: Article[];
+  leftArticles: Article[];
+  centerArticle: Article | null;
+  rightArticles: Article[];
+  weekArticles: Article[];
+  categories: { id: string; name: string }[];
 };
 
-const Pulse = ({ locale }: PulseProps) => {
+const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, weekArticles, categories }: PulseProps) => {
   return (
     <main className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
-      <PulseHeaderSection locale={locale} />
-      <PulseNewsSection locale={locale} />
+      <PulseHeaderSection locale={locale} leftArticles={leftArticles} centerArticle={centerArticle} rightArticles={rightArticles} />
+      <PulseNewsSection locale={locale} articles={articles} weekArticles={weekArticles} categories={categories} />
       <PulseKeywordsSection />
       <CallbackForm />
       <HomeFooter locale={locale} />
@@ -72,7 +78,7 @@ function AuthorBlock({ author, authorImage }: Pick<Article, "author" | "authorIm
     <div className="news_author-wrap hide-landscape">
       {authorImage && (
         <div className="news_author-headshot">
-          <img src={authorImage} loading="lazy" alt={author} className="fullwidth-img" />
+          <img src={toAbsUrl(authorImage)} loading="lazy" alt={author} className="fullwidth-img" />
         </div>
       )}
       <div>{author}</div>
@@ -100,7 +106,7 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
       <Link href={`/${locale}/pulse/${article.slug}`} className={linkClass}>
         <div className={imgWrapClass}>
           <div className={variant === "left" ? "news_leftcol-img-holder" : isWeek ? "news_week-img-holder" : "news_middle-img-holder"}>
-            <img src={article.image} loading="lazy" alt={article.title} className="fullwidth-img" />
+            <img src={toAbsUrl(article.image || "")} loading="lazy" alt={article.title} className="fullwidth-img" />
           </div>
           {!isWeek && (
             <>
@@ -122,10 +128,7 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
   );
 }
 
-function PulseHeaderSection({ locale }: { locale: string }) {
-  const leftArticles = ARTICLES.slice(0, 2);
-  const rightArticles = [...(FEATURED_ARTICLE ? [FEATURED_ARTICLE] : []), ...ARTICLES.slice(0, 3)];
-
+function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles }: { locale: string; leftArticles: Article[]; centerArticle: Article | null; rightArticles: Article[] }) {
   return (
     <section id="pulse" className="section_news-header">
       <div className="global-padding">
@@ -152,15 +155,15 @@ function PulseHeaderSection({ locale }: { locale: string }) {
               <div className="news-header_middle-col">
                 <div className="w-dyn-list">
                   <div role="list" className="news_header-list w-dyn-items">
-                    {FEATURED_ARTICLE && (
+                    {centerArticle && (
                       <div role="listitem" className="news_header-item w-dyn-item">
-                        <Link href={`/${locale}/pulse/${FEATURED_ARTICLE.slug}`} className="news-header_middle-link w-inline-block">
+                        <Link href={`/${locale}/pulse/${centerArticle.slug}`} className="news-header_middle-link w-inline-block">
                           <div className="news-header_middle-img-wrap">
                             <div className="news_middle-img-holder">
                               <img
-                                src={FEATURED_ARTICLE.image}
+                                src={toAbsUrl(centerArticle.image || "")}
                                 loading="lazy"
-                                alt={FEATURED_ARTICLE.title}
+                                alt={centerArticle.title}
                                 className="fullwidth-img"
                               />
                             </div>
@@ -170,10 +173,10 @@ function PulseHeaderSection({ locale }: { locale: string }) {
 
                           <div className="news-header_middle-content-wrap">
                             <div className="news_middle-content">
-                              <ArticleMeta category={FEATURED_ARTICLE.category} date={FEATURED_ARTICLE.date} />
-                              <h2 className="news-header_middle-title no-animate">{FEATURED_ARTICLE.title}</h2>
+                              <ArticleMeta category={centerArticle.category} date={centerArticle.date} />
+                              <h2 className="news-header_middle-title no-animate">{centerArticle.title}</h2>
                             </div>
-                            <AuthorBlock author={FEATURED_ARTICLE.author} authorImage={FEATURED_ARTICLE.authorImage} />
+                            <AuthorBlock author={centerArticle.author} authorImage={centerArticle.authorImage} />
                           </div>
                         </Link>
                       </div>
@@ -212,11 +215,14 @@ function PulseHeaderSection({ locale }: { locale: string }) {
   );
 }
 
-function PulseNewsSection({ locale }: { locale: string }) {
+function PulseNewsSection({ locale, articles, weekArticles, categories }: { locale: string; articles: Article[]; weekArticles: Article[]; categories: { id: string; name: string }[] }) {
   const [visibleCount, setVisibleCount] = useState(6);
   const handleViewMore = () => {
     setVisibleCount(prev => prev + 6);
   };
+
+  const weekSlugs = new Set(weekArticles.map((a) => a.slug));
+  const gridArticles = articles.filter((a) => !weekSlugs.has(a.slug));
 
   return (
     <section className="section_news">
@@ -245,7 +251,9 @@ function PulseNewsSection({ locale }: { locale: string }) {
 
                 <div className="w-dyn-list">
                   <div role="list" className="news_week-list w-dyn-items">
-                    {WEEK_ARTICLE && <NewsCard article={WEEK_ARTICLE} locale={locale} variant="week" />}
+                    {weekArticles.map((w) => (
+                      <NewsCard key={w.slug} article={w} locale={locale} variant="week" />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -262,11 +270,11 @@ function PulseNewsSection({ locale }: { locale: string }) {
                       <div>Kateqoriyalar</div>
 
                       <div className="news_tags-list">
-                        {["Bloq", "Kampaniya", "Tədbir", "Analizlər", "Xəbərlər"].map(
+                        {categories.map(
                           (category) => (
-                            <label key={category} className="w-checkbox news_checkbox-field">
-                              <input type="checkbox" className="hidden" value={category} />
-                              <span className="news_checkbox-label w-form-label">{category}</span>
+                            <label key={category.id} className="w-checkbox news_checkbox-field">
+                              <input type="checkbox" className="hidden" value={category.name} />
+                              <span className="news_checkbox-label w-form-label">{category.name}</span>
                             </label>
                           ),
                         )}
@@ -280,13 +288,13 @@ function PulseNewsSection({ locale }: { locale: string }) {
               <div id="all-articles" className="news_middle-wrap">
                 <div className="w-dyn-list">
                   <div role="list" className="news_middle-list w-dyn-items">
-                    {ARTICLES.slice(0, visibleCount).map((article) => (
+                    {gridArticles.slice(0, visibleCount).map((article) => (
                       <NewsCard key={article.slug} article={article} locale={locale} />
                     ))}
                   </div>
                 </div>
 
-                {visibleCount < ARTICLES.length && (
+                {visibleCount < gridArticles.length && (
                   <div className="news_view-more-container">
                     <button onClick={handleViewMore} className="button is-view-more">
                       <ButtonText>Daha çox göstər</ButtonText>

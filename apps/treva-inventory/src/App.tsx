@@ -21,6 +21,13 @@ import { OwnerForm } from "./pages/resale/OwnerForm";
 import { AttributesList } from "./pages/resale/AttributesList";
 import { AttributeForm } from "./pages/resale/AttributeForm";
 import { RequestsList } from "./pages/resale/RequestsList";
+import { ArticleList } from "./pages/pulse/ArticleList";
+import { ArticleForm } from "./pages/pulse/ArticleForm";
+import { AuthorList } from "./pages/pulse/AuthorList";
+import { AuthorForm } from "./pages/pulse/AuthorForm";
+import { PulseLayout } from "./pages/pulse/PulseLayout";
+import { PulseCategoryList } from "./pages/pulse/PulseCategoryList";
+import { PulseCategoryForm } from "./pages/pulse/PulseCategoryForm";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -279,6 +286,86 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <CurrencyList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/articles"
+                            element={
+                                <ProtectedRoute>
+                                    <ArticleList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/articles/new"
+                            element={
+                                <ProtectedRoute>
+                                    <ArticleForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/articles/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <ArticleForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/authors"
+                            element={
+                                <ProtectedRoute>
+                                    <AuthorList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/authors/new"
+                            element={
+                                <ProtectedRoute>
+                                    <AuthorForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/authors/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <AuthorForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/layout"
+                            element={
+                                <ProtectedRoute>
+                                    <PulseLayout />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/categories"
+                            element={
+                                <ProtectedRoute>
+                                    <PulseCategoryList />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/categories/new"
+                            element={
+                                <ProtectedRoute>
+                                    <PulseCategoryForm />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/pulse/categories/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <PulseCategoryForm />
                                 </ProtectedRoute>
                             }
                         />

@@ -3,7 +3,7 @@ import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import Link from "next/link";
-import { ARTICLES } from "@/lib/pulse-data";
+import { getAuthorBySlug, apiArticleToArticle, toAbsUrl } from "@/lib/pulse-api";
 import { notFound } from "next/navigation";
 import "@/app/components/Pulse/pulse.css";
 
@@ -15,45 +15,40 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  const locales = ["az", "en", "ru"];
-  const params: { locale: string; slug: string }[] = [];
-
-  locales.forEach((locale) => {
-    const uniqueAuthors = new Set<string>();
-    ARTICLES.forEach((article) => {
-      if (article.author) {
-        uniqueAuthors.add(article.author.toLowerCase().replace(/\s+/g, '-'));
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001/api/v1"}/pulse/authors`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const result = await res.json();
+    const authors = result.data ?? result;
+    const locales = ["az", "en", "ru"];
+    const params: { locale: string; slug: string }[] = [];
+    for (const locale of locales) {
+      for (const author of authors) {
+        params.push({ locale, slug: author.slug });
       }
-    });
-    uniqueAuthors.forEach((slug) => {
-      params.push({ locale, slug });
-    });
-  });
-
-  return params;
+    }
+    return params;
+  } catch {
+    return [];
+  }
 }
 
 export default async function AuthorPage({ params }: Props) {
   const { locale, slug } = await params;
 
-  // Filter articles by author slug
-  const authorArticles = ARTICLES.filter((article) => {
-    if (!article.author) return false;
-    return article.author.toLowerCase().replace(/\s+/g, '-') === slug;
-  });
-
-  if (authorArticles.length === 0) {
+  let apiAuthor;
+  try {
+    apiAuthor = await getAuthorBySlug(slug);
+  } catch {
     notFound();
   }
 
-  // Get author details from the first matching article
-  const firstArticle = authorArticles[0];
-  if (!firstArticle) {
-    notFound();
-  }
-  const authorName = firstArticle.author!;
-  const authorTitle = firstArticle.authorTitle || "Ekspert / Müəllif";
-  const authorImage = firstArticle.authorImage || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg";
+  const authorArticles = apiAuthor.articles.map(apiArticleToArticle);
+  const authorName = apiAuthor.name;
+  const authorTitle = apiAuthor.title || "Ekspert / Müəllif";
+  const authorImage = apiAuthor.avatar || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg";
 
   const keywords = [
     authorName,
@@ -106,7 +101,7 @@ export default async function AuthorPage({ params }: Props) {
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_middle-link w-inline-block">
                           <div className="news_middle-img-wrap">
                             <div className="news_middle-img-holder">
-                              <img src={article.image} loading="lazy" alt={article.title} className="fullwidth-img" />
+                              <img src={toAbsUrl(article.image || "")} loading="lazy" alt={article.title} className="fullwidth-img" />
                             </div>
                           </div>
 

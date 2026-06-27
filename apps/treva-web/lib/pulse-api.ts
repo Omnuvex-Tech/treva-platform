@@ -1,0 +1,187 @@
+import { Article } from "./pulse.types";
+
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+
+export type ArticleBlock =
+    | { type: "heading"; level: 2 | 3; text: string }
+    | { type: "paragraph"; text: string }
+    | { type: "image"; url: string; alt: string; caption?: string }
+    | { type: "list"; items: string[] }
+    | { type: "faq"; question: string; answer: string }
+    | { type: "quote"; text: string; author?: string }
+    | { type: "video"; url: string }
+    | { type: "gallery"; images: { url: string; alt: string }[] };
+
+export interface ApiAuthor {
+    id: string;
+    name: string;
+    slug: string;
+    title?: string;
+    avatar?: string;
+}
+
+export interface ApiKeyword {
+    id: string;
+    name: string;
+    slug: string;
+}
+
+export interface ApiArticle {
+    id: string;
+    slug: string;
+    title: string;
+    category: string;
+    date: string;
+    coverImage?: string;
+    excerpt?: string;
+    authorId?: string;
+    author?: ApiAuthor;
+    keywords?: ApiKeyword[];
+    blocks: ArticleBlock[];
+    metaTitle?: string;
+    metaDescription?: string;
+    featured: boolean;
+    published: boolean;
+    headerPosition?: "left" | "center" | "right" | "week" | null;
+    headerOrder?: number | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
+
+export async function getArticles(params?: {
+    category?: string;
+    page?: number;
+    limit?: number;
+}): Promise<PaginatedResponse<ApiArticle>> {
+    const searchParams = new URLSearchParams();
+    if (params?.category) searchParams.set("category", params.category);
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+
+    const url = `${API}/pulse/articles${searchParams.toString() ? `?${searchParams}` : ""}`;
+    const res = await fetch(url, { next: { revalidate: 60 } });
+    if (!res.ok) throw new Error("Failed to fetch articles");
+    const data = await res.json();
+    // Handle both paginated and plain array responses
+    if (Array.isArray(data)) {
+        return { data, pagination: { page: 1, limit: data.length, total: data.length, totalPages: 1 } };
+    }
+    return data;
+}
+
+export async function getArticleBySlug(
+    slug: string,
+): Promise<ApiArticle> {
+    const res = await fetch(`${API}/pulse/articles/slug/${slug}`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) throw new Error("Article not found");
+    return res.json();
+}
+
+export async function getFeaturedArticles(): Promise<ApiArticle[]> {
+    const res = await fetch(`${API}/pulse/articles/featured`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) throw new Error("Failed to fetch featured articles");
+    return res.json();
+}
+
+export async function getHeaderArticles(
+    position: "left" | "center" | "right" | "week",
+): Promise<ApiArticle[]> {
+    const res = await fetch(
+        `${API}/pulse/articles/header?position=${position}`,
+        { next: { revalidate: 60 } },
+    );
+    if (!res.ok) throw new Error("Failed to fetch header articles");
+    return res.json();
+}
+
+export interface PulseCategory {
+    id: string;
+    name: string;
+    slug: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export async function getPulseCategories(): Promise<PulseCategory[]> {
+    const res = await fetch(`${API}/pulse/categories`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) throw new Error("Failed to fetch categories");
+    return res.json();
+}
+
+export async function getAuthors(): Promise<ApiAuthor[]> {
+    const res = await fetch(`${API}/pulse/authors`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) throw new Error("Failed to fetch authors");
+    return res.json();
+}
+
+export async function getAuthorBySlug(
+    slug: string,
+): Promise<ApiAuthor & { articles: ApiArticle[] }> {
+    const res = await fetch(`${API}/pulse/authors/slug/${slug}`, {
+        next: { revalidate: 60 },
+    });
+    if (!res.ok) throw new Error("Author not found");
+    return res.json();
+}
+
+const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+
+export function toAbsUrl(path: string): string {
+    if (!path) return "";
+    if (path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")) return path;
+    return `${ABS_API}${path}`;
+}
+
+export function formatDate(iso: string): string {
+    const d = new Date(iso);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+}
+
+export function apiArticleToArticle(api: ApiArticle): Article {
+    return {
+        id: api.id,
+        slug: api.slug,
+        title: api.title,
+        category: api.category,
+        date: formatDate(api.date),
+        image: api.coverImage,
+        coverImage: api.coverImage,
+        author: api.author?.name,
+        authorImage: api.author?.avatar,
+        authorTitle: api.author?.title,
+        authorId: api.authorId,
+        authorObj: api.author
+            ? { id: api.author.id, name: api.author.name, slug: api.author.slug, title: api.author.title, avatar: api.author.avatar }
+            : undefined,
+        keywords: api.keywords,
+        blocks: api.blocks,
+        excerpt: api.excerpt,
+        featured: api.featured,
+        published: api.published,
+        headerPosition: api.headerPosition ?? undefined,
+        headerOrder: api.headerOrder ?? undefined,
+        metaTitle: api.metaTitle,
+        metaDescription: api.metaDescription,
+    };
+}

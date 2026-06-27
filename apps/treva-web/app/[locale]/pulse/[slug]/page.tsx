@@ -1,6 +1,7 @@
 import React from "react";
 import PulseArticleDetail from "@/app/components/Pulse/PulseArticleDetail";
-import { getArticleBySlug, ARTICLES } from "@/lib/pulse-data";
+import { getArticleBySlug, getArticles, apiArticleToArticle } from "@/lib/pulse-api";
+import { Article } from "@/lib/pulse.types";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -12,24 +13,49 @@ type Props = {
 
 export default async function Page({ params }: Props) {
   const { locale, slug } = await params;
-  const article = getArticleBySlug(slug);
 
-  if (!article) {
+  let apiArticle;
+  try {
+    apiArticle = await getArticleBySlug(slug);
+  } catch {
     notFound();
   }
 
-  return <PulseArticleDetail locale={locale} article={article} />;
+  const article = apiArticleToArticle(apiArticle);
+
+  let sidebarArticles: Article[] = [];
+  let relatedArticles: Article[] = [];
+  try {
+    const result = await getArticles({ limit: 10 });
+    const all = result.data.map(apiArticleToArticle);
+    sidebarArticles = all.filter((a) => a.slug !== slug).slice(0, 4);
+    relatedArticles = all.filter((a) => a.slug !== slug).slice(0, 6);
+  } catch {
+    // fallback to empty
+  }
+
+  return (
+    <PulseArticleDetail
+      locale={locale}
+      article={article}
+      sidebarArticles={sidebarArticles}
+      relatedArticles={relatedArticles}
+    />
+  );
 }
 
 export async function generateStaticParams() {
-  const locales = ["az", "en", "ru"];
-  const params: { locale: string; slug: string }[] = [];
-
-  locales.forEach((locale) => {
-    ARTICLES.forEach((article) => {
-      params.push({ locale, slug: article.slug });
-    });
-  });
-
-  return params;
+  try {
+    const result = await getArticles({ limit: 200 });
+    const locales = ["az", "en", "ru"];
+    const params: { locale: string; slug: string }[] = [];
+    for (const locale of locales) {
+      for (const article of result.data) {
+        params.push({ locale, slug: article.slug });
+      }
+    }
+    return params;
+  } catch {
+    return [];
+  }
 }

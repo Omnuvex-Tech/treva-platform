@@ -18,6 +18,7 @@ import { ApartmentsModule } from './apartments/apartments.module';
 import { OwnersModule } from './owners/owners.module';
 import { AttributesModule } from './attributes/attributes.module';
 import { RequestsModule } from './requests/requests.module';
+import { PulseModule } from './pulse/pulse.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { RequestsModule } from './requests/requests.module';
     OwnersModule,
     AttributesModule,
     RequestsModule,
+    PulseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
