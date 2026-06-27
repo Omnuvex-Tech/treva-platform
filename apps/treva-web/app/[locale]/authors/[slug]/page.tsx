@@ -100,8 +100,8 @@ export default async function AuthorPage({ params }: Props) {
                       <div key={article.slug} role="listitem" className="news_header-item w-dyn-item">
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_middle-link w-inline-block">
                           <div className="news_middle-img-wrap">
-                            <div className="news_middle-img-holder">
-                              <img src={toAbsUrl(article.image || "")} loading="lazy" alt={article.title} className="fullwidth-img" />
+                              <div className="news_middle-img-holder">
+                              {article.image ? <img src={toAbsUrl(article.image)} loading="lazy" alt={article.title} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
                             </div>
                           </div>
 

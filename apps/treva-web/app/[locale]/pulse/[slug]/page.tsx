@@ -25,10 +25,17 @@ export default async function Page({ params }: Props) {
 
   let sidebarArticles: Article[] = [];
   let relatedArticles: Article[] = [];
+
+  if (apiArticle.selectedArticles && apiArticle.selectedArticles.length > 0) {
+    sidebarArticles = apiArticle.selectedArticles.map(apiArticleToArticle);
+  }
+
   try {
     const result = await getArticles({ limit: 10 });
     const all = result.data.map(apiArticleToArticle);
-    sidebarArticles = all.filter((a) => a.slug !== slug).slice(0, 4);
+    if (sidebarArticles.length === 0) {
+      sidebarArticles = all.filter((a) => a.slug !== slug).slice(0, 4);
+    }
     relatedArticles = all.filter((a) => a.slug !== slug).slice(0, 6);
   } catch {
     // fallback to empty

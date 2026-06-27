@@ -44,6 +44,7 @@ export interface ApiArticle {
     published: boolean;
     headerPosition?: "left" | "center" | "right" | "week" | null;
     headerOrder?: number | null;
+    selectedArticles?: ApiArticle[];
     createdAt: string;
     updatedAt: string;
 }
@@ -181,6 +182,7 @@ export function apiArticleToArticle(api: ApiArticle): Article {
         published: api.published,
         headerPosition: api.headerPosition ?? undefined,
         headerOrder: api.headerOrder ?? undefined,
+        selectedArticles: api.selectedArticles?.map(apiArticleToArticle),
         metaTitle: api.metaTitle,
         metaDescription: api.metaDescription,
     };

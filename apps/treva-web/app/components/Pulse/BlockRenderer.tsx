@@ -49,6 +49,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                         alt={block.alt}
                                         src={toAbsUrl(block.url)}
                                         loading="lazy"
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                     />
                                 </div>
                                 {block.caption && (
@@ -139,6 +140,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                             alt={img.alt}
                                             loading="lazy"
                                             style={{ width: "100%", height: "auto", display: "block" }}
+                                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                         />
                                     </div>
                                 ))}

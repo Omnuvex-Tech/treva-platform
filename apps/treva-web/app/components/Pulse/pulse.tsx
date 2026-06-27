@@ -106,7 +106,7 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
       <Link href={`/${locale}/pulse/${article.slug}`} className={linkClass}>
         <div className={imgWrapClass}>
           <div className={variant === "left" ? "news_leftcol-img-holder" : isWeek ? "news_week-img-holder" : "news_middle-img-holder"}>
-            <img src={toAbsUrl(article.image || "")} loading="lazy" alt={article.title} className="fullwidth-img" />
+            {article.image ? <img src={toAbsUrl(article.image)} loading="lazy" alt={article.title} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
           </div>
           {!isWeek && (
             <>
@@ -129,6 +129,8 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
 }
 
 function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles }: { locale: string; leftArticles: Article[]; centerArticle: Article | null; rightArticles: Article[] }) {
+  const visibleRightArticles = rightArticles.slice(0, 4);
+
   return (
     <section id="pulse" className="section_news-header">
       <div className="global-padding">
@@ -136,7 +138,6 @@ function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles
           <div className="news-header_component">
             <div className="news-header_rec">
               <h1 className="heading-style-h1-medium">
-                <span className="heading-gap-h1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                 Treva pulse
               </h1>
             </div>
@@ -160,12 +161,16 @@ function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles
                         <Link href={`/${locale}/pulse/${centerArticle.slug}`} className="news-header_middle-link w-inline-block">
                           <div className="news-header_middle-img-wrap">
                             <div className="news_middle-img-holder">
-                              <img
-                                src={toAbsUrl(centerArticle.image || "")}
-                                loading="lazy"
-                                alt={centerArticle.title}
-                                className="fullwidth-img"
-                              />
+                              {centerArticle.image ? (
+                                <img
+                                  src={toAbsUrl(centerArticle.image)}
+                                  loading="lazy"
+                                  alt={centerArticle.title}
+                                  className="fullwidth-img"
+                                />
+                              ) : (
+                                <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />
+                              )}
                             </div>
                             <ReadMoreOverlay />
                             <div className="img-cover"></div>
@@ -176,7 +181,6 @@ function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles
                               <ArticleMeta category={centerArticle.category} date={centerArticle.date} />
                               <h2 className="news-header_middle-title no-animate">{centerArticle.title}</h2>
                             </div>
-                            <AuthorBlock author={centerArticle.author} authorImage={centerArticle.authorImage} />
                           </div>
                         </Link>
                       </div>
@@ -188,12 +192,12 @@ function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles
               <div className="news-header_right-col hide-landscape">
                 <div className="news_rightcol-list-wrap w-dyn-list">
                   <div role="list" className="news_rightcol-list w-dyn-items">
-                    {rightArticles.map((article) => (
+                    {visibleRightArticles.map((article) => (
                       <div key={article.slug} role="listitem" className="news_rightcol-item w-dyn-item">
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_rightcol-link w-inline-block">
                           <div className="news_rightcol-link-content">
-                            <h2 className="news_rightcol-title no-animate">{article.title}</h2>
                             <ArticleMeta category={article.category} date={article.date} />
+                            <h2 className="news_rightcol-title no-animate">{article.title}</h2>
                           </div>
                         </Link>
                       </div>

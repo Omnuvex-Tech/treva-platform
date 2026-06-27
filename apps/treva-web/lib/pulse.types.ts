@@ -29,6 +29,7 @@ export interface Article {
   published?: boolean;
   headerPosition?: "left" | "center" | "right" | "week";
   headerOrder?: number;
+  selectedArticles?: Article[];
   metaTitle?: string;
   metaDescription?: string;
 }

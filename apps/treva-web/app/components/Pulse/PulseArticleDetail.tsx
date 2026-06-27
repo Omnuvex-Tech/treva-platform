@@ -88,12 +88,16 @@ const ArticleHero: React.FC<{ article: Article }> = ({ article }) => (
     </div>
 
     <div className="article_cover-wrap img-reveal">
-      <img
-        src={toAbsUrl(article.image || "")}
-        loading="lazy"
-        alt={article.title}
-        className="fullwidth-img"
-      />
+      {article.image ? (
+        <img
+          src={toAbsUrl(article.image)}
+          loading="lazy"
+          alt={article.title}
+          className="fullwidth-img"
+        />
+      ) : (
+        <div className="fullwidth-img" style={{ background: "#f1f5f9", minHeight: 200 }} />
+      )}
       <div className="img-cover" />
     </div>
   </>
@@ -111,7 +115,7 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
             <div key={item.slug} role="listitem" className="w-dyn-item">
               <a href={`/${locale}/pulse/${item.slug}`} className="article_sidebar-link w-inline-block">
                 <div className="article_sidebar-img">
-                  <img src={toAbsUrl(item.image || "")} loading="lazy" alt="" className="fullwidth-img ease0-6" />
+                  {item.image ? <img src={toAbsUrl(item.image)} loading="lazy" alt="" className="fullwidth-img ease0-6" /> : <div className="fullwidth-img ease0-6" style={{ background: "#f1f5f9" }} />}
                 </div>
                 <div className="article_sidebar-content">
                   <h4 className="no-animate">{item.title}</h4>
@@ -168,7 +172,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                       <a href={`/${locale}/pulse/${item.slug}`} className={`f-articles_link w-inline-block${item.slug === currentSlug ? " w--current" : ""}`}>
                         <div className="f-articles_img-wrap">
                           <div className="news_middle-img-holder">
-                            <img src={toAbsUrl(item.image || "")} loading="lazy" alt={item.title} className="fullwidth-img" />
+                            {item.image ? <img src={toAbsUrl(item.image)} loading="lazy" alt={item.title} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
                           </div>
                           <div className="projects_overlay hide-tablet">
                             <div className="news_btn">
@@ -189,7 +193,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                           {item.author && (
                             <div className="news_author-wrap">
                               <div className="news_author-headshot">
-                                <img src={toAbsUrl(item.authorImage || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg")} loading="lazy" alt={item.author} className="fullwidth-img" />
+                                <img src={toAbsUrl(item.authorImage) || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg"} loading="lazy" alt={item.author} className="fullwidth-img" />
                               </div>
                               <div>{item.author}</div>
                             </div>
@@ -213,7 +217,7 @@ const ArticleAuthorBlock: React.FC<{ locale: string; article: Article }> = ({ lo
     {article.author && (
       <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
         <div className="article_author-avatar">
-          <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
+          <img src={toAbsUrl(article.authorImage)} loading="lazy" alt={article.author} className="fullwidth-img" />
         </div>
         <div className="article_author-content">
           <div className="text-color-blue400">{article.author}</div>
@@ -279,7 +283,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                         <div className="article_content-author">
                           <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
                             <div className="article_author-avatar">
-                              <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
+                              <img src={toAbsUrl(article.authorImage)} loading="lazy" alt={article.author} className="fullwidth-img" />
                             </div>
                             <div className="article_author-content">
                               <div className="text-color-blue400">{article.author}</div>
