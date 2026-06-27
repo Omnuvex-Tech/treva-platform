@@ -196,8 +196,8 @@ function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles
                       <div key={article.slug} role="listitem" className="news_rightcol-item w-dyn-item">
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_rightcol-link w-inline-block">
                           <div className="news_rightcol-link-content">
-                            <ArticleMeta category={article.category} date={article.date} />
                             <h2 className="news_rightcol-title no-animate">{article.title}</h2>
+                            <ArticleMeta category={article.category} date={article.date} />
                           </div>
                         </Link>
                       </div>
