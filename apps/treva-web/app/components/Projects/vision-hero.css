@@ -82,6 +82,10 @@
   margin-bottom: 36px;
 }
 
+.vision-hero__description--desktop {
+  text-transform: none;
+}
+
 .lowercase-text {
   text-transform: lowercase;
 }
