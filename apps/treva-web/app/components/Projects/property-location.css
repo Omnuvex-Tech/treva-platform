@@ -184,6 +184,26 @@
     text-align: right;
     margin-top: 16px;
   }
+
+  .property-map-link {
+    display: inline-block;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(255,255,255,0.9);
+    color: #1a1a2e;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background 0.2s;
+    z-index: 1;
+  }
+  .property-map-link:hover {
+    background: #fff;
+  }
 }
 
 /* --- 2. MOBILE CONFIGURATION (Şəkil 5e936f) --- */

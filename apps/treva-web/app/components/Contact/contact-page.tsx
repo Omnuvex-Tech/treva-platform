@@ -551,40 +551,57 @@ export function ContactPage({ locale }: ContactPageProps) {
                           </div>
                         </a>
 
-                        <a
-                          href="https://maps.app.goo.gl/fU1nX7dWJVy4KTkA9"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="offices_item"
-                        >
-                          <div className="offices_img-wrap is-large img-reveal">
-                            <div className="offices_split-gallery">
-                              <div className="offices_split-img">
-                                <OfficeImageSlider
-                                  images={officeGalleryImages.seaBreeze}
-                                  alt="Sea Breeze Satış Ofisi"
-                                />
+                        <div className="contact_offices-right-col">
+                          <a
+                            href="https://maps.app.goo.gl/fU1nX7dWJVy4KTkA9"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="offices_item"
+                          >
+                            <div className="offices_img-wrap img-reveal">
+                              <div className="offices_overlay">
+                                <div className="offices_btn"><div>Xəritədə göstər</div></div>
                               </div>
-                              <div className="offices_split-img">
-                                <OfficeImageSlider
-                                  images={officeGalleryImages.reportage}
-                                  alt="Reportage Satış Ofisi"
-                                />
+                              <OfficeImageSlider
+                                images={officeGalleryImages.seaBreeze}
+                                alt="Sea Breeze Satış Ofisi"
+                              />
+                              <div className="img-cover" />
+                            </div>
+                            <div className="offices_content-wrap">
+                              <div className="offices_title-wrap">
+                                <div>Sea Breeze Satış Ofisi</div>
+                                <div className="offices_caption">Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097</div>
                               </div>
+                              <div className="icon-xxlarge"><ArrowDiagSVG /></div>
                             </div>
-                            <div className="offices_overlay">
-                              <div className="offices_btn"><div>Xəritədə göstər</div></div>
+                          </a>
+
+                          <a
+                            href="https://maps.app.goo.gl/reportageBaku"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="offices_item"
+                          >
+                            <div className="offices_img-wrap img-reveal">
+                              <div className="offices_overlay">
+                                <div className="offices_btn"><div>Xəritədə göstər</div></div>
+                              </div>
+                              <OfficeImageSlider
+                                images={officeGalleryImages.reportage}
+                                alt="Reportage Satış Ofisi"
+                              />
+                              <div className="img-cover" />
                             </div>
-                            <div className="img-cover" />
-                          </div>
-                          <div className="offices_content-wrap">
-                            <div className="offices_title-wrap">
-                              <div>Sea Breeze Satış Ofisi</div>
-                              <div className="offices_caption">Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097</div>
+                            <div className="offices_content-wrap">
+                              <div className="offices_title-wrap">
+                                <div>Reportage Satış Ofisi</div>
+                                <div className="offices_caption">Bakı şəhəri, Səbail rayonu, Üzeyir Hacıbəyli küçəsi 33/35</div>
+                              </div>
+                              <div className="icon-xxlarge"><ArrowDiagSVG /></div>
                             </div>
-                            <div className="icon-xxlarge"><ArrowDiagSVG /></div>
-                          </div>
-                        </a>
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>

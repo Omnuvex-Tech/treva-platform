@@ -110,7 +110,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
         ];
         setCards(fallbackCards.map((c, i) => ({
           ...c,
-          image: fallbackImagesArray[i],
+          image: fallbackImagesArray[i] || "",
         })));
       } finally {
         setLoading(false);

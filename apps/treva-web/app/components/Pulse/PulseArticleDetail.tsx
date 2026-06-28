@@ -193,7 +193,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                           {item.author && (
                             <div className="news_author-wrap">
                               <div className="news_author-headshot">
-                                <img src={toAbsUrl(item.authorImage) || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg"} loading="lazy" alt={item.author} className="fullwidth-img" />
+                                <img src={toAbsUrl(item.authorImage || "") || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg"} loading="lazy" alt={item.author} className="fullwidth-img" />
                               </div>
                               <div>{item.author}</div>
                             </div>
@@ -217,7 +217,7 @@ const ArticleAuthorBlock: React.FC<{ locale: string; article: Article }> = ({ lo
     {article.author && (
       <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
         <div className="article_author-avatar">
-          <img src={toAbsUrl(article.authorImage)} loading="lazy" alt={article.author} className="fullwidth-img" />
+          <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
         </div>
         <div className="article_author-content">
           <div className="text-color-blue400">{article.author}</div>
@@ -283,7 +283,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                         <div className="article_content-author">
                           <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
                             <div className="article_author-avatar">
-                              <img src={toAbsUrl(article.authorImage)} loading="lazy" alt={article.author} className="fullwidth-img" />
+          <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
                             </div>
                             <div className="article_author-content">
                               <div className="text-color-blue400">{article.author}</div>

@@ -2,14 +2,47 @@
 
 import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
-import { ProjectOverviewData } from "@/lib/projects.types";
 import "./project-overview.css";
 
-interface Props {
-  data: ProjectOverviewData;
+interface OverviewImage {
+  url: string;
+  label: string;
 }
 
-export default function ProjectOverview({ data }: Props): React.ReactElement {
+interface DataRow {
+  key: string;
+  value: string;
+}
+
+interface Props {
+  titleLight: string;
+  titleBold: string;
+  brandName: string;
+  debutText: string;
+  locationText: string;
+  debutTextEnd: string;
+  description: string;
+  images: {
+    large: OverviewImage;
+    medium: OverviewImage;
+    small: OverviewImage;
+  };
+  dataRows: DataRow[];
+  getImageUrl: (url: string) => string;
+}
+
+export default function ProjectOverview({
+  titleLight,
+  titleBold,
+  brandName,
+  debutText,
+  locationText,
+  debutTextEnd,
+  description,
+  images,
+  dataRows,
+  getImageUrl,
+}: Props): React.ReactElement {
   return (
     <section className="po-section">
       <PageContainer>
@@ -17,77 +50,97 @@ export default function ProjectOverview({ data }: Props): React.ReactElement {
         <div className="po-header">
           <div className="po-title-col">
             <h2 className="po-title">
-              <span className="po-title-light">{data.titleLight}</span>
-              <span className="po-title-bold">{data.titleBold}</span>
+              <span className="po-title-light">{titleLight}</span>
+              <span className="po-title-bold">{titleBold}</span>
             </h2>
           </div>
 
           <div className="po-intro-col">
             <p className="po-brand-heading">
-              <span className="po-brand-name">{data.brandName}</span>
-              <br className="mobile-br" />
-              <span className="po-brand-debut">{data.debutText}</span>
-              <br className="desktop-br" />
-              <span className="po-brand-location">{data.locationText}</span>{" "}
-              <span className="po-brand-debut">{data.debutTextEnd}</span>
+              {brandName && <span className="po-brand-name">{brandName}</span>}
+              {debutText && (
+                <>
+                  <br className="mobile-br" />
+                  <span className="po-brand-debut">{debutText}</span>
+                </>
+              )}
+              {locationText && (
+                <>
+                  <br className="desktop-br" />
+                  <span className="po-brand-location">{locationText}</span>{" "}
+                </>
+              )}
+              {debutTextEnd && (
+                <span className="po-brand-debut">{debutTextEnd}</span>
+              )}
             </p>
 
             <div className="po-divider" />
 
-            <p className="po-description">
-              {data.description}
-            </p>
+            {description && (
+              <p className="po-description">{description}</p>
+            )}
           </div>
         </div>
 
         {/* Images Grid */}
         <div className="po-images-grid">
-          <div className="po-image-card po-card-large">
-            <span className="po-image-label">{data.images.large.label}</span>
-            <div className="po-image-wrapper">
-              <img
-                src={data.images.large.url}
-                alt={data.images.large.label}
-                className="po-img"
-              />
+          {images.large.url && (
+            <div className="po-image-card po-card-large">
+              <span className="po-image-label">{images.large.label}</span>
+              <div className="po-image-wrapper">
+                <img
+                  src={getImageUrl(images.large.url)}
+                  alt={images.large.label}
+                  className="po-img"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="po-image-card po-card-medium">
-            <span className="po-image-label">{data.images.medium.label}</span>
-            <div className="po-image-wrapper">
-              <img
-                src={data.images.medium.url}
-                alt={data.images.medium.label}
-                className="po-img"
-              />
+          {images.medium.url && (
+            <div className="po-image-card po-card-medium">
+              <span className="po-image-label">{images.medium.label}</span>
+              <div className="po-image-wrapper">
+                <img
+                  src={getImageUrl(images.medium.url)}
+                  alt={images.medium.label}
+                  className="po-img"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="po-image-card po-card-small">
-            <span className="po-image-label">{data.images.small.label}</span>
-            <div className="po-image-wrapper">
-              <img
-                src={data.images.small.url}
-                alt={data.images.small.label}
-                className="po-img"
-              />
+          {images.small.url && (
+            <div className="po-image-card po-card-small">
+              <span className="po-image-label">{images.small.label}</span>
+              <div className="po-image-wrapper">
+                <img
+                  src={getImageUrl(images.small.url)}
+                  alt={images.small.label}
+                  className="po-img"
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Data Rows */}
-        <div className="po-data-section">
-          {data.dataRows.map((row, idx) => (
-            <React.Fragment key={idx}>
-              <div className="po-data-row">
-                <span className="po-data-key">{row.key}</span>
-                <span className="po-data-val">{row.value}</span>
-              </div>
-              {idx < data.dataRows.length - 1 && <hr className="po-data-line" />}
-            </React.Fragment>
-          ))}
-        </div>
+        {dataRows.length > 0 && (
+          <div className="po-data-section">
+            {dataRows.map((row, idx) => (
+              <React.Fragment key={idx}>
+                <div className="po-data-row">
+                  <span className="po-data-key">{row.key}</span>
+                  <span className="po-data-val">{row.value}</span>
+                </div>
+                {idx < dataRows.length - 1 && (
+                  <hr className="po-data-line" />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
       </PageContainer>
     </section>
   );

@@ -24,29 +24,29 @@ interface LayoutItem {
   number: string;
   price: string;
   image?: string;
-  svgBlueprint?: React.ReactNode;
 }
 
 interface Props {
   categorySlug: string;
-  fallbackLayouts: LayoutItem[];
   locale: string;
 }
 
-export default function DynamicProjectLayouts({ categorySlug, fallbackLayouts, locale }: Props) {
-  const [layouts, setLayouts] = useState<LayoutItem[]>(fallbackLayouts);
-  const [fromApi, setFromApi] = useState(false);
+export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
+  const [layouts, setLayouts] = useState<LayoutItem[]>([]);
 
   useEffect(() => {
     const fetchLayouts = async () => {
       try {
-        const trevaApiUrl = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
+        const trevaApiUrl =
+          process.env.NEXT_PUBLIC_TREVA_API_URL ||
+          "http://localhost:10011/api/v1";
         const res = await fetch(
           `${trevaApiUrl}/unit-layouts?categorySlug=${categorySlug}&limit=10`
         );
         if (!res.ok) return;
         const rawData = await res.json();
-        const items: ApiUnitLayout[] = rawData.data || rawData.items || rawData;
+        const items: ApiUnitLayout[] =
+          rawData.data || rawData.items || rawData;
 
         if (items && items.length > 0) {
           const apiUrl = trevaApiUrl.replace(/\/api\/v1\/?$/, "");
@@ -68,15 +68,16 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackLayouts, l
                 : undefined,
             }))
           );
-          setFromApi(true);
         }
       } catch {
-        // Use fallback static layouts
+        // No layouts available
       }
     };
 
     fetchLayouts();
   }, [categorySlug]);
+
+  if (layouts.length === 0) return null;
 
   return (
     <ProjectLayouts
