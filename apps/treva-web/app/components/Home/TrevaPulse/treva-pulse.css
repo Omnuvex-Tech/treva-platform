@@ -98,9 +98,9 @@
   height: 38px;
   padding: 11px 12px;
   border-radius: 30px;
-  border: 2px solid var(--color-btn-inactive);
-  background: transparent;
-  color: var(--color-btn-inactive);
+  border: 2px solid #565a63;
+  background: #565a63;
+  color: #ffffff;
   font-family: var(--font-family);
   font-size: 14px;
   font-weight: 500;
@@ -113,16 +113,16 @@
 }
 
 .pulse__filter-btn:hover {
-  background-color: #2F3134;
+  background-color: #484d55;
   color: #ffffff;
-  border-color: #2F3134;
+  border-color: #484d55;
 }
 
 .pulse__filter-btn:active,
 .pulse__filter-btn--active {
-  background-color: #000000 !important;
+  background-color: #484d55 !important;
   color: var(--color-white) !important;
-  border-color: #000000 !important;
+  border-color: #484d55 !important;
 }
 
 .pulse__view-all-wrapper {

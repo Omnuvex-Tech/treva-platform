@@ -124,7 +124,7 @@ const productionStyles = `
   }
 
   .logos_cell:hover .logos_cell-decoration .icon-large svg {
-    opacity: 0.5 !important;
+    opacity: 1 !important;
     transform: none !important;
   }
 
@@ -156,13 +156,13 @@ const productionStyles = `
     grid-row-gap: 5px !important;
     border: 1px solid var(--_color---white) !important;
     background-color: var(--_color---white) !important;
-    color: var(--_color---blue-400) !important;
+    color: #565a63 !important;
     white-space: nowrap !important;
     border-radius: 80px !important;
     justify-content: center !important;
     align-items: center !important;
     box-sizing: border-box !important;
-    width: 186px !important;
+    width: fit-content !important;
     min-width: 0 !important;
     max-width: 100% !important;
     height: 29px !important;
@@ -179,39 +179,8 @@ const productionStyles = `
 
   .section_logos .logos-partnership-button:hover {
     color: var(--_color---white) !important;
-    background-color: #fff0 !important;
-  }
-
-  .section_logos .logos-partnership-button .button-text-wrap {
-    position: relative !important;
-    width: 100% !important;
-    height: 17px !important;
-    line-height: 17px !important;
-    display: block !important;
-    overflow: hidden !important;
-  }
-
-  .section_logos .logos-partnership-button .button-text {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    height: 17px !important;
-    line-height: 17px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    transform: translateY(0) !important;
-    transition: transform .3s ease !important;
-  }
-
-  .section_logos .logos-partnership-button .button-text + .button-text {
-    top: 17px !important;
-  }
-
-  .section_logos .logos-partnership-button:hover .button-text {
-    transform: translateY(-17px) !important;
+    background-color: transparent !important;
+    border-color: var(--_color---white) !important;
   }
 
   .logos-left-description-mobile {

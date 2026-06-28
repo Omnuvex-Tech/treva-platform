@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { usePathname, useParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -143,7 +143,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
               </h2>
             </div>
             <div className="featured__title-wrapper">
-              <ViewAllButton className="featured__view-all" label={content.viewAll} />
+              <ViewAllButton className="featured__view-all" label={content.viewAll} href={`/${activeLocale}/projects`} />
             </div>
           </div>
 
@@ -156,7 +156,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
             <p className="featured__subtitle-mobile">
               {content.subtitle}
             </p>
-            <ViewAllButton mobile className="featured__view-all-mobile" label={content.viewAll} />
+            <ViewAllButton mobile className="featured__view-all-mobile" label={content.viewAll} href={`/${activeLocale}/projects`} />
           </div>
 
           {/* SLIDER */}

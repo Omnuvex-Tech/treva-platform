@@ -135,6 +135,10 @@ body.gsap-hidden {
   overflow: hidden;
   transform-origin: center;
   will-change: transform, opacity;
+  background-color: #565a63 !important;
+  border: 1px solid #565a63 !important;
+  color: #ffffff !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
 }
 
 .home-offices-card-overlay-button-text {
@@ -754,17 +758,17 @@ textarea:focus::placeholder {
   box-sizing: border-box;
   width: 52.5px;
   height: 52.5px;
-  background: rgba(255, 255, 255, 0.25);
+  background: #565a63;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 0.8px solid rgba(255, 255, 255, 0.4);
+  border: 0.8px solid #565a63;
   opacity: 0;
   transform-origin: center;
   will-change: transform, opacity;
   transform: translate(-50%, -50%) scale(0.6);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s, opacity 0.4s ease 0.15s;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s, opacity 0.4s ease 0.15s;
 }
 
 .projects_btn .icon-large {
@@ -994,8 +998,8 @@ html.disable-smooth-scroll {
   justify-content: center;
   transform: scale(0.6);
   transition: all 0.4s ease;
-  background-color: rgba(255, 255, 255, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background-color: #565a63 !important;
+  border: 1px solid #565a63 !important;
   color: white !important;
   text-transform: uppercase;
   font-size: 13.16px;
@@ -1011,7 +1015,8 @@ html.disable-smooth-scroll {
 }
 
 .news_btn:hover {
-  background-color: rgba(255, 255, 255, 0.5) !important;
+  background-color: #484d55 !important;
+  border-color: #484d55 !important;
 }
 
 @keyframes live-scroll {
@@ -1739,6 +1744,33 @@ body.gsap-hidden {
   flex: 0 0 22.4px;
   height: 22.4px;
   line-height: 22.4px !important;
+}
+
+/* Home button palette overrides */
+.home-hero-primary-button,
+.home-hero-secondary-button,
+.home-services-cta-button,
+.home-projects-cta-button,
+.home-hero-scroll-button {
+  background-color: #565a63 !important;
+  border-color: #565a63 !important;
+  color: #ffffff !important;
+}
+
+.home-hero-primary-button:hover,
+.home-hero-secondary-button:hover,
+.home-services-cta-button:hover,
+.home-projects-cta-button:hover,
+.home-hero-scroll-button:hover,
+.offices_item:hover .home-offices-card-overlay-button,
+.projects_btn:hover {
+  background-color: #484d55 !important;
+  border-color: #484d55 !important;
+  color: #ffffff !important;
+}
+
+.home-hero-scroll-button svg path {
+  fill: #ffffff !important;
 }
 
 
