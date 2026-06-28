@@ -82,6 +82,17 @@ export default function TrevaHero() {
   const locationDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const savedCategory = localStorage.getItem('treva_selectedCategory');
+    if (savedCategory) {
+      setSelectedCategory(savedCategory);
+    }
+    const savedDeal = localStorage.getItem('treva_dealType');
+    if (savedDeal && content.dealOptions.includes(savedDeal as any)) {
+      setDealType(savedDeal);
+    }
+  }, []);
+
+  useEffect(() => {
     setDealType(content.dealOptions[0]);
   }, [locale]);
 
@@ -93,7 +104,10 @@ export default function TrevaHero() {
         const data = Array.isArray(raw) ? raw : raw.value || [];
         const cats = data.map((cat: any) => ({ title: cat.title, slug: cat.slug }));
         setCategories(cats);
-        if (cats.length > 0 && !selectedCategory) {
+        const saved = localStorage.getItem('treva_selectedCategory');
+        if (saved) {
+          setSelectedCategory(saved);
+        } else if (cats.length > 0 && !selectedCategory) {
           setSelectedCategory(cats[0].title);
         }
       })
@@ -115,14 +129,16 @@ export default function TrevaHero() {
 
   const handleHomeClick = useCallback(() => {
     const path = dealType === "Resale" ? "resale" : "off-plan";
-    router.push(`/${locale}/${path}`);
-  }, [dealType, locale, router]);
+    const selectedCat = categories.find((c) => c.title === selectedCategory);
+    const categoryParam = selectedCat ? `?category=${selectedCat.slug}` : '';
+    router.push(`/${locale}/${path}${categoryParam}`);
+  }, [dealType, locale, router, categories, selectedCategory]);
 
   const handleCategoryClick = useCallback((slug: string, title: string) => {
     setLocationMenuOpen(false);
     setSelectedCategory(title);
-    router.push(`/${locale}/projects/${slug}`);
-  }, [locale, router]);
+    localStorage.setItem('treva_selectedCategory', title);
+  }, []);
 
   return (
     <>
@@ -205,6 +221,7 @@ export default function TrevaHero() {
                       aria-selected={dealType === option}
                       onClick={() => {
                         setDealType(option);
+                        localStorage.setItem('treva_dealType', option);
                         setDealMenuOpen(false);
                       }}
                     >
