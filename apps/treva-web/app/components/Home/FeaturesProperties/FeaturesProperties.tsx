@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -61,6 +61,8 @@ type FeaturedCard = {
   title: string;
   desc: string;
   brand: string;
+  brandImage: string;
+  brandTextColor: string;
   image: string;
   slug?: string;
 };
@@ -93,6 +95,8 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
             title: cat.title,
             desc: cat.description || "",
             brand: cat.brand || "",
+            brandImage: cat.brandImage ? (cat.brandImage.startsWith("http") ? cat.brandImage : `${apiUrl}${cat.brandImage}`) : "",
+            brandTextColor: cat.brandTextColor || "white",
             image: cat.image ? (cat.image.startsWith("http") ? cat.image : `${apiUrl}${cat.image}`) : (fallbackImages[cat.slug] || ""),
             slug: cat.slug,
           })));
@@ -110,6 +114,8 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
         ];
         setCards(fallbackCards.map((c, i) => ({
           ...c,
+          brandImage: "",
+          brandTextColor: "white",
           image: fallbackImagesArray[i] || "",
         })));
       } finally {
@@ -155,90 +161,75 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
 
           {/* SLIDER */}
           <div className="featured__slider-container" style={{ marginBottom: "40px" }}>
-            <Swiper
-              modules={[Autoplay]}
-              spaceBetween={20}
-              slidesPerView={1.2}
-              loop={true}
-              speed={6000}
-              autoplay={{
-                delay: 0,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }}
-              breakpoints={{
-                768: { slidesPerView: 2, spaceBetween: 20 },
-                1024: { slidesPerView: 3, spaceBetween: 20 },
-                1280: { slidesPerView: 4, spaceBetween: 20 },
-              }}
-              className="featured__swiper"
-            >
-              {cards.slice(0, 6).map((card, i) => (
-                <SwiperSlide key={card.slug || i} style={{ height: 'auto' }}>
-                  <a
-                    href={card.slug ? `#` : "#"}
-                    className={`property-card${i === 3 ? ' property-card--highlighted' : ''}`}
-                    style={{ height: '100%' }}
-                  >
-                    {card.image && (
-                      <img
-                        className="property-card__bg"
-                        src={card.image}
-                        alt={`${card.title} background`}
-                      />
-                    )}
-                    <div className="property-card__overlay"></div>
-                    
-                    {(() => {
-                      const normalized = (card.brand || '').toLowerCase().trim();
-                      if (normalized.includes("sea breeze") || normalized.includes("seabreeze")) {
-                        return (
-                          <div className="property-card__brand-text brand-seabreeze">
-                            SEA BREEZE
-                            <span>REAL ESTATE</span>
-                          </div>
-                        );
-                      }
-                      if (normalized.includes("reportage")) {
-                        return (
-                          <div className="property-card__brand-text brand-reportage">
-                            Reportage.
-                            <span>Properties</span>
-                          </div>
-                        );
-                      }
-                      if (normalized.includes("sabah")) {
-                        return (
-                          <div className="property-card__brand-text brand-sabah">
-                            SABAH
-                            <span>RESIDENCE</span>
-                          </div>
-                        );
-                      }
-                      return <div className="property-card__brand-text">{card.brand}</div>;
-                    })()}
-
-                    <h3 className="property-card__title">
-                      {card.title.split(' ').length > 2 ? (
-                        <>
-                          {card.title.split(' ').slice(0, Math.ceil(card.title.split(' ').length / 2)).join(' ')} <br />
-                          {card.title.split(' ').slice(Math.ceil(card.title.split(' ').length / 2)).join(' ')}
-                        </>
-                      ) : (
-                        card.title.split(' ').map((word, wi) => (
-                          <React.Fragment key={wi}>{word}{wi < card.title.split(' ').length - 1 ? <br /> : ''}</React.Fragment>
-                        ))
+            {cards.length > 0 && (
+              <Swiper
+                modules={[Autoplay]}
+                spaceBetween={20}
+                slidesPerView={1.2}
+                loop={true}
+                speed={6000}
+                autoplay={{
+                  delay: 0,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                breakpoints={{
+                  768: { slidesPerView: 2, spaceBetween: 20 },
+                  1024: { slidesPerView: 3, spaceBetween: 20 },
+                  1280: { slidesPerView: 4, spaceBetween: 20 },
+                }}
+                className="featured__swiper"
+              >
+                {cards.slice(0, 6).map((card, i) => (
+                  <SwiperSlide key={card.slug || i} style={{ height: 'auto' }}>
+                    <a
+                      href={card.slug ? `/${activeLocale}/projects/${card.slug}` : "#"}
+                      className={`property-card${i === 3 ? ' property-card--highlighted' : ''}`}
+                      style={{ height: '100%' }}
+                    >
+                      {card.image && (
+                        <img
+                          className="property-card__bg"
+                          src={card.image}
+                          alt={`${card.title} background`}
+                        />
                       )}
-                    </h3>
-                    <p className="property-card__desc">{card.desc}</p>
-                    <span className="property-card__action">
-                      {content.learnMore}
-                      {arrowSvg}
-                    </span>
-                  </a>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                      <div className="property-card__overlay"></div>
+                      
+                      {card.brandImage ? (
+                        <img
+                          className="property-card__brand-logo"
+                          src={card.brandImage}
+                          alt={card.brand || "Brand"}
+                        />
+                      ) : (
+                        <div className="property-card__brand-text" style={{ color: card.brandTextColor === 'black' ? '#000' : '#fff' }}>
+                          {card.brand}
+                        </div>
+                      )}
+
+                      <h3 className="property-card__title">
+                        {card.title.split(' ').length > 2 ? (
+                          <>
+                            {card.title.split(' ').slice(0, Math.ceil(card.title.split(' ').length / 2)).join(' ')} <br />
+                            {card.title.split(' ').slice(Math.ceil(card.title.split(' ').length / 2)).join(' ')}
+                          </>
+                        ) : (
+                          card.title.split(' ').map((word, wi) => (
+                            <React.Fragment key={wi}>{word}{wi < card.title.split(' ').length - 1 ? <br /> : ''}</React.Fragment>
+                          ))
+                        )}
+                      </h3>
+                      <p className="property-card__desc">{card.desc}</p>
+                      <span className="property-card__action">
+                        {content.learnMore}
+                        {arrowSvg}
+                      </span>
+                    </a>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
           </div>
 
         </section>

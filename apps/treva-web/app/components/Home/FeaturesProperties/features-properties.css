@@ -148,6 +148,15 @@
 /* --------------------------------------------------------
     YENİ: Mətn Formatında Ağ Brend Loqoları (Böyük və Simmetrik)
    -------------------------------------------------------- */
+.property-card__brand-logo {
+  position: relative;
+  z-index: 3;
+  max-width: 80%;
+  max-height: 160px;
+  object-fit: contain;
+  margin: -47 auto;
+}
+
 .property-card__brand-text {
   position: relative;
   z-index: 3;

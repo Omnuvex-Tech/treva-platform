@@ -71,6 +71,8 @@ export class CategoriesController {
         title: cat.title,
         slug: cat.slug,
         image: cms?.image || cat.image || null,
+        brandImage: cms?.brandImage || null,
+        brandTextColor: cms?.brandTextColor || 'white',
         description: cms?.description || null,
         brand: cms?.brand || null,
         order: cms?.order ?? cat.order ?? 0,

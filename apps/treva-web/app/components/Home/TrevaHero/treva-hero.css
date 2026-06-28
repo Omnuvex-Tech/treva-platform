@@ -84,7 +84,6 @@
   width: 100%;
   height: 100vh;
   min-height: 620px;
-  overflow: hidden;
   margin-top: 0;
 }
 
@@ -93,6 +92,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 .treva-hero-bg__image {
   width: 100%;
@@ -203,6 +203,46 @@
   transform: translateY(1px);
 }
 
+.treva-filter-bar__location-group {
+  position: relative;
+  width: 260px;
+  z-index: 9999999;
+}
+
+.treva-filter-bar__input-group--clickable {
+  cursor: pointer;
+  width: 100%;
+}
+
+.treva-filter-bar__location-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: #fff;
+  stroke: #fff;
+}
+
+.treva-filter-bar__input-group--clickable[aria-expanded="true"] .treva-filter-bar__location-chevron,
+.treva-filter-bar__input-group--clickable.treva-pill-button--pressed .treva-filter-bar__location-chevron {
+  transform: rotate(180deg);
+}
+
+.treva-filter-bar__deal-menu--location {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 100%;
+  z-index: 9999999;
+  padding: 12px 0;
+  background: var(--treva-pill-bg);
+  border-radius: 20px;
+  box-shadow: var(--treva-shadow);
+  overflow: hidden;
+}
+
+.treva-filter-bar__deal-option--active {
+  background: rgba(0, 0, 0, 0.16);
+}
+
 /* BUY BUTTON */
 .treva-filter-bar__dropdown-btn {
   display: flex;
@@ -266,6 +306,7 @@
   box-shadow: var(--treva-shadow);
   transform: translateX(-50%);
   overflow: hidden;
+  z-index: 9999999;
 }
 
 .treva-filter-bar__deal-option {
