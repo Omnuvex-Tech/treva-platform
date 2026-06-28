@@ -62,7 +62,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
 
                     case "list":
                         return (
-                            <ul key={index} role="list" style={{ marginBottom: "1rem", paddingLeft: "1.5rem" }}>
+                            <ul key={index} role="list" style={{ marginBottom: "1rem", paddingLeft: "1.5rem", listStyleType: "disc" }}>
                                 {block.items.map((item, itemIdx) => (
                                     <li key={itemIdx} dangerouslySetInnerHTML={{ __html: item }} />
                                 ))}

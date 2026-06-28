@@ -19,6 +19,7 @@ interface ProjectCategory {
   slug: string;
   image: string | null;
   brand: string | null;
+  order?: number;
 }
 
 interface ProjectsPageProps {
@@ -38,7 +39,9 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
         const res = await fetch(`${trevaApiUrl}/categories/featured`);
         if (res.ok) {
           const data = await res.json();
-          setCategories(Array.isArray(data) ? data : data.value || []);
+          const list = Array.isArray(data) ? data : data.value || [];
+          list.sort((a: ProjectCategory, b: ProjectCategory) => (a.order ?? 0) - (b.order ?? 0));
+          setCategories(list);
         }
       } catch {
         // fallback

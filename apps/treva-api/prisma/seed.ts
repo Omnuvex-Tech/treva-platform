@@ -30,33 +30,36 @@ async function main() {
   // Create categories
   const category1 = await prisma.category.upsert({
     where: { slug: 'panorama-by-elie-saab' },
-    update: {},
+    update: { order: 5 },
     create: {
       title: 'Panorama by ELIE SAAB',
       name: 'Panorama by ELIE SAAB',
       slug: 'panorama-by-elie-saab',
+      order: 5,
     },
   });
   console.log('Category 1 created:', category1.title);
 
   const category2 = await prisma.category.upsert({
     where: { slug: 'treva-residences' },
-    update: {},
+    update: { order: 6 },
     create: {
       title: 'TREVA Residences',
       name: 'TREVA Residences',
       slug: 'treva-residences',
+      order: 6,
     },
   });
   console.log('Category 2 created:', category2.title);
 
   // Create Layihelerimiz categories
   const layihelerimizCategories = [
-    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights' },
-    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches' },
-    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village' },
-    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island' },
-    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence' },
+    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights', order: 0 },
+    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches', order: 1 },
+    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village', order: 2 },
+    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island', order: 3 },
+    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence', order: 4 },
+    { title: 'Toronto', name: 'Toronto', slug: 'toronto', order: 7 },
   ];
 
   for (const cat of layihelerimizCategories) {

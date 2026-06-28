@@ -73,9 +73,9 @@ export class CategoriesController {
         image: cms?.image || cat.image || null,
         description: cms?.description || null,
         brand: cms?.brand || null,
-        order: cms?.order ?? 0,
+        order: cms?.order ?? cat.order ?? 0,
       };
-    });
+    }).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }
 
   @Get(':id')
