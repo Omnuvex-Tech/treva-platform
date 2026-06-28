@@ -173,7 +173,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
               }}
               className="featured__swiper"
             >
-              {cards.map((card, i) => (
+              {cards.slice(0, 6).map((card, i) => (
                 <SwiperSlide key={card.slug || i} style={{ height: 'auto' }}>
                   <a
                     href={card.slug ? `#` : "#"}
@@ -188,9 +188,36 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                       />
                     )}
                     <div className="property-card__overlay"></div>
-                    <div className="property-card__brand-text">
-                      {card.brand}
-                    </div>
+                    
+                    {(() => {
+                      const normalized = (card.brand || '').toLowerCase().trim();
+                      if (normalized.includes("sea breeze") || normalized.includes("seabreeze")) {
+                        return (
+                          <div className="property-card__brand-text brand-seabreeze">
+                            SEA BREEZE
+                            <span>REAL ESTATE</span>
+                          </div>
+                        );
+                      }
+                      if (normalized.includes("reportage")) {
+                        return (
+                          <div className="property-card__brand-text brand-reportage">
+                            Reportage.
+                            <span>Properties</span>
+                          </div>
+                        );
+                      }
+                      if (normalized.includes("sabah")) {
+                        return (
+                          <div className="property-card__brand-text brand-sabah">
+                            SABAH
+                            <span>RESIDENCE</span>
+                          </div>
+                        );
+                      }
+                      return <div className="property-card__brand-text">{card.brand}</div>;
+                    })()}
+
                     <h3 className="property-card__title">
                       {card.title.split(' ').length > 2 ? (
                         <>

@@ -269,8 +269,24 @@
 }
 
 .section_contact .offices_block > .offices_item.is-large {
-  flex: 0 0 auto;
-  /* width kept from Webflow's is-large rule */
+  flex: 0 0 50%;
+  max-width: 50%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.section_contact .offices_block > .offices_item.is-large .offices_img-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.section_contact .offices_block > .offices_item.is-large .offices_img-wrap img,
+.section_contact .offices_block > .offices_item.is-large .offices_img-wrap .fullwidth-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .section_contact .contact_offices-right-col {
@@ -286,11 +302,43 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
 }
 
 .section_contact .contact_offices-right-col .offices_item .offices_img-wrap {
   flex: 1 1 0;
   min-height: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.section_contact .contact_offices-right-col .offices_item .offices_img-wrap img,
+.section_contact .contact_offices-right-col .offices_item .offices_img-wrap .fullwidth-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 991px) {
+  .section_contact .offices_block {
+    flex-direction: column;
+  }
+
+  .section_contact .offices_block > .offices_item.is-large {
+    flex: none;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .section_contact .contact_offices-right-col {
+    flex-direction: row;
+  }
+
+  .section_contact .contact_offices-right-col .offices_item {
+    aspect-ratio: 16 / 9;
+  }
 }
 
 

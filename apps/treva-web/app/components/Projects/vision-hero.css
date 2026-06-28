@@ -135,18 +135,7 @@
   display: flex;
   gap: 12px;
   align-self: flex-end;
-  margin-bottom: 80px; 
-}
-
-.vision-hero__slider-arrows .portfolio-direction-button {
-  border-color: rgba(255, 255, 255, 0.3);
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.vision-hero__slider-arrows .portfolio-direction-button:hover {
-  border-color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.2);
+  margin-bottom: 80px;
 }
 
 
