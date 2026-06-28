@@ -9,7 +9,7 @@ import { useViewOptions } from '@/hooks/use-view-options';
 import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
-import { getAssetUrl } from '@/lib/asset-url';
+import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
 

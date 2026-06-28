@@ -44,6 +44,40 @@ export class CategoriesController {
     return this.categoriesService.findAll();
   }
 
+  @Get('featured')
+  @ApiOperation({ summary: 'Get featured project categories (combined from off-plan + CMS)' })
+  async findFeatured() {
+    // 1. Get all categories from treva-api (off-plan)
+    const categories = await this.categoriesService.findAll();
+
+    // 2. Get display data from cms-api (image, brand, description)
+    let cmsData: Record<string, any> = {};
+    try {
+      const cmsUrl = process.env.CMS_API_URL || 'http://localhost:10021';
+      const res = await fetch(`${cmsUrl}/layihelerimiz/categories/visible`);
+      if (res.ok) {
+        const cmsCategories = await res.json();
+        for (const cat of cmsCategories) {
+          cmsData[cat.slug] = cat;
+        }
+      }
+    } catch {}
+
+    // 3. Combine: all categories, with image/brand from cms-api if available
+    return categories.map((cat) => {
+      const cms = cmsData[cat.slug];
+      return {
+        id: cat.id,
+        title: cat.title,
+        slug: cat.slug,
+        image: cms?.image || cat.image || null,
+        description: cms?.description || null,
+        brand: cms?.brand || null,
+        order: cms?.order ?? 0,
+      };
+    });
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
   @ApiResponse({ status: 200, description: 'Category retrieved successfully' })

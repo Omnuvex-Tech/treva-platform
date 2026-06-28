@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { trevaApi as api } from "@/lib/api";
 import { endpoints } from "@/config/endpoints";
 
 export interface RoomOption {

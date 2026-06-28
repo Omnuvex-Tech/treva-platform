@@ -16,7 +16,7 @@ type Props = {
 
 export async function generateStaticParams() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001/api/v1"}/pulse/authors`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10011/api/v1"}/pulse/authors`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) return [];

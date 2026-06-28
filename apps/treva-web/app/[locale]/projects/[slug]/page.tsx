@@ -13,6 +13,7 @@ import {
   ProjectOverview,
 } from "@/app/components/Projects";
 import { getProjectModelBySlug } from "@/lib/projects";
+import DynamicProjectLayouts from "@/app/components/Projects/DynamicProjectLayouts";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -40,21 +41,9 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       openGraph: {
         title,
         description,
-        images: [
-          {
-            url: detail.ogImage,
-            width: 1200,
-            height: 630,
-            alt: title,
-          },
-        ],
+        images: [{ url: detail.ogImage, width: 1200, height: 630, alt: title }],
       },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: [detail.ogImage],
-      },
+      twitter: { card: "summary_large_image", title, description, images: [detail.ogImage] },
     };
   }
 
@@ -71,21 +60,9 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     openGraph: {
       title,
       description,
-      images: [
-        {
-          url: model.ogImage,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      images: [{ url: model.ogImage, width: 1200, height: 630, alt: title }],
     },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [model.ogImage],
-    },
+    twitter: { card: "summary_large_image", title, description, images: [model.ogImage] },
   };
 }
 
@@ -111,7 +88,7 @@ export default async function DynamicProjectPage({ params, searchParams }: Props
       <ProjectOverview data={model.overview} />
       <ProjectFeatures data={model.features} />
       <ProjectLocation data={model.location} />
-      <ProjectLayouts layouts={model.layouts} />
+      <DynamicProjectLayouts categorySlug={slug} fallbackLayouts={model.layouts} locale={locale} />
       <CallbackForm />
       <HomeFooter locale={locale} />
     </div>

@@ -6,9 +6,13 @@ import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Autoplay, EffectFade } from 'swiper/modules'
 import Header from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
+import 'swiper/css'
+import 'swiper/css/effect-fade'
 import './contact.css'  // ayrıca CSS faylı
 
 declare global {
@@ -68,6 +72,58 @@ const INITIAL_CONTACT_FIELDS: ContactFields = {
   email: '',
   phone: '',
   message: '',
+}
+
+const officeGalleryImages = {
+  trevabaku: [
+    '/images/contact/trevabaku/office1.jpeg',
+    '/images/contact/trevabaku/office2.jpeg',
+  ],
+  seaBreeze: [
+    '/images/contact/sea-breeze/office1.png',
+    '/images/contact/sea-breeze/office2.PNG',
+    '/images/contact/sea-breeze/office3.PNG',
+    '/images/contact/sea-breeze/office4.PNG',
+  ],
+  reportage: [
+    '/images/contact/reportage/office1.JPG',
+    '/images/contact/reportage/office2.JPG',
+    '/images/contact/reportage/office3.JPG',
+  ],
+}
+
+type OfficeImageSliderProps = {
+  images: string[]
+  alt: string
+}
+
+function OfficeImageSlider({ images, alt }: OfficeImageSliderProps) {
+  return (
+    <Swiper
+      modules={[Autoplay, EffectFade]}
+      effect="fade"
+      fadeEffect={{ crossFade: true }}
+      loop={images.length > 1}
+      speed={900}
+      autoplay={{
+        delay: 2800,
+        disableOnInteraction: false,
+      }}
+      allowTouchMove={false}
+      className="office_image-swiper"
+    >
+      {images.map((src, index) => (
+        <SwiperSlide key={src}>
+          <img
+            src={src}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            alt={alt}
+            className="fullwidth-img ease0-6"
+          />
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  )
 }
 
 function ConnectLink({ href, label, isLarge = false, isSmallCaps = false, external = false }: ConnectLinkProps) {
@@ -480,12 +536,9 @@ export function ContactPage({ locale }: ContactPageProps) {
                             <div className="offices_overlay">
                               <div className="offices_btn"><div>Xəritədə göstər</div></div>
                             </div>
-                            <img
-                              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/689706aae06419ffd1eb8aa7_Ekran-treva.avif"
-                              loading="lazy"
-                              width={462}
+                            <OfficeImageSlider
+                              images={officeGalleryImages.trevabaku}
                               alt="TREVA Real Estate Bakı Baş Ofisi"
-                              className="fullwidth-img ease0-6"
                             />
                             <div className="img-cover" />
                           </div>
@@ -505,12 +558,20 @@ export function ContactPage({ locale }: ContactPageProps) {
                           className="offices_item"
                         >
                           <div className="offices_img-wrap is-large img-reveal">
-                            <img
-                              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687dea9661c0efc7fbff9e44_office.avif"
-                              loading="lazy"
-                              alt="Sea Breeze Satış Ofisi"
-                              className="fullwidth-img ease0-6"
-                            />
+                            <div className="offices_split-gallery">
+                              <div className="offices_split-img">
+                                <OfficeImageSlider
+                                  images={officeGalleryImages.seaBreeze}
+                                  alt="Sea Breeze Satış Ofisi"
+                                />
+                              </div>
+                              <div className="offices_split-img">
+                                <OfficeImageSlider
+                                  images={officeGalleryImages.reportage}
+                                  alt="Reportage Satış Ofisi"
+                                />
+                              </div>
+                            </div>
                             <div className="offices_overlay">
                               <div className="offices_btn"><div>Xəritədə göstər</div></div>
                             </div>

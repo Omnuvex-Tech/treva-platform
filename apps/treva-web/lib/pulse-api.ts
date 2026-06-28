@@ -1,6 +1,6 @@
 import { Article } from "./pulse.types";
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
 
 export type ArticleBlock =
     | { type: "heading"; level: 2 | 3; text: string }
@@ -143,7 +143,7 @@ export async function getAuthorBySlug(
     return res.json();
 }
 
-const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
 
 export function toAbsUrl(path: string): string {
     if (!path) return "";

@@ -126,7 +126,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
   const trackWidth = totalItems === 0 ? "100%" : `${(totalItems / itemsVisible) * 100}%`;
   const cardWidth = totalItems === 0 ? "100%" : `${100 / totalItems}%`;
 
-  const scrollSpeed = `${baseData.length * 2}s`;
+  const scrollSpeed = `${baseData.length * 6}s`;
 
   return (
     <main>

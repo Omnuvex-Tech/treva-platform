@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import helmet from 'helmet';
 
 function parseCsv(value?: string) {
   return value
@@ -39,6 +40,13 @@ async function bootstrap() {
     origin: corsOrigins,
     credentials: true,
   });
+
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: false,
+    crossOriginOpenerPolicy: false,
+  }));
 
   app.setGlobalPrefix(apiPrefix);
 

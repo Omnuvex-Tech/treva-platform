@@ -320,3 +320,8 @@
   .property-card { padding: 32px 20px; }
   .property-card__title { font-size: 23px; }
 }
+
+/* Swiper Continuous Scroll Fix */
+.featured__swiper .swiper-wrapper {
+  transition-timing-function: linear !important;
+}

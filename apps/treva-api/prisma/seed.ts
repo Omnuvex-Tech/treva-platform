@@ -50,6 +50,25 @@ async function main() {
   });
   console.log('Category 2 created:', category2.title);
 
+  // Create Layihelerimiz categories
+  const layihelerimizCategories = [
+    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights' },
+    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches' },
+    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village' },
+    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island' },
+    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence' },
+  ];
+
+  for (const cat of layihelerimizCategories) {
+    const existing = await prisma.category.findUnique({ where: { slug: cat.slug } });
+    if (!existing) {
+      await prisma.category.create({ data: cat });
+      console.log('Category created:', cat.title);
+    } else {
+      console.log('Category already exists:', cat.title);
+    }
+  }
+
   // Create default currencies
   const currencies = [
     { name: 'US Dollar', value: 'USD', order: 0 },
