@@ -148,8 +148,8 @@
 }
 
 .po-card-large  { flex: 0 0 50%; }
-.po-card-medium { flex: 0 0 27%; }
-.po-card-small  { flex: 1 1 0; }
+.po-card-medium { flex: 0 0 25%; }
+.po-card-small  { flex: 0 0 25%; }
 
 .po-image-label {
   font-size: 14px;
@@ -168,7 +168,7 @@
   width: 100%;
   overflow: hidden;
   border-radius: 4px;
-  height: 210px;
+  height: 280px;
 }
 
 .po-img {
@@ -318,9 +318,9 @@
     white-space: normal;
   }
 
-  .po-card-large  .po-image-wrapper { height: 240px; }
-  .po-card-medium .po-image-wrapper { height: 160px; }
-  .po-card-small  .po-image-wrapper { height: 160px; }
+  .po-card-large  .po-image-wrapper { height: 300px; }
+  .po-card-medium .po-image-wrapper { height: 210px; }
+  .po-card-small  .po-image-wrapper { height: 210px; }
 
   .po-data-section {
     margin-top: 32px;

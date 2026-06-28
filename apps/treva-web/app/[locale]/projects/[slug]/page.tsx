@@ -147,6 +147,7 @@ export default function ProjectDetailPage() {
       <ProjectLocation
         titleLight={detail.locationTitleLight || "Property "}
         titleBold={detail.locationTitleBold || "Location"}
+        brandName={detail.locationBrandName || ""}
         mainLead={detail.locationMainLead || ""}
         subText={detail.locationSubText || ""}
         mapImage={detail.locationMapImage || ""}

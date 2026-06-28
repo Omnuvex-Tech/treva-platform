@@ -117,7 +117,7 @@
 .pd-image-cell {
   overflow: hidden;
   position: relative;
-  height: 360px; /* Uniform height for all images */
+  height: 370px; /* Uniform height for all images */
   border-radius: 6px; /* Smooth rounded corners for images */
 }
 
@@ -134,7 +134,7 @@
   flex-direction: column;
   justify-content: flex-start;
   padding: 44px 48px;
-  height: 360px; /* Same uniform height as images */
+  height: 370px; /* Same uniform height as images */
   box-sizing: border-box;
   border-radius: 6px; /* Soft rounded corners for cards */
 }

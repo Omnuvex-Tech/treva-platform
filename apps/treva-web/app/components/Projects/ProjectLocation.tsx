@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import "./property-location.css";
 
 interface Props {
   titleLight: string;
   titleBold: string;
+  brandName: string;
   mainLead: string;
   subText: string;
   mapImage: string;
@@ -62,6 +63,7 @@ function toGoogleMapsEmbed(url: string): string {
 export default function ProjectLocation({
   titleLight,
   titleBold,
+  brandName,
   mainLead,
   subText,
   mapImage,
@@ -69,12 +71,13 @@ export default function ProjectLocation({
   googleMapsUrl,
   getImageUrl,
 }: Props) {
-  const embedUrl = googleMapsUrl ? toGoogleMapsEmbed(googleMapsUrl) : "";
-  const [mapFailed, setMapFailed] = useState(false);
+  const hasGoogleMapsUrl = !!googleMapsUrl;
+  const embedUrl = hasGoogleMapsUrl ? toGoogleMapsEmbed(googleMapsUrl) : "";
 
-  const handleMapError = () => {
-    setMapFailed(true);
-  };
+  const showIframe = !!embedUrl;
+  const showImage = !showIframe && !!mapImage;
+  const showLinkOnly = !showIframe && !showImage && hasGoogleMapsUrl;
+  const showEmpty = !showIframe && !showImage && !showLinkOnly;
 
   return (
     <section className="property-location-section">
@@ -88,17 +91,22 @@ export default function ProjectLocation({
             </h2>
           )}
 
-          {(mainLead || subText) && (
+          {(brandName || mainLead || subText) && (
             <div className="property-description-wrapper">
-              {mainLead && <p className="property-main-lead">{mainLead}</p>}
+              {(brandName || mainLead) && (
+                <p className="property-description-text">
+                  {brandName && <span className="property-brand-name">{brandName} </span>}
+                  {mainLead && <span className="property-main-lead">{mainLead}</span>}
+                </p>
+              )}
               <div className="property-divider-line" />
               {subText && <p className="property-sub-text">{subText}</p>}
             </div>
           )}
         </div>
 
-        {/* Google Maps Embed */}
-        {embedUrl && !mapFailed && (
+        {/* Case 1: Google Maps URL provided → full height iframe */}
+        {showIframe && (
           <div className="property-map-wrapper">
             <div className="property-map-container">
               <iframe
@@ -110,14 +118,13 @@ export default function ProjectLocation({
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Property Location Map"
-                onError={handleMapError}
               />
             </div>
           </div>
         )}
 
-        {/* Fallback: static image + link when iframe blocked */}
-        {(mapFailed || !embedUrl) && mapImage && (
+        {/* Case 2: No iframe, but map image available → show image + link */}
+        {showImage && (
           <div className="property-map-wrapper">
             <div className="property-map-container">
               <img
@@ -126,7 +133,7 @@ export default function ProjectLocation({
                 className="property-real-map"
                 style={{ objectFit: "cover" }}
               />
-              {googleMapsUrl && (
+              {hasGoogleMapsUrl && (
                 <a
                   href={googleMapsUrl}
                   target="_blank"
@@ -140,8 +147,8 @@ export default function ProjectLocation({
           </div>
         )}
 
-        {/* Fallback: link only if no map image */}
-        {(mapFailed || !embedUrl) && !mapImage && googleMapsUrl && (
+        {/* Case 3: Has Google Maps URL but no image → link only */}
+        {showLinkOnly && (
           <div className="property-map-wrapper">
             <div className="property-map-container" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
               <a
@@ -153,6 +160,13 @@ export default function ProjectLocation({
                 Google Maps-də aç
               </a>
             </div>
+          </div>
+        )}
+
+        {/* Case 4: No URL, no image → minimal placeholder */}
+        {showEmpty && (
+          <div className="property-map-wrapper">
+            <div className="property-map-container property-map-container--empty" />
           </div>
         )}
 

@@ -54,6 +54,7 @@ export interface ProjectDetail {
 
   locationTitleLight: string;
   locationTitleBold: string;
+  locationBrandName: string;
   locationMainLead: string;
   locationSubText: string;
   locationMapImage: string;

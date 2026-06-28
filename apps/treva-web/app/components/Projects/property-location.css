@@ -63,10 +63,22 @@
   box-sizing: border-box;
 }
 
-.property-main-lead {
-  color: #2d3139;
-  font-family: var(--font-sans, "Inter", sans-serif);
+.property-description-text {
   margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.property-brand-name {
+  color: #000000;
+  font-family: var(--font-sans, "Inter", sans-serif);
+  text-transform: none;
+}
+
+.property-main-lead {
+  color: #6b7280;
+  font-family: var(--font-sans, "Inter", sans-serif);
   text-transform: none;
 }
 
@@ -112,6 +124,11 @@
   display: block;
 }
 
+.property-map-container--empty {
+  height: 80px;
+  background: #f9fafb;
+}
+
 .property-footer-address {
   color: #9ca3af;
   font-family: var(--font-sans, "Inter", sans-serif);
@@ -151,10 +168,14 @@
     text-align: left;
   }
 
-  .property-main-lead {
+  .property-description-text {
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.4;
+  }
+
+  .property-main-lead {
+    color: #6b7280;
   }
 
   .property-main-lead .lead-light {
@@ -175,7 +196,7 @@
   }
 
   .property-map-container {
-    aspect-ratio: 21 / 9; /* Geniş ekran premium xəritə görünüşü */
+    aspect-ratio: 28 / 9; /* Geniş ekran premium xəritə görünüşü */
   }
 
   .property-footer-address {
@@ -254,10 +275,14 @@
     text-align: left;
   }
 
-  .property-main-lead {
+  .property-description-text {
     font-size: 20px;
     font-weight: 400;
     line-height: 1.35;
+  }
+
+  .property-main-lead {
+    color: #6b7280;
   }
 
   .property-main-lead .lead-light {
