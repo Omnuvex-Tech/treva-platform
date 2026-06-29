@@ -201,16 +201,16 @@
 
 .treva-navbar__lang-list {
   position: absolute;
-  top: 100%;
+  top: calc(100% + (var(--treva-nav-height) - 100%) / 2);
   left: 50%;
   transform: translateX(-50%);
   min-width: 76px;
-  padding: 4px 0;
-  background: rgba(0, 0, 0, 0.9);
+  padding: 0;
+  background: var(--treva-pill-bg);
   backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 6px;
-  margin-top: 0.5rem;
+  margin-top: 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   z-index: 300;
@@ -233,7 +233,11 @@
 }
 
 .treva-navbar__lang-item:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--treva-pill-hover-bg);
+}
+
+.treva-navbar__lang-item:active {
+  background: var(--treva-pill-pressed-bg);
 }
 
 /* ===== NAV DROPDOWN (İnventar / Tərəfdaşlıq) ===== */
@@ -273,17 +277,17 @@
 
 .treva-navbar__dropdown-list {
   position: absolute;
-  top: 100%;
+  top: calc(100% + (var(--treva-nav-height) - 100%) / 2);
   left: 50%;
   transform: translateX(-50%);
   min-width: 120px;
-  padding: 4px 0;
-  background: rgba(0, 0, 0, 0.9);
+  padding: 0;
+  background: var(--treva-pill-bg);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 6px;
-  margin-top: 0.5rem;
+  margin-top: 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   z-index: 300;
@@ -306,7 +310,11 @@
   transition: background 0.18s ease, color 0.18s ease;
 }
 .treva-navbar__dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--treva-pill-hover-bg);
+}
+
+.treva-navbar__dropdown-item:active {
+  background: var(--treva-pill-pressed-bg);
 }
 
 /* Mobile dropdown group */

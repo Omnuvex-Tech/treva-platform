@@ -164,7 +164,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
               </div>
 
               <div className="pulse__view-all-wrapper d-desktop">
-                <ViewAllButton label={content.viewAll} />
+                <ViewAllButton label={content.viewAll} href={`/${activeLocale}/pulse`} />
               </div>
             </div>
           </div>
@@ -181,7 +181,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
               >
                 {duplicatedData.map((post, index) => (
                   <a
-                    href="#"
+                    href={post.slug ? `/${activeLocale}/pulse/${post.slug}` : `/${activeLocale}/pulse`}
                     key={`${post.slug}-${index}`}
                     className="blog-card"
                     style={{ flex: `0 0 ${cardWidth}`, width: cardWidth }}
@@ -214,7 +214,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
           </div>
 
           <div className="pulse__mobile-view-all d-mobile">
-            <ViewAllButton mobile label={content.viewAll} />
+            <ViewAllButton mobile label={content.viewAll} href={`/${activeLocale}/pulse`} />
           </div>
 
         </section>

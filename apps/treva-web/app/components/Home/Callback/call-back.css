@@ -131,24 +131,24 @@
   font-size: 18px;
   font-weight: 400;
   border-radius: 25px;
-  border: 1px solid #a0a5b0;
-  background-color: transparent;
-  color: #4a505e;
+  border: 1px solid #565a63;
+  background-color: #565a63;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .roleButton:hover {
-  background-color: #2F3134;
+  background-color: #484d55;
   color: #ffffff;
-  border-color: #2F3134;
+  border-color: #484d55;
 }
 
 .roleButton:active,
 .activeRole {
-  background-color: #000000;
+  background-color: #484d55;
   color: #ffffff;
-  border-color: #000000;
+  border-color: #484d55;
 }
 
 /* Input sahələri */
@@ -184,7 +184,7 @@
 .submitButton {
   width: 100%;
   max-width: 760px;
-  background-color: #3F4249;
+  background-color: #565a63;
   color: #ffffff;
   border: none;
   border-radius: 30px;
@@ -211,11 +211,11 @@
 }
 
 .submitButton:hover {
-  background-color: #2F3134;
+  background-color: #484d55;
 }
 
 .submitButton:active {
-  background-color: #000000;
+  background-color: #484d55;
 }
 
 /* Hüquqi xəbərdarlıq mətni */

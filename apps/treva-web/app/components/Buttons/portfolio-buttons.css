@@ -6,6 +6,8 @@
   --color-border: #e2e8f0;
   --color-white: #ffffff;
   --color-btn-active-bg: #4e525d;
+  --color-home-btn: #565a63;
+  --color-home-btn-hover: #484d55;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -17,9 +19,10 @@
   width: 112px;
   height: 40px;
   border-radius: 30px;
-  border: 1.5px solid #2E3037;
+  border: 1.5px solid var(--color-home-btn);
+  background-color: var(--color-white);
   padding: 9px 14px;
-  color: #2E3037;
+  color: var(--color-home-btn);
   text-decoration: none;
   transition: all 0.2s ease;
   font-family: 'Oak Sans', var(--font-family);
@@ -30,15 +33,15 @@
 }
 
 .portfolio-view-all:hover {
-  background-color: #2F3134;
+  background-color: var(--color-home-btn-hover);
   color: var(--color-white);
-  border-color: #2F3134;
+  border-color: var(--color-home-btn-hover);
 }
 
 .portfolio-view-all:active {
-  background-color: #000000;
+  background-color: var(--color-home-btn-hover);
   color: var(--color-white);
-  border-color: #000000;
+  border-color: var(--color-home-btn-hover);
 }
 
 .portfolio-view-all--mobile {
