@@ -22,10 +22,36 @@ type PulseProps = {
 };
 
 const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, weekArticles, categories }: PulseProps) => {
+  const scrollToAllArticles = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    const target = document.getElementById("all-articles");
+    if (!target) return;
+
+    window.history.replaceState(null, "", "#all-articles");
+
+    const smoother = (window as any).ScrollSmoother?.get?.();
+    if (smoother) {
+      smoother.scrollTo(target, true);
+      return;
+    }
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <main className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
-      <PulseHeaderSection locale={locale} leftArticles={leftArticles} centerArticle={centerArticle} rightArticles={rightArticles} />
+      <PulseHeaderSection
+        locale={locale}
+        leftArticles={leftArticles}
+        centerArticle={centerArticle}
+        rightArticles={rightArticles}
+        onScrollToAllArticles={scrollToAllArticles}
+      />
       <PulseNewsSection locale={locale} articles={articles} weekArticles={weekArticles} categories={categories} />
       <PulseKeywordsSection />
       <CallbackForm />
@@ -128,7 +154,19 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
   );
 }
 
-function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles }: { locale: string; leftArticles: Article[]; centerArticle: Article | null; rightArticles: Article[] }) {
+function PulseHeaderSection({
+  locale,
+  leftArticles,
+  centerArticle,
+  rightArticles,
+  onScrollToAllArticles,
+}: {
+  locale: string;
+  leftArticles: Article[];
+  centerArticle: Article | null;
+  rightArticles: Article[];
+  onScrollToAllArticles: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
   const visibleRightArticles = rightArticles.slice(0, 4);
 
   return (
@@ -206,7 +244,7 @@ function PulseHeaderSection({ locale, leftArticles, centerArticle, rightArticles
                 </div>
 
                 <div className="news-header_right-cta-holder">
-                  <a href="#all-articles" className="button w-inline-block">
+                  <a href="#all-articles" onClick={onScrollToAllArticles} className="button w-inline-block">
                     <ButtonText>Bütün məqalələr</ButtonText>
                   </a>
                 </div>

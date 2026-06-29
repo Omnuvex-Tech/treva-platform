@@ -1,5 +1,13 @@
 /* Developers page specific CSS - orijinal HTML-dən kopyalanıb */
 
+#services {
+  scroll-margin-top: calc(var(--treva-nav-height, 64px) + 24px);
+}
+
+#featured-projects {
+  scroll-margin-top: calc(var(--treva-nav-height, 64px) + 24px);
+}
+
 /* PROJECTS CARDS */
 @media screen and (min-width: 991px) {
   .projects-prev_item:hover .projects_overlay {

@@ -1,5 +1,9 @@
 /* Səhifəyə özəl CSS. Orijinal HTML-dən kopyalanıb. */
 
+#broker-registration {
+  scroll-margin-top: calc(var(--treva-nav-height, 64px) + 24px);
+}
+
 .header-services_video-wrap:hover .header-services_video-overlay {
   opacity: 1;
   transition-delay: 0.05s;

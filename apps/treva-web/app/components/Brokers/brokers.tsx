@@ -3,7 +3,7 @@ import { ButtonText } from '@/app/components/ButtonText';
 
 
 import { useEffect, useRef, useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
@@ -61,6 +61,53 @@ export function BrokersPage({ locale }: BrokersPageProps) {
   const [fields, setFields] = useState<BrokerFields>(INITIAL_FIELDS)
   const [errors, setErrors] = useState<BrokerErrors>({})
   const [status, setStatus] = useState<SubmitStatus>('idle')
+
+  const getBrokerRegistrationOffset = () => {
+    if (typeof window === 'undefined') return 88
+
+    const navHeightValue = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue('--treva-nav-height')
+
+    const navHeight = Number.parseFloat(navHeightValue) || 64
+    return navHeight + 24
+  }
+
+  const scrollToBrokerRegistration = (event?: MouseEvent<HTMLAnchorElement>) => {
+    event?.preventDefault()
+
+    if (typeof window === 'undefined') return
+
+    const target = document.getElementById('broker-registration')
+    if (!target) return
+
+    window.history.replaceState(null, '', '#broker-registration')
+
+    const offset = getBrokerRegistrationOffset()
+
+    const smoother = window.ScrollSmoother?.get?.()
+    if (smoother) {
+      const smootherTop = typeof smoother.offset === 'function'
+        ? smoother.offset(target, 'top top')
+        : target.getBoundingClientRect().top + (smoother.scrollTop?.() ?? window.scrollY)
+
+      smoother.scrollTo(Math.max(smootherTop - offset, 0), true)
+      return
+    }
+
+    window.scrollTo({
+      top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+      behavior: 'smooth',
+    })
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.location.hash !== '#broker-registration') return
+
+    const timer = window.setTimeout(() => scrollToBrokerRegistration(), 150)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   const initGSAP = () => {
     if (gsapReady.current) return
@@ -286,7 +333,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                       <div className="header-services_bottom">
                         <div className="header-services_content-wrap">
                           <p>SİZ BROKER, DAŞINMAZ ƏMLAK AGENTLİYİ, YA DA BEYNƏLXALQ ŞİRKƏTSİZ? TREVA OLARAQ, BİZ BÜTÜN SAHƏ VƏ ÖLKƏLƏRDƏN OLAN TƏRƏFDAŞLARI MƏMNUNİYYƏTLƏ QƏBUL EDİRİK. SİZƏ DAHA ÇOX KOMİSSİYA QAZANMAQ VƏ AZƏRBAYCANIN DAŞINMAZ ƏMLAK BAZARINDA, HƏMÇİNİN ONDAN KƏNARDA ŞƏBƏKƏNİZİ GENİŞLƏNDİRMƏK ÜÇÜN LAZIM OLAN BÜTÜN ALƏTLƏRİ, ELANLARI VƏ DƏSTƏYİ BİZİM PLATFORMA TƏQDİM EDİR.</p>
-                          <a data-wf--button--variant="blue" href="#broker-registration" className="button w-inline-block">
+                          <a data-wf--button--variant="blue" href="#broker-registration" onClick={scrollToBrokerRegistration} className="button w-inline-block">
                             <ButtonText>Şəbəkəmizə qoşulun</ButtonText>
                           </a>
                         </div>
@@ -392,7 +439,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="note_wrap is-wide">
                           <p>TREVA TƏRƏFDAŞI OLARAQ, SATIŞLARINIZI ARTIRMAQ VƏ ŞƏBƏKƏNİZİ GENİŞLƏNDİRMƏK ÜÇÜN XÜSUSİ HAZIRLANMIŞ GÜCLÜ RESURSLARDAN İSTİFADƏ ETMƏ İMKANI QAZANIRSINIZ.</p>
                         </div>
-                        <a data-wf--button--variant="blue" href="#broker-registration" className="button w-inline-block">
+                        <a data-wf--button--variant="blue" href="#broker-registration" onClick={scrollToBrokerRegistration} className="button w-inline-block">
                           <ButtonText>TREVA ilə tərəfdaş olun </ButtonText>
                         </a>
                       </div>
@@ -526,7 +573,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                           <div className="max-width-40rem">
                             <p className="text-color-blue60">HARADA YERLƏŞMƏYİNİZDƏN ASILI OLMAYARAQ — TREVA BROKERLƏRİ, ŞİRKƏTLƏRİ, BEYNƏLXALQ AGENTLƏRİ SATIŞ ŞƏBƏKƏMİZƏ QOŞULMAĞA DƏVƏT EDİR. TREVA İLƏ MÜQAVİLƏLƏRİ DAHA SÜRƏTLİ BAĞLAMAĞA, YÜKSƏK KOMİSSİYALAR QAZANMAĞA BAŞLAYIN.</p>
                           </div>
-                          <a data-wf--button--variant="blue" href="#broker-registration" className="button w-inline-block">
+                          <a data-wf--button--variant="blue" href="#broker-registration" onClick={scrollToBrokerRegistration} className="button w-inline-block">
                             <div className="svg-code">This is some text inside of a div block.</div>
                             <ButtonText>Bizimlə tərəfdaş olun</ButtonText>
                           </a>

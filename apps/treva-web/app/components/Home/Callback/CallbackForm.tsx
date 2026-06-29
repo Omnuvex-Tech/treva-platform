@@ -140,14 +140,14 @@ export default function CallbackForm() {
           {hasExtraLine && <div className="bgLineTopExtra"></div>}
           <div className="bgLineTop"></div>
           <div className="bgLineBottom"></div>
-          <h1 className="title">
+          <h1 className="title no-animate">
             <span className="titleTop">{content.titleTop}</span>
             {hasExtraLine && <span className="titleMiddle">{content.titleExtra}</span>}
             <span className="titleBottom">{content.titleBottom}</span>
           </h1>
         </div>
 
-        <p className="subtitle">
+        <p className="subtitle no-animate">
           {content.subtitle}
         </p>
 

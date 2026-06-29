@@ -1,4 +1,11 @@
 .callbackContainer {
+  --callback-header-min-height: 160px;
+  --callback-line-top: 62px;
+  --callback-line-bottom: 138px;
+  --callback-line-top-extra: 0px;
+  --callback-title-top-indent: 60px;
+  --callback-title-bottom-indent: 200px;
+  --callback-title-middle-indent: 160px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,13 +42,13 @@
   margin-bottom: 35px;
   display: flex;
   flex-direction: column;
-  min-height: 160px;
+  min-height: var(--callback-header-min-height);
 }
 
 /* Üçüncü xətt (3 sətirli başlıqlar üçün əlavə) */
 .bgLineTopExtra {
   position: absolute;
-  top: 0;
+  top: var(--callback-line-top-extra);
   left: 0;
   width: 100%;
   height: 1px;
@@ -52,7 +59,7 @@
 /* Birinci sətirlə mükəmməl kəsişən xətt */
 .bgLineTop {
   position: absolute;
-  top: 62px;
+  top: var(--callback-line-top);
   left: 0;
   width: 100%;
   height: 1px;
@@ -63,7 +70,7 @@
 /* İkinci sətirlə mükəmməl kəsişən xətt */
 .bgLineBottom {
   position: absolute;
-  top: 138px;
+  top: var(--callback-line-bottom);
   left: 0;
   width: 100%;
   height: 1px;
@@ -88,18 +95,18 @@
 
 .titleTop {
   display: block;
-  padding-left: 60px; 
+  padding-left: var(--callback-title-top-indent);
 }
 
 .titleBottom {
   display: block;
-  padding-left: 200px;
+  padding-left: var(--callback-title-bottom-indent);
   margin-top: 4px;
 }
 
 .titleMiddle {
   display: block;
-  padding-left: 160px;
+  padding-left: var(--callback-title-middle-indent);
   margin-top: 4px;
 }
 
@@ -243,6 +250,11 @@
    ========================================================================== */
 @media (max-width: 768px) {
   .callbackContainer {
+    --callback-line-top: 31px;
+    --callback-line-bottom: 69px;
+    --callback-title-top-indent: 15px;
+    --callback-title-bottom-indent: 50px;
+    --callback-title-middle-indent: 40px;
     padding-top: 30px;
     padding-bottom: 30px;
   }
@@ -258,12 +270,10 @@
 
   /* Mobildə xətlərin proporsional şəkildə yenidən mövqeləndirilməsi */
   .bgLineTop {
-    top: 31px;
     display: block; /* Orijinal dizayn xətləri mobildə də aktivdir */
   }
 
   .bgLineBottom {
-    top: 69px;
     display: block;
   }
 
@@ -274,20 +284,6 @@
   }
 
   /* Sürüşmə boşluqları mobil ekrana uyğun proporsional azaldıldı */
-  .titleTop {
-    padding-left: 15px;
-  }
-
-  .titleBottom {
-    padding-left: 50px;
-    margin-top: 4px;
-  }
-
-  .titleMiddle {
-    padding-left: 40px;
-    margin-top: 4px;
-  }
-
   .subtitle {
     font-size: 18px;
     margin-top: 20px;

@@ -3,12 +3,14 @@
 import { ButtonText } from '@/app/components/ButtonText';
 
 import { useEffect, useRef, useState } from 'react'
+import type { MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
+import PartnershipCTA from '@/app/components/PartnershipCTA'
 import './developers.css'
 
 declare global {
@@ -24,11 +26,156 @@ type DevelopersPageProps = {
   locale: string
 }
 
+type LocalizedValue = string | { az?: string; en?: string; ru?: string }
+
+type ProjectCategory = {
+  title: LocalizedValue
+  slug: string
+  image?: string | null
+  brand?: LocalizedValue | null
+  order?: number
+}
+
+type FeaturedProjectCard = {
+  title: LocalizedValue
+  slug: string
+  image: string
+  location: LocalizedValue
+}
+
+const TREVA_API_URL = process.env.NEXT_PUBLIC_TREVA_API_URL || 'http://localhost:10011/api/v1'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021'
+const FEATURED_PROJECT_PLACEHOLDER = '/assets/webflow-placeholder.svg'
+
+const featuredProjectFallbackImages: Record<string, string> = {
+  'arabian-ranches': '/images/features-pro/arabian-cover.jpg',
+  'marina-village': '/images/features-pro/marina-cover.jpg',
+  'panorama-by-elie-saab': '/images/features-pro/panorama-cover.png',
+  'reportage-heights': '/images/features-pro/reportage-cover.jpg',
+  'sabah-residence': '/images/features-pro/sabah-cover.png',
+}
+
+const featuredProjectsFallback: FeaturedProjectCard[] = [
+  {
+    title: 'Arabian Ranches',
+    slug: 'arabian-ranches',
+    image: 'https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp',
+    location: 'Sea Breeze',
+  },
+  {
+    title: 'Marina Village',
+    slug: 'marina-village',
+    image: 'https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif',
+    location: 'Sea Breeze',
+  },
+  {
+    title: 'Villa Siena',
+    slug: 'villa-siena',
+    image: 'https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif',
+    location: 'Baku',
+  },
+  {
+    title: 'Sabah Residence',
+    slug: 'sabah-residence',
+    image: 'https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/692d30a5de9b28406e24d70b_sabah4.jpg',
+    location: 'Baku',
+  },
+]
+
+function getLocalizedValue(value: LocalizedValue | undefined | null, locale: string, fallback = ''): string {
+  if (!value) return fallback
+  if (typeof value === 'string') return value || fallback
+  return value[locale as keyof typeof value] || value.az || value.en || value.ru || fallback
+}
+
+function toAssetUrl(value?: string | null): string {
+  if (!value) return ''
+  return value.startsWith('http') ? value : `${API_BASE_URL}${value}`
+}
+
 export function DevelopersPage({ locale }: DevelopersPageProps) {
   const gsapReady = useRef(false)
   const dropdownNavRefs = useRef<Array<HTMLDivElement | null>>([])
 
+  const scrollToServices = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+
+    const target = document.getElementById('services')
+    if (!target) return
+
+    window.history.replaceState(null, '', '#services')
+
+    const smoother = window.ScrollSmoother?.get?.()
+    if (smoother) {
+      smoother.scrollTo(target, true)
+      return
+    }
+
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
+  const scrollToFeaturedProjects = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+
+    const target = document.getElementById('featured-projects')
+    if (!target) return
+
+    window.history.replaceState(null, '', '#featured-projects')
+
+    const smoother = window.ScrollSmoother?.get?.()
+    if (smoother) {
+      smoother.scrollTo(target, true)
+      return
+    }
+
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
   const [openDropdown, setOpenDropdown] = useState<number | null>(0)
+  const [featuredProjects, setFeaturedProjects] = useState<FeaturedProjectCard[]>([])
+
+  useEffect(() => {
+    const fetchFeaturedProjects = async () => {
+      try {
+        const response = await fetch(`${TREVA_API_URL}/categories/featured`)
+        if (!response.ok) throw new Error('Failed to fetch featured projects')
+
+        const rawData = await response.json()
+        const list = Array.isArray(rawData) ? rawData : rawData.value || []
+
+        const nextProjects = list
+          .sort((a: ProjectCategory, b: ProjectCategory) => (a.order ?? 0) - (b.order ?? 0))
+          .slice(0, 4)
+          .map((item: ProjectCategory) => ({
+            title: item.title,
+            slug: item.slug,
+            image:
+              toAssetUrl(item.image) ||
+              featuredProjectFallbackImages[item.slug] ||
+              featuredProjectsFallback.find((card) => card.slug === item.slug)?.image ||
+              FEATURED_PROJECT_PLACEHOLDER,
+            location: item.brand || '',
+          }))
+          .filter((item: FeaturedProjectCard) => item.slug)
+
+        if (list.length > 0) {
+          setFeaturedProjects(nextProjects)
+        } else {
+          setFeaturedProjects(featuredProjectsFallback)
+        }
+      } catch {
+        setFeaturedProjects(featuredProjectsFallback)
+      }
+    }
+
+    fetchFeaturedProjects()
+  }, [])
 
   const toggleDropdown = (index: number) => {
     setOpenDropdown(openDropdown === index ? null : index)
@@ -264,10 +411,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                         <div className="header-services_content-wrap is-services">
                           <p>TREVA DEVELOPERLƏRƏ ƏMLAK LAYİHƏLƏRİNİ BAZARA ÇIXARMAQDA STRATEJİ SATIŞ VƏ MARKETİNQ DƏSTƏYİ GÖSTƏRİR. BAZARA ÇIXIŞ PLANLAMASINDAN MÜRACİƏTLƏRİN İDARƏETMƏSİNƏ QƏDƏR SATIŞLARI ARTIRMAQ VƏ LAYİHƏNİN UĞURUNU YÜKSƏLTMƏK ÜÇÜN HƏRTƏRƏFLİ HƏLLƏR TƏQDİM EDİRİK.</p>
                           <div className="button-group animate-up">
-                            <Link href="#services" className="button w-inline-block" data-wf--button--variant="blue">
+                            <Link href="#services" onClick={scrollToServices} className="button w-inline-block" data-wf--button--variant="blue">
                               <ButtonText>Xidmətlərlə tanış olun</ButtonText>
                             </Link>
-                            <Link href={`/${locale}/projects`} className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block" data-wf--button--variant="ghost">
+                            <Link href="#featured-projects" onClick={scrollToFeaturedProjects} className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block" data-wf--button--variant="ghost">
                               <ButtonText>Layihələrlə tanış olun</ButtonText>
                             </Link>
                           </div>
@@ -547,7 +694,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
               </div>
             </section>
 
-            <section className="section_projects-prev is-services">
+            <section id="featured-projects" className="section_projects-prev is-services">
               <div className="global-padding padding-section-medium">
                 <div className="container-large">
                   <div className="projects-prev_component">
@@ -559,103 +706,41 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                     </div>
                     <div className="w-dyn-list">
                       <div role="list" className="projects-prev_wrap w-dyn-items">
-                        
-                        <div role="listitem" className="projects-prev_item img-reveal w-dyn-item">
-                          <div className="projects-prev_holder">
-                            <div className="projects-prev_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp" loading="lazy" alt="Arabian Ranches" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-500.webp 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-800.webp 800w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1080.webp 1080w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-1600.webp 1600w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5-p-2000.webp 2000w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/69e0ca6fb39a1d49bd14574e_arabiann-5.webp 2602w" className="fullwidth-img ease0-6"/>
-                            </div>
-                            <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_overlay w-inline-block">
-                              <div className="projects_btn">
-                                <div className="icon-large w-embed">
-                                  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.4803C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.4803C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
-                                  </svg>
-                                </div>
-                              </div>
-                              <div className="projects_caption">Arabian Ranches</div>
-                            </Link>
-                            <div className="img-cover bg-color-grey200"></div>
-                          </div>
-                          <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_content-wrap show-landscape w-inline-block">
-                            <div className="heading-style-h3 text-color-blue400">Arabian Ranches</div>
-                            <div fs-list-field="location">Sea Breeze</div>
-                            <div fs-list-field="status" className="hide">Under Development</div>
-                          </Link>
-                        </div>
+                        {featuredProjects.map((project, index) => {
+                          const title = getLocalizedValue(project.title, locale)
+                          const location = getLocalizedValue(project.location, locale)
+                          const href = `/${locale}/projects/${project.slug}`
 
-                        <div role="listitem" className="projects-prev_item img-reveal w-dyn-item">
-                          <div className="projects-prev_holder">
-                            <div className="projects-prev_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif" loading="lazy" alt="Marina Village" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c0b5046e1d573cd3b04d_700X800_MARI%CC%87NA.avif 700w" className="fullwidth-img ease0-6"/>
-                            </div>
-                            <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_overlay w-inline-block">
-                              <div className="projects_btn">
-                                <div className="icon-large w-embed">
-                                  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.4803C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.4803C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
-                                  </svg>
+                          return (
+                            <div
+                              key={project.slug}
+                              role="listitem"
+                              className={`projects-prev_item img-reveal w-dyn-item${index === featuredProjects.length - 1 ? ' is-large' : ''}`}
+                            >
+                              <div className="projects-prev_holder">
+                                <div className="projects-prev_img-wrap">
+                                  <img src={project.image} loading="lazy" alt={title} className="fullwidth-img ease0-6" />
                                 </div>
+                                <Link aria-label={`go to ${title} project`} href={href} className="projects_overlay w-inline-block">
+                                  <div className="projects_btn">
+                                    <div className="icon-large w-embed">
+                                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.4803C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.4803C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
+                                      </svg>
+                                    </div>
+                                  </div>
+                                  <div className="projects_caption">{title}</div>
+                                </Link>
+                                <div className="img-cover bg-color-grey200"></div>
                               </div>
-                              <div className="projects_caption">Marina Village</div>
-                            </Link>
-                            <div className="img-cover bg-color-grey200"></div>
-                          </div>
-                          <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_content-wrap show-landscape w-inline-block">
-                            <div className="heading-style-h3 text-color-blue400">Marina Village</div>
-                            <div fs-list-field="location">Sea Breeze</div>
-                            <div fs-list-field="status" className="hide">Under Development</div>
-                          </Link>
-                        </div>
-
-                        <div role="listitem" className="projects-prev_item img-reveal w-dyn-item">
-                          <div className="projects-prev_holder">
-                            <div className="projects-prev_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif" loading="lazy" alt="Villa Siena" sizes="100vw" srcSet="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800-p-500.avif 500w, https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/6878c132b243b50c391cf0eb_700X800.avif 700w" className="fullwidth-img ease0-6"/>
+                              <Link aria-label={`go to ${title} project`} href={href} className="projects_content-wrap show-landscape w-inline-block">
+                                <div className="heading-style-h3 text-color-blue400">{title}</div>
+                                <div fs-list-field="location">{location}</div>
+                                <div fs-list-field="status" className="hide"></div>
+                              </Link>
                             </div>
-                            <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_overlay w-inline-block">
-                              <div className="projects_btn">
-                                <div className="icon-large w-embed">
-                                  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.4803C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.4803C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
-                                  </svg>
-                                </div>
-                              </div>
-                              <div className="projects_caption">Villa Siena</div>
-                            </Link>
-                            <div className="img-cover bg-color-grey200"></div>
-                          </div>
-                          <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_content-wrap show-landscape w-inline-block">
-                            <div className="heading-style-h3 text-color-blue400">Villa Siena</div>
-                            <div fs-list-field="location">Baku</div>
-                            <div fs-list-field="status" className="hide">Completed</div>
-                          </Link>
-                        </div>
-
-                        <div role="listitem" className="projects-prev_item img-reveal w-dyn-item is-large">
-                          <div className="projects-prev_holder">
-                            <div className="projects-prev_img-wrap">
-                              <img src="https://cdn.prod.website-files.com/685e5b3de579c8df7030142b/692d30a5de9b28406e24d70b_sabah4.jpg" loading="lazy" alt="Sabah Residence" className="fullwidth-img ease0-6"/>
-                            </div>
-                            <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_overlay w-inline-block">
-                              <div className="projects_btn">
-                                <div className="icon-large w-embed">
-                                  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.4803C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.4803C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
-                                  </svg>
-                                </div>
-                              </div>
-                              <div className="projects_caption">Sabah Residence</div>
-                            </Link>
-                            <div className="img-cover bg-color-grey200"></div>
-                          </div>
-                          <Link aria-label="go to project" href={`/${locale}/projects`} className="projects_content-wrap show-landscape w-inline-block">
-                            <div className="heading-style-h3 text-color-blue400">Sabah Residence</div>
-                            <div fs-list-field="location">Baku</div>
-                            <div fs-list-field="status" className="hide">Completed</div>
-                          </Link>
-                        </div>
-
+                          )
+                        })}
                       </div>
                     </div>
                     <div className="projects-prev_cta-wrap animate-up">
@@ -671,52 +756,11 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
               </div>
             </section>
 
-            <section data-w-id="53797656-c2da-3541-a7b7-695898a96114" className="section_cta bg-color-white">
-              <div className="global-padding padding-section-xlarge">
-                <div className="container-large">
-                  <div className="cta_component">
-                    <div className="cta_wrap">
-                      <div className="cta_content">
-                        <h2 className="cta_heading">Tərəfdaşlığa <em>hazırsınız?</em></h2>
-                        <div className="button-group">
-                          <Link href={`/${locale}/contact#get-in-touch`} className="button w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e w-inline-block" data-wf--button--variant="blue-large">
-                            <div className="svg-code">This is some text inside of a div block.</div>
-                            <ButtonText className="w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e">Əlaqə saxlayın</ButtonText>
-                          </Link>
-                          <Link href={`/${locale}/brokers#broker-registration`} className="button w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb w-inline-block" data-wf--button--variant="ghost-large">
-                            <div className="svg-code">This is some text inside of a div block.</div>
-                            <ButtonText className="w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb">Şəbəkəmizə qoşulun</ButtonText>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="cta_bg-wrap">
-                <div className="cta_bg-top is-consultation">
-                  <div className="cta_img-wrap is-top-left is-az">
-                    <img width="Auto" loading="lazy" alt="A large white building with palm trees in front of it - arabian ranches" src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6877795ce390ea79b5c67e2e_1014X598.avif" className="fullwidth-img"/>
-                  </div>
-                  <div className="cta_img-wrap is-top-right is-az">
-                    <img width="Auto" sizes="100vw" alt="A building with a fountain in front of it - villa siena" src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080.avif" loading="lazy" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080-p-1080.avif 1080w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080.avif 1920w" className="fullwidth-img"/>
-                  </div>
-                </div>
-                <div className="cta_bg-middle is-consultation">
-                  <div className="cta_img-wrap is-middle-right">
-                    <img width="Auto" sizes="100vw" alt="A large house with a pool in front of it  - villa siena" src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif" loading="lazy" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif 1014w" className="fullwidth-img"/>
-                  </div>
-                </div>
-                <div className="cta_bg-bottom is-consultation">
-                  <div className="cta_img-wrap is-bottom-left">
-                    <img sizes="100vw" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9.avif 1920w" alt="A plane flying over a building with a curved facade - Sabah Residence" src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9.avif" loading="lazy" className="fullwidth-img"/>
-                  </div>
-                  <div className="cta_img-wrap is-bottom-right">
-                    <img width="Auto" sizes="100vw" alt="A large building with a boat in front of it - marina village" src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1.avif" loading="lazy" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-1080.avif 1080w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-1600.avif 1600w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1.avif 2000w" className="fullwidth-img"/>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <PartnershipCTA
+              sectionDataWId="53797656-c2da-3541-a7b7-695898a96114"
+              primaryAction={{ href: `/${locale}/contact#get-in-touch`, label: 'Əlaqə saxlayın' }}
+              secondaryAction={{ href: `/${locale}/brokers#broker-registration`, label: 'Şəbəkəmizə qoşulun' }}
+            />
           </main>
 
           <CallbackForm />

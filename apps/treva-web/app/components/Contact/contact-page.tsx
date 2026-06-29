@@ -3,7 +3,7 @@ import { ButtonText } from '@/app/components/ButtonText';
 
 
 import { useEffect, useRef, useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -11,6 +11,7 @@ import { Autoplay, EffectFade } from 'swiper/modules'
 import Header from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
+import PartnershipCTA from '@/app/components/PartnershipCTA'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 import './contact.css'  // ayrıca CSS faylı
@@ -65,8 +66,6 @@ type ContactStatus = 'idle' | 'loading' | 'success' | 'error'
    CONFIG
 ───────────────────────────────────────────────────────── */
 const LEAD_ENDPOINT = 'https://nodebitrixproject15.vercel.app/api/webflow-lead'
-const FALLBACK_PHONE_PREFIX = '+994'
-
 const INITIAL_CONTACT_FIELDS: ContactFields = {
   name: '',
   email: '',
@@ -148,18 +147,6 @@ function ContactForm() {
   const [fields, setFields] = useState<ContactFields>(INITIAL_CONTACT_FIELDS)
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<ContactStatus>('idle')
-  const [phonePrefix, setPhonePrefix] = useState('+994')
-
-  useEffect(() => {
-    fetch('https://ipwho.is/')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.calling_code) {
-          setPhonePrefix('+' + data.calling_code)
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   const validate = () => {
     const errs: ContactErrors = {}
@@ -176,15 +163,6 @@ function ContactForm() {
     const fieldName = name as keyof ContactFields
     setFields(f => ({ ...f, [name]: value }))
     if (errors[fieldName]) setErrors(er => ({ ...er, [fieldName]: '' }))
-  }
-
-  const handlePhoneFocus = () => {
-    if (!fields.phone.startsWith(phonePrefix)) {
-      setFields(f => ({
-        ...f,
-        phone: phonePrefix + f.phone.replace(/^\+*/, '').replace(/^(\d+)/, '')
-      }))
-    }
   }
 
   const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -273,7 +251,6 @@ function ContactForm() {
             placeholder="Telefon nömrəsi *"
             type="tel"
             value={fields.phone}
-            onFocus={handlePhoneFocus}
             onChange={handlePhoneChange}
           />
           {errors.phone && <div className="connect_error" style={{ display: 'block' }}>{errors.phone}</div>}
@@ -317,6 +294,26 @@ type ContactPageProps = {
 
 export function ContactPage({ locale }: ContactPageProps) {
   const gsapReady = useRef(false)
+
+  const scrollToContactForm = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+
+    const target = document.getElementById('get-in-touch')
+    if (!target) return
+
+    window.history.replaceState(null, '', '#get-in-touch')
+
+    const smoother = window.ScrollSmoother?.get?.()
+    if (smoother) {
+      smoother.scrollTo(target, true)
+      return
+    }
+
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   const initGSAP = () => {
     if (gsapReady.current) return
@@ -514,17 +511,16 @@ export function ContactPage({ locale }: ContactPageProps) {
                           Kömək üçün buradayıq, bizimlə əlaqə saxlayın
                         </h1>
                       </div>
-                      <p className="contact_top-label">(bizimlə əlaqə)</p>
-                    </div>
-
-                    <div className="contact_offices-wrap">
-                      <div className="offices_bio-wrap">
+                      <div className="contact_office-copy offices_bio-wrap">
                         <p>
                           Bakıdakı baş ofisimizə gəlin və ya tərəfdaşlıq imkanlarını araşdırmaq
                           üçün Sea Breeze satış ofisimizə yaxınlaşın.
                         </p>
+                        <p className="contact_top-label">(bizimlə əlaqə)</p>
                       </div>
+                    </div>
 
+                    <div className="contact_offices-wrap">
                       <div className="offices_block">
                         <a
                           href="https://www.google.com/maps/place/TREVA+Real+Estate/@40.3517196,49.827273,17z"
@@ -649,86 +645,17 @@ export function ContactPage({ locale }: ContactPageProps) {
             </section>
 
             {/* SECTION 3: CTA */}
-            <section className="section_cta bg-color-white">
-              <div className="global-padding padding-section-xlarge">
-                <div className="container-large">
-                  <div className="cta_component">
-                    <div className="cta_wrap">
-                      <div className="cta_content">
-                        <h2 className="cta_heading">
-                          Tərəfdaşlığa <em>hazırsınız?</em>
-                        </h2>
-                        <div className="button-group">
-                          <Link
-                            href="#get-in-touch"
-                            className="button contact_cta-action-button contact_cta-action-button--primary"
-                            data-wf--button--variant="blue-large"
-                          >
-                            <ButtonText className="elaqe-saxlayin">Əlaqə saxlayın</ButtonText>
-                          </Link>
-                          <Link
-                            href="/brokers#broker-registration"
-                            className="button contact_cta-action-button contact_cta-action-button--secondary"
-                            data-wf--button--variant="ghost-large"
-                          >
-                            <ButtonText className="elaqe-saxlayin">Şəbəkəmizə qoşulun</ButtonText>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="cta_bg-wrap" aria-hidden="true">
-                <div className="cta_bg-top is-consultation">
-                  <div className="cta_img-wrap is-top-left is-az">
-                    <img
-                      loading="lazy"
-                      alt="Arabian Ranches"
-                      src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6877795ce390ea79b5c67e2e_1014X598.avif"
-                      className="fullwidth-img"
-                    />
-                  </div>
-                  <div className="cta_img-wrap is-top-right is-az">
-                    <img
-                      loading="lazy"
-                      alt="Villa Siena"
-                      src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080.avif"
-                      className="fullwidth-img"
-                    />
-                  </div>
-                </div>
-                <div className="cta_bg-middle is-consultation">
-                  <div className="cta_img-wrap is-middle-right">
-                    <img
-                      loading="lazy"
-                      alt="Villa Siena pool"
-                      src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif"
-                      className="fullwidth-img"
-                    />
-                  </div>
-                </div>
-                <div className="cta_bg-bottom is-consultation">
-                  <div className="cta_img-wrap is-bottom-left">
-                    <img
-                      loading="lazy"
-                      alt="Sabah Residence"
-                      src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9.avif"
-                      className="fullwidth-img"
-                    />
-                  </div>
-                  <div className="cta_img-wrap is-bottom-right">
-                    <img
-                      loading="lazy"
-                      alt="Marina Village"
-                      src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1.avif"
-                      className="fullwidth-img"
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
+            <PartnershipCTA
+              primaryAction={{
+                href: '#get-in-touch',
+                label: 'Əlaqə saxlayın',
+                onClick: scrollToContactForm,
+              }}
+              secondaryAction={{
+                href: `/${locale}/brokers#broker-registration`,
+                label: 'Şəbəkəmizə qoşulun',
+              }}
+            />
 
           </main>
 

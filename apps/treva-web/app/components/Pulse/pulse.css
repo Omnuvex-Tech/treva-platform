@@ -20,6 +20,10 @@
   padding-bottom: 7rem;
 }
 
+#all-articles {
+  scroll-margin-top: calc(var(--treva-nav-height, 64px) + 24px);
+}
+
 .fullwidth-img {
   border: none !important;
   outline: none !important;
@@ -83,7 +87,7 @@
 
 .news_top-full-banner {
   width: 100%;
-  height: 440px;
+  height: 520px;
   overflow: hidden;
   border: 0 !important;
   border-radius: 0px !important; 

@@ -1,9 +1,17 @@
+'use client';
+
 import React from "react";
 import Link from "next/link";
 import "./styles/home.css";
 
 import { ButtonText } from "@/app/components/ButtonText";
 import PageContainer from "@/app/components/Container/PageContainer";
+
+declare global {
+  interface Window {
+    ScrollSmoother?: any;
+  }
+}
 
 const ArrowUpIcon = () => (
   <svg
@@ -115,6 +123,57 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
   const homeHref = `/${locale}`;
   const contactHref = `/${locale}/contact`;
   const pulseHref = `/${locale}/pulse`;
+  const scrollFrameRef = React.useRef<number | null>(null);
+
+  const scrollToTop = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    if (typeof window === "undefined") return;
+
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+
+    const smoother = window.ScrollSmoother?.get?.();
+    const getScrollTop = () =>
+      smoother && typeof smoother.scrollTop === "function"
+        ? smoother.scrollTop()
+        : window.scrollY || document.documentElement.scrollTop || 0;
+
+    const setScrollTop = (value: number) => {
+      if (smoother && typeof smoother.scrollTop === "function") {
+        smoother.scrollTop(value);
+        return;
+      }
+
+      window.scrollTo(0, value);
+    };
+
+    if (scrollFrameRef.current) {
+      window.cancelAnimationFrame(scrollFrameRef.current);
+    }
+
+    const start = getScrollTop();
+    const duration = 1200;
+    const startTime = performance.now();
+    const easeOutCubic = (progress: number) => 1 - Math.pow(1 - progress, 3);
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progress);
+      const next = start * (1 - easedProgress);
+
+      setScrollTop(next);
+
+      if (progress < 1) {
+        scrollFrameRef.current = window.requestAnimationFrame(animate);
+      } else {
+        scrollFrameRef.current = null;
+        setScrollTop(0);
+      }
+    };
+
+    scrollFrameRef.current = window.requestAnimationFrame(animate);
+  };
 
   return (
     <footer className="footer">
@@ -210,6 +269,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                   <div className="footer_bottom-links">
                     <FooterActionLink
                       href="#top"
+                      onClick={scrollToTop}
                       label="BACK TO TOP"
                       icon={
                         <div className="button-icon-wrap is-small">
