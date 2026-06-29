@@ -57,10 +57,18 @@ const localeStrings = {
   },
 };
 
+type LocalizedValue = string | { az?: string; en?: string; ru?: string };
+
+function getLocalized(val: LocalizedValue | undefined | null, locale: string, fallback = ""): string {
+  if (!val) return fallback;
+  if (typeof val === "string") return val || fallback;
+  return (val as any)[locale] || val.az || val.en || val.ru || fallback;
+}
+
 type FeaturedCard = {
-  title: string;
-  desc: string;
-  brand: string;
+  title: LocalizedValue;
+  desc: LocalizedValue;
+  brand: LocalizedValue;
   brandImage: string;
   brandTextColor: string;
   image: string;
@@ -191,7 +199,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                         <img
                           className="property-card__bg"
                           src={card.image}
-                          alt={`${card.title} background`}
+                          alt={`${getLocalized(card.title, activeLocale)} background`}
                         />
                       )}
                       <div className="property-card__overlay"></div>
@@ -200,27 +208,33 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                         <img
                           className="property-card__brand-logo"
                           src={card.brandImage}
-                          alt={card.brand || "Brand"}
+                          alt={getLocalized(card.brand, activeLocale) || "Brand"}
                         />
                       ) : (
                         <div className="property-card__brand-text" style={{ color: card.brandTextColor === 'black' ? '#000' : '#fff' }}>
-                          {card.brand}
+                          {getLocalized(card.brand, activeLocale)}
                         </div>
                       )}
 
-                      <h3 className="property-card__title">
-                        {card.title.split(' ').length > 2 ? (
-                          <>
-                            {card.title.split(' ').slice(0, Math.ceil(card.title.split(' ').length / 2)).join(' ')} <br />
-                            {card.title.split(' ').slice(Math.ceil(card.title.split(' ').length / 2)).join(' ')}
-                          </>
-                        ) : (
-                          card.title.split(' ').map((word, wi) => (
-                            <React.Fragment key={wi}>{word}{wi < card.title.split(' ').length - 1 ? <br /> : ''}</React.Fragment>
-                          ))
-                        )}
-                      </h3>
-                      <p className="property-card__desc">{card.desc}</p>
+                      {(() => {
+                        const titleText = getLocalized(card.title, activeLocale);
+                        const words = titleText.split(' ');
+                        return (
+                          <h3 className="property-card__title">
+                            {words.length > 2 ? (
+                              <>
+                                {words.slice(0, Math.ceil(words.length / 2)).join(' ')} <br />
+                                {words.slice(Math.ceil(words.length / 2)).join(' ')}
+                              </>
+                            ) : (
+                              words.map((word: string, wi: number) => (
+                                <React.Fragment key={wi}>{word}{wi < words.length - 1 ? <br /> : ''}</React.Fragment>
+                              ))
+                            )}
+                          </h3>
+                        );
+                      })()}
+                      <p className="property-card__desc">{getLocalized(card.desc, activeLocale)}</p>
                       <span className="property-card__action">
                         {content.learnMore}
                         {arrowSvg}

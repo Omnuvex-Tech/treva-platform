@@ -1,3 +1,9 @@
+export interface LocalizedString {
+  az?: string;
+  en?: string;
+  ru?: string;
+}
+
 export interface HeroImage {
   url: string;
   alt: string;
@@ -23,45 +29,45 @@ export interface ProjectDetail {
   id: string;
   categorySlug: string;
 
-  heroTitle: string;
-  heroDesktopDesc: string;
-  heroMobileDesc: string;
+  heroTitle: LocalizedString;
+  heroDesktopDesc: LocalizedString;
+  heroMobileDesc: LocalizedString;
   heroImages: HeroImage[];
-  heroCtaText: string;
+  heroCtaText: LocalizedString;
   heroCtaLink: string;
 
-  overviewTitleLight: string;
-  overviewTitleBold: string;
-  overviewBrandName: string;
-  overviewDebutText: string;
-  overviewLocationText: string;
-  overviewDebutTextEnd: string;
-  overviewDescription: string;
+  overviewTitleLight: LocalizedString;
+  overviewTitleBold: LocalizedString;
+  overviewBrandName: LocalizedString;
+  overviewDebutText: LocalizedString;
+  overviewLocationText: LocalizedString;
+  overviewDebutTextEnd: LocalizedString;
+  overviewDescription: LocalizedString;
   overviewImageLarge: string;
-  overviewImageLargeLabel: string;
+  overviewImageLargeLabel: LocalizedString;
   overviewImageMedium: string;
-  overviewImageMediumLabel: string;
+  overviewImageMediumLabel: LocalizedString;
   overviewImageSmall: string;
-  overviewImageSmallLabel: string;
+  overviewImageSmallLabel: LocalizedString;
   overviewDataRows: OverviewDataRow[];
 
-  featuresHeaderMain: string;
-  featuresHeaderSub: string;
-  featuresTitleLight: string;
-  featuresTitleBold: string;
+  featuresHeaderMain: LocalizedString;
+  featuresHeaderSub: LocalizedString;
+  featuresTitleLight: LocalizedString;
+  featuresTitleBold: LocalizedString;
   featuresSections: FeatureSection[];
   brochureFile: string;
 
-  locationTitleLight: string;
-  locationTitleBold: string;
-  locationBrandName: string;
-  locationMainLead: string;
-  locationSubText: string;
+  locationTitleLight: LocalizedString;
+  locationTitleBold: LocalizedString;
+  locationBrandName: LocalizedString;
+  locationMainLead: LocalizedString;
+  locationSubText: LocalizedString;
   locationMapImage: string;
-  locationFooterAddress: string;
+  locationFooterAddress: LocalizedString;
   locationGoogleMapsUrl: string;
 
-  seoTitle: string;
-  seoDescription: string;
+  seoTitle: LocalizedString;
+  seoDescription: LocalizedString;
   ogImage: string;
 }

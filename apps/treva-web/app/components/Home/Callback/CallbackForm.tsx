@@ -103,14 +103,31 @@ export default function CallbackForm() {
   const [activeRole, setActiveRole] = useState<RoleType>('Client');
   const [name, setName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      role: activeRole,
-      name,
-      phone
-    });
+    setSubmitting(true);
+    setError('');
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021';
+      const res = await fetch(`${apiBase}/callback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, role: activeRole }),
+      });
+      if (!res.ok) throw new Error('Xəta baş verdi');
+      setSubmitted(true);
+      setName('');
+      setPhone('');
+      setActiveRole('Client');
+    } catch {
+      setError('Göndərilmədi. Yenidən cəhd edin.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const hasExtraLine = !!content.titleExtra;
@@ -166,7 +183,10 @@ export default function CallbackForm() {
           />
         </div>
 
-        <CallbackSubmitButton label={content.submitLabel} />
+        <CallbackSubmitButton label={submitting ? '...' : (submitted ? (locale === 'az' ? 'Göndərildi!' : locale === 'en' ? 'Sent!' : 'Отправлено!') : content.submitLabel)} disabled={submitting} />
+
+        {error && <p style={{ color: '#ff4444', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</p>}
+        {submitted && <p style={{ color: '#22c55e', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{locale === 'az' ? 'Sorğunuz qəbul edildi. Tezliklə əlaqə saxlayacağıq.' : locale === 'en' ? 'Your request has been received. We will contact you shortly.' : 'Ваш запрос принят. Мы свяжемся с вами в ближайшее время.'}</p>}
 
         <p className="disclaimer">
           {content.disclaimerParts.before}

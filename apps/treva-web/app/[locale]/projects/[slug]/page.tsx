@@ -4,6 +4,7 @@ import React from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useProjectDetail } from "@/hooks/use-project-detail";
+import type { LocalizedString } from "@/lib/project-detail.types";
 import { getAssetUrl } from "@/lib/asset-url";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
@@ -13,6 +14,12 @@ import ProjectOverview from "@/app/components/Projects/ProjectOverview";
 import ProjectFeatures from "@/app/components/Projects/ProjectFeatures";
 import ProjectLocation from "@/app/components/Projects/ProjectLocation";
 import DynamicProjectLayouts from "@/app/components/Projects/DynamicProjectLayouts";
+
+function loc(obj: LocalizedString | undefined | null, locale: string, fallback = ""): string {
+  if (!obj) return fallback;
+  if (typeof obj === "string") return obj || fallback;
+  return (obj as any)[locale] || obj.az || obj.en || obj.ru || fallback;
+}
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -99,35 +106,35 @@ export default function ProjectDetailPage() {
     <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
       <ProjectHero
-        title={detail.heroTitle || ""}
-        desktopDescription={detail.heroDesktopDesc || ""}
-        mobileDescription={detail.heroMobileDesc || ""}
+        title={loc(detail.heroTitle, locale)}
+        desktopDescription={loc(detail.heroDesktopDesc, locale)}
+        mobileDescription={loc(detail.heroMobileDesc, locale)}
         images={detail.heroImages || []}
-        ctaText={detail.heroCtaText}
+        ctaText={loc(detail.heroCtaText, locale)}
         ctaLink={detail.heroCtaLink}
         getImageUrl={getImageUrl}
       />
 
       <ProjectOverview
-        titleLight={detail.overviewTitleLight || "Project "}
-        titleBold={detail.overviewTitleBold || "Overview"}
-        brandName={detail.overviewBrandName || ""}
-        debutText={detail.overviewDebutText || ""}
-        locationText={detail.overviewLocationText || ""}
-        debutTextEnd={detail.overviewDebutTextEnd || ""}
-        description={detail.overviewDescription || ""}
+        titleLight={loc(detail.overviewTitleLight, locale, "Project ")}
+        titleBold={loc(detail.overviewTitleBold, locale, "Overview")}
+        brandName={loc(detail.overviewBrandName, locale)}
+        debutText={loc(detail.overviewDebutText, locale)}
+        locationText={loc(detail.overviewLocationText, locale)}
+        debutTextEnd={loc(detail.overviewDebutTextEnd, locale)}
+        description={loc(detail.overviewDescription, locale)}
         images={{
           large: {
             url: detail.overviewImageLarge || "",
-            label: detail.overviewImageLargeLabel || "",
+            label: loc(detail.overviewImageLargeLabel, locale),
           },
           medium: {
             url: detail.overviewImageMedium || "",
-            label: detail.overviewImageMediumLabel || "",
+            label: loc(detail.overviewImageMediumLabel, locale),
           },
           small: {
             url: detail.overviewImageSmall || "",
-            label: detail.overviewImageSmallLabel || "",
+            label: loc(detail.overviewImageSmallLabel, locale),
           },
         }}
         dataRows={detail.overviewDataRows || []}
@@ -135,23 +142,23 @@ export default function ProjectDetailPage() {
       />
 
       <ProjectFeatures
-        headerMain={detail.featuresHeaderMain || ""}
-        headerSub={detail.featuresHeaderSub || ""}
-        titleLight={detail.featuresTitleLight || "Project "}
-        titleBold={detail.featuresTitleBold || "Details"}
+        headerMain={loc(detail.featuresHeaderMain, locale)}
+        headerSub={loc(detail.featuresHeaderSub, locale)}
+        titleLight={loc(detail.featuresTitleLight, locale, "Project ")}
+        titleBold={loc(detail.featuresTitleBold, locale, "Details")}
         sections={detail.featuresSections || []}
         brochureFile={detail.brochureFile}
         getImageUrl={getImageUrl}
       />
 
       <ProjectLocation
-        titleLight={detail.locationTitleLight || "Property "}
-        titleBold={detail.locationTitleBold || "Location"}
-        brandName={detail.locationBrandName || ""}
-        mainLead={detail.locationMainLead || ""}
-        subText={detail.locationSubText || ""}
+        titleLight={loc(detail.locationTitleLight, locale, "Property ")}
+        titleBold={loc(detail.locationTitleBold, locale, "Location")}
+        brandName={loc(detail.locationBrandName, locale)}
+        mainLead={loc(detail.locationMainLead, locale)}
+        subText={loc(detail.locationSubText, locale)}
         mapImage={detail.locationMapImage || ""}
-        footerAddress={detail.locationFooterAddress || ""}
+        footerAddress={loc(detail.locationFooterAddress, locale)}
         googleMapsUrl={detail.locationGoogleMapsUrl}
         getImageUrl={getImageUrl}
       />

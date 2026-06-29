@@ -13,12 +13,21 @@ gsap.registerPlugin(ScrollTrigger, SplitText)
 
 const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
 
+type LocalizedValue = string | { az?: string; en?: string; ru?: string };
+
+function getLocalized(val: LocalizedValue | undefined | null, loc: string, fallback = ""): string {
+  if (!val) return fallback;
+  if (typeof val === "string") return val || fallback;
+  const obj = val as Record<string, string | undefined>;
+  return obj[loc] || obj.az || obj.en || obj.ru || fallback;
+}
+
 interface ProjectCategory {
   id: string;
-  title: string;
+  title: LocalizedValue;
   slug: string;
   image: string | null;
-  brand: string | null;
+  brand: LocalizedValue | null;
   order?: number;
 }
 
@@ -194,7 +203,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                     <img
                                       src={cat.image.startsWith('http') ? cat.image : `${CMS_API}${cat.image}`}
                                       loading="lazy"
-                                      alt={cat.title}
+                                      alt={getLocalized(cat.title, locale)}
                                       className="fullwidth-img"
                                     />
                                   ) : (
@@ -209,8 +218,8 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                 <div className="img-cover"></div>
                               </div>
                               <div className="projects_content-wrap">
-                                <div className="heading-style-h3 text-color-blue400">{cat.title}</div>
-                                <div fs-list-field="location">{cat.brand || ""}</div>
+                                <div className="heading-style-h3 text-color-blue400">{getLocalized(cat.title, locale)}</div>
+                                <div fs-list-field="location">{getLocalized(cat.brand, locale)}</div>
                               </div>
                             </a>
                           </div>

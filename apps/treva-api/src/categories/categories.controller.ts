@@ -66,15 +66,19 @@ export class CategoriesController {
     // 3. Combine: all categories, with image/brand from cms-api if available
     return categories.map((cat) => {
       const cms = cmsData[cat.slug];
+      const cmsTitle = cms?.title;
+      const title = (cmsTitle && typeof cmsTitle === 'object') ? cmsTitle : { az: cat.title, en: cat.title, ru: cat.title };
+      const description = (cms?.description && typeof cms.description === 'object') ? cms.description : (cms?.description ? { az: cms.description, en: cms.description, ru: cms.description } : null);
+      const brand = (cms?.brand && typeof cms.brand === 'object') ? cms.brand : (cms?.brand ? { az: cms.brand, en: cms.brand, ru: cms.brand } : null);
       return {
         id: cat.id,
-        title: cat.title,
+        title,
         slug: cat.slug,
         image: cms?.image || cat.image || null,
         brandImage: cms?.brandImage || null,
         brandTextColor: cms?.brandTextColor || 'white',
-        description: cms?.description || null,
-        brand: cms?.brand || null,
+        description,
+        brand,
         order: cms?.order ?? cat.order ?? 0,
       };
     }).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));

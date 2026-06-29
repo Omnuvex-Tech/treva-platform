@@ -22,8 +22,14 @@ function PillButton({ className = '', isPressed = false, ...props }: PillButtonP
 }
 
 interface CategoryOption {
-  title: string;
+  title: { az?: string; en?: string; ru?: string } | string;
   slug: string;
+}
+
+function getCatTitle(title: CategoryOption['title'], loc: string): string {
+  if (typeof title === 'string') return title;
+  const t = title as Record<string, string | undefined>;
+  return t[loc] || t.az || t.en || t.ru || '';
 }
 
 const heroDictionary = {
@@ -102,7 +108,11 @@ export default function TrevaHero() {
       .then((res) => res.json())
       .then((raw) => {
         const data = Array.isArray(raw) ? raw : raw.value || [];
-        const cats = data.map((cat: any) => ({ title: cat.title, slug: cat.slug }));
+        const cats = data.map((cat: any) => {
+          const rawTitle = cat.title;
+          const titleObj = (rawTitle && typeof rawTitle === 'object') ? rawTitle : { az: rawTitle, en: rawTitle, ru: rawTitle };
+          return { title: titleObj, slug: cat.slug };
+        });
         setCategories(cats);
         const saved = localStorage.getItem('treva_selectedCategory');
         if (saved) {
@@ -129,7 +139,7 @@ export default function TrevaHero() {
 
   const handleHomeClick = useCallback(() => {
     const path = dealType === "Resale" ? "resale" : "off-plan";
-    const selectedCat = categories.find((c) => c.title === selectedCategory);
+    const selectedCat = categories.find((c) => getCatTitle(c.title, locale) === selectedCategory);
     const categoryParam = selectedCat ? `?category=${selectedCat.slug}` : '';
     router.push(`/${locale}/${path}${categoryParam}`);
   }, [dealType, locale, router, categories, selectedCategory]);
@@ -182,17 +192,20 @@ export default function TrevaHero() {
 
               {locationMenuOpen && categories.length > 0 && (
                 <div className="treva-filter-bar__deal-menu treva-filter-bar__deal-menu--location" role="listbox">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.slug}
-                      className={`treva-filter-bar__deal-option ${selectedCategory === cat.title ? 'treva-filter-bar__deal-option--active' : ''}`}
-                      type="button"
-                      role="option"
-                      onClick={() => handleCategoryClick(cat.slug, cat.title)}
-                    >
-                      {cat.title}
-                    </button>
-                  ))}
+                  {categories.map((cat) => {
+                    const catTitle = getCatTitle(cat.title, locale);
+                    return (
+                      <button
+                        key={cat.slug}
+                        className={`treva-filter-bar__deal-option ${selectedCategory === catTitle ? 'treva-filter-bar__deal-option--active' : ''}`}
+                        type="button"
+                        role="option"
+                        onClick={() => handleCategoryClick(cat.slug, catTitle)}
+                      >
+                        {catTitle}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
