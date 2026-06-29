@@ -65,7 +65,8 @@ type ContactStatus = 'idle' | 'loading' | 'success' | 'error'
 /* ─────────────────────────────────────────────────────────
    CONFIG
 ───────────────────────────────────────────────────────── */
-const LEAD_ENDPOINT = 'https://nodebitrixproject15.vercel.app/api/webflow-lead'
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021'
+const LEAD_ENDPOINT = `${API_BASE}/contact/submit`
 const INITIAL_CONTACT_FIELDS: ContactFields = {
   name: '',
   email: '',
@@ -187,12 +188,11 @@ function ContactForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields),
       })
-      const result = await res.json()
-      if (res.ok && result.success) {
+      if (res.ok) {
         setStatus('success')
         setFields(INITIAL_CONTACT_FIELDS)
       } else {
-        throw new Error(result.message || 'Xəta baş verdi')
+        throw new Error('Xəta baş verdi')
       }
     } catch {
       setStatus('error')
