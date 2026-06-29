@@ -148,17 +148,11 @@
 
 .pulse__slider-track {
   display: flex;
-  animation: infinite-scroll var(--scroll-speed, 10s) linear infinite;
   will-change: transform;
 }
 
 .pulse__slider-track:hover {
-  animation-play-state: paused;
-}
-
-@keyframes infinite-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } 
+  opacity: 0.9;
 }
 
 .blog-card {

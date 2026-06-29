@@ -84,20 +84,12 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  let baseData = [...filteredData];
-  if (baseData.length > 0) {
-    while (baseData.length <= itemsVisible) {
-      baseData = [...baseData, ...filteredData];
-    }
-  }
-
-  const duplicatedData = [...baseData, ...baseData];
-  const totalItems = duplicatedData.length;
+  const totalItems = filteredData.length;
 
   const trackWidth = totalItems === 0 ? "100%" : `${(totalItems / itemsVisible) * 100}%`;
   const cardWidth = totalItems === 0 ? "100%" : `${100 / totalItems}%`;
 
-  const scrollSpeed = `${baseData.length * 2}s`;
+  const scrollSpeed = `${totalItems * 2}s`;
 
   return (
     <main>
@@ -160,7 +152,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                   '--scroll-speed': scrollSpeed
                 } as React.CSSProperties}
               >
-                {duplicatedData.map((post, index) => (
+                {filteredData.map((post, index) => (
                   <a
                     href={post.slug ? `/${activeLocale}/pulse/${post.slug}` : `/${activeLocale}/pulse`}
                     key={`${post.slug}-${index}`}
