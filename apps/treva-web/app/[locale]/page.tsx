@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Home from "@/app/components/Home";
 import { config } from "@/config";
-import { getArticles, apiArticleToArticle } from "@/lib/pulse-api";
+import { getArticles, apiArticleToArticle, getPulseCategories } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 
 export const dynamicParams = false;
@@ -27,14 +27,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     }
 
     let pulseArticles: Article[] = [];
+    let pulseCategories: { id: string; name: string; slug: string }[] = [];
     try {
         const result = await getArticles({ limit: 4 });
         pulseArticles = result.data.map(apiArticleToArticle);
     } catch {
         pulseArticles = [];
     }
+    try {
+        pulseCategories = await getPulseCategories();
+    } catch {
+        pulseCategories = [];
+    }
 
     return (
-        <Home locale={locale} pulseArticles={pulseArticles} />
+        <Home locale={locale} pulseArticles={pulseArticles} pulseCategories={pulseCategories} />
     );
 }

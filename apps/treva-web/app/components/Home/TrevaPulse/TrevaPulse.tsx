@@ -16,7 +16,7 @@ const pulseDictionary = {
       "daxili dinamikasını və ən vacib yeniliklərini izləyin.",
     ],
     filterLabel: "Kateqoriyaya görə",
-    categories: { all: "Hamısı", events: "Tədbirlər", blog: "Bloq", highlights: "Seçilmişlər" },
+    categories: { all: "Hamısı" },
     viewAll: "BÜTÜNÜ",
     noData: "Bu kateqoriyada məqalə tapılmadı.",
   },
@@ -28,7 +28,7 @@ const pulseDictionary = {
       "Baku's premium real estate market.",
     ],
     filterLabel: "Filter by category",
-    categories: { all: "All", events: "Events", blog: "Blog", highlights: "Highlights" },
+    categories: { all: "All" },
     viewAll: "view all",
     noData: "No articles found in this category.",
   },
@@ -40,40 +40,21 @@ const pulseDictionary = {
       "бакинского рынка элитной недвижимости.",
     ],
     filterLabel: "Фильтр по категории",
-    categories: { all: "Все", events: "События", blog: "Блог", highlights: "Избранное" },
+    categories: { all: "Все" },
     viewAll: "ВСЕ",
     noData: "В этой категории статей не найдено.",
   },
 } as const;
 
-type CategoryKey = keyof typeof pulseDictionary.az.categories;
-
-type PulseFilterButtonProps = {
-  label: string;
-  isActive: boolean;
-  onClick: (key: CategoryKey) => void;
-  categoryKey: CategoryKey;
-};
-
-function PulseFilterButton({ label, isActive, onClick, categoryKey }: PulseFilterButtonProps) {
-  return (
-    <button
-      type="button"
-      className={`pulse__filter-btn ${isActive ? 'pulse__filter-btn--active' : ''}`}
-      onClick={() => onClick(categoryKey)}
-      suppressHydrationWarning
-    >
-      {label}
-    </button>
-  );
-}
+type PulseCategory = { id: string; name: string; slug: string };
 
 type TrevaPulseProps = {
   locale?: string;
   articles?: Article[];
+  categories?: PulseCategory[];
 };
 
-const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] }) => {
+const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], categories = [] }) => {
   const pathname = usePathname();
   const detectedLocale = pathname?.split('/')[1];
   const activeLocale = (detectedLocale && detectedLocale in pulseDictionary)
@@ -81,22 +62,12 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
     : locale as keyof typeof pulseDictionary;
   const content = pulseDictionary[activeLocale];
 
-  const [activeFilter, setActiveFilter] = useState<CategoryKey>('blog');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
   const [itemsVisible, setItemsVisible] = useState(3);
-
-  const categoryKeys: CategoryKey[] = ['all', 'events', 'blog', 'highlights'];
 
   const filteredData = activeFilter === 'all'
     ? [...articles]
-    : articles.filter(post => {
-        const categoryMap: Record<CategoryKey, string> = {
-          all: '',
-          events: 'Tədbir',
-          blog: content.categories.blog,
-          highlights: 'Highlight',
-        };
-        return post.category.toLowerCase() === categoryMap[activeFilter].toLowerCase();
-      });
+    : articles.filter(post => post.category?.toLowerCase() === activeFilter.toLowerCase());
 
   useEffect(() => {
     const handleResize = () => {
@@ -126,7 +97,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
   const trackWidth = totalItems === 0 ? "100%" : `${(totalItems / itemsVisible) * 100}%`;
   const cardWidth = totalItems === 0 ? "100%" : `${100 / totalItems}%`;
 
-  const scrollSpeed = `${baseData.length * 6}s`;
+  const scrollSpeed = `${baseData.length * 2}s`;
 
   return (
     <main>
@@ -151,14 +122,24 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [] })
               <div className="pulse__filters">
                 <span className="pulse__filter-label">{content.filterLabel}</span>
                 <div className="pulse__btn-group">
-                  {categoryKeys.map((key) => (
-                    <PulseFilterButton
-                      key={key}
-                      categoryKey={key}
-                      label={content.categories[key]}
-                      isActive={activeFilter === key}
-                      onClick={setActiveFilter}
-                    />
+                  <button
+                    type="button"
+                    className={`pulse__filter-btn ${activeFilter === 'all' ? 'pulse__filter-btn--active' : ''}`}
+                    onClick={() => setActiveFilter('all')}
+                    suppressHydrationWarning
+                  >
+                    {content.categories.all}
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      type="button"
+                      key={cat.id}
+                      className={`pulse__filter-btn ${activeFilter === cat.name ? 'pulse__filter-btn--active' : ''}`}
+                      onClick={() => setActiveFilter(cat.name)}
+                      suppressHydrationWarning
+                    >
+                      {cat.name}
+                    </button>
                   ))}
                 </div>
               </div>
