@@ -813,7 +813,19 @@
   border-color: #999;
 }
 
+.custom-select__trigger span {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .custom-select__trigger svg {
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
   transition: transform 0.2s ease;
   color: #555;
@@ -825,16 +837,21 @@
 
 .custom-select__dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 8px);
   left: 0;
   width: 100%;
   background: #3F4249;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  box-shadow: var(--treva-shadow, 0 8px 24px rgba(28, 33, 45, 0.18));
   overflow: hidden;
   z-index: 50;
   min-width: 100%;
-  padding: 6px 0;
+  padding: 0;
+  max-height: min(320px, 60vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
 }
 
 .custom-select__option {
@@ -842,16 +859,17 @@
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  min-height: 38px;
-  padding: 8px 18px;
+  min-height: 42px;
+  padding: 18px 20px;
   border: none;
   background: transparent;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
   cursor: pointer;
-  font-family: 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  text-transform: none;
+  font-family: var(--treva-font-oak, 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  text-transform: uppercase;
   transition: background 0.18s ease;
   text-align: left;
 }
@@ -861,5 +879,5 @@
 }
 
 .custom-select__option--active {
-  background: rgba(0, 0, 0, 0.16);
+  background: #2F3134;
 }

@@ -101,6 +101,7 @@ export default function ResalePage() {
                   <button
                     type="button"
                     className="re-sort-trigger"
+                    aria-expanded={typeDropdownOpen}
                     onClick={() => setTypeDropdownOpen((p) => !p)}
                   >
                     <span>{selectedTypeId ? (apartmentTypes?.find((t: any) => t.id === selectedTypeId)?.title || 'Type') : 'Recommended'}</span>

@@ -2,14 +2,13 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useResaleApartmentRange, useResaleCurrencies } from '@/hooks/use-resale-apartments';
+import { useRoomOptions } from '@/hooks/use-room-options';
 import { useDebounce } from '@/hooks/use-debounce';
 import './unit-filter.css';
 
 const FLOOR_OPTIONS = ['All', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
 const VIEW_OPTIONS = ['All', 'City', 'Sea', 'Mountain', 'Park', 'Courtyard'];
 const STATUS_OPTIONS = ['All', 'Renovated', 'Without renovation', 'Euro renovation', 'Cosmic renovation', 'Designer renovation'];
-const ROOM_OPTIONS = ['1', '2', '3', '4', '5+'];
-
 export interface ResaleFilterState {
   minPrice?: number;
   maxPrice?: number;
@@ -22,8 +21,10 @@ export interface ResaleFilterState {
 
 export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingChange }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number; onDebouncingChange?: (v: boolean) => void }) {
   const { data: currenciesData } = useResaleCurrencies();
+  const { data: roomOptionsData } = useRoomOptions();
 
-  const currencies = currenciesData?.map(c => ({ value: c.value, name: c.name })) || [];
+  const currencies = currenciesData || [];
+  const roomOptions = roomOptionsData || [];
 
   const [currency, setCurrency] = useState('');
   const { data: rangeData } = useResaleApartmentRange(currency || undefined);
@@ -197,22 +198,24 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </div>
 
             <div className="custom-select currency-select" ref={currencyRef}>
-              <button type="button" className="custom-select__trigger" onClick={() => setCurrencyOpen((p) => !p)}>
-                <span>{currency || 'Select currency'}</span>
+              <button type="button" className="custom-select__trigger" aria-expanded={currencyOpen} onClick={() => setCurrencyOpen((p) => !p)}>
+                <span>{currency || 'USD'}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {currencyOpen && (
                 <div className="custom-select__dropdown">
-                  {currencies.map((c) => (
+                  {(currencies.length
+                    ? currencies.map((c) => ({ value: c.value, label: c.value }))
+                    : [{ value: 'USD', label: 'USD' }, { value: 'AZN', label: 'AZN' }]).map((opt) => (
                     <button
-                      key={c.value}
+                      key={opt.value}
                       type="button"
-                      className={`custom-select__option ${currency === c.value ? 'custom-select__option--active' : ''}`}
-                      onClick={() => { setCurrency(c.value); setCurrencyOpen(false); }}
+                      className={`custom-select__option ${currency === opt.value ? 'custom-select__option--active' : ''}`}
+                      onClick={() => { setCurrency(opt.value); setCurrencyOpen(false); }}
                     >
-                      {c.name} ({c.value})
+                      {opt.label}
                     </button>
                   ))}
                 </div>
@@ -334,7 +337,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
           <div className="filter-group filter-group--floor">
             <label className="filter-label">Floor</label>
             <div className="custom-select" ref={floorRef}>
-              <button type="button" className="custom-select__trigger" onClick={() => setFloorOpen((p) => !p)}>
+              <button type="button" className="custom-select__trigger" aria-expanded={floorOpen} onClick={() => setFloorOpen((p) => !p)}>
                 <span>{floor}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
@@ -358,7 +361,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
           <div className="filter-group filter-group--view">
             <label className="filter-label">View</label>
             <div className="custom-select" ref={viewRef}>
-              <button type="button" className="custom-select__trigger" onClick={() => setViewOpen((p) => !p)}>
+              <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
                 <span>{selectedView}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
@@ -379,7 +382,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
           <div className="filter-group filter-group--status">
             <label className="filter-label">Status</label>
             <div className="custom-select" ref={statusRef}>
-              <button type="button" className="custom-select__trigger" onClick={() => setStatusOpen((p) => !p)}>
+              <button type="button" className="custom-select__trigger" aria-expanded={statusOpen} onClick={() => setStatusOpen((p) => !p)}>
                 <span>{selectedStatus}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
@@ -402,16 +405,20 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
         <div className="filter-group filter-group--rooms">
           <label className="filter-label">Number of rooms</label>
           <div className="rooms-group">
-            {ROOM_OPTIONS.map((room) => (
-              <button
-                key={room}
-                type="button"
-                className={`room-btn ${selectedRooms === room ? 'room-btn--active' : ''}`}
-                onClick={() => setSelectedRooms(selectedRooms === room ? '' : room)}
-              >
-                {room}
-              </button>
-            ))}
+            {roomOptions.length === 0 ? (
+              <span style={{ fontSize: 13, color: '#9ca3af' }}>Otaq yoxdur</span>
+            ) : (
+              roomOptions.map((room) => (
+                <button
+                  key={room.id}
+                  type="button"
+                  className={`room-btn ${selectedRooms === room.value ? 'room-btn--active' : ''}`}
+                  onClick={() => setSelectedRooms(selectedRooms === room.value ? '' : room.value)}
+                >
+                  {room.value}
+                </button>
+              ))
+            )}
           </div>
         </div>
       </div>

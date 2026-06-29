@@ -38,7 +38,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -52,7 +52,7 @@
 .re-sort-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .re-sort-label {
@@ -66,22 +66,37 @@
 }
 
 .re-sort-trigger {
-  background-color: var(--slate-dark);
+  min-height: 42px;
+  background-color: #3F4249;
   color: #ffffff;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 400;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
   cursor: pointer;
-  text-transform: none;
+  text-transform: uppercase;
   border: none;
+  min-width: 170px;
+  font-family: var(--font-stack);
+  line-height: 1;
+  transition: background 0.18s ease;
 }
 
 .re-sort-trigger:hover {
-  background-color: #3a3d45;
+  background: #2F3134;
+}
+
+.re-sort-trigger svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.re-sort-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }
 
 .re-sort-dropdown-menu {
@@ -90,22 +105,27 @@
   right: 0;
   min-width: 200px;
   background: #3F4249;
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  box-shadow: var(--treva-shadow, 0 8px 24px rgba(28, 33, 45, 0.18));
   z-index: 100;
-  padding: 6px 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .re-sort-dropdown-item {
   width: 100%;
-  padding: 10px 18px;
+  min-height: 42px;
+  padding: 18px 20px;
   background: transparent;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 400;
   text-align: left;
   cursor: pointer;
-  text-transform: none;
+  text-transform: uppercase;
+  font-family: var(--font-stack);
+  line-height: 1;
+  border: none;
 }
 
 .re-sort-dropdown-item:hover {
@@ -113,7 +133,7 @@
 }
 
 .re-sort-dropdown-item--active {
-  background: rgba(0, 0, 0, 0.16);
+  background: #2F3134;
 }
 
 .re-grid {
@@ -362,8 +382,8 @@
   }
 
   .re-sort-trigger {
+    min-width: 150px;
     padding: 10px 14px;
-    font-size: 14px;
   }
 
   .re-grid {
