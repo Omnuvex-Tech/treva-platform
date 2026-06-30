@@ -32,6 +32,7 @@ export interface Article {
   selectedArticles?: Article[];
   metaTitle?: string;
   metaDescription?: string;
+  _searchable?: string;
 }
 
 export interface ArticleCard extends Omit<Article, 'content' | 'blocks'> {}

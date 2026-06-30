@@ -170,6 +170,14 @@ export function formatDate(iso: string): string {
 }
 
 export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Article {
+    const searchParts = [api.title, api.category, api.excerpt]
+        .filter(Boolean)
+        .flatMap(v => {
+            if (typeof v === "string") return [v];
+            if (v && typeof v === "object") return Object.values(v).filter(Boolean) as string[];
+            return [];
+        });
+
     return {
         id: api.id,
         slug: api.slug,
@@ -195,5 +203,6 @@ export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Art
         selectedArticles: api.selectedArticles?.map(a => apiArticleToArticle(a, locale)),
         metaTitle: getLocalized(api.metaTitle, locale),
         metaDescription: getLocalized(api.metaDescription, locale),
+        _searchable: searchParts.join(' ').toLowerCase(),
     };
 }

@@ -269,10 +269,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
 
     if (searchQuery.trim()) {
       const term = searchQuery.trim().toLowerCase();
-      result = result.filter(a => {
-        const haystack = [a.title, a.category, a.excerpt].filter(Boolean).join(' ').toLowerCase();
-        return haystack.includes(term);
-      });
+      result = result.filter(a => (a._searchable || '').includes(term));
     }
 
     if (selectedSlugs.length > 0) {
