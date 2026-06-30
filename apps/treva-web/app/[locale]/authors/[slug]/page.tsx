@@ -45,7 +45,7 @@ export default async function AuthorPage({ params }: Props) {
     notFound();
   }
 
-  const authorArticles = apiAuthor.articles.map(apiArticleToArticle);
+  const authorArticles = apiAuthor.articles.map(a => apiArticleToArticle(a, locale));
   const authorName = apiAuthor.name;
   const authorTitle = apiAuthor.title || "Ekspert / Müəllif";
   const authorImage = apiAuthor.avatar || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg";

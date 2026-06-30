@@ -21,18 +21,18 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  const article = apiArticleToArticle(apiArticle);
+  const article = apiArticleToArticle(apiArticle, locale);
 
   let sidebarArticles: Article[] = [];
   let relatedArticles: Article[] = [];
 
   if (apiArticle.selectedArticles && apiArticle.selectedArticles.length > 0) {
-    sidebarArticles = apiArticle.selectedArticles.map(apiArticleToArticle);
+    sidebarArticles = apiArticle.selectedArticles.map(a => apiArticleToArticle(a, locale));
   }
 
   try {
     const result = await getArticles({ limit: 10 });
-    const all = result.data.map(apiArticleToArticle);
+    const all = result.data.map(a => apiArticleToArticle(a, locale));
     if (sidebarArticles.length === 0) {
       sidebarArticles = all.filter((a) => a.slug !== slug).slice(0, 4);
     }

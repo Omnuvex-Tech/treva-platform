@@ -12,6 +12,14 @@ export type ArticleBlock =
     | { type: "video"; url: string }
     | { type: "gallery"; images: { url: string; alt: string }[] };
 
+export type LocalizedString = string | { az?: string; en?: string; ru?: string };
+
+export function getLocalized(value: LocalizedString | undefined | null, locale: string = "az"): string {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    return value[locale as keyof typeof value] || value.az || Object.values(value)[0] || "";
+}
+
 export interface ApiAuthor {
     id: string;
     name: string;
@@ -29,17 +37,17 @@ export interface ApiKeyword {
 export interface ApiArticle {
     id: string;
     slug: string;
-    title: string;
-    category: string;
+    title: LocalizedString;
+    category: LocalizedString;
     date: string;
     coverImage?: string;
-    excerpt?: string;
+    excerpt?: LocalizedString;
     authorId?: string;
     author?: ApiAuthor;
     keywords?: ApiKeyword[];
     blocks: ArticleBlock[];
-    metaTitle?: string;
-    metaDescription?: string;
+    metaTitle?: LocalizedString;
+    metaDescription?: LocalizedString;
     featured: boolean;
     published: boolean;
     headerPosition?: "left" | "center" | "right" | "week" | null;
@@ -60,11 +68,13 @@ export interface PaginatedResponse<T> {
 }
 
 export async function getArticles(params?: {
+    q?: string;
     category?: string;
     page?: number;
     limit?: number;
 }): Promise<PaginatedResponse<ApiArticle>> {
     const searchParams = new URLSearchParams();
+    if (params?.q) searchParams.set("q", params.q);
     if (params?.category) searchParams.set("category", params.category);
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.limit) searchParams.set("limit", String(params.limit));
@@ -111,7 +121,7 @@ export async function getHeaderArticles(
 
 export interface PulseCategory {
     id: string;
-    name: string;
+    name: LocalizedString;
     slug: string;
     createdAt: string;
     updatedAt: string;
@@ -159,12 +169,12 @@ export function formatDate(iso: string): string {
     return `${day}.${month}.${year}`;
 }
 
-export function apiArticleToArticle(api: ApiArticle): Article {
+export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Article {
     return {
         id: api.id,
         slug: api.slug,
-        title: api.title,
-        category: api.category,
+        title: getLocalized(api.title, locale),
+        category: getLocalized(api.category, locale),
         date: formatDate(api.date),
         image: api.coverImage,
         coverImage: api.coverImage,
@@ -177,13 +187,13 @@ export function apiArticleToArticle(api: ApiArticle): Article {
             : undefined,
         keywords: api.keywords,
         blocks: api.blocks,
-        excerpt: api.excerpt,
+        excerpt: getLocalized(api.excerpt, locale),
         featured: api.featured,
         published: api.published,
         headerPosition: api.headerPosition ?? undefined,
         headerOrder: api.headerOrder ?? undefined,
-        selectedArticles: api.selectedArticles?.map(apiArticleToArticle),
-        metaTitle: api.metaTitle,
-        metaDescription: api.metaDescription,
+        selectedArticles: api.selectedArticles?.map(a => apiArticleToArticle(a, locale)),
+        metaTitle: getLocalized(api.metaTitle, locale),
+        metaDescription: getLocalized(api.metaDescription, locale),
     };
 }

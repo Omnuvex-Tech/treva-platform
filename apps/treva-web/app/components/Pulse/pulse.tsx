@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
@@ -18,7 +18,7 @@ type PulseProps = {
   centerArticle: Article | null;
   rightArticles: Article[];
   weekArticles: Article[];
-  categories: { id: string; name: string }[];
+  categories: { id: string; name: string; slug: string }[];
 };
 
 const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, weekArticles, categories }: PulseProps) => {
@@ -257,14 +257,58 @@ function PulseHeaderSection({
   );
 }
 
-function PulseNewsSection({ locale, articles, weekArticles, categories }: { locale: string; articles: Article[]; weekArticles: Article[]; categories: { id: string; name: string }[] }) {
+function PulseNewsSection({ locale, articles: initialArticles, weekArticles, categories }: { locale: string; articles: Article[]; weekArticles: Article[]; categories: { id: string; name: string; slug: string }[] }) {
   const [visibleCount, setVisibleCount] = useState(6);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
+
+  const weekSlugs = useMemo(() => new Set(weekArticles.map((a) => a.slug)), [weekArticles]);
+
+  const gridArticles = useMemo(() => {
+    let result = initialArticles;
+
+    if (searchQuery.trim()) {
+      const term = searchQuery.trim().toLowerCase();
+      result = result.filter(a => {
+        const haystack = [a.title, a.category, a.excerpt].filter(Boolean).join(' ').toLowerCase();
+        return haystack.includes(term);
+      });
+    }
+
+    if (selectedSlugs.length > 0) {
+      result = result.filter(a => {
+        const catLower = (a.category || '').toLowerCase();
+        return selectedSlugs.some(slug => {
+          const cat = categories.find(c => c.slug === slug);
+          return cat && cat.name.toLowerCase() === catLower;
+        });
+      });
+    }
+
+    return result.filter(a => !weekSlugs.has(a.slug));
+  }, [initialArticles, searchQuery, selectedSlugs, weekSlugs, categories]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setVisibleCount(6);
+  };
+
+  const toggleCategory = (slug: string) => {
+    setSelectedSlugs(prev =>
+      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
+    );
+    setVisibleCount(6);
+  };
+
+  const clearFilters = () => {
+    setSelectedSlugs([]);
+    setSearchQuery('');
+    setVisibleCount(6);
+  };
+
   const handleViewMore = () => {
     setVisibleCount(prev => prev + 6);
   };
-
-  const weekSlugs = new Set(weekArticles.map((a) => a.slug));
-  const gridArticles = articles.filter((a) => !weekSlugs.has(a.slug));
 
   return (
     <section className="section_news">
@@ -303,23 +347,55 @@ function PulseNewsSection({ locale, articles, weekArticles, categories }: { loca
               {/* 3. SAĞ SÜTUN: Axtarış və Kateqoriyalar */}
               <div className="news_filters-col">
                 <div className="news_filters-holder w-form">
-                  <form className="news_filters-form">
+                  <form className="news_filters-form" onSubmit={e => e.preventDefault()}>
                     <div className="news_filters-search-wrap">
-                      <input className="news_filters-search w-input" placeholder="Axtarış..." type="text" />
+                      <input
+                        className="news_filters-search w-input"
+                        placeholder="Axtarış..."
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                      />
                     </div>
 
                     <div className="news_filters-block">
                       <div>Kateqoriyalar</div>
 
                       <div className="news_tags-list">
-                        {categories.map(
-                          (category) => (
-                            <label key={category.id} className="w-checkbox news_checkbox-field">
-                              <input type="checkbox" className="hidden" value={category.name} />
-                              <span className="news_checkbox-label w-form-label">{category.name}</span>
-                            </label>
-                          ),
-                        )}
+                        <button
+                          type="button"
+                          onClick={clearFilters}
+                          style={{
+                            padding: "3px 11px", borderRadius: 20, fontSize: 11, fontWeight: 400,
+                            border: "none", cursor: "pointer",
+                            background: selectedSlugs.length === 0 && !searchQuery ? "#4C525E" : "#ededed",
+                            color: selectedSlugs.length === 0 && !searchQuery ? "#fff" : "#17191c",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                          }}
+                        >
+                          Hamısı
+                        </button>
+                        {categories.map((category) => {
+                          const isActive = selectedSlugs.includes(category.slug);
+                          return (
+                            <button
+                              key={category.id}
+                              type="button"
+                              onClick={() => toggleCategory(category.slug)}
+                              style={{
+                                padding: "3px 11px", borderRadius: 20, fontSize: 11, fontWeight: 400,
+                                border: "none", cursor: "pointer",
+                                background: isActive ? "#4C525E" : "#ededed",
+                                color: isActive ? "#fff" : "#17191c",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                              }}
+                            >
+                              {category.name}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   </form>
@@ -330,9 +406,15 @@ function PulseNewsSection({ locale, articles, weekArticles, categories }: { loca
               <div id="all-articles" className="news_middle-wrap">
                 <div className="w-dyn-list">
                   <div role="list" className="news_middle-list w-dyn-items">
-                    {gridArticles.slice(0, visibleCount).map((article) => (
-                      <NewsCard key={article.slug} article={article} locale={locale} />
-                    ))}
+                    {gridArticles.length === 0 ? (
+                      <div style={{ padding: "2rem", textAlign: "center", color: "#94a3b8" }}>
+                        Nəticə tapılmadı
+                      </div>
+                    ) : (
+                      gridArticles.slice(0, visibleCount).map((article) => (
+                        <NewsCard key={article.slug} article={article} locale={locale} />
+                      ))
+                    )}
                   </div>
                 </div>
 

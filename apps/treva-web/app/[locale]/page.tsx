@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Home from "@/app/components/Home";
 import { config } from "@/config";
-import { getArticles, apiArticleToArticle, getPulseCategories } from "@/lib/pulse-api";
+import { getArticles, apiArticleToArticle, getPulseCategories, getLocalized } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 
 export const dynamicParams = false;
@@ -30,12 +30,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     let pulseCategories: { id: string; name: string; slug: string }[] = [];
     try {
         const result = await getArticles({ limit: 4 });
-        pulseArticles = result.data.map(apiArticleToArticle);
+        pulseArticles = result.data.map(a => apiArticleToArticle(a, locale));
     } catch {
         pulseArticles = [];
     }
     try {
-        pulseCategories = await getPulseCategories();
+        const cats = await getPulseCategories();
+        pulseCategories = cats.map(c => ({ id: c.id, name: getLocalized(c.name, locale), slug: c.slug }));
     } catch {
         pulseCategories = [];
     }

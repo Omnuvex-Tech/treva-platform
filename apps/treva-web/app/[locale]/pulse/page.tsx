@@ -6,6 +6,7 @@ import {
     getHeaderArticles,
     getPulseCategories,
     apiArticleToArticle,
+    getLocalized,
 } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 
@@ -30,7 +31,7 @@ export default async function PulseRoute({ params }: { params: Promise<{ locale:
     let centerArticle: Article | null = null;
     let rightArticles: Article[] = [];
     let weekArticles: Article[] = [];
-    let categories: { id: string; name: string }[] = [];
+    let categories: { id: string; name: string; slug: string }[] = [];
 
     try {
         const [allResult, left, center, right, week, cats] = await Promise.all([
@@ -41,12 +42,12 @@ export default async function PulseRoute({ params }: { params: Promise<{ locale:
             getHeaderArticles("week"),
             getPulseCategories(),
         ]);
-        articles = allResult.data.map(apiArticleToArticle);
-        leftArticles = left.map(apiArticleToArticle);
-        centerArticle = center[0] ? apiArticleToArticle(center[0]) : null;
-        rightArticles = right.map(apiArticleToArticle);
-        weekArticles = week.map(apiArticleToArticle);
-        categories = cats.map((c) => ({ id: c.id, name: c.name }));
+        articles = allResult.data.map(a => apiArticleToArticle(a, locale));
+        leftArticles = left.map(a => apiArticleToArticle(a, locale));
+        centerArticle = center[0] ? apiArticleToArticle(center[0], locale) : null;
+        rightArticles = right.map(a => apiArticleToArticle(a, locale));
+        weekArticles = week.map(a => apiArticleToArticle(a, locale));
+        categories = cats.map((c) => ({ id: c.id, name: getLocalized(c.name, locale), slug: c.slug }));
     } catch {
         articles = [];
     }
