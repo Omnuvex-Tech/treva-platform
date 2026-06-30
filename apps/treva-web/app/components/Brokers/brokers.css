@@ -265,10 +265,50 @@ input:focus::placeholder, textarea:focus::placeholder {
   transition: transform 0.3s ease;
 }
 
-/* Specific Select Field Hide the native select */
+/* Specific Select Field */
 .connect_input-field.is-select {
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* Custom Dropdown (navbar style) */
+.broker-dropdown-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  min-width: 180px;
+  padding: 6px 0;
+  background: #3F4249;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 999;
+}
+
+.broker-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.broker-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.broker-dropdown-item--active {
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
 }

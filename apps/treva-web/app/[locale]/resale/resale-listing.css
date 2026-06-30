@@ -216,8 +216,8 @@
 
 .re-bookmark-btn {
   background-color: transparent;
-  color: var(--slate-dark);
-  border: 1.2px solid #00000040;
+  color: #9AA5B4;
+  border: 1.2px solid rgba(154, 165, 180, 0.4);
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -230,11 +230,13 @@
 }
 
 .re-bookmark-btn:hover {
-  opacity: 0.7;
+  background-color: rgba(154, 165, 180, 0.15);
+  color: #7A8A9D;
 }
 
 .re-bookmark-btn.active {
-  color: var(--slate-dark);
+  color: #4A4E57;
+  border-color: #4A4E57;
 }
 
 .re-price-block {

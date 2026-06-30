@@ -9,6 +9,7 @@ import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import PropertyInfoCards from './PropertyInfoCards';
 import { useResaleApartmentBySlug } from '@/hooks/use-resale-apartments';
+import { isSaved as isSavedProp, addSaved, removeSaved } from '@/lib/saved-properties';
 import './resale-detail.css';
 
 export default function ResaleDetailPage() {
@@ -35,6 +36,35 @@ export default function ResaleDetailPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (apartment) {
+      setIsSaved(isSavedProp(apartment.id));
+    }
+  }, [apartment]);
+
+  const toggleSaveProp = () => {
+    if (!apartment) return;
+    if (isSavedProp(apartment.id)) {
+      removeSaved(apartment.id);
+      setIsSaved(false);
+    } else {
+      addSaved({
+        id: apartment.id,
+        slug: apartment.slug,
+        type: 'resale',
+        image: apartment.gallery?.[0] || apartment.image || '',
+        price: apartment.prices?.[0]?.priceTotal ?? apartment.priceTotal ?? 0,
+        currency: apartment.prices?.[0]?.currency?.value ?? 'AZN',
+        rooms: String(apartment.roomCount ?? ''),
+        area: String(apartment.area ?? ''),
+        floor: `${apartment.floorFrom}/${apartment.floorTo}`,
+        location: apartment.locationTitle || '',
+        title: apartment.title || '',
+      });
+      setIsSaved(true);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -262,7 +292,7 @@ export default function ResaleDetailPage() {
                   <button
                     type="button"
                     className={`pdet-widget-btn ${isSaved ? 'saved' : ''}`}
-                    onClick={() => setIsSaved(!isSaved)}
+                    onClick={toggleSaveProp}
                   >
                     <img src="/images/resale/save.png" alt="" width="21" height="21" />
                     <span>{isSaved ? 'Saved' : 'Save'}</span>

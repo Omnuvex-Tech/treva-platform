@@ -9,6 +9,7 @@ import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
 import { useResaleApartments, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
+import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
 import type { ResaleApartment } from '@/lib/resale.types';
 import './resale-listing.css';
 
@@ -36,10 +37,30 @@ export default function ResalePage() {
   const pagination = response?.pagination;
   const showSpinner = isLoading || isFetching || isDebouncing;
 
-  const toggleSave = (id: string) => {
-    setSavedItems(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+  useEffect(() => {
+    setSavedItems(getSaved().filter(p => p.type === 'resale').map(p => p.id));
+  }, []);
+
+  const toggleSave = (apt: ResaleApartment) => {
+    if (savedItems.includes(apt.id)) {
+      removeSaved(apt.id);
+      setSavedItems(prev => prev.filter(item => item !== apt.id));
+    } else {
+      addSaved({
+        id: apt.id,
+        slug: apt.slug,
+        type: 'resale',
+        image: apt.image || '',
+        price: apt.prices?.[0]?.priceTotal ?? apt.priceTotal ?? 0,
+        currency: apt.prices?.[0]?.currency?.value ?? 'AZN',
+        rooms: String(apt.roomCount ?? ''),
+        area: String(apt.area ?? ''),
+        floor: `${apt.floorFrom}/${apt.floorTo}`,
+        location: apt.locationTitle || '',
+        title: apt.title || '',
+      });
+      setSavedItems(prev => [...prev, apt.id]);
+    }
   };
 
   const handleFilterChange = useCallback((f: ResaleFilterState) => {
@@ -174,7 +195,7 @@ export default function ResalePage() {
                           <button
                             type="button"
                             className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
-                            onClick={() => toggleSave(apt.id)}
+                            onClick={() => toggleSave(apt)}
                             aria-label="Save listing"
                           >
                             <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

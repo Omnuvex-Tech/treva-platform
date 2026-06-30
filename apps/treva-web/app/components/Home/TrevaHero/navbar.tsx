@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useRouter } from "next/navigation";
 import './navbar.css';
 import { IoMdClose, IoMdMenu } from 'react-icons/io';
 import { ChevronDown } from 'lucide-react';
 import { createPortal } from "react-dom";
+import { getSavedCount, onSavedChange } from '@/lib/saved-properties';
 
 type PillButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isPressed?: boolean;
@@ -137,6 +138,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [solidBgReady, setSolidBgReady] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -177,6 +179,12 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
 
   useEffect(() => {
     setPortalTarget(document.getElementById("treva-navbar-layer"));
+  }, []);
+
+  useEffect(() => {
+    setSavedCount(getSavedCount());
+    const unsubscribe = onSavedChange((count) => setSavedCount(count));
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -366,6 +374,19 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
                 </svg>
                 <span className="treva-navbar__search-text">Search</span>
               </PillButton>
+
+              <a
+                href={routeHref('/saved')}
+                className="treva-navbar__saved-btn"
+                aria-label={`Saved properties (${savedCount})`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                {savedCount > 0 && (
+                  <span className="treva-navbar__saved-badge">{savedCount}</span>
+                )}
+              </a>
 
               {/* Desktop Language Switcher */}
               <div className="treva-navbar__lang-container" ref={langDropdownRef}>

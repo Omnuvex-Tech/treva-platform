@@ -61,6 +61,10 @@ export function BrokersPage({ locale }: BrokersPageProps) {
   const [fields, setFields] = useState<BrokerFields>(INITIAL_FIELDS)
   const [errors, setErrors] = useState<BrokerErrors>({})
   const [status, setStatus] = useState<SubmitStatus>('idle')
+  const [brokerTypeOpen, setBrokerTypeOpen] = useState(false)
+  const [experienceOpen, setExperienceOpen] = useState(false)
+  const brokerTypeRef = useRef<HTMLDivElement>(null)
+  const experienceRef = useRef<HTMLDivElement>(null)
 
   const getBrokerRegistrationOffset = () => {
     if (typeof window === 'undefined') return 88
@@ -107,6 +111,15 @@ export function BrokersPage({ locale }: BrokersPageProps) {
 
     const timer = window.setTimeout(() => scrollToBrokerRegistration(), 150)
     return () => window.clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (e: globalThis.MouseEvent) => {
+      if (brokerTypeRef.current && !brokerTypeRef.current.contains(e.target as Node)) setBrokerTypeOpen(false)
+      if (experienceRef.current && !experienceRef.current.contains(e.target as Node)) setExperienceOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const initGSAP = () => {
@@ -267,21 +280,23 @@ export function BrokersPage({ locale }: BrokersPageProps) {
 
     setStatus('loading')
     try {
-      const data = {
-        name: fields.name,
-        email: fields.email,
-        phone: fields.phone,
-        city: fields.city
-      }
-      
-      const res = await fetch('https://nodebitrixproject15.vercel.app/api/webflow-registration', {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021'
+      const res = await fetch(`${apiBase}/broker-registration`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          name: fields.name,
+          email: fields.email,
+          phone: fields.phone,
+          city: fields.city,
+          brokerType: fields.brokerType,
+          experience: fields.experience,
+          website: fields.website || null,
+          message: fields.message || null,
+        })
       })
       
-      const result = await res.json()
-      // Webflow bitrix integration often just assumes success if not error thrown
+      if (!res.ok) throw new Error('Xəta baş verdi')
       setStatus('success')
       setFields(INITIAL_FIELDS)
     } catch (err) {
@@ -481,45 +496,65 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                           </div>
                           
                           <div className="field_wrap">
-                            <div className="fs_selectcustom-1_component">
-                              <div data-delay="0" data-hover="false" className="fs_selectcustom-1_dropdown w-dropdown">
-                                <div className={`connect_input-field is-select w-dropdown-toggle ${errors.brokerType ? 'error' : ''}`}>
-                                  <div className="fs_selectcustom-1_text">{fields.brokerType || 'BROKER NÖVÜ *'}</div>
-                                  <div className="icon-small w-embed">
-                                    <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M11.354 1.35403L6.35403 6.35403C6.30759 6.40052 6.25245 6.4374 6.19175 6.46256C6.13105 6.48772 6.06599 6.50067 6.00028 6.50067C5.93457 6.50067 5.86951 6.48772 5.80881 6.46256C5.74811 6.4374 5.69297 6.40052 5.64653 6.35403L0.646528 1.35403C0.552708 1.26021 0.5 1.13296 0.5 1.00028C0.5 0.867596 0.552708 0.740348 0.646528 0.646528C0.740348 0.552707 0.867596 0.5 1.00028 0.5C1.13296 0.5 1.26021 0.552707 1.35403 0.646528L6.00028 5.2934L10.6465 0.646528C10.693 0.600073 10.7481 0.563222 10.8088 0.538081C10.8695 0.51294 10.9346 0.5 11.0003 0.5C11.066 0.5 11.131 0.51294 11.1917 0.538081C11.2524 0.563222 11.3076 0.600073 11.354 0.646528C11.4005 0.692983 11.4373 0.748133 11.4625 0.80883C11.4876 0.869526 11.5006 0.934581 11.5006 1.00028C11.5006 1.06598 11.4876 1.13103 11.4625 1.19173C11.4373 1.25242 11.4005 1.30757 11.354 1.35403Z" fill="white" fillOpacity="0.4"/>
-                                    </svg>
-                                  </div>
-                                  <select id="BROKER-N-V" name="brokerType" data-name="BROKER NÖVÜ" className="fs_selectcustom-1_field w-select" value={fields.brokerType} onChange={handleChange} style={{ position: 'absolute', top: 0, left: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}>
-                                    <option value="">BROKER NÖVÜ *</option>
-                                    <option value="Şirkət">Şirkət</option>
-                                    <option value="Fərdi broker">Fərdi broker</option>
-                                  </select>
+                            <div ref={brokerTypeRef} style={{ position: 'relative' }}>
+                              <div
+                                className={`connect_input-field is-select ${errors.brokerType ? 'error' : ''}`}
+                                onClick={() => setBrokerTypeOpen(p => !p)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <span style={{ color: fields.brokerType ? '#fff' : 'rgba(255,255,255,0.4)', fontSize: 14, fontFamily: 'inherit' }}>{fields.brokerType || 'BROKER NÖVÜ *'}</span>
+                                <div className="icon-small w-embed" style={{ pointerEvents: 'none' }}>
+                                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11.354 1.35403L6.35403 6.35403C6.30759 6.40052 6.25245 6.4374 6.19175 6.46256C6.13105 6.48772 6.06599 6.50067 6.00028 6.50067C5.93457 6.50067 5.86951 6.48772 5.80881 6.46256C5.74811 6.4374 5.69297 6.40052 5.64653 6.35403L0.646528 1.35403C0.552708 1.26021 0.5 1.13296 0.5 1.00028C0.5 0.867596 0.552708 0.740348 0.646528 0.646528C0.740348 0.552707 0.867596 0.5 1.00028C1.13296 0.5 1.26021 0.552707 1.35403 0.646528L6.00028 5.2934L10.6465 0.646528C10.693 0.600073 10.7481 0.563222 10.8088 0.538081C10.8695 0.51294 10.9346 0.5 11.0003 0.5C11.066 0.5 11.131 0.51294 11.1917 0.538081C11.2524 0.563222 11.3076 0.600073 11.354 0.646528C11.4005 0.692983 11.4373 0.748133 11.4625 0.80883C11.4876 0.869526 11.5006 0.934581 11.5006 1.00028C11.5006 1.06598 11.4876 1.13103 11.4625 1.19173C11.4373 1.25242 11.4005 1.30757 11.354 1.35403Z" fill="white" fillOpacity="0.4"/>
+                                  </svg>
                                 </div>
                               </div>
+                              {brokerTypeOpen && (
+                                <div className="broker-dropdown-list">
+                                  {['Şirkət', 'Fərdi broker'].map(opt => (
+                                    <button
+                                      key={opt}
+                                      type="button"
+                                      className={`broker-dropdown-item ${fields.brokerType === opt ? 'broker-dropdown-item--active' : ''}`}
+                                      onClick={() => { setFields(f => ({ ...f, brokerType: opt })); setBrokerTypeOpen(false) }}
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                             {errors.brokerType && <div className="connect_error" style={{ display: 'block' }}>{errors.brokerType}</div>}
                           </div>
 
                           <div className="field_wrap">
-                            <div className="fs_selectcustom-1_component">
-                              <div data-delay="0" data-hover="false" className="fs_selectcustom-1_dropdown w-dropdown">
-                                <div className={`connect_input-field is-select w-dropdown-toggle ${errors.experience ? 'error' : ''}`}>
-                                  <div className="fs_selectcustom-1_text">{fields.experience || 'İŞ TƏCRÜBƏSİ'}</div>
-                                  <div className="icon-small w-embed">
-                                    <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M11.354 1.35403L6.35403 6.35403C6.30759 6.40052 6.25245 6.4374 6.19175 6.46256C6.13105 6.48772 6.06599 6.50067 6.00028 6.50067C5.93457 6.50067 5.86951 6.48772 5.80881 6.46256C5.74811 6.4374 5.69297 6.40052 5.64653 6.35403L0.646528 1.35403C0.552708 1.26021 0.5 1.13296 0.5 1.00028C0.5 0.867596 0.552708 0.740348 0.646528 0.646528C0.740348 0.552707 0.867596 0.5 1.00028 0.5C1.13296 0.5 1.26021 0.552707 1.35403 0.646528L6.00028 5.2934L10.6465 0.646528C10.693 0.600073 10.7481 0.563222 10.8088 0.538081C10.8695 0.51294 10.9346 0.5 11.0003 0.5C11.066 0.5 11.131 0.51294 11.1917 0.538081C11.2524 0.563222 11.3076 0.600073 11.354 0.646528C11.4005 0.692983 11.4373 0.748133 11.4625 0.80883C11.4876 0.869526 11.5006 0.934581 11.5006 1.00028C11.5006 1.06598 11.4876 1.13103 11.4625 1.19173C11.4373 1.25242 11.4005 1.30757 11.354 1.35403Z" fill="white" fillOpacity="0.4"/>
-                                    </svg>
-                                  </div>
-                                  <select id="Years-of-Experience" name="experience" data-name="Years of Experience" className="fs_selectcustom-1_field w-select" value={fields.experience} onChange={handleChange} style={{ position: 'absolute', top: 0, left: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}>
-                                    <option value="">İŞ TƏCRÜBƏSİ</option>
-                                    <option value="Təcrübəm yoxdur">Təcrübəm yoxdur</option>
-                                    <option value="1 ildən az">1 ildən az</option>
-                                    <option value="1-3 il">1-3 il</option>
-                                    <option value="3 ildən artıq">3 ildən artıq</option>
-                                  </select>
+                            <div ref={experienceRef} style={{ position: 'relative' }}>
+                              <div
+                                className={`connect_input-field is-select ${errors.experience ? 'error' : ''}`}
+                                onClick={() => setExperienceOpen(p => !p)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <span style={{ color: fields.experience ? '#fff' : 'rgba(255,255,255,0.4)', fontSize: 14, fontFamily: 'inherit' }}>{fields.experience || 'İŞ TƏCRÜBƏSİ'}</span>
+                                <div className="icon-small w-embed" style={{ pointerEvents: 'none' }}>
+                                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M11.354 1.35403L6.35403 6.35403C6.30759 6.40052 6.25245 6.4374 6.19175 6.46256C6.13105 6.48772 6.06599 6.50067 6.00028 6.50067C5.93457 6.50067 5.86951 6.48772 5.80881 6.46256C5.74811 6.4374 5.69297 6.40052 5.64653 6.35403L0.646528 1.35403C0.552708 1.26021 0.5 1.13296 0.5 1.00028C0.5 0.867596 0.552708 0.740348 0.646528 0.646528C0.740348 0.552707 0.867596 0.5 1.00028C1.13296 0.5 1.26021 0.552707 1.35403 0.646528L6.00028 5.2934L10.6465 0.646528C10.693 0.600073 10.7481 0.563222 10.8088 0.538081C10.8695 0.51294 10.9346 0.5 11.0003 0.5C11.066 0.5 11.131 0.51294 11.1917 0.538081C11.2524 0.563222 11.3076 0.600073 11.354 0.646528C11.4005 0.692983 11.4373 0.748133 11.4625 0.80883C11.4876 0.869526 11.5006 0.934581 11.5006 1.00028C11.5006 1.06598 11.4876 1.13103 11.4625 1.19173C11.4373 1.25242 11.4005 1.30757 11.354 1.35403Z" fill="white" fillOpacity="0.4"/>
+                                  </svg>
                                 </div>
                               </div>
+                              {experienceOpen && (
+                                <div className="broker-dropdown-list">
+                                  {['Təcrübəm yoxdur', '1 ildən az', '1-3 il', '3 ildən artıq'].map(opt => (
+                                    <button
+                                      key={opt}
+                                      type="button"
+                                      className={`broker-dropdown-item ${fields.experience === opt ? 'broker-dropdown-item--active' : ''}`}
+                                      onClick={() => { setFields(f => ({ ...f, experience: opt })); setExperienceOpen(false) }}
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                             {errors.experience && <div className="connect_error" style={{ display: 'block' }}>{errors.experience}</div>}
                           </div>

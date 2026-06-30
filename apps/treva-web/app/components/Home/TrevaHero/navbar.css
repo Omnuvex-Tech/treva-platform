@@ -177,6 +177,45 @@
   display: none;
 }
 
+/* Saved Button */
+.treva-navbar__saved-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--treva-pill-bg);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.18s ease;
+  z-index: 1;
+}
+.treva-navbar__saved-btn:hover {
+  background: var(--treva-pill-hover-bg);
+}
+.treva-navbar__saved-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.treva-navbar__saved-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #e53e3e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+}
+
 /* Dynamic Language Dropdown Styles */
 .treva-navbar__lang-container {
   position: relative;
