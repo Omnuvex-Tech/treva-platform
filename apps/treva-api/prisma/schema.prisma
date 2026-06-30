@@ -60,12 +60,15 @@ model UnitLayout {
 
 model RoomOption {
   id        String   @id @default(cuid())
-  value     String   @unique
+  value     String
+  type      String   @default("off-plan") // "resale" | "off-plan"
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   unitLayouts UnitLayout[]
+
+  @@unique([value, type])
 }
 
 model ViewOption {

@@ -7,16 +7,20 @@ import { endpoints } from "@/config/endpoints";
 export interface RoomOption {
     id: string;
     value: string;
+    type: string;
     order: number;
 }
 
-export function useRoomOptions() {
+export function useRoomOptions(type?: 'resale' | 'off-plan') {
     return useQuery({
-        queryKey: ["room-options"],
+        queryKey: ["room-options", type],
         queryFn: async () => {
-            const response = await api.get<RoomOption[]>(endpoints.roomOptions.list);
+            const url = type
+                ? `${endpoints.roomOptions.list}?type=${type}`
+                : endpoints.roomOptions.list;
+            const response = await api.get<RoomOption[]>(url);
             return response.data;
         },
-        staleTime: 1000 * 60 * 5, // 5 minutes cache
+        staleTime: 1000 * 60 * 5,
     });
 }

@@ -4,12 +4,15 @@ const navItems = [
     { path: "/", label: "Dashboard", icon: "📊" },
 ];
 
+const sharedItems = [
+    { path: "/room-options", label: "Room Options", icon: "🛏️" },
+    { path: "/currencies", label: "Currencies", icon: "💰" },
+];
+
 const offPlanItems = [
     { path: "/categories", label: "Categories", icon: "📁" },
     { path: "/unit-layouts", label: "Unit Layouts", icon: "🏢" },
-    { path: "/room-options", label: "Room Options", icon: "🛏️" },
     { path: "/view-options", label: "View Options", icon: "🖼️" },
-    { path: "/currencies", label: "Currencies", icon: "💰" },
     { path: "/status-options", label: "Status Options", icon: "🏷️" },
 ];
 
@@ -19,7 +22,6 @@ const resaleItems = [
     { path: "/resale/owners", label: "Owners", icon: "👤" },
     { path: "/resale/attributes", label: "Attributes", icon: "🔧" },
     { path: "/resale/requests", label: "Requests", icon: "📬" },
-    { path: "/resale/currencies", label: "Currencies", icon: "💰" },
 ];
 
 const pulseItems = [
@@ -59,13 +61,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             {item.label}
                         </Link>
                     ))}
+                    <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-white/40">Shared</div>
+                    {sharedItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+                                location.pathname === item.path
+                                    ? "bg-white/10 text-white"
+                                    : "text-white/85 hover:bg-white/5 hover:text-white"
+                            }`}
+                        >
+                            <span className="mr-2">{item.icon}</span>
+                            {item.label}
+                        </Link>
+                    ))}
                     <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-white/40">Off-Plan</div>
                     {offPlanItems.map((item) => (
                         <Link
                             key={item.path}
                             to={item.path}
                             className={`rounded-lg px-3 py-2 text-sm transition-colors ${
-                                location.pathname === item.path
+                                location.pathname.startsWith(item.path)
                                     ? "bg-white/10 text-white"
                                     : "text-white/85 hover:bg-white/5 hover:text-white"
                             }`}
@@ -118,7 +135,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <header className="flex items-center justify-between border-b border-white/10 bg-white/5 px-5 py-3 backdrop-blur">
                     <div>
                         <div className="text-sm font-semibold">
-                            {[...navItems, ...offPlanItems, ...resaleItems, ...pulseItems].find(
+                            {[...navItems, ...sharedItems, ...offPlanItems, ...resaleItems, ...pulseItems].find(
                                 (i) => location.pathname === i.path || (i.path !== "/" && location.pathname.startsWith(i.path))
                             )?.label ?? "Dashboard"}
                         </div>

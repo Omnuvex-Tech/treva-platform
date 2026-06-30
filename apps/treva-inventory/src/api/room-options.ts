@@ -3,6 +3,7 @@ import apiClient from "./client";
 export interface RoomOption {
     id: string;
     value: string;
+    type: string;
     order: number;
     createdAt: string;
     updatedAt: string;
@@ -10,11 +11,13 @@ export interface RoomOption {
 
 export interface CreateRoomOptionData {
     value: string;
+    type?: string;
     order?: number;
 }
 
 export interface UpdateRoomOptionData {
     value?: string;
+    type?: string;
     order?: number;
 }
 

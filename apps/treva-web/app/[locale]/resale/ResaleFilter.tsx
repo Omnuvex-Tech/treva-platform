@@ -21,7 +21,7 @@ export interface ResaleFilterState {
 
 export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingChange }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number; onDebouncingChange?: (v: boolean) => void }) {
   const { data: currenciesData } = useResaleCurrencies();
-  const { data: roomOptionsData } = useRoomOptions();
+  const { data: roomOptionsData } = useRoomOptions('resale');
 
   const currencies = currenciesData || [];
   const roomOptions = roomOptionsData || [];

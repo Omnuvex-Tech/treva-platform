@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { RoomOptionsService } from './room-options.service';
 import { CreateRoomOptionDto } from './dto/create-room-option.dto';
 import { UpdateRoomOptionDto } from './dto/update-room-option.dto';
@@ -9,8 +9,8 @@ export class RoomOptionsController {
   constructor(private readonly roomOptionsService: RoomOptionsService) {}
 
   @Get()
-  findAll() {
-    return this.roomOptionsService.findAll();
+  findAll(@Query('type') type?: string) {
+    return this.roomOptionsService.findAll(type);
   }
 
   @Get(':id')

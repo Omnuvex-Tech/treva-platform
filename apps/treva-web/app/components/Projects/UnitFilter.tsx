@@ -49,7 +49,7 @@ export default function UnitLayout() {
   const [page, setPage] = useState(1);
   const limit = 12;
 
-  const { data: roomOptionsData } = useRoomOptions();
+  const { data: roomOptionsData } = useRoomOptions('off-plan');
   const roomOptions = roomOptionsData || [];
 
   const { data: viewOptionsData } = useViewOptions();

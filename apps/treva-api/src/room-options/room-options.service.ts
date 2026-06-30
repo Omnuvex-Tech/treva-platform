@@ -8,21 +8,23 @@ export class RoomOptionsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createRoomOptionDto: CreateRoomOptionDto) {
+    const type = createRoomOptionDto.type || 'off-plan';
     const existing = await this.prisma.roomOption.findUnique({
-      where: { value: createRoomOptionDto.value },
+      where: { value_type: { value: createRoomOptionDto.value, type } },
     });
 
     if (existing) {
-      throw new ConflictException('RoomOption with this value already exists');
+      throw new ConflictException('RoomOption with this value and type already exists');
     }
 
     return this.prisma.roomOption.create({
-      data: createRoomOptionDto,
+      data: { ...createRoomOptionDto, type },
     });
   }
 
-  async findAll() {
+  async findAll(type?: string) {
     return this.prisma.roomOption.findMany({
+      where: type ? { type } : undefined,
       orderBy: { order: 'asc' },
     });
   }
@@ -48,13 +50,16 @@ export class RoomOptionsService {
       throw new NotFoundException('RoomOption not found');
     }
 
-    if (updateRoomOptionDto.value && updateRoomOptionDto.value !== roomOption.value) {
+    const newValue = updateRoomOptionDto.value ?? roomOption.value;
+    const newType = updateRoomOptionDto.type ?? roomOption.type;
+
+    if (newValue !== roomOption.value || newType !== roomOption.type) {
       const existing = await this.prisma.roomOption.findUnique({
-        where: { value: updateRoomOptionDto.value },
+        where: { value_type: { value: newValue, type: newType } },
       });
 
       if (existing) {
-        throw new ConflictException('RoomOption with this value already exists');
+        throw new ConflictException('RoomOption with this value and type already exists');
       }
     }
 

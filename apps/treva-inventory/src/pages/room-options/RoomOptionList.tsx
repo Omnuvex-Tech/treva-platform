@@ -8,6 +8,7 @@ export function RoomOptionList() {
     const [showForm, setShowForm] = useState(false);
     const [editItem, setEditItem] = useState<RoomOption | null>(null);
     const [value, setValue] = useState("");
+    const [type, setType] = useState("off-plan");
     const [order, setOrder] = useState<number>(0);
     const [error, setError] = useState("");
 
@@ -17,7 +18,7 @@ export function RoomOptionList() {
     });
 
     const createMutation = useMutation({
-        mutationFn: () => roomOptionsApi.create({ value: value.trim(), order }),
+        mutationFn: () => roomOptionsApi.create({ value: value.trim(), type, order }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["room-options"] });
             resetForm();
@@ -29,7 +30,7 @@ export function RoomOptionList() {
 
     const updateMutation = useMutation({
         mutationFn: () =>
-            roomOptionsApi.update(editItem!.id, { value: value.trim(), order }),
+            roomOptionsApi.update(editItem!.id, { value: value.trim(), type, order }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["room-options"] });
             resetForm();
@@ -50,6 +51,7 @@ export function RoomOptionList() {
         setShowForm(false);
         setEditItem(null);
         setValue("");
+        setType("off-plan");
         setOrder(0);
         setError("");
     };
@@ -57,6 +59,7 @@ export function RoomOptionList() {
     const handleEdit = (item: RoomOption) => {
         setEditItem(item);
         setValue(item.value);
+        setType(item.type);
         setOrder(item.order);
         setError("");
         setShowForm(true);
@@ -107,7 +110,7 @@ export function RoomOptionList() {
                                 {error}
                             </div>
                         )}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                             <div>
                                 <label className="mb-1.5 block text-xs font-medium text-white/70">
                                     Value <span className="text-red-400">*</span>
@@ -122,7 +125,23 @@ export function RoomOptionList() {
                                     autoFocus
                                 />
                                 <p className="mt-1 text-xs text-white/40">
-                                    The label shown on the filter button (e.g. "S", "1", "2", "4+")
+                                    The label shown on the filter button
+                                </p>
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    Type <span className="text-red-400">*</span>
+                                </label>
+                                <select
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value)}
+                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                >
+                                    <option value="off-plan">Off-Plan</option>
+                                    <option value="resale">Resale</option>
+                                </select>
+                                <p className="mt-1 text-xs text-white/40">
+                                    Which listing type this room belongs to
                                 </p>
                             </div>
                             <div>
@@ -138,7 +157,7 @@ export function RoomOptionList() {
                                     min={0}
                                 />
                                 <p className="mt-1 text-xs text-white/40">
-                                    Sort order on the filter (lower = shown first)
+                                    Sort order (lower = shown first)
                                 </p>
                             </div>
                         </div>
@@ -172,6 +191,7 @@ export function RoomOptionList() {
                         <thead className="border-b border-white/10 bg-white/5">
                             <tr>
                                 <th className="px-4 py-3 font-medium">Value</th>
+                                <th className="px-4 py-3 font-medium">Type</th>
                                 <th className="px-4 py-3 font-medium">Order</th>
                                 <th className="px-4 py-3 font-medium">Created</th>
                                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -186,6 +206,15 @@ export function RoomOptionList() {
                                     <td className="px-4 py-3">
                                         <span className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-bold tracking-wider">
                                             {item.value}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                                            item.type === 'resale'
+                                                ? 'bg-blue-500/20 text-blue-300'
+                                                : 'bg-green-500/20 text-green-300'
+                                        }`}>
+                                            {item.type === 'resale' ? 'Resale' : 'Off-Plan'}
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 text-white/70">{item.order}</td>
@@ -210,8 +239,8 @@ export function RoomOptionList() {
                             ))}
                             {items.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className="px-4 py-8 text-center text-white/50">
-                                        No room options yet. Add "S", "1", "2", "3", "4+" to get started.
+                                    <td colSpan={5} className="px-4 py-8 text-center text-white/50">
+                                        No room options yet. Add options for Resale and Off-Plan to get started.
                                     </td>
                                 </tr>
                             )}
