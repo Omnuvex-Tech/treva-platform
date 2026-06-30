@@ -239,7 +239,7 @@ export default function UnitLayout() {
               </div>
               
               <div className="custom-select currency-select" ref={currencyRef}>
-                <button type="button" className="custom-select__trigger" onClick={() => setCurrencyOpen((p) => !p)}>
+                <button type="button" className="custom-select__trigger" aria-expanded={currencyOpen} onClick={() => setCurrencyOpen((p) => !p)}>
                   <span>{currency}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
@@ -380,7 +380,7 @@ export default function UnitLayout() {
             <div className="filter-group filter-group--floor">
               <label className="filter-label">Floor</label>
               <div className="custom-select" ref={floorRef}>
-                <button type="button" className="custom-select__trigger" onClick={() => setFloorOpen((p) => !p)}>
+                <button type="button" className="custom-select__trigger" aria-expanded={floorOpen} onClick={() => setFloorOpen((p) => !p)}>
                   <span>{floor || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
@@ -404,7 +404,7 @@ export default function UnitLayout() {
             <div className="filter-group filter-group--view">
               <label className="filter-label">View</label>
               <div className="custom-select" ref={viewRef}>
-                <button type="button" className="custom-select__trigger" onClick={() => setViewOpen((p) => !p)}>
+                <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
                   <span>{viewOptions.find(v => v.id === selectedView)?.value || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
@@ -428,7 +428,7 @@ export default function UnitLayout() {
             <div className="filter-group filter-group--status">
               <label className="filter-label">Status</label>
               <div className="custom-select" ref={statusRef}>
-                <button type="button" className="custom-select__trigger" onClick={() => setStatusOpen((p) => !p)}>
+                <button type="button" className="custom-select__trigger" aria-expanded={statusOpen} onClick={() => setStatusOpen((p) => !p)}>
                   <span>{statusOptions.find(s => s.id === selectedStatus)?.value || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
