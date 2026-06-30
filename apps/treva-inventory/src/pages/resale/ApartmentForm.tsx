@@ -635,9 +635,9 @@ export function ApartmentForm() {
                                                                 } else {
                                                                     const val = parseFloat(raw) || 0;
                                                                     if (idx >= 0) {
-                                                                        prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea };
+                                                                        prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea ?? 0 };
                                                                     } else {
-                                                                        prices.push({ currencyId: cur.id, priceTotal: val, priceByArea: undefined });
+                                                                        prices.push({ currencyId: cur.id, priceTotal: val, priceByArea: 0 });
                                                                     }
                                                                 }
                                                                 updateField("prices", prices);
@@ -661,9 +661,9 @@ export function ApartmentForm() {
                                                                 } else {
                                                                     const val = parseFloat(raw) || 0;
                                                                     if (idx >= 0) {
-                                                                        prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal, priceByArea: val };
+                                                                        prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal ?? 0, priceByArea: val };
                                                                     } else {
-                                                                        prices.push({ currencyId: cur.id, priceTotal: undefined, priceByArea: val });
+                                                                        prices.push({ currencyId: cur.id, priceTotal: 0, priceByArea: val });
                                                                     }
                                                                 }
                                                                 updateField("prices", prices);

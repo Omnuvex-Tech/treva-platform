@@ -146,7 +146,6 @@ const sanitizeUnitLayoutData = (
         title: data.title?.trim(),
         name: data.name?.trim(),
         slug: data.slug?.trim(),
-        view: cleanString(data.view),
         number: data.number,
         balconyArea: data.balconyArea,
         similarApartmentIds: data.similarApartmentIds?.filter(Boolean),

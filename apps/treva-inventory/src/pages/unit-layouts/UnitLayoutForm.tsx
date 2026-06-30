@@ -215,10 +215,10 @@ export function UnitLayoutForm() {
                 categoryId: d.categoryId,
                 statusOptionId: d.statusOptionId ?? undefined,
                 floor: d.floor ?? 1,
-                number: d.number ?? undefined,
+                number: d.number ?? 0,
                 totalArea: d.totalArea ?? 0,
                 internalArea: d.internalArea ?? 0,
-                balconyArea: d.balconyArea ?? undefined,
+                balconyArea: d.balconyArea ?? 0,
                 prices: d.prices || {},
                 completionYear: d.completionYear ?? 2030,
                 numberOfFloors: d.numberOfFloors || { start: 1, end: 1 },
@@ -686,7 +686,7 @@ export function UnitLayoutForm() {
                                             type="number"
                                             value={form.floor ?? ""}
                                             onChange={(e) =>
-                                                updateField("floor", e.target.value ? parseInt(e.target.value) : undefined)
+                                                updateField("floor", e.target.value ? parseInt(e.target.value) : 0)
                                             }
                                             placeholder="e.g. 5"
                                             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
@@ -704,7 +704,7 @@ export function UnitLayoutForm() {
                                             onChange={(e) =>
                                                 updateField(
                                                     "number",
-                                                    e.target.value ? parseInt(e.target.value) : undefined
+                                                    e.target.value ? parseInt(e.target.value) : 0
                                                 )
                                             }
                                             placeholder="e.g. 12"
@@ -826,7 +826,7 @@ export function UnitLayoutForm() {
                                                     "balconyArea",
                                                     e.target.value
                                                         ? parseFloat(e.target.value)
-                                                        : undefined
+                                                        : 0
                                                 )
                                             }
                                             placeholder="e.g. 8.5"
@@ -988,7 +988,7 @@ export function UnitLayoutForm() {
                                             onChange={(e) =>
                                                 updateFloors(
                                                     "start",
-                                                    e.target.value ? parseInt(e.target.value) : undefined
+                                                    e.target.value ? parseInt(e.target.value) : 0
                                                 )
                                             }
                                             placeholder="e.g. 1"
@@ -1007,7 +1007,7 @@ export function UnitLayoutForm() {
                                             onChange={(e) =>
                                                 updateFloors(
                                                     "end",
-                                                    e.target.value ? parseInt(e.target.value) : undefined
+                                                    e.target.value ? parseInt(e.target.value) : 0
                                                 )
                                             }
                                             placeholder="e.g. 15"

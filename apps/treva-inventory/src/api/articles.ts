@@ -98,7 +98,7 @@ export const articlesApi = {
     create: (data: CreateArticleData) =>
         apiClient.post<Article>("/pulse/articles", data),
 
-    update: (id: string, data: CreateArticleData) =>
+    update: (id: string, data: Partial<CreateArticleData>) =>
         apiClient.patch<Article>(`/pulse/articles/${id}`, data),
 
     delete: (id: string) => apiClient.delete(`/pulse/articles/${id}`),

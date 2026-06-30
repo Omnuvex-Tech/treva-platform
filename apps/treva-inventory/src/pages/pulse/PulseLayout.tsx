@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { articlesApi, Article } from "../../api/articles";
+import { articlesApi, Article, CreateArticleData } from "../../api/articles";
 import { Layout } from "../../components/Layout";
 
 type SectionKey = "left" | "center" | "right" | "week";
@@ -30,7 +30,7 @@ export function PulseLayout() {
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: { headerPosition: string | null; headerOrder: number | null } }) =>
-            articlesApi.update(id, data),
+            articlesApi.update(id, data as Partial<CreateArticleData>),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["articles"] });
         },
@@ -84,7 +84,7 @@ export function PulseLayout() {
         const swapIdx = direction === "up" ? idx - 1 : idx + 1;
         if (swapIdx < 0 || swapIdx >= items.length) return;
 
-        const swap = items[swapIdx];
+        const swap = items[swapIdx]!;
         updateMutation.mutate({ id: article.id, data: { headerPosition: section, headerOrder: swap.headerOrder ?? 0 } });
         updateMutation.mutate({ id: swap.id, data: { headerPosition: section, headerOrder: article.headerOrder ?? 0 } });
     };
@@ -104,7 +104,7 @@ export function PulseLayout() {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     {(Object.keys(SECTION_CONFIG) as SectionKey[]).map((key) => {
                         const config = SECTION_CONFIG[key];
-                        const colors = colorClasses[config.color];
+                        const colors = colorClasses[config.color]!;
                         const items = sections[key];
                         const isFull = config.limit !== null && items.length >= config.limit;
 
