@@ -2,9 +2,26 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcryptjs';
 import { config } from 'dotenv';
+import { existsSync } from 'fs';
 import { resolve } from 'path';
 
-config({ path: resolve(__dirname, '../.env') });
+const envCandidates = [
+  process.env.NODE_ENV === 'production' ? '../.env.production' : '../.env.development',
+  '../.env',
+  '../.env.production',
+];
+
+for (const relativePath of envCandidates) {
+  const absolutePath = resolve(__dirname, relativePath);
+
+  if (existsSync(absolutePath)) {
+    config({ path: absolutePath });
+  }
+}
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not defined. Check .env.development or .env.production.');
+}
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,

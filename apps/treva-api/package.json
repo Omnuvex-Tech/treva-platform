@@ -24,7 +24,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "db:dev": "npm run prisma:migrate && npm run prisma:generate",
     "db:deploy": "npm run prisma:deploy && npm run prisma:generate",
-    "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:seed": "node ../../scripts/run-with-env.cjs .env.development ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
