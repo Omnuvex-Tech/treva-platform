@@ -4,9 +4,9 @@
     "version": "0.1.0",
     "type": "module",
     "scripts": {
-        "dev": "vite --port 10030",
-        "build": "tsc -b && vite build",
-        "preview": "vite preview --host 0.0.0.0 --port 10030",
+        "dev": "node ../../scripts/run-with-env.cjs .env.development vite --port 10030",
+        "build": "tsc -b && node ../../scripts/run-with-env.cjs .env.production vite build",
+        "preview": "node ../../scripts/run-with-env.cjs .env.production vite preview --host 0.0.0.0 --port 10030",
         "lint": "eslint . --max-warnings 0",
         "check-types": "tsc -b --pretty false"
     },
