@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { NotifyProvider, NotifyContainer } from "@repo/ui";
@@ -35,6 +35,9 @@ export const metadata: Metadata = {
         ],
         apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
     },
+};
+
+export const viewport: Viewport = {
     themeColor: "#ffffff",
 };
 
