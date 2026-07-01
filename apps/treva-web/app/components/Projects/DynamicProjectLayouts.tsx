@@ -50,8 +50,10 @@ export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
 
         if (items && items.length > 0) {
           const apiUrl = trevaApiUrl.replace(/\/api\/v1\/?$/, "");
+          const shuffled = [...items].sort(() => Math.random() - 0.5);
+          const picked = shuffled.slice(0, 3);
           setLayouts(
-            items.map((item) => ({
+            picked.map((item) => ({
               title: item.title,
               code: item.name || item.title,
               floor: `${item.floor} floor`,
