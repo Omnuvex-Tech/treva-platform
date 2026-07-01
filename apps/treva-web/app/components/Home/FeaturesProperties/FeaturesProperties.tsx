@@ -93,7 +93,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${CMS_API}/categories/featured`);
+        const res = await fetch(`${CMS_API}/layihelerimiz/categories/visible`);
         if (!res.ok) throw new Error("Failed to fetch");
         const rawData = await res.json();
         const data = Array.isArray(rawData) ? rawData : rawData.value || [];

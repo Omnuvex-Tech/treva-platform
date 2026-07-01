@@ -142,7 +142,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
   useEffect(() => {
     const fetchFeaturedProjects = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/categories/featured`)
+        const response = await fetch(`${API_BASE_URL}/layihelerimiz/categories/visible`)
         if (!response.ok) throw new Error('Failed to fetch featured projects')
 
         const rawData = await response.json()

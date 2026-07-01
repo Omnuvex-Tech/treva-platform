@@ -44,7 +44,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${CMS_API}/categories/featured`);
+        const res = await fetch(`${CMS_API}/layihelerimiz/categories/visible`);
         if (res.ok) {
           const data = await res.json();
           const list = Array.isArray(data) ? data : data.value || [];

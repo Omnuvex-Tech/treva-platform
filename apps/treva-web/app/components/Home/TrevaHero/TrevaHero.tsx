@@ -105,7 +105,7 @@ export default function TrevaHero() {
   }, [locale]);
 
   useEffect(() => {
-    fetch(`${CMS_API}/categories/featured`)
+    fetch(`${CMS_API}/layihelerimiz/categories/visible`)
       .then((res) => res.json())
       .then((raw) => {
         const data = Array.isArray(raw) ? raw : raw.value || [];
