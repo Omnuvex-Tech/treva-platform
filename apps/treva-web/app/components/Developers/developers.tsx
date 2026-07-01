@@ -43,7 +43,6 @@ type FeaturedProjectCard = {
   location: LocalizedValue
 }
 
-const TREVA_API_URL = process.env.NEXT_PUBLIC_TREVA_API_URL || 'http://localhost:10011/api/v1'
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021'
 const FEATURED_PROJECT_PLACEHOLDER = '/assets/webflow-placeholder.svg'
 
@@ -143,7 +142,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
   useEffect(() => {
     const fetchFeaturedProjects = async () => {
       try {
-        const response = await fetch(`${TREVA_API_URL}/categories/featured`)
+        const response = await fetch(`${API_BASE_URL}/categories/featured`)
         if (!response.ok) throw new Error('Failed to fetch featured projects')
 
         const rawData = await response.json()

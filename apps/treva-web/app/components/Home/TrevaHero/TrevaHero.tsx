@@ -71,6 +71,8 @@ const heroDictionary = {
   },
 } as const;
 
+const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
+
 export default function TrevaHero() {
   const pathname = usePathname();
   const router = useRouter();
@@ -103,8 +105,7 @@ export default function TrevaHero() {
   }, [locale]);
 
   useEffect(() => {
-    const trevaApiUrl = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
-    fetch(`${trevaApiUrl}/categories/featured`)
+    fetch(`${CMS_API}/categories/featured`)
       .then((res) => res.json())
       .then((raw) => {
         const data = Array.isArray(raw) ? raw : raw.value || [];

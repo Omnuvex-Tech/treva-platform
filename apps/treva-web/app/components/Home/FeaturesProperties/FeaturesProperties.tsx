@@ -33,6 +33,8 @@ const fallbackImages: Record<string, string> = {
   "sabah-residence": "/images/features-pro/sabah-cover.png",
 };
 
+const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
+
 const localeStrings = {
   az: {
     titleLight: "ÖZƏL SEÇİLMİŞ",
@@ -91,21 +93,19 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const trevaApiUrl = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
-        const res = await fetch(`${trevaApiUrl}/categories/featured`);
+        const res = await fetch(`${CMS_API}/categories/featured`);
         if (!res.ok) throw new Error("Failed to fetch");
         const rawData = await res.json();
         const data = Array.isArray(rawData) ? rawData : rawData.value || [];
 
         if (data && data.length > 0) {
-          const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
           setCards(data.map((cat: any) => ({
             title: cat.title,
             desc: cat.description || "",
             brand: cat.brand || "",
-            brandImage: cat.brandImage ? (cat.brandImage.startsWith("http") ? cat.brandImage : `${apiUrl}${cat.brandImage}`) : "",
+            brandImage: cat.brandImage ? (cat.brandImage.startsWith("http") ? cat.brandImage : `${CMS_API}${cat.brandImage}`) : "",
             brandTextColor: cat.brandTextColor || "white",
-            image: cat.image ? (cat.image.startsWith("http") ? cat.image : `${apiUrl}${cat.image}`) : (fallbackImages[cat.slug] || ""),
+            image: cat.image ? (cat.image.startsWith("http") ? cat.image : `${CMS_API}${cat.image}`) : (fallbackImages[cat.slug] || ""),
             slug: cat.slug,
           })));
         } else {

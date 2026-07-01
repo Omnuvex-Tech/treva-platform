@@ -44,8 +44,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const trevaApiUrl = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
-        const res = await fetch(`${trevaApiUrl}/categories/featured`);
+        const res = await fetch(`${CMS_API}/categories/featured`);
         if (res.ok) {
           const data = await res.json();
           const list = Array.isArray(data) ? data : data.value || [];
