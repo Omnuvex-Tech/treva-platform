@@ -524,7 +524,7 @@ export default function UnitLayout() {
           
           <div className="cards-grid" style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
             {layouts.map((layout: UnitLayout) => (
-              <div key={layout.id} className="layout-card-wrapper">
+              <Link key={layout.id} href={`/${locale}/off-plan/${layout.slug}`} className="layout-card-wrapper">
                 <div className="layout-card">
                   <div className="layout-card__header">
                     <div className="layout-card__title-block">
@@ -552,8 +552,8 @@ export default function UnitLayout() {
                     <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
                   </div>
                 </div>
-                <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__cta">VIew Apartment DetaIls</Link>
-              </div>
+                <span className="layout-card__cta">VIew Apartment DetaIls</span>
+              </Link>
             ))}
             {layouts.length === 0 && !showSpinner && (
               <div className="empty-state">

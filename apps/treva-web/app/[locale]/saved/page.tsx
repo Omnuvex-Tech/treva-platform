@@ -11,9 +11,40 @@ import { getSaved, removeSaved, type SavedProperty } from '@/lib/saved-propertie
 import '@/app/[locale]/resale/resale-listing.css';
 import './saved.css';
 
+const savedDictionary = {
+  az: {
+    title: 'SEVİLMİŞ ƏMLAKLAR',
+    properties: 'əmlak',
+    loading: 'Yüklənir...',
+    emptyTitle: 'Hələ saxlanılmış əmlak yoxdur',
+    browse: 'ƏMLAKLARA BAX',
+    removeLabel: 'Seçilmişlərdən sil',
+    viewDetails: 'Mənzil detallarına bax',
+  },
+  en: {
+    title: 'SAVED PROPERTIES',
+    properties: 'properties',
+    loading: 'Loading...',
+    emptyTitle: 'No saved properties yet',
+    browse: 'BROWSE PROPERTIES',
+    removeLabel: 'Remove from saved',
+    viewDetails: 'View apartment details',
+  },
+  ru: {
+    title: 'СОХРАНЕННЫЕ ОБЪЕКТЫ',
+    properties: 'объектов',
+    loading: 'Загрузка...',
+    emptyTitle: 'Сохраненных объектов пока нет',
+    browse: 'СМОТРЕТЬ ОБЪЕКТЫ',
+    removeLabel: 'Удалить из сохраненных',
+    viewDetails: 'Смотреть детали квартиры',
+  },
+} as const;
+
 export default function SavedPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'az';
+  const content = savedDictionary[locale as keyof typeof savedDictionary] ?? savedDictionary.az;
   const [items, setItems] = useState<SavedProperty[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -34,25 +65,31 @@ export default function SavedPage() {
     <div className="re-page-wrapper">
       <Navbar variant="solid" />
       <main className="re-main-wrapper">
-        <PageContainer>
+        <PageContainer className="saved-page-container">
           <header className="re-header">
-            <h1 className="re-main-title">SAVED PROPERTIES</h1>
+            <h1 className="re-main-title">{content.title}</h1>
             <div className="re-controls-row">
-              <div className="re-property-count">{items.length} properties</div>
+              <div className="re-property-count">{items.length} {content.properties}</div>
             </div>
           </header>
 
           {!loaded ? (
-            <div className="py-16 text-center text-white/50">Loading...</div>
+            <div className="saved-empty-shell">
+              <div className="saved-empty">
+                <p>{content.loading}</p>
+              </div>
+            </div>
           ) : items.length === 0 ? (
-            <div className="saved-empty">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-              </svg>
-              <p>No saved properties yet</p>
-              <Link href={`/${locale}/resale`} className="saved-browse-btn">
-                Browse Properties
-              </Link>
+            <div className="saved-empty-shell">
+              <div className="saved-empty">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                <p>{content.emptyTitle}</p>
+                <Link href={`/${locale}/resale`} className="saved-browse-btn">
+                  {content.browse}
+                </Link>
+              </div>
             </div>
           ) : (
             <main className="re-grid">
@@ -74,7 +111,7 @@ export default function SavedPage() {
                           type="button"
                           className="re-bookmark-btn active"
                           onClick={() => handleRemove(item.id)}
-                          aria-label="Remove from saved"
+                          aria-label={content.removeLabel}
                         >
                           <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
@@ -97,7 +134,7 @@ export default function SavedPage() {
                   </article>
 
                   <Link href={`/${locale}/resale/${item.slug}`} className="re-action-btn">
-                    VIew Apartment DetaIls
+                    {content.viewDetails}
                   </Link>
                 </div>
               ))}

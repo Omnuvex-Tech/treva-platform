@@ -44,7 +44,7 @@ const heroDictionary = {
     ),
     subtitle: "Doğru investisiya seçimləri və fərdi həyat tərzi həlləri təqdim edən platforma.",
     location: "Layihələr",
-    dealOptions: ["Resale", "Off-Plan"],
+    dealOptions: ["Off-Plan", "Resale"],
   },
   en: {
     title: (
@@ -56,7 +56,7 @@ const heroDictionary = {
     ),
     subtitle: "Curated real estate investments and tailored lifestyle solutions.",
     location: "Projects",
-    dealOptions: ["Resale", "Off-Plan"],
+    dealOptions: ["Off-Plan", "Resale"],
   },
   ru: {
     title: (
@@ -68,7 +68,7 @@ const heroDictionary = {
     ),
     subtitle: "Надёжная платформа для правильных инвестиций и индивидуальных решений для жизни.",
     location: "Проекты",
-    dealOptions: ["Resale", "Off-Plan"],
+    dealOptions: ["Off-Plan", "Resale"],
   },
 } as const;
 
@@ -94,10 +94,6 @@ export default function TrevaHero() {
     const savedCategorySlug = localStorage.getItem('treva_selectedCategorySlug');
     if (savedCategorySlug) {
       setSelectedCategorySlug(savedCategorySlug);
-    }
-    const savedDeal = localStorage.getItem('treva_dealType');
-    if (savedDeal && content.dealOptions.includes(savedDeal as any)) {
-      setDealType(savedDeal);
     }
   }, []);
 

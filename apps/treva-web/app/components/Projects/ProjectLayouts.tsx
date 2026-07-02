@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import PageContainer from "@/app/components/Container/PageContainer";
 import "./unit-layout.css";
 
@@ -10,6 +11,7 @@ interface LayoutItem {
   floor: string;
   number: string;
   price: string;
+  slug: string;
   image?: string;
   svgBlueprint?: React.ReactNode;
 }
@@ -17,10 +19,11 @@ interface LayoutItem {
 interface Props {
   layouts: LayoutItem[];
   categorySlug?: string;
+  locale: string;
   viewAllHref?: string;
 }
 
-export default function ProjectLayouts({ layouts, categorySlug, viewAllHref }: Props) {
+export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllHref }: Props) {
   const viewAllUrl = viewAllHref || (categorySlug ? `/off-plan?category=${categorySlug}` : "/off-plan");
 
   return (
@@ -37,7 +40,7 @@ export default function ProjectLayouts({ layouts, categorySlug, viewAllHref }: P
 
         <div className="layouts-grid">
           {layouts.map((layout, idx) => (
-            <article key={idx} className="layout-card">
+            <Link key={idx} href={`/${locale}/off-plan/${layout.slug}`} className="layout-card layout-card--link">
               <div className="layout-card__header">
                 <div className="layout-card__title-block">
                   <span className="layout-card__code">{layout.code}</span>
@@ -62,7 +65,7 @@ export default function ProjectLayouts({ layouts, categorySlug, viewAllHref }: P
                 <h2 className="layout-card__name">{layout.title}</h2>
                 <span className="layout-card__price">{layout.price}</span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </PageContainer>

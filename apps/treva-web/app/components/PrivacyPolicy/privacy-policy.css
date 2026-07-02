@@ -5,6 +5,15 @@
   z-index: 2;
 }
 
+.section_policy .global-padding {
+  padding-top: 0 !important;
+}
+
+.section_policy .projects_intro-wrap h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .policy_wrap {
   display: flex;
   flex-direction: row;

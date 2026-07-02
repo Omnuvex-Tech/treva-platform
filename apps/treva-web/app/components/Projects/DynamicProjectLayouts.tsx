@@ -23,6 +23,7 @@ interface LayoutItem {
   floor: string;
   number: string;
   price: string;
+  slug: string;
   image?: string;
 }
 
@@ -63,6 +64,7 @@ export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
                 : item.prices?.AZN
                 ? `₼${item.prices.AZN.toLocaleString()}`
                 : "",
+              slug: item.slug,
               image: item.mainImage?.url
                 ? item.mainImage.url.startsWith("http")
                   ? item.mainImage.url
@@ -85,6 +87,7 @@ export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
     <ProjectLayouts
       layouts={layouts}
       categorySlug={categorySlug}
+      locale={locale}
       viewAllHref={`/${locale}/off-plan?category=${categorySlug}`}
     />
   );

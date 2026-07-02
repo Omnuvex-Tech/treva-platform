@@ -12,7 +12,7 @@ export default function OffPlanPage() {
     <div className="page-wrapper">
       <Navbar variant="solid" />
       <main className="main-wrapper">
-        <PageContainer>
+        <PageContainer className="off-plan-page-container">
           <UnitFilter />
         </PageContainer>
       </main>

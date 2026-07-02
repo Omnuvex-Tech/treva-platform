@@ -3,9 +3,19 @@
   /* padding-bottom: 64px; */
 }
 
+.off-plan-page-container {
+  padding-left: 36px;
+  padding-right: 36px;
+}
+
 @media (max-width: 768px) {
   .page-wrapper .main-wrapper {
     padding-top: calc(var(--treva-nav-height, 64px) + 16px);
     padding-bottom: 52px;
+  }
+
+  .off-plan-page-container {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }
