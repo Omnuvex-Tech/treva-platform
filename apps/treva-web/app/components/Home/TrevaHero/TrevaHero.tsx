@@ -119,7 +119,7 @@ export default function TrevaHero() {
         if (saved) {
           setSelectedCategory(saved);
         } else if (cats.length > 0 && !selectedCategory) {
-          setSelectedCategory(cats[0].title);
+          setSelectedCategory(getCatTitle(cats[0].title, locale));
         }
       })
       .catch(() => {});
