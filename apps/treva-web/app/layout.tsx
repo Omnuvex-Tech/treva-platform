@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import { NotifyProvider, NotifyContainer } from "@repo/ui";
 import { QueryProvider } from "@/app/providers";
 import { config } from "@/config";
-import { SmoothScrollRoot } from "@/app/components/SmoothScrollRoot";
 import "./globals.css";
 
 const inter = localFont({
@@ -61,9 +60,7 @@ export default function RootLayout({
                 <QueryProvider>
                     <NotifyProvider>
                         <div id="treva-navbar-layer" />
-                        <SmoothScrollRoot>
-                            <main>{children}</main>
-                        </SmoothScrollRoot>
+                        <main>{children}</main>
                         <NotifyContainer />
                     </NotifyProvider>
                 </QueryProvider>

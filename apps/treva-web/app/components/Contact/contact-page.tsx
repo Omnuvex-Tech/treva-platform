@@ -20,7 +20,6 @@ declare global {
   interface Window {
     gsap?: any
     ScrollTrigger?: any
-    ScrollSmoother?: any
     SplitText?: any
   }
 }
@@ -302,17 +301,7 @@ export function ContactPage({ locale }: ContactPageProps) {
     if (!target) return
 
     window.history.replaceState(null, '', '#get-in-touch')
-
-    const smoother = window.ScrollSmoother?.get?.()
-    if (smoother) {
-      smoother.scrollTo(target, true)
-      return
-    }
-
-    target.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+    target.scrollIntoView({ block: 'start' })
   }
 
   const initGSAP = () => {

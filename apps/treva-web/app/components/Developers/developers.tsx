@@ -17,7 +17,6 @@ declare global {
   interface Window {
     gsap?: any
     ScrollTrigger?: any
-    ScrollSmoother?: any
     SplitText?: any
   }
 }
@@ -103,17 +102,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     if (!target) return
 
     window.history.replaceState(null, '', '#services')
-
-    const smoother = window.ScrollSmoother?.get?.()
-    if (smoother) {
-      smoother.scrollTo(target, true)
-      return
-    }
-
-    target.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+    target.scrollIntoView({ block: 'start' })
   }
 
   const scrollToFeaturedProjects = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -123,17 +112,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     if (!target) return
 
     window.history.replaceState(null, '', '#featured-projects')
-
-    const smoother = window.ScrollSmoother?.get?.()
-    if (smoother) {
-      smoother.scrollTo(target, true)
-      return
-    }
-
-    target.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+    target.scrollIntoView({ block: 'start' })
   }
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(0)

@@ -15,7 +15,6 @@ declare global {
   interface Window {
     gsap?: any
     ScrollTrigger?: any
-    ScrollSmoother?: any
     SplitText?: any
   }
 }
@@ -89,19 +88,9 @@ export function BrokersPage({ locale }: BrokersPageProps) {
 
     const offset = getBrokerRegistrationOffset()
 
-    const smoother = window.ScrollSmoother?.get?.()
-    if (smoother) {
-      const smootherTop = typeof smoother.offset === 'function'
-        ? smoother.offset(target, 'top top')
-        : target.getBoundingClientRect().top + (smoother.scrollTop?.() ?? window.scrollY)
-
-      smoother.scrollTo(Math.max(smootherTop - offset, 0), true)
-      return
-    }
-
     window.scrollTo({
       top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
-      behavior: 'smooth',
+      behavior: 'auto',
     })
   }
 

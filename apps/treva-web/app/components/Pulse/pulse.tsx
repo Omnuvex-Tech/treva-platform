@@ -29,17 +29,7 @@ const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, w
     if (!target) return;
 
     window.history.replaceState(null, "", "#all-articles");
-
-    const smoother = (window as any).ScrollSmoother?.get?.();
-    if (smoother) {
-      smoother.scrollTo(target, true);
-      return;
-    }
-
-    target.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    target.scrollIntoView({ block: "start" });
   };
 
   return (

@@ -198,33 +198,18 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   }, [variant]);
 
   useEffect(() => {
-    const readScrollTop = () => {
-      const smoother = window.ScrollSmoother?.get?.();
-      const smootherScrollTop = smoother?.scrollTop?.();
-      if (typeof smootherScrollTop === "number") return smootherScrollTop;
-
-      return (
+    const onScroll = () => {
+      const top =
         window.scrollY ||
         document.documentElement.scrollTop ||
         document.body.scrollTop ||
-        0
-      );
+        0;
+      setIsScrolled(top > 16);
     };
 
-    let frameId = 0;
-    let last = false;
-
-    const tick = () => {
-      const next = readScrollTop() > 16;
-      if (next !== last) {
-        last = next;
-        setIsScrolled(next);
-      }
-      frameId = window.requestAnimationFrame(tick);
-    };
-
-    tick();
-    return () => window.cancelAnimationFrame(frameId);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
