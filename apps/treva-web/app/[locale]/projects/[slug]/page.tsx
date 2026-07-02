@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useProjectDetail } from "@/hooks/use-project-detail";
@@ -19,6 +19,57 @@ function loc(obj: LocalizedString | undefined | null, locale: string, fallback =
   if (!obj) return fallback;
   if (typeof obj === "string") return obj || fallback;
   return (obj as any)[locale] || obj.az || obj.en || obj.ru || fallback;
+}
+
+function ScrollToFormButton({ locale }: { locale: string }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setVisible(window.scrollY > 600);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleClick = () => {
+    const form = document.querySelector(".callbackContainer");
+    if (form) {
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  if (!visible) return null;
+
+  return (
+    <button
+      onClick={handleClick}
+      aria-label="Scroll to contact form"
+      style={{
+        position: "fixed",
+        bottom: 32,
+        right: 32,
+        width: 56,
+        height: 56,
+        borderRadius: "50%",
+        backgroundColor: "#3F4249",
+        color: "#ffffff",
+        border: "none",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+        zIndex: 1000,
+        transition: "opacity 0.2s ease, transform 0.2s ease",
+      }}
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <polyline points="19 12 12 19 5 12"/>
+      </svg>
+    </button>
+  );
 }
 
 export default function ProjectDetailPage() {
@@ -166,6 +217,10 @@ export default function ProjectDetailPage() {
       <DynamicProjectLayouts categorySlug={slug} locale={locale} />
 
       <CallbackForm />
+
+      {/* Scroll to form floating button */}
+      <ScrollToFormButton locale={locale} />
+
       <HomeFooter locale={locale} />
     </div>
   );

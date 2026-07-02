@@ -94,18 +94,19 @@ const officeGalleryImages = {
 type OfficeImageSliderProps = {
   images: string[]
   alt: string
+  delay?: number
 }
 
-function OfficeImageSlider({ images, alt }: OfficeImageSliderProps) {
+function OfficeImageSlider({ images, alt, delay = 2800 }: OfficeImageSliderProps) {
   return (
     <Swiper
       modules={[Autoplay, EffectFade]}
       effect="fade"
       fadeEffect={{ crossFade: true }}
       loop={images.length > 1}
-      speed={900}
+      speed={1200}
       autoplay={{
-        delay: 2800,
+        delay: delay,
         disableOnInteraction: false,
       }}
       allowTouchMove={false}
@@ -524,6 +525,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                             <OfficeImageSlider
                               images={officeGalleryImages.trevabaku}
                               alt="TREVA Real Estate Bakı Baş Ofisi"
+                              delay={5000}
                             />
                             <div className="img-cover" />
                           </div>
@@ -550,6 +552,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                               <OfficeImageSlider
                                 images={officeGalleryImages.seaBreeze}
                                 alt="Sea Breeze Satış Ofisi"
+                                delay={5500}
                               />
                               <div className="img-cover" />
                             </div>
@@ -575,6 +578,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                               <OfficeImageSlider
                                 images={officeGalleryImages.reportage}
                                 alt="Reportage Satış Ofisi"
+                                delay={6000}
                               />
                               <div className="img-cover" />
                             </div>

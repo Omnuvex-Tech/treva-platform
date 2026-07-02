@@ -187,6 +187,19 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                   </div>
 
                   <div className="projects_wrap">
+                    {loading ? (
+                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '80px 0' }}>
+                        <div style={{
+                          width: 40,
+                          height: 40,
+                          border: '3px solid #e5e7eb',
+                          borderTop: '3px solid #3F4249',
+                          borderRadius: '50%',
+                          animation: 'spin 0.8s linear infinite',
+                        }} />
+                        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                      </div>
+                    ) : (
                     <div className="w-dyn-list">
                       <div fs-list-element="list" role="list" className="projects_list w-dyn-items">
                         {categories.map((cat) => (
@@ -225,6 +238,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
                 </div>
               </div>

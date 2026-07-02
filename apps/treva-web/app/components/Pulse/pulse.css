@@ -16,7 +16,7 @@
   z-index: 1;
   width: 100%;
   clear: both;
-  overflow: visible;
+  overflow: hidden;
   padding-bottom: 7rem;
 }
 
@@ -74,7 +74,7 @@
     "articles articles";
   align-items: stretch;
   gap: 0px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .news_top-full-banner-container {
@@ -309,10 +309,11 @@
   width: 100%;
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch; 
-  gap: 0px; 
+  align-items: stretch;
+  gap: 0px;
   border-top: none;
   border-left: none;
+  overflow: hidden;
 }
 
 .section_news .news_middle-list .news_header-item {

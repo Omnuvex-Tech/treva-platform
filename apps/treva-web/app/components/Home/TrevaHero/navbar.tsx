@@ -352,13 +352,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
 
           <div className="treva-navbar__controls">
             <div className="treva-navbar__actions">
-              <PillButton className="treva-navbar__search-btn" aria-label="Open search">
-                <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <circle cx="5.8" cy="5.8" r="4.4" stroke="#ffffff" strokeWidth="1.4" />
-                  <line x1="9.2" y1="9.2" x2="13" y2="13" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" />
-                </svg>
-                <span className="treva-navbar__search-text">Search</span>
-              </PillButton>
+           
 
               <a
                 href={routeHref('/saved')}

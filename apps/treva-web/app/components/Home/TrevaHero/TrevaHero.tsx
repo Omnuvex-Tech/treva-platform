@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown, Home } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import './treva-hero.css';
 import PageContainer from '@/app/components/Container/PageContainer';
 import Navbar from './navbar';
@@ -26,7 +26,8 @@ interface CategoryOption {
   slug: string;
 }
 
-function getCatTitle(title: CategoryOption['title'], loc: string): string {
+function getCatTitle(title: CategoryOption['title'] | undefined, loc: string): string {
+  if (!title) return '';
   if (typeof title === 'string') return title;
   const t = title as Record<string, string | undefined>;
   return t[loc] || t.az || t.en || t.ru || '';
@@ -42,7 +43,7 @@ const heroDictionary = {
       </>
     ),
     subtitle: "Doğru investisiya seçimləri və fərdi həyat tərzi həlləri təqdim edən platforma.",
-    location: "MƏKAN",
+    location: "Layihələr",
     dealOptions: ["Resale", "Off-Plan"],
   },
   en: {
@@ -54,7 +55,7 @@ const heroDictionary = {
       </>
     ),
     subtitle: "Curated real estate investments and tailored lifestyle solutions.",
-    location: "LOCATION",
+    location: "Projects",
     dealOptions: ["Resale", "Off-Plan"],
   },
   ru: {
@@ -66,7 +67,7 @@ const heroDictionary = {
       </>
     ),
     subtitle: "Надёжная платформа для правильных инвестиций и индивидуальных решений для жизни.",
-    location: "МЕСТОПОЛОЖЕНИЕ",
+    location: "Проекты",
     dealOptions: ["Resale", "Off-Plan"],
   },
 } as const;
@@ -86,23 +87,19 @@ export default function TrevaHero() {
 
   const [locationMenuOpen, setLocationMenuOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('');
   const locationDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedCategory = localStorage.getItem('treva_selectedCategory');
-    if (savedCategory) {
-      setSelectedCategory(savedCategory);
+    const savedCategorySlug = localStorage.getItem('treva_selectedCategorySlug');
+    if (savedCategorySlug) {
+      setSelectedCategorySlug(savedCategorySlug);
     }
     const savedDeal = localStorage.getItem('treva_dealType');
     if (savedDeal && content.dealOptions.includes(savedDeal as any)) {
       setDealType(savedDeal);
     }
   }, []);
-
-  useEffect(() => {
-    setDealType(content.dealOptions[0]);
-  }, [locale]);
 
   useEffect(() => {
     fetch(`${CMS_API}/layihelerimiz/categories/visible`)
@@ -115,12 +112,6 @@ export default function TrevaHero() {
           return { title: titleObj, slug: cat.slug };
         });
         setCategories(cats);
-        const saved = localStorage.getItem('treva_selectedCategory');
-        if (saved) {
-          setSelectedCategory(saved);
-        } else if (cats.length > 0 && !selectedCategory) {
-          setSelectedCategory(getCatTitle(cats[0].title, locale));
-        }
       })
       .catch(() => {});
   }, []);
@@ -140,15 +131,18 @@ export default function TrevaHero() {
 
   const handleHomeClick = useCallback(() => {
     const path = dealType === "Resale" ? "resale" : "off-plan";
-    const selectedCat = categories.find((c) => getCatTitle(c.title, locale) === selectedCategory);
-    const categoryParam = selectedCat ? `?category=${selectedCat.slug}` : '';
+    const categoryParam = selectedCategorySlug ? `?category=${selectedCategorySlug}` : '';
     router.push(`/${locale}/${path}${categoryParam}`);
-  }, [dealType, locale, router, categories, selectedCategory]);
+  }, [dealType, locale, router, selectedCategorySlug]);
 
-  const handleCategoryClick = useCallback((slug: string, title: string) => {
+  const handleCategoryClick = useCallback((slug: string) => {
     setLocationMenuOpen(false);
-    setSelectedCategory(title);
-    localStorage.setItem('treva_selectedCategory', title);
+    setSelectedCategorySlug(slug);
+    if (slug) {
+      localStorage.setItem('treva_selectedCategorySlug', slug);
+    } else {
+      localStorage.removeItem('treva_selectedCategorySlug');
+    }
   }, []);
 
   return (
@@ -187,21 +181,33 @@ export default function TrevaHero() {
                   <path d="M11.5 30C17.3333 22.1923 22 15.5 22 11.0385C22 8.3761 20.8938 5.82277 18.9246 3.9402C16.9555 2.05762 14.2848 1 11.5 1C8.71523 1 6.04451 2.05762 4.07538 3.9402C2.10625 5.82277 1 8.3761 1 11.0385C1 15.5 5.66667 22.1923 11.5 30Z" stroke="#ffffff" strokeWidth="2"/>
                   <path d="M15 11.5C15 12.4283 14.6313 13.3185 13.9749 13.9749C13.3185 14.6313 12.4283 15 11.5 15C10.5717 15 9.6815 14.6313 9.02513 13.9749C8.36875 13.3185 8 12.4283 8 11.5C8 10.5717 8.36875 9.6815 9.02513 9.02513C9.6815 8.36875 10.5717 8 11.5 8C12.4283 8 13.3185 8.36875 13.9749 9.02513C14.6313 9.6815 15 10.5717 15 11.5Z" stroke="#ffffff" strokeWidth="2"/>
                 </svg>
-                <span className="treva-filter-bar__location-text">{selectedCategory || content.location}</span>
+                <span className="treva-filter-bar__location-text">
+                  {selectedCategorySlug 
+                    ? getCatTitle(categories.find(c => c.slug === selectedCategorySlug)?.title, locale) || content.location
+                    : content.location}
+                </span>
                 <ChevronDown size={14} strokeWidth={2} className="treva-filter-bar__location-chevron" />
               </PillButton>
 
-              {locationMenuOpen && categories.length > 0 && (
+              {locationMenuOpen && (
                 <div className="treva-filter-bar__deal-menu treva-filter-bar__deal-menu--location" role="listbox">
+                  <button
+                    className={`treva-filter-bar__deal-option ${!selectedCategorySlug ? 'treva-filter-bar__deal-option--active' : ''}`}
+                    type="button"
+                    role="option"
+                    onClick={() => handleCategoryClick('')}
+                  >
+                    {content.location}
+                  </button>
                   {categories.map((cat) => {
                     const catTitle = getCatTitle(cat.title, locale);
                     return (
                       <button
                         key={cat.slug}
-                        className={`treva-filter-bar__deal-option ${selectedCategory === catTitle ? 'treva-filter-bar__deal-option--active' : ''}`}
+                        className={`treva-filter-bar__deal-option ${selectedCategorySlug === cat.slug ? 'treva-filter-bar__deal-option--active' : ''}`}
                         type="button"
                         role="option"
-                        onClick={() => handleCategoryClick(cat.slug, catTitle)}
+                        onClick={() => handleCategoryClick(cat.slug)}
                       >
                         {catTitle}
                       </button>
@@ -246,9 +252,12 @@ export default function TrevaHero() {
               )}
             </div>
 
-            {/* Home button — navigates based on deal type */}
+            {/* Search button — navigates based on deal type */}
             <PillButton className="treva-filter-bar__home-btn" aria-label="Go to section" onClick={handleHomeClick}>
-              <Home size={24} strokeWidth={2} />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
             </PillButton>
           </div>
         </PageContainer>

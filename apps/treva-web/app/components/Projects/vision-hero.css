@@ -4,8 +4,8 @@
 .vision-hero {
   position: relative;
   width: 100%;
-  height: calc(100vh + 10px);
-  min-height: calc(100vh + 10px);
+  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
