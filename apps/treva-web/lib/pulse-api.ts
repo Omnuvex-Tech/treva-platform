@@ -3,10 +3,10 @@ import { Article } from "./pulse.types";
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
 
 export type ArticleBlock =
-    | { type: "heading"; level: 2 | 3; text: string }
+    | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
     | { type: "paragraph"; text: string }
     | { type: "image"; url: string; alt: string; caption?: string }
-    | { type: "list"; items: string[] }
+    | { type: "list"; items: string[]; ordered?: boolean }
     | { type: "faq"; question: string; answer: string }
     | { type: "quote"; text: string; author?: string }
     | { type: "video"; url: string }
@@ -50,7 +50,7 @@ export interface ApiArticle {
     metaDescription?: LocalizedString;
     featured: boolean;
     published: boolean;
-    headerPosition?: "left" | "center" | "right" | "week" | null;
+    headerPositions?: string[];
     headerOrder?: number | null;
     selectedArticles?: ApiArticle[];
     createdAt: string;
@@ -198,7 +198,7 @@ export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Art
         excerpt: getLocalized(api.excerpt, locale),
         featured: api.featured,
         published: api.published,
-        headerPosition: api.headerPosition ?? undefined,
+        headerPositions: api.headerPositions ?? undefined,
         headerOrder: api.headerOrder ?? undefined,
         selectedArticles: api.selectedArticles?.map(a => apiArticleToArticle(a, locale)),
         metaTitle: getLocalized(api.metaTitle, locale),

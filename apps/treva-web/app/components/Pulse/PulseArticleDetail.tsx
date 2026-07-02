@@ -3,7 +3,7 @@
 import { ButtonText } from '@/app/components/ButtonText';
 /* eslint-disable @next/next/no-img-element, react/no-unknown-property */
 
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
@@ -247,6 +247,7 @@ const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; sl
 };
 
 const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article, sidebarArticles = [], relatedArticles = [] }) => {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   return (
     <div className="page-wrapper">
       <Navbar locale={locale} variant="solid" />
