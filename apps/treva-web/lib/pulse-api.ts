@@ -3,7 +3,7 @@ import { Article } from "./pulse.types";
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
 
 export type ArticleBlock =
-    | { type: "heading"; level: 2 | 3; text: string }
+    | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
     | { type: "paragraph"; text: string }
     | { type: "image"; url: string; alt: string; caption?: string }
     | { type: "list"; items: string[]; ordered?: boolean }
