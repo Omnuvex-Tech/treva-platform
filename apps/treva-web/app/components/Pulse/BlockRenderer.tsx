@@ -61,12 +61,16 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                         );
 
                     case "list":
+                        const ListTag = block.ordered ? "ol" : "ul";
                         return (
-                            <ul key={index} role="list" style={{ marginBottom: "1rem", paddingLeft: "1.5rem", listStyleType: "disc" }}>
+                            <ListTag key={index} role="list" style={{
+                                marginBottom: "1rem", paddingLeft: "1.5rem",
+                                listStyleType: block.ordered ? "decimal" : "disc"
+                            }}>
                                 {block.items.map((item, itemIdx) => (
                                     <li key={itemIdx} dangerouslySetInnerHTML={{ __html: item }} />
                                 ))}
-                            </ul>
+                            </ListTag>
                         );
 
                     case "faq":
