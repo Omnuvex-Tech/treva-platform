@@ -29,7 +29,17 @@ const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, w
     if (!target) return;
 
     window.history.replaceState(null, "", "#all-articles");
-    target.scrollIntoView({ block: "start" });
+
+    const navHeightValue = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue("--treva-nav-height");
+    const navHeight = Number.parseFloat(navHeightValue) || 64;
+    const offset = navHeight + 24;
+
+    window.scrollTo({
+      top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+      behavior: "smooth",
+    });
   };
 
   return (

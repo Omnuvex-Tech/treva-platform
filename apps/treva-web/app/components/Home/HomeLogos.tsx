@@ -893,7 +893,7 @@ export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
                 <div className="text-color-white60 home-logos-note-text">{content.ctaNote}</div>
               </div>
               <LogosPartnershipButton
-                href="brokers#broker-registration"
+                href={`/${activeLocale}/brokers#broker-registration`}
                 label={content.ctaButton}
               />
             </div>

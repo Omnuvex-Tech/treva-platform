@@ -24,6 +24,7 @@ interface Props {
   images: ProjectHeroImage[];
   ctaText?: string;
   ctaLink?: string;
+  onCtaClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
   getImageUrl: (url: string) => string;
 }
 
@@ -34,6 +35,7 @@ export default function ProjectHero({
   images,
   ctaText,
   ctaLink,
+  onCtaClick,
   getImageUrl,
 }: Props) {
   const validImages = images?.filter((img) => img.url) || [];
@@ -94,27 +96,50 @@ export default function ProjectHero({
             </p>
           )}
 
-          {ctaText && ctaLink && (
-            <Link href={ctaLink} className="vision-hero__cta">
-              <span className="vision-hero__cta-text">{ctaText}</span>
-              <span className="vision-hero__cta-icon">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M13 1M13 1H5M13 1V9M13 1L1 13"
-                    stroke="#0A0A0A"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </Link>
+          {ctaText && (ctaLink || onCtaClick) && (
+            onCtaClick ? (
+              <button type="button" className="vision-hero__cta" onClick={onCtaClick}>
+                <span className="vision-hero__cta-text">{ctaText}</span>
+                <span className="vision-hero__cta-icon">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M13 1M13 1H5M13 1V9M13 1L1 13"
+                      stroke="#0A0A0A"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </button>
+            ) : (
+              <Link href={ctaLink!} className="vision-hero__cta">
+                <span className="vision-hero__cta-text">{ctaText}</span>
+                <span className="vision-hero__cta-icon">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M13 1M13 1H5M13 1V9M13 1L1 13"
+                      stroke="#0A0A0A"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </Link>
+            )
           )}
         </div>
 

@@ -95,6 +95,17 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
   const gsapReady = useRef(false)
   const dropdownNavRefs = useRef<Array<HTMLDivElement | null>>([])
 
+  const getScrollOffset = () => {
+    if (typeof window === 'undefined') return 88
+
+    const navHeightValue = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue('--treva-nav-height')
+
+    const navHeight = Number.parseFloat(navHeightValue) || 64
+    return navHeight + 24
+  }
+
   const scrollToServices = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
 
@@ -102,7 +113,12 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     if (!target) return
 
     window.history.replaceState(null, '', '#services')
-    target.scrollIntoView({ block: 'start' })
+    const offset = getScrollOffset()
+
+    window.scrollTo({
+      top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+      behavior: 'smooth',
+    })
   }
 
   const scrollToFeaturedProjects = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -112,7 +128,12 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     if (!target) return
 
     window.history.replaceState(null, '', '#featured-projects')
-    target.scrollIntoView({ block: 'start' })
+    const offset = getScrollOffset()
+
+    window.scrollTo({
+      top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+      behavior: 'smooth',
+    })
   }
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(0)
@@ -700,13 +721,12 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
             </section>
 
             <PartnershipCTA
-              sectionDataWId="53797656-c2da-3541-a7b7-695898a96114"
               primaryAction={{ href: `/${locale}/contact#get-in-touch`, label: 'Əlaqə saxlayın' }}
-              secondaryAction={{ href: `/${locale}/brokers#broker-registration`, label: 'Şəbəkəmizə qoşulun' }}
+              secondaryAction={{ href: '#developers-callback-cta', label: 'Şəbəkəmizə qoşulun' }}
             />
           </main>
 
-          <CallbackForm allowedRoles={['Developer']} />
+          <CallbackForm allowedRoles={['Developer']} sectionId="developers-callback-cta" />
           <HomeFooter locale={locale} />
       </div>
     </>

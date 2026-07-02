@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import type { MouseEventHandler } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { ButtonText } from '@/app/components/ButtonText'
 
 type CTAButton = {
@@ -17,7 +18,6 @@ type CTAButton = {
 type PartnershipCTAProps = {
   primaryAction: CTAButton
   secondaryAction: CTAButton
-  sectionDataWId?: string
 }
 
 declare global {
@@ -35,6 +35,7 @@ const SECONDARY_BUTTON_CLASS =
 
 const PRIMARY_TEXT_CLASS = 'w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e'
 const SECONDARY_TEXT_CLASS = 'w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb'
+const PENDING_SCROLL_KEY = 'treva_pending_hash_scroll'
 
 function CTAActionButton({
   action,
@@ -84,9 +85,88 @@ function CTAActionButton({
 export default function PartnershipCTA({
   primaryAction,
   secondaryAction,
-  sectionDataWId,
 }: PartnershipCTAProps) {
+  const pathname = usePathname()
+  const router = useRouter()
   const sectionRef = useRef<HTMLElement | null>(null)
+
+  const scrollToHashTarget = (hash: string) => {
+    if (typeof window === 'undefined') return
+
+    const targetId = hash.replace(/^#/, '')
+    if (!targetId) return
+
+    const attemptScroll = (remainingAttempts = 20) => {
+      const target = document.getElementById(targetId)
+      if (!target) {
+        if (remainingAttempts > 0) {
+          window.setTimeout(() => attemptScroll(remainingAttempts - 1), 120)
+        }
+        return
+      }
+
+      const navHeightValue = window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue('--treva-nav-height')
+      const navHeight = Number.parseFloat(navHeightValue) || 64
+      const offset = navHeight + 24
+
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${targetId}`)
+      window.scrollTo({
+        top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+        behavior: 'smooth',
+      })
+    }
+
+    attemptScroll()
+  }
+
+  const enhanceAction = (action: CTAButton): CTAButton => {
+    if (action.external || !action.href.includes('#')) {
+      return action
+    }
+
+    const [rawPath, rawHash] = action.href.split('#')
+    const targetHash = rawHash ? `#${rawHash}` : ''
+
+    if (!targetHash) {
+      return action
+    }
+
+    const targetPath = rawPath || pathname || ''
+    const isSamePage = !rawPath || rawPath === pathname
+
+    return {
+      ...action,
+      onClick: (event) => {
+        event.preventDefault()
+
+        if (isSamePage) {
+          scrollToHashTarget(targetHash)
+          return
+        }
+
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(
+            PENDING_SCROLL_KEY,
+            JSON.stringify({ pathname: targetPath, hash: targetHash }),
+          )
+        }
+
+        router.push(`${targetPath}${targetHash}`)
+      },
+    }
+  }
+
+  const resolvedPrimaryAction = useMemo(
+    () => enhanceAction(primaryAction),
+    [pathname, primaryAction],
+  )
+
+  const resolvedSecondaryAction = useMemo(
+    () => enhanceAction(secondaryAction),
+    [pathname, secondaryAction],
+  )
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -147,11 +227,27 @@ export default function PartnershipCTA({
     }
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const rawPendingScroll = window.sessionStorage.getItem(PENDING_SCROLL_KEY)
+    if (!rawPendingScroll) return
+
+    try {
+      const pendingScroll = JSON.parse(rawPendingScroll) as { pathname?: string; hash?: string }
+      if (pendingScroll.pathname !== pathname || !pendingScroll.hash) return
+
+      window.sessionStorage.removeItem(PENDING_SCROLL_KEY)
+      scrollToHashTarget(pendingScroll.hash)
+    } catch {
+      window.sessionStorage.removeItem(PENDING_SCROLL_KEY)
+    }
+  }, [pathname])
+
   return (
     <section
       ref={sectionRef}
       className="section_cta bg-color-white"
-      {...(sectionDataWId ? { 'data-w-id': sectionDataWId } : {})}
     >
       <div className="global-padding padding-section-xlarge">
         <div className="container-large">
@@ -163,13 +259,13 @@ export default function PartnershipCTA({
                 </h2>
                 <div className="button-group">
                   <CTAActionButton
-                    action={primaryAction}
+                    action={resolvedPrimaryAction}
                     className={PRIMARY_BUTTON_CLASS}
                     textClassName={PRIMARY_TEXT_CLASS}
                     variant="blue-large"
                   />
                   <CTAActionButton
-                    action={secondaryAction}
+                    action={resolvedSecondaryAction}
                     className={SECONDARY_BUTTON_CLASS}
                     textClassName={SECONDARY_TEXT_CLASS}
                     variant="ghost-large"

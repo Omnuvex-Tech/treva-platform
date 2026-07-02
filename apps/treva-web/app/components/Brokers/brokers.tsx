@@ -90,7 +90,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
 
     window.scrollTo({
       top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
-      behavior: 'auto',
+      behavior: 'smooth',
     })
   }
 

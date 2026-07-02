@@ -55,6 +55,7 @@ type RoleType = 'Client' | 'Developer' | 'Broker';
 
 type CallbackFormProps = {
   allowedRoles?: RoleType[];
+  sectionId?: string;
 };
 
 const defaultRoles: RoleType[] = ['Client', 'Developer', 'Broker'];
@@ -89,7 +90,7 @@ function CallbackSubmitButton({ label, ...props }: CallbackSubmitButtonProps) {
   );
 }
 
-export default function CallbackForm({ allowedRoles }: CallbackFormProps) {
+export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormProps) {
   const pathname = usePathname();
   const detectedLocale = pathname?.split("/")[1];
   const locale: Locale = (detectedLocale && detectedLocale in callbackDictionary) ? detectedLocale as Locale : "az";
@@ -144,7 +145,7 @@ export default function CallbackForm({ allowedRoles }: CallbackFormProps) {
   const hasExtraLine = !!content.titleExtra;
 
   return (
-    <PageContainer as="main" className="callbackContainer">
+    <PageContainer as="main" className="callbackContainer" {...(sectionId ? { id: sectionId } : {})}>
       <form onSubmit={handleSubmit} className="formWrapper">
         
         <div className="headerContainer">
