@@ -127,7 +127,7 @@ export default function ApartmentCard() {
             <div />
           </PageContainer>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter />
         <div className="apt-loading-overlay" role="status" aria-live="polite" aria-busy="true">
           <div className="apt-spinner" />
@@ -150,7 +150,7 @@ export default function ApartmentCard() {
             </div>
           </PageContainer>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter />
       </div>
     );
@@ -434,7 +434,7 @@ export default function ApartmentCard() {
           </div>
         </PageContainer>
       </main>
-      <CallbackForm />
+      <CallbackForm allowedRoles={['Client']} />
       <HomeFooter />
     </div>
   );

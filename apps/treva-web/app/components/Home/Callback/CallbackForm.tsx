@@ -53,6 +53,12 @@ const callbackDictionary: Record<Locale, {
 
 type RoleType = 'Client' | 'Developer' | 'Broker';
 
+type CallbackFormProps = {
+  allowedRoles?: RoleType[];
+};
+
+const defaultRoles: RoleType[] = ['Client', 'Developer', 'Broker'];
+
 type RoleButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
   isActive: boolean;
@@ -83,29 +89,34 @@ function CallbackSubmitButton({ label, ...props }: CallbackSubmitButtonProps) {
   );
 }
 
-export default function CallbackForm() {
+export default function CallbackForm({ allowedRoles }: CallbackFormProps) {
   const pathname = usePathname();
   const detectedLocale = pathname?.split("/")[1];
   const locale: Locale = (detectedLocale && detectedLocale in callbackDictionary) ? detectedLocale as Locale : "az";
   const content = callbackDictionary[locale];
 
-  const roleKeyMap: Record<Locale, RoleType[]> = {
-    az: ['Client', 'Developer', 'Broker'],
-    en: ['Client', 'Developer', 'Broker'],
-    ru: ['Client', 'Developer', 'Broker'],
-  };
-  const roleLabels: Record<RoleType, Record<Locale, string>> = {
-    Client: { az: content.roles.client, en: content.roles.client, ru: content.roles.client },
-    Developer: { az: content.roles.developer, en: content.roles.developer, ru: content.roles.developer },
-    Broker: { az: content.roles.broker, en: content.roles.broker, ru: content.roles.broker },
+  const visibleRoles: RoleType[] = allowedRoles && allowedRoles.length > 0
+    ? allowedRoles
+    : defaultRoles;
+
+  const roleLabels: Record<RoleType, string> = {
+    Client: content.roles.client,
+    Developer: content.roles.developer,
+    Broker: content.roles.broker,
   };
 
-  const [activeRole, setActiveRole] = useState<RoleType>('Client');
+  const [activeRole, setActiveRole] = useState<RoleType>(visibleRoles[0] ?? 'Client');
   const [name, setName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    if (!visibleRoles.includes(activeRole)) {
+      setActiveRole(visibleRoles[0] ?? 'Client');
+    }
+  }, [activeRole, visibleRoles]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,7 +133,7 @@ export default function CallbackForm() {
       setSubmitted(true);
       setName('');
       setPhone('');
-      setActiveRole('Client');
+      setActiveRole(visibleRoles[0] ?? 'Client');
     } catch {
       setError('Göndərilmədi. Yenidən cəhd edin.');
     } finally {
@@ -151,16 +162,18 @@ export default function CallbackForm() {
           {content.subtitle}
         </p>
 
+        {visibleRoles.length > 1 && (
         <div className="roleSelector">
-          {roleKeyMap[locale].map((role) => (
+          {visibleRoles.map((role) => (
             <RoleButton
               key={role}
-              label={roleLabels[role][locale]}
+              label={roleLabels[role]}
               isActive={activeRole === role}
               onClick={() => setActiveRole(role)}
             />
           ))}
         </div>
+        )}
 
         <div className="inputGroup">
           <input

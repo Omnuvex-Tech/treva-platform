@@ -66,6 +66,12 @@ const labelToLocale = {
   RUS: "ru",
 } as const;
 
+const loginLabels = {
+  az: "kabinet",
+  en: "cabinet",
+  ru: "кабинет",
+} as const;
+
 type NavItem = {
   name: string;
   href: string;
@@ -352,8 +358,6 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
 
           <div className="treva-navbar__controls">
             <div className="treva-navbar__actions">
-           
-
               <a
                 href={routeHref('/saved')}
                 className="treva-navbar__saved-btn"
@@ -412,7 +416,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Login
+                {loginLabels[activeLocale as keyof typeof loginLabels] ?? loginLabels.az}
               </a>
             </div>
 

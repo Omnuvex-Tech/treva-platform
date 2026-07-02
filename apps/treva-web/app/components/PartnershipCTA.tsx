@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import type { MouseEventHandler } from 'react'
 import { ButtonText } from '@/app/components/ButtonText'
 
@@ -17,6 +18,13 @@ type PartnershipCTAProps = {
   primaryAction: CTAButton
   secondaryAction: CTAButton
   sectionDataWId?: string
+}
+
+declare global {
+  interface Window {
+    gsap?: any
+    ScrollTrigger?: any
+  }
 }
 
 const PRIMARY_BUTTON_CLASS =
@@ -78,8 +86,70 @@ export default function PartnershipCTA({
   secondaryAction,
   sectionDataWId,
 }: PartnershipCTAProps) {
+  const sectionRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    let cleanup: (() => void) | undefined
+
+    const initCTAAnimation = () => {
+      if (!sectionRef.current) return
+      if (!window.gsap || !window.ScrollTrigger) return
+
+      const { gsap, ScrollTrigger } = window
+      gsap.registerPlugin(ScrollTrigger)
+
+      cleanup?.()
+
+      const mm = gsap.matchMedia()
+      mm.add('(min-width: 768px)', () => {
+        const q = gsap.utils.selector(sectionRef.current)
+        const scrollProgress = { value: 0 }
+        const ctaTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 0.93,
+          },
+          defaults: { ease: 'none' },
+        })
+
+        gsap.set(q('.cta_img-wrap.is-top-left'), { y: '4rem' })
+        gsap.set(q('.cta_img-wrap.is-top-right'), { y: '0rem' })
+        gsap.set(q('.cta_img-wrap.is-middle-right'), { y: '0rem' })
+        gsap.set(q('.cta_img-wrap.is-bottom-left'), { y: '4rem' })
+        gsap.set(q('.cta_img-wrap.is-bottom-right'), { y: '-2rem' })
+
+        ctaTimeline
+          .to(scrollProgress, { value: 1, duration: 1 }, 0)
+          .to(q('.cta_img-wrap.is-top-left'), { y: '-1rem', duration: 0.52 }, 0.12)
+          .to(q('.cta_img-wrap.is-top-right'), { y: '5rem', duration: 0.52 }, 0.12)
+          .to(q('.cta_img-wrap.is-middle-right'), { y: '-6rem', duration: 0.55 }, 0.2)
+          .to(q('.cta_img-wrap.is-bottom-left'), { y: '-1rem', duration: 0.6 }, 0.3)
+          .to(q('.cta_img-wrap.is-bottom-right'), { y: '2rem', duration: 0.6 }, 0.3)
+
+        return () => {
+          ctaTimeline.kill()
+        }
+      })
+
+      cleanup = () => mm.revert()
+    }
+
+    initCTAAnimation()
+    window.addEventListener('gsap-ready', initCTAAnimation)
+
+    return () => {
+      window.removeEventListener('gsap-ready', initCTAAnimation)
+      cleanup?.()
+    }
+  }, [])
+
   return (
     <section
+      ref={sectionRef}
       className="section_cta bg-color-white"
       {...(sectionDataWId ? { 'data-w-id': sectionDataWId } : {})}
     >

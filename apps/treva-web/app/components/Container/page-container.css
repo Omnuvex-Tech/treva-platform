@@ -3,10 +3,20 @@
   padding-right: 48px;
 }
 
+.home-page .page-container {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
 @media (max-width: 1024px) {
   .page-container {
     padding-left: 32px;
     padding-right: 32px;
+  }
+
+  .home-page .page-container {
+    padding-left: 28px;
+    padding-right: 28px;
   }
 }
 
@@ -14,5 +24,10 @@
   .page-container {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .home-page .page-container {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }

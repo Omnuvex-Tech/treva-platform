@@ -28,10 +28,6 @@ body.gsap-hidden {
   visibility: hidden;
 }
 
-
-
-
-
 .heading-span::after {
   content: "";
   display: inline-block;

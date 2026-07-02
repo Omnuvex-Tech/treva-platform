@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 import './treva-hero.css';
 import PageContainer from '@/app/components/Container/PageContainer';
 import Navbar from './navbar';
@@ -254,10 +254,7 @@ export default function TrevaHero() {
 
             {/* Search button — navigates based on deal type */}
             <PillButton className="treva-filter-bar__home-btn" aria-label="Go to section" onClick={handleHomeClick}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
+              <Search size={24} strokeWidth={2} />
             </PillButton>
           </div>
         </PageContainer>

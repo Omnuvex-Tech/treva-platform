@@ -648,7 +648,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
             </section>
           </main>
           
-          <CallbackForm />
+          <CallbackForm allowedRoles={['Broker']} />
           <HomeFooter locale={locale} />
       </div>
     </>

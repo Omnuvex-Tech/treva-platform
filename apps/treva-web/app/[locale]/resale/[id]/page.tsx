@@ -75,7 +75,7 @@ export default function ResaleDetailPage() {
             <div className="py-16 text-center text-white/50">Loading...</div>
           </PageContainer>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter />
       </div>
     );
@@ -90,7 +90,7 @@ export default function ResaleDetailPage() {
             <div className="py-16 text-center text-white/50">Apartment not found</div>
           </PageContainer>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter />
       </div>
     );
@@ -338,7 +338,7 @@ export default function ResaleDetailPage() {
           </div>
         </PageContainer>
       </main>
-      <CallbackForm />
+      <CallbackForm allowedRoles={['Client']} />
       <HomeFooter />
     </div>
   );

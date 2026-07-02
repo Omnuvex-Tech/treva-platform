@@ -138,17 +138,24 @@
   font-size: 18px;
   font-weight: 400;
   border-radius: 25px;
-  border: 1px solid #4E525D;
-  background-color: #ffffff;
-  color: #4E525D;
+  border: 1px solid #565a63;
+  background-color: transparent;
+  color: #565a63;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.roleButton:hover {
+  background-color: #565a63;
+  color: #ffffff;
+  border-color: #565a63;
 }
 
 .roleButton:active,
 .activeRole {
-  background-color: #4E525D;
+  background-color: #565a63;
   color: #ffffff;
-  border-color: #4E525D;
+  border-color: #565a63;
 }
 
 /* Input sahələri */
