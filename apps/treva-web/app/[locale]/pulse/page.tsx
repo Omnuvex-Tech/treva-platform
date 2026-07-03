@@ -51,6 +51,7 @@ export default async function PulseRoute({ params }: { params: Promise<{ locale:
     } catch {
         articles = [];
     }
+    
 
     return (
         <Pulse
