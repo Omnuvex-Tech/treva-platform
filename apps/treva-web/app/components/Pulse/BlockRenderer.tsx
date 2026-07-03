@@ -175,7 +175,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                     loading="lazy"
                                 />
                             </div>
-                        );
+                        )
 
                     case "gallery": {
                         return <GalleryCarousel key={index} images={block.images} />;
