@@ -93,10 +93,14 @@ export async function getArticles(params?: {
 export async function getArticleBySlug(
     slug: string,
 ): Promise<ApiArticle> {
-    const res = await fetch(`${API}/pulse/articles/slug/${slug}`, {
-        next: { revalidate: 60 },
+    const res = await fetch(`${API}/pulse/articles/slug/${encodeURIComponent(slug)}`, {
+        cache: "no-store",
     });
-    if (!res.ok) throw new Error("Article not found");
+    if (!res.ok) {
+        const error = new Error("Article not found") as Error & { status?: number };
+        error.status = res.status;
+        throw error;
+    }
     return res.json();
 }
 
