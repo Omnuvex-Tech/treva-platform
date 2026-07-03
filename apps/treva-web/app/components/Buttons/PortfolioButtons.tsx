@@ -9,7 +9,7 @@ type ViewAllButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 export function ViewAllButton({
-  label = 'vIew all',
+  label = 'View all',
   mobile = false,
   className = '',
   href = '#',

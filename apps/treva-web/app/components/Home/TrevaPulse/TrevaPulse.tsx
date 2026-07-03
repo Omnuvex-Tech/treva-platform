@@ -18,7 +18,7 @@ const pulseDictionary = {
     ],
     filterLabel: "Kateqoriyaya görə",
     categories: { all: "Hamısı" },
-    viewAll: "BÜTÜNÜ",
+    viewAll: "Hamısına bax",
     noData: "Bu kateqoriyada məqalə tapılmadı.",
   },
   en: {
@@ -30,7 +30,7 @@ const pulseDictionary = {
     ],
     filterLabel: "Filter by category",
     categories: { all: "All" },
-    viewAll: "view all",
+    viewAll: "View all",
     noData: "No articles found in this category.",
   },
   ru: {
@@ -42,7 +42,7 @@ const pulseDictionary = {
     ],
     filterLabel: "Фильтр по категории",
     categories: { all: "Все" },
-    viewAll: "ВСЕ",
+    viewAll: "Смотреть все",
     noData: "В этой категории статей не найдено.",
   },
 } as const;
