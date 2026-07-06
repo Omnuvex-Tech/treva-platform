@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export function Dashboard() {
-    const [activeMenu, setActiveMenu] = useState("dashboard");
+    const [activeMenu, setActiveMenu] = useState<"dashboard" | "offplan" | "resale">("dashboard");
 
     return (
         <div className="flex min-h-screen w-full bg-white font-sans overflow-hidden">
@@ -33,19 +33,43 @@ export function Dashboard() {
                         )}
                     </a>
                     
-                    {/* Listings */}
-                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("listings"); }}
+                    {/* Off-plan */}
+                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("offplan"); }}
                         className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
                         style={{
-                            background: activeMenu === "listings" ? "#4C525E" : "transparent",
-                            color: activeMenu === "listings" ? "#FFFFFF" : "#808191"
+                            background: activeMenu === "offplan" ? "#4C525E" : "transparent",
+                            color: activeMenu === "offplan" ? "#FFFFFF" : "#808191"
                         }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                            <circle cx="12" cy="10" r="3" />
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" />
+                            <rect x="10" y="14" width="4" height="7" />
+                            <path d="M8 7L16 7" />
+                            <path d="M9 5L12 3L15 5" />
                         </svg>
-                        Listings
-                        {activeMenu === "listings" && (
+                        Off-plan
+                        {activeMenu === "offplan" && (
+                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
+                                </svg>
+                            </span>
+                        )}
+                    </a>
+                    
+                    {/* Resale */}
+                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("resale"); }}
+                        className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
+                        style={{
+                            background: activeMenu === "resale" ? "#4C525E" : "transparent",
+                            color: activeMenu === "resale" ? "#FFFFFF" : "#808191"
+                        }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 12L5 10M5 10L7 12M5 10V14C5 16.5 7 18 9.5 18" />
+                            <path d="M21 12L19 14M19 14L17 12M19 14V10C19 7.5 17 6 14.5 6" />
+                            <path d="M9 16C9 17.5 10.5 19 12 19C13.5 19 15 17.5 15 16C15 14.5 13.5 13 12 13C10.5 13 9 14.5 9 16Z" />
+                        </svg>
+                        Resale
+                        {activeMenu === "resale" && (
                             <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
@@ -62,10 +86,10 @@ export function Dashboard() {
                 <header className="h-[80px] w-full bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
                     <div>
                         <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
-                            {activeMenu === "dashboard" ? "Dashboard" : "Listings"}
+                            {activeMenu === "dashboard" ? "Dashboard" : activeMenu === "offplan" ? "Off-plan" : "Resale"}
                         </h2>
                         <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>
-                            {activeMenu === "dashboard" ? "Welcome back, here's what's happening today" : "Manage your apartment listings"}
+                            {activeMenu === "dashboard" ? "Welcome back, here's what's happening today" : activeMenu === "offplan" ? "Pre-construction project pipeline" : "Secondary market listings"}
                         </p>
                     </div>
 
@@ -274,15 +298,236 @@ export function Dashboard() {
                 </main>
                 )}
 
-                {/* Listings Content */}
-                {activeMenu === "listings" && (
+                {/* Off-plan Content */}
+                {activeMenu === "offplan" && (
                 <main 
                     className="flex-1 p-8 overflow-y-auto flex flex-col gap-6"
                     style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
                 >
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                        <h3 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Listings</h3>
-                        <p className="m-0 mt-2 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Manage and view all apartment listings here.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Off-plan Sales</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>18</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+15% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Projects</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>45</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+22% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Units Sold</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>89</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+31% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Units</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>7</h3>
+                                <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-3.2% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+                            <div className="flex items-center justify-between mb-6">
+                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Revenue Overview</h4>
+                                <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
+                            </div>
+                            <div className="relative w-full flex-1 min-h-[260px]">
+                                <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "0%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "20%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "40%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "60%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "80%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "100%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
+                                </div>
+                                <div className="ml-[72px] relative" style={{ height: "calc(100% - 32px)" }}>
+                                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                    </div>
+                                    <img src="/images/pages/inv-dashboard/schedule.svg" alt="" className="absolute inset-0 w-full h-full object-cover object-left-top pointer-events-none" />
+                                </div>
+                                <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "38%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Mar</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "55%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Apr</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "72%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>May</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "90%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jun</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Unit Distribution</h4>
+                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Current inventory status</p>
+                            </div>
+                            <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
+                                <svg width="140" height="140" viewBox="0 0 128 128">
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
+                                        strokeDasharray="150.1 164.1" strokeLinecap="butt" transform="rotate(184 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
+                                        strokeDasharray="57.6 256.6" strokeLinecap="butt" transform="rotate(4 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#0075E3" strokeWidth="13"
+                                        strokeDasharray="68.1 246.1" strokeLinecap="butt" transform="rotate(76 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#E6211B" strokeWidth="13"
+                                        strokeDasharray="15.7 298.5" strokeLinecap="butt" transform="rotate(160 64 64)" />
+                                </svg>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
+                                    <span>Monthly.S <span className="font-semibold text-[#2C3E50] ml-0.5">24</span></span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
+                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">89</span></span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
+                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">45</span></span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
+                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">7</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                )}
+
+                {/* Resale Content */}
+                {activeMenu === "resale" && (
+                <main 
+                    className="flex-1 p-8 overflow-y-auto flex flex-col gap-6"
+                    style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
+                >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Resale Listings</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>156</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+9% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Resale</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>87</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+5% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Sold Resale</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>42</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+18% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Resale</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>5</h3>
+                                <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-1.8% from last month</span>
+                            </div>
+                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+                            <div className="flex items-center justify-between mb-6">
+                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Revenue Overview</h4>
+                                <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
+                            </div>
+                            <div className="relative w-full flex-1 min-h-[260px]">
+                                <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "0%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "20%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "40%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "60%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "80%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "100%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
+                                </div>
+                                <div className="ml-[72px] relative" style={{ height: "calc(100% - 32px)" }}>
+                                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                    </div>
+                                    <img src="/images/pages/inv-dashboard/schedule.svg" alt="" className="absolute inset-0 w-full h-full object-cover object-left-top pointer-events-none" />
+                                </div>
+                                <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "38%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Mar</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "55%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Apr</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "72%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>May</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "90%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jun</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Unit Distribution</h4>
+                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Current inventory status</p>
+                            </div>
+                            <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
+                                <svg width="140" height="140" viewBox="0 0 128 128">
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
+                                        strokeDasharray="150.1 164.1" strokeLinecap="butt" transform="rotate(184 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
+                                        strokeDasharray="57.6 256.6" strokeLinecap="butt" transform="rotate(4 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#0075E3" strokeWidth="13"
+                                        strokeDasharray="68.1 246.1" strokeLinecap="butt" transform="rotate(76 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#E6211B" strokeWidth="13"
+                                        strokeDasharray="15.7 298.5" strokeLinecap="butt" transform="rotate(160 64 64)" />
+                                </svg>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
+                                    <span>Monthly.S <span className="font-semibold text-[#2C3E50] ml-0.5">24</span></span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
+                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">42</span></span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
+                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">87</span></span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-[#555555]">
+                                    <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
+                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">5</span></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
                 )}
