@@ -3,9 +3,96 @@ import { unitLayoutsApi, type UnitLayoutStats } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
 import { apartmentsApi, type Apartment } from "../api/apartments";
 import { apartmentTypesApi, type ApartmentType } from "../api/apartment-types";
+import { CategoriesSection } from "./dashboard/CategoriesSection";
+import { UnitLayoutsSection } from "./dashboard/UnitLayoutsSection";
+import { ViewOptionsSection } from "./dashboard/ViewOptionsSection";
+import { StatusOptionsSection } from "./dashboard/StatusOptionsSection";
+import { RoomOptionsSection } from "./dashboard/RoomOptionsSection";
+import { CurrenciesSection } from "./dashboard/CurrenciesSection";
+import { ApartmentsSection } from "./dashboard/ApartmentsSection";
+import { ApartmentTypesSection } from "./dashboard/ApartmentTypesSection";
+import { OwnersSection } from "./dashboard/OwnersSection";
+import { AttributesSection } from "./dashboard/AttributesSection";
+import { RequestsSection } from "./dashboard/RequestsSection";
+
+type MenuKey = "dashboard" | "offplan" | "resale"
+    | "categories" | "unitLayouts" | "viewOptions" | "statusOptions"
+    | "roomOptions" | "currencies"
+    | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests";
+
+const pageNames: Record<MenuKey, string> = {
+    dashboard: "Dashboard",
+    offplan: "Off-plan",
+    resale: "Resale",
+    categories: "Categories",
+    unitLayouts: "Unit Layouts",
+    viewOptions: "View Options",
+    statusOptions: "Status Options",
+    roomOptions: "Room Options",
+    currencies: "Currencies",
+    apartments: "Apartments",
+    apartmentTypes: "Apartment Types",
+    owners: "Owners",
+    attributes: "Attributes",
+    requests: "Requests",
+};
+
+const pageSubtitles: Record<MenuKey, string> = {
+    dashboard: "Welcome back, here's what's happening today",
+    offplan: "Pre-construction project pipeline",
+    resale: "Secondary market listings",
+    categories: "Manage property categories",
+    unitLayouts: "Manage off-plan unit layouts",
+    viewOptions: "Manage view options",
+    statusOptions: "Manage status options",
+    roomOptions: "Manage room options",
+    currencies: "Manage currencies",
+    apartments: "Manage resale apartments",
+    apartmentTypes: "Manage apartment types",
+    owners: "Manage apartment owners",
+    attributes: "Manage apartment attributes",
+    requests: "View buyer requests",
+};
+
+const sectionItems: { label: string; items: { key: MenuKey; icon: React.ReactNode }[] }[] = [
+    {
+        label: "Main",
+        items: [
+            { key: "dashboard", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
+            { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg> },
+            { key: "resale", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12L5 10M5 10L7 12M5 10V14C5 16.5 7 18 9.5 18" /><path d="M21 12L19 14M19 14L17 12M19 14V10C19 7.5 17 6 14.5 6" /><path d="M9 16C9 17.5 10.5 19 12 19C13.5 19 15 17.5 15 16C15 14.5 13.5 13 12 13C10.5 13 9 14.5 9 16Z" /></svg> },
+        ],
+    },
+    {
+        label: "Off-plan Management",
+        items: [
+            { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
+            { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
+            { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
+            { key: "statusOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
+        ],
+    },
+    {
+        label: "Shared",
+        items: [
+            { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
+            { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
+        ],
+    },
+    {
+        label: "Resale Management",
+        items: [
+            { key: "apartments", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
+            { key: "apartmentTypes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg> },
+            { key: "owners", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
+            { key: "attributes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg> },
+            { key: "requests", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg> },
+        ],
+    },
+];
 
 export function Dashboard() {
-    const [activeMenu, setActiveMenu] = useState<"dashboard" | "offplan" | "resale">("dashboard");
+    const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
 
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -49,72 +136,34 @@ export function Dashboard() {
                     <span className="text-[22px] font-bold tracking-wider text-[#11142D]">TREVA</span>
                 </div>
                 
-                <nav className="flex flex-col gap-2 w-full">
-                    {/* Dashboard */}
-                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("dashboard"); }}
-                        className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
-                        style={{
-                            background: activeMenu === "dashboard" ? "#4C525E" : "transparent",
-                            color: activeMenu === "dashboard" ? "#FFFFFF" : "#808191"
-                        }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                            <polyline points="9 22 9 12 15 12 15 22" />
-                        </svg>
-                        Dashboard
-                        {activeMenu === "dashboard" && (
-                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                                </svg>
-                            </span>
-                        )}
-                    </a>
-                    
-                    {/* Off-plan */}
-                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("offplan"); }}
-                        className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
-                        style={{
-                            background: activeMenu === "offplan" ? "#4C525E" : "transparent",
-                            color: activeMenu === "offplan" ? "#FFFFFF" : "#808191"
-                        }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" />
-                            <rect x="10" y="14" width="4" height="7" />
-                            <path d="M8 7L16 7" />
-                            <path d="M9 5L12 3L15 5" />
-                        </svg>
-                        Off-plan
-                        {activeMenu === "offplan" && (
-                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                                </svg>
-                            </span>
-                        )}
-                    </a>
-                    
-                    {/* Resale */}
-                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("resale"); }}
-                        className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
-                        style={{
-                            background: activeMenu === "resale" ? "#4C525E" : "transparent",
-                            color: activeMenu === "resale" ? "#FFFFFF" : "#808191"
-                        }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 12L5 10M5 10L7 12M5 10V14C5 16.5 7 18 9.5 18" />
-                            <path d="M21 12L19 14M19 14L17 12M19 14V10C19 7.5 17 6 14.5 6" />
-                            <path d="M9 16C9 17.5 10.5 19 12 19C13.5 19 15 17.5 15 16C15 14.5 13.5 13 12 13C10.5 13 9 14.5 9 16Z" />
-                        </svg>
-                        Resale
-                        {activeMenu === "resale" && (
-                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                                </svg>
-                            </span>
-                        )}
-                    </a>
+                <nav className="flex flex-col w-full">
+                    {sectionItems.map((section) => (
+                        <div key={section.label} className="mb-2">
+                            <div className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#808191]">
+                                {section.label}
+                            </div>
+                            <div className="flex flex-col gap-0.5">
+                                {section.items.map((item) => (
+                                    <a key={item.key} href="#" onClick={(e) => { e.preventDefault(); setActiveMenu(item.key); }}
+                                        className="relative flex items-center gap-3 px-4 h-10 rounded-xl font-medium text-[13px] transition-colors"
+                                        style={{
+                                            background: activeMenu === item.key ? "#4C525E" : "transparent",
+                                            color: activeMenu === item.key ? "#FFFFFF" : "#808191"
+                                        }}>
+                                        {item.icon}
+                                        {pageNames[item.key]}
+                                        {activeMenu === item.key && (
+                                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
+                                                </svg>
+                                            </span>
+                                        )}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </nav>
             </div>
  
@@ -124,10 +173,10 @@ export function Dashboard() {
                 <header className="h-[80px] w-full bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
                     <div>
                         <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
-                            {activeMenu === "dashboard" ? "Dashboard" : activeMenu === "offplan" ? "Off-plan" : "Resale"}
+                            {pageNames[activeMenu]}
                         </h2>
                         <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>
-                            {activeMenu === "dashboard" ? "Welcome back, here's what's happening today" : activeMenu === "offplan" ? "Pre-construction project pipeline" : "Secondary market listings"}
+                            {pageSubtitles[activeMenu]}
                         </p>
                     </div>
 
@@ -583,6 +632,19 @@ export function Dashboard() {
                     )}
                 </main>
                 )}
+
+                {/* Management Content Sections */}
+                {activeMenu === "categories" && <CategoriesSection />}
+                {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
+                {activeMenu === "viewOptions" && <ViewOptionsSection />}
+                {activeMenu === "statusOptions" && <StatusOptionsSection />}
+                {activeMenu === "roomOptions" && <RoomOptionsSection />}
+                {activeMenu === "currencies" && <CurrenciesSection />}
+                {activeMenu === "apartments" && <ApartmentsSection />}
+                {activeMenu === "apartmentTypes" && <ApartmentTypesSection />}
+                {activeMenu === "owners" && <OwnersSection />}
+                {activeMenu === "attributes" && <AttributesSection />}
+                {activeMenu === "requests" && <RequestsSection />}
             </div>
         </div>
     );
