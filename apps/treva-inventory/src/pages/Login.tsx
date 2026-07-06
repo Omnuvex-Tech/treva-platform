@@ -58,7 +58,7 @@ export function Login() {
                             </label>
                             <div className="relative flex items-center">
                                 <span className="absolute left-4 pointer-events-none flex items-center justify-center w-5 h-5">
-                                    <img src="/images/login/mail.svg" alt="" width={19} height={17} />
+                                    <img src="/images/pages/login/mail.svg" alt="" width={19} height={17} />
                                 </span>
                                 <input
                                     type="email"
@@ -78,7 +78,7 @@ export function Login() {
                             </label>
                             <div className="relative flex items-center">
                                 <span className="absolute left-4 pointer-events-none flex items-center justify-center w-5 h-5">
-                                    <img src="/images/login/lock.svg" alt="" width={15} height={19} />
+                                    <img src="/images/pages/login/lock.svg" alt="" width={15} height={19} />
                                 </span>
                                 <input
                                     type="password"
@@ -107,7 +107,7 @@ export function Login() {
                                         </svg>
                                     </span>
                                 ) : (
-                                    <img src="/images/login/checkbox.svg" alt="" width={20} height={20} />
+                                    <img src="/images/pages/login/checkbox.svg" alt="" width={20} height={20} />
                                 )}
                                 Remember me
                             </label>

@@ -34,35 +34,27 @@ export function Dashboard() {
                 {/* Header Navbar */}
                 <header className="h-[80px] w-full bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
                     <div>
-                        <h2 className="text-[20px] font-bold text-[#11142D] m-0">Dashboard</h2>
-                        <p className="text-[12px] text-[#808191] m-0 mt-0.5">Welcome back, here's what's happening today</p>
+                        <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>Dashboard</h2>
+                        <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Welcome back, here's what's happening today</p>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="relative flex items-center w-[320px]">
-                            <span className="absolute left-4 text-[#A0AEC0]">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                </svg>
+                    <div className="ml-6 flex min-w-0 flex-1 items-center justify-end gap-4">
+                        <div className="relative flex min-w-[180px] max-w-[392px] flex-1 items-center" style={{ height: 44 }}>
+                            <span className="absolute left-4 pointer-events-none flex items-center justify-center w-5 h-5">
+                                <img src="/images/pages/inv-dashboard/search.svg" alt="" className="h-5 w-5" />
                             </span>
                             <input 
                                 type="text" 
                                 placeholder="Search" 
-                                className="w-full h-11 pl-11 pr-4 bg-[#F4F5F6] border border-transparent rounded-xl text-[14px] outline-none focus:bg-white focus:border-gray-200"
+                                className="w-full h-full pl-12 pr-4 bg-[#F4F5F6] border border-transparent rounded-xl outline-none focus:bg-white focus:border-gray-200"
+                                style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0, color: "#666666" }}
                             />
                         </div>
-                        <button className="w-11 h-11 flex items-center justify-center bg-[#F4F5F6] rounded-xl text-[#11142D] hover:bg-gray-100 transition-colors">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-7" />
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                            </svg>
+                        <button className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-visible rounded-[16px] border border-white bg-[#EBEBEB] transition-colors">
+                            <img src="/images/pages/inv-dashboard/notification.svg" alt="" className="h-4 w-4" />
                         </button>
-                        <button className="w-11 h-11 flex items-center justify-center bg-[#F4F5F6] rounded-xl text-[#11142D] hover:bg-gray-100 transition-colors">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="3" />
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                            </svg>
+                        <button className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-visible rounded-[16px] border border-white bg-[#EBEBEB] transition-colors">
+                            <img src="/images/pages/inv-dashboard/settings.svg" alt="" className="h-4 w-4" />
                         </button>
                     </div>
                 </header>
@@ -77,41 +69,41 @@ export function Dashboard() {
                         {/* Card 1 */}
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
                             <div>
-                                <p className="text-[13px] font-medium text-[#808191] m-0">Monthly Apartment Sales</p>
-                                <h3 className="text-[28px] font-bold text-[#11142D] mt-2 mb-1">24</h3>
-                                <span className="text-[12px] font-semibold text-[#2ECC71]">+12% from last month</span>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Monthly Apartment Sales</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>24</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+12% from last month</span>
                             </div>
-                            <span className="text-[24px]">🏢</span>
+                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-12 w-12" />
                         </div>
 
                         {/* Card 2 */}
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
                             <div>
-                                <p className="text-[13px] font-medium text-[#808191] m-0">Active Apartments</p>
-                                <h3 className="text-[28px] font-bold text-[#11142D] mt-2 mb-1">1,234</h3>
-                                <span className="text-[12px] font-semibold text-[#2ECC71]">+8% from last month</span>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Apartments</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>1,234</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+8% from last month</span>
                             </div>
-                            <span className="text-[24px]">🔑</span>
+                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-12 w-12" />
                         </div>
 
                         {/* Card 3 */}
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
                             <div>
-                                <p className="text-[13px] font-medium text-[#808191] m-0">Apartments Sold</p>
-                                <h3 className="text-[28px] font-bold text-[#11142D] mt-2 mb-1">323</h3>
-                                <span className="text-[12px] font-semibold text-[#2ECC71]">+26% from last month</span>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Apartments Sold</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>323</h3>
+                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+26% from last month</span>
                             </div>
-                            <span className="text-[24px]">🏪</span>
+                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-12 w-12" />
                         </div>
 
                         {/* Card 4 */}
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
                             <div>
-                                <p className="text-[13px] font-medium text-[#808191] m-0">Reserved Apartments</p>
-                                <h3 className="text-[28px] font-bold text-[#11142D] mt-2 mb-1">12</h3>
-                                <span className="text-[12px] font-semibold text-[#E74C3C]">-5.1% from last month</span>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Apartments</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>12</h3>
+                                <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-5.1% from last month</span>
                             </div>
-                            <span className="text-[24px]">📋</span>
+                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-12 w-12." />
                         </div>
                     </div>
 
