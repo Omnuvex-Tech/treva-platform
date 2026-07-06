@@ -120,7 +120,7 @@ export function Login() {
                             type="submit"
                             disabled={loading}
                             className="mt-3 h-[52px] w-full rounded-[16px] border border-white text-white transition-colors hover:bg-[#3F4452] disabled:opacity-50 flex items-center justify-center"
-                            style={{ background: "#4E525D", fontWeight: 500, fontSize: 16, lineHeight: "20px", letterSpacing: 0, paddingTop: 16, paddingRight: 14, paddingBottom: 16, paddingLeft: 14 }}
+                            style={{ background: "#4E525D", fontWeight: 500, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}
                         >
                             {loading ? "Signing in..." : "Sign in to dashboard"}
                         </button>
