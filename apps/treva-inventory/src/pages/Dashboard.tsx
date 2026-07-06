@@ -197,10 +197,10 @@ export function Dashboard() {
                                             instead of nearly touching it). */}
                                         <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
                                             <div className="relative">
-                                                <div className="rounded-xl px-3 py-2 text-center text-white" style={{ background: "#6B7280", boxShadow: "0px 4px 8px rgba(0,0,0,0.15)" }}>
+                                                <div className="flex items-center justify-center text-white" style={{ width: 45, height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
                                                     <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
                                                 </div>
-                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #6B7280" }} />
+                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
                                             </div>
                                         </div>
                                         {/* Dashed vertical line, dropping straight down from the dot to the axis, on the same vertical axis */}
