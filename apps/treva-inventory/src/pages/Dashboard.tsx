@@ -54,45 +54,71 @@ const pageSubtitles: Record<MenuKey, string> = {
     requests: "View buyer requests",
 };
 
-const sectionItems: { label: string; items: { key: MenuKey; icon: React.ReactNode }[] }[] = [
+type SectionKey = "offplan" | "resale";
+
+const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; children: { key: MenuKey; icon: React.ReactNode }[] }[] = [
     {
-        label: "Main",
-        items: [
-            { key: "dashboard", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
-            { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg> },
-            { key: "resale", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12L5 10M5 10L7 12M5 10V14C5 16.5 7 18 9.5 18" /><path d="M21 12L19 14M19 14L17 12M19 14V10C19 7.5 17 6 14.5 6" /><path d="M9 16C9 17.5 10.5 19 12 19C13.5 19 15 17.5 15 16C15 14.5 13.5 13 12 13C10.5 13 9 14.5 9 16Z" /></svg> },
-        ],
-    },
-    {
-        label: "Off-plan Management",
-        items: [
+        key: "offplan",
+        label: "Off-plan",
+        icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg>,
+        children: [
+            { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
             { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
             { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
             { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
             { key: "statusOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
-        ],
-    },
-    {
-        label: "Shared",
-        items: [
             { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
             { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
         ],
     },
     {
-        label: "Resale Management",
-        items: [
+        key: "resale",
+        label: "Resale",
+        icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12L5 10M5 10L7 12M5 10V14C5 16.5 7 18 9.5 18" /><path d="M21 12L19 14M19 14L17 12M19 14V10C19 7.5 17 6 14.5 6" /><path d="M9 16C9 17.5 10.5 19 12 19C13.5 19 15 17.5 15 16C15 14.5 13.5 13 12 13C10.5 13 9 14.5 9 16Z" /></svg>,
+        children: [
+            { key: "resale", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
             { key: "apartments", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
             { key: "apartmentTypes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg> },
             { key: "owners", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
             { key: "attributes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg> },
             { key: "requests", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg> },
+            { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
+            { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
         ],
     },
 ];
 
+const getParentSection = (key: MenuKey): SectionKey | null => {
+    if (key === "dashboard") return null;
+    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions" || key === "roomOptions" || key === "currencies") return "offplan";
+    return "resale";
+};
+
 export function Dashboard() {
     const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
+    const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set(["offplan", "resale"]));
+
+    const toggleSection = (key: SectionKey) => {
+        setExpandedSections(prev => {
+            const next = new Set(prev);
+            if (next.has(key)) next.delete(key);
+            else next.add(key);
+            return next;
+        });
+    };
+
+    const handleMenuClick = (key: MenuKey) => {
+        setActiveMenu(key);
+        const parent = getParentSection(key);
+        if (parent) {
+            setExpandedSections(prev => {
+                if (prev.has(parent)) return prev;
+                const next = new Set(prev);
+                next.add(parent);
+                return next;
+            });
+        }
+    };
 
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -131,46 +157,86 @@ export function Dashboard() {
     return (
         <div className="flex min-h-screen w-full bg-white font-sans overflow-hidden">
             {/* Sidebar Navigation */}
-            <div className="w-[240px] bg-white border-r border-gray-100 flex flex-col pt-8 px-4 flex-shrink-0 relative">
-                <div className="px-4 mb-10">
-                    <span className="text-[22px] font-bold tracking-wider text-[#11142D]">TREVA</span>
+            <div className="w-[240px] bg-white flex flex-col pt-8 px-4 flex-shrink-0 relative">
+                <div className="px-4 mb-8">
+                    <svg width="100" height="22" viewBox="0 0 112 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M85.1527 0.458984L79.8945 19.2893H78.3652L73.1025 0.458984H67.9434L74.9692 24.0438H83.223L90.2534 0.458984H85.1527Z" fill="#111212" />
+                        <path d="M106.476 24.0438H111.496L103.908 0.458984H96.2162L88.6641 24.0438H93.5579L99.2478 5.1822H100.71L106.476 24.0438Z" fill="#111212" />
+                        <path d="M18.8967 4.54827H11.9428V24.6376H7.28285V4.54827H0.292969V0.458984H18.8967V4.54827Z" fill="#111212" />
+                        <path d="M26.7537 24.6381H22.0938V0.455078H33.1633C34.4093 0.455078 35.5472 0.660436 36.5818 1.06669C37.6163 1.47294 38.4979 2.04883 39.2311 2.78544C39.9643 3.52204 40.5355 4.40597 40.9493 5.4283C41.3586 6.45062 41.5656 7.57115 41.5656 8.78097C41.5656 10.6113 41.1023 12.2051 40.1802 13.5712C39.2581 14.9372 38.0301 15.9149 36.4963 16.5131C38.5429 19.2006 40.567 21.9104 42.5641 24.6381H37.0046C36.033 23.3837 35.0795 22.1158 34.1529 20.839C33.2218 19.5622 32.2952 18.2631 31.3641 16.9417H26.7537V24.6381ZM26.7537 12.8479H33.1543C33.5726 12.8479 34.0134 12.7631 34.4632 12.5979C34.9175 12.4328 35.3178 12.1783 35.6732 11.839C36.0285 11.4997 36.3209 11.0756 36.5548 10.5667C36.7887 10.0622 36.9011 9.46401 36.9011 8.78097C36.9011 8.42829 36.8562 8.01312 36.7662 7.52651C36.6762 7.0399 36.5008 6.58008 36.2354 6.13812C35.9701 5.69615 35.5922 5.32115 35.1064 5.01312C34.6207 4.70508 33.9684 4.54883 33.1498 4.54883H26.7492V12.8479H26.7537Z" fill="#111212" />
+                        <path d="M50.7205 4.54827V10.6018H62.5007V14.7938H50.7205V20.4724H64.003V24.6376H46.0605V0.458984H64.003V4.54827H50.7205Z" fill="#111212" />
+                    </svg>
                 </div>
                 
                 <nav className="flex flex-col w-full">
-                    {sectionItems.map((section) => (
-                        <div key={section.label} className="mb-2">
-                            <div className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#808191]">
-                                {section.label}
+                    {/* Dashboard - always visible */}
+                    <a href="#" onClick={(e) => { e.preventDefault(); handleMenuClick("dashboard"); }}
+                        className="relative flex items-center gap-3 px-4 h-10 rounded-xl font-medium text-[13px] transition-colors mb-1"
+                        style={{
+                            background: activeMenu === "dashboard" ? "#4C525E" : "transparent",
+                            color: activeMenu === "dashboard" ? "#FFFFFF" : "#808191"
+                        }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                        Dashboard
+                        {activeMenu === "dashboard" && (
+                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
+                                </svg>
+                            </span>
+                        )}
+                    </a>
+
+                    {/* Accordion sections */}
+                    {accordionConfig.map((section) => {
+                        const isOpen = expandedSections.has(section.key);
+                        return (
+                            <div key={section.key} className="mb-1">
+                                {/* Section header */}
+                                <button onClick={() => toggleSection(section.key)}
+                                    className="flex items-center gap-3 w-full px-4 h-10 rounded-xl font-medium text-[13px] transition-colors"
+                                    style={{ color: "#808191" }}>
+                                    {section.icon}
+                                    <span className="flex-1 text-left">{section.label}</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                                        style={{ transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)", transition: "transform 0.2s" }}>
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                </button>
+
+                                {/* Children */}
+                                {isOpen && (
+                                    <div className="flex flex-col gap-0.5 ml-2">
+                                        {section.children.map((item) => (
+                                            <a key={item.key} href="#" onClick={(e) => { e.preventDefault(); handleMenuClick(item.key); }}
+                                                className="relative flex items-center gap-3 px-4 h-9 rounded-xl font-medium text-[12px] transition-colors"
+                                                style={{
+                                                    background: activeMenu === item.key ? "#4C525E" : "transparent",
+                                                    color: activeMenu === item.key ? "#FFFFFF" : "#808191"
+                                                }}>
+                                                {item.icon}
+                                                {pageNames[item.key]}
+                                                {activeMenu === item.key && (
+                                                    <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
+                                                        </svg>
+                                                    </span>
+                                                )}
+                                            </a>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex flex-col gap-0.5">
-                                {section.items.map((item) => (
-                                    <a key={item.key} href="#" onClick={(e) => { e.preventDefault(); setActiveMenu(item.key); }}
-                                        className="relative flex items-center gap-3 px-4 h-10 rounded-xl font-medium text-[13px] transition-colors"
-                                        style={{
-                                            background: activeMenu === item.key ? "#4C525E" : "transparent",
-                                            color: activeMenu === item.key ? "#FFFFFF" : "#808191"
-                                        }}>
-                                        {item.icon}
-                                        {pageNames[item.key]}
-                                        {activeMenu === item.key && (
-                                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                                                </svg>
-                                            </span>
-                                        )}
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </nav>
             </div>
  
             {/* Main Application Container */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Header Navbar */}
-                <header className="h-[80px] w-full bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+                <header className="h-[80px] w-full bg-white flex items-center justify-between px-8 flex-shrink-0">
                     <div>
                         <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
                             {pageNames[activeMenu]}
