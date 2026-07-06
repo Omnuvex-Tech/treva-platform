@@ -1,7 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { unitLayoutsApi, type UnitLayoutStats } from "../api/unit-layouts";
+import { categoriesApi, type Category } from "../api/categories";
+import { apartmentsApi, type Apartment } from "../api/apartments";
+import { apartmentTypesApi, type ApartmentType } from "../api/apartment-types";
 
 export function Dashboard() {
     const [activeMenu, setActiveMenu] = useState<"dashboard" | "offplan" | "resale">("dashboard");
+
+    const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [apartments, setApartments] = useState<Apartment[]>([]);
+    const [apartmentTypes, setApartmentTypes] = useState<ApartmentType[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (activeMenu === "offplan") {
+            setLoading(true);
+            Promise.all([
+                unitLayoutsApi.getStats(),
+                categoriesApi.getAll(),
+            ]).then(([statsRes, catsRes]) => {
+                setUnitStats(statsRes.data);
+                setCategories(catsRes.data);
+            }).catch(() => {
+                setUnitStats(null);
+                setCategories([]);
+            }).finally(() => setLoading(false));
+        } else if (activeMenu === "resale") {
+            setLoading(true);
+            Promise.all([
+                apartmentsApi.getAll({ limit: 100 }),
+                apartmentTypesApi.getAll(),
+            ]).then(([aptsRes, typesRes]) => {
+                setApartments(aptsRes.data.data);
+                setApartmentTypes(typesRes.data);
+            }).catch(() => {
+                setApartments([]);
+                setApartmentTypes([]);
+            }).finally(() => setLoading(false));
+        }
+    }, [activeMenu]);
 
     return (
         <div className="flex min-h-screen w-full bg-white font-sans overflow-hidden">
@@ -304,11 +342,15 @@ export function Dashboard() {
                     className="flex-1 p-8 overflow-y-auto flex flex-col gap-6"
                     style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
                 >
+                    {loading ? (
+                        <div className="flex items-center justify-center h-64 text-[#4E525D] text-lg">Loading...</div>
+                    ) : (
+                    <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Off-plan Sales</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>18</h3>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{unitStats?.total ?? 0}</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+15% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
@@ -316,7 +358,7 @@ export function Dashboard() {
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Projects</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>45</h3>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{categories.length}</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+22% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
@@ -324,7 +366,7 @@ export function Dashboard() {
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Units Sold</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>89</h3>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{unitStats?.sold ?? 0}</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+31% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
@@ -332,7 +374,7 @@ export function Dashboard() {
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Units</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>7</h3>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{unitStats?.reserved ?? 0}</h3>
                                 <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-3.2% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
@@ -395,23 +437,25 @@ export function Dashboard() {
                             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
-                                    <span>Monthly.S <span className="font-semibold text-[#2C3E50] ml-0.5">24</span></span>
+                                    <span>Available <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.available ?? 0}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
-                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">89</span></span>
+                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.sold ?? 0}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
-                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">45</span></span>
+                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">{categories.length}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
-                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">7</span></span>
+                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.reserved ?? 0}</span></span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    </>
+                    )}
                 </main>
                 )}
 
@@ -421,35 +465,41 @@ export function Dashboard() {
                     className="flex-1 p-8 overflow-y-auto flex flex-col gap-6"
                     style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
                 >
+                    {loading ? (
+                        <div className="flex items-center justify-center h-64 text-[#4E525D] text-lg">Loading...</div>
+                    ) : (
+                    <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Resale Listings</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>156</h3>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{apartments.length}</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+9% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Resale</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>87</h3>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Apartment Types</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{apartmentTypes.length}</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+5% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Sold Resale</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>42</h3>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>With Prices</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{apartments.filter(a => a.prices && a.prices.length > 0).length}</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+18% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
                         </div>
                         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Resale</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>5</h3>
+                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Avg Room Count</p>
+                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>
+                                    {apartments.length > 0 ? (apartments.reduce((s, a) => s + a.roomCount, 0) / apartments.length).toFixed(1) : "0"}
+                                </h3>
                                 <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-1.8% from last month</span>
                             </div>
                             <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
@@ -494,8 +544,8 @@ export function Dashboard() {
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
                             <div>
-                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Unit Distribution</h4>
-                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Current inventory status</p>
+                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Type Distribution</h4>
+                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>By apartment type</p>
                             </div>
                             <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
                                 <svg width="140" height="140" viewBox="0 0 128 128">
@@ -512,23 +562,25 @@ export function Dashboard() {
                             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
-                                    <span>Monthly.S <span className="font-semibold text-[#2C3E50] ml-0.5">24</span></span>
+                                    <span>{apartmentTypes[0]?.title ?? "Type A"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => a.apartmentType?.id === apartmentTypes[0]?.id).length}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
-                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">42</span></span>
+                                    <span>{apartmentTypes[1]?.title ?? "Type B"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => a.apartmentType?.id === apartmentTypes[1]?.id).length}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
-                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">87</span></span>
+                                    <span>{apartmentTypes[2]?.title ?? "Type C"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => a.apartmentType?.id === apartmentTypes[2]?.id).length}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
-                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">5</span></span>
+                                    <span>{apartmentTypes[3]?.title ?? "Other"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => !apartmentTypes.slice(0, 3).some(t => t.id === a.apartmentType?.id)).length}</span></span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    </>
+                    )}
                 </main>
                 )}
             </div>
