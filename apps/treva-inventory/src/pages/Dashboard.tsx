@@ -14,7 +14,7 @@ export function Dashboard() {
                 <nav className="flex flex-col gap-2 w-full">
                     {/* Dashboard */}
                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("dashboard"); }}
-                        className="flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
+                        className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
                         style={{
                             background: activeMenu === "dashboard" ? "#4C525E" : "transparent",
                             color: activeMenu === "dashboard" ? "#FFFFFF" : "#808191"
@@ -24,11 +24,18 @@ export function Dashboard() {
                             <polyline points="9 22 9 12 15 12 15 22" />
                         </svg>
                         Dashboard
+                        {activeMenu === "dashboard" && (
+                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
+                                </svg>
+                            </span>
+                        )}
                     </a>
                     
                     {/* Listings */}
                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveMenu("listings"); }}
-                        className="flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
+                        className="relative flex items-center gap-3 px-4 h-12 rounded-xl font-medium text-[14px] transition-colors"
                         style={{
                             background: activeMenu === "listings" ? "#4C525E" : "transparent",
                             color: activeMenu === "listings" ? "#FFFFFF" : "#808191"
@@ -38,15 +45,15 @@ export function Dashboard() {
                             <circle cx="12" cy="10" r="3" />
                         </svg>
                         Listings
+                        {activeMenu === "listings" && (
+                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
+                                </svg>
+                            </span>
+                        )}
                     </a>
                 </nav>
-
-                {/* Chevron left button - external, moves with active menu */}
-                <div style={{ position: "absolute", right: -23, top: activeMenu === "dashboard" ? 130 : 182, width: 36, height: 36, borderRadius: 10, border: "1px solid #EBEBEB", background: "#FFFFFF", boxShadow: "0px 2px 8px rgba(0,0,0,0.08)", cursor: "pointer", zIndex: 10, transition: "top 0.2s ease", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                    </svg>
-                </div>
             </div>
  
             {/* Main Application Container */}
