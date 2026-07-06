@@ -110,27 +110,119 @@ export function Dashboard() {
                     {/* Middle Row: Graphic Charts Breakdown */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Analytical Line Chart Widget */}
-                        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
-                            <div className="flex items-center justify-between mb-8">
-                                <h4 className="text-[16px] font-bold text-[#11142D] m-0">Revenue Overview</h4>
-                                <span className="text-[12px] text-[#808191]">Last 6 months performance</span>
+                        <div
+                            className="lg:col-span-2 bg-white p-6 rounded-2xl flex flex-col"
+                            style={{ border: "2px solid var(--Background-Brand, #4E525D)", boxShadow: "0px 2px 1px 0px #0000000D" }}
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Revenue Overview</h4>
+                                <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
                             </div>
-                            <div className="h-[220px] w-full flex flex-col justify-between relative pt-4">
-                                {/* Grid backdrop tracks */}
-                                <div className="border-b border-dashed border-gray-100 w-full h-0"></div>
-                                <div className="border-b border-dashed border-gray-100 w-full h-0"></div>
-                                <div className="border-b border-dashed border-gray-100 w-full h-0"></div>
-                                <div className="border-b border-dashed border-gray-100 w-full h-0"></div>
-                                <div className="border-b border-gray-200 w-full h-0"></div>
-                                
-                                {/* Timeline label references */}
-                                <div className="flex justify-between text-[11px] font-medium text-[#808191] px-2 mt-2">
-                                    <span>Jan</span>
-                                    <span>Feb</span>
-                                    <span>Mar</span>
-                                    <span>Apr</span>
-                                    <span>May</span>
-                                    <span>Jun</span>
+                            <div className="relative w-full flex-1 min-h-[260px]">
+                                {/* Y-axis labels */}
+                                <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-right pr-3" style={{ width: 72 }}>
+                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
+                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
+                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
+                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
+                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
+                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
+                                </div>
+
+                                {/* Chart area */}
+                                <div className="ml-[72px] relative" style={{ height: "calc(100% - 32px)" }}>
+                                    {/* Dotted grid lines */}
+                                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                    </div>
+
+                                    {/* Line + area chart, drawn to match the reference image exactly */}
+                                    <svg
+                                        className="absolute inset-0 w-full h-full pointer-events-none"
+                                        viewBox="0 0 100 100"
+                                        preserveAspectRatio="none"
+                                    >
+                                        <defs>
+                                            <linearGradient id="revenueAreaFill" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#4E525D" stopOpacity="0.35" />
+                                                <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+                                        {/* Filled area under the curve */}
+                                        <path
+                                            d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15 L 100 100 L 0 100 Z"
+                                            fill="url(#revenueAreaFill)"
+                                            stroke="none"
+                                            vectorEffect="non-scaling-stroke"
+                                        />
+                                        {/* Revenue line, matching curve shape/peaks/dips from the reference image */}
+                                        <path
+                                            d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15"
+                                            fill="none"
+                                            stroke="#4E525D"
+                                            strokeWidth="1.4"
+                                            vectorEffect="non-scaling-stroke"
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+
+                                    {/* Dots on each month, positioned exactly on the curve above */}
+                                    {/* Jan */}
+                                    <div className="absolute flex items-center justify-center" style={{ left: "5%", top: "51%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    {/* Feb */}
+                                    <div className="absolute flex items-center justify-center" style={{ left: "22%", top: "46%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    {/* Mar - active with tooltip. Wrapper is a zero-size anchor placed exactly
+                                        on the curve point (38%, 74%); every child is positioned relative to
+                                        that single point so the dot never drifts off the line. */}
+                                    <div className="absolute" style={{ left: "38%", top: "73%", width: 0, height: 0 }}>
+                                        {/* Dot, centered exactly on the curve point */}
+                                        <div
+                                            className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]"
+                                            style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }}
+                                        />
+                                        {/* Tooltip, floating directly above the dot on the same vertical axis */}
+                                        <div className="absolute" style={{ left: "50%", bottom: 12, transform: "translateX(-50%)" }}>
+                                            <div className="relative">
+                                                <div className="rounded-xl px-3 py-2 text-center text-white" style={{ background: "#6B7280", boxShadow: "0px 4px 8px rgba(0,0,0,0.15)" }}>
+                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
+                                                </div>
+                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #6B7280" }} />
+                                            </div>
+                                        </div>
+                                        {/* Dashed vertical line, dropping straight down from the dot to the axis, on the same vertical axis */}
+                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
+                                    </div>
+                                    {/* Apr */}
+                                    <div className="absolute flex items-center justify-center" style={{ left: "55%", top: "69%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    {/* May */}
+                                    <div className="absolute flex items-center justify-center" style={{ left: "72%", top: "55%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    {/* Jun */}
+                                    <div className="absolute flex items-center justify-center" style={{ left: "90%", top: "40%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                </div>
+
+                                {/* Month labels - each pinned to the exact same x-coordinate as its dot/dashed line above, so labels never drift off their axis */}
+                                <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "38%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Mar</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "55%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Apr</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "72%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>May</span>
+                                    <span className="absolute text-[#1A1A1A]" style={{ left: "90%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jun</span>
                                 </div>
                             </div>
                         </div>
@@ -138,8 +230,8 @@ export function Dashboard() {
                         {/* Distribution Donut Diagram Card */}
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                             <div className="mb-6">
-                                <h4 className="text-[16px] font-bold text-[#11142D] m-0">Unit Distribution</h4>
-                                <p className="text-[12px] text-[#808191] m-0 mt-0.5">Current inventory status</p>
+                                <h4 className="m-0 text-[#4E525D]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Unit Distribution</h4>
+                                <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Current inventory status</p>
                             </div>
                             
                             <div className="flex-1 flex items-center justify-center relative min-h-[160px]">
