@@ -140,42 +140,42 @@ export function Login() {
 
                     <div className="flex flex-col gap-7">
                         <div className="flex items-start gap-4">
-                            <div className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-white">
-                                <div className="h-2 w-2 rounded-full bg-white" />
+                            <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "#FFFFFF1F" }}>
+                                <div className="h-3 w-3 rounded-full bg-white" />
                             </div>
                             <div>
-                                <h3 className="text-[16px] font-semibold text-white m-0">
+                                <h3 className="m-0 text-white" style={{ fontWeight: 500, fontSize: 20, lineHeight: "28px", letterSpacing: 0 }}>
                                     Off-plan & Resale Management
                                 </h3>
-                                <p className="mt-1 text-[13px] text-[#B2B3BD] m-0">
+                                <p className="mt-1 m-0" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0, color: "#C8C9CD" }}>
                                     Complete inventory control
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex items-start gap-4">
-                            <div className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-white">
-                                <div className="h-2 w-2 rounded-full bg-white" />
+                            <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "#FFFFFF1F" }}>
+                                <div className="h-3 w-3 rounded-full bg-white" />
                             </div>
                             <div>
-                                <h3 className="text-[16px] font-semibold text-white m-0">
+                                <h3 className="m-0 text-white" style={{ fontWeight: 500, fontSize: 20, lineHeight: "28px", letterSpacing: 0 }}>
                                     Advanced Integrations
                                 </h3>
-                                <p className="mt-1 text-[13px] text-[#B2B3BD] m-0">
+                                <p className="mt-1 m-0" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0, color: "#C8C9CD" }}>
                                     Profitbase sync & Excel imports
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex items-start gap-4">
-                            <div className="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-white">
-                                <div className="h-2 w-2 rounded-full bg-white" />
+                            <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "#FFFFFF1F" }}>
+                                <div className="h-3 w-3 rounded-full bg-white" />
                             </div>
                             <div>
-                                <h3 className="text-[16px] font-semibold text-white m-0">
+                                <h3 className="m-0 text-white" style={{ fontWeight: 500, fontSize: 20, lineHeight: "28px", letterSpacing: 0 }}>
                                     Real-time Analytics
                                 </h3>
-                                <p className="mt-1 text-[13px] text-[#B2B3BD] m-0">
+                                <p className="mt-1 m-0" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0, color: "#C8C9CD" }}>
                                     KPIs & comprehensive reporting
                                 </p>
                             </div>
