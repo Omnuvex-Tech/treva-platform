@@ -6,7 +6,6 @@ import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
 import { currenciesApi, Currency } from "../../api/currencies";
-import { Layout } from "../../components/Layout";
 
 type TabKey = "basic" | "area" | "location" | "gallery" | "description";
 
@@ -220,21 +219,21 @@ export function ApartmentForm() {
     })();
 
     const inputClass =
-        "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-white/30 placeholder:text-white/30";
+        "w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400";
 
     const renderTabErrors = (tab: TabKey) => {
         const errors = tabErrors[tab];
         if (!errors || errors.length === 0) return null;
         return (
-            <div className="mb-4 rounded-lg border border-[#ff6767]/20 bg-[#ff6767]/5 p-3">
-                <div className="mb-1 flex items-center gap-2 text-sm font-medium text-[#ff6767]">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3">
+                <div className="mb-1 flex items-center gap-2 text-sm font-medium text-[#C3362B]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C3362B" strokeWidth="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                         <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                     </svg>
                     Please fill in all required fields
                 </div>
-                <ul className="ml-5 list-disc text-xs text-[#ff6767]/80">
+                <ul className="ml-5 list-disc text-xs text-[#C3362B]">
                     {errors.map((e, i) => <li key={i}>{e}</li>)}
                 </ul>
             </div>
@@ -270,26 +269,25 @@ export function ApartmentForm() {
 
         return (
             <div ref={ref} className="relative">
-                <label className="mb-1 block text-xs text-white/60">{label}</label>
+                <label className="mb-1 block text-xs text-[#4E525D]">{label}</label>
                 <button
                     type="button"
                     onClick={() => setOpen(!open)}
-                    className={`w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-left text-sm transition-colors hover:border-white/20 ${selected ? "text-white" : "text-white/40"}`}
+                    className={`flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none`}
                 >
-                    <span>{selected?.label || placeholder}</span>
+                    <span className={selected ? "text-[#1A1A1A]" : "text-[#999]"}>{selected?.label || placeholder}</span>
                     <svg
                         width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                        className="pointer-events-none absolute right-3 top-[38px]"
-                        style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}
+                        className={open ? "rotate-180 transition-transform" : "transition-transform"}
                     >
                         <path d="M6 9l6 6 6-6" />
                     </svg>
                 </button>
                 {open && (
-                    <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-lg border border-white/10 bg-[#2a2d35] py-1 shadow-xl">
+                    <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                         <button
                             type="button"
-                            className="w-full px-3 py-2 text-left text-sm text-white/50 hover:bg-white/10"
+                            className="w-full px-4 py-2.5 text-left text-sm text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                             onClick={() => { onChange(""); setOpen(false); }}
                         >
                             -- None
@@ -298,10 +296,10 @@ export function ApartmentForm() {
                             <button
                                 key={opt.id}
                                 type="button"
-                                className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
                                     value === opt.id
-                                        ? "bg-white/15 text-white font-medium"
-                                        : "text-white/70 hover:bg-white/10"
+                                        ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                        : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                 }`}
                                 onClick={() => { onChange(opt.id); setOpen(false); }}
                             >
@@ -309,7 +307,7 @@ export function ApartmentForm() {
                             </button>
                         ))}
                         {options.length === 0 && (
-                            <div className="px-3 py-2 text-sm text-white/40">No options yet</div>
+                            <div className="px-4 py-2.5 text-sm text-[#999]">No options yet</div>
                         )}
                     </div>
                 )}
@@ -392,15 +390,17 @@ export function ApartmentForm() {
 
     // ─── Render ────────────────────────────────────────────────
     return (
-        <Layout>
-            <div className="mb-4">
-                <h2 className="text-lg font-semibold">
-                    {isEdit ? "Edit Apartment" : "New Apartment"}
-                </h2>
-            </div>
+        <div className="min-h-screen bg-[#F4F5F6] py-8">
+            <div className="mx-auto max-w-4xl">
+                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="mb-6">
+                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>
+                        {isEdit ? "Edit Apartment" : "New Apartment"}
+                    </h4>
+                </div>
 
             {/* Tabs */}
-            <div className="mb-6 flex gap-1 border-b border-white/10">
+            <div className="mb-6 flex gap-1 border-b border-gray-200">
                 {TABS.map((tab) => {
                     const hasError = (tabErrors[tab.key]?.length ?? 0) > 0;
                     return (
@@ -421,10 +421,10 @@ export function ApartmentForm() {
                                     setActiveTab(tab.key);
                                 }
                             }}
-                            className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
+                            className={`relative px-4 py-2.5 text-sm transition-colors ${
                                 activeTab === tab.key
-                                    ? "border-b-2 border-white text-white"
-                                    : "text-white/50 hover:text-white/80"
+                                    ? "border-b-2 border-[#4E525D] text-[#1A1A1A]"
+                                    : "text-[#808191] hover:text-[#4E525D]"
                             }`}
                         >
                             {tab.label}
@@ -437,7 +437,7 @@ export function ApartmentForm() {
             </div>
 
             {mutationError && (
-                <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-center text-sm text-red-300">
+                <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-center text-sm text-[#C3362B]">
                     {mutationError}
                 </div>
             )}
@@ -448,7 +448,7 @@ export function ApartmentForm() {
                     <div className="space-y-4">
                         {renderTabErrors("basic")}
                         <div>
-                            <label className="mb-1 block text-xs text-white/60">Title</label>
+                            <label className="mb-1 block text-xs text-[#4E525D]">Title</label>
                             <input
                                 className={inputClass}
                                 value={form.title || ""}
@@ -460,7 +460,7 @@ export function ApartmentForm() {
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-white/60">Slug</label>
+                            <label className="mb-1 block text-xs text-[#4E525D]">Slug</label>
                             <input
                                 className={inputClass}
                                 value={form.slug || ""}
@@ -489,7 +489,7 @@ export function ApartmentForm() {
                         </div>
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Floor From</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Floor From</label>
                                 <input
                                     className={inputClass}
                                     type="number"
@@ -500,7 +500,7 @@ export function ApartmentForm() {
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Floor To</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Floor To</label>
                                 <input
                                     className={inputClass}
                                     type="number"
@@ -511,7 +511,7 @@ export function ApartmentForm() {
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Room Count</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Room Count</label>
                                 <input
                                     className={inputClass}
                                     type="number"
@@ -523,8 +523,8 @@ export function ApartmentForm() {
                             </div>
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-white/60">Attributes (Apartment Details)</label>
-                            <div className="flex flex-wrap gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                            <label className="mb-1 block text-xs text-[#4E525D]">Attributes (Apartment Details)</label>
+                            <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 py-2">
                                 {attributes?.data?.map((attr: Attribute) => {
                                     const selected = form.attributeIds?.includes(attr.id);
                                     return (
@@ -540,8 +540,8 @@ export function ApartmentForm() {
                                             }}
                                             className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                                                 selected
-                                                    ? "bg-blue-500/20 text-blue-300 border border-blue-400/30"
-                                                    : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white/80"
+                                                    ? "bg-blue-500/20 text-blue-600 border border-blue-400/30"
+                                                    : "bg-white text-[#666666] border border-gray-200 hover:bg-gray-50 hover:text-[#1A1A1A]"
                                             }`}
                                         >
                                             {attr.icon && (
@@ -552,13 +552,13 @@ export function ApartmentForm() {
                                     );
                                 })}
                                 {(!attributes?.data || attributes.data.length === 0) && (
-                                    <span className="text-xs text-white/40">No attributes created yet</span>
+                                    <span className="text-xs text-[#999]">No attributes created yet</span>
                                 )}
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Renovation</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Renovation</label>
                                 <input
                                     className={inputClass}
                                     value={form.renovation || ""}
@@ -567,7 +567,7 @@ export function ApartmentForm() {
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Kitchen Size (m²)</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Kitchen Size (m²)</label>
                                 <input
                                     className={inputClass}
                                     type="number"
@@ -579,7 +579,7 @@ export function ApartmentForm() {
                                 />
                             </div>
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Wall Material</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Wall Material</label>
                                 <input
                                     className={inputClass}
                                     value={form.wallMaterial || ""}
@@ -597,7 +597,7 @@ export function ApartmentForm() {
                         {renderTabErrors("area")}
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="mb-1 block text-xs text-white/60">Area (m²)</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Area (m²)</label>
                                 <input
                                     className={inputClass}
                                     type="number"
@@ -612,16 +612,16 @@ export function ApartmentForm() {
 
                         {currencies?.data && currencies.data.length > 0 && (
                             <div className="mt-4">
-                                <label className="mb-2 block text-sm font-semibold text-white/80">Prices by Currency</label>
+                                <label className="mb-2 block text-sm font-semibold text-[#1A1A1A]">Prices by Currency</label>
                                 <div className="space-y-3">
                                     {currencies.data.map((cur: Currency) => {
                                         const existingPrice = form.prices?.find((p: any) => p.currencyId === cur.id);
                                         return (
-                                            <div key={cur.id} className="rounded-lg border border-white/10 p-3">
-                                                <div className="mb-2 text-xs font-medium text-white/50">{cur.name} ({cur.value})</div>
+                                            <div key={cur.id} className="rounded-xl border border-gray-200 bg-[#F4F5F6] p-3">
+                                                <div className="mb-2 text-xs font-medium text-[#666666]">{cur.name} ({cur.value})</div>
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>
-                                                        <label className="mb-1 block text-xs text-white/60">Price Total</label>
+                                                        <label className="mb-1 block text-xs text-[#4E525D]">Price Total</label>
                                                         <input
                                                             className={inputClass}
                                                             type="number"
@@ -647,7 +647,7 @@ export function ApartmentForm() {
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="mb-1 block text-xs text-white/60">Price per m²</label>
+                                                        <label className="mb-1 block text-xs text-[#4E525D]">Price per m²</label>
                                                         <input
                                                             className={inputClass}
                                                             type="number"
@@ -687,7 +687,7 @@ export function ApartmentForm() {
                     <div className="space-y-4">
                         {renderTabErrors("location")}
                         <div>
-                            <label className="mb-1 block text-xs text-white/60">Location Title</label>
+                            <label className="mb-1 block text-xs text-[#4E525D]">Location Title</label>
                             <input
                                 className={inputClass}
                                 value={form.locationTitle || ""}
@@ -696,7 +696,7 @@ export function ApartmentForm() {
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-white/60">Location URL</label>
+                            <label className="mb-1 block text-xs text-[#4E525D]">Location URL</label>
                             <input
                                 className={inputClass}
                                 value={form.locationUrl || ""}
@@ -712,19 +712,19 @@ export function ApartmentForm() {
                     <div className="space-y-6">
                         {renderTabErrors("gallery")}
                         {uploadError && (
-                            <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-xs text-red-400">{uploadError}</div>
+                            <div className="rounded-xl border border-red-200 bg-red-50 p-2 text-xs text-[#C3362B]">{uploadError}</div>
                         )}
 
                         {/* Main Image */}
                         <div>
-                            <label className="mb-1.5 block text-xs font-medium text-white/70">Main Image</label>
+                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Main Image</label>
                             {form.image ? (
                                 <div className="relative inline-block">
                                     <img src={form.image} alt="Main" className="h-32 w-32 rounded-lg object-cover" />
                                     <button
                                         type="button"
                                         onClick={() => updateField("image", "")}
-                                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/80 text-xs text-white hover:bg-red-500"
+                                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#C3362B] text-xs text-white hover:opacity-90"
                                         title="Remove"
                                     >
                                         ✕
@@ -732,7 +732,7 @@ export function ApartmentForm() {
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded bg-black/70 px-2 py-0.5 text-[11px] text-white hover:bg-black/90"
+                                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded bg-[#4E525D] px-2 py-0.5 text-[11px] text-white hover:opacity-90"
                                     >
                                         Change
                                     </button>
@@ -744,23 +744,23 @@ export function ApartmentForm() {
                                     onDragLeave={onMainDragLeave}
                                     onDrop={onMainDrop}
                                     onClick={() => fileInputRef.current?.click()}
-                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 transition-colors ${
+                                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 transition-colors ${
                                         mainDrag
-                                            ? "border-blue-400 bg-blue-500/10"
+                                            ? "border-blue-400 bg-blue-50"
                                             : uploading
-                                                ? "pointer-events-none opacity-50 border-white/15 bg-white/5"
-                                                : "border-white/15 bg-white/5 hover:border-white/25 hover:bg-white/8"
+                                                ? "pointer-events-none opacity-50 border-gray-200 bg-[#F4F5F6]"
+                                                : "border-gray-200 bg-[#F4F5F6] hover:border-gray-400"
                                     }`}
                                 >
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={`transition-colors ${mainDrag ? "text-blue-400" : "text-white/40"}`}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={`transition-colors ${mainDrag ? "text-blue-500" : "text-[#999]"}`}>
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                         <polyline points="17 8 12 3 7 8" />
                                         <line x1="12" y1="3" x2="12" y2="15" />
                                     </svg>
-                                    <span className={`text-sm ${mainDrag ? "text-blue-400" : "text-white/60"}`}>
+                                    <span className={`text-sm ${mainDrag ? "text-blue-500" : "text-[#666666]"}`}>
                                         {uploading ? "Uploading..." : mainDrag ? "Drop image here" : "Drag & drop or click to upload"}
                                     </span>
-                                    <span className="text-[11px] text-white/30">Image files</span>
+                                    <span className="text-[11px] text-[#999]">Image files</span>
                                 </div>
                             )}
                             <input
@@ -778,7 +778,7 @@ export function ApartmentForm() {
 
                         {/* Gallery Images */}
                         <div>
-                            <label className="mb-1.5 block text-xs font-medium text-white/70">
+                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">
                                 Gallery Images {form.gallery && form.gallery.length > 0 && `(${form.gallery.length}/20)`}
                             </label>
                             <div
@@ -787,23 +787,23 @@ export function ApartmentForm() {
                                 onDragLeave={onGalleryDragLeave}
                                 onDrop={onGalleryDrop}
                                 onClick={() => galleryInputRef.current?.click()}
-                                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 transition-colors ${
+                                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 transition-colors ${
                                     galleryDrag
-                                        ? "border-blue-400 bg-blue-500/10"
+                                        ? "border-blue-400 bg-blue-50"
                                         : uploading
-                                            ? "pointer-events-none opacity-50 border-white/15 bg-white/5"
-                                            : "border-white/15 bg-white/5 hover:border-white/25 hover:bg-white/8"
+                                            ? "pointer-events-none opacity-50 border-gray-200 bg-[#F4F5F6]"
+                                            : "border-gray-200 bg-[#F4F5F6] hover:border-gray-400"
                                 }`}
                             >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={`transition-colors ${galleryDrag ? "text-blue-400" : "text-white/40"}`}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={`transition-colors ${galleryDrag ? "text-blue-500" : "text-[#999]"}`}>
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                     <polyline points="17 8 12 3 7 8" />
                                     <line x1="12" y1="3" x2="12" y2="15" />
                                 </svg>
-                                <span className={`text-sm ${galleryDrag ? "text-blue-400" : "text-white/60"}`}>
+                                <span className={`text-sm ${galleryDrag ? "text-blue-500" : "text-[#666666]"}`}>
                                     {uploading ? "Uploading..." : galleryDrag ? "Drop images here" : "Drag & drop or click to upload"}
                                 </span>
-                                <span className="text-[11px] text-white/30">
+                                <span className="text-[11px] text-[#999]">
                                     {(form.gallery?.length || 0) >= 20 ? "Maximum 20 images reached" : "Image files (multiple)"}
                                 </span>
                             </div>
@@ -831,11 +831,11 @@ export function ApartmentForm() {
                                             <button
                                                 type="button"
                                                 onClick={() => removeGalleryItem(idx)}
-                                                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500/80 text-[10px] text-white opacity-0 transition-opacity hover:bg-red-500 group-hover:opacity-100"
+                                                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#C3362B] text-[10px] text-white opacity-0 transition-opacity hover:opacity-90 group-hover:opacity-100"
                                             >
                                                 ✕
                                             </button>
-                                            <div className="absolute bottom-1 left-1 rounded bg-black/60 px-1 py-0.5 text-[9px] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                            <div className="absolute bottom-1 left-1 rounded bg-[#4E525D] px-1 py-0.5 text-[9px] text-white opacity-0 transition-opacity group-hover:opacity-100">
                                                 {idx + 1}
                                             </div>
                                         </div>
@@ -850,7 +850,7 @@ export function ApartmentForm() {
                 {activeTab === "description" && (
                     <div className="space-y-4">
                         <div>
-                            <label className="mb-1 block text-xs text-white/60">Description (HTML)</label>
+                            <label className="mb-1 block text-xs text-[#4E525D]">Description (HTML)</label>
                             <textarea
                                 className={`${inputClass} min-h-[200px] resize-y font-mono`}
                                 value={form.description || ""}
@@ -866,7 +866,7 @@ export function ApartmentForm() {
                     <button
                         type="submit"
                         disabled={createMutation.isPending || updateMutation.isPending}
-                        className="rounded-lg bg-white/10 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+                        className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
                     >
                         {createMutation.isPending || updateMutation.isPending
                             ? "Saving..."
@@ -877,12 +877,14 @@ export function ApartmentForm() {
                     <button
                         type="button"
                         onClick={() => navigate("/resale/apartments")}
-                        className="rounded-lg border border-white/10 px-5 py-2 text-sm text-white/70 hover:bg-white/5"
+                        className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
                     >
                         Cancel
                     </button>
                 </div>
             </form>
-        </Layout>
+        </div>
+        </div>
+        </div>
     );
 }

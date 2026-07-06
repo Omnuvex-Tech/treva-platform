@@ -12,7 +12,6 @@ import { categoriesApi, Category } from "../../api/categories";
 import { roomOptionsApi, RoomOption } from "../../api/room-options";
 import { viewOptionsApi, ViewOption } from "../../api/view-options";
 import { statusOptionsApi, StatusOption } from "../../api/status-options";
-import { Layout } from "../../components/Layout";
 import { FileUpload } from "../../components/FileUpload";
 
 type Tab = "basic" | "area" | "location" | "documents" | "gallery" | "similar";
@@ -446,23 +445,24 @@ export function UnitLayoutForm() {
 
     if (isEdit && loadingExisting) {
         return (
-            <Layout>
-                <div className="py-8 text-center text-white/50">Loading...</div>
-            </Layout>
+            <div className="flex min-h-screen items-center justify-center bg-[#F4F5F6]">
+                <div className="text-center text-[#666666]">Loading...</div>
+            </div>
         );
     }
 
     return (
-        <Layout>
-            <div className="mx-auto max-w-3xl">
-                <div className="mb-4">
-                    <h2 className="text-lg font-semibold">
+        <div className="min-h-screen bg-[#F4F5F6] py-8">
+            <div className="mx-auto max-w-4xl">
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="mb-6">
+                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>
                         {isEdit ? "Edit Unit Layout" : "New Unit Layout"}
-                    </h2>
+                    </h4>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-4 flex gap-1 border-b border-white/10">
+                    <div className="mb-4 flex gap-1 border-b border-gray-200">
                         {tabs.map((tab) => {
                             const tabResult = validateTab(tab.key, form);
                             const isActive = activeTab === tab.key;
@@ -474,8 +474,8 @@ export function UnitLayoutForm() {
                                     onClick={() => handleTabClick(tab.key)}
                                     className={`relative px-4 py-2.5 text-sm transition-colors ${
                                         isActive
-                                            ? "border-b-2 border-white text-white"
-                                            : "text-white/50 hover:text-white/80"
+                                            ? "border-b-2 border-[#4E525D] text-[#1A1A1A]"
+                                            : "text-[#808191] hover:text-[#4E525D]"
                                     }`}
                                 >
                                     {tab.label}
@@ -490,11 +490,11 @@ export function UnitLayoutForm() {
                         })}
                     </div>
 
-                    <div className="rounded-xl border border-white/10 bg-white/3 p-6">
+                    <div className="rounded-xl border border-gray-100 bg-white p-6">
                         {activeTab === "basic" && (
                             <div className="flex flex-col gap-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Title
                                     </label>
                                     <input
@@ -502,12 +502,12 @@ export function UnitLayoutForm() {
                                         value={form.title}
                                         onChange={(e) => handleSlugFromTitle(e.target.value)}
                                         placeholder="e.g. Sea Breeze Residence"
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Name
                                     </label>
                                     <input
@@ -515,12 +515,12 @@ export function UnitLayoutForm() {
                                         value={form.name}
                                         onChange={(e) => updateField("name", e.target.value)}
                                         placeholder="e.g. Block A, Apartment 12"
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Slug
                                     </label>
                                     <input
@@ -528,22 +528,22 @@ export function UnitLayoutForm() {
                                         value={form.slug}
                                         onChange={(e) => { setSlugManuallyEdited(true); updateField("slug", e.target.value); }}
                                         placeholder="e.g. sea-breeze-residence-a-12"
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Category
                                         </label>
                                         <div ref={categoryRef} className="relative">
                                             <button
                                                 type="button"
                                                 onClick={() => setCategoryOpen((p) => !p)}
-                                                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
                                             >
-                                                <span className={form.categoryId ? "text-white" : "text-white/40"}>
+                                                <span className={form.categoryId ? "text-[#1A1A1A]" : "text-[#999]"}>
                                                     {categories.find((c) => c.id === form.categoryId)?.title || "Select category"}
                                                 </span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${categoryOpen ? "rotate-180" : ""}`}>
@@ -551,7 +551,7 @@ export function UnitLayoutForm() {
                                                 </svg>
                                             </button>
                                             {categoryOpen && (
-                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                                                     {categories.map((cat) => (
                                                         <button
                                                             key={cat.id}
@@ -559,8 +559,8 @@ export function UnitLayoutForm() {
                                                             onClick={() => { updateField("categoryId", cat.id); setCategoryOpen(false); }}
                                                             className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                                 form.categoryId === cat.id
-                                                                    ? "bg-white/15 text-white font-medium"
-                                                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                             }`}
                                                         >
                                                             {cat.title}
@@ -571,16 +571,16 @@ export function UnitLayoutForm() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Status
                                         </label>
                                         <div ref={statusRef} className="relative">
                                             <button
                                                 type="button"
                                                 onClick={() => setStatusOpen((p) => !p)}
-                                                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
                                             >
-                                                <span className={form.statusOptionId ? "text-white" : "text-white/40"}>
+                                                <span className={form.statusOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
                                                     {statusOptions.find((s) => s.id === form.statusOptionId)?.value || "Select status (optional)"}
                                                 </span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${statusOpen ? "rotate-180" : ""}`}>
@@ -588,14 +588,14 @@ export function UnitLayoutForm() {
                                                 </svg>
                                             </button>
                                             {statusOpen && (
-                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                                                     <button
                                                         type="button"
                                                         onClick={() => { updateField("statusOptionId", undefined); setStatusOpen(false); }}
                                                         className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                             !form.statusOptionId
-                                                                ? "bg-white/15 text-white font-medium"
-                                                                : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                                ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
                                                         — None
@@ -607,15 +607,15 @@ export function UnitLayoutForm() {
                                                             onClick={() => { updateField("statusOptionId", opt.id); setStatusOpen(false); }}
                                                             className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                                 form.statusOptionId === opt.id
-                                                                    ? "bg-white/15 text-white font-medium"
-                                                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                             }`}
                                                         >
                                                             {opt.value}
                                                         </button>
                                                     ))}
                                                     {statusOptions.length === 0 && (
-                                                        <div className="px-4 py-3 text-sm text-white/40">
+                                                        <div className="px-4 py-3 text-sm text-[#999]">
                                                             No status options yet. Add them in Status Options.
                                                         </div>
                                                     )}
@@ -625,16 +625,16 @@ export function UnitLayoutForm() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Room Option
                                     </label>
                                     <div ref={roomOptionRef} className="relative">
                                         <button
                                             type="button"
                                             onClick={() => setRoomOptionOpen((p) => !p)}
-                                            className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                            className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
                                         >
-                                            <span className={form.roomOptionId ? "text-white" : "text-white/40"}>
+                                            <span className={form.roomOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
                                                 {roomOptions.find((r) => r.id === form.roomOptionId)?.value || "Select room option (optional)"}
                                             </span>
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${roomOptionOpen ? "rotate-180" : ""}`}>
@@ -642,14 +642,14 @@ export function UnitLayoutForm() {
                                             </svg>
                                         </button>
                                         {roomOptionOpen && (
-                                            <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                            <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                                                 <button
                                                     type="button"
                                                     onClick={() => { updateField("roomOptionId", undefined); setRoomOptionOpen(false); }}
                                                     className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                         !form.roomOptionId
-                                                            ? "bg-white/15 text-white font-medium"
-                                                            : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                            ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                            : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                     }`}
                                                 >
                                                     — None
@@ -661,15 +661,15 @@ export function UnitLayoutForm() {
                                                         onClick={() => { updateField("roomOptionId", opt.id); setRoomOptionOpen(false); }}
                                                         className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                             form.roomOptionId === opt.id
-                                                                ? "bg-white/15 text-white font-medium"
-                                                                : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                                ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
                                                         {opt.value}
                                                     </button>
                                                 ))}
                                                 {roomOptions.length === 0 && (
-                                                    <div className="px-4 py-3 text-sm text-white/40">
+                                                    <div className="px-4 py-3 text-sm text-[#999]">
                                                         No room options yet. Add them in Room Options.
                                                     </div>
                                                 )}
@@ -679,7 +679,7 @@ export function UnitLayoutForm() {
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Floor
                                         </label>
                                         <input
@@ -689,13 +689,13 @@ export function UnitLayoutForm() {
                                                 updateField("floor", e.target.value ? parseInt(e.target.value) : 0)
                                             }
                                             placeholder="e.g. 5"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Number
                                         </label>
                                         <input
@@ -708,22 +708,22 @@ export function UnitLayoutForm() {
                                                 )
                                             }
                                             placeholder="e.g. 12"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             View Option
                                         </label>
                                         <div ref={viewOptionRef} className="relative">
                                             <button
                                                 type="button"
                                                 onClick={() => setViewOptionOpen((p) => !p)}
-                                                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none"
+                                                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
                                             >
-                                                <span className={form.viewOptionId ? "text-white" : "text-white/40"}>
+                                                <span className={form.viewOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
                                                     {viewOptions.find((v) => v.id === form.viewOptionId)?.value || "Select view option (optional)"}
                                                 </span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${viewOptionOpen ? "rotate-180" : ""}`}>
@@ -731,14 +731,14 @@ export function UnitLayoutForm() {
                                                 </svg>
                                             </button>
                                             {viewOptionOpen && (
-                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-lg border border-white/10 bg-[#2a2d35] shadow-lg">
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                                                     <button
                                                         type="button"
                                                         onClick={() => { updateField("viewOptionId", undefined); setViewOptionOpen(false); }}
                                                         className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                             !form.viewOptionId
-                                                                ? "bg-white/15 text-white font-medium"
-                                                                : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                                ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
                                                         — None
@@ -750,15 +750,15 @@ export function UnitLayoutForm() {
                                                             onClick={() => { updateField("viewOptionId", opt.id); setViewOptionOpen(false); }}
                                                             className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
                                                                 form.viewOptionId === opt.id
-                                                                    ? "bg-white/15 text-white font-medium"
-                                                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                             }`}
                                                         >
                                                             {opt.value}
                                                         </button>
                                                     ))}
                                                     {viewOptions.length === 0 && (
-                                                        <div className="px-4 py-3 text-sm text-white/40">
+                                                        <div className="px-4 py-3 text-sm text-[#999]">
                                                             No view options yet. Add them in View Options.
                                                         </div>
                                                     )}
@@ -774,7 +774,7 @@ export function UnitLayoutForm() {
                             <div className="flex flex-col gap-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Total Area (m²)
                                         </label>
                                         <input
@@ -787,14 +787,14 @@ export function UnitLayoutForm() {
                                                 )
                                             }
                                             placeholder="e.g. 85.5"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
                                             step={0.1}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Internal Area (m²)
                                         </label>
                                         <input
@@ -807,7 +807,7 @@ export function UnitLayoutForm() {
                                                 )
                                             }
                                             placeholder="e.g. 72.3"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
                                             step={0.1}
                                             required
@@ -815,7 +815,7 @@ export function UnitLayoutForm() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Balcony Area (m²)
                                     </label>
                                         <input
@@ -830,7 +830,7 @@ export function UnitLayoutForm() {
                                                 )
                                             }
                                             placeholder="e.g. 8.5"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
                                             step={0.1}
                                             required
@@ -839,7 +839,7 @@ export function UnitLayoutForm() {
                                 <div className="grid grid-cols-2 gap-4">
                                     {currencies.map((curr) => (
                                         <div key={curr.id}>
-                                            <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                            <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                                 Price ({curr.value})
                                             </label>
                                             <input
@@ -855,7 +855,7 @@ export function UnitLayoutForm() {
                                                     )
                                                 }
                                                 placeholder={`e.g. 120,000`}
-                                                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                                className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                                 min={0}
                                             />
                                         </div>
@@ -863,7 +863,7 @@ export function UnitLayoutForm() {
                                     {currencies.length === 0 && (
                                         <>
                                             <div>
-                                                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                                <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                                     Price (USD)
                                                 </label>
                                                 <input
@@ -879,12 +879,12 @@ export function UnitLayoutForm() {
                                                         )
                                                     }
                                                     placeholder="e.g. 120,000"
-                                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                                     min={0}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                                <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                                     Price (AZN)
                                                 </label>
                                                 <input
@@ -900,7 +900,7 @@ export function UnitLayoutForm() {
                                                         )
                                                     }
                                                     placeholder="e.g. 204,000"
-                                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                                     min={0}
                                                 />
                                             </div>
@@ -913,7 +913,7 @@ export function UnitLayoutForm() {
                         {activeTab === "location" && (
                             <div className="flex flex-col gap-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Location Title
                                     </label>
                                     <input
@@ -923,12 +923,12 @@ export function UnitLayoutForm() {
                                             updateLocation("title", e.target.value)
                                         }
                                         placeholder="e.g. Sea Breeze Resort, Nardaran District"
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Location URL
                                     </label>
                                         <input
@@ -938,12 +938,12 @@ export function UnitLayoutForm() {
                                                 updateLocation("url", e.target.value)
                                             }
                                             placeholder="e.g. https://maps.google.com/..."
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             required
                                         />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Location Type
                                     </label>
                                     <input
@@ -953,12 +953,12 @@ export function UnitLayoutForm() {
                                             updateLocation("type", e.target.value)
                                         }
                                         placeholder="For example: Apartment"
-                                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Completion Year
                                     </label>
                                         <input
@@ -971,7 +971,7 @@ export function UnitLayoutForm() {
                                             )
                                         }
                                             placeholder="e.g. 2026"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={2020}
                                             max={2100}
                                             required
@@ -979,7 +979,7 @@ export function UnitLayoutForm() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Floors From
                                         </label>
                                         <input
@@ -992,13 +992,13 @@ export function UnitLayoutForm() {
                                                 )
                                             }
                                             placeholder="e.g. 1"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                             Floors To
                                         </label>
                                         <input
@@ -1011,7 +1011,7 @@ export function UnitLayoutForm() {
                                                 )
                                             }
                                             placeholder="e.g. 15"
-                                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
                                         />
@@ -1032,15 +1032,15 @@ export function UnitLayoutForm() {
                                         {form.documents.map((doc: Document, index: number) => (
                                             <div
                                                 key={index}
-                                                className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-2.5"
+                                                className="flex items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 py-2.5"
                                             >
-                                                <span className="text-sm text-white/70">
+                                                <span className="text-sm text-[#666666]">
                                                     {doc.url.split("/").pop()}
                                                 </span>
                                                 <button
                                                     type="button"
                                                     onClick={() => removeDocument(index)}
-                                                    className="text-red-400 hover:text-red-300"
+                                                    className="text-[#C3362B] hover:underline"
                                                 >
                                                     Remove
                                                 </button>
@@ -1054,7 +1054,7 @@ export function UnitLayoutForm() {
                         {activeTab === "gallery" && (
                             <div className="flex flex-col gap-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Main Image
                                     </label>
                                     {form.mainImage ? (
@@ -1069,7 +1069,7 @@ export function UnitLayoutForm() {
                                                 onClick={() =>
                                                     updateField("mainImage", undefined)
                                                 }
-                                                className="text-red-400 hover:text-red-300"
+                                                className="text-[#C3362B] hover:underline"
                                             >
                                                 Remove
                                             </button>
@@ -1083,7 +1083,7 @@ export function UnitLayoutForm() {
                                     )}
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Gallery Images
                                     </label>
                                     <FileUpload
@@ -1107,7 +1107,7 @@ export function UnitLayoutForm() {
                                                             onClick={() =>
                                                                 removeGalleryImage(index)
                                                             }
-                                                            className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-xs text-white hover:bg-black/80"
+                                                            className="absolute top-1 right-1 rounded-full bg-[#4E525D] p-1 text-xs text-white hover:opacity-80"
                                                         >
                                                             ✕
                                                         </button>
@@ -1124,11 +1124,11 @@ export function UnitLayoutForm() {
                             <div className="flex flex-col gap-6">
                                 {/* Selected Similar Apartments */}
                                 <div>
-                                    <label className="mb-3 block text-xs font-medium text-white/70">
+                                    <label className="mb-3 block text-xs font-medium text-[#4E525D]">
                                         Selected Similar Apartments ({(form.similarApartmentIds || []).length})
                                     </label>
                                     {(form.similarApartmentIds || []).length === 0 ? (
-                                        <p className="text-sm text-white/40">No similar apartments selected yet.</p>
+                                        <p className="text-sm text-[#999]">No similar apartments selected yet.</p>
                                     ) : (
                                         <div className="grid grid-cols-3 gap-3">
                                             {(Array.isArray(allLayoutsResponse?.data?.data) ? allLayoutsResponse.data.data : [])
@@ -1136,9 +1136,9 @@ export function UnitLayoutForm() {
                                                 .map((layout: any) => (
                                                     <div
                                                         key={layout.id}
-                                                        className="relative overflow-hidden rounded-xl border border-white/10 bg-white/5"
+                                                        className="relative overflow-hidden rounded-xl border border-gray-200 bg-[#F4F5F6]"
                                                     >
-                                                        <div className="relative h-32 w-full bg-white/5">
+                                                        <div className="relative h-32 w-full bg-[#F4F5F6]">
                                                             {(layout.mainImage?.url || layout.gallery?.[0]?.url) ? (
                                                                 <img
                                                                     src={layout.mainImage?.url || layout.gallery?.[0]?.url}
@@ -1146,14 +1146,14 @@ export function UnitLayoutForm() {
                                                                     className="h-full w-full object-cover"
                                                                 />
                                                             ) : (
-                                                                <div className="flex h-full w-full items-center justify-center text-xs text-white/30">
+                                                                <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">
                                                                     No image
                                                                 </div>
                                                             )}
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeSimilarApartment(layout.id)}
-                                                                className="absolute top-2 right-2 rounded-full bg-red-500/80 p-1 text-white hover:bg-red-500"
+                                                                className="absolute top-2 right-2 rounded-full bg-[#C3362B] p-1 text-white hover:opacity-90"
                                                             >
                                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                                                                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1165,11 +1165,11 @@ export function UnitLayoutForm() {
                                                             </span>
                                                         </div>
                                                         <div className="p-3">
-                                                            <div className="text-xs text-white/50">N° {layout.number || '?'} · {layout.floor} floor</div>
-                                                            <div className="mt-0.5 text-sm font-medium text-white">{layout.title}</div>
+                                                            <div className="text-xs text-[#666666]">N° {layout.number || '?'} · {layout.floor} floor</div>
+                                                            <div className="mt-0.5 text-sm font-medium text-[#1A1A1A]">{layout.title}</div>
                                                             <div className="mt-1 flex items-center justify-between">
-                                                                <span className="text-xs text-white/50">{layout.totalArea} m²</span>
-                                                                 <span className="text-sm font-semibold text-white">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
+                                                                <span className="text-xs text-[#666666]">{layout.totalArea} m²</span>
+                                                                 <span className="text-sm font-semibold text-[#1A1A1A]">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1180,7 +1180,7 @@ export function UnitLayoutForm() {
 
                                 {/* Available Apartments */}
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
                                         Available Apartments
                                     </label>
                                     <input
@@ -1188,7 +1188,7 @@ export function UnitLayoutForm() {
                                         value={similarSearch}
                                         onChange={(e) => setSimilarSearch(e.target.value)}
                                         placeholder="Search apartments..."
-                                        className="mb-3 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                        className="mb-3 w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                     />
                                     <div className="grid max-h-[540px] grid-cols-3 gap-3 overflow-y-auto pr-1">
                                         {(Array.isArray(allLayoutsResponse?.data?.data) ? allLayoutsResponse.data.data : [])
@@ -1211,10 +1211,10 @@ export function UnitLayoutForm() {
                                                         className={`relative cursor-pointer overflow-hidden rounded-xl border transition-all ${
                                                             isSelected
                                                                 ? "border-blue-400/60 ring-2 ring-blue-400/30"
-                                                                : "border-white/10 hover:border-white/25"
+                                                                : "border-gray-200 hover:border-gray-400"
                                                         }`}
                                                     >
-                                                        <div className="relative h-32 w-full bg-white/5">
+                                                        <div className="relative h-32 w-full bg-[#F4F5F6]">
                                                             {(layout.mainImage?.url || layout.gallery?.[0]?.url) ? (
                                                                 <img
                                                                     src={layout.mainImage?.url || layout.gallery?.[0]?.url}
@@ -1222,7 +1222,7 @@ export function UnitLayoutForm() {
                                                                     className="h-full w-full object-cover"
                                                                 />
                                                             ) : (
-                                                                <div className="flex h-full w-full items-center justify-center text-xs text-white/30">
+                                                                <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">
                                                                     No image
                                                                 </div>
                                                             )}
@@ -1230,7 +1230,7 @@ export function UnitLayoutForm() {
                                                                 className={`absolute top-2 left-2 flex h-5 w-5 items-center justify-center rounded border transition-colors ${
                                                                     isSelected
                                                                         ? "border-blue-400 bg-blue-500"
-                                                                        : "border-white/30 bg-black/30"
+                                                                        : "border-gray-300 bg-[#F4F5F6]"
                                                                 }`}
                                                             >
                                                                 {isSelected && (
@@ -1244,11 +1244,11 @@ export function UnitLayoutForm() {
                                                             </span>
                                                         </div>
                                                         <div className="p-3">
-                                                            <div className="text-xs text-white/50">N° {layout.number || '?'} · {layout.floor} floor</div>
-                                                            <div className="mt-0.5 text-sm font-medium text-white">{layout.title}</div>
+                                                            <div className="text-xs text-[#666666]">N° {layout.number || '?'} · {layout.floor} floor</div>
+                                                            <div className="mt-0.5 text-sm font-medium text-[#1A1A1A]">{layout.title}</div>
                                                             <div className="mt-1 flex items-center justify-between">
-                                                                <span className="text-xs text-white/50">{layout.totalArea} m²</span>
-                                                                 <span className="text-sm font-semibold text-white">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
+                                                                <span className="text-xs text-[#666666]">{layout.totalArea} m²</span>
+                                                                 <span className="text-sm font-semibold text-[#1A1A1A]">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1261,22 +1261,22 @@ export function UnitLayoutForm() {
                     </div>
 
                     {currentTabError.length > 0 && (
-                        <div className="mt-4 overflow-hidden rounded-xl border border-[#ff6767]/20 bg-[#ff6767]/5">
-                            <div className="flex items-center gap-2 border-b border-[#ff6767]/10 bg-[#ff6767]/10 px-4 py-2.5">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff6767" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <div className="mt-4 overflow-hidden rounded-xl border border-red-200 bg-red-50">
+                            <div className="flex items-center gap-2 border-b border-red-100 bg-red-50 px-4 py-2.5">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C3362B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <circle cx="12" cy="12" r="10"/>
                                     <line x1="12" y1="8" x2="12" y2="12"/>
                                     <line x1="12" y1="16" x2="12.01" y2="16"/>
                                 </svg>
-                                <span className="text-sm font-medium" style={{ color: '#ff6767', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                                <span className="text-sm font-medium text-[#C3362B]">
                                     Please fill in all required fields
                                 </span>
                             </div>
                             <div className="px-4 py-3">
                                 <ul className="flex flex-col gap-1.5">
                                     {currentTabError.map((err, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#ff6767', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
-                                            <span className="mt-1.5 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#ff6767]" />
+                                        <li key={i} className="flex items-start gap-2 text-sm text-[#C3362B]">
+                                            <span className="mt-1.5 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#C3362B]" />
                                             {err.message}
                                         </li>
                                     ))}
@@ -1286,20 +1286,20 @@ export function UnitLayoutForm() {
                     )}
 
                     {mutationError && (
-                        <div className="mt-4 rounded-lg bg-red-500/20 p-3 text-center text-sm text-red-300">
+                        <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-center text-sm text-[#C3362B]">
                             {mutationErrorMessage}
                         </div>
                     )}
 
                     {similarRecommendation && (
-                        <div className="mt-4 overflow-hidden rounded-xl border border-yellow-500/20 bg-yellow-500/5">
+                        <div className="mt-4 overflow-hidden rounded-xl border border-yellow-200 bg-yellow-50">
                             <div className="flex items-center gap-2 px-4 py-3">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A7A1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <circle cx="12" cy="12" r="10"/>
                                     <line x1="12" y1="16" x2="12" y2="12"/>
                                     <line x1="12" y1="8" x2="12.01" y2="8"/>
                                 </svg>
-                                <span className="text-sm" style={{ color: '#eab308', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                                <span className="text-sm text-[#9A7A1F]">
                                     Selecting similar apartments is recommended for better user experience
                                 </span>
                             </div>
@@ -1310,7 +1310,7 @@ export function UnitLayoutForm() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="rounded-lg bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
                         >
                             {isSubmitting
                                 ? "Saving..."
@@ -1321,13 +1321,14 @@ export function UnitLayoutForm() {
                         <button
                             type="button"
                             onClick={() => navigate("/unit-layouts")}
-                            className="rounded-lg border border-white/10 px-5 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/5"
+                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
                         >
                             Cancel
                         </button>
                     </div>
                 </form>
             </div>
-        </Layout>
+        </div>
+        </div>
     );
 }
