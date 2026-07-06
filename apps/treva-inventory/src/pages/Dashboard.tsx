@@ -119,14 +119,17 @@ export function Dashboard() {
                                 <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
                             </div>
                             <div className="relative w-full flex-1 min-h-[260px]">
-                                {/* Y-axis labels */}
-                                <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-right pr-3" style={{ width: 72 }}>
-                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
-                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
-                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
-                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
-                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
-                                    <span className="text-[#1A1A1A]" style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
+                                {/* Y-axis labels — absolutely positioned at the SAME percentage stops as the
+                                    dotted grid lines below (0/20/40/60/80/100%), each centered on its stop
+                                    with translateY(-50%) so the text sits exactly on the line instead of
+                                    drifting from its own line-height box. */}
+                                <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "0%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "20%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "40%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "60%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "80%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
+                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "100%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
                                 </div>
 
                                 {/* Chart area */}
@@ -189,8 +192,10 @@ export function Dashboard() {
                                             className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]"
                                             style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }}
                                         />
-                                        {/* Tooltip, floating directly above the dot on the same vertical axis */}
-                                        <div className="absolute" style={{ left: "50%", bottom: 12, transform: "translateX(-50%)" }}>
+                                        {/* Tooltip, floating above the dot with a clear gap (bottom pushed
+                                            out to 34px so the arrow tip sits well clear of the dot's top edge,
+                                            instead of nearly touching it). */}
+                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
                                             <div className="relative">
                                                 <div className="rounded-xl px-3 py-2 text-center text-white" style={{ background: "#6B7280", boxShadow: "0px 4px 8px rgba(0,0,0,0.15)" }}>
                                                     <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
