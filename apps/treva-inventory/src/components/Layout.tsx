@@ -24,13 +24,6 @@ const resaleItems = [
     { path: "/resale/requests", label: "Requests", icon: "📬" },
 ];
 
-const pulseItems = [
-    { path: "/pulse/articles", label: "Articles", icon: "📝" },
-    { path: "/pulse/authors", label: "Authors", icon: "👤" },
-    { path: "/pulse/categories", label: "Categories", icon: "🏷️" },
-    { path: "/pulse/layout", label: "Layout", icon: "📐" },
-];
-
 export function Layout({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const navigate = useNavigate();
@@ -106,21 +99,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             {item.label}
                         </Link>
                     ))}
-                    <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-white/40">Pulse</div>
-                    {pulseItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`rounded-lg px-3 py-2 text-sm transition-colors ${
-                                location.pathname.startsWith(item.path)
-                                    ? "bg-white/10 text-white"
-                                    : "text-white/85 hover:bg-white/5 hover:text-white"
-                            }`}
-                        >
-                            <span className="mr-2">{item.icon}</span>
-                            {item.label}
-                        </Link>
-                    ))}
                 </nav>
                 <div className="mt-auto border-t border-white/10 pt-4">
                     <button
@@ -135,7 +113,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <header className="flex items-center justify-between border-b border-white/10 bg-white/5 px-5 py-3 backdrop-blur">
                     <div>
                         <div className="text-sm font-semibold">
-                            {[...navItems, ...sharedItems, ...offPlanItems, ...resaleItems, ...pulseItems].find(
+                            {[...navItems, ...sharedItems, ...offPlanItems, ...resaleItems].find(
                                 (i) => location.pathname === i.path || (i.path !== "/" && location.pathname.startsWith(i.path))
                             )?.label ?? "Dashboard"}
                         </div>
