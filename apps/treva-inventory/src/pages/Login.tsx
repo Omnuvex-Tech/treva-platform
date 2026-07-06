@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../api/auth";
 
@@ -35,12 +35,12 @@ export function Login() {
         <div className="flex min-h-screen w-full bg-white font-sans overflow-x-hidden">
             {/* Left Panel: Form Section */}
             <div className="flex w-full md:w-1/2 items-center justify-center p-8 sm:p-12 md:p-16 bg-white">
-                <div className="w-full max-w-[420px] flex flex-col">
+                <div className="w-full max-w-[508px] flex flex-col">
                     <header className="mb-9 text-center">
-                        <h1 className="text-[28px] font-bold tracking-tight text-[#11142D] mb-2">
+                        <h1 className="mb-2 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>
                             Welcome to TREVA
                         </h1>
-                        <p className="text-[14px] text-[#808191]">
+                        <p className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>
                             Premium real estate management platform
                         </p>
                     </header>
@@ -53,60 +53,65 @@ export function Login() {
                         )}
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-[12px] font-semibold text-[#53545C] block mb-0.5">
+                            <label className="block mb-0.5 text-[#333333]" style={{ fontWeight: 600, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>
                                 Email address
                             </label>
                             <div className="relative flex items-center">
-                                <span className="absolute left-4 text-[#A0AEC0] pointer-events-none">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                                        <polyline points="22,6 12,13 2,6" />
-                                    </svg>
+                                <span className="absolute left-4 pointer-events-none flex items-center justify-center w-5 h-5">
+                                    <img src="/images/login/mail.svg" alt="" width={19} height={17} />
                                 </span>
                                 <input
                                     type="email"
                                     placeholder="admin@treva.az"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full h-[52px] rounded-xl border border-transparent bg-[#F4F5F6] pl-12 pr-4 text-[14px] text-[#11142D] placeholder-[#A0AEC0] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
+                                    className="w-full h-[52px] rounded-[16px] border bg-[#F4F5F5] pl-[44px] pr-3 text-[#666666] placeholder-[#666666] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
+                                    style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0, borderColor: "#EBEBEB", paddingTop: 16, paddingBottom: 16 }}
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label className="text-[12px] font-semibold text-[#53545C] block mb-0.5">
+                            <label className="block mb-0.5 text-[#333333]" style={{ fontWeight: 600, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>
                                 Password
                             </label>
                             <div className="relative flex items-center">
-                                <span className="absolute left-4 text-[#A0AEC0] pointer-events-none">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                                    </svg>
+                                <span className="absolute left-4 pointer-events-none flex items-center justify-center w-5 h-5">
+                                    <img src="/images/login/lock.svg" alt="" width={15} height={19} />
                                 </span>
                                 <input
                                     type="password"
                                     placeholder="••••••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full h-[52px] rounded-xl border border-transparent bg-[#F4F5F6] pl-12 pr-4 text-[14px] text-[#11142D] placeholder-[#A0AEC0] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
+                                    className="w-full h-[52px] rounded-[16px] border bg-[#F4F5F5] pl-[44px] pr-3 text-[#666666] placeholder-[#666666] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
+                                    style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0, borderColor: "#EBEBEB", paddingTop: 16, paddingBottom: 16 }}
                                     required
                                 />
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-1 text-[13px]">
-                            <label className="flex cursor-pointer items-center gap-2 font-medium text-[#4A5568] select-none">
+                        <div className="flex items-center justify-between" style={{ paddingTop: "calc(var(--spacing) * 8)" }}>
+                            <label className="flex cursor-pointer items-center gap-2 select-none text-[#333333]" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>
                                 <input
                                     type="checkbox"
                                     checked={rememberMe}
                                     onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="h-[18px] w-[18px] rounded border-[#A0AEC0] accent-[#4E5464]"
+                                    className="sr-only"
                                 />
+                                {rememberMe ? (
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-[5px] bg-[#4E525D]">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </span>
+                                ) : (
+                                    <img src="/images/login/checkbox.svg" alt="" width={20} height={20} />
+                                )}
                                 Remember me
                             </label>
-                            <a href="#" className="font-medium text-[#11142D] hover:underline transition-all">
+                            <a href="#" className="text-[#1A1A1A] hover:underline transition-all" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0, textAlign: "center" as const }}>
                                 Forgot password?
                             </a>
                         </div>
@@ -114,14 +119,15 @@ export function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="mt-3 h-[52px] w-full rounded-xl bg-[#4E5464] text-[15px] font-semibold text-white transition-colors hover:bg-[#3F4452] disabled:opacity-50"
+                            className="mt-3 h-[52px] w-full rounded-[16px] border border-white text-white transition-colors hover:bg-[#3F4452] disabled:opacity-50 flex items-center justify-center"
+                            style={{ background: "#4E525D", fontWeight: 500, fontSize: 16, lineHeight: "20px", letterSpacing: 0, paddingTop: 16, paddingRight: 14, paddingBottom: 16, paddingLeft: 14 }}
                         >
                             {loading ? "Signing in..." : "Sign in to dashboard"}
                         </button>
                     </form>
 
                     <footer className="mt-6 text-center">
-                        <p className="text-[13px] text-[#808191]">
+                        <p className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>
                             Protected by enterprise-grade security
                         </p>
                     </footer>
