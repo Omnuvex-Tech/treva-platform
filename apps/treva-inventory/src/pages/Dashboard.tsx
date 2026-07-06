@@ -67,43 +67,43 @@ export function Dashboard() {
                     {/* Top Row: Info Metric Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {/* Card 1 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Monthly Apartment Sales</p>
                                 <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>24</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+12% from last month</span>
                             </div>
-                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-12 w-12" />
+                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
                         </div>
 
                         {/* Card 2 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Apartments</p>
                                 <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>1,234</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+8% from last month</span>
                             </div>
-                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-12 w-12" />
+                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
                         </div>
 
                         {/* Card 3 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Apartments Sold</p>
                                 <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>323</h3>
                                 <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+26% from last month</span>
                             </div>
-                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-12 w-12" />
+                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
                         </div>
 
                         {/* Card 4 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 flex justify-between items-start shadow-sm">
+                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                             <div>
                                 <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Apartments</p>
                                 <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>12</h3>
                                 <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-5.1% from last month</span>
                             </div>
-                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-12 w-12." />
+                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
                         </div>
                     </div>
 
