@@ -127,7 +127,7 @@ export default function AboutUs({ locale = 'az' }: AboutUsProps) {
             </div>
           </div>
           <div className="about-hero__image-wrapper">
-            <img className="about-hero__image" src="/images/about-us/aboutus.png" alt="TREVA Real Estate" />
+            <img className="about-hero__image" src="/images/about-us/aboutus.jpeg" alt="TREVA Real Estate" />
           </div>
         </section>
 

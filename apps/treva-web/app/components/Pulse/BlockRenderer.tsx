@@ -16,6 +16,7 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
     const prev = () => setCurrent(c => (c === 0 ? total - 1 : c - 1));
     const next = () => setCurrent(c => (c === total - 1 ? 0 : c + 1));
     const img = images[current];
+    if (total === 0 || !img) return null;
     return (
         <div style={{ margin: "2rem 0" }}>
             <div style={{
@@ -174,7 +175,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                     loading="lazy"
                                 />
                             </div>
-                        );
+                        )
 
                     case "gallery": {
                         return <GalleryCarousel key={index} images={block.images} />;

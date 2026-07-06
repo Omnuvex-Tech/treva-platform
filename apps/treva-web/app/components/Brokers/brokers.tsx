@@ -588,12 +588,12 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                 <div className="container-large">
                   <div className="gallery_component">
                     <div className="gallery_wrap">
-                      <div className="gallery_content-wrap">
+                      <div className="gallery_content-wrap brokers-gallery-content">
                         <div className="gallery_title-wrap is-az">
                           <div className="text-color-blue60">(TREVA ilə tərəfdaş olun)</div>
                           <h2>Daha çox komissiya qazanın, daha çox müqavilə bağlayın.</h2>
                         </div>
-                        <div className="gallery_bottom-wrap">
+                        <div className="gallery_bottom-wrap brokers-gallery-bottom">
                           <div className="max-width-40rem">
                             <p className="text-color-blue60">HARADA YERLƏŞMƏYİNİZDƏN ASILI OLMAYARAQ — TREVA BROKERLƏRİ, ŞİRKƏTLƏRİ, BEYNƏLXALQ AGENTLƏRİ SATIŞ ŞƏBƏKƏMİZƏ QOŞULMAĞA DƏVƏT EDİR. TREVA İLƏ MÜQAVİLƏLƏRİ DAHA SÜRƏTLİ BAĞLAMAĞA, YÜKSƏK KOMİSSİYALAR QAZANMAĞA BAŞLAYIN.</p>
                           </div>

@@ -16,7 +16,8 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 112px;
+  width: auto;
+  min-width: 112px;
   height: 40px;
   border-radius: 30px;
   border: 1.5px solid var(--color-home-btn);
@@ -30,6 +31,7 @@
   font-style: normal;
   font-size: 17px;
   line-height: 120%;
+  white-space: nowrap;
 }
 
 .portfolio-view-all:hover {
@@ -45,7 +47,8 @@
 }
 
 .portfolio-view-all--mobile {
-  width: 104px;
+  width: auto;
+  min-width: 104px;
   height: 38px;
   border-radius: 24px;
   padding: 0 14px;

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
 import { Article } from '@/lib/pulse.types';
+import { toAbsUrl } from '@/lib/pulse-api';
 import './treva-pulse.css';
 
 const pulseDictionary = {
@@ -17,7 +18,7 @@ const pulseDictionary = {
     ],
     filterLabel: "Kateqoriyaya görə",
     categories: { all: "Hamısı" },
-    viewAll: "BÜTÜNÜ",
+    viewAll: "Hamısına bax",
     noData: "Bu kateqoriyada məqalə tapılmadı.",
   },
   en: {
@@ -29,7 +30,7 @@ const pulseDictionary = {
     ],
     filterLabel: "Filter by category",
     categories: { all: "All" },
-    viewAll: "view all",
+    viewAll: "View all",
     noData: "No articles found in this category.",
   },
   ru: {
@@ -41,7 +42,7 @@ const pulseDictionary = {
     ],
     filterLabel: "Фильтр по категории",
     categories: { all: "Все" },
-    viewAll: "ВСЕ",
+    viewAll: "Смотреть все",
     noData: "В этой категории статей не найдено.",
   },
 } as const;
@@ -90,6 +91,12 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
   const cardWidth = totalItems === 0 ? "100%" : `${100 / totalItems}%`;
 
   const scrollSpeed = `${totalItems * 2}s`;
+  const placeholderImage = 'https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg';
+
+  const normalizeAssetUrl = (url?: string) => {
+    const absUrl = url ? toAbsUrl(url) : '';
+    return absUrl ? absUrl.replace(/ /g, '%20') : '';
+  };
 
   return (
     <main>
@@ -152,34 +159,39 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                   '--scroll-speed': scrollSpeed
                 } as React.CSSProperties}
               >
-                {filteredData.map((post, index) => (
-                  <a
-                    href={post.slug ? `/${activeLocale}/pulse/${post.slug}` : `/${activeLocale}/pulse`}
-                    key={`${post.slug}-${index}`}
-                    className="blog-card"
-                    style={{ flex: `0 0 ${cardWidth}`, width: cardWidth }}
-                  >
-                    <div className="blog-card__inner">
-                      <div className="blog-card__img-wrapper">
-                        <img src={post.image} alt={post.title} className="blog-card__img" />
-                      </div>
+                {filteredData.map((post, index) => {
+                  const imageSrc = normalizeAssetUrl(post.image) || placeholderImage;
+                  const authorImageSrc = normalizeAssetUrl(post.authorImage);
 
-                      <div className="blog-card__meta">
-                        <span className="blog-card__category">{post.category}</span>
-                        <span className="blog-card__date">{post.date}</span>
-                      </div>
+                  return (
+                    <a
+                      href={post.slug ? `/${activeLocale}/pulse/${post.slug}` : `/${activeLocale}/pulse`}
+                      key={`${post.slug}-${index}`}
+                      className="blog-card"
+                      style={{ flex: `0 0 ${cardWidth}`, width: cardWidth }}
+                    >
+                      <div className="blog-card__inner">
+                        <div className="blog-card__img-wrapper">
+                          <img src={imageSrc} alt={post.title} className="blog-card__img" loading="lazy" />
+                        </div>
 
-                      <h3 className="blog-card__title">{post.title}</h3>
+                        <div className="blog-card__meta">
+                          <span className="blog-card__category">{post.category}</span>
+                          <span className="blog-card__date">{post.date}</span>
+                        </div>
 
-                      <div className="blog-card__author">
-                        {post.authorImage && (
-                          <img src={post.authorImage} alt={post.author ?? ''} className="blog-card__avatar" />
-                        )}
-                        <span className="blog-card__author-name">{post.author}</span>
+                        <h3 className="blog-card__title">{post.title}</h3>
+
+                        <div className="blog-card__author">
+                          {authorImageSrc && (
+                            <img src={authorImageSrc} alt={post.author ?? ''} className="blog-card__avatar" loading="lazy" />
+                          )}
+                          <span className="blog-card__author-name">{post.author}</span>
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                ))}
+                    </a>
+                  );
+                })}
               </div>
             ) : (
               <div className="pulse__no-data">{content.noData}</div>

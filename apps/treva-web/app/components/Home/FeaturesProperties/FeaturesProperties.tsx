@@ -41,21 +41,21 @@ const localeStrings = {
     titleBold: "DAŞINMAZ ƏMLAKLAR",
     subtitle: "Portfelimiz şəhərin memarlıq dəyəri və investisiya potensialı yüksək olan strateji nöqtələrini əhatə edir. Biz əsas diqqətimizi zaman keçdikcə sahibinə davamlı kapital artımı qazandıracaq unikal layihələrə yönəldirik.",
     learnMore: "DAHA ƏTRAFLI",
-    viewAll: "BÜTÜNÜ",
+    viewAll: "Hamısına bax",
   },
   en: {
     titleLight: "FEATURED",
     titleBold: "PROPERTIES",
     subtitle: "Strategic portfolio of the city's top venues. Our focus remains on architectural landmarks and long-term capital growth for investors.",
     learnMore: "LEARN MORE",
-    viewAll: "VIEW ALL",
+    viewAll: "View all",
   },
   ru: {
     titleLight: "ИЗБРАННЫЕ",
     titleBold: "НЕДВИЖИМОСТЬ",
     subtitle: "Наш портфель охватывает стратегические точки города с высоким архитектурным значением и инвестиционным потенциалом.",
     learnMore: "ПОДРОБНЕЕ",
-    viewAll: "ВСЕ",
+    viewAll: "Смотреть все",
   },
 };
 

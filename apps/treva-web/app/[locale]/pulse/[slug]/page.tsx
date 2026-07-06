@@ -17,8 +17,15 @@ export default async function Page({ params }: Props) {
   let apiArticle;
   try {
     apiArticle = await getArticleBySlug(slug);
-  } catch {
-    notFound();
+  } catch (error) {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      apiArticle = await getArticleBySlug(slug);
+    } catch {
+      const status = (error as any)?.status;
+      if (status === 404) notFound();
+      throw error;
+    }
   }
 
   const article = apiArticleToArticle(apiArticle, locale);
