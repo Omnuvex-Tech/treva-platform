@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayoutStats } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
 import { apartmentsApi, type Apartment } from "../api/apartments";
@@ -87,13 +88,75 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
 ];
 
 const getParentSection = (key: MenuKey): SectionKey | null => {
-    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions" || key === "roomOptions" || key === "currencies") return "offplan";
+    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions") return "offplan";
     return "resale";
 };
 
+function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
+    if (key === "resale") return "/dashboard/resale";
+    if (key === "offplan") return "/dashboard/offplan";
+
+    if (key === "apartments") return "/dashboard/resale/apartments";
+    if (key === "apartmentTypes") return "/dashboard/resale/apartment-types";
+    if (key === "owners") return "/dashboard/resale/owners";
+    if (key === "attributes") return "/dashboard/resale/attributes";
+    if (key === "requests") return "/dashboard/resale/requests";
+
+    if (key === "categories") return "/dashboard/offplan/categories";
+    if (key === "unitLayouts") return "/dashboard/offplan/unit-layouts";
+    if (key === "viewOptions") return "/dashboard/offplan/view-options";
+    if (key === "statusOptions") return "/dashboard/offplan/status-options";
+
+    if (key === "roomOptions") return `/dashboard/${parent}/room-options`;
+    if (key === "currencies") return `/dashboard/${parent}/currencies`;
+
+    return "/";
+}
+
 export function Dashboard() {
+    const location = useLocation();
+    const navigate = useNavigate();
     const [activeMenu, setActiveMenu] = useState<MenuKey>("resale");
-    const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set(["resale"]));
+    const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
+
+    useEffect(() => {
+        const path = location.pathname;
+
+        const routeToMenu: Record<string, MenuKey> = {
+            "/dashboard/resale": "resale",
+            "/dashboard/offplan": "offplan",
+            "/dashboard/resale/apartments": "apartments",
+            "/dashboard/resale/apartment-types": "apartmentTypes",
+            "/dashboard/resale/owners": "owners",
+            "/dashboard/resale/attributes": "attributes",
+            "/dashboard/resale/requests": "requests",
+            "/dashboard/offplan/categories": "categories",
+            "/dashboard/offplan/unit-layouts": "unitLayouts",
+            "/dashboard/offplan/view-options": "viewOptions",
+            "/dashboard/offplan/status-options": "statusOptions",
+            "/dashboard/offplan/room-options": "roomOptions",
+            "/dashboard/offplan/currencies": "currencies",
+            "/dashboard/resale/room-options": "roomOptions",
+            "/dashboard/resale/currencies": "currencies",
+        };
+
+        const key = routeToMenu[path];
+        if (key) {
+            setActiveMenu(key);
+            const parent =
+                path.startsWith("/dashboard/resale") ? "resale" :
+                path.startsWith("/dashboard/offplan") ? "offplan" :
+                getParentSection(key);
+            if (parent) {
+                setExpandedSections(prev => {
+                    const next = new Set(prev);
+                    next.add(parent);
+                    return next;
+                });
+            }
+            return;
+        }
+    }, [location.pathname]);
 
     const toggleSection = (key: SectionKey) => {
         setExpandedSections(prev => {
@@ -104,17 +167,9 @@ export function Dashboard() {
         });
     };
 
-    const handleMenuClick = (key: MenuKey) => {
+    const handleMenuClick = (key: MenuKey, parent: SectionKey) => {
+        navigate(getRouteForMenu(key, parent));
         setActiveMenu(key);
-        const parent = getParentSection(key);
-        if (parent) {
-            setExpandedSections(prev => {
-                if (prev.has(parent)) return prev;
-                const next = new Set(prev);
-                next.add(parent);
-                return next;
-            });
-        }
     };
 
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
@@ -186,24 +241,33 @@ export function Dashboard() {
                                 {/* Children */}
                                 {isOpen && (
                                     <div className="flex flex-col gap-0.5 ml-2">
-                                        {section.children.map((item) => (
-                                            <a key={item.key} href="#" onClick={(e) => { e.preventDefault(); handleMenuClick(item.key); }}
-                                                className="relative flex items-center gap-3 px-4 h-9 rounded-xl font-medium text-[12px] transition-colors cursor-pointer"
-                                                style={{
-                                                    background: activeMenu === item.key ? "#4C525E" : "transparent",
-                                                    color: activeMenu === item.key ? "#FFFFFF" : "#808191"
-                                                }}>
-                                                {item.icon}
-                                                {pageNames[item.key]}
-                                                {activeMenu === item.key && (
-                                                    <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                                                        </svg>
-                                                    </span>
-                                                )}
-                                            </a>
-                                        ))}
+                                        {section.children.map((item) => {
+                                            const to = getRouteForMenu(item.key, section.key);
+                                            const isActive = location.pathname === to;
+
+                                            return (
+                                                <button
+                                                    key={item.key}
+                                                    type="button"
+                                                    onClick={() => handleMenuClick(item.key, section.key)}
+                                                    className="relative flex items-center gap-3 px-4 h-9 rounded-xl font-medium text-[12px] transition-colors cursor-pointer"
+                                                    style={{
+                                                        background: isActive ? "#4C525E" : "transparent",
+                                                        color: isActive ? "#FFFFFF" : "#808191"
+                                                    }}
+                                                >
+                                                    {item.icon}
+                                                    {pageNames[item.key]}
+                                                    {isActive && (
+                                                        <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D" />
+                                                            </svg>
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>

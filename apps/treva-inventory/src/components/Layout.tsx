@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const navItems = [
@@ -27,6 +28,16 @@ const resaleItems = [
 export function Layout({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const navigate = useNavigate();
+    const [offPlanOpen, setOffPlanOpen] = useState(false);
+    const [resaleOpen, setResaleOpen] = useState(false);
+
+    useEffect(() => {
+        const isOffPlan = offPlanItems.some((item) => location.pathname.startsWith(item.path));
+        const isResale = location.pathname.startsWith("/resale");
+
+        setOffPlanOpen(isOffPlan);
+        setResaleOpen(isResale);
+    }, [location.pathname]);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -69,36 +80,53 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             {item.label}
                         </Link>
                     ))}
-                    <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-white/40">Off-Plan</div>
-                    {offPlanItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`rounded-lg px-3 py-2 text-sm transition-colors ${
-                                location.pathname.startsWith(item.path)
-                                    ? "bg-white/10 text-white"
-                                    : "text-white/85 hover:bg-white/5 hover:text-white"
-                            }`}
-                        >
-                            <span className="mr-2">{item.icon}</span>
-                            {item.label}
-                        </Link>
-                    ))}
-                    <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-white/40">Resale</div>
-                    {resaleItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`rounded-lg px-3 py-2 text-sm transition-colors ${
-                                location.pathname.startsWith(item.path)
-                                    ? "bg-white/10 text-white"
-                                    : "text-white/85 hover:bg-white/5 hover:text-white"
-                            }`}
-                        >
-                            <span className="mr-2">{item.icon}</span>
-                            {item.label}
-                        </Link>
-                    ))}
+                    <button
+                        type="button"
+                        onClick={() => setOffPlanOpen((v) => !v)}
+                        className="mt-3 mb-1 flex items-center justify-between px-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40"
+                    >
+                        <span>Off-Plan</span>
+                        <span className="text-white/35">{offPlanOpen ? "▾" : "▸"}</span>
+                    </button>
+                    {offPlanOpen &&
+                        offPlanItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+                                    location.pathname.startsWith(item.path)
+                                        ? "bg-white/10 text-white"
+                                        : "text-white/85 hover:bg-white/5 hover:text-white"
+                                }`}
+                            >
+                                <span className="mr-2">{item.icon}</span>
+                                {item.label}
+                            </Link>
+                        ))}
+
+                    <button
+                        type="button"
+                        onClick={() => setResaleOpen((v) => !v)}
+                        className="mt-3 mb-1 flex items-center justify-between px-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40"
+                    >
+                        <span>Resale</span>
+                        <span className="text-white/35">{resaleOpen ? "▾" : "▸"}</span>
+                    </button>
+                    {resaleOpen &&
+                        resaleItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+                                    location.pathname.startsWith(item.path)
+                                        ? "bg-white/10 text-white"
+                                        : "text-white/85 hover:bg-white/5 hover:text-white"
+                                }`}
+                            >
+                                <span className="mr-2">{item.icon}</span>
+                                {item.label}
+                            </Link>
+                        ))}
                 </nav>
                 <div className="mt-auto border-t border-white/10 pt-4">
                     <button

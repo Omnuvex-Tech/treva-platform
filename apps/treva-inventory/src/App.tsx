@@ -1,26 +1,15 @@
 import { Component, type ReactNode, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
-import { CategoryList } from "./pages/categories/CategoryList";
 import { CategoryCreate } from "./pages/categories/CategoryCreate";
 import { CategoryEdit } from "./pages/categories/CategoryEdit";
-import { UnitLayoutList } from "./pages/unit-layouts/UnitLayoutList";
 import { UnitLayoutForm } from "./pages/unit-layouts/UnitLayoutForm";
-import { RoomOptionList } from "./pages/room-options/RoomOptionList";
-import { ViewOptionList } from "./pages/view-options/ViewOptionList";
-import { CurrencyList } from "./pages/currencies/CurrencyList";
-import { StatusOptionList } from "./pages/status-options/StatusOptionList";
-import { ApartmentsList } from "./pages/resale/ApartmentsList";
 import { ApartmentForm } from "./pages/resale/ApartmentForm";
-import { ApartmentTypesList } from "./pages/resale/ApartmentTypesList";
 import { ApartmentTypeForm } from "./pages/resale/ApartmentTypeForm";
-import { OwnersList } from "./pages/resale/OwnersList";
 import { OwnerForm } from "./pages/resale/OwnerForm";
-import { AttributesList } from "./pages/resale/AttributesList";
 import { AttributeForm } from "./pages/resale/AttributeForm";
-import { RequestsList } from "./pages/resale/RequestsList";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -91,10 +80,130 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/resale"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/apartments"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/apartment-types"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/owners"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/attributes"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/requests"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/room-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/currencies"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/categories"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/unit-layouts"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/view-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/status-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/room-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/currencies"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/categories"
                             element={
                                 <ProtectedRoute>
-                                    <CategoryList />
+                                    <Navigate to="/dashboard/offplan/categories" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -118,7 +227,7 @@ function App() {
                             path="/unit-layouts"
                             element={
                                 <ProtectedRoute>
-                                    <UnitLayoutList />
+                                    <Navigate to="/dashboard/offplan/unit-layouts" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -142,7 +251,15 @@ function App() {
                             path="/room-options"
                             element={
                                 <ProtectedRoute>
-                                    <RoomOptionList />
+                                    <Navigate to="/dashboard/offplan/room-options" replace />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/resale/room-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Navigate to="/dashboard/resale/room-options" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -150,7 +267,7 @@ function App() {
                             path="/view-options"
                             element={
                                 <ProtectedRoute>
-                                    <ViewOptionList />
+                                    <Navigate to="/dashboard/offplan/view-options" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -158,7 +275,7 @@ function App() {
                             path="/currencies"
                             element={
                                 <ProtectedRoute>
-                                    <CurrencyList />
+                                    <Navigate to="/dashboard/offplan/currencies" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -166,7 +283,7 @@ function App() {
                             path="/status-options"
                             element={
                                 <ProtectedRoute>
-                                    <StatusOptionList />
+                                    <Navigate to="/dashboard/offplan/status-options" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -174,7 +291,7 @@ function App() {
                             path="/resale/apartments"
                             element={
                                 <ProtectedRoute>
-                                    <ApartmentsList />
+                                    <Navigate to="/dashboard/resale/apartments" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -198,7 +315,7 @@ function App() {
                             path="/resale/apartment-types"
                             element={
                                 <ProtectedRoute>
-                                    <ApartmentTypesList />
+                                    <Navigate to="/dashboard/resale/apartment-types" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -222,7 +339,7 @@ function App() {
                             path="/resale/owners"
                             element={
                                 <ProtectedRoute>
-                                    <OwnersList />
+                                    <Navigate to="/dashboard/resale/owners" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -246,7 +363,7 @@ function App() {
                             path="/resale/attributes"
                             element={
                                 <ProtectedRoute>
-                                    <AttributesList />
+                                    <Navigate to="/dashboard/resale/attributes" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -270,7 +387,7 @@ function App() {
                             path="/resale/requests"
                             element={
                                 <ProtectedRoute>
-                                    <RequestsList />
+                                    <Navigate to="/dashboard/resale/requests" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -278,7 +395,7 @@ function App() {
                             path="/resale/currencies"
                             element={
                                 <ProtectedRoute>
-                                    <CurrencyList />
+                                    <Navigate to="/dashboard/resale/currencies" replace />
                                 </ProtectedRoute>
                             }
                         />
