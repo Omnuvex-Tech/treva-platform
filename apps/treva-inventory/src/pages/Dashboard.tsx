@@ -15,13 +15,12 @@ import { OwnersSection } from "./dashboard/OwnersSection";
 import { AttributesSection } from "./dashboard/AttributesSection";
 import { RequestsSection } from "./dashboard/RequestsSection";
 
-type MenuKey = "dashboard" | "offplan" | "resale"
+type MenuKey = "offplan" | "resale"
     | "categories" | "unitLayouts" | "viewOptions" | "statusOptions"
     | "roomOptions" | "currencies"
     | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests";
 
 const pageNames: Record<MenuKey, string> = {
-    dashboard: "Dashboard",
     offplan: "Off-plan",
     resale: "Resale",
     categories: "Categories",
@@ -38,7 +37,6 @@ const pageNames: Record<MenuKey, string> = {
 };
 
 const pageSubtitles: Record<MenuKey, string> = {
-    dashboard: "Welcome back, here's what's happening today",
     offplan: "Pre-construction project pipeline",
     resale: "Secondary market listings",
     categories: "Manage property categories",
@@ -58,20 +56,6 @@ type SectionKey = "offplan" | "resale";
 
 const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; children: { key: MenuKey; icon: React.ReactNode }[] }[] = [
     {
-        key: "offplan",
-        label: "Off-plan",
-        icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg>,
-        children: [
-            { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
-            { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
-            { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
-            { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
-            { key: "statusOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
-            { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
-            { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
-        ],
-    },
-    {
         key: "resale",
         label: "Resale",
         icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12L5 10M5 10L7 12M5 10V14C5 16.5 7 18 9.5 18" /><path d="M21 12L19 14M19 14L17 12M19 14V10C19 7.5 17 6 14.5 6" /><path d="M9 16C9 17.5 10.5 19 12 19C13.5 19 15 17.5 15 16C15 14.5 13.5 13 12 13C10.5 13 9 14.5 9 16Z" /></svg>,
@@ -86,17 +70,30 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
             { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
         ],
     },
+    {
+        key: "offplan",
+        label: "Off-plan",
+        icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg>,
+        children: [
+            { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
+            { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
+            { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
+            { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
+            { key: "statusOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
+            { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
+            { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
+        ],
+    },
 ];
 
 const getParentSection = (key: MenuKey): SectionKey | null => {
-    if (key === "dashboard") return null;
     if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions" || key === "roomOptions" || key === "currencies") return "offplan";
     return "resale";
 };
 
 export function Dashboard() {
-    const [activeMenu, setActiveMenu] = useState<MenuKey>("dashboard");
-    const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set(["offplan", "resale"]));
+    const [activeMenu, setActiveMenu] = useState<MenuKey>("resale");
+    const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set(["resale"]));
 
     const toggleSection = (key: SectionKey) => {
         setExpandedSections(prev => {
@@ -169,24 +166,6 @@ export function Dashboard() {
                 </div>
                 
                 <nav className="flex flex-col w-full">
-                    {/* Dashboard - always visible */}
-                    <a href="#" onClick={(e) => { e.preventDefault(); handleMenuClick("dashboard"); }}
-                        className="relative flex items-center gap-3 px-4 h-10 rounded-xl font-medium text-[13px] transition-colors mb-1"
-                        style={{
-                            background: activeMenu === "dashboard" ? "#4C525E" : "transparent",
-                            color: activeMenu === "dashboard" ? "#FFFFFF" : "#808191"
-                        }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
-                        Dashboard
-                        {activeMenu === "dashboard" && (
-                            <span className="absolute -right-[41px] top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[10px] border border-[#EBEBEB] bg-white shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M10.1658 4.23431C10.4782 4.54673 10.4782 5.05327 10.1658 5.36569L7.53147 8L10.1658 10.6343C10.4782 10.9467 10.4782 11.4533 10.1658 11.7657C9.85336 12.0781 9.34683 12.0781 9.03441 11.7657L5.83441 8.56569C5.52199 8.25327 5.52199 7.74673 5.83441 7.43431L9.03441 4.23431C9.34683 3.9219 9.85336 3.9219 10.1658 4.23431Z" fill="#4E525D"/>
-                                </svg>
-                            </span>
-                        )}
-                    </a>
-
                     {/* Accordion sections */}
                     {accordionConfig.map((section) => {
                         const isOpen = expandedSections.has(section.key);
@@ -194,7 +173,7 @@ export function Dashboard() {
                             <div key={section.key} className="mb-1">
                                 {/* Section header */}
                                 <button onClick={() => toggleSection(section.key)}
-                                    className="flex items-center gap-3 w-full px-4 h-10 rounded-xl font-medium text-[13px] transition-colors"
+                                    className="flex items-center gap-3 w-full px-4 h-10 rounded-xl font-medium text-[13px] transition-colors cursor-pointer"
                                     style={{ color: "#808191" }}>
                                     {section.icon}
                                     <span className="flex-1 text-left">{section.label}</span>
@@ -209,7 +188,7 @@ export function Dashboard() {
                                     <div className="flex flex-col gap-0.5 ml-2">
                                         {section.children.map((item) => (
                                             <a key={item.key} href="#" onClick={(e) => { e.preventDefault(); handleMenuClick(item.key); }}
-                                                className="relative flex items-center gap-3 px-4 h-9 rounded-xl font-medium text-[12px] transition-colors"
+                                                className="relative flex items-center gap-3 px-4 h-9 rounded-xl font-medium text-[12px] transition-colors cursor-pointer"
                                                 style={{
                                                     background: activeMenu === item.key ? "#4C525E" : "transparent",
                                                     color: activeMenu === item.key ? "#FFFFFF" : "#808191"
@@ -266,190 +245,6 @@ export function Dashboard() {
                         </button>
                     </div>
                 </header>
-
-                {/* Dashboard Content */}
-                {activeMenu === "dashboard" && (
-                <main 
-                    className="flex-1 p-8 overflow-y-auto flex flex-col gap-6"
-                    style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
-                >
-                    {/* Top Row: Info Metric Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Card 1 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Monthly Apartment Sales</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>24</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+12% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-
-                        {/* Card 2 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Apartments</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>1,234</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+8% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Apartments Sold</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>323</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+26% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-
-                        {/* Card 4 */}
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Apartments</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>12</h3>
-                                <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-5.1% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                    </div>
-
-                    {/* Middle Row: Graphic Charts Breakdown */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Analytical Line Chart Widget */}
-                        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Revenue Overview</h4>
-                                <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
-                            </div>
-                            <div className="relative w-full flex-1 min-h-[260px]">
-                                <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "0%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "20%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "40%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "60%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "80%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "100%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
-                                </div>
-
-                                <div className="ml-[72px] relative" style={{ height: "calc(100% - 32px)" }}>
-                                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                    </div>
-
-                                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                        <defs>
-                                            <linearGradient id="revenueAreaFill" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#4E525D" stopOpacity="0.35" />
-                                                <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15 L 100 100 L 0 100 Z" fill="url(#revenueAreaFill)" stroke="none" vectorEffect="non-scaling-stroke" />
-                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15" fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
-                                    </svg>
-
-                                    <div className="absolute flex items-center justify-center" style={{ left: "5%", top: "51%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "22%", top: "46%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute" style={{ left: "38%", top: "73%", width: 0, height: 0 }}>
-                                        <div className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }} />
-                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
-                                            <div className="relative">
-                                                <div className="flex items-center justify-center text-white" style={{ width: 45, height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
-                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
-                                                </div>
-                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
-                                            </div>
-                                        </div>
-                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "55%", top: "69%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "72%", top: "55%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "90%", top: "40%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                </div>
-
-                                <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "38%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Mar</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "55%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Apr</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "72%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>May</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "90%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jun</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Distribution Donut Diagram Card */}
-                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
-                            <div>
-                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Unit Distribution</h4>
-                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Current inventory status</p>
-                            </div>
-                            
-                            <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
-                                {/* SVG Donut Chart with corrected angles, colors, and clean padding gaps matching image_dd0e00.png */}
-                                <svg width="140" height="140" viewBox="0 0 128 128">
-                                    {/* Green Slice - Sold (Top Half) */}
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
-                                        strokeDasharray="150.1 164.1" strokeLinecap="butt"
-                                        transform="rotate(184 64 64)" />
-                                    
-                                    {/* Yellow Slice - Active (Bottom Right) */}
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
-                                        strokeDasharray="57.6 256.6" strokeLinecap="butt"
-                                        transform="rotate(4 64 64)" />
-
-                                    {/* Blue Slice - Monthly.S (Bottom Left) */}
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#0075E3" strokeWidth="13"
-                                        strokeDasharray="68.1 246.1" strokeLinecap="butt"
-                                        transform="rotate(76 64 64)" />
-
-                                    {/* Red Slice - Reserved (Mid Left) */}
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#E6211B" strokeWidth="13"
-                                        strokeDasharray="15.7 298.5" strokeLinecap="butt"
-                                        transform="rotate(160 64 64)" />
-                                </svg>
-                            </div>
-
-                            {/* Legend Grid matching the sequence layout in image_dd0e00.png */}
-                            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
-                                    <span>Monthly.S <span className="font-semibold text-[#2C3E50] ml-0.5">24</span></span>
-                                </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
-                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">323</span></span>
-                                </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
-                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">1,234</span></span>
-                                </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
-                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">12</span></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-                )}
 
                 {/* Off-plan Content */}
                 {activeMenu === "offplan" && (
@@ -520,8 +315,47 @@ export function Dashboard() {
                                         <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
                                         <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
                                     </div>
-                                    <img src="/images/pages/inv-dashboard/schedule.svg" alt="" className="absolute inset-0 w-full h-full object-cover object-left-top pointer-events-none" />
+
+                                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id="revenueAreaFill" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#4E525D" stopOpacity="0.35" />
+                                                <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15 L 100 100 L 0 100 Z" fill="url(#revenueAreaFill)" stroke="none" vectorEffect="non-scaling-stroke" />
+                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15" fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+                                    </svg>
+
+                                    <div className="absolute flex items-center justify-center" style={{ left: "5%", top: "51%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "22%", top: "46%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute" style={{ left: "38%", top: "73%", width: 0, height: 0 }}>
+                                        <div className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }} />
+                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
+                                            <div className="relative">
+                                                <div className="flex items-center justify-center text-white" style={{ width: 45, height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
+                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
+                                                </div>
+                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
+                                            </div>
+                                        </div>
+                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "55%", top: "69%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "72%", top: "55%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "90%", top: "40%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
                                 </div>
+
                                 <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
                                     <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
                                     <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
@@ -645,8 +479,47 @@ export function Dashboard() {
                                         <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
                                         <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
                                     </div>
-                                    <img src="/images/pages/inv-dashboard/schedule.svg" alt="" className="absolute inset-0 w-full h-full object-cover object-left-top pointer-events-none" />
+
+                                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id="revenueAreaFillResale" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#4E525D" stopOpacity="0.35" />
+                                                <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15 L 100 100 L 0 100 Z" fill="url(#revenueAreaFillResale)" stroke="none" vectorEffect="non-scaling-stroke" />
+                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15" fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+                                    </svg>
+
+                                    <div className="absolute flex items-center justify-center" style={{ left: "5%", top: "51%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "22%", top: "46%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute" style={{ left: "38%", top: "73%", width: 0, height: 0 }}>
+                                        <div className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }} />
+                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
+                                            <div className="relative">
+                                                <div className="flex items-center justify-center text-white" style={{ width: 45, height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
+                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
+                                                </div>
+                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
+                                            </div>
+                                        </div>
+                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "55%", top: "69%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "72%", top: "55%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
+                                    <div className="absolute flex items-center justify-center" style={{ left: "90%", top: "40%" }}>
+                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
+                                    </div>
                                 </div>
+
                                 <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
                                     <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
                                     <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
