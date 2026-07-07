@@ -16,7 +16,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
 
     return (
         <div
-            className="bg-white border border-[#E2E8F0] rounded-[24px] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
+            className="w-[260px] h-[368px] bg-white border border-[#EBEBEB] rounded-[28px] p-2 pb-3 flex flex-col gap-3 hover:shadow-md transition-shadow group cursor-pointer"
             onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
         >
             {/* Image */}
@@ -78,15 +78,10 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                             <span>{apt.roomCount} bed</span>
                         </div>
 
-                        <span className="text-[#CBD5E1]">|</span>
-
                         {/* Bath */}
                         <div className="flex items-center gap-1">
-                           
                             <span>1 bath</span>
                         </div>
-
-                        <span className="text-[#CBD5E1]">|</span>
 
                         {/* Area */}
                         <div>
@@ -96,7 +91,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                 </div>
 
                 {/* Bottom row */}
-                <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9]">
+                <div className="flex items-center justify-between">
                     {/* Price */}
                     <div className="bg-[#F1F5F9] px-3.5 py-1.5 rounded-full flex items-center justify-center">
                         <span className="text-[14px] font-bold text-[#1A1C1E] tracking-tight">
