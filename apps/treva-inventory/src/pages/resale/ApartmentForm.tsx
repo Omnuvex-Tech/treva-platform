@@ -25,7 +25,7 @@ function slugify(text: string): string {
         .replace(/(^-|-$)/g, "");
 }
 
-export function ApartmentForm() {
+export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {}) {
     const { id } = useParams();
     const isEdit = Boolean(id);
     const navigate = useNavigate();
@@ -138,7 +138,7 @@ export function ApartmentForm() {
         mutationFn: (data: CreateApartmentData) => apartmentsApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["apartments"] });
-            navigate("/resale/apartments");
+            navigate("/dashboard/resale/apartments");
         },
     });
 
@@ -146,7 +146,7 @@ export function ApartmentForm() {
         mutationFn: (data: CreateApartmentData) => apartmentsApi.update(id!, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["apartments"] });
-            navigate("/resale/apartments");
+            navigate("/dashboard/resale/apartments");
         },
     });
 
@@ -391,9 +391,7 @@ export function ApartmentForm() {
     };
 
     // ─── Render ────────────────────────────────────────────────
-    return (
-        <div className="min-h-screen bg-[#F4F5F6] py-8">
-            <div className="mx-auto max-w-4xl">
+    const formContent = (
                 <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <div className="mb-6">
                     <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>
@@ -889,7 +887,7 @@ export function ApartmentForm() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate("/resale/apartments")}
+                        onClick={() => embedded ? navigate("/dashboard/resale/apartments") : navigate("/dashboard/resale/apartments")}
                         className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
                     >
                         Cancel
@@ -897,7 +895,21 @@ export function ApartmentForm() {
                 </div>
             </form>
         </div>
-        </div>
+    );
+
+    if (embedded) {
+        return (
+            <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+                {formContent}
+            </main>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-[#F4F5F6] py-8">
+            <div className="mx-auto max-w-4xl">
+                {formContent}
+            </div>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayoutStats } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
 import { apartmentsApi, type Apartment } from "../api/apartments";
@@ -11,6 +11,7 @@ import { StatusOptionsSection } from "./dashboard/StatusOptionsSection";
 import { RoomOptionsSection } from "./dashboard/RoomOptionsSection";
 import { CurrenciesSection } from "./dashboard/CurrenciesSection";
 import { ResaleApartmentsCardSection } from "./dashboard/ResaleApartmentsCardSection";
+import { ApartmentForm } from "./resale/ApartmentForm";
 import { ApartmentTypesSection } from "./dashboard/ApartmentTypesSection";
 import { OwnersSection } from "./dashboard/OwnersSection";
 import { AttributesSection } from "./dashboard/AttributesSection";
@@ -116,6 +117,8 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
 export function Dashboard() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { id: apartmentId } = useParams();
+    const isCreatingApartment = location.pathname === "/dashboard/resale/apartments/create";
     const [activeMenu, setActiveMenu] = useState<MenuKey>("resale");
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
 
@@ -643,7 +646,7 @@ export function Dashboard() {
                 {activeMenu === "statusOptions" && <StatusOptionsSection />}
                 {activeMenu === "roomOptions" && <RoomOptionsSection />}
                 {activeMenu === "currencies" && <CurrenciesSection />}
-                {activeMenu === "apartments" && <ResaleApartmentsCardSection />}
+                {activeMenu === "apartments" && (apartmentId || isCreatingApartment ? <ApartmentForm embedded /> : <ResaleApartmentsCardSection />)}
                 {activeMenu === "apartmentTypes" && <ApartmentTypesSection />}
                 {activeMenu === "owners" && <OwnersSection />}
                 {activeMenu === "attributes" && <AttributesSection />}

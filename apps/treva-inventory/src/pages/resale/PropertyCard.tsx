@@ -17,7 +17,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
     return (
         <div
             className="bg-white border border-[#E2E8F0] rounded-[24px] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
-            onClick={() => navigate(`/resale/apartments/${apt.id}/edit`)}
+            onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
         >
             {/* Image */}
             <div className="relative w-full aspect-[4/3] rounded-[18px] overflow-hidden mb-4 bg-[#F8F9FA]">
@@ -116,7 +116,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/resale/apartments/${apt.id}/edit`);
+                            navigate(`/dashboard/resale/apartments/${apt.id}`);
                         }}
                         className="bg-[#4A4E5A] hover:bg-[#3A3D46] text-white text-xs font-semibold px-4 h-8 rounded-full transition-colors shadow-xs"
                     >

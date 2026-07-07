@@ -84,7 +84,7 @@ export function ResaleApartmentsCardSection() {
 
                 {/* Global Blueprint Action Button */}
                 <button
-                    onClick={() => navigate("/resale/apartments/new")}
+                    onClick={() => navigate("/dashboard/resale/apartments/create")}
                     className="flex items-center gap-2 px-5 h-[46px] bg-[#4A4E5A] hover:bg-[#3A3D46] text-white rounded-full text-sm font-medium transition-colors shadow-sm cursor-pointer"
                 >
                     <span className="text-base font-light">+</span>

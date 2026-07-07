@@ -96,6 +96,22 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/resale/apartments/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/apartments/create"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/dashboard/resale/apartment-types"
                             element={
                                 <ProtectedRoute>
