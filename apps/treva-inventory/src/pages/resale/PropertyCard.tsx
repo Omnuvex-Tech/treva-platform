@@ -16,11 +16,11 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
 
     return (
         <div
-            className="w-[260px] h-[368px] bg-white border border-[#EBEBEB] rounded-[28px] p-2 pb-3 flex flex-col gap-3 hover:shadow-md transition-shadow group cursor-pointer"
+            className="w-[280px] bg-white border border-[#EBEBEB] rounded-[28px] p-2 pb-3 flex flex-col gap-3 hover:shadow-md transition-shadow group cursor-pointer"
             onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
         >
             {/* Image */}
-            <div className="relative w-full aspect-[4/3] rounded-[18px] overflow-hidden mb-4 bg-[#F8F9FA]">
+            <div className="relative w-full h-[200px] rounded-[24px] overflow-hidden bg-[#F8F9FA]">
                 {apt.image ? (
                     <img
                         src={apt.image}
@@ -35,66 +35,70 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                 )}
 
                 {/* View count badge - top left */}
-                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+                <div className="absolute top-3 left-3 bg-[#EBEBEB] px-2 py-1 rounded-full flex items-center gap-1">
                     <img src="/images/inv-resale/eye.svg" alt="" className="w-[13px] h-[13px]" />
-                    <span className="text-[11px] font-bold text-[#4A5568]">0</span>
+                    <span className="text-[12px] font-medium text-[#666666]">0</span>
                 </div>
 
                 {/* Status badge - top right */}
                 <div className="absolute top-3 right-3">
-                    <span
-                        className={`text-[11px] font-bold px-3 py-1 rounded-full shadow-xs tracking-wide ${
-                            status === "active"
-                                ? "bg-[#E6F7ED] text-[#27AE60]"
-                                : status === "pending"
-                                ? "bg-[#FFF4EC] text-[#D35400]"
-                                : "bg-[#FDECEC] text-[#C3362B]"
-                        }`}
-                    >
-                        {status === "active" ? "Active" : status === "pending" ? "Pending" : "Non Active"}
-                    </span>
+                    {status === "active" ? (
+                        <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#2D9A5B] text-white">
+                            Active
+                        </span>
+                    ) : status === "pending" ? (
+                        <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#FDF4E0] text-[#967B38]">
+                            Pending
+                        </span>
+                    ) : (
+                        <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#FDECEC] text-[#C3362B]">
+                            Non Active
+                        </span>
+                    )}
                 </div>
             </div>
 
             {/* Content */}
-            <div className="flex-1 flex flex-col justify-between px-1">
+            <div className="flex-1 flex flex-col justify-between px-1.5">
                 <div>
                     {/* Title */}
-                    <h3 className="text-[16px] font-bold text-[#1A1C1E] tracking-tight leading-snug line-clamp-1 mb-1.5">
+                    <h3 className="text-[16px] font-semibold text-[#1A1A1A] leading-[20px] line-clamp-1 mb-5">
                         {apt.title}
                     </h3>
 
                     {/* Location */}
-                    <div className="flex items-center gap-1 text-[#718096] mb-3">
+                    <div className="flex items-center gap-1 mb-3">
                         <img src="/images/inv-resale/location.svg" alt="" className="w-[14px] h-[14px]" />
-                        <span className="text-xs font-medium">{apt.locationTitle || "—"}</span>
+                        <span className="text-[14px] font-medium text-[#4E525D] leading-[20px]">{apt.locationTitle || "—"}</span>
                     </div>
 
                     {/* Details row */}
-                    <div className="flex items-center gap-2.5 text-xs font-medium text-[#718096] mb-4">
+                    <div className="flex items-center text-[#4E525D] text-[13px] font-medium leading-[20px] mb-6">
                         {/* Bed */}
-                        <div className="flex items-center gap-1">
-                            <img src="/images/inv-resale/bedroom.svg" alt="" className="w-[13px] h-[13px]" />
+                        <div className="flex items-center gap-1.5">
+                            <img src="/images/inv-resale/bedroom.svg" alt="" className="w-[16px] h-[16px]" />
                             <span>{apt.roomCount} bed</span>
                         </div>
 
+                        {/* Şaquli Ayırıcı Simvol */}
+                        <span className="mx-3 text-[#D1D5DB]">|</span>
+
                         {/* Bath */}
-                        <div className="flex items-center gap-1">
-                            <span>1 bath</span>
-                        </div>
+                        <span>2 bath</span>
+
+                        {/* Şaquli Ayırıcı Simvol */}
+                        <span className="mx-3 text-[#D1D5DB]">|</span>
 
                         {/* Area */}
-                        <div>
-                            <span>{apt.area} m²</span>
-                        </div>
+                        <span>{apt.area} m²</span>
                     </div>
                 </div>
 
-                {/* Bottom row */}
-                <div className="flex items-center justify-between">
+                {/* Bottom row - Qiymət və Düymə arasındakı sahə */}
+                <div className="flex items-center justify-between gap-4 mt-auto pt-1">
                     {/* Price */}
-                    <div className="bg-[#F1F5F9] px-3.5 py-1.5 rounded-full flex items-center justify-center">
-                        <span className="text-[14px] font-bold text-[#1A1C1E] tracking-tight">
+                    <div className="bg-[#EBEBEB] px-3 py-1 rounded-3xl flex items-center justify-center min-w-[96px] h-[32px]">
+                        <span className="text-[14px] font-semibold text-[#000000] leading-[20px] whitespace-nowrap">
                             ₼ {formatPrice(price)}
                         </span>
                     </div>
@@ -105,7 +109,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                             e.stopPropagation();
                             navigate(`/dashboard/resale/apartments/${apt.id}`);
                         }}
-                        className="bg-[#4A4E5A] hover:bg-[#3A3D46] text-white text-xs font-semibold px-4 h-8 rounded-full transition-colors shadow-xs"
+                        className="bg-[#4E525D] hover:bg-[#3A3D46] text-white text-[14px] font-medium leading-[20px] px-4 h-[32px] rounded-3xl transition-colors flex items-center justify-center whitespace-nowrap"
                     >
                         View Details
                     </button>

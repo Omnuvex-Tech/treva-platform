@@ -84,7 +84,7 @@ export function ResaleApartmentsCardSection() {
 
             {/* Card Grid */}
             {isLoading ? (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 w-full">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 w-full">
                     {Array.from({ length: 8 }).map((_, i) => (
                         <div
                             key={i}
@@ -128,7 +128,7 @@ export function ResaleApartmentsCardSection() {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 w-full">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 w-full">
                     {apartments.map((apt: Apartment) => (
                         <PropertyCard key={apt.id} apartment={apt} />
                     ))}
