@@ -97,9 +97,10 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                 {/* Bottom row - Qiymət və Düymə arasındakı sahə */}
                 <div className="flex items-center justify-between gap-4 mt-auto pt-1">
                     {/* Price */}
-                    <div className="bg-[#EBEBEB] px-3 py-1 rounded-3xl flex items-center justify-center min-w-[96px] h-[32px]">
+                    <div className="bg-[#EBEBEB] px-3 py-1 rounded-3xl inline-flex items-baseline min-w-[96px] h-[32px]">
+                        <img src="/images/inv-resale/manat.svg" alt="" className="h-[12px] w-auto relative top-[2px] mr-1" />
                         <span className="text-[14px] font-semibold text-[#000000] leading-[20px] whitespace-nowrap">
-                            ₼ {formatPrice(price)}
+                            {formatPrice(price)}
                         </span>
                     </div>
 
