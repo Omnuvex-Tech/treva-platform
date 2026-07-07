@@ -82,6 +82,7 @@ export function ApartmentForm() {
         ownerId: "",
         attributeIds: [],
         requestIds: [],
+        status: "active" as "active" | "pending" | "non-active",
         prices: [],
     });
 
@@ -109,6 +110,7 @@ export function ApartmentForm() {
                 ownerId: d.ownerId || "",
                 attributeIds: d.attributeIds || [],
                 requestIds: d.requestIds || [],
+                status: d.status || "active",
                 prices: (d.prices || []).map((p: any) => ({ currencyId: p.currencyId, priceTotal: p.priceTotal, priceByArea: p.priceByArea })),
             });
         }
@@ -488,6 +490,17 @@ export function ApartmentForm() {
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-4">
+                            <CustomSelect
+                                label="Status"
+                                value={form.status || "active"}
+                                options={[
+                                    { id: "active", label: "Active" },
+                                    { id: "pending", label: "Pending" },
+                                    { id: "non-active", label: "Non Active" },
+                                ]}
+                                placeholder="Select status"
+                                onChange={(id) => updateField("status", id as "active" | "pending" | "non-active")}
+                            />
                             <div>
                                 <label className="mb-1 block text-xs text-[#4E525D]">Floor From</label>
                                 <input

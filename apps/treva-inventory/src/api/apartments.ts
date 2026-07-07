@@ -20,6 +20,7 @@ export interface Apartment {
     wallMaterial: string | null;
     attributeIds: string[];
     requestIds: string[];
+    status?: "active" | "pending" | "non-active";
     apartmentTypeId: string;
     apartmentType: { id: string; title: string } | null;
     ownerId: string | null;
@@ -62,6 +63,7 @@ export interface CreateApartmentData {
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
+    status?: "active" | "pending" | "non-active";
     currencyId?: string;
     prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
@@ -87,6 +89,7 @@ export interface UpdateApartmentData {
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
+    status?: "active" | "pending" | "non-active";
     currencyId?: string;
     prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }

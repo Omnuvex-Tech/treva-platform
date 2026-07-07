@@ -104,6 +104,11 @@ export class UpdateApartmentDto {
   @IsArray()
   requestIds?: string[];
 
+  @ApiPropertyOptional({ example: 'active', enum: ['active', 'pending', 'non-active'] })
+  @IsOptional()
+  @IsString()
+  status?: string;
+
   @ApiPropertyOptional({ type: [ApartmentPriceInput] })
   @IsOptional()
   @IsArray()

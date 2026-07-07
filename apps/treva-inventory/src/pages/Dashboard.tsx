@@ -10,7 +10,7 @@ import { ViewOptionsSection } from "./dashboard/ViewOptionsSection";
 import { StatusOptionsSection } from "./dashboard/StatusOptionsSection";
 import { RoomOptionsSection } from "./dashboard/RoomOptionsSection";
 import { CurrenciesSection } from "./dashboard/CurrenciesSection";
-import { ApartmentsSection } from "./dashboard/ApartmentsSection";
+import { ResaleApartmentsCardSection } from "./dashboard/ResaleApartmentsCardSection";
 import { ApartmentTypesSection } from "./dashboard/ApartmentTypesSection";
 import { OwnersSection } from "./dashboard/OwnersSection";
 import { AttributesSection } from "./dashboard/AttributesSection";
@@ -643,7 +643,7 @@ export function Dashboard() {
                 {activeMenu === "statusOptions" && <StatusOptionsSection />}
                 {activeMenu === "roomOptions" && <RoomOptionsSection />}
                 {activeMenu === "currencies" && <CurrenciesSection />}
-                {activeMenu === "apartments" && <ApartmentsSection />}
+                {activeMenu === "apartments" && <ResaleApartmentsCardSection />}
                 {activeMenu === "apartmentTypes" && <ApartmentTypesSection />}
                 {activeMenu === "owners" && <OwnersSection />}
                 {activeMenu === "attributes" && <AttributesSection />}

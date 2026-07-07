@@ -165,6 +165,7 @@ model Apartment {
   wallMaterial    String?
   attributeIds    String[]
   requestIds      String[]
+  status          String        @default("active")
   apartmentTypeId String
   apartmentType   ApartmentType  @relation(fields: [apartmentTypeId], references: [id])
   ownerId         String?
