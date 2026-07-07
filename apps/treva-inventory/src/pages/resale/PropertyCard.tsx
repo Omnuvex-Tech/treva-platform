@@ -36,10 +36,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
 
                 {/* View count badge - top left */}
                 <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#718096" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                    </svg>
+                    <img src="/images/inv-resale/eye.svg" alt="" className="w-[13px] h-[13px]" />
                     <span className="text-[11px] font-bold text-[#4A5568]">0</span>
                 </div>
 
@@ -69,10 +66,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
 
                     {/* Location */}
                     <div className="flex items-center gap-1 text-[#718096] mb-3">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                            <circle cx="12" cy="10" r="3" />
-                        </svg>
+                        <img src="/images/inv-resale/location.svg" alt="" className="w-[14px] h-[14px]" />
                         <span className="text-xs font-medium">{apt.locationTitle || "—"}</span>
                     </div>
 
@@ -80,9 +74,7 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                     <div className="flex items-center gap-2.5 text-xs font-medium text-[#718096] mb-4">
                         {/* Bed */}
                         <div className="flex items-center gap-1">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                            </svg>
+                            <img src="/images/inv-resale/bedroom.svg" alt="" className="w-[13px] h-[13px]" />
                             <span>{apt.roomCount} bed</span>
                         </div>
 

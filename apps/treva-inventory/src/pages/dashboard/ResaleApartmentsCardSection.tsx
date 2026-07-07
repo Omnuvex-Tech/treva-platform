@@ -40,10 +40,8 @@ export function ResaleApartmentsCardSection() {
             {/* Action Bar */}
             <div className="w-full flex items-center justify-end gap-3 mb-8">
                 {/* Filter Pill Button */}
-                <button className="flex items-center gap-2 px-5 h-[46px] bg-white border border-[#E2E8F0] rounded-full text-sm font-medium text-[#4A5568] hover:bg-[#F8F9FA] transition-colors shadow-sm cursor-pointer">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                    </svg>
+                <button className="flex items-center justify-center gap-2 w-[85px] h-[44px] bg-[#EBEBEB] border border-white rounded-[16px] py-2 px-3.5 text-[14px] font-medium leading-[20px] tracking-[0px] text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer">
+                    <img src="/images/inv-resale/filter.svg" alt="" className="w-4 h-4" />
                     <span>Filter</span>
                 </button>
 
@@ -51,33 +49,25 @@ export function ResaleApartmentsCardSection() {
                 <div className="flex items-center bg-white border border-[#E2E8F0] rounded-full h-[46px] p-1 shadow-sm">
                     <button
                         onClick={() => setViewMode("grid")}
-                        className={`flex items-center gap-2 px-4 h-full rounded-full text-sm font-medium transition-all cursor-pointer ${
-                            viewMode === "grid" ? "bg-[#F1F5F9] text-[#1A1A1A]" : "text-[#718096] hover:text-[#1A1A1A]"
+                        className={`flex items-center justify-center gap-2 w-[80px] h-[40px] rounded-[24px] py-2 px-3.5 text-[14px] font-medium leading-[20px] tracking-[0px] transition-all cursor-pointer ${
+                            viewMode === "grid"
+                                ? "bg-[#EBEBEB] text-[#4E525D] border border-white"
+                                : "bg-transparent text-[#718096] border border-transparent hover:bg-[#F1F5F9]"
                         }`}
                     >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
+                        <img src="/images/inv-resale/grid.svg" alt="" className="w-4 h-4" />
                         <span>Grid</span>
                     </button>
 
                     <button
                         onClick={() => setViewMode("list")}
-                        className={`flex items-center gap-2 px-4 h-full rounded-full text-sm font-medium transition-all cursor-pointer ${
-                            viewMode === "list" ? "bg-[#F1F5F9] text-[#1A1A1A]" : "text-[#718096] hover:text-[#1A1A1A]"
+                        className={`flex items-center justify-center gap-2 w-[80px] h-[40px] rounded-[24px] py-2 px-3.5 text-[14px] font-medium leading-[20px] tracking-[0px] transition-all cursor-pointer ${
+                            viewMode === "list"
+                                ? "bg-[#EBEBEB] text-[#4E525D] border border-white"
+                                : "bg-transparent text-[#718096] border border-transparent hover:bg-[#F1F5F9]"
                         }`}
                     >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="8" y1="6" x2="21" y2="6"></line>
-                            <line x1="8" y1="12" x2="21" y2="12"></line>
-                            <line x1="8" y1="18" x2="21" y2="18"></line>
-                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                        </svg>
+                        <img src="/images/inv-resale/list.svg" alt="" className="w-4 h-4" />
                         <span>List</span>
                     </button>
                 </div>
@@ -85,9 +75,9 @@ export function ResaleApartmentsCardSection() {
                 {/* Global Blueprint Action Button */}
                 <button
                     onClick={() => navigate("/dashboard/resale/apartments/create")}
-                    className="flex items-center gap-2 px-5 h-[46px] bg-[#4A4E5A] hover:bg-[#3A3D46] text-white rounded-full text-sm font-medium transition-colors shadow-sm cursor-pointer"
+                    className="flex items-center justify-center gap-2 w-[124px] h-[44px] bg-[#4E525D] border border-white rounded-[16px] py-2 px-3.5 text-[13px] font-medium leading-[20px] tracking-[0px] text-white hover:bg-[#3D404A] transition-colors cursor-pointer"
                 >
-                    <span className="text-base font-light">+</span>
+                    <img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />
                     <span>Add Listing</span>
                 </button>
             </div>
