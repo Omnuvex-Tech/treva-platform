@@ -17,6 +17,10 @@ import { OwnersSection } from "./dashboard/OwnersSection";
 import { AttributesSection } from "./dashboard/AttributesSection";
 import { RequestsSection } from "./dashboard/RequestsSection";
 import { OffPlanObjectsSection } from "./dashboard/OffPlanObjectsSection";
+import { CategoryEdit } from "./categories/CategoryEdit";
+import { CategoryCreate } from "./categories/CategoryCreate";
+import { ObjectEditPage } from "./dashboard/ObjectEditPage";
+import { ObjectCreatePage } from "./dashboard/ObjectCreatePage";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type MenuKey = "offplan" | "resale"
@@ -131,7 +135,7 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["requests", (value) => value === "/dashboard/resale/requests"],
         ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
         ["categories", (value) => value === "/dashboard/offplan/categories"],
-        ["objects", (value) => value === "/dashboard/offplan/objects"],
+        ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create"],
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["viewOptions", (value) => value === "/dashboard/offplan/view-options"],
         ["statusOptions", (value) => value === "/dashboard/offplan/status-options"],
@@ -147,6 +151,9 @@ export function Dashboard() {
     const navigate = useNavigate();
     const { id: apartmentId } = useParams();
     const isCreatingApartment = location.pathname === "/dashboard/resale/apartments/create";
+    const isEditingObject = /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(location.pathname);
+    const isCreatingObject = location.pathname === "/dashboard/offplan/objects/create";
+    const objectId = isEditingObject ? location.pathname.split("/")[4] : null;
     const activeMenu = getMenuKeyFromPath(location.pathname) ?? "resale";
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
 
@@ -640,7 +647,7 @@ export function Dashboard() {
 
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
-                {activeMenu === "objects" && <OffPlanObjectsSection />}
+                {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage /> : objectId ? <ObjectEditPage /> : <OffPlanObjectsSection />)}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}
                 {activeMenu === "statusOptions" && <StatusOptionsSection />}

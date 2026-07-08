@@ -186,6 +186,22 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/offplan/objects/create"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/objects/:id/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/dashboard/offplan/unit-layouts"
                             element={
                                 <ProtectedRoute>

@@ -24,75 +24,79 @@ export class CategoriesService {
   async findAll() {
     const categories = await this.prisma.category.findMany({
       orderBy: { createdAt: 'desc' },
-      include: {
-        unitLayouts: {
-          include: {
-            statusOption: true,
-          },
-        },
+    });
+
+    return categories.map((category) => ({
+      id: category.id,
+      title: category.title,
+      name: category.name,
+      slug: category.slug,
+      image: category.image,
+      status: category.status,
+      order: category.order,
+      housesCount: category.housesCount,
+      propertiesCount: category.propertiesCount,
+      reservedCount: category.reservedCount,
+      soldCount: category.soldCount,
+      objectType: category.objectType,
+      propertyName: category.propertyName,
+      currency: category.currency,
+      region: category.region,
+      area: category.area,
+      city: category.city,
+      developerBrand: category.developerBrand,
+      website: category.website,
+      fedLaw214: category.fedLaw214,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+      metrics: {
+        houses: category.housesCount,
+        properties: category.propertiesCount,
+        reserved: category.reservedCount,
+        sold: category.soldCount,
+        available: category.propertiesCount - category.reservedCount - category.soldCount,
       },
-    });
-
-    return categories.map((category) => {
-      const unitLayouts = category.unitLayouts;
-      const total = unitLayouts.length;
-      const sold = unitLayouts.filter(
-        (u) => u.statusOption?.value?.toLowerCase() === 'sold',
-      ).length;
-      const reserved = unitLayouts.filter(
-        (u) => u.statusOption?.value?.toLowerCase() === 'reserved',
-      ).length;
-      const available = total - sold - reserved;
-
-      const { unitLayouts: _unitLayouts, ...categoryData } = category;
-      return {
-        ...categoryData,
-        metrics: {
-          houses: total,
-          properties: total,
-          reserved,
-          sold,
-          available,
-        },
-      };
-    });
+    }));
   }
 
   async findOne(id: string) {
     const category = await this.prisma.category.findUnique({
       where: { id },
-      include: {
-        unitLayouts: {
-          include: {
-            statusOption: true,
-          },
-        },
-      },
     });
 
     if (!category) {
       throw new NotFoundException('Category not found');
     }
 
-    const unitLayouts = category.unitLayouts;
-    const total = unitLayouts.length;
-    const sold = unitLayouts.filter(
-      (u) => u.statusOption?.value?.toLowerCase() === 'sold',
-    ).length;
-    const reserved = unitLayouts.filter(
-      (u) => u.statusOption?.value?.toLowerCase() === 'reserved',
-    ).length;
-    const available = total - sold - reserved;
-
-    const { unitLayouts: _unitLayouts, ...categoryData } = category;
     return {
-      ...categoryData,
+      id: category.id,
+      title: category.title,
+      name: category.name,
+      slug: category.slug,
+      image: category.image,
+      status: category.status,
+      order: category.order,
+      housesCount: category.housesCount,
+      propertiesCount: category.propertiesCount,
+      reservedCount: category.reservedCount,
+      soldCount: category.soldCount,
+      objectType: category.objectType,
+      propertyName: category.propertyName,
+      currency: category.currency,
+      region: category.region,
+      area: category.area,
+      city: category.city,
+      developerBrand: category.developerBrand,
+      website: category.website,
+      fedLaw214: category.fedLaw214,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
       metrics: {
-        houses: total,
-        properties: total,
-        reserved,
-        sold,
-        available,
+        houses: category.housesCount,
+        properties: category.propertiesCount,
+        reserved: category.reservedCount,
+        sold: category.soldCount,
+        available: category.propertiesCount - category.reservedCount - category.soldCount,
       },
     };
   }
@@ -100,38 +104,41 @@ export class CategoriesService {
   async findBySlug(slug: string) {
     const category = await this.prisma.category.findUnique({
       where: { slug },
-      include: {
-        unitLayouts: {
-          include: {
-            statusOption: true,
-          },
-        },
-      },
     });
 
     if (!category) {
       throw new NotFoundException('Category not found');
     }
 
-    const unitLayouts = category.unitLayouts;
-    const total = unitLayouts.length;
-    const sold = unitLayouts.filter(
-      (u) => u.statusOption?.value?.toLowerCase() === 'sold',
-    ).length;
-    const reserved = unitLayouts.filter(
-      (u) => u.statusOption?.value?.toLowerCase() === 'reserved',
-    ).length;
-    const available = total - sold - reserved;
-
-    const { unitLayouts: _unitLayouts, ...categoryData } = category;
     return {
-      ...categoryData,
+      id: category.id,
+      title: category.title,
+      name: category.name,
+      slug: category.slug,
+      image: category.image,
+      status: category.status,
+      order: category.order,
+      housesCount: category.housesCount,
+      propertiesCount: category.propertiesCount,
+      reservedCount: category.reservedCount,
+      soldCount: category.soldCount,
+      objectType: category.objectType,
+      propertyName: category.propertyName,
+      currency: category.currency,
+      region: category.region,
+      area: category.area,
+      city: category.city,
+      developerBrand: category.developerBrand,
+      website: category.website,
+      fedLaw214: category.fedLaw214,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
       metrics: {
-        houses: total,
-        properties: total,
-        reserved,
-        sold,
-        available,
+        houses: category.housesCount,
+        properties: category.propertiesCount,
+        reserved: category.reservedCount,
+        sold: category.soldCount,
+        available: category.propertiesCount - category.reservedCount - category.soldCount,
       },
     };
   }

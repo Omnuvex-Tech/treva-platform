@@ -15,7 +15,7 @@ export function OffPlanObjectsSection() {
     const navigate = useNavigate();
     const qc = useQueryClient();
     const { showError, showSuccess } = useMessageCenter();
-    const [activeTab, setActiveTab] = useState<"active" | "archive">("active");
+    const [activeTab, setActiveTab] = useState<"Active" | "Archive">("Active");
 
     const { data: response, isLoading } = useQuery({
         queryKey: ["categories"],
@@ -41,7 +41,7 @@ export function OffPlanObjectsSection() {
         : [];
 
     const filtered = categories.filter(
-        (c) => (c.status || "active") === activeTab
+        (c) => (c.status || "active") === activeTab.toLowerCase()
     );
 
     return (
@@ -50,25 +50,25 @@ export function OffPlanObjectsSection() {
             style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
         >
             {/* Action Bar */}
-            <div className="w-full flex items-center justify-between mb-8">
-                {/* Active / Archive Toggle */}
-                <div className="flex bg-[#EBEBEB] p-1 rounded-xl">
+            <div className="w-full flex items-center justify-between mb-6">
+                {/* Toggle Segment Control */}
+                <div className="flex items-center bg-white border border-[#E2E8F0] rounded-full p-1 shadow-sm gap-1">
                     <button
-                        onClick={() => setActiveTab("active")}
-                        className={`px-5 h-[38px] text-[14px] font-medium rounded-lg transition-all cursor-pointer ${
-                            activeTab === "active"
-                                ? "bg-white text-[#1A1A1A] shadow-sm"
-                                : "text-[#666666] hover:text-[#1A1A1A]"
+                        onClick={() => setActiveTab("Active")}
+                        className={`flex items-center justify-center w-[69px] h-[44px] px-[14px] py-[8px] rounded-full text-[14px] font-medium leading-[20px] tracking-[0px] transition-all cursor-pointer ${
+                            activeTab === "Active"
+                                ? "bg-[#EBEBEB] text-[#4E525D] border border-white"
+                                : "bg-transparent text-[#A6A6A6] border border-transparent hover:text-[#4E525D]"
                         }`}
                     >
                         Active
                     </button>
                     <button
-                        onClick={() => setActiveTab("archive")}
-                        className={`px-5 h-[38px] text-[14px] font-medium rounded-lg transition-all cursor-pointer ${
-                            activeTab === "archive"
-                                ? "bg-white text-[#1A1A1A] shadow-sm"
-                                : "text-[#666666] hover:text-[#1A1A1A]"
+                        onClick={() => setActiveTab("Archive")}
+                        className={`flex items-center justify-center w-[69px] h-[44px] px-[14px] py-[8px] rounded-full text-[14px] font-medium leading-[20px] tracking-[0px] transition-all cursor-pointer ${
+                            activeTab === "Archive"
+                                ? "bg-[#EBEBEB] text-[#4E525D] border border-white"
+                                : "bg-transparent text-[#A6A6A6] border border-transparent hover:text-[#4E525D]"
                         }`}
                     >
                         Archive
@@ -77,10 +77,10 @@ export function OffPlanObjectsSection() {
 
                 {/* Add Object Button */}
                 <button
-                    onClick={() => navigate("/dashboard/offplan/categories")}
-                    className="flex items-center gap-1.5 px-4 h-[40px] bg-[#4E525D] hover:bg-[#3D404A] text-white rounded-xl text-[13px] font-medium transition-colors cursor-pointer"
+                    onClick={() => navigate("/dashboard/offplan/objects/create")}
+                    className="flex items-center justify-center gap-2 w-[124px] h-[44px] bg-[#4E525D] border border-white rounded-[16px] py-2 px-3.5 text-[13px] font-medium leading-[20px] tracking-[0px] text-white hover:bg-[#3D404A] transition-colors cursor-pointer"
                 >
-                    <span className="text-sm font-light">+</span>
+                    <img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />
                     <span>Add Object</span>
                 </button>
             </div>
@@ -109,25 +109,25 @@ export function OffPlanObjectsSection() {
                         No objects found
                     </p>
                     <p className="text-[14px] text-[#999]">
-                        {activeTab === "active"
+                        {activeTab === "Active"
                             ? "Create your first project object"
                             : "No archived objects"}
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 w-full">
+                <div className="flex flex-wrap gap-5 w-full">
                     {filtered.map((cat) => (
                         <div
                             key={cat.id}
-                            className="bg-white rounded-[28px] p-4 flex flex-col justify-between shadow-md group"
+                            className="bg-[#FFFFFF] border border-[#EBEBEB] rounded-[32px] pt-[8px] pr-[8px] pb-[12px] pl-[8px] flex flex-col gap-[12px] w-[265px] h-[398px] shrink-0"
                         >
-                            {/* Image */}
-                            <div className="relative w-full h-[200px] rounded-[24px] overflow-hidden mb-4 bg-[#F3F4F6]">
+                            {/* Image Container */}
+                            <div className="relative w-full h-[200px] rounded-[32px] overflow-hidden bg-[#F3F4F6] shrink-0">
                                 {cat.image ? (
                                     <img
                                         src={cat.image}
                                         alt={cat.title}
-                                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                                        className="w-full h-full object-cover"
                                         loading="lazy"
                                     />
                                 ) : (
@@ -137,68 +137,65 @@ export function OffPlanObjectsSection() {
                                 )}
 
                                 {/* Status Badge */}
-                                <div className="absolute top-3 right-3">
+                                <div className="absolute top-2.5 right-2.5">
                                     <span
-                                        className={`text-[11px] font-bold px-3 py-1 rounded-full shadow-xs tracking-wide ${
-                                            activeTab === "active"
-                                                ? "bg-[#E6F7ED] text-[#27AE60]"
+                                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide ${
+                                            activeTab === "Active"
+                                                ? "bg-[#EAF7F0] text-[#219653]"
                                                 : "bg-[#F3F4F6] text-[#999]"
                                         }`}
                                     >
-                                        {activeTab === "active" ? "Active" : "Archive"}
+                                        {activeTab === "Active" ? "Active" : "Archive"}
                                     </span>
                                 </div>
                             </div>
 
                             {/* Content */}
                             <div className="flex-1 flex flex-col justify-between">
-                                <div className="px-1">
+                                <div className="px-0.5">
                                     {/* Title */}
-                                    <h3 className="text-[16px] font-bold text-[#1A1C1E] tracking-tight leading-snug line-clamp-1 mb-1">
+                                    <h3 className="text-[16px] font-semibold text-[#1A1A1A] leading-[20px] tracking-[0px] mb-1 line-clamp-1">
                                         {cat.title}
                                     </h3>
 
-                                    {/* Date */}
-                                    <div className="flex items-center gap-1.5 text-[#718096] mb-5">
-                                        <span className="text-xs font-medium tracking-wide">
+                                    {/* Date & Edit Icon */}
+                                    <div className="flex items-center gap-2 pb-4 mb-4 border-b border-[#EBEBEB]">
+                                        <span className="text-[14px] font-medium text-[#4E525D] leading-[20px] tracking-[0px]">
                                             {formatDate(cat.createdAt)}
                                         </span>
                                         <button
-                                            onClick={() => navigate("/dashboard/offplan/categories")}
-                                            className="text-[#A0AEC0] hover:text-[#4A4E5A] transition-colors cursor-pointer"
+                                            onClick={() => navigate(`/dashboard/offplan/objects/${cat.id}/edit`)}
+                                            className="transition-colors cursor-pointer flex items-center justify-center"
                                             aria-label="Edit Date"
                                         >
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z" />
-                                            </svg>
+                                            <img src="/images/inv-dashboard/inv-offplan/edit.svg" alt="edit" className="w-4 h-4" />
                                         </button>
                                     </div>
 
-                                    {/* Metrics */}
-                                    <div className="grid grid-cols-4 gap-1 text-center mb-5 bg-[#F8F9FA] py-2.5 px-1 rounded-xl">
+                                    {/* Metrics Grid */}
+                                    <div className="grid grid-cols-4 gap-0 text-center mb-4">
                                         <div>
-                                            <span className="block text-[11px] font-medium text-[#A0AEC0] mb-1">Houses</span>
-                                            <span className="text-xs font-bold text-[#2D3748]">
-                                                {cat.metrics?.houses ?? 0}
+                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Houses</span>
+                                            <span className="block text-[14px] font-semibold text-[#1A1A1A] leading-[20px] tracking-[0px]">
+                                                {(cat.metrics?.houses ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="block text-[11px] font-medium text-[#A0AEC0] mb-1">Properties</span>
-                                            <span className="text-xs font-bold text-[#27AE60]">
-                                                {cat.metrics?.properties ?? 0}
+                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Properties</span>
+                                            <span className="block text-[14px] font-semibold text-[#00C274] leading-[20px] tracking-[0px]">
+                                                {(cat.metrics?.properties ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="block text-[11px] font-medium text-[#A0AEC0] mb-1">Reserved</span>
-                                            <span className={`text-xs font-bold ${(cat.metrics?.reserved ?? 0) > 0 ? "text-[#F1C40F]" : "text-[#A0AEC0]"}`}>
-                                                {cat.metrics?.reserved ?? 0}
+                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Reserved</span>
+                                            <span className="block text-[14px] font-semibold text-[#FFBB00] leading-[20px] tracking-[0px]">
+                                                {(cat.metrics?.reserved ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="block text-[11px] font-medium text-[#A0AEC0] mb-1">Sold</span>
-                                            <span className={`text-xs font-bold ${(cat.metrics?.sold ?? 0) > 0 ? "text-[#2D3748]" : "text-[#A0AEC0]"}`}>
-                                                {cat.metrics?.sold ?? 0}
+                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Sold</span>
+                                            <span className="block text-[14px] font-semibold text-[#4E525D] leading-[20px] tracking-[0px]">
+                                                {(cat.metrics?.sold ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
@@ -206,8 +203,8 @@ export function OffPlanObjectsSection() {
 
                                 {/* Edit Button */}
                                 <button
-                                    onClick={() => navigate("/dashboard/offplan/categories")}
-                                    className="w-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#4A5568] text-xs font-bold py-2.5 rounded-xl transition-colors tracking-wide cursor-pointer"
+                                    onClick={() => navigate(`/dashboard/offplan/objects/${cat.id}/edit`)}
+                                    className="w-[236px] mx-auto h-[28px] max-h-[28px] bg-[#EBEBEB] rounded-[24px] flex items-center justify-center gap-[8px] py-[15px] px-[8px] text-[14px] font-medium leading-[20px] tracking-[0px] text-center text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer"
                                 >
                                     Edit
                                 </button>
