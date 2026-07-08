@@ -16,4 +16,9 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsString()
   slug?: string;
+
+  @ApiPropertyOptional({ example: 'active', enum: ['active', 'archive'] })
+  @IsOptional()
+  @IsString()
+  status?: string;
 }

@@ -22,33 +22,118 @@ export class CategoriesService {
   }
 
   async findAll() {
-    return this.prisma.category.findMany({
+    const categories = await this.prisma.category.findMany({
       orderBy: { createdAt: 'desc' },
+      include: {
+        unitLayouts: {
+          include: {
+            statusOption: true,
+          },
+        },
+      },
+    });
+
+    return categories.map((category) => {
+      const unitLayouts = category.unitLayouts;
+      const total = unitLayouts.length;
+      const sold = unitLayouts.filter(
+        (u) => u.statusOption?.value?.toLowerCase() === 'sold',
+      ).length;
+      const reserved = unitLayouts.filter(
+        (u) => u.statusOption?.value?.toLowerCase() === 'reserved',
+      ).length;
+      const available = total - sold - reserved;
+
+      const { unitLayouts: _unitLayouts, ...categoryData } = category;
+      return {
+        ...categoryData,
+        metrics: {
+          houses: total,
+          properties: total,
+          reserved,
+          sold,
+          available,
+        },
+      };
     });
   }
 
   async findOne(id: string) {
     const category = await this.prisma.category.findUnique({
       where: { id },
+      include: {
+        unitLayouts: {
+          include: {
+            statusOption: true,
+          },
+        },
+      },
     });
 
     if (!category) {
       throw new NotFoundException('Category not found');
     }
 
-    return category;
+    const unitLayouts = category.unitLayouts;
+    const total = unitLayouts.length;
+    const sold = unitLayouts.filter(
+      (u) => u.statusOption?.value?.toLowerCase() === 'sold',
+    ).length;
+    const reserved = unitLayouts.filter(
+      (u) => u.statusOption?.value?.toLowerCase() === 'reserved',
+    ).length;
+    const available = total - sold - reserved;
+
+    const { unitLayouts: _unitLayouts, ...categoryData } = category;
+    return {
+      ...categoryData,
+      metrics: {
+        houses: total,
+        properties: total,
+        reserved,
+        sold,
+        available,
+      },
+    };
   }
 
   async findBySlug(slug: string) {
     const category = await this.prisma.category.findUnique({
       where: { slug },
+      include: {
+        unitLayouts: {
+          include: {
+            statusOption: true,
+          },
+        },
+      },
     });
 
     if (!category) {
       throw new NotFoundException('Category not found');
     }
 
-    return category;
+    const unitLayouts = category.unitLayouts;
+    const total = unitLayouts.length;
+    const sold = unitLayouts.filter(
+      (u) => u.statusOption?.value?.toLowerCase() === 'sold',
+    ).length;
+    const reserved = unitLayouts.filter(
+      (u) => u.statusOption?.value?.toLowerCase() === 'reserved',
+    ).length;
+    const available = total - sold - reserved;
+
+    const { unitLayouts: _unitLayouts, ...categoryData } = category;
+    return {
+      ...categoryData,
+      metrics: {
+        houses: total,
+        properties: total,
+        reserved,
+        sold,
+        available,
+      },
+    };
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {

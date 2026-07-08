@@ -1,24 +1,39 @@
 import apiClient from "./client";
 
+export interface CategoryMetrics {
+    houses: number;
+    properties: number;
+    reserved: number;
+    sold: number;
+    available: number;
+}
+
 export interface Category {
     id: string;
     title: string;
     name: string;
     slug: string;
+    image?: string;
+    status?: string;
     createdAt: string;
     updatedAt: string;
+    metrics?: CategoryMetrics;
 }
 
 export interface CreateCategoryData {
     title: string;
     name: string;
     slug: string;
+    image?: string;
+    status?: string;
 }
 
 export interface UpdateCategoryData {
     title?: string;
     name?: string;
     slug?: string;
+    image?: string;
+    status?: string;
 }
 
 export const categoriesApi = {

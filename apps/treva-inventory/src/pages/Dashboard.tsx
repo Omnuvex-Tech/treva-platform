@@ -16,12 +16,14 @@ import { ApartmentTypesSection } from "./dashboard/ApartmentTypesSection";
 import { OwnersSection } from "./dashboard/OwnersSection";
 import { AttributesSection } from "./dashboard/AttributesSection";
 import { RequestsSection } from "./dashboard/RequestsSection";
+import { OffPlanObjectsSection } from "./dashboard/OffPlanObjectsSection";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type MenuKey = "offplan" | "resale"
     | "categories" | "unitLayouts" | "viewOptions" | "statusOptions"
     | "roomOptions" | "currencies"
-    | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests";
+    | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests"
+    | "objects";
 
 const pageNames: Record<MenuKey, string> = {
     offplan: "Off-plan",
@@ -37,6 +39,7 @@ const pageNames: Record<MenuKey, string> = {
     owners: "Owners",
     attributes: "Attributes",
     requests: "Requests",
+    objects: "Objects",
 };
 
 const pageSubtitles: Record<MenuKey, string> = {
@@ -53,6 +56,7 @@ const pageSubtitles: Record<MenuKey, string> = {
     owners: "Manage apartment owners",
     attributes: "Manage apartment attributes",
     requests: "View buyer requests",
+    objects: "Manage off-plan project objects",
 };
 
 type SectionKey = "offplan" | "resale";
@@ -79,6 +83,7 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
         icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg>,
         children: [
             { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
+            { key: "objects", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
             { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
             { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
             { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
@@ -105,6 +110,7 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
     if (key === "requests") return "/dashboard/resale/requests";
 
     if (key === "categories") return "/dashboard/offplan/categories";
+    if (key === "objects") return "/dashboard/offplan/objects";
     if (key === "unitLayouts") return "/dashboard/offplan/unit-layouts";
     if (key === "viewOptions") return "/dashboard/offplan/view-options";
     if (key === "statusOptions") return "/dashboard/offplan/status-options";
@@ -125,6 +131,7 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["requests", (value) => value === "/dashboard/resale/requests"],
         ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
         ["categories", (value) => value === "/dashboard/offplan/categories"],
+        ["objects", (value) => value === "/dashboard/offplan/objects"],
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["viewOptions", (value) => value === "/dashboard/offplan/view-options"],
         ["statusOptions", (value) => value === "/dashboard/offplan/status-options"],
@@ -633,6 +640,7 @@ export function Dashboard() {
 
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
+                {activeMenu === "objects" && <OffPlanObjectsSection />}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}
                 {activeMenu === "statusOptions" && <StatusOptionsSection />}
