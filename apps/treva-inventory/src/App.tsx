@@ -11,6 +11,7 @@ import { ApartmentTypeForm } from "./pages/resale/ApartmentTypeForm";
 import { OwnerForm } from "./pages/resale/OwnerForm";
 import { AttributeForm } from "./pages/resale/AttributeForm";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { MessageCenterProvider } from "./components/MessageCenter";
 
 const queryClient = new QueryClient();
 
@@ -67,9 +68,10 @@ function App() {
     return (
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
-                <BrowserRouter>
-                    <AuthEventBridge />
-                    <Routes>
+                <MessageCenterProvider>
+                    <BrowserRouter>
+                        <AuthEventBridge />
+                        <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route
                             path="/"
@@ -432,8 +434,9 @@ function App() {
                                 </div>
                             }
                         />
-                    </Routes>
-                </BrowserRouter>
+                        </Routes>
+                    </BrowserRouter>
+                </MessageCenterProvider>
             </QueryClientProvider>
         </ErrorBoundary>
     );

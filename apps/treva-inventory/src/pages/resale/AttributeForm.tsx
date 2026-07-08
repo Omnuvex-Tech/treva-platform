@@ -4,12 +4,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { attributesApi, CreateAttributeData } from "../../api/attributes";
 import { apartmentsApi } from "../../api/apartments";
 import { Layout } from "../../components/Layout";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 export function AttributeForm() {
     const { id } = useParams();
     const isEdit = Boolean(id);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
 
     const { data: existing } = useQuery({
         queryKey: ["attribute", id],
@@ -46,8 +49,13 @@ export function AttributeForm() {
         try {
             const res = await apartmentsApi.uploadFile(file);
             setForm((f) => ({ ...f, icon: res.data.url }));
+            showSuccess({ title: "Icon uploaded" });
         } catch {
             setUploadError("Icon upload failed");
+            showError({
+                title: "Icon upload failed",
+                description: "Please try again.",
+            });
         } finally {
             setUploading(false);
         }
@@ -69,7 +77,18 @@ export function AttributeForm() {
             isEdit ? attributesApi.update(id!, data) : attributesApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["attributes"] });
+            showSuccess({
+                title: isEdit ? "Attribute updated" : "Attribute created",
+            });
             navigate("/resale/attributes");
+        },
+        onError: (error) => {
+            showError({
+                title: isEdit
+                    ? "Attribute could not be updated"
+                    : "Attribute could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 

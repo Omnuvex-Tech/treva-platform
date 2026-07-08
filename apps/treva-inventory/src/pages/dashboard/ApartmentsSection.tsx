@@ -2,10 +2,16 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { apartmentsApi, type Apartment, type ApartmentFilters } from "../../api/apartments";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { RowActions } from "../../components/RowActions";
+import { buildApartmentDuplicatePayload } from "../../utils/entityDuplicatePayloads";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 export function ApartmentsSection() {
     const qc = useQueryClient();
     const navigate = useNavigate();
+    const { showError, showSuccess } = useMessageCenter();
     const [filters, setFilters] = useState<ApartmentFilters>({ page: 1, limit: 12 });
     const [search, setSearch] = useState("");
 
@@ -16,7 +22,30 @@ export function ApartmentsSection() {
 
     const deleteMut = useMutation({
         mutationFn: (id: string) => apartmentsApi.delete(id),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["apartments"] }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["apartments"] });
+            showSuccess({ title: "Apartment deleted" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be deleted",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const duplicateMut = useMutation({
+        mutationFn: (apartment: Apartment) => apartmentsApi.create(buildApartmentDuplicatePayload(apartment)),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["apartments"] });
+            showSuccess({ title: "Apartment duplicated" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be duplicated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
     });
 
     const formatPrice = (p: number) => p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -49,7 +78,7 @@ export function ApartmentsSection() {
                 </div>
 
                 {isLoading ? (
-                    <div className="py-8 text-center text-[#666666]">Loading...</div>
+                    <LoadingSpinner label="Loading apartments" />
                 ) : (
                     <>
                         <div className="overflow-hidden rounded-xl border border-gray-100">
@@ -84,11 +113,16 @@ export function ApartmentsSection() {
                                             <td className="px-4 py-3 text-[#666666]">
                                                 {apt.owner ? `${apt.owner.firstName} ${apt.owner.lastName}` : "—"}
                                             </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <button onClick={() => navigate(`/resale/apartments/${apt.id}/edit`)}
-                                                    className="mr-3 text-sm text-[#4E525D] hover:underline">Edit</button>
-                                                <button onClick={() => { if (window.confirm(`Delete "${apt.title}"?`)) deleteMut.mutate(apt.id); }}
-                                                    className="text-sm text-[#C3362B] hover:underline">Delete</button>
+                                            <td className="px-4 py-3">
+                                                <RowActions
+                                                    onEdit={() => navigate(`/resale/apartments/${apt.id}/edit`)}
+                                                    onDuplicate={() => duplicateMut.mutate(apt)}
+                                                    onDelete={() => {
+                                                        if (window.confirm(`Delete "${apt.title}"?`)) {
+                                                            deleteMut.mutate(apt.id);
+                                                        }
+                                                    }}
+                                                />
                                             </td>
                                         </tr>
                                     ))}

@@ -13,6 +13,8 @@ import { roomOptionsApi, RoomOption } from "../../api/room-options";
 import { viewOptionsApi, ViewOption } from "../../api/view-options";
 import { statusOptionsApi, StatusOption } from "../../api/status-options";
 import { FileUpload } from "../../components/FileUpload";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 type Tab = "basic" | "area" | "location" | "documents" | "gallery" | "similar";
 
@@ -116,6 +118,7 @@ export function UnitLayoutForm() {
     const isEdit = !!id;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
 
     const [activeTab, setActiveTab] = useState<Tab>("basic");
     const [form, setForm] = useState<CreateUnitLayoutData>({
@@ -236,7 +239,14 @@ export function UnitLayoutForm() {
         mutationFn: (data: CreateUnitLayoutData) => unitLayoutsApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
+            showSuccess({ title: "Unit layout created" });
             navigate("/unit-layouts");
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 
@@ -245,7 +255,14 @@ export function UnitLayoutForm() {
             unitLayoutsApi.update(id!, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
+            showSuccess({ title: "Unit layout updated" });
             navigate("/unit-layouts");
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be updated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 

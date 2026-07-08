@@ -3,12 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ownersApi, CreateOwnerData } from "../../api/owners";
 import { Layout } from "../../components/Layout";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 export function OwnerForm() {
     const { id } = useParams();
     const isEdit = Boolean(id);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
 
     const { data: existing } = useQuery({
         queryKey: ["owner", id],
@@ -39,7 +42,16 @@ export function OwnerForm() {
             isEdit ? ownersApi.update(id!, data) : ownersApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["owners"] });
+            showSuccess({
+                title: isEdit ? "Owner updated" : "Owner created",
+            });
             navigate("/resale/owners");
+        },
+        onError: (error) => {
+            showError({
+                title: isEdit ? "Owner could not be updated" : "Owner could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 

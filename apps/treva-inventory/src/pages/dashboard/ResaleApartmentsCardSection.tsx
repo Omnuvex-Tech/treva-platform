@@ -6,11 +6,16 @@ import {
     type Apartment,
     type ApartmentFilters,
 } from "../../api/apartments";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { useMessageCenter } from "../../components/MessageCenter";
 import { PropertyCard } from "../resale/PropertyCard";
+import { buildApartmentDuplicatePayload } from "../../utils/entityDuplicatePayloads";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 export function ResaleApartmentsCardSection() {
     const navigate = useNavigate();
     const qc = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [filters, setFilters] = useState<ApartmentFilters>({
         page: 1,
@@ -24,7 +29,31 @@ export function ResaleApartmentsCardSection() {
 
     const deleteMut = useMutation({
         mutationFn: (id: string) => apartmentsApi.delete(id),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["apartments"] }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["apartments"] });
+            showSuccess({ title: "Apartment deleted" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be deleted",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const duplicateMut = useMutation({
+        mutationFn: (apartment: Apartment) =>
+            apartmentsApi.create(buildApartmentDuplicatePayload(apartment)),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["apartments"] });
+            showSuccess({ title: "Apartment duplicated" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be duplicated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
     });
 
     const apartments = Array.isArray(response?.data?.data)
@@ -84,25 +113,7 @@ export function ResaleApartmentsCardSection() {
 
             {/* Card Grid */}
             {isLoading ? (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 w-full">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <div
-                            key={i}
-                            className="bg-white border border-[#E2E8F0] rounded-[24px] p-4 shadow-sm overflow-hidden animate-pulse"
-                        >
-                            <div className="aspect-[4/3] bg-[#F8F9FA] rounded-[18px] mb-4" />
-                            <div className="px-1">
-                                <div className="h-5 bg-gray-100 rounded w-3/4 mb-3" />
-                                <div className="h-4 bg-gray-100 rounded w-1/2 mb-3" />
-                                <div className="h-4 bg-gray-100 rounded w-full mb-4" />
-                                <div className="flex justify-between items-center pt-2 border-t border-[#F1F5F9]">
-                                    <div className="h-8 bg-gray-100 rounded-full w-1/3" />
-                                    <div className="h-8 bg-gray-100 rounded-full w-1/4" />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <LoadingSpinner label="Loading listings" className="min-h-[320px]" />
             ) : apartments.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-[#666666]">
                     <svg
@@ -130,7 +141,11 @@ export function ResaleApartmentsCardSection() {
             ) : (
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 w-full">
                     {apartments.map((apt: Apartment) => (
-                        <PropertyCard key={apt.id} apartment={apt} />
+                        <PropertyCard
+                            key={apt.id}
+                            apartment={apt}
+                            onDuplicate={(apartment) => duplicateMut.mutate(apartment)}
+                        />
                     ))}
                 </div>
             )}

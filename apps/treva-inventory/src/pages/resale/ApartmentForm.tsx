@@ -6,6 +6,8 @@ import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
 import { currenciesApi, Currency } from "../../api/currencies";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 type TabKey = "basic" | "area" | "location" | "gallery" | "description";
 
@@ -30,6 +32,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     const isEdit = Boolean(id);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
 
     const [activeTab, setActiveTab] = useState<TabKey>("basic");
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -138,7 +141,14 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         mutationFn: (data: CreateApartmentData) => apartmentsApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["apartments"] });
+            showSuccess({ title: "Apartment created" });
             navigate("/dashboard/resale/apartments");
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 
@@ -146,7 +156,31 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         mutationFn: (data: CreateApartmentData) => apartmentsApi.update(id!, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["apartments"] });
+            queryClient.invalidateQueries({ queryKey: ["apartment", id] });
+            showSuccess({ title: "Apartment updated" });
             navigate("/dashboard/resale/apartments");
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be updated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: () => apartmentsApi.delete(id!),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["apartments"] });
+            queryClient.removeQueries({ queryKey: ["apartment", id] });
+            showSuccess({ title: "Apartment deleted" });
+            navigate("/dashboard/resale/apartments");
+        },
+        onError: (error) => {
+            showError({
+                title: "Apartment could not be deleted",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 
@@ -212,7 +246,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     };
 
     const mutationError = (() => {
-        const err = isEdit ? updateMutation.error : createMutation.error;
+        const err = deleteMutation.error || (isEdit ? updateMutation.error : createMutation.error);
         if (!err) return null;
         const e = err as any;
         const msg = e?.response?.data?.message;
@@ -876,8 +910,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 <div className="mt-6 flex gap-3 pt-2">
                     <button
                         type="submit"
-                        disabled={createMutation.isPending || updateMutation.isPending}
-                        className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                        disabled={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+                        className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {createMutation.isPending || updateMutation.isPending
                             ? "Saving..."
@@ -888,10 +922,25 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                     <button
                         type="button"
                         onClick={() => embedded ? navigate("/dashboard/resale/apartments") : navigate("/dashboard/resale/apartments")}
-                        className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                        disabled={deleteMutation.isPending || createMutation.isPending || updateMutation.isPending}
+                        className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         Cancel
                     </button>
+                    {isEdit && (
+                        <button
+                            type="button"
+                            disabled={deleteMutation.isPending || createMutation.isPending || updateMutation.isPending}
+                            onClick={() => {
+                                if (window.confirm(`Delete "${form.title || "this apartment"}"?`)) {
+                                    deleteMutation.mutate();
+                                }
+                            }}
+                            className="rounded-xl bg-[#C3362B] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#AA2E24] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                        </button>
+                    )}
                 </div>
             </form>
         </div>

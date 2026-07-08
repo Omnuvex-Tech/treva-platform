@@ -1,97 +1,104 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { roomOptionsApi, type RoomOption } from "../../api/room-options";
+import { CrudSection } from "../../components/CrudSection";
+import { useEntityCrud } from "../../hooks/useEntityCrud";
+import { createDuplicateToken, duplicateText } from "../../utils/duplicate";
 
 export function RoomOptionsSection() {
-    const qc = useQueryClient();
-    const [show, setShow] = useState(false);
-    const [edit, setEdit] = useState<RoomOption | null>(null);
-    const [value, setValue] = useState("");
-    const [type, setType] = useState("");
-    const [order, setOrder] = useState("");
-
-    const { data, isLoading } = useQuery({ queryKey: ["room-options"], queryFn: () => roomOptionsApi.getAll() });
-
-    const createMut = useMutation({
-        mutationFn: (d: { value: string; type?: string; order?: number }) => roomOptionsApi.create(d),
-        onSuccess: () => { qc.invalidateQueries({ queryKey: ["room-options"] }); close(); },
+    const {
+        items,
+        isLoading,
+        showForm,
+        form,
+        setForm,
+        editItem,
+        openCreate,
+        openEdit,
+        closeForm,
+        submitForm,
+        confirmAndDelete,
+        duplicateItem,
+    } = useEntityCrud({
+        queryKey: ["room-options"],
+        queryFn: () => roomOptionsApi.getAll(),
+        getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
+        createEmptyForm: () => ({ value: "", type: "", order: "" }),
+        mapItemToForm: (item: RoomOption) => ({
+            value: item.value,
+            type: item.type || "",
+            order: item.order != null ? String(item.order) : "",
+        }),
+        buildPayload: (nextForm) => ({
+            value: nextForm.value,
+            type: nextForm.type || undefined,
+            order: nextForm.order ? Number(nextForm.order) : undefined,
+        }),
+        createFn: (payload) => roomOptionsApi.create(payload),
+        updateFn: (itemId, payload) => roomOptionsApi.update(itemId, payload),
+        deleteFn: (itemId) => roomOptionsApi.delete(itemId),
+        getItemId: (item: RoomOption) => item.id,
+        getDeleteLabel: (item: RoomOption) => item.value,
+        entityName: "Room option",
+        buildDuplicatePayload: (item: RoomOption) => {
+            const token = createDuplicateToken();
+            return {
+                value: duplicateText(item.value, token),
+                type: item.type || undefined,
+                order: item.order,
+            };
+        },
     });
-    const updateMut = useMutation({
-        mutationFn: (d: { id: string; data: { value?: string; type?: string; order?: number } }) => roomOptionsApi.update(d.id, d.data),
-        onSuccess: () => { qc.invalidateQueries({ queryKey: ["room-options"] }); close(); },
-    });
-    const deleteMut = useMutation({
-        mutationFn: (id: string) => roomOptionsApi.delete(id),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["room-options"] }),
-    });
-
-    const close = () => { setShow(false); setEdit(null); setValue(""); setType(""); setOrder(""); };
-
-    const items = Array.isArray(data?.data) ? data.data : [];
 
     return (
-        <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16 }}>Room Options</h4>
-                    <button onClick={() => { close(); setShow(true); }} className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ background: "#4E525D" }}>+ New Room Option</button>
-                </div>
-
-                {show && (
-                    <form onSubmit={(e) => { e.preventDefault(); const p = { value, type: type || undefined, order: order ? Number(order) : undefined }; if (edit) updateMut.mutate({ id: edit.id, data: p }); else createMut.mutate(p); }} className="mb-6 p-4 rounded-xl border border-gray-200 bg-gray-50">
-                        <div className="grid grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label className="block text-xs text-[#666666] mb-1">Value</label>
-                                <input value={value} onChange={e => setValue(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400" required />
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[#666666] mb-1">Type</label>
-                                <input value={type} onChange={e => setType(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400" placeholder="offplan / resale" />
-                            </div>
-                            <div>
-                                <label className="block text-xs text-[#666666] mb-1">Order</label>
-                                <input type="number" value={order} onChange={e => setOrder(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-gray-400" />
-                            </div>
+        <CrudSection
+            title="Room Options"
+            createLabel="+ New Room Option"
+            onCreate={openCreate}
+            showForm={showForm}
+            formContent={
+                <form onSubmit={submitForm} className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div className="mb-4 grid grid-cols-3 gap-4">
+                        <div>
+                            <label className="mb-1 block text-xs text-[#666666]">Value</label>
+                            <input value={form.value} onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
                         </div>
-                        <div className="flex gap-2">
-                            <button type="submit" className="px-4 py-2 rounded-xl text-sm font-medium text-white" style={{ background: "#4E525D" }}>{edit ? "Update" : "Create"}</button>
-                            <button type="button" onClick={close} className="px-4 py-2 rounded-xl text-sm font-medium text-[#666666] border border-gray-200">Cancel</button>
+                        <div>
+                            <label className="mb-1 block text-xs text-[#666666]">Type</label>
+                            <input value={form.type} onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" placeholder="offplan / resale" />
                         </div>
-                    </form>
-                )}
-
-                {isLoading ? (
-                    <div className="py-8 text-center text-[#666666]">Loading...</div>
-                ) : (
-                    <div className="overflow-hidden rounded-xl border border-gray-100">
-                        <table className="w-full text-left text-sm">
-                            <thead className="border-b border-gray-100 bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 font-medium text-[#4E525D]">Value</th>
-                                    <th className="px-4 py-3 font-medium text-[#4E525D]">Type</th>
-                                    <th className="px-4 py-3 font-medium text-[#4E525D]">Order</th>
-                                    <th className="px-4 py-3 font-medium text-[#4E525D] text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {items.length === 0 ? (
-                                    <tr><td colSpan={4} className="px-4 py-8 text-center text-[#666666]">No room options yet</td></tr>
-                                ) : items.map((item: RoomOption) => (
-                                    <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                                        <td className="px-4 py-3 text-[#1A1A1A]">{item.value}</td>
-                                        <td className="px-4 py-3 text-[#666666]">{item.type || "—"}</td>
-                                        <td className="px-4 py-3 text-[#666666]">{item.order}</td>
-                                        <td className="px-4 py-3 text-right">
-                                            <button onClick={() => { setValue(item.value); setType(item.type || ""); setOrder(String(item.order)); setEdit(item); setShow(true); }} className="mr-3 text-sm text-[#4E525D] hover:underline">Edit</button>
-                                            <button onClick={() => { if (window.confirm(`Delete "${item.value}"?`)) deleteMut.mutate(item.id); }} className="text-sm text-[#C3362B] hover:underline">Delete</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div>
+                            <label className="mb-1 block text-xs text-[#666666]">Order</label>
+                            <input type="number" value={form.order} onChange={(e) => setForm((prev) => ({ ...prev, order: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" />
+                        </div>
                     </div>
-                )}
-            </div>
-        </main>
+                    <div className="flex gap-2">
+                        <button type="submit" className="rounded-xl px-4 py-2 text-sm font-medium text-white" style={{ background: "#4E525D" }}>
+                            {editItem ? "Update" : "Create"}
+                        </button>
+                        <button type="button" onClick={closeForm} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-[#666666]">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            }
+            isLoading={isLoading}
+            columns={[
+                { key: "value", label: "Value" },
+                { key: "type", label: "Type" },
+                { key: "order", label: "Order" },
+            ]}
+            items={items}
+            emptyText="No room options yet"
+            getRowKey={(item) => item.id}
+            renderCells={(item) => (
+                <>
+                    <td className="px-4 py-3 text-[#1A1A1A]">{item.value}</td>
+                    <td className="px-4 py-3 text-[#666666]">{item.type || "—"}</td>
+                    <td className="px-4 py-3 text-[#666666]">{item.order}</td>
+                </>
+            )}
+            onEdit={openEdit}
+            onDuplicate={duplicateItem}
+            onDelete={confirmAndDelete}
+        />
     );
 }

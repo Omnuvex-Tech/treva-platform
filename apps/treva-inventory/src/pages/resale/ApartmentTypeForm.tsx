@@ -3,12 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { apartmentTypesApi, CreateApartmentTypeData } from "../../api/apartment-types";
 import { Layout } from "../../components/Layout";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 export function ApartmentTypeForm() {
     const { id } = useParams();
     const isEdit = Boolean(id);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
 
     const { data: existing } = useQuery({
         queryKey: ["apartment-type", id],
@@ -37,7 +40,18 @@ export function ApartmentTypeForm() {
             isEdit ? apartmentTypesApi.update(id!, data) : apartmentTypesApi.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["apartment-types"] });
+            showSuccess({
+                title: isEdit ? "Apartment type updated" : "Apartment type created",
+            });
             navigate("/resale/apartment-types");
+        },
+        onError: (error) => {
+            showError({
+                title: isEdit
+                    ? "Apartment type could not be updated"
+                    : "Apartment type could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 

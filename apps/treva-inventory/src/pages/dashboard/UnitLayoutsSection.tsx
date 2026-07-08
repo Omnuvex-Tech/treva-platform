@@ -2,6 +2,11 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayout, type UnitLayoutFilters } from "../../api/unit-layouts";
+import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { RowActions } from "../../components/RowActions";
+import { buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 const statusColors: Record<string, string> = {
     available: "bg-green-100 text-green-700",
@@ -12,6 +17,7 @@ const statusColors: Record<string, string> = {
 export function UnitLayoutsSection() {
     const qc = useQueryClient();
     const navigate = useNavigate();
+    const { showError, showSuccess } = useMessageCenter();
     const [filters, setFilters] = useState<UnitLayoutFilters>({ page: 1, limit: 12 });
     const [search, setSearch] = useState("");
 
@@ -22,7 +28,30 @@ export function UnitLayoutsSection() {
 
     const deleteMut = useMutation({
         mutationFn: (id: string) => unitLayoutsApi.delete(id),
-        onSuccess: () => qc.invalidateQueries({ queryKey: ["unit-layouts"] }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["unit-layouts"] });
+            showSuccess({ title: "Unit layout deleted" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be deleted",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const duplicateMut = useMutation({
+        mutationFn: (layout: UnitLayout) => unitLayoutsApi.create(buildUnitLayoutDuplicatePayload(layout)),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["unit-layouts"] });
+            showSuccess({ title: "Unit layout duplicated" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be duplicated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
     });
 
     const handlePageChange = (page: number) => setFilters(f => ({ ...f, page }));
@@ -58,7 +87,7 @@ export function UnitLayoutsSection() {
                 </div>
 
                 {isLoading ? (
-                    <div className="py-8 text-center text-[#666666]">Loading...</div>
+                    <LoadingSpinner label="Loading unit layouts" />
                 ) : (
                     <>
                         <div className="overflow-hidden rounded-xl border border-gray-100">
@@ -89,11 +118,16 @@ export function UnitLayoutsSection() {
                                                     {layout.statusOption?.value || "—"}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <button onClick={() => navigate(`/unit-layouts/${layout.id}/edit`)}
-                                                    className="mr-3 text-sm text-[#4E525D] hover:underline">Edit</button>
-                                                <button onClick={() => { if (window.confirm(`Delete "${layout.title}"?`)) deleteMut.mutate(layout.id); }}
-                                                    className="text-sm text-[#C3362B] hover:underline">Delete</button>
+                                            <td className="px-4 py-3">
+                                                <RowActions
+                                                    onEdit={() => navigate(`/unit-layouts/${layout.id}/edit`)}
+                                                    onDuplicate={() => duplicateMut.mutate(layout)}
+                                                    onDelete={() => {
+                                                        if (window.confirm(`Delete "${layout.title}"?`)) {
+                                                            deleteMut.mutate(layout.id);
+                                                        }
+                                                    }}
+                                                />
                                             </td>
                                         </tr>
                                     ))}

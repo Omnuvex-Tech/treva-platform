@@ -1,5 +1,7 @@
 import { useState, useRef } from "react";
 import { unitLayoutsApi, UploadResponse } from "../api/unit-layouts";
+import { useMessageCenter } from "./MessageCenter";
+import { getApiErrorMessage } from "../utils/apiError";
 
 interface FileUploadProps {
     accept?: string;
@@ -18,6 +20,7 @@ export function FileUpload({
     const [error, setError] = useState("");
     const [isDragging, setIsDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { showError, showSuccess } = useMessageCenter();
 
     const uploadFiles = async (files: FileList | File[]) => {
         if (!files || files.length === 0) return;
@@ -31,13 +34,16 @@ export function FileUpload({
                 const response = await unitLayoutsApi.uploadFile(file);
                 onUpload(response.data);
             }
+            showSuccess({
+                title: fileArray.length > 1 ? "Files uploaded" : "File uploaded",
+            });
         } catch (err: unknown) {
-            if (err && typeof err === "object" && "response" in err) {
-                const axiosErr = err as { response?: { data?: { message?: string } } };
-                setError(axiosErr.response?.data?.message || "Upload failed");
-            } else {
-                setError("Upload failed");
-            }
+            const message = getApiErrorMessage(err, "Upload failed");
+            setError(message);
+            showError({
+                title: "Upload failed",
+                description: message,
+            });
         } finally {
             setUploading(false);
             if (inputRef.current) inputRef.current.value = "";

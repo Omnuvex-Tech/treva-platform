@@ -3,12 +3,13 @@ import type { Apartment } from "../../api/apartments";
 
 interface PropertyCardProps {
     apartment: Apartment;
+    onDuplicate?: (apartment: Apartment) => void;
 }
 
 const formatPrice = (p: number) =>
     p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
-export function PropertyCard({ apartment: apt }: PropertyCardProps) {
+export function PropertyCard({ apartment: apt, onDuplicate }: PropertyCardProps) {
     const navigate = useNavigate();
 
     const status = apt.status || "active";
@@ -16,11 +17,13 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
 
     return (
         <div
-            className="w-[280px] bg-white border border-[#EBEBEB] rounded-[28px] p-2 pb-3 flex flex-col gap-3 hover:shadow-md transition-shadow group cursor-pointer"
-            onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
+            className="w-[280px] bg-white border border-[#EBEBEB] rounded-[28px] p-2 pb-3 flex flex-col gap-3 hover:shadow-md transition-shadow group"
         >
             {/* Image */}
-            <div className="relative w-full h-[200px] rounded-[24px] overflow-hidden bg-[#F8F9FA]">
+            <div
+                className="relative w-full h-[200px] rounded-[24px] overflow-hidden bg-[#F8F9FA] cursor-pointer"
+                onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
+            >
                 {apt.image ? (
                     <img
                         src={apt.image}
@@ -104,16 +107,41 @@ export function PropertyCard({ apartment: apt }: PropertyCardProps) {
                         </span>
                     </div>
 
-                    {/* View Details button */}
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/dashboard/resale/apartments/${apt.id}`);
-                        }}
-                        className="bg-[#4E525D] hover:bg-[#3A3D46] text-white text-[14px] font-medium leading-[20px] px-4 h-[32px] rounded-3xl transition-colors flex items-center justify-center whitespace-nowrap"
-                    >
-                        View Details
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {onDuplicate ? (
+                            <button
+                                type="button"
+                                onClick={() => onDuplicate(apt)}
+                                aria-label="Duplicate"
+                                title="Duplicate"
+                                className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0]"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    className="h-4 w-4"
+                                >
+                                    <rect x="9" y="9" width="10" height="10" rx="2" />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"
+                                    />
+                                </svg>
+                            </button>
+                        ) : null}
+
+                        <button
+                            type="button"
+                            onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
+                            className="bg-[#4E525D] hover:bg-[#3A3D46] text-white text-[14px] font-medium leading-[20px] px-4 h-[32px] rounded-3xl transition-colors flex items-center justify-center whitespace-nowrap cursor-pointer"
+                        >
+                            View Details
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
