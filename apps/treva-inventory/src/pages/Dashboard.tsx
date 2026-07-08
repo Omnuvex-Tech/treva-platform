@@ -647,7 +647,7 @@ export function Dashboard() {
 
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
-                {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage /> : objectId ? <ObjectEditPage /> : <OffPlanObjectsSection />)}
+                {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}
                 {activeMenu === "statusOptions" && <StatusOptionsSection />}

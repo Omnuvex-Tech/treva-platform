@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi, type Category } from "../../api/categories";
 
-export function ObjectCreatePage() {
+export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = {}) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -64,15 +64,17 @@ export function ObjectCreatePage() {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    return (
-        <div className="w-full min-h-screen bg-[#F8F9FA] flex items-center justify-center p-6 antialiased font-sans">
-            {/* Primary Card */}
+    const formContent = (
+        <div className="w-full min-h-full flex items-center justify-center p-6 antialiased font-sans">
             <div className="w-full max-w-[1000px] bg-white rounded-[24px] border border-[#E2E8F0] shadow-xs p-8 relative">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-[22px] font-bold text-[#1A1C1E] tracking-tight">
-                        Creating an Object
-                    </h2>
+                    <div>
+                        <h2 className="text-[22px] font-bold text-[#1A1C1E] tracking-tight">
+                            Creating an Object
+                        </h2>
+                        <p className="text-[14px] text-[#666666] mt-1">Create a new project object</p>
+                    </div>
                     <button
                         type="button"
                         onClick={() => navigate("/dashboard/offplan/objects")}
@@ -272,5 +274,19 @@ export function ObjectCreatePage() {
                 </form>
             </div>
         </div>
+    );
+
+    if (embedded) {
+        return (
+            <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+                {formContent}
+            </main>
+        );
+    }
+
+    return (
+        <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+            {formContent}
+        </main>
     );
 }

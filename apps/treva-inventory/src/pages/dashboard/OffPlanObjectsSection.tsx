@@ -139,13 +139,13 @@ export function OffPlanObjectsSection() {
                                 {/* Status Badge */}
                                 <div className="absolute top-2.5 right-2.5">
                                     <span
-                                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full tracking-wide ${
-                                            activeTab === "Active"
-                                                ? "bg-[#EAF7F0] text-[#219653]"
+                                        className={`inline-flex items-center justify-center w-[51px] h-[26px] rounded-full gap-[4px] py-[18px] px-[31px] text-[14px] font-medium leading-[18px] tracking-[0px] ${
+                                            (cat.status || "active") === "active"
+                                                ? "bg-[#D7F3E3] text-[#2D9A5B]"
                                                 : "bg-[#F3F4F6] text-[#999]"
                                         }`}
                                     >
-                                        {activeTab === "Active" ? "Active" : "Archive"}
+                                        {(cat.status || "active") === "active" ? "Active" : "Archive"}
                                     </span>
                                 </div>
                             </div>
