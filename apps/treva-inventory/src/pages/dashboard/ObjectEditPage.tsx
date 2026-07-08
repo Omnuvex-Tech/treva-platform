@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi } from "../../api/categories";
+import { objectTypesApi, type ObjectType } from "../../api/object-types";
 
 const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -41,6 +42,13 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const categoriesList = Array.isArray(categoriesResponse?.data) ? categoriesResponse.data : [];
 
+    const { data: objectTypesResponse } = useQuery({
+        queryKey: ["object-types"],
+        queryFn: () => objectTypesApi.getAll(),
+    });
+
+    const objectTypesList: ObjectType[] = Array.isArray(objectTypesResponse?.data) ? objectTypesResponse.data : [];
+
     const { data: response, isLoading } = useQuery({
         queryKey: ["category", id],
         queryFn: () => categoriesApi.getById(id!),
@@ -73,14 +81,14 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const updateMutation = useMutation({
         mutationFn: () => {
-            const selectedCategory = categoriesList.find((c) => c.id === objectType);
+            const selectedType = objectTypesList.find((t) => t.id === objectType);
             return categoriesApi.update(id!, {
                 title,
                 name,
                 slug,
                 image,
                 status,
-                objectType: selectedCategory?.title || objectType,
+                objectType: selectedType?.title || objectType,
                 propertyName,
                 currency,
                 region,
@@ -174,7 +182,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                 {/* 2-Column Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
-                    {/* Object Type - Dynamic from Categories */}
+                    {/* Object Type - Dynamic from ObjectTypes */}
                     <div>
                         <label className="mb-1.5 block text-xs font-medium text-[#666666]">Object type<span className="text-[#C3362B] ml-0.5">*</span></label>
                         <div className="relative">
@@ -184,9 +192,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                 className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400 bg-white cursor-pointer appearance-none"
                                 required
                             >
-                                <option value="" disabled>Select category</option>
-                                {categoriesList.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>{cat.title}</option>
+                                <option value="" disabled>Select object type</option>
+                                {objectTypesList.map((type) => (
+                                    <option key={type.id} value={type.id}>{type.title}</option>
                                 ))}
                             </select>
                             <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#999]">

@@ -20,6 +20,7 @@ import { ApartmentsModule } from './apartments/apartments.module';
 import { OwnersModule } from './owners/owners.module';
 import { AttributesModule } from './attributes/attributes.module';
 import { RequestsModule } from './requests/requests.module';
+import { ObjectTypesModule } from './object-types/object-types.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { RequestsModule } from './requests/requests.module';
     OwnersModule,
     AttributesModule,
     RequestsModule,
+    ObjectTypesModule,
   ],
   controllers: [AppController],
   providers: [

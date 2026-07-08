@@ -21,13 +21,14 @@ import { CategoryEdit } from "./categories/CategoryEdit";
 import { CategoryCreate } from "./categories/CategoryCreate";
 import { ObjectEditPage } from "./dashboard/ObjectEditPage";
 import { ObjectCreatePage } from "./dashboard/ObjectCreatePage";
+import { ObjectTypesSection } from "./dashboard/ObjectTypesSection";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type MenuKey = "offplan" | "resale"
     | "categories" | "unitLayouts" | "viewOptions" | "statusOptions"
     | "roomOptions" | "currencies"
     | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests"
-    | "objects";
+    | "objects" | "objectTypes";
 
 const pageNames: Record<MenuKey, string> = {
     offplan: "Off-plan",
@@ -44,6 +45,7 @@ const pageNames: Record<MenuKey, string> = {
     attributes: "Attributes",
     requests: "Requests",
     objects: "Objects",
+    objectTypes: "Object Types",
 };
 
 const pageSubtitles: Record<MenuKey, string> = {
@@ -61,6 +63,7 @@ const pageSubtitles: Record<MenuKey, string> = {
     attributes: "Manage apartment attributes",
     requests: "View buyer requests",
     objects: "Manage off-plan project objects",
+    objectTypes: "Manage object types",
 };
 
 type SectionKey = "offplan" | "resale";
@@ -88,6 +91,7 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
         children: [
             { key: "offplan", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
             { key: "objects", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
+            { key: "objectTypes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
             { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
             { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
             { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
@@ -99,7 +103,7 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
 ];
 
 const getParentSection = (key: MenuKey): SectionKey | null => {
-    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions") return "offplan";
+    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions" || key === "objects" || key === "objectTypes") return "offplan";
     return "resale";
 };
 
@@ -115,6 +119,7 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
 
     if (key === "categories") return "/dashboard/offplan/categories";
     if (key === "objects") return "/dashboard/offplan/objects";
+    if (key === "objectTypes") return "/dashboard/offplan/object-types";
     if (key === "unitLayouts") return "/dashboard/offplan/unit-layouts";
     if (key === "viewOptions") return "/dashboard/offplan/view-options";
     if (key === "statusOptions") return "/dashboard/offplan/status-options";
@@ -136,6 +141,7 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
         ["categories", (value) => value === "/dashboard/offplan/categories"],
         ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create"],
+        ["objectTypes", (value) => value === "/dashboard/offplan/object-types"],
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["viewOptions", (value) => value === "/dashboard/offplan/view-options"],
         ["statusOptions", (value) => value === "/dashboard/offplan/status-options"],
@@ -648,6 +654,7 @@ export function Dashboard() {
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
                 {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
+                {activeMenu === "objectTypes" && <ObjectTypesSection />}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}
                 {activeMenu === "statusOptions" && <StatusOptionsSection />}

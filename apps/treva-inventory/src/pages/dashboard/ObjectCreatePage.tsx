@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { categoriesApi, type Category } from "../../api/categories";
+import { categoriesApi } from "../../api/categories";
+import { objectTypesApi, type ObjectType } from "../../api/object-types";
 
 export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = {}) {
     const navigate = useNavigate();
@@ -12,8 +13,17 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         queryFn: () => categoriesApi.getAll(),
     });
 
-    const categories: Category[] = Array.isArray(categoriesResponse?.data)
+    const categories = Array.isArray(categoriesResponse?.data)
         ? categoriesResponse.data
+        : [];
+
+    const { data: objectTypesResponse } = useQuery({
+        queryKey: ["object-types"],
+        queryFn: () => objectTypesApi.getAll(),
+    });
+
+    const objectTypes: ObjectType[] = Array.isArray(objectTypesResponse?.data)
+        ? objectTypesResponse.data
         : [];
 
     const [formData, setFormData] = useState({
@@ -30,7 +40,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const createMutation = useMutation({
         mutationFn: () => {
-            const selectedCategory = categories.find((c) => c.id === formData.objectType);
+            const selectedType = objectTypes.find((t) => t.id === formData.objectType);
             return categoriesApi.create({
                 title: formData.propertyName || "Untitled",
                 name: formData.propertyName || "untitled",
@@ -38,7 +48,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                     .toLowerCase()
                     .replace(/[^a-z0-9]+/g, "-")
                     .replace(/(^-|-$)/g, "") || "untitled",
-                objectType: selectedCategory?.title || formData.objectType,
+                objectType: selectedType?.title || formData.objectType,
                 propertyName: formData.propertyName,
                 currency: formData.currency,
                 region: formData.region,
@@ -92,7 +102,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* 2-Column Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                        {/* Object Type - Dynamic from Categories */}
+                        {/* Object Type - Dynamic from ObjectTypes */}
                         <div className="flex flex-col">
                             <label className="text-[14px] font-semibold text-[#2D313A] mb-2">
                                 Object type<span className="text-[#EF4444] ml-0.5">*</span>
@@ -104,10 +114,10 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                     className="w-full h-[52px] px-4 bg-white border border-[#E2E8F0] rounded-[16px] text-[15px] text-[#2D313A] font-normal appearance-none focus:outline-hidden focus:border-[#4A4E5A] transition-colors cursor-pointer"
                                     required
                                 >
-                                    <option value="" disabled>Select category</option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.id} value={cat.id}>
-                                            {cat.title}
+                                    <option value="" disabled>Select object type</option>
+                                    {objectTypes.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.title}
                                         </option>
                                     ))}
                                 </select>
@@ -261,7 +271,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             disabled={createMutation.isPending}
                             className="px-5 h-[55px] bg-[#43464E] hover:bg-[#33363D] text-white rounded-[27px] text-[20px] font-medium tracking-wide transition-all shadow-xs ml-auto sm:ml-0 disabled:opacity-50 cursor-pointer"
                         >
-                            {createMutation.isPending ? "Creating..." : "Create"}
+                            {createMutation.isPending ? "Creating..." : "Creat"}
                         </button>
                     </div>
 

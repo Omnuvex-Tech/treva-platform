@@ -210,6 +210,14 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/offplan/object-types"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/dashboard/offplan/view-options"
                             element={
                                 <ProtectedRoute>
