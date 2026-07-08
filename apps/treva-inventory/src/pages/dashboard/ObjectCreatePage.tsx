@@ -259,7 +259,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         <button
                             type="submit"
                             disabled={createMutation.isPending}
-                            className="px-7 h-[46px] bg-[#43464E] hover:bg-[#33363D] text-white rounded-full text-sm font-medium tracking-wide transition-all shadow-xs ml-auto sm:ml-0 disabled:opacity-50 cursor-pointer"
+                            className="px-5 h-[55px] bg-[#43464E] hover:bg-[#33363D] text-white rounded-[27px] text-[20px] font-medium tracking-wide transition-all shadow-xs ml-auto sm:ml-0 disabled:opacity-50 cursor-pointer"
                         >
                             {createMutation.isPending ? "Creating..." : "Create"}
                         </button>
