@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi } from "../../api/categories";
 import { objectTypesApi, type ObjectType } from "../../api/object-types";
+import { FormDropdown, FormTextField, FormNumberField, FormImageField, FormButton } from "@repo/ui";
 
 const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -13,7 +14,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [title, setTitle] = useState("");
     const [name, setName] = useState("");
@@ -33,7 +33,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     const [propertiesCount, setPropertiesCount] = useState(0);
     const [reservedCount, setReservedCount] = useState(0);
     const [soldCount, setSoldCount] = useState(0);
-    const [uploading, setUploading] = useState(false);
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ["categories"],
@@ -109,90 +108,15 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         },
     });
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setUploading(true);
-        try {
-            const res = await categoriesApi.uploadFile(file);
-            setImage(res.data.url);
-        } catch {
-            alert("Image upload failed");
-        } finally {
-            setUploading(false);
-        }
+    const handleImageUpload = async (file: File) => {
+        const res = await categoriesApi.uploadFile(file);
+        return res.data;
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         updateMutation.mutate();
     };
-
-    function CustomSelect({
-        label,
-        value,
-        options,
-        placeholder,
-        onChange,
-        required,
-    }: {
-        label: string;
-        value: string;
-        options: { id: string; label: string }[];
-        placeholder: string;
-        onChange: (id: string) => void;
-        required?: boolean;
-    }) {
-        const [open, setOpen] = useState(false);
-        const ref = useRef<HTMLDivElement>(null);
-
-        useEffect(() => {
-            const handler = (e: MouseEvent) => {
-                if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-            };
-            document.addEventListener("mousedown", handler);
-            return () => document.removeEventListener("mousedown", handler);
-        }, []);
-
-        const selected = options.find((o) => o.id === value);
-
-        return (
-            <div ref={ref} className="relative">
-                <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>{label}{required && <span style={{ color: "#F31100" }}>*</span>}</label>
-                <button
-                    type="button"
-                    onClick={() => setOpen(!open)}
-                    className={`flex w-full items-center justify-between rounded-xl border border-[#CCCCCC] bg-white px-4 h-[36px] text-[14px] font-normal text-[#333333] focus:border-gray-400 focus:outline-none`}
-                    style={{ lineHeight: "20px" }}
-                >
-                    <span className={selected ? "text-[#333333]" : "text-[#666666]"}>{selected?.label || placeholder}</span>
-                    <img src="/images/inv-dashboard/inv-offplan/arrow.svg" alt="" className={open ? "rotate-180 transition-transform" : "transition-transform"} />
-                </button>
-                {open && (
-                    <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#CCCCCC] bg-white shadow-lg">
-                        {options.map((opt) => (
-                            <button
-                                key={opt.id}
-                                type="button"
-                                className={`w-full px-4 py-2.5 text-left text-[14px] font-normal transition-colors ${
-                                    value === opt.id
-                                        ? "bg-[#4E525D]/10 text-[#333333] font-medium"
-                                        : "text-[#666666] hover:bg-gray-50 hover:text-[#333333]"
-                                }`}
-                                style={{ lineHeight: "20px" }}
-                                onClick={() => { onChange(opt.id); setOpen(false); }}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                        {options.length === 0 && (
-                            <div className="px-4 py-2.5 text-sm text-[#999]">No options yet</div>
-                        )}
-                    </div>
-                )}
-            </div>
-        );
-    }
 
     const formContent = (
         <div className="mx-auto max-w-[800px]">
@@ -203,86 +127,40 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
             <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 {/* Image Upload */}
-                <div className="mb-5">
-                    <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Image</label>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                    />
-                    {image ? (
-                        <div className="relative w-full h-[200px] rounded-xl overflow-hidden bg-[#F4F5F6]">
-                            <img src={image} alt={title} className="w-full h-full object-cover" />
-                            <button
-                                type="button"
-                                onClick={() => setImage("")}
-                                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center text-xs hover:bg-black/70 cursor-pointer"
-                            >
-                                ✕
-                            </button>
-                        </div>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploading}
-                            className="w-full h-[180px] rounded-xl border-2 border-dashed border-gray-200 bg-[#F4F5F6] flex flex-col items-center justify-center gap-2 hover:border-gray-300 transition-colors cursor-pointer"
-                        >
-                            {uploading ? (
-                                <span className="text-sm text-[#666666]">Uploading...</span>
-                            ) : (
-                                <>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                                        <circle cx="9" cy="9" r="2" />
-                                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                                    </svg>
-                                    <span className="text-sm text-[#999]">Click to upload image</span>
-                                </>
-                            )}
-                        </button>
-                    )}
-                </div>
+                <FormImageField
+                    label="Image"
+                    value={image}
+                    onChange={setImage}
+                    uploadFn={handleImageUpload}
+                />
 
                 {/* 2-Column Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
-                    {/* Object Type */}
-                    <CustomSelect
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5 mt-5">
+                    <FormDropdown
                         label="Object type"
                         value={objectType}
                         options={objectTypesList.map((t) => ({ id: t.id, label: t.title }))}
                         placeholder="Select object type"
                         onChange={setObjectType}
                         required
+                        noOptionsLabel="Create Object Type"
+                        onNoOptionsClick={() => navigate("/dashboard/offplan/object-types")}
                     />
 
-                    {/* Title */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Title</label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                            required
-                        />
-                    </div>
+                    <FormTextField
+                        label="Title"
+                        value={title}
+                        onChange={setTitle}
+                        required
+                    />
 
-                    {/* Property Name */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Name of property</label>
-                        <input
-                            type="text"
-                            value={propertyName}
-                            onChange={(e) => setPropertyName(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                        />
-                    </div>
+                    <FormTextField
+                        label="Name of property"
+                        value={propertyName}
+                        onChange={setPropertyName}
+                    />
 
-                    {/* Currency */}
-                    <CustomSelect
+                    <FormDropdown
                         label="Currency"
                         value={currency}
                         options={[
@@ -295,63 +173,37 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                         required
                     />
 
-                    {/* Region */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Region</label>
-                        <input
-                            type="text"
-                            value={region}
-                            onChange={(e) => setRegion(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                        />
-                    </div>
+                    <FormTextField
+                        label="Region"
+                        value={region}
+                        onChange={setRegion}
+                    />
 
-                    {/* Area */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Area</label>
-                        <input
-                            type="text"
-                            value={area}
-                            onChange={(e) => setArea(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                        />
-                    </div>
+                    <FormTextField
+                        label="Area"
+                        value={area}
+                        onChange={setArea}
+                    />
 
-                    {/* City */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>City</label>
-                        <input
-                            type="text"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                        />
-                    </div>
+                    <FormTextField
+                        label="City"
+                        value={city}
+                        onChange={setCity}
+                    />
 
-                    {/* Developer Brand */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Developer Brand</label>
-                        <input
-                            type="text"
-                            value={developerBrand}
-                            onChange={(e) => setDeveloperBrand(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                        />
-                    </div>
+                    <FormTextField
+                        label="Developer Brand"
+                        value={developerBrand}
+                        onChange={setDeveloperBrand}
+                    />
 
-                    {/* Website */}
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Website</label>
-                        <input
-                            type="url"
-                            value={website}
-                            onChange={(e) => setWebsite(e.target.value)}
-                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                        />
-                    </div>
+                    <FormTextField
+                        label="Website"
+                        value={website}
+                        onChange={setWebsite}
+                    />
 
-                    {/* Status */}
-                    <CustomSelect
+                    <FormDropdown
                         label="Status"
                         value={status}
                         options={[
@@ -362,8 +214,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                         onChange={setStatus}
                     />
 
-                    {/* Date (read-only) */}
-                    <div>
+                    <div className="flex flex-col">
                         <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Date</label>
                         <input
                             type="text"
@@ -400,46 +251,26 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 <div className="border-t border-gray-100 pt-5 mb-5">
                     <h3 className="text-sm font-semibold text-[#1A1A1A] mb-4">Metrics</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Houses</label>
-                            <input
-                                type="number"
-                                min={0}
-                                value={housesCount}
-                                onChange={(e) => setHousesCount(Number(e.target.value))}
-                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Properties</label>
-                            <input
-                                type="number"
-                                min={0}
-                                value={propertiesCount}
-                                onChange={(e) => setPropertiesCount(Number(e.target.value))}
-                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Reserved</label>
-                            <input
-                                type="number"
-                                min={0}
-                                value={reservedCount}
-                                onChange={(e) => setReservedCount(Number(e.target.value))}
-                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                            />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Sold</label>
-                            <input
-                                type="number"
-                                min={0}
-                                value={soldCount}
-                                onChange={(e) => setSoldCount(Number(e.target.value))}
-                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
-                            />
-                        </div>
+                        <FormNumberField
+                            label="Houses"
+                            value={housesCount}
+                            onChange={setHousesCount}
+                        />
+                        <FormNumberField
+                            label="Properties"
+                            value={propertiesCount}
+                            onChange={setPropertiesCount}
+                        />
+                        <FormNumberField
+                            label="Reserved"
+                            value={reservedCount}
+                            onChange={setReservedCount}
+                        />
+                        <FormNumberField
+                            label="Sold"
+                            value={soldCount}
+                            onChange={setSoldCount}
+                        />
                     </div>
                 </div>
 
@@ -452,20 +283,20 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                 {/* Actions */}
                 <div className="flex gap-3">
-                    <button
+                    <FormButton
                         type="submit"
-                        disabled={updateMutation.isPending || uploading}
-                        className="rounded-xl px-5 py-2.5 text-sm font-medium text-white bg-[#4E525D] hover:bg-[#3D404A] transition-colors disabled:opacity-50 cursor-pointer"
+                        disabled={updateMutation.isPending}
+                        loading={updateMutation.isPending}
                     >
                         {updateMutation.isPending ? "Saving..." : "Save"}
-                    </button>
-                    <button
+                    </FormButton>
+                    <FormButton
                         type="button"
+                        variant="secondary"
                         onClick={() => navigate("/dashboard/offplan/objects")}
-                        className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-[#666666] hover:bg-gray-50 transition-colors cursor-pointer"
                     >
                         Cancel
-                    </button>
+                    </FormButton>
                 </div>
             </form>
         </div>

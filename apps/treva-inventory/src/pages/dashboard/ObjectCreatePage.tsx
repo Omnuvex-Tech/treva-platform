@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi } from "../../api/categories";
 import { objectTypesApi, type ObjectType } from "../../api/object-types";
+import { FormDropdown, FormTextField, FormButton } from "@repo/ui";
 
 export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = {}) {
     const navigate = useNavigate();
@@ -74,75 +75,9 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    function CustomSelect({
-        label,
-        value,
-        options,
-        placeholder,
-        onChange,
-        required,
-    }: {
-        label: string;
-        value: string;
-        options: { id: string; label: string }[];
-        placeholder: string;
-        onChange: (id: string) => void;
-        required?: boolean;
-    }) {
-        const [open, setOpen] = useState(false);
-        const ref = useRef<HTMLDivElement>(null);
-
-        useEffect(() => {
-            const handler = (e: MouseEvent) => {
-                if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-            };
-            document.addEventListener("mousedown", handler);
-            return () => document.removeEventListener("mousedown", handler);
-        }, []);
-
-        const selected = options.find((o) => o.id === value);
-
-        return (
-            <div ref={ref} className="relative">
-                <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>{label}{required && <span style={{ color: "#F31100" }}>*</span>}</label>
-                <button
-                    type="button"
-                    onClick={() => setOpen(!open)}
-                    className={`flex w-full items-center justify-between rounded-xl border border-[#CCCCCC] bg-white px-4 h-[36px] text-[14px] font-normal text-[#333333] focus:border-gray-400 focus:outline-none`}
-                    style={{ lineHeight: "20px" }}
-                >
-                    <span className={selected ? "text-[#333333]" : "text-[#666666]"}>{selected?.label || placeholder}</span>
-                    <img src="/images/inv-dashboard/inv-offplan/arrow.svg" alt="" className={open ? "rotate-180 transition-transform" : "transition-transform"} />
-                </button>
-                {open && (
-                    <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#CCCCCC] bg-white shadow-lg">
-                        {options.map((opt) => (
-                            <button
-                                key={opt.id}
-                                type="button"
-                                className={`w-full px-4 py-2.5 text-left text-[14px] font-normal transition-colors ${
-                                    value === opt.id
-                                        ? "bg-[#4E525D]/10 text-[#333333] font-medium"
-                                        : "text-[#666666] hover:bg-gray-50 hover:text-[#333333]"
-                                }`}
-                                style={{ lineHeight: "20px" }}
-                                onClick={() => { onChange(opt.id); setOpen(false); }}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                        {options.length === 0 && (
-                            <div className="px-4 py-2.5 text-sm text-[#999]">No options yet</div>
-                        )}
-                    </div>
-                )}
-            </div>
-        );
-    }
-
     const formContent = (
         <div className="w-full min-h-full flex items-center justify-center p-6 antialiased font-sans">
-            <div className="w-full max-w-[1000px]  bg-white rounded-[24px] border border-[#E2E8F0] shadow-xs p-5 relative">
+            <div className="w-full max-w-[1000px] bg-white rounded-[24px] border border-[#E2E8F0] shadow-xs p-5 relative">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div>
@@ -167,32 +102,25 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* 2-Column Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                        {/* Object Type */}
-                        <CustomSelect
+                        <FormDropdown
                             label="Object type"
                             value={formData.objectType}
                             options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
                             placeholder="Select object type"
                             onChange={(id) => updateField("objectType", id)}
                             required
+                            noOptionsLabel="Create Object Type"
+                            onNoOptionsClick={() => navigate("/dashboard/offplan/object-types")}
                         />
 
-                        {/* Property Name */}
-                        <div className="flex flex-col">
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>
-                                Name of property
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Placeholder"
-                                value={formData.propertyName}
-                                onChange={(e) => updateField("propertyName", e.target.value)}
-                                className="w-full h-[36px] px-4 bg-white border border-[#CCCCCC] rounded-[16px] text-[14px] font-normal placeholder-[#666666] text-[#333333] focus:outline-hidden focus:border-[#4A4E5A] transition-colors"
-                            />
-                        </div>
+                        <FormTextField
+                            label="Name of property"
+                            value={formData.propertyName}
+                            onChange={(v) => updateField("propertyName", v)}
+                            placeholder="Placeholder"
+                        />
 
-                        {/* Currency */}
-                        <CustomSelect
+                        <FormDropdown
                             label="Currency"
                             value={formData.currency}
                             options={[
@@ -205,75 +133,40 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             required
                         />
 
-                        {/* Region */}
-                        <div className="flex flex-col">
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>
-                                Region
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Placeholder"
-                                value={formData.region}
-                                onChange={(e) => updateField("region", e.target.value)}
-                                className="w-full h-[36px] px-4 bg-white border border-[#CCCCCC] rounded-[16px] text-[14px] font-normal placeholder-[#666666] text-[#333333] focus:outline-hidden focus:border-[#4A4E5A] transition-colors"
-                            />
-                        </div>
+                        <FormTextField
+                            label="Region"
+                            value={formData.region}
+                            onChange={(v) => updateField("region", v)}
+                            placeholder="Placeholder"
+                        />
 
-                        {/* Area */}
-                        <div className="flex flex-col">
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>
-                                Area
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Placeholder"
-                                value={formData.area}
-                                onChange={(e) => updateField("area", e.target.value)}
-                                className="w-full h-[36px] px-4 bg-white border border-[#CCCCCC] rounded-[16px] text-[14px] font-normal placeholder-[#666666] text-[#333333] focus:outline-hidden focus:border-[#4A4E5A] transition-colors"
-                            />
-                        </div>
+                        <FormTextField
+                            label="Area"
+                            value={formData.area}
+                            onChange={(v) => updateField("area", v)}
+                            placeholder="Placeholder"
+                        />
 
-                        {/* City */}
-                        <div className="flex flex-col">
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>
-                                City
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Placeholder"
-                                value={formData.city}
-                                onChange={(e) => updateField("city", e.target.value)}
-                                className="w-full h-[36px] px-4 bg-white border border-[#CCCCCC] rounded-[16px] text-[14px] font-normal placeholder-[#666666] text-[#333333] focus:outline-hidden focus:border-[#4A4E5A] transition-colors"
-                            />
-                        </div>
+                        <FormTextField
+                            label="City"
+                            value={formData.city}
+                            onChange={(v) => updateField("city", v)}
+                            placeholder="Placeholder"
+                        />
 
-                        {/* Developer Brand */}
-                        <div className="flex flex-col">
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>
-                                Developer Brand
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Placeholder"
-                                value={formData.developerBrand}
-                                onChange={(e) => updateField("developerBrand", e.target.value)}
-                                className="w-full h-[36px] px-4 bg-white border border-[#CCCCCC] rounded-[16px] text-[14px] font-normal placeholder-[#666666] text-[#333333] focus:outline-hidden focus:border-[#4A4E5A] transition-colors"
-                            />
-                        </div>
+                        <FormTextField
+                            label="Developer Brand"
+                            value={formData.developerBrand}
+                            onChange={(v) => updateField("developerBrand", v)}
+                            placeholder="Placeholder"
+                        />
 
-                        {/* Website */}
-                        <div className="flex flex-col">
-                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>
-                                Website
-                            </label>
-                            <input
-                                type="url"
-                                placeholder="Placeholder"
-                                value={formData.website}
-                                onChange={(e) => updateField("website", e.target.value)}
-                                className="w-full h-[36px] px-4 bg-white border border-[#CCCCCC] rounded-[16px] text-[14px] font-normal placeholder-[#666666] text-[#333333] focus:outline-hidden focus:border-[#4A4E5A] transition-colors"
-                            />
-                        </div>
+                        <FormTextField
+                            label="Website"
+                            value={formData.website}
+                            onChange={(v) => updateField("website", v)}
+                            placeholder="Placeholder"
+                        />
                     </div>
 
                     {/* Bottom Row: Checkbox + Submit */}
@@ -299,13 +192,14 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         </label>
 
                         {/* Submit Button */}
-                        <button
+                        <FormButton
                             type="submit"
                             disabled={createMutation.isPending}
-                            className="px-5 h-[52px] bg-[#43464E] hover:bg-[#33363D] text-white rounded-[24px] text-[16px] font-medium tracking-wide transition-all shadow-xs ml-auto sm:ml-0 mt-8 sm:mt-12 disabled:opacity-50 cursor-pointer"
+                            loading={createMutation.isPending}
+                            className="ml-auto sm:ml-0 mt-8 sm:mt-12"
                         >
-                            {createMutation.isPending ? "Creating..." : "Creat"}
-                        </button>
+                            {createMutation.isPending ? "Creating..." : "Create"}
+                        </FormButton>
                     </div>
 
                     {/* Error */}
