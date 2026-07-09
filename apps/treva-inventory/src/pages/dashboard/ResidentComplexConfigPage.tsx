@@ -12,14 +12,14 @@ interface ManagementCategory {
 }
 
 export function ResidentComplexConfigPage({ embedded = false }: { embedded?: boolean } = {}) {
-    const { id } = useParams<{ id: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<"Sales" | "Legal">("Sales");
 
     const { data: response, isLoading } = useQuery({
-        queryKey: ["category", id],
-        queryFn: () => categoriesApi.getById(id!),
-        enabled: !!id,
+        queryKey: ["category", slug],
+        queryFn: () => categoriesApi.getBySlug(slug!),
+        enabled: !!slug,
     });
 
     const category = response?.data;
@@ -31,10 +31,6 @@ export function ResidentComplexConfigPage({ embedded = false }: { embedded?: boo
         { id: "options", label: "Options", iconType: "options", iconSrc: "/images/inv-dashboard/inv-offplan/options.svg" },
         { id: "stock", label: "Stock", iconType: "stock", iconSrc: "/images/inv-dashboard/inv-offplan/stock.svg" },
     ];
-
-    const handleBack = () => {
-        navigate("/dashboard/offplan/objects");
-    };
 
     const content = (
         <div className="min-h-full w-full bg-[#ffffff] p-8 font-sans antialiased">
@@ -58,10 +54,10 @@ export function ResidentComplexConfigPage({ embedded = false }: { embedded?: boo
                         key={cat.id}
                         onClick={() => {
                             if (cat.id === "properties") {
-                                navigate(`/dashboard/offplan/objects/${id}/config/properties`);
+                                navigate(`/dashboard/offplan/objects/${slug}/config/properties`);
                             }
                         }}
-                        className="bg-white border border-[#E5E7EB] rounded-[18px] aspect-[4/3] p-6 flex flex-col items-center justify-center gap-5 hover:border-[#D1D5DB] hover:shadow-xs transition-all cursor-pointer group"
+                        className="w-[260px] h-[160px] p-[24px] rounded-[24px] bg-[var(--Background-Primary,#FFFFFF)] border border-[var(--Border-Subtle,#EBEBEB)] flex flex-col items-center justify-center gap-5 hover:border-[#D1D5DB] hover:shadow-xs transition-all cursor-pointer group opacity-100"
                     >
                         {/* Icon */}
                         <div className="w-20 h-20 flex items-center justify-center group-hover:scale-[1.03] transition-transform duration-300">

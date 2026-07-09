@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { categoriesApi, type Category } from "../../api/categories";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { FormAddButton } from "@repo/ui";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { FormTabSwitcher } from "@repo/ui";
@@ -37,6 +38,39 @@ export function OffPlanObjectsSection() {
         },
     });
 
+    const copyMut = useMutation({
+        mutationFn: (cat: Category) => {
+            return categoriesApi.create({
+                title: `${cat.title} (Copy)`,
+                name: `${cat.name}-copy`,
+                slug: `${cat.slug}-copy-${Date.now()}`,
+                objectType: cat.objectType,
+                propertyName: cat.propertyName,
+                currency: cat.currency,
+                region: cat.region,
+                area: cat.area,
+                city: cat.city,
+                developerBrand: cat.developerBrand,
+                website: cat.website,
+                fedLaw214: cat.fedLaw214,
+                image: cat.image,
+                banks: cat.banks,
+                infrastructure: cat.infrastructure,
+                salesDepartment: cat.salesDepartment,
+            });
+        },
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["categories"] });
+            showSuccess({ title: "Object copied" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Object could not be copied",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
     const categories: Category[] = Array.isArray(response?.data)
         ? response.data
         : [];
@@ -64,13 +98,13 @@ export function OffPlanObjectsSection() {
                 />
 
                 {/* Add Object Button */}
-                <button
+                <FormAddButton
                     onClick={() => navigate("/dashboard/offplan/objects/create")}
-                    className="flex items-center justify-center gap-2 w-[124px] h-[44px] bg-[#4E525D] border border-white rounded-[16px] py-2 px-3.5 text-[13px] font-medium leading-[20px] tracking-[0px] text-white hover:bg-[#3D404A] transition-colors cursor-pointer"
+                    icon={<img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />}
+                    className="w-[124px]"
                 >
-                    <img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />
-                    <span>Add Object</span>
-                </button>
+                    Add Object
+                </FormAddButton>
             </div>
 
             {/* Card Grid */}
@@ -189,13 +223,46 @@ export function OffPlanObjectsSection() {
                                     </div>
                                 </div>
 
-                                {/* Edit Button */}
-                                <button
-                                    onClick={() => navigate(`/dashboard/offplan/objects/${cat.id}/edit`)}
-                                    className="w-[236px] mx-auto h-[28px] max-h-[28px] bg-[#EBEBEB] rounded-[24px] flex items-center justify-center gap-[8px] py-[15px] px-[8px] text-[14px] font-medium leading-[20px] tracking-[0px] text-center text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer"
-                                >
-                                    Edit
-                                </button>
+                                {/* Action Buttons */}
+                                <div className="flex items-center justify-between gap-2">
+                                    {/* Delete Button */}
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm(`Delete "${cat.title}"?`)) {
+                                                deleteMut.mutate(cat.id);
+                                            }
+                                        }}
+                                        aria-label="Delete"
+                                        title="Delete"
+                                        className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#C3362B] transition-colors hover:bg-[#FCEDEA] cursor-pointer"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                        </svg>
+                                    </button>
+
+                                    {/* Copy Button */}
+                                    <button
+                                        onClick={() => copyMut.mutate(cat)}
+                                        disabled={copyMut.isPending}
+                                        aria-label="Copy"
+                                        title="Copy"
+                                        className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer disabled:opacity-50"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                            <rect x="9" y="9" width="10" height="10" rx="2" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                                        </svg>
+                                    </button>
+
+                                    {/* Edit Button */}
+                                    <button
+                                        onClick={() => navigate(`/dashboard/offplan/objects/${cat.id}/edit`)}
+                                        className="flex-1 h-[32px] bg-[#EBEBEB] rounded-[24px] flex items-center justify-center text-[14px] font-medium leading-[20px] text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer"
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

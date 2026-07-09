@@ -19,6 +19,7 @@ export {
     FormDropdown,
     FormImageField,
     FormTabSwitcher,
+    FormAddButton,
 } from "./components/Form";
 
 export { cn } from "./lib/utils";

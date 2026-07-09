@@ -194,7 +194,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/dashboard/offplan/objects/:id/edit"
+                            path="/dashboard/offplan/objects/:slug/edit"
                             element={
                                 <ProtectedRoute>
                                     <Dashboard />
@@ -202,7 +202,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/dashboard/offplan/objects/:id/config"
+                            path="/dashboard/offplan/objects/:slug/config"
                             element={
                                 <ProtectedRoute>
                                     <Dashboard />
@@ -210,7 +210,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/dashboard/offplan/objects/:id/config/properties"
+                            path="/dashboard/offplan/objects/:slug/config/properties"
                             element={
                                 <ProtectedRoute>
                                     <Dashboard />

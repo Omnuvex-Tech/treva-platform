@@ -87,6 +87,21 @@ export class UpdateCategoryDto {
   @IsString()
   website?: string;
 
+  @ApiPropertyOptional({ example: 'Sberbank' })
+  @IsOptional()
+  @IsString()
+  banks?: string;
+
+  @ApiPropertyOptional({ example: 'Pool, Gym' })
+  @IsOptional()
+  @IsString()
+  infrastructure?: string;
+
+  @ApiPropertyOptional({ example: '+7 999 123 4567' })
+  @IsOptional()
+  @IsString()
+  salesDepartment?: string;
+
   @ApiPropertyOptional({ example: false })
   @IsOptional()
   @IsBoolean()

@@ -30,27 +30,61 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [formData, setFormData] = useState({
         objectType: "",
         propertyName: "",
+        slug: "",
         currency: "Rubels",
         region: "",
         area: "",
         city: "",
         developerBrand: "",
         website: "",
+        banks: "",
+        infrastructure: "",
+        salesDepartment: "",
         fedLaw214: false,
     });
+
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const validate = (): boolean => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.objectType) newErrors.objectType = "Object type is required";
+        if (!formData.propertyName.trim()) newErrors.propertyName = "Name of property is required";
+        if (!formData.currency) newErrors.currency = "Currency is required";
+        if (!formData.region.trim()) newErrors.region = "Region is required";
+        if (!formData.area.trim()) newErrors.area = "Area is required";
+        if (!formData.city.trim()) newErrors.city = "City is required";
+        if (!formData.developerBrand.trim()) newErrors.developerBrand = "Developer brand is required";
+        if (!formData.website.trim()) newErrors.website = "Website is required";
+        if (!formData.banks.trim()) newErrors.banks = "Banks is required";
+        if (!formData.infrastructure.trim()) newErrors.infrastructure = "Infrastructure is required";
+        if (!formData.salesDepartment.trim()) newErrors.salesDepartment = "Sales department is required";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const clearError = (field: string) => {
+        if (errors[field]) {
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+            });
+        }
+    };
 
     const createMutation = useMutation({
         mutationFn: () => {
             const selectedType = objectTypes.find((t) => t.id === formData.objectType);
+            const finalSlug = formData.slug || `${formData.propertyName
+                ? formData.propertyName
+                      .toLowerCase()
+                      .replace(/[^a-z0-9]+/g, "-")
+                      .replace(/(^-|-$)/g, "")
+                : "untitled"}-${Date.now()}`;
             return categoriesApi.create({
                 title: formData.propertyName || "Untitled",
                 name: formData.propertyName || "untitled",
-                slug: `${formData.propertyName
-                    ? formData.propertyName
-                          .toLowerCase()
-                          .replace(/[^a-z0-9]+/g, "-")
-                          .replace(/(^-|-$)/g, "")
-                    : "untitled"}-${Date.now()}`,
+                slug: finalSlug,
                 objectType: selectedType?.title || formData.objectType,
                 propertyName: formData.propertyName,
                 currency: formData.currency,
@@ -59,14 +93,17 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 city: formData.city,
                 developerBrand: formData.developerBrand,
                 website: formData.website,
+                banks: formData.banks,
+                infrastructure: formData.infrastructure,
+                salesDepartment: formData.salesDepartment,
                 fedLaw214: formData.fedLaw214,
             });
         },
         onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: ["categories"] });
-            const newId = response?.data?.id;
-            if (newId) {
-                navigate(`/dashboard/offplan/objects/${newId}/config`);
+            const slug = response?.data?.slug;
+            if (slug) {
+                navigate(`/dashboard/offplan/objects/${slug}/config`);
             } else {
                 navigate("/dashboard/offplan/objects");
             }
@@ -75,6 +112,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validate()) return;
         createMutation.mutate();
     };
 
@@ -109,71 +147,141 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* 2-Column Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                        <FormDropdown
-                            label="Object type"
-                            value={formData.objectType}
-                            options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
-                            placeholder="Select object type"
-                            onChange={(id) => updateField("objectType", id)}
-                            required
-                            noOptionsLabel="Create Object Type"
-                            onNoOptionsClick={() => navigate("/dashboard/offplan/object-types")}
-                        />
+                        <div>
+                            <FormDropdown
+                                label="Object type"
+                                value={formData.objectType}
+                                options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
+                                placeholder="Select object type"
+                                onChange={(id) => { updateField("objectType", id); clearError("objectType"); }}
+                                required
+                                noOptionsLabel="Create Object Type"
+                                onNoOptionsClick={() => navigate("/dashboard/offplan/object-types")}
+                            />
+                            {errors.objectType && <p className="text-[12px] text-[#C3362B] mt-1">{errors.objectType}</p>}
+                        </div>
+
+                        <div>
+                            <FormTextField
+                                label="Name of property"
+                                value={formData.propertyName}
+                                onChange={(v) => { updateField("propertyName", v); clearError("propertyName"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.propertyName && <p className="text-[12px] text-[#C3362B] mt-1">{errors.propertyName}</p>}
+                        </div>
 
                         <FormTextField
-                            label="Name of property"
-                            value={formData.propertyName}
-                            onChange={(v) => updateField("propertyName", v)}
-                            placeholder="Placeholder"
+                            label="Slug"
+                            value={formData.slug}
+                            onChange={(v) => updateField("slug", v)}
+                            placeholder="auto-generated-from-name"
                         />
 
-                        <FormDropdown
-                            label="Currency"
-                            value={formData.currency}
-                            options={[
-                                { id: "Rubels", label: "Rubels" },
-                                { id: "Manat", label: "Manat (₼)" },
-                                { id: "USD", label: "USD ($)" },
-                            ]}
-                            placeholder="Select currency"
-                            onChange={(id) => updateField("currency", id)}
-                            required
-                        />
+                        <div>
+                            <FormDropdown
+                                label="Currency"
+                                value={formData.currency}
+                                options={[
+                                    { id: "Rubels", label: "Rubels" },
+                                    { id: "Manat", label: "Manat (₼)" },
+                                    { id: "USD", label: "USD ($)" },
+                                ]}
+                                placeholder="Select currency"
+                                onChange={(id) => { updateField("currency", id); clearError("currency"); }}
+                                required
+                            />
+                            {errors.currency && <p className="text-[12px] text-[#C3362B] mt-1">{errors.currency}</p>}
+                        </div>
 
-                        <FormTextField
-                            label="Region"
-                            value={formData.region}
-                            onChange={(v) => updateField("region", v)}
-                            placeholder="Placeholder"
-                        />
+                        <div>
+                            <FormTextField
+                                label="Region"
+                                value={formData.region}
+                                onChange={(v) => { updateField("region", v); clearError("region"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.region && <p className="text-[12px] text-[#C3362B] mt-1">{errors.region}</p>}
+                        </div>
 
-                        <FormTextField
-                            label="Area"
-                            value={formData.area}
-                            onChange={(v) => updateField("area", v)}
-                            placeholder="Placeholder"
-                        />
+                        <div>
+                            <FormTextField
+                                label="Area"
+                                value={formData.area}
+                                onChange={(v) => { updateField("area", v); clearError("area"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.area && <p className="text-[12px] text-[#C3362B] mt-1">{errors.area}</p>}
+                        </div>
 
-                        <FormTextField
-                            label="City"
-                            value={formData.city}
-                            onChange={(v) => updateField("city", v)}
-                            placeholder="Placeholder"
-                        />
+                        <div>
+                            <FormTextField
+                                label="City"
+                                value={formData.city}
+                                onChange={(v) => { updateField("city", v); clearError("city"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.city && <p className="text-[12px] text-[#C3362B] mt-1">{errors.city}</p>}
+                        </div>
 
-                        <FormTextField
-                            label="Developer Brand"
-                            value={formData.developerBrand}
-                            onChange={(v) => updateField("developerBrand", v)}
-                            placeholder="Placeholder"
-                        />
+                        <div>
+                            <FormTextField
+                                label="Developer Brand"
+                                value={formData.developerBrand}
+                                onChange={(v) => { updateField("developerBrand", v); clearError("developerBrand"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.developerBrand && <p className="text-[12px] text-[#C3362B] mt-1">{errors.developerBrand}</p>}
+                        </div>
 
-                        <FormTextField
-                            label="Website"
-                            value={formData.website}
-                            onChange={(v) => updateField("website", v)}
-                            placeholder="Placeholder"
-                        />
+                        <div>
+                            <FormTextField
+                                label="Website"
+                                value={formData.website}
+                                onChange={(v) => { updateField("website", v); clearError("website"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.website && <p className="text-[12px] text-[#C3362B] mt-1">{errors.website}</p>}
+                        </div>
+
+                        <div>
+                            <FormTextField
+                                label="Banks"
+                                value={formData.banks}
+                                onChange={(v) => { updateField("banks", v); clearError("banks"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.banks && <p className="text-[12px] text-[#C3362B] mt-1">{errors.banks}</p>}
+                        </div>
+
+                        <div>
+                            <FormTextField
+                                label="Infrastructure"
+                                value={formData.infrastructure}
+                                onChange={(v) => { updateField("infrastructure", v); clearError("infrastructure"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.infrastructure && <p className="text-[12px] text-[#C3362B] mt-1">{errors.infrastructure}</p>}
+                        </div>
+
+                        <div>
+                            <FormTextField
+                                label="Sales department"
+                                value={formData.salesDepartment}
+                                onChange={(v) => { updateField("salesDepartment", v); clearError("salesDepartment"); }}
+                                placeholder="Placeholder"
+                                required
+                            />
+                            {errors.salesDepartment && <p className="text-[12px] text-[#C3362B] mt-1">{errors.salesDepartment}</p>}
+                        </div>
                     </div>
 
                     {/* Bottom Row: Checkbox + Submit */}
@@ -188,7 +296,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                     className="sr-only"
                                 />
                                 {formData.fedLaw214 ? (
-                                    <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5" />
+                                    <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="w-5 h-5" />
                                 ) : (
                                     <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5 opacity-60" />
                                 )}

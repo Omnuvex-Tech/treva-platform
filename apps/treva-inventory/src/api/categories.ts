@@ -27,6 +27,9 @@ export interface Category {
     city?: string;
     developerBrand?: string;
     website?: string;
+    banks?: string;
+    infrastructure?: string;
+    salesDepartment?: string;
     fedLaw214: boolean;
     createdAt: string;
     updatedAt: string;
@@ -51,6 +54,9 @@ export interface CreateCategoryData {
     city?: string;
     developerBrand?: string;
     website?: string;
+    banks?: string;
+    infrastructure?: string;
+    salesDepartment?: string;
     fedLaw214?: boolean;
 }
 
@@ -72,6 +78,9 @@ export interface UpdateCategoryData {
     city?: string;
     developerBrand?: string;
     website?: string;
+    banks?: string;
+    infrastructure?: string;
+    salesDepartment?: string;
     fedLaw214?: boolean;
 }
 

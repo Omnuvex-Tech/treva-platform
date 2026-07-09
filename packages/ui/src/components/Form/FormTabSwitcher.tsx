@@ -29,12 +29,13 @@ export function FormTabSwitcher({
         <div className={cn("flex items-center gap-2", className)}>
             <div
                 style={{
-                    backgroundColor: "#F4F5F7",
+                    backgroundColor: "#FFFFFF",
                     borderRadius: "9999px",
                     padding: "4px",
                     display: "flex",
                     alignItems: "center",
                     gap: "4px",
+                    border: "1px solid #E5E7EB",
                 }}
             >
                 {tabs.map((tab) => {

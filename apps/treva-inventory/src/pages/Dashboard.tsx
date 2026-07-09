@@ -164,8 +164,8 @@ export function Dashboard() {
     const isConfiguringObject = /^\/dashboard\/offplan\/objects\/[^/]+\/config$/.test(location.pathname);
     const isPropertyConfig = /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties$/.test(location.pathname);
     const objectId = isEditingObject ? location.pathname.split("/")[4] : null;
-    const configObjectId = isConfiguringObject ? location.pathname.split("/")[4] : null;
-    const propertyConfigId = isPropertyConfig ? location.pathname.split("/")[4] : null;
+    const configObjectSlug = isConfiguringObject ? location.pathname.split("/")[4] : null;
+    const propertyConfigSlug = isPropertyConfig ? location.pathname.split("/")[4] : null;
     const activeMenu = getMenuKeyFromPath(location.pathname) ?? "resale";
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
 
@@ -300,14 +300,47 @@ export function Dashboard() {
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Header Navbar */}
                 <header className="relative h-[80px] w-full bg-white flex items-center justify-between px-8 flex-shrink-0">
-                    <div>
-                        <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
-                            {pageNames[activeMenu]}
-                        </h2>
-                        <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>
-                            {pageSubtitles[activeMenu]}
-                        </p>
-                    </div>
+                    {!isConfiguringObject && !isPropertyConfig && (
+                        <div>
+                            <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
+                                {pageNames[activeMenu]}
+                            </h2>
+                            <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>
+                                {pageSubtitles[activeMenu]}
+                            </p>
+                        </div>
+                    )}
+                    {isConfiguringObject && (
+                        <div className="flex items-center gap-2 text-[14px]">
+                            <span
+                                onClick={() => navigate("/dashboard/offplan/objects")}
+                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
+                            >
+                                objects
+                            </span>
+                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
+                            <span className="text-[#333333] font-medium">{configObjectSlug}</span>
+                        </div>
+                    )}
+                    {isPropertyConfig && (
+                        <div className="flex items-center gap-2 text-[14px]">
+                            <span
+                                onClick={() => navigate("/dashboard/offplan/objects")}
+                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
+                            >
+                                objects
+                            </span>
+                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
+                            <span
+                                onClick={() => navigate(`/dashboard/offplan/objects/${propertyConfigSlug}/config`)}
+                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
+                            >
+                                {propertyConfigSlug}
+                            </span>
+                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
+                            <span className="text-[#333333] font-medium">properties</span>
+                        </div>
+                    )}
 
                     <div className="ml-6 flex min-w-0 flex-1 items-center justify-end gap-4">
                         <div className="relative flex min-w-[180px] max-w-[392px] flex-1 items-center" style={{ height: 44 }}>
@@ -659,7 +692,7 @@ export function Dashboard() {
 
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
-                {activeMenu === "objects" && (isPropertyConfig ? <PropertyConfigPage embedded key={propertyConfigId} /> : isConfiguringObject ? <ResidentComplexConfigPage embedded key={configObjectId} /> : isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
+                {activeMenu === "objects" && (isPropertyConfig ? <PropertyConfigPage embedded key={propertyConfigSlug} /> : isConfiguringObject ? <ResidentComplexConfigPage embedded key={configObjectSlug} /> : isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
                 {activeMenu === "objectTypes" && <ObjectTypesSection />}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}
