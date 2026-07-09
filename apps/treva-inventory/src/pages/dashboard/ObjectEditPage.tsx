@@ -134,12 +134,14 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         options,
         placeholder,
         onChange,
+        required,
     }: {
         label: string;
         value: string;
         options: { id: string; label: string }[];
         placeholder: string;
         onChange: (id: string) => void;
+        required?: boolean;
     }) {
         const [open, setOpen] = useState(false);
         const ref = useRef<HTMLDivElement>(null);
@@ -156,19 +158,15 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
         return (
             <div ref={ref} className="relative">
-                <label className="mb-1 block text-xs text-[#333333]">{label}</label>
+                <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>{label}{required && <span style={{ color: "#F31100" }}>*</span>}</label>
                 <button
                     type="button"
                     onClick={() => setOpen(!open)}
-                    className={`flex w-full items-center justify-between rounded-xl border border-[#CCCCCC] bg-white px-4 h-[36px] text-sm text-[#333333] focus:border-gray-400 focus:outline-none`}
+                    className={`flex w-full items-center justify-between rounded-xl border border-[#CCCCCC] bg-white px-4 h-[36px] text-[14px] font-normal text-[#333333] focus:border-gray-400 focus:outline-none`}
+                    style={{ lineHeight: "20px" }}
                 >
                     <span className={selected ? "text-[#333333]" : "text-[#666666]"}>{selected?.label || placeholder}</span>
-                    <svg
-                        width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                        className={open ? "rotate-180 transition-transform" : "transition-transform"}
-                    >
-                        <path d="M6 9l6 6 6-6" />
-                    </svg>
+                    <img src="/images/inv-dashboard/inv-offplan/arrow.svg" alt="" className={open ? "rotate-180 transition-transform" : "transition-transform"} />
                 </button>
                 {open && (
                     <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#CCCCCC] bg-white shadow-lg">
@@ -176,11 +174,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             <button
                                 key={opt.id}
                                 type="button"
-                                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
+                                className={`w-full px-4 py-2.5 text-left text-[14px] font-normal transition-colors ${
                                     value === opt.id
                                         ? "bg-[#4E525D]/10 text-[#333333] font-medium"
                                         : "text-[#666666] hover:bg-gray-50 hover:text-[#333333]"
                                 }`}
+                                style={{ lineHeight: "20px" }}
                                 onClick={() => { onChange(opt.id); setOpen(false); }}
                             >
                                 {opt.label}
@@ -205,7 +204,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 {/* Image Upload */}
                 <div className="mb-5">
-                    <label className="mb-1 block text-xs text-[#333333]">Image</label>
+                    <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Image</label>
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -251,16 +250,17 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
                     {/* Object Type */}
                     <CustomSelect
-                        label="Object type *"
+                        label="Object type"
                         value={objectType}
                         options={objectTypesList.map((t) => ({ id: t.id, label: t.title }))}
                         placeholder="Select object type"
                         onChange={setObjectType}
+                        required
                     />
 
                     {/* Title */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Title</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Title</label>
                         <input
                             type="text"
                             value={title}
@@ -272,7 +272,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* Property Name */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Name of property</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Name of property</label>
                         <input
                             type="text"
                             value={propertyName}
@@ -283,7 +283,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* Currency */}
                     <CustomSelect
-                        label="Currency *"
+                        label="Currency"
                         value={currency}
                         options={[
                             { id: "Rubels", label: "Rubels" },
@@ -292,11 +292,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                         ]}
                         placeholder="Select currency"
                         onChange={setCurrency}
+                        required
                     />
 
                     {/* Region */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Region</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Region</label>
                         <input
                             type="text"
                             value={region}
@@ -307,7 +308,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* Area */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Area</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Area</label>
                         <input
                             type="text"
                             value={area}
@@ -318,7 +319,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* City */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">City</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>City</label>
                         <input
                             type="text"
                             value={city}
@@ -329,7 +330,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* Developer Brand */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Developer Brand</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Developer Brand</label>
                         <input
                             type="text"
                             value={developerBrand}
@@ -340,7 +341,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* Website */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Website</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Website</label>
                         <input
                             type="url"
                             value={website}
@@ -363,7 +364,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                     {/* Date (read-only) */}
                     <div>
-                        <label className="mb-1 block text-xs text-[#333333]">Date</label>
+                        <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Date</label>
                         <input
                             type="text"
                             value={response?.data ? formatDate(response.data.createdAt) : ""}
@@ -383,19 +384,13 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                 onChange={(e) => setFedLaw214(e.target.checked)}
                                 className="sr-only"
                             />
-                            <div className={`w-5 h-5 border-2 rounded-md transition-all flex items-center justify-center ${
-                                fedLaw214
-                                    ? "bg-[#4E525D] border-[#4E525D]"
-                                    : "bg-white border-[#A0AEC0] hover:border-[#4E525D]"
-                            }`}>
-                                {fedLaw214 && (
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="20 6 9 17 4 12" />
-                                    </svg>
-                                )}
-                            </div>
+                            {fedLaw214 ? (
+                                <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5" />
+                            ) : (
+                                <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5 opacity-60" />
+                            )}
                         </div>
-                        <span className="text-sm font-medium text-[#1A1A1A]">
+                        <span className="text-[14px] font-normal text-[#333333]" style={{ lineHeight: "20px" }}>
                             Possibility of Purchase under Federal Law No. 214
                         </span>
                     </label>
@@ -406,7 +401,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     <h3 className="text-sm font-semibold text-[#1A1A1A] mb-4">Metrics</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label className="mb-1 block text-xs text-[#333333]">Houses</label>
+                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Houses</label>
                             <input
                                 type="number"
                                 min={0}
@@ -416,7 +411,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-[#333333]">Properties</label>
+                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Properties</label>
                             <input
                                 type="number"
                                 min={0}
@@ -426,7 +421,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-[#333333]">Reserved</label>
+                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Reserved</label>
                             <input
                                 type="number"
                                 min={0}
@@ -436,7 +431,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             />
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-[#333333]">Sold</label>
+                            <label className="mb-1 block text-xs font-semibold text-[#333333]" style={{ lineHeight: "18px" }}>Sold</label>
                             <input
                                 type="number"
                                 min={0}
