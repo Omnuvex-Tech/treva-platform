@@ -128,6 +128,73 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         updateMutation.mutate();
     };
 
+    function CustomSelect({
+        label,
+        value,
+        options,
+        placeholder,
+        onChange,
+    }: {
+        label: string;
+        value: string;
+        options: { id: string; label: string }[];
+        placeholder: string;
+        onChange: (id: string) => void;
+    }) {
+        const [open, setOpen] = useState(false);
+        const ref = useRef<HTMLDivElement>(null);
+
+        useEffect(() => {
+            const handler = (e: MouseEvent) => {
+                if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+            };
+            document.addEventListener("mousedown", handler);
+            return () => document.removeEventListener("mousedown", handler);
+        }, []);
+
+        const selected = options.find((o) => o.id === value);
+
+        return (
+            <div ref={ref} className="relative">
+                <label className="mb-1 block text-xs text-[#333333]">{label}</label>
+                <button
+                    type="button"
+                    onClick={() => setOpen(!open)}
+                    className={`flex w-full items-center justify-between rounded-xl border border-[#CCCCCC] bg-white px-4 h-[36px] text-sm text-[#333333] focus:border-gray-400 focus:outline-none`}
+                >
+                    <span className={selected ? "text-[#333333]" : "text-[#666666]"}>{selected?.label || placeholder}</span>
+                    <svg
+                        width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                        className={open ? "rotate-180 transition-transform" : "transition-transform"}
+                    >
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </button>
+                {open && (
+                    <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#CCCCCC] bg-white shadow-lg">
+                        {options.map((opt) => (
+                            <button
+                                key={opt.id}
+                                type="button"
+                                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
+                                    value === opt.id
+                                        ? "bg-[#4E525D]/10 text-[#333333] font-medium"
+                                        : "text-[#666666] hover:bg-gray-50 hover:text-[#333333]"
+                                }`}
+                                onClick={() => { onChange(opt.id); setOpen(false); }}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                        {options.length === 0 && (
+                            <div className="px-4 py-2.5 text-sm text-[#999]">No options yet</div>
+                        )}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     const formContent = (
         <div className="mx-auto max-w-[800px]">
             <div className="mb-6">
@@ -138,7 +205,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 {/* Image Upload */}
                 <div className="mb-5">
-                    <label className="mb-1.5 block text-xs font-medium text-[#666666]">Image</label>
+                    <label className="mb-1 block text-xs text-[#333333]">Image</label>
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -182,156 +249,126 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                 {/* 2-Column Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
-                    {/* Object Type - Dynamic from ObjectTypes */}
-                    <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Object type<span className="text-[#C3362B] ml-0.5">*</span></label>
-                        <div className="relative">
-                            <select
-                                value={objectType}
-                                onChange={(e) => setObjectType(e.target.value)}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400 bg-white cursor-pointer appearance-none"
-                                required
-                            >
-                                <option value="" disabled>Select object type</option>
-                                {objectTypesList.map((type) => (
-                                    <option key={type.id} value={type.id}>{type.title}</option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#999]">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                    {/* Object Type */}
+                    <CustomSelect
+                        label="Object type *"
+                        value={objectType}
+                        options={objectTypesList.map((t) => ({ id: t.id, label: t.title }))}
+                        placeholder="Select object type"
+                        onChange={setObjectType}
+                    />
 
                     {/* Title */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Title</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Title</label>
                         <input
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                             required
                         />
                     </div>
 
                     {/* Property Name */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Name of property</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Name of property</label>
                         <input
                             type="text"
                             value={propertyName}
                             onChange={(e) => setPropertyName(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                         />
                     </div>
 
                     {/* Currency */}
-                    <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Currency<span className="text-[#C3362B] ml-0.5">*</span></label>
-                        <div className="relative">
-                            <select
-                                value={currency}
-                                onChange={(e) => setCurrency(e.target.value)}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400 bg-white cursor-pointer appearance-none"
-                            >
-                                <option value="Rubels">Rubels</option>
-                                <option value="Manat">Manat (₼)</option>
-                                <option value="USD">USD ($)</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#999]">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                    <CustomSelect
+                        label="Currency *"
+                        value={currency}
+                        options={[
+                            { id: "Rubels", label: "Rubels" },
+                            { id: "Manat", label: "Manat (₼)" },
+                            { id: "USD", label: "USD ($)" },
+                        ]}
+                        placeholder="Select currency"
+                        onChange={setCurrency}
+                    />
 
                     {/* Region */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Region</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Region</label>
                         <input
                             type="text"
                             value={region}
                             onChange={(e) => setRegion(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                         />
                     </div>
 
                     {/* Area */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Area</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Area</label>
                         <input
                             type="text"
                             value={area}
                             onChange={(e) => setArea(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                         />
                     </div>
 
                     {/* City */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">City</label>
+                        <label className="mb-1 block text-xs text-[#333333]">City</label>
                         <input
                             type="text"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                         />
                     </div>
 
                     {/* Developer Brand */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Developer Brand</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Developer Brand</label>
                         <input
                             type="text"
                             value={developerBrand}
                             onChange={(e) => setDeveloperBrand(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                         />
                     </div>
 
                     {/* Website */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Website</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Website</label>
                         <input
                             type="url"
                             value={website}
                             onChange={(e) => setWebsite(e.target.value)}
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                         />
                     </div>
 
                     {/* Status */}
-                    <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Status</label>
-                        <div className="relative">
-                            <select
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400 bg-white cursor-pointer appearance-none"
-                            >
-                                <option value="active">Active</option>
-                                <option value="archive">Archive</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#999]">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                    <CustomSelect
+                        label="Status"
+                        value={status}
+                        options={[
+                            { id: "active", label: "Active" },
+                            { id: "archive", label: "Archive" },
+                        ]}
+                        placeholder="Select status"
+                        onChange={setStatus}
+                    />
 
                     {/* Date (read-only) */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-medium text-[#666666]">Date</label>
+                        <label className="mb-1 block text-xs text-[#333333]">Date</label>
                         <input
                             type="text"
                             value={response?.data ? formatDate(response.data.createdAt) : ""}
                             readOnly
-                            className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#999] bg-[#F4F5F6] cursor-not-allowed"
+                            className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#999] bg-[#F4F5F6] cursor-not-allowed outline-none"
                         />
                     </div>
                 </div>
@@ -369,43 +406,43 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     <h3 className="text-sm font-semibold text-[#1A1A1A] mb-4">Metrics</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label className="mb-1.5 block text-xs font-medium text-[#666666]">Houses</label>
+                            <label className="mb-1 block text-xs text-[#333333]">Houses</label>
                             <input
                                 type="number"
                                 min={0}
                                 value={housesCount}
                                 onChange={(e) => setHousesCount(Number(e.target.value))}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-xs font-medium text-[#666666]">Properties</label>
+                            <label className="mb-1 block text-xs text-[#333333]">Properties</label>
                             <input
                                 type="number"
                                 min={0}
                                 value={propertiesCount}
                                 onChange={(e) => setPropertiesCount(Number(e.target.value))}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-xs font-medium text-[#666666]">Reserved</label>
+                            <label className="mb-1 block text-xs text-[#333333]">Reserved</label>
                             <input
                                 type="number"
                                 min={0}
                                 value={reservedCount}
                                 onChange={(e) => setReservedCount(Number(e.target.value))}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-xs font-medium text-[#666666]">Sold</label>
+                            <label className="mb-1 block text-xs text-[#333333]">Sold</label>
                             <input
                                 type="number"
                                 min={0}
                                 value={soldCount}
                                 onChange={(e) => setSoldCount(Number(e.target.value))}
-                                className="w-full h-10 rounded-xl border border-gray-200 px-3 text-sm text-[#1A1A1A] outline-none focus:border-gray-400"
+                                className="w-full h-[36px] rounded-xl border border-[#CCCCCC] px-4 text-[14px] font-normal text-[#333333] outline-none focus:border-[#4A4E5A] placeholder-[#666666]"
                             />
                         </div>
                     </div>
