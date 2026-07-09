@@ -22,6 +22,8 @@ import { CategoryCreate } from "./categories/CategoryCreate";
 import { ObjectEditPage } from "./dashboard/ObjectEditPage";
 import { ObjectCreatePage } from "./dashboard/ObjectCreatePage";
 import { ObjectTypesSection } from "./dashboard/ObjectTypesSection";
+import { ResidentComplexConfigPage } from "./dashboard/ResidentComplexConfigPage";
+import { PropertyConfigPage } from "./dashboard/PropertyConfigPage";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type MenuKey = "offplan" | "resale"
@@ -140,7 +142,7 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["requests", (value) => value === "/dashboard/resale/requests"],
         ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
         ["categories", (value) => value === "/dashboard/offplan/categories"],
-        ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create"],
+        ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create" || /^\/dashboard\/offplan\/objects\/[^/]+\/config$/.test(value) || /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties$/.test(value)],
         ["objectTypes", (value) => value === "/dashboard/offplan/object-types"],
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["viewOptions", (value) => value === "/dashboard/offplan/view-options"],
@@ -159,7 +161,11 @@ export function Dashboard() {
     const isCreatingApartment = location.pathname === "/dashboard/resale/apartments/create";
     const isEditingObject = /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(location.pathname);
     const isCreatingObject = location.pathname === "/dashboard/offplan/objects/create";
+    const isConfiguringObject = /^\/dashboard\/offplan\/objects\/[^/]+\/config$/.test(location.pathname);
+    const isPropertyConfig = /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties$/.test(location.pathname);
     const objectId = isEditingObject ? location.pathname.split("/")[4] : null;
+    const configObjectId = isConfiguringObject ? location.pathname.split("/")[4] : null;
+    const propertyConfigId = isPropertyConfig ? location.pathname.split("/")[4] : null;
     const activeMenu = getMenuKeyFromPath(location.pathname) ?? "resale";
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
 
@@ -653,7 +659,7 @@ export function Dashboard() {
 
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
-                {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
+                {activeMenu === "objects" && (isPropertyConfig ? <PropertyConfigPage embedded key={propertyConfigId} /> : isConfiguringObject ? <ResidentComplexConfigPage embedded key={configObjectId} /> : isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
                 {activeMenu === "objectTypes" && <ObjectTypesSection />}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}

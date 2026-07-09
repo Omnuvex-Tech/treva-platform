@@ -5,6 +5,7 @@ import { categoriesApi, type Category } from "../../api/categories";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { FormTabSwitcher } from "@repo/ui";
 
 const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -52,28 +53,15 @@ export function OffPlanObjectsSection() {
             {/* Action Bar */}
             <div className="w-full flex items-center justify-between mb-6">
                 {/* Toggle Segment Control */}
-                <div className="flex items-center bg-white border border-[#E2E8F0] rounded-full p-1 shadow-sm gap-1">
-                    <button
-                        onClick={() => setActiveTab("Active")}
-                        className={`flex items-center justify-center w-[69px] h-[44px] px-[14px] py-[8px] rounded-full text-[14px] font-medium leading-[20px] tracking-[0px] transition-all cursor-pointer ${
-                            activeTab === "Active"
-                                ? "bg-[#EBEBEB] text-[#4E525D] border border-white"
-                                : "bg-transparent text-[#A6A6A6] border border-transparent hover:text-[#4E525D]"
-                        }`}
-                    >
-                        Active
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("Archive")}
-                        className={`flex items-center justify-center w-[69px] h-[44px] px-[14px] py-[8px] rounded-full text-[14px] font-medium leading-[20px] tracking-[0px] transition-all cursor-pointer ${
-                            activeTab === "Archive"
-                                ? "bg-[#EBEBEB] text-[#4E525D] border border-white"
-                                : "bg-transparent text-[#A6A6A6] border border-transparent hover:text-[#4E525D]"
-                        }`}
-                    >
-                        Archive
-                    </button>
-                </div>
+                <FormTabSwitcher
+                    tabs={[
+                        { id: "Active", label: "Active" },
+                        { id: "Archive", label: "Archive" },
+                    ]}
+                    activeTab={activeTab}
+                    onChange={(id) => setActiveTab(id as "Active" | "Archive")}
+                    size="sm"
+                />
 
                 {/* Add Object Button */}
                 <button

@@ -4,3 +4,4 @@ export { FormNumberField } from "./FormNumberField";
 export { FormTextArea } from "./FormTextArea";
 export { FormDropdown } from "./FormDropdown";
 export { FormImageField } from "./FormImageField";
+export { FormTabSwitcher } from "./FormTabSwitcher";

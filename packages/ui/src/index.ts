@@ -18,6 +18,7 @@ export {
     FormTextArea,
     FormDropdown,
     FormImageField,
+    FormTabSwitcher,
 } from "./components/Form";
 
 export { cn } from "./lib/utils";

@@ -25,7 +25,7 @@ export function FormButton({
         <button
             disabled={disabled || loading}
             className={cn(
-                "inline-flex items-center justify-center rounded-[27px] px-5 h-[52px] text-[16px] font-medium transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer",
+                "inline-flex items-center justify-center rounded-[27px] px-5 h-[52px] text-[16px] font-medium transition-all disabled:cursor-not-allowed cursor-pointer",
                 variantStyles[variant],
                 className
             )}

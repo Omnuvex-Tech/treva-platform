@@ -202,6 +202,22 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/offplan/objects/:id/config"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/objects/:id/config/properties"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/dashboard/offplan/unit-layouts"
                             element={
                                 <ProtectedRoute>

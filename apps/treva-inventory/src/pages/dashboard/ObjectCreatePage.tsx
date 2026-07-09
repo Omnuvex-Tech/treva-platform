@@ -45,10 +45,12 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             return categoriesApi.create({
                 title: formData.propertyName || "Untitled",
                 name: formData.propertyName || "untitled",
-                slug: formData.propertyName
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, "-")
-                    .replace(/(^-|-$)/g, "") || "untitled",
+                slug: `${formData.propertyName
+                    ? formData.propertyName
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, "-")
+                          .replace(/(^-|-$)/g, "")
+                    : "untitled"}-${Date.now()}`,
                 objectType: selectedType?.title || formData.objectType,
                 propertyName: formData.propertyName,
                 currency: formData.currency,
@@ -60,9 +62,14 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 fedLaw214: formData.fedLaw214,
             });
         },
-        onSuccess: () => {
+        onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: ["categories"] });
-            navigate("/dashboard/offplan/objects");
+            const newId = response?.data?.id;
+            if (newId) {
+                navigate(`/dashboard/offplan/objects/${newId}/config`);
+            } else {
+                navigate("/dashboard/offplan/objects");
+            }
         },
     });
 
@@ -195,10 +202,9 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         <FormButton
                             type="submit"
                             disabled={createMutation.isPending}
-                            loading={createMutation.isPending}
                             className="ml-auto sm:ml-0 mt-8 sm:mt-12"
                         >
-                            {createMutation.isPending ? "Creating..." : "Create"}
+                            {createMutation.isPending ? "Creating..." : "Next"}
                         </FormButton>
                     </div>
 
