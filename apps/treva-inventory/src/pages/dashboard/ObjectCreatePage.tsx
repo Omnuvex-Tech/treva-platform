@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi } from "../../api/categories";
 import { objectTypesApi, type ObjectType } from "../../api/object-types";
-import { FormDropdown, FormTextField, FormButton } from "@repo/ui";
+import { FormDropdown, FormTextField, FormButton, FormImageField } from "@repo/ui";
 
 export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = {}) {
     const navigate = useNavigate();
@@ -41,6 +41,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         infrastructure: "",
         salesDepartment: "",
         fedLaw214: false,
+        image: "",
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -97,6 +98,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 infrastructure: formData.infrastructure,
                 salesDepartment: formData.salesDepartment,
                 fedLaw214: formData.fedLaw214,
+                image: formData.image || undefined,
             });
         },
         onSuccess: (response) => {
@@ -123,7 +125,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const formContent = (
         <div className="w-full min-h-full flex items-center justify-center p-6 antialiased font-sans">
             <div className="w-full max-w-[1000px] bg-white rounded-[24px] border border-[#E2E8F0] shadow-xs p-5 relative">
-                {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h2 className="text-[16px] font-bold text-[#333333]" style={{ lineHeight: "20px" }}>
@@ -143,9 +144,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                     </button>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* 2-Column Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                         <div>
                             <FormDropdown
@@ -284,9 +283,16 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         </div>
                     </div>
 
-                    {/* Bottom Row: Checkbox + Submit */}
+                    <FormImageField
+                        label="Object Image"
+                        value={formData.image}
+                        onChange={(url) => updateField("image", url)}
+                        uploadFn={(file) => categoriesApi.uploadFile(file).then((res) => res.data)}
+                        accept="image/jpeg,image/png,image/webp"
+                        required
+                    />
+
                     <div className="w-full flex flex-col sm:flex-row items-start py-4 justify-between gap-4">
-                        {/* Federal Law Checkbox */}
                         <label className="flex items-center gap-3 group cursor-pointer select-none -mt-2">
                             <div className="relative">
                                 <input
@@ -306,7 +312,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             </span>
                         </label>
 
-                        {/* Submit Button */}
                         <FormButton
                             type="submit"
                             disabled={createMutation.isPending}
@@ -316,7 +321,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         </FormButton>
                     </div>
 
-                    {/* Error */}
                     {createMutation.isError && (
                         <div className="rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
                             {(createMutation.error as Error)?.message || "Failed to create object"}

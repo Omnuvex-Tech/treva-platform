@@ -49,10 +49,10 @@ export function FormDropdown({
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="flex w-full items-center justify-between rounded-xl border border-[#CCCCCC] bg-white px-4 h-[36px] text-[14px] font-normal text-[#333333] focus:border-gray-400 focus:outline-none cursor-pointer"
+                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] placeholder-[#999] focus:bg-white focus:border-gray-400 focus:outline-none cursor-pointer"
                 style={{ lineHeight: "20px" }}
             >
-                <span className={selected ? "text-[#333333]" : "text-[#666666]"}>
+                <span className={selected ? "text-[#1A1A1A]" : "text-[#999]"}>
                     {selected?.label || placeholder}
                 </span>
                 <img
@@ -62,16 +62,16 @@ export function FormDropdown({
                 />
             </button>
             {open && (
-                <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#CCCCCC] bg-white shadow-lg">
+                <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                     {options.map((opt) => (
                         <button
                             key={opt.id}
                             type="button"
                             className={cn(
-                                "w-full px-4 py-2.5 text-left text-[14px] font-normal transition-colors",
+                                "w-full px-4 py-2.5 text-left text-sm font-normal transition-colors",
                                 value === opt.id
-                                    ? "bg-[#4E525D]/10 text-[#333333] font-medium"
-                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#333333]"
+                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                    : "text-[#1A1A1A] hover:bg-gray-50"
                             )}
                             style={{ lineHeight: "20px" }}
                             onClick={() => {
@@ -85,7 +85,7 @@ export function FormDropdown({
                     {options.length === 0 && noOptionsLabel && onNoOptionsClick && (
                         <button
                             type="button"
-                            className="w-full px-4 py-2.5 text-left text-[14px] font-normal text-[#333333] hover:bg-gray-50 transition-colors cursor-pointer"
+                            className="w-full px-4 py-2.5 text-left text-sm font-normal text-[#1A1A1A] hover:bg-gray-50 transition-colors cursor-pointer"
                             style={{ lineHeight: "20px" }}
                             onClick={() => {
                                 onNoOptionsClick();
@@ -96,7 +96,7 @@ export function FormDropdown({
                         </button>
                     )}
                     {options.length === 0 && !noOptionsLabel && (
-                        <div className="px-4 py-2.5 text-[14px] text-[#999]" style={{ lineHeight: "20px" }}>
+                        <div className="px-4 py-2.5 text-sm text-[#999]" style={{ lineHeight: "20px" }}>
                             No options
                         </div>
                     )}

@@ -186,7 +186,7 @@ export function OffPlanObjectsSection() {
                                             {formatDate(cat.createdAt)}
                                         </span>
                                         <button
-                                            onClick={() => navigate(`/dashboard/offplan/objects/${cat.id}/edit`)}
+                                            onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}
                                             className="transition-colors cursor-pointer flex items-center justify-center"
                                             aria-label="Edit Date"
                                         >
@@ -227,11 +227,7 @@ export function OffPlanObjectsSection() {
                                 <div className="flex items-center justify-between gap-2">
                                     {/* Delete Button */}
                                     <button
-                                        onClick={() => {
-                                            if (window.confirm(`Delete "${cat.title}"?`)) {
-                                                deleteMut.mutate(cat.id);
-                                            }
-                                        }}
+                                        onClick={() => deleteMut.mutate(cat.id)}
                                         aria-label="Delete"
                                         title="Delete"
                                         className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#C3362B] transition-colors hover:bg-[#FCEDEA] cursor-pointer"
@@ -257,7 +253,7 @@ export function OffPlanObjectsSection() {
 
                                     {/* Edit Button */}
                                     <button
-                                        onClick={() => navigate(`/dashboard/offplan/objects/${cat.id}/edit`)}
+                                        onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}
                                         className="flex-1 h-[32px] bg-[#EBEBEB] rounded-[24px] flex items-center justify-center text-[14px] font-medium leading-[20px] text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer"
                                     >
                                         Edit

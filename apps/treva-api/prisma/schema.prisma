@@ -38,6 +38,7 @@ model Category {
   banks           String?
   infrastructure  String?
   salesDepartment String?
+  documents       Json       @default("[]")
   fedLaw214       Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -56,33 +57,48 @@ model ObjectType {
 }
 
 model UnitLayout {
-  id                  String      @id @default(cuid())
-  title               String
-  name                String
-  slug                String      @unique
-  floor               Int
-  number              Int?
-  totalArea           Float
-  internalArea        Float
-  balconyArea         Float?
-  prices              Json         @default("{}")
-  completionYear      Int
-  numberOfFloors      Json
-  similarApartmentIds String[]
-  mainImage           Json?
-  gallery             Json[]
-  documents           Json[]
-  location            Json?
-  categoryId          String
-  category            Category    @relation(fields: [categoryId], references: [id])
-  roomOptionId        String?
-  roomOption          RoomOption? @relation(fields: [roomOptionId], references: [id])
-  viewOptionId        String?
-  viewOption          ViewOption? @relation(fields: [viewOptionId], references: [id])
-  statusOptionId      String?
-  statusOption        StatusOption? @relation(fields: [statusOptionId], references: [id])
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  id                          String      @id @default(cuid())
+  title                       String
+  name                        String
+  slug                        String      @unique
+  floor                       Int
+  number                      Int?
+  totalArea                   Float
+  internalArea                Float
+  balconyArea                 Float?
+  prices                      Json         @default("{}")
+  completionYear              Int
+  numberOfFloors              Json
+  similarApartmentIds         String[]
+  mainImage                   Json?
+  gallery                     Json[]
+  documents                   Json[]
+  location                    Json?
+  categoryId                  String
+  category                    Category    @relation(fields: [categoryId], references: [id])
+  roomOptionId                String?
+  roomOption                  RoomOption? @relation(fields: [roomOptionId], references: [id])
+  viewOptionId                String?
+  viewOption                  ViewOption? @relation(fields: [viewOptionId], references: [id])
+  statusOptionId              String?
+  statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
+  lcd                         String?
+  typeOfBuilding              String?
+  defaultPropertyType         String?
+  constructionStage           String?
+  startOfConstruction         Json?
+  completionOfConstruction    Json?
+  startOfSales                Json?
+  endOfSales                  Json?
+  salesOffice                 String?
+  contractAddress             String?
+  street                      String?
+  houseNumber                 String?
+  deadlineForCommissioning    DateTime?
+  landCadastralNumber         String?
+  showroomAvailability        String?
+  createdAt                   DateTime    @default(now())
+  updatedAt                   DateTime    @updatedAt
 }
 
 model RoomOption {

@@ -27,6 +27,11 @@ export default defineConfig(({ mode }) => {
           target: apiProxyTarget,
           changeOrigin: true,
         },
+        "/cms-api": {
+          target: "http://localhost:10021",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/cms-api/, ""),
+        },
       },
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate",

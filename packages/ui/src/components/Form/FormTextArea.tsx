@@ -34,7 +34,7 @@ export function FormTextArea({
                 placeholder={placeholder}
                 rows={rows}
                 className={cn(
-                    "w-full rounded-xl border border-[#CCCCCC] bg-white px-4 py-3 text-[14px] font-normal text-[#333333] placeholder-[#666666] outline-none focus:border-[#4A4E5A] transition-colors resize-none",
+                    "w-full rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 py-3 text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400 transition-colors resize-none",
                     className
                 )}
                 style={{ lineHeight: "20px" }}

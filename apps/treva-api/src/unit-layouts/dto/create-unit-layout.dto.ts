@@ -8,6 +8,7 @@ import {
   ValidateNested,
   IsObject,
   Min,
+  Max,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -33,11 +34,13 @@ export class NumberOfFloorsDto {
   @ApiProperty({ example: 3 })
   @IsNumber()
   @Min(1)
+  @Max(999)
   start: number;
 
   @ApiProperty({ example: 30 })
   @IsNumber()
   @Min(1)
+  @Max(999)
   end: number;
 }
 
@@ -111,11 +114,13 @@ export class CreateUnitLayoutDto {
   @ApiProperty({ example: 5 })
   @IsNumber()
   @Min(1)
+  @Max(999)
   floor: number;
 
   @ApiProperty({ example: 1 })
   @IsNumber()
   @Min(1)
+  @Max(999)
   number: number;
 
   @ApiProperty({ example: 50.5 })
@@ -139,6 +144,7 @@ export class CreateUnitLayoutDto {
 
   @ApiProperty({ example: 2030 })
   @IsNumber()
+  @Max(2100)
   completionYear: number;
 
   @ApiProperty({ example: { start: 3, end: 30 } })
@@ -176,9 +182,85 @@ export class CreateUnitLayoutDto {
   @Type(() => DocumentDto)
   documents: DocumentDto[];
 
-  @ApiProperty({ type: LocationDto })
+  @ApiPropertyOptional({ type: LocationDto })
+  @IsOptional()
   @IsObject()
   @ValidateNested()
   @Type(() => LocationDto)
-  location: LocationDto;
+  location?: LocationDto;
+
+  @ApiPropertyOptional({ example: 'LCD-1' })
+  @IsOptional()
+  @IsString()
+  lcd?: string;
+
+  @ApiPropertyOptional({ example: 'Residential' })
+  @IsOptional()
+  @IsString()
+  typeOfBuilding?: string;
+
+  @ApiPropertyOptional({ example: 'Apartment' })
+  @IsOptional()
+  @IsString()
+  defaultPropertyType?: string;
+
+  @ApiPropertyOptional({ example: 'Under construction' })
+  @IsOptional()
+  @IsString()
+  constructionStage?: string;
+
+  @ApiPropertyOptional({ example: { month: 1, year: 2024 } })
+  @IsOptional()
+  @IsObject()
+  startOfConstruction?: Record<string, number>;
+
+  @ApiPropertyOptional({ example: { month: 12, year: 2026 } })
+  @IsOptional()
+  @IsObject()
+  completionOfConstruction?: Record<string, number>;
+
+  @ApiPropertyOptional({ example: { month: 3, year: 2024 } })
+  @IsOptional()
+  @IsObject()
+  startOfSales?: Record<string, number>;
+
+  @ApiPropertyOptional({ example: { month: 6, year: 2027 } })
+  @IsOptional()
+  @IsObject()
+  endOfSales?: Record<string, number>;
+
+  @ApiPropertyOptional({ example: 'Main Office' })
+  @IsOptional()
+  @IsString()
+  salesOffice?: string;
+
+  @ApiPropertyOptional({ example: '123 Main Street, Building 5' })
+  @IsOptional()
+  @IsString()
+  contractAddress?: string;
+
+  @ApiPropertyOptional({ example: 'Neftchilar Avenue' })
+  @IsOptional()
+  @IsString()
+  street?: string;
+
+  @ApiPropertyOptional({ example: '42' })
+  @IsOptional()
+  @IsString()
+  houseNumber?: string;
+
+  @ApiPropertyOptional({ example: '2026-12-31' })
+  @IsOptional()
+  @IsString()
+  deadlineForCommissioning?: string;
+
+  @ApiPropertyOptional({ example: '123456789' })
+  @IsOptional()
+  @IsString()
+  landCadastralNumber?: string;
+
+  @ApiPropertyOptional({ example: 'Yes' })
+  @IsOptional()
+  @IsString()
+  showroomAvailability?: string;
 }

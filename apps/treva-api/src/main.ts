@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './filters/http-exception.filter';
 import helmet from 'helmet';
 
 function parseCsv(value?: string) {
@@ -40,6 +41,8 @@ async function bootstrap() {
     origin: corsOrigins,
     credentials: true,
   });
+
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },

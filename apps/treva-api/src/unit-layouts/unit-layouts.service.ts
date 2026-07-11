@@ -38,6 +38,21 @@ export class UnitLayoutsService {
         gallery: createDto.gallery as any[] || [],
         documents: createDto.documents as any[] || [],
         location: createDto.location as any,
+        lcd: createDto.lcd,
+        typeOfBuilding: createDto.typeOfBuilding,
+        defaultPropertyType: createDto.defaultPropertyType,
+        constructionStage: createDto.constructionStage,
+        startOfConstruction: createDto.startOfConstruction as any,
+        completionOfConstruction: createDto.completionOfConstruction as any,
+        startOfSales: createDto.startOfSales as any,
+        endOfSales: createDto.endOfSales as any,
+        salesOffice: createDto.salesOffice,
+        contractAddress: createDto.contractAddress,
+        street: createDto.street,
+        houseNumber: createDto.houseNumber,
+        deadlineForCommissioning: createDto.deadlineForCommissioning ? new Date(createDto.deadlineForCommissioning) : undefined,
+        landCadastralNumber: createDto.landCadastralNumber,
+        showroomAvailability: createDto.showroomAvailability,
       },
       include: { category: true },
     });
@@ -260,6 +275,21 @@ export class UnitLayoutsService {
     if (updateDto.gallery !== undefined) data.gallery = updateDto.gallery;
     if (updateDto.documents !== undefined) data.documents = updateDto.documents;
     if (updateDto.location !== undefined) data.location = updateDto.location;
+    if (updateDto.lcd !== undefined) data.lcd = updateDto.lcd;
+    if (updateDto.typeOfBuilding !== undefined) data.typeOfBuilding = updateDto.typeOfBuilding;
+    if (updateDto.defaultPropertyType !== undefined) data.defaultPropertyType = updateDto.defaultPropertyType;
+    if (updateDto.constructionStage !== undefined) data.constructionStage = updateDto.constructionStage;
+    if (updateDto.startOfConstruction !== undefined) data.startOfConstruction = updateDto.startOfConstruction;
+    if (updateDto.completionOfConstruction !== undefined) data.completionOfConstruction = updateDto.completionOfConstruction;
+    if (updateDto.startOfSales !== undefined) data.startOfSales = updateDto.startOfSales;
+    if (updateDto.endOfSales !== undefined) data.endOfSales = updateDto.endOfSales;
+    if (updateDto.salesOffice !== undefined) data.salesOffice = updateDto.salesOffice;
+    if (updateDto.contractAddress !== undefined) data.contractAddress = updateDto.contractAddress;
+    if (updateDto.street !== undefined) data.street = updateDto.street;
+    if (updateDto.houseNumber !== undefined) data.houseNumber = updateDto.houseNumber;
+    if (updateDto.deadlineForCommissioning !== undefined) data.deadlineForCommissioning = updateDto.deadlineForCommissioning ? new Date(updateDto.deadlineForCommissioning) : null;
+    if (updateDto.landCadastralNumber !== undefined) data.landCadastralNumber = updateDto.landCadastralNumber;
+    if (updateDto.showroomAvailability !== undefined) data.showroomAvailability = updateDto.showroomAvailability;
 
     return this.prisma.unitLayout.update({
       where: { id },

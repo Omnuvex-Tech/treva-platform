@@ -59,6 +59,21 @@ export interface UnitLayout {
     roomOptionId?: string;
     roomOption?: { id: string; value: string; order: number };
     viewOption?: { id: string; value: string; order: number };
+    lcd?: string;
+    typeOfBuilding?: string;
+    defaultPropertyType?: string;
+    constructionStage?: string;
+    startOfConstruction?: { month: number; year: number };
+    completionOfConstruction?: { month: number; year: number };
+    startOfSales?: { month: number; year: number };
+    endOfSales?: { month: number; year: number };
+    salesOffice?: string;
+    contractAddress?: string;
+    street?: string;
+    houseNumber?: string;
+    deadlineForCommissioning?: string;
+    landCadastralNumber?: string;
+    showroomAvailability?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -103,12 +118,28 @@ export interface CreateUnitLayoutData {
     documents?: Document[];
     location?: Location;
     roomOptionId?: string;
+    lcd?: string;
+    typeOfBuilding?: string;
+    defaultPropertyType?: string;
+    constructionStage?: string;
+    startOfConstruction?: { month: number; year: number };
+    completionOfConstruction?: { month: number; year: number };
+    startOfSales?: { month: number; year: number };
+    endOfSales?: { month: number; year: number };
+    salesOffice?: string;
+    contractAddress?: string;
+    street?: string;
+    houseNumber?: string;
+    deadlineForCommissioning?: string;
+    landCadastralNumber?: string;
+    showroomAvailability?: string;
 }
 
 export interface UnitLayoutFilters {
     page?: number;
     limit?: number;
     categoryId?: string;
+    categorySlug?: string;
     statusOptionId?: string;
     search?: string;
     minPrice?: number;

@@ -218,6 +218,22 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/offplan/objects/:slug/config/properties/houses/create"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/offplan/objects/:slug/config/properties/houses/:houseId/edit"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/dashboard/offplan/unit-layouts"
                             element={
                                 <ProtectedRoute>

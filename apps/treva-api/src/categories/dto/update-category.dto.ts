@@ -1,5 +1,7 @@
-import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsBoolean, IsArray, ValidateNested } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { CategoryDocumentDto } from './create-category.dto';
 
 export class UpdateCategoryDto {
   @ApiPropertyOptional({ example: 'Panorama by ELIE SAAB' })
@@ -106,4 +108,11 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsBoolean()
   fedLaw214?: boolean;
+
+  @ApiPropertyOptional({ type: [CategoryDocumentDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CategoryDocumentDto)
+  documents?: CategoryDocumentDto[];
 }

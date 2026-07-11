@@ -17,7 +17,7 @@ export class CategoriesService {
     }
 
     return this.prisma.category.create({
-      data: createCategoryDto,
+      data: { ...createCategoryDto, documents: createCategoryDto.documents as any },
     });
   }
 
@@ -46,6 +46,10 @@ export class CategoriesService {
       city: category.city,
       developerBrand: category.developerBrand,
       website: category.website,
+      banks: category.banks,
+      infrastructure: category.infrastructure,
+      salesDepartment: category.salesDepartment,
+      documents: category.documents,
       fedLaw214: category.fedLaw214,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
@@ -88,6 +92,10 @@ export class CategoriesService {
       city: category.city,
       developerBrand: category.developerBrand,
       website: category.website,
+      banks: category.banks,
+      infrastructure: category.infrastructure,
+      salesDepartment: category.salesDepartment,
+      documents: category.documents,
       fedLaw214: category.fedLaw214,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
@@ -130,6 +138,10 @@ export class CategoriesService {
       city: category.city,
       developerBrand: category.developerBrand,
       website: category.website,
+      banks: category.banks,
+      infrastructure: category.infrastructure,
+      salesDepartment: category.salesDepartment,
+      documents: category.documents,
       fedLaw214: category.fedLaw214,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
@@ -164,7 +176,7 @@ export class CategoriesService {
 
     return this.prisma.category.update({
       where: { id },
-      data: updateCategoryDto,
+      data: { ...updateCategoryDto, documents: updateCategoryDto.documents as any },
     });
   }
 
@@ -176,6 +188,10 @@ export class CategoriesService {
     if (!category) {
       throw new NotFoundException('Category not found');
     }
+
+    await this.prisma.unitLayout.deleteMany({
+      where: { categoryId: id },
+    });
 
     return this.prisma.category.delete({
       where: { id },

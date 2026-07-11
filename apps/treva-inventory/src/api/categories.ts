@@ -8,6 +8,11 @@ export interface CategoryMetrics {
     available: number;
 }
 
+export interface CategoryDocument {
+    type: string;
+    url: string;
+}
+
 export interface Category {
     id: string;
     title: string;
@@ -30,6 +35,7 @@ export interface Category {
     banks?: string;
     infrastructure?: string;
     salesDepartment?: string;
+    documents?: CategoryDocument[];
     fedLaw214: boolean;
     createdAt: string;
     updatedAt: string;
@@ -81,6 +87,7 @@ export interface UpdateCategoryData {
     banks?: string;
     infrastructure?: string;
     salesDepartment?: string;
+    documents?: CategoryDocument[];
     fedLaw214?: boolean;
 }
 

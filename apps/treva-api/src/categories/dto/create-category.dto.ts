@@ -1,5 +1,18 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsNumber, IsBoolean, IsArray, ValidateNested } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+
+export class CategoryDocumentDto {
+  @ApiProperty({ example: 'pdf' })
+  @IsString()
+  @IsNotEmpty()
+  type: string;
+
+  @ApiProperty({ example: '/uploads/documents/plan.pdf' })
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+}
 
 export class CreateCategoryDto {
   @ApiProperty({ example: 'Panorama by ELIE SAAB' })
@@ -101,4 +114,11 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsBoolean()
   fedLaw214?: boolean;
+
+  @ApiPropertyOptional({ type: [CategoryDocumentDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CategoryDocumentDto)
+  documents?: CategoryDocumentDto[];
 }
