@@ -74,6 +74,9 @@ export interface UnitLayout {
     deadlineForCommissioning?: string;
     landCadastralNumber?: string;
     showroomAvailability?: string;
+    renovation?: string;
+    wallMaterial?: string;
+    description?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -133,6 +136,9 @@ export interface CreateUnitLayoutData {
     deadlineForCommissioning?: string;
     landCadastralNumber?: string;
     showroomAvailability?: string;
+    renovation?: string;
+    wallMaterial?: string;
+    description?: string;
 }
 
 export interface UnitLayoutFilters {

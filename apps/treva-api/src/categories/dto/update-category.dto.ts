@@ -109,6 +109,11 @@ export class UpdateCategoryDto {
   @IsBoolean()
   fedLaw214?: boolean;
 
+  @ApiPropertyOptional({ example: 'object', enum: ['category', 'object'] })
+  @IsOptional()
+  @IsString()
+  type?: string;
+
   @ApiPropertyOptional({ type: [CategoryDocumentDto] })
   @IsOptional()
   @IsArray()

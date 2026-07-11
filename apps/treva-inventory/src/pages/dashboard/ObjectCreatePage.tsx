@@ -86,6 +86,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 title: formData.propertyName || "Untitled",
                 name: formData.propertyName || "untitled",
                 slug: finalSlug,
+                type: "object",
                 objectType: selectedType?.title || formData.objectType,
                 propertyName: formData.propertyName,
                 currency: formData.currency,

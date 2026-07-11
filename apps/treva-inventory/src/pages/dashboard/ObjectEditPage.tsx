@@ -1,19 +1,25 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi, type CategoryDocument } from "../../api/categories";
 import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
 import { objectTypesApi, type ObjectType } from "../../api/object-types";
-import { FormDropdown, FormTextField, FormButton, FormTabSwitcher, FormAddButton, FormImageField } from "@repo/ui";
+import { FormButton, FormTabSwitcher, FormAddButton, FormDropdown, FormTextField, FormImageField } from "@repo/ui";
+import { HouseForm } from "./HouseForm";
+import { useMessageCenter } from "../../components/MessageCenter";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}) {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { showError, showSuccess } = useMessageCenter();
 
     const [activeHouseTab, setActiveHouseTab] = useState<"Active" | "Archive">("Active");
     const [docUploading, setDocUploading] = useState(false);
     const docInputRef = useRef<HTMLInputElement>(null);
+    const houseFormRef = useRef<HTMLDivElement>(null);
+    const [editingHouseId, setEditingHouseId] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         objectType: "",
@@ -32,15 +38,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         image: "",
     });
 
-    const { data: objectTypesResponse } = useQuery({
-        queryKey: ["object-types"],
-        queryFn: () => objectTypesApi.getAll(),
-    });
-
-    const objectTypes: ObjectType[] = Array.isArray(objectTypesResponse?.data)
-        ? objectTypesResponse.data
-        : [];
-
     const { data: response, isLoading } = useQuery({
         queryKey: ["category", slug],
         queryFn: () => categoriesApi.getBySlug(slug!),
@@ -49,6 +46,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const category = response?.data;
     const documents: CategoryDocument[] = category?.documents || [];
+
+    const { data: objectTypesResponse } = useQuery({
+        queryKey: ["object-types"],
+        queryFn: () => objectTypesApi.getAll(),
+    });
+    const objectTypes: ObjectType[] = Array.isArray(objectTypesResponse?.data) ? objectTypesResponse.data : [];
 
     const { data: layoutsRes } = useQuery({
         queryKey: ["unit-layouts", slug],
@@ -83,30 +86,30 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     }, [category]);
 
     const updateMutation = useMutation({
-        mutationFn: () => {
-            const selectedType = objectTypes.find((t) => t.title === formData.objectType || t.id === formData.objectType);
+        mutationFn: (data: typeof formData) => {
             return categoriesApi.update(category!.id, {
-                title: formData.propertyName || category!.title,
-                name: formData.propertyName || category!.name,
-                slug: formData.slug,
-                image: formData.image || undefined,
-                objectType: selectedType?.title || formData.objectType,
-                propertyName: formData.propertyName,
-                currency: formData.currency,
-                region: formData.region,
-                area: formData.area,
-                city: formData.city,
-                developerBrand: formData.developerBrand,
-                website: formData.website,
-                banks: formData.banks,
-                infrastructure: formData.infrastructure,
-                salesDepartment: formData.salesDepartment,
-                fedLaw214: formData.fedLaw214,
+                objectType: data.objectType,
+                propertyName: data.propertyName,
+                slug: data.slug,
+                currency: data.currency,
+                region: data.region,
+                area: data.area,
+                city: data.city,
+                developerBrand: data.developerBrand,
+                website: data.website,
+                banks: data.banks,
+                infrastructure: data.infrastructure,
+                salesDepartment: data.salesDepartment,
+                fedLaw214: data.fedLaw214,
+                image: data.image,
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
             queryClient.invalidateQueries({ queryKey: ["category", slug] });
+            showSuccess({ title: "Object updated" });
+        },
+        onError: (error) => {
+            showError({ title: "Could not update object", description: getApiErrorMessage(error, "Please try again.") });
         },
     });
 
@@ -125,6 +128,15 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
         },
     });
+
+    const updateField = (field: string, value: any) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        updateMutation.mutate(formData);
+    };
 
     const handleDocUpload = async (files: FileList | File[]) => {
         const arr = Array.from(files);
@@ -150,15 +162,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         updateDocsMutation.mutate(documents.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!category) return;
-        updateMutation.mutate();
-    };
-
-    const updateField = (field: string, value: string | boolean) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-    };
+    const inputClass =
+        "w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400";
 
     const formContent = (
         <div className="w-full min-h-full p-6 antialiased font-sans">
@@ -181,145 +186,209 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     </button>
                 </div>
 
-                {/* ── Section 1: Editable Form ── */}
-                <div className="bg-white rounded-[24px] border border-[#E2E8F0] shadow-xs p-5 mb-6">
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                            <div>
+                <form onSubmit={handleSubmit}>
+                    {/* ── Section 1: Edit Object Form ── */}
+                    <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
+                        <div className="flex items-center gap-1.5 pb-4">
+                            <h2 style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">Object information</h2>
+                            <img src="/images/inv-dashboard/question.svg" alt="" className="w-[14px] h-[14px] cursor-help flex-shrink-0 mt-[3px]" title="Object details" />
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
                                 <FormDropdown
                                     label="Object type"
                                     value={formData.objectType}
-                                    options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
+                                    options={objectTypes.map((t) => ({ id: t.name, label: t.title || t.name }))}
                                     placeholder="Select object type"
-                                    onChange={(id) => updateField("objectType", id)}
-                                    required
-                                    noOptionsLabel="Create Object Type"
-                                    onNoOptionsClick={() => navigate("/dashboard/offplan/object-types")}
+                                    onChange={(val) => updateField("objectType", val)}
                                 />
+                                <div>
+                                    <label className="mb-1 block text-xs text-[#4E525D]">Name</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.propertyName || ""}
+                                        onChange={(e) => updateField("propertyName", e.target.value)}
+                                        placeholder="e.g. Sea Breeze Residence"
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <FormTextField
-                                    label="Name of property"
-                                    value={formData.propertyName}
-                                    onChange={(v) => updateField("propertyName", v)}
-                                    placeholder="Placeholder"
-                                    required
-                                />
-                            </div>
-                            <FormTextField
-                                label="Slug"
-                                value={formData.slug}
-                                onChange={(v) => updateField("slug", v)}
-                                placeholder="auto-generated-from-name"
-                            />
-                            <div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1 block text-xs text-[#4E525D]">Slug</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.slug || ""}
+                                        onChange={(e) => updateField("slug", e.target.value)}
+                                        placeholder="e.g. sea-breeze-residence"
+                                    />
+                                </div>
                                 <FormDropdown
                                     label="Currency"
-                                    value={formData.currency}
+                                    value={formData.currency || "Rubels"}
                                     options={[
                                         { id: "Rubels", label: "Rubels" },
-                                        { id: "Manat", label: "Manat" },
-                                        { id: "USD", label: "USD ($)" },
+                                        { id: "USD", label: "USD" },
+                                        { id: "AZN", label: "AZN" },
+                                        { id: "EUR", label: "EUR" },
                                     ]}
                                     placeholder="Select currency"
-                                    onChange={(id) => updateField("currency", id)}
-                                    required
+                                    onChange={(val) => updateField("currency", val)}
                                 />
                             </div>
-                            <div>
-                                <FormTextField label="Region" value={formData.region} onChange={(v) => updateField("region", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="Area" value={formData.area} onChange={(v) => updateField("area", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="City" value={formData.city} onChange={(v) => updateField("city", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="Developer Brand" value={formData.developerBrand} onChange={(v) => updateField("developerBrand", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="Website" value={formData.website} onChange={(v) => updateField("website", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="Banks" value={formData.banks} onChange={(v) => updateField("banks", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="Infrastructure" value={formData.infrastructure} onChange={(v) => updateField("infrastructure", v)} placeholder="Placeholder" required />
-                            </div>
-                            <div>
-                                <FormTextField label="Sales department" value={formData.salesDepartment} onChange={(v) => updateField("salesDepartment", v)} placeholder="Placeholder" required />
-                            </div>
-                        </div>
 
-                        <FormImageField
-                            label="Object Image"
-                            value={formData.image}
-                            onChange={(url) => updateField("image", url)}
-                            uploadFn={(file) => categoriesApi.uploadFile(file).then((res) => res.data)}
-                            accept="image/jpeg,image/png,image/webp"
-                        />
-
-                        {/* Federal Law */}
-                        <label className="flex items-center gap-3 cursor-pointer select-none">
-                            <div className="relative">
-                                <input type="checkbox" checked={formData.fedLaw214} onChange={(e) => updateField("fedLaw214", e.target.checked)} className="sr-only" />
-                                {formData.fedLaw214 ? (
-                                    <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="w-5 h-5" />
-                                ) : (
-                                    <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5 opacity-60" />
-                                )}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1 block text-xs text-[#4E525D]">Region</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.region || ""}
+                                        onChange={(e) => updateField("region", e.target.value)}
+                                        placeholder="e.g. Dubai Marina"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-xs text-[#4E525D]">Area</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.area || ""}
+                                        onChange={(e) => updateField("area", e.target.value)}
+                                        placeholder="e.g. 2500 m²"
+                                    />
+                                </div>
                             </div>
-                            <span className="text-[14px] font-normal text-[#333333]" style={{ lineHeight: "20px" }}>
-                                Possibility of Purchase under Federal Law No. 214
-                            </span>
-                        </label>
 
-                        {updateMutation.isError && (
-                            <div className="rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
-                                {(updateMutation.error as Error)?.message || "Failed to update"}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1 block text-xs text-[#4E525D]">City</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.city || ""}
+                                        onChange={(e) => updateField("city", e.target.value)}
+                                        placeholder="e.g. Baku"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1 block text-xs text-[#4E525D]">Developer Brand</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.developerBrand || ""}
+                                        onChange={(e) => updateField("developerBrand", e.target.value)}
+                                        placeholder="e.g. ABC Development"
+                                    />
+                                </div>
                             </div>
-                        )}
-                    </form>
-                </div>
 
-                {/* ── Section 2: Property Information (read-only) ── */}
-                {category && (
-                    <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
-                        <div className="flex items-center justify-between border-b border-[#F4F5F7] pb-4 mb-4">
-                            <h2 style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">Property information</h2>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3.5 pt-1">
-                            <div className="space-y-3.5">
-                                {[
-                                    { label: "Object type", value: category.objectType },
-                                    { label: "Name", value: category.propertyName || category.title },
-                                    { label: "Address", value: category.region },
-                                    { label: "Developer", value: category.developerBrand },
-                                    { label: "Banks", value: formData.banks },
-                                ].map((item) => (
-                                    <div key={item.label} className="flex items-start">
-                                        <span style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px" }} className="w-[100px] text-[#4E525D] shrink-0">{item.label}</span>
-                                        <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">{item.value || "not specified"}</span>
-                                    </div>
-                                ))}
+                            <div>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Website</label>
+                                <input
+                                    className={inputClass}
+                                    value={formData.website || ""}
+                                    onChange={(e) => updateField("website", e.target.value)}
+                                    placeholder="e.g. https://example.com"
+                                />
                             </div>
-                            <div className="space-y-3.5">
-                                {[
-                                    { label: "Currency", value: category.currency },
-                                    { label: "Infrastructure", value: formData.infrastructure },
-                                    { label: "Website", value: category.website },
-                                    { label: "Sales department", value: formData.salesDepartment },
-                                ].map((item) => (
-                                    <div key={item.label} className="flex items-start">
-                                        <span style={{ fontWeight: 400, fontSize: 12, lineHeight: "18px" }} className="w-[110px] text-[#4E525D] shrink-0">{item.label}</span>
-                                        <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">{item.value || "not specified"}</span>
-                                    </div>
-                                ))}
+
+                            <div>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Banks</label>
+                                <input
+                                    className={inputClass}
+                                    value={formData.banks || ""}
+                                    onChange={(e) => updateField("banks", e.target.value)}
+                                    placeholder="e.g. Kapital Bank, PASHA Bank"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Infrastructure</label>
+                                <input
+                                    className={inputClass}
+                                    value={formData.infrastructure || ""}
+                                    onChange={(e) => updateField("infrastructure", e.target.value)}
+                                    placeholder="e.g. Swimming pool, Gym, Parking"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Sales department</label>
+                                <input
+                                    className={inputClass}
+                                    value={formData.salesDepartment || ""}
+                                    onChange={(e) => updateField("salesDepartment", e.target.value)}
+                                    placeholder="e.g. sales@example.com"
+                                />
+                            </div>
+
+                            <div>
+                                <FormImageField
+                                    label="Object Image"
+                                    value={formData.image}
+                                    onChange={(url) => updateField("image", url)}
+                                    uploadFn={async (file) => {
+                                        const res = await categoriesApi.uploadFile(file);
+                                        return { url: res.data.url };
+                                    }}
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="fedLaw214"
+                                    checked={formData.fedLaw214 || false}
+                                    onChange={(e) => updateField("fedLaw214", e.target.checked)}
+                                    className="h-4 w-4 rounded border-gray-300 accent-[#4E525D] cursor-pointer"
+                                />
+                                <label htmlFor="fedLaw214" className="text-xs text-[#4E525D] cursor-pointer">FedLaw 214</label>
                             </div>
                         </div>
                     </div>
-                )}
+
+                    {/* ── Section 2: Property Information (read-only) ── */}
+                    <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
+                        <div className="flex items-center gap-1.5 pb-4">
+                            <h2 style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">Property Information</h2>
+                            <img src="/images/inv-dashboard/question.svg" alt="" className="w-[14px] h-[14px] cursor-help flex-shrink-0 mt-[3px]" title="Property stats" />
+                        </div>
+                        <div className="grid grid-cols-4 gap-4">
+                            <div className="rounded-xl border border-[#EAECEF] p-4 text-center">
+                                <p className="text-[24px] font-bold text-[#1A1A1A]">{category?.housesCount || 0}</p>
+                                <p className="text-[12px] text-[#999]">Houses</p>
+                            </div>
+                            <div className="rounded-xl border border-[#EAECEF] p-4 text-center">
+                                <p className="text-[24px] font-bold text-[#1A1A1A]">{category?.propertiesCount || 0}</p>
+                                <p className="text-[12px] text-[#999]">Properties</p>
+                            </div>
+                            <div className="rounded-xl border border-[#EAECEF] p-4 text-center">
+                                <p className="text-[24px] font-bold text-[#1A1A1A]">{category?.reservedCount || 0}</p>
+                                <p className="text-[12px] text-[#999]">Reserved</p>
+                            </div>
+                            <div className="rounded-xl border border-[#EAECEF] p-4 text-center">
+                                <p className="text-[24px] font-bold text-[#1A1A1A]">{category?.soldCount || 0}</p>
+                                <p className="text-[12px] text-[#999]">Sold</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Save / Cancel */}
+                    <div className="flex gap-3 mb-6">
+                        <button
+                            type="submit"
+                            disabled={updateMutation.isPending}
+                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {updateMutation.isPending ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate("/dashboard/offplan/objects")}
+                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
 
                 {/* ── Section 3: General Plans ── */}
                 <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs min-h-[200px]">
@@ -390,13 +459,29 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     )}
                 </div>
 
-                {/* ── Section 4: List of Houses ── */}
+                {/* ── Section 4: Make a home (inline HouseForm) ── */}
+                <div ref={houseFormRef}>
+                    <HouseForm
+                        inline
+                        houseId={editingHouseId ?? undefined}
+                        key={editingHouseId ?? "new"}
+                        onSuccess={() => {
+                            setEditingHouseId(null);
+                            queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
+                        }}
+                    />
+                </div>
+
+                {/* ── Section 5: List of Houses ── */}
                 <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
                     <div className="w-full flex items-center justify-between mb-4">
                         <h2 style={{ fontWeight: 500, fontSize: 16, lineHeight: "20px" }} className="text-[#1A1A1A]">List of houses</h2>
                         <FormAddButton
                             icon={<span className="text-base font-light mr-0.5">+</span>}
-                            onClick={() => navigate(`/dashboard/offplan/objects/${slug}/config/properties/houses/create`)}
+                            onClick={() => {
+                                setEditingHouseId(null);
+                                setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+                            }}
                         >
                             Add a houses
                         </FormAddButton>
@@ -437,14 +522,17 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                             <div className="flex gap-1 px-1 pb-1">
                                                 <button
                                                     type="button"
-                                                    onClick={() => navigate(`/dashboard/offplan/objects/${slug}/config/properties/houses/${house.id}/edit`)}
+                                                    onClick={() => {
+                                                        setEditingHouseId(house.id);
+                                                        setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+                                                    }}
                                                     className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => { if (window.confirm("Delete this house?")) deleteMutation.mutate(house.id); }}
+                                                    onClick={() => deleteMutation.mutate(house.id)}
                                                     className="flex-1 rounded-lg border border-[#FECACA] py-1.5 text-[12px] font-medium text-[#C3362B] hover:bg-red-50 transition-colors cursor-pointer"
                                                 >
                                                     Delete
@@ -456,18 +544,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             </div>
                         )}
                     </div>
-                </div>
-
-                {/* ── Save / Cancel Buttons ── */}
-                <div className="flex gap-3 mb-8">
-                    <FormButton type="button" disabled={updateMutation.isPending}
-                        onClick={() => updateMutation.mutate()}>
-                        {updateMutation.isPending ? "Saving..." : "Save"}
-                    </FormButton>
-                    <FormButton type="button" variant="secondary"
-                        onClick={() => navigate("/dashboard/offplan/objects")}>
-                        Cancel
-                    </FormButton>
                 </div>
             </div>
         </div>

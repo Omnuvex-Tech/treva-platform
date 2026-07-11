@@ -158,7 +158,8 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
 export function Dashboard() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { id: apartmentId } = useParams();
+    const routeParams = useParams<{ id?: string; slug?: string; houseId?: string }>();
+    const apartmentId = routeParams.id;
     const isCreatingApartment = location.pathname === "/dashboard/resale/apartments/create";
     const isEditingObject = /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(location.pathname);
     const isCreatingObject = location.pathname === "/dashboard/offplan/objects/create";
@@ -171,7 +172,7 @@ export function Dashboard() {
     const propertyConfigSlug = isPropertyConfig ? location.pathname.split("/")[4] : null;
     const creatingHouseSlug = isCreatingHouse ? location.pathname.split("/")[4] : null;
     const editingHouseSlug = isEditingHouse ? location.pathname.split("/")[4] : null;
-    const editingHouseId = isEditingHouse ? location.pathname.split("/")[7] : null;
+    const editingHouseId = isEditingHouse ? routeParams.houseId ?? location.pathname.split("/")[8] : null;
     const activeMenu = getMenuKeyFromPath(location.pathname) ?? "resale";
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
 

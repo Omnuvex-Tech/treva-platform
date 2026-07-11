@@ -263,4 +263,19 @@ export class CreateUnitLayoutDto {
   @IsOptional()
   @IsString()
   showroomAvailability?: string;
+
+  @ApiPropertyOptional({ example: 'Renovated' })
+  @IsOptional()
+  @IsString()
+  renovation?: string;
+
+  @ApiPropertyOptional({ example: 'Brick' })
+  @IsOptional()
+  @IsString()
+  wallMaterial?: string;
+
+  @ApiPropertyOptional({ example: '<p>Beautiful apartment</p>' })
+  @IsOptional()
+  @IsString()
+  description?: string;
 }

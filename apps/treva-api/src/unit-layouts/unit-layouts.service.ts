@@ -53,6 +53,9 @@ export class UnitLayoutsService {
         deadlineForCommissioning: createDto.deadlineForCommissioning ? new Date(createDto.deadlineForCommissioning) : undefined,
         landCadastralNumber: createDto.landCadastralNumber,
         showroomAvailability: createDto.showroomAvailability,
+        renovation: createDto.renovation,
+        wallMaterial: createDto.wallMaterial,
+        description: createDto.description,
       },
       include: { category: true },
     });
@@ -290,6 +293,9 @@ export class UnitLayoutsService {
     if (updateDto.deadlineForCommissioning !== undefined) data.deadlineForCommissioning = updateDto.deadlineForCommissioning ? new Date(updateDto.deadlineForCommissioning) : null;
     if (updateDto.landCadastralNumber !== undefined) data.landCadastralNumber = updateDto.landCadastralNumber;
     if (updateDto.showroomAvailability !== undefined) data.showroomAvailability = updateDto.showroomAvailability;
+    if (updateDto.renovation !== undefined) data.renovation = updateDto.renovation;
+    if (updateDto.wallMaterial !== undefined) data.wallMaterial = updateDto.wallMaterial;
+    if (updateDto.description !== undefined) data.description = updateDto.description;
 
     return this.prisma.unitLayout.update({
       where: { id },

@@ -315,6 +315,13 @@ export function PropertyConfigPage({ embedded = false }: { embedded?: boolean } 
                                     </div>
                                     <div className="px-1 pb-1">
                                         <p className="text-[14px] font-semibold text-[#1A1A1A] truncate">{house.title}</p>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate(`/dashboard/offplan/objects/${slug}/config/properties/houses/${house.id}/edit`)}
+                                            className="mt-2 w-full rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer"
+                                        >
+                                            Edit
+                                        </button>
                                         <p className="text-[12px] text-[#999]">{house.totalArea} m² · {house.roomOption?.value || `${house.number || 0} rooms`}</p>
                                     </div>
                                 </div>

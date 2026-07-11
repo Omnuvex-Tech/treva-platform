@@ -47,36 +47,38 @@ async function main() {
   // Create categories
   const category1 = await prisma.category.upsert({
     where: { slug: 'panorama-by-elie-saab' },
-    update: { order: 5 },
+    update: { order: 5, type: 'object' },
     create: {
       title: 'Panorama by ELIE SAAB',
       name: 'Panorama by ELIE SAAB',
       slug: 'panorama-by-elie-saab',
       order: 5,
+      type: 'object',
     },
   });
   console.log('Category 1 created:', category1.title);
 
   const category2 = await prisma.category.upsert({
     where: { slug: 'treva-residences' },
-    update: { order: 6 },
+    update: { order: 6, type: 'object' },
     create: {
       title: 'TREVA Residences',
       name: 'TREVA Residences',
       slug: 'treva-residences',
       order: 6,
+      type: 'object',
     },
   });
   console.log('Category 2 created:', category2.title);
 
   // Create Layihelerimiz categories
   const layihelerimizCategories = [
-    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights', order: 0 },
-    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches', order: 1 },
-    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village', order: 2 },
-    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island', order: 3 },
-    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence', order: 4 },
-    { title: 'Toronto', name: 'Toronto', slug: 'toronto', order: 7 },
+    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights', order: 0, type: 'category' },
+    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches', order: 1, type: 'category' },
+    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village', order: 2, type: 'category' },
+    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island', order: 3, type: 'category' },
+    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence', order: 4, type: 'category' },
+    { title: 'Toronto', name: 'Toronto', slug: 'toronto', order: 7, type: 'category' },
   ];
 
   for (const cat of layihelerimizCategories) {
@@ -105,6 +107,87 @@ async function main() {
       console.log(`Currency created: ${currency.value}`);
     } else {
       console.log(`Currency already exists: ${currency.value}`);
+    }
+  }
+
+  // Create LCD options
+  const lcdOptions = [
+    { value: 'LCD-1', order: 0 },
+    { value: 'LCD-2', order: 1 },
+    { value: 'LCD-3', order: 2 },
+  ];
+  for (const opt of lcdOptions) {
+    const existing = await prisma.lcdOption.findUnique({ where: { value: opt.value } });
+    if (!existing) {
+      await prisma.lcdOption.create({ data: opt });
+      console.log(`LCD option created: ${opt.value}`);
+    } else {
+      console.log(`LCD option already exists: ${opt.value}`);
+    }
+  }
+
+  // Create Type of building options
+  const typeOfBuildingOptions = [
+    { value: 'Residential', order: 0 },
+    { value: 'Commercial', order: 1 },
+    { value: 'Mixed', order: 2 },
+  ];
+  for (const opt of typeOfBuildingOptions) {
+    const existing = await prisma.typeOfBuildingOption.findUnique({ where: { value: opt.value } });
+    if (!existing) {
+      await prisma.typeOfBuildingOption.create({ data: opt });
+      console.log(`Type of building option created: ${opt.value}`);
+    } else {
+      console.log(`Type of building option already exists: ${opt.value}`);
+    }
+  }
+
+  // Create Property type options
+  const propertyTypeOptions = [
+    { value: 'Apartment', order: 0 },
+    { value: 'Penthouse', order: 1 },
+    { value: 'Studio', order: 2 },
+    { value: 'Duplex', order: 3 },
+  ];
+  for (const opt of propertyTypeOptions) {
+    const existing = await prisma.propertyTypeOption.findUnique({ where: { value: opt.value } });
+    if (!existing) {
+      await prisma.propertyTypeOption.create({ data: opt });
+      console.log(`Property type option created: ${opt.value}`);
+    } else {
+      console.log(`Property type option already exists: ${opt.value}`);
+    }
+  }
+
+  // Create Construction stage options
+  const constructionStageOptions = [
+    { value: 'Pre-construction', order: 0 },
+    { value: 'Under construction', order: 1 },
+    { value: 'Completed', order: 2 },
+  ];
+  for (const opt of constructionStageOptions) {
+    const existing = await prisma.constructionStageOption.findUnique({ where: { value: opt.value } });
+    if (!existing) {
+      await prisma.constructionStageOption.create({ data: opt });
+      console.log(`Construction stage option created: ${opt.value}`);
+    } else {
+      console.log(`Construction stage option already exists: ${opt.value}`);
+    }
+  }
+
+  // Create Sales office options
+  const salesOfficeOptions = [
+    { value: 'Main Office', order: 0 },
+    { value: 'Branch 1', order: 1 },
+    { value: 'Branch 2', order: 2 },
+  ];
+  for (const opt of salesOfficeOptions) {
+    const existing = await prisma.salesOfficeOption.findUnique({ where: { value: opt.value } });
+    if (!existing) {
+      await prisma.salesOfficeOption.create({ data: opt });
+      console.log(`Sales office option created: ${opt.value}`);
+    } else {
+      console.log(`Sales office option already exists: ${opt.value}`);
     }
   }
 }

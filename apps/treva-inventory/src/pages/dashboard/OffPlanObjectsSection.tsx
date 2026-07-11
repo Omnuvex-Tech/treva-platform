@@ -20,14 +20,14 @@ export function OffPlanObjectsSection() {
     const [activeTab, setActiveTab] = useState<"Active" | "Archive">("Active");
 
     const { data: response, isLoading } = useQuery({
-        queryKey: ["categories"],
-        queryFn: () => categoriesApi.getAll(),
+        queryKey: ["categories", "object"],
+        queryFn: () => categoriesApi.getAll("object"),
     });
 
     const deleteMut = useMutation({
         mutationFn: (id: string) => categoriesApi.delete(id),
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["categories"] });
+            qc.invalidateQueries({ queryKey: ["categories", "object"] });
             showSuccess({ title: "Object deleted" });
         },
         onError: (error) => {
@@ -44,6 +44,7 @@ export function OffPlanObjectsSection() {
                 title: `${cat.title} (Copy)`,
                 name: `${cat.name}-copy`,
                 slug: `${cat.slug}-copy-${Date.now()}`,
+                type: "object",
                 objectType: cat.objectType,
                 propertyName: cat.propertyName,
                 currency: cat.currency,
@@ -60,7 +61,7 @@ export function OffPlanObjectsSection() {
             });
         },
         onSuccess: () => {
-            qc.invalidateQueries({ queryKey: ["categories"] });
+            qc.invalidateQueries({ queryKey: ["categories", "object"] });
             showSuccess({ title: "Object copied" });
         },
         onError: (error) => {

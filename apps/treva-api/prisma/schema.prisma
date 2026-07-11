@@ -40,6 +40,7 @@ model Category {
   salesDepartment String?
   documents       Json       @default("[]")
   fedLaw214       Boolean  @default(false)
+  type            String   @default("object") // "category" | "object"
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -97,6 +98,9 @@ model UnitLayout {
   deadlineForCommissioning    DateTime?
   landCadastralNumber         String?
   showroomAvailability        String?
+  renovation                  String?
+  wallMaterial                String?
+  description                 String?
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 }
@@ -143,6 +147,46 @@ model StatusOption {
   updatedAt DateTime @updatedAt
 
   unitLayouts UnitLayout[]
+}
+
+model LcdOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TypeOfBuildingOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PropertyTypeOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConstructionStageOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SalesOfficeOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ─── Resale Models ───────────────────────────────────────────

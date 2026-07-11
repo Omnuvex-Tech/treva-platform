@@ -20,6 +20,7 @@ export interface Category {
     slug: string;
     image?: string;
     status?: string;
+    type?: string;
     housesCount: number;
     propertiesCount: number;
     reservedCount: number;
@@ -46,6 +47,7 @@ export interface CreateCategoryData {
     title: string;
     name: string;
     slug: string;
+    type?: string;
     image?: string;
     status?: string;
     housesCount?: number;
@@ -101,7 +103,10 @@ export interface UploadResponse {
 }
 
 export const categoriesApi = {
-    getAll: () => apiClient.get<Category[]>("/categories"),
+    getAll: (type?: string) => {
+        const params = type ? `?type=${type}` : "";
+        return apiClient.get<Category[]>(`/categories${params}`);
+    },
 
     getById: (id: string) => apiClient.get<Category>(`/categories/${id}`),
 

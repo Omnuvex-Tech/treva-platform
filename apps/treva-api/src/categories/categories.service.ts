@@ -21,8 +21,10 @@ export class CategoriesService {
     });
   }
 
-  async findAll() {
+  async findAll(type?: string) {
+    const where = type ? { type } : {};
     const categories = await this.prisma.category.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -34,6 +36,7 @@ export class CategoriesService {
       image: category.image,
       status: category.status,
       order: category.order,
+      type: category.type,
       housesCount: category.housesCount,
       propertiesCount: category.propertiesCount,
       reservedCount: category.reservedCount,
@@ -80,6 +83,7 @@ export class CategoriesService {
       image: category.image,
       status: category.status,
       order: category.order,
+      type: category.type,
       housesCount: category.housesCount,
       propertiesCount: category.propertiesCount,
       reservedCount: category.reservedCount,
@@ -126,6 +130,7 @@ export class CategoriesService {
       image: category.image,
       status: category.status,
       order: category.order,
+      type: category.type,
       housesCount: category.housesCount,
       propertiesCount: category.propertiesCount,
       reservedCount: category.reservedCount,

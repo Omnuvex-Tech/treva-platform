@@ -18,8 +18,8 @@ export function CategoriesSection() {
         confirmAndDelete,
         duplicateItem,
     } = useEntityCrud({
-        queryKey: ["categories"],
-        queryFn: () => categoriesApi.getAll(),
+        queryKey: ["categories", "category"],
+        queryFn: () => categoriesApi.getAll("category"),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
         createEmptyForm: () => ({ title: "", name: "", slug: "" }),
         mapItemToForm: (item: Category) => ({
@@ -27,7 +27,7 @@ export function CategoriesSection() {
             name: item.name,
             slug: item.slug,
         }),
-        buildPayload: (nextForm) => nextForm,
+        buildPayload: (nextForm) => ({ ...nextForm, type: "category" }),
         createFn: (payload) => categoriesApi.create(payload),
         updateFn: (itemId, payload) => categoriesApi.update(itemId, payload),
         deleteFn: (itemId) => categoriesApi.delete(itemId),

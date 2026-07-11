@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type CreateUnitLayoutData } from "../../api/unit-layouts";
@@ -8,6 +8,11 @@ import { statusOptionsApi, type StatusOption } from "../../api/status-options";
 import { attributesApi, type Attribute } from "../../api/attributes";
 import { currenciesApi, type Currency } from "../../api/currencies";
 import { categoriesApi } from "../../api/categories";
+import { lcdOptionsApi, type LcdOption } from "../../api/lcd-options";
+import { typeOfBuildingOptionsApi, type TypeOfBuildingOption } from "../../api/type-of-building-options";
+import { propertyTypeOptionsApi, type PropertyTypeOption } from "../../api/property-type-options";
+import { constructionStageOptionsApi, type ConstructionStageOption } from "../../api/construction-stage-options";
+import { salesOfficeOptionsApi, type SalesOfficeOption } from "../../api/sales-office-options";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { FormDropdown } from "@repo/ui";
@@ -30,7 +35,38 @@ function slugify(text: string): string {
         .replace(/(^-|-$)/g, "");
 }
 
-export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; houseId?: string } = {}) {
+const responseData = <T,>(response: unknown): T | undefined => {
+    const value = response as any;
+    return value?.data?.data ?? value?.data ?? value;
+};
+
+const responseArray = <T,>(response: unknown): T[] => {
+    const value = responseData<T[] | { data?: T[] }>(response);
+    if (Array.isArray(value)) return value;
+    if (Array.isArray((value as any)?.data)) return (value as any).data;
+    return [];
+};
+
+const firstValue = (...values: unknown[]) => {
+    for (const value of values) {
+        if (value !== undefined && value !== null && value !== "") return value;
+    }
+    return undefined;
+};
+
+const toNumberOrUndefined = (...values: unknown[]) => {
+    const value = firstValue(...values);
+    if (value === undefined) return undefined as unknown as number;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : (undefined as unknown as number);
+};
+
+const toDateInputValue = (value: unknown): string => {
+    if (!value) return "";
+    return String(value).split("T")[0] || "";
+};
+
+export function HouseForm({ embedded = false, inline = false, houseId, onSuccess }: { embedded?: boolean; inline?: boolean; houseId?: string; onSuccess?: () => void } = {}) {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -66,6 +102,31 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
         queryFn: () => currenciesApi.getAll(),
     });
 
+    const { data: lcdOptionsRes } = useQuery({
+        queryKey: ["lcd-options"],
+        queryFn: () => lcdOptionsApi.getAll(),
+    });
+
+    const { data: typeOfBuildingOptionsRes } = useQuery({
+        queryKey: ["type-of-building-options"],
+        queryFn: () => typeOfBuildingOptionsApi.getAll(),
+    });
+
+    const { data: propertyTypeOptionsRes } = useQuery({
+        queryKey: ["property-type-options"],
+        queryFn: () => propertyTypeOptionsApi.getAll(),
+    });
+
+    const { data: constructionStageOptionsRes } = useQuery({
+        queryKey: ["construction-stage-options"],
+        queryFn: () => constructionStageOptionsApi.getAll(),
+    });
+
+    const { data: salesOfficeOptionsRes } = useQuery({
+        queryKey: ["sales-office-options"],
+        queryFn: () => salesOfficeOptionsApi.getAll(),
+    });
+
     const { data: categoryRes } = useQuery({
         queryKey: ["category", slug],
         queryFn: () => categoriesApi.getBySlug(slug!),
@@ -74,11 +135,26 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
 
     const { data: existingHouse, isLoading: isLoadingHouse } = useQuery({
         queryKey: ["unit-layout", houseId],
-        queryFn: () => unitLayoutsApi.getById(houseId!),
+        queryFn: async () => {
+            const response = await unitLayoutsApi.getById(houseId!);
+            return response.data;
+        },
         enabled: !!houseId,
     });
 
-    const categoryId = categoryRes?.data?.id || "";
+    const category = useMemo(() => responseData<any>(categoryRes), [categoryRes]);
+    const existingHouseData = useMemo(() => responseData<any>(existingHouse), [existingHouse]);
+    const roomOptions = useMemo(() => responseArray<RoomOption>(roomOptionsRes), [roomOptionsRes]);
+    const viewOptions = useMemo(() => responseArray<ViewOption>(viewOptionsRes), [viewOptionsRes]);
+    const statusOptions = useMemo(() => responseArray<StatusOption>(statusOptionsRes), [statusOptionsRes]);
+    const attributes = useMemo(() => responseArray<Attribute>(attributesRes), [attributesRes]);
+    const currencies = useMemo(() => responseArray<Currency>(currenciesRes), [currenciesRes]);
+    const lcdOptions = useMemo(() => responseArray<LcdOption>(lcdOptionsRes), [lcdOptionsRes]);
+    const typeOfBuildingOptions = useMemo(() => responseArray<TypeOfBuildingOption>(typeOfBuildingOptionsRes), [typeOfBuildingOptionsRes]);
+    const propertyTypeOptions = useMemo(() => responseArray<PropertyTypeOption>(propertyTypeOptionsRes), [propertyTypeOptionsRes]);
+    const constructionStageOptions = useMemo(() => responseArray<ConstructionStageOption>(constructionStageOptionsRes), [constructionStageOptionsRes]);
+    const salesOfficeOptions = useMemo(() => responseArray<SalesOfficeOption>(salesOfficeOptionsRes), [salesOfficeOptionsRes]);
+    const categoryId = category?.id || "";
 
     const monthOptions = Array.from({ length: 12 }, (_, i) => ({
         id: String(i + 1),
@@ -90,12 +166,62 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
         label: String(2024 + i),
     }));
 
+    const findOptionId = <T extends { id: string; value?: string; name?: string; title?: string }>(
+        options: T[] | undefined,
+        value: unknown
+    ) => {
+        if (!value) return "";
+        const raw = String(value);
+        return options?.find((option) => {
+            const candidates = [option.id, option.value, option.name, option.title].filter(Boolean).map(String);
+            return candidates.includes(raw);
+        })?.id || raw;
+    };
+
+    const findOptionValue = <T extends { id: string; value?: string; name?: string; title?: string }>(
+        options: T[] | undefined,
+        value: unknown
+    ) => {
+        if (!value) return "";
+        const raw = String(value);
+        const option = options?.find((item) => {
+            const candidates = [item.id, item.value, item.name, item.title].filter(Boolean).map(String);
+            return candidates.includes(raw);
+        });
+        return option?.value || option?.title || option?.name || option?.id || raw;
+    };
+
+    const optionLabel = <T extends { id: string; value?: string; name?: string; title?: string }>(
+        options: T[] | undefined,
+        value: unknown
+    ) => {
+        if (!value) return "";
+        const raw = String(value);
+        const option = options?.find((item) => {
+            const candidates = [item.id, item.value, item.name, item.title].filter(Boolean).map(String);
+            return candidates.includes(raw);
+        });
+        return option?.value || option?.title || option?.name || raw;
+    };
+
+    const dropdownOptions = <T extends { id: string; value?: string; name?: string; title?: string }>(
+        options: T[],
+        currentValue: string,
+        mapper: (option: T) => { id: string; label: string }
+    ) => {
+        const mapped = options.map(mapper);
+        if (currentValue && !mapped.some((option) => option.id === currentValue)) {
+            mapped.unshift({ id: currentValue, label: optionLabel(options, currentValue) });
+        }
+        return mapped;
+    };
+
     const [form, setForm] = useState({
         title: "",
         slug: "",
         apartmentTypeId: "",
         ownerId: "",
-        status: "active" as "active" | "pending" | "non-active",
+        status: "" as string,
         floorFrom: undefined as unknown as number,
         floorTo: undefined as unknown as number,
         roomCount: undefined as unknown as number,
@@ -132,62 +258,65 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
     });
 
     useEffect(() => {
-        if (existingHouse?.data && isEditMode) {
-            const house = existingHouse.data;
-            const pricesArray = house.prices && typeof house.prices === "object"
-                ? Object.entries(house.prices).map(([currencyValue, priceTotal]) => {
-                    const cur = currenciesRes?.data?.find((c: Currency) => c.value === currencyValue);
+        if (existingHouseData && isEditMode) {
+            const house = existingHouseData;
+            const totalArea = Number(firstValue(house.totalArea, house.internalArea, house.area, 0));
+            const rawPrices = house.pricesByCurrency || house.priceByCurrency || house.prices || {};
+            const pricesArray = rawPrices && typeof rawPrices === "object"
+                ? Object.entries(rawPrices).map(([currencyValue, priceTotal]) => {
+                    const cur = currencies.find((c: Currency) => [c.id, c.value, c.name].includes(String(currencyValue)));
+                    const total = Number(priceTotal) || 0;
                     return {
-                        currencyId: cur?.id || "",
-                        priceTotal: priceTotal as number,
-                        priceByArea: 0,
+                        currencyId: cur?.id || String(currencyValue),
+                        priceTotal: total,
+                        priceByArea: totalArea > 0 ? Number((total / totalArea).toFixed(2)) : 0,
                     };
                 }).filter(p => p.currencyId)
                 : [];
 
             setForm({
-                title: house.title || "",
+                title: house.title || house.name || "",
                 slug: house.slug || "",
-                apartmentTypeId: house.roomOptionId || "",
-                ownerId: house.viewOptionId || "",
-                status: (house.statusOption?.value as "active" | "pending" | "non-active") || "active",
-                floorFrom: (house.floor as unknown as number) || (0 as unknown as number),
-                floorTo: (house.numberOfFloors?.end as unknown as number) || (0 as unknown as number),
-                roomCount: (house.number as unknown as number) || (0 as unknown as number),
-                attributeIds: house.similarApartmentIds || [],
-                renovation: "",
-                kitchenSize: (house.balconyArea as unknown as number) || (0 as unknown as number),
-                wallMaterial: "",
-                area: (house.totalArea as unknown as number) || (0 as unknown as number),
+                apartmentTypeId: findOptionId(roomOptions, firstValue(house.roomOptionId, house.apartmentTypeId, house.houseNameId, house.roomOption?.id, house.roomOption?.value, house.apartmentType?.id, house.apartmentType?.value)),
+                ownerId: findOptionId(viewOptions, firstValue(house.viewOptionId, house.ownerId, house.viewOption?.id, house.viewOption?.value)),
+                status: findOptionId(statusOptions, firstValue(house.statusOptionId, house.statusId, house.status, house.statusOption?.id, house.statusOption?.value)) || "active",
+                floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
+                floorTo: toNumberOrUndefined(house.floorTo, house.numberOfFloors?.end, house.floor),
+                roomCount: toNumberOrUndefined(house.roomCount, house.numberOfRooms, house.number),
+                attributeIds: house.attributeIds || house.similarApartmentIds || [],
+                renovation: house.renovation || "",
+                kitchenSize: toNumberOrUndefined(house.kitchenSize, house.balconyArea),
+                wallMaterial: house.wallMaterial || "",
+                area: (totalArea || undefined) as number,
                 prices: pricesArray,
-                locationTitle: house.location?.title || "",
-                locationUrl: house.location?.url || "",
-                image: house.mainImage?.url || "",
+                locationTitle: house.locationTitle || house.location?.title || "",
+                locationUrl: house.locationUrl || house.location?.url || "",
+                image: house.image || house.mainImage?.url || "",
                 gallery: (house.gallery || []).map((g: any) => ({ url: g.url, alt: g.alt })),
-                description: "",
-                lcd: house.lcd || "",
-                typeOfBuilding: house.typeOfBuilding || "",
-                defaultPropertyType: house.defaultPropertyType || "",
-                constructionStage: house.constructionStage || "",
-                startOfConstructionMonth: house.startOfConstruction?.month ? String(house.startOfConstruction.month) : "",
-                startOfConstructionYear: house.startOfConstruction?.year ? String(house.startOfConstruction.year) : "",
-                completionOfConstructionMonth: house.completionOfConstruction?.month ? String(house.completionOfConstruction.month) : "",
-                completionOfConstructionYear: house.completionOfConstruction?.year ? String(house.completionOfConstruction.year) : house.completionYear ? String(house.completionYear) : "",
-                startOfSalesMonth: house.startOfSales?.month ? String(house.startOfSales.month) : "",
-                startOfSalesYear: house.startOfSales?.year ? String(house.startOfSales.year) : "",
-                endOfSalesMonth: house.endOfSales?.month ? String(house.endOfSales.month) : "",
-                endOfSalesYear: house.endOfSales?.year ? String(house.endOfSales.year) : "",
-                salesOffice: house.salesOffice || "",
+                description: house.description || "",
+                lcd: findOptionValue(lcdOptions, firstValue(house.lcdId, house.lcd)),
+                typeOfBuilding: findOptionValue(typeOfBuildingOptions, firstValue(house.typeOfBuildingId, house.typeOfBuilding)),
+                defaultPropertyType: findOptionValue(propertyTypeOptions, firstValue(house.defaultPropertyTypeId, house.defaultPropertyType, house.propertyTypeId, house.propertyType)),
+                constructionStage: findOptionValue(constructionStageOptions, firstValue(house.constructionStageId, house.constructionStage)),
+                startOfConstructionMonth: firstValue(house.startOfConstructionMonth, house.startOfConstruction?.month)?.toString() || "",
+                startOfConstructionYear: firstValue(house.startOfConstructionYear, house.startOfConstruction?.year)?.toString() || "",
+                completionOfConstructionMonth: firstValue(house.completionOfConstructionMonth, house.completionOfConstruction?.month)?.toString() || "",
+                completionOfConstructionYear: firstValue(house.completionOfConstructionYear, house.completionOfConstruction?.year, house.completionYear)?.toString() || "",
+                startOfSalesMonth: firstValue(house.startOfSalesMonth, house.startOfSales?.month)?.toString() || "",
+                startOfSalesYear: firstValue(house.startOfSalesYear, house.startOfSales?.year)?.toString() || "",
+                endOfSalesMonth: firstValue(house.endOfSalesMonth, house.endOfSales?.month)?.toString() || "",
+                endOfSalesYear: firstValue(house.endOfSalesYear, house.endOfSales?.year)?.toString() || "",
+                salesOffice: findOptionValue(salesOfficeOptions, firstValue(house.salesOfficeId, house.salesOffice)),
                 contractAddress: house.contractAddress || "",
                 street: house.street || "",
                 houseNumber: house.houseNumber || "",
-                deadlineForCommissioning: (house.deadlineForCommissioning ? String(house.deadlineForCommissioning).split("T")[0] : "") as string,
+                deadlineForCommissioning: toDateInputValue(house.deadlineForCommissioning),
                 landCadastralNumber: house.landCadastralNumber || "",
                 showroomAvailability: house.showroomAvailability || "",
             });
             setSlugManuallyEdited(true);
         }
-    }, [existingHouse, isEditMode, currenciesRes]);
+    }, [existingHouseData, isEditMode, currencies, roomOptions, viewOptions, statusOptions, lcdOptions, typeOfBuildingOptions, propertyTypeOptions, constructionStageOptions, salesOfficeOptions]);
 
     const handleSlugFromTitle = (title: string) => {
         if (!slugManuallyEdited) {
@@ -216,8 +345,14 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
+            if (houseId) queryClient.invalidateQueries({ queryKey: ["unit-layout", houseId] });
             showSuccess({ title: isEditMode ? "House updated" : "House created" });
-            navigate(`/dashboard/offplan/objects/${slug}/config/properties`);
+            if (onSuccess) {
+                onSuccess();
+            } else if (!inline) {
+                navigate(`/dashboard/offplan/objects/${slug}/config/properties`);
+            }
         },
         onError: (error) => {
             showError({
@@ -279,8 +414,8 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
 
         const pricesRecord: Record<string, number> = {};
         for (const p of form.prices) {
-            const cur = currenciesRes?.data?.find((c: Currency) => c.id === p.currencyId);
-            if (cur) pricesRecord[cur.value] = p.priceTotal;
+            const cur = currencies.find((c: Currency) => c.id === p.currencyId || c.value === p.currencyId || c.name === p.currencyId);
+            pricesRecord[cur?.value || p.currencyId] = p.priceTotal;
         }
 
         const submitData: CreateUnitLayoutData = {
@@ -301,7 +436,7 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
             gallery: form.gallery,
             documents: [],
             location: form.locationTitle ? { title: form.locationTitle, type: "custom", url: form.locationUrl } : undefined,
-            statusOptionId: form.status === "active" ? undefined : undefined,
+            statusOptionId: form.status || undefined,
             viewOptionId: form.ownerId || undefined,
             roomOptionId: form.apartmentTypeId || undefined,
             lcd: form.lcd || undefined,
@@ -327,6 +462,9 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
             deadlineForCommissioning: form.deadlineForCommissioning?.trim() || undefined,
             landCadastralNumber: form.landCadastralNumber || undefined,
             showroomAvailability: form.showroomAvailability || undefined,
+            renovation: form.renovation || undefined,
+            wallMaterial: form.wallMaterial || undefined,
+            description: form.description || undefined,
         };
 
         createMutation.mutate(submitData);
@@ -466,18 +604,8 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                             key={tab.key}
                             type="button"
                             onClick={() => {
-                                if (TABS.findIndex((t) => t.key === tab.key) <= TABS.findIndex((t) => t.key === activeTab)) {
-                                    setTabErrors((prev) => { const n = { ...prev }; delete n[tab.key]; return n; });
-                                    setActiveTab(tab.key);
-                                } else {
-                                    const errs = validateTab(activeTab);
-                                    if (errs.length > 0) {
-                                        setTabErrors((prev) => ({ ...prev, [activeTab]: errs }));
-                                        return;
-                                    }
-                                    setTabErrors((prev) => { const n = { ...prev }; delete n[tab.key]; return n; });
-                                    setActiveTab(tab.key);
-                                }
+                                setTabErrors((prev) => { const n = { ...prev }; delete n[tab.key]; return n; });
+                                setActiveTab(tab.key);
                             }}
                             className={`relative px-4 py-2.5 text-sm transition-colors ${
                                 activeTab === tab.key
@@ -500,7 +628,7 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="max-w-3xl">
+            <form onSubmit={handleSubmit}>
                 {/* ─── Tab: Basic Info ──────────────────────── */}
                 {activeTab === "basic" && (
                     <div className="space-y-4">
@@ -521,69 +649,48 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                             <FormDropdown
                                 label="House name *"
                                 value={form.apartmentTypeId || ""}
-                                options={roomOptionsRes?.data?.map((t: RoomOption) => ({ id: t.id, label: t.value })) || []}
+                                options={dropdownOptions(roomOptions, form.apartmentTypeId || "", (t) => ({ id: t.id, label: t.value }))}
                                 placeholder="Select house name"
                                 onChange={(id) => updateField("apartmentTypeId", id)}
                             />
                             <FormDropdown
                                 label="LCD *"
                                 value={form.lcd || ""}
-                                options={[
-                                    { id: "LCD-1", label: "LCD-1" },
-                                    { id: "LCD-2", label: "LCD-2" },
-                                    { id: "LCD-3", label: "LCD-3" },
-                                ]}
+                                options={dropdownOptions(lcdOptions, form.lcd || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select LCD"
-                                onChange={(id) => updateField("lcd", id)}
+                                onChange={(val) => updateField("lcd", val)}
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <FormDropdown
                                 label="Type of building *"
                                 value={form.typeOfBuilding || ""}
-                                options={[
-                                    { id: "Residential", label: "Residential" },
-                                    { id: "Commercial", label: "Commercial" },
-                                    { id: "Mixed", label: "Mixed" },
-                                ]}
+                                options={dropdownOptions(typeOfBuildingOptions, form.typeOfBuilding || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select type"
-                                onChange={(id) => updateField("typeOfBuilding", id)}
+                                onChange={(val) => updateField("typeOfBuilding", val)}
                             />
                             <FormDropdown
                                 label="Default property type *"
                                 value={form.defaultPropertyType || ""}
-                                options={[
-                                    { id: "Apartment", label: "Apartment" },
-                                    { id: "Penthouse", label: "Penthouse" },
-                                    { id: "Studio", label: "Studio" },
-                                    { id: "Duplex", label: "Duplex" },
-                                ]}
+                                options={dropdownOptions(propertyTypeOptions, form.defaultPropertyType || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select property type"
-                                onChange={(id) => updateField("defaultPropertyType", id)}
+                                onChange={(val) => updateField("defaultPropertyType", val)}
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <FormDropdown
                                 label="Construction stage"
                                 value={form.constructionStage || ""}
-                                options={[
-                                    { id: "Pre-construction", label: "Pre-construction" },
-                                    { id: "Under construction", label: "Under construction" },
-                                    { id: "Completed", label: "Completed" },
-                                ]}
+                                options={dropdownOptions(constructionStageOptions, form.constructionStage || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select stage"
-                                onChange={(id) => updateField("constructionStage", id)}
+                                onChange={(val) => updateField("constructionStage", val)}
                             />
                             <FormDropdown
                                 label="Sales office"
                                 value={form.salesOffice || ""}
-                                options={[
-                                    { id: "Main Office", label: "Main Office" },
-                                    { id: "Branch 1", label: "Branch 1" },
-                                    { id: "Branch 2", label: "Branch 2" },
-                                ]}
+                                options={dropdownOptions(salesOfficeOptions, form.salesOffice || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select office"
-                                onChange={(id) => updateField("salesOffice", id)}
+                                onChange={(val) => updateField("salesOffice", val)}
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -622,13 +729,9 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                             <FormDropdown
                                 label="Status"
                                 value={form.status || "active"}
-                                options={[
-                                    { id: "active", label: "Active" },
-                                    { id: "pending", label: "Pending" },
-                                    { id: "non-active", label: "Non Active" },
-                                ]}
+                                options={dropdownOptions(statusOptions, form.status || "active", (o) => ({ id: o.id, label: o.value }))}
                                 placeholder="Select status"
-                                onChange={(id) => updateField("status", id as "active" | "pending" | "non-active")}
+                                onChange={(id) => updateField("status", id)}
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-4">
@@ -672,7 +775,7 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                         <div>
                             <label className="mb-1 block text-xs text-[#4E525D]">Attributes (Apartment Details)</label>
                             <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 py-2">
-                                {attributesRes?.data?.map((attr: Attribute) => {
+                                {attributes.map((attr: Attribute) => {
                                     const selected = form.attributeIds?.includes(attr.id);
                                     return (
                                         <button
@@ -698,7 +801,7 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                                         </button>
                                     );
                                 })}
-                                {(!attributesRes?.data || attributesRes.data.length === 0) && (
+                                {attributes.length === 0 && (
                                     <span className="text-xs text-[#999]">No attributes created yet</span>
                                 )}
                             </div>
@@ -822,11 +925,11 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                             </div>
                         </div>
 
-                        {currenciesRes?.data && currenciesRes.data.length > 0 && (
+                        {currencies.length > 0 && (
                             <div className="mt-4">
                                 <label className="mb-2 block text-sm font-semibold text-[#1A1A1A]">Prices by Currency</label>
                                 <div className="space-y-3">
-                                    {currenciesRes.data.map((cur: Currency) => {
+                                    {currencies.map((cur: Currency) => {
                                         const existingPrice = form.prices?.find((p: any) => p.currencyId === cur.id);
                                         return (
                                             <div key={cur.id} className="rounded-xl border border-gray-200 bg-[#F4F5F6] p-3">
@@ -1138,11 +1241,17 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
                         disabled={createMutation.isPending}
                         className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {createMutation.isPending ? "Saving..." : isEditMode ? "Update" : "Create"}
+                        {createMutation.isPending ? "Saving..." : isEditMode ? "Update" : inline ? "Edit" : "Create"}
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate(`/dashboard/offplan/objects/${slug}/config/properties`)}
+                        onClick={() => {
+                            if (onSuccess) {
+                                onSuccess();
+                            } else if (!inline) {
+                                navigate(`/dashboard/offplan/objects/${slug}/config/properties`);
+                            }
+                        }}
                         disabled={createMutation.isPending}
                         className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
@@ -1152,6 +1261,10 @@ export function HouseForm({ embedded = false, houseId }: { embedded?: boolean; h
             </form>
         </div>
     );
+
+    if (inline) {
+        return formContent;
+    }
 
     if (embedded) {
         return (
