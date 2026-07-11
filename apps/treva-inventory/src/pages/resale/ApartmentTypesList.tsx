@@ -39,9 +39,8 @@ export function ApartmentTypesList() {
                     <table className="w-full text-left text-sm">
                         <thead className="border-b border-white/10 bg-white/5">
                             <tr>
+                                <th className="px-4 py-3 font-medium">Name</th>
                                 <th className="px-4 py-3 font-medium">Title</th>
-                                <th className="px-4 py-3 font-medium">Slug</th>
-                                <th className="px-4 py-3 font-medium">Order</th>
                                 <th className="px-4 py-3 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
@@ -51,9 +50,8 @@ export function ApartmentTypesList() {
                                     key={type.id}
                                     className="border-b border-white/5 transition-colors hover:bg-white/3"
                                 >
+                                    <td className="px-4 py-3 text-white/70">{type.name}</td>
                                     <td className="px-4 py-3 font-medium">{type.title}</td>
-                                    <td className="px-4 py-3 text-white/70">{type.slug}</td>
-                                    <td className="px-4 py-3 text-white/70">{type.order}</td>
                                     <td className="px-4 py-3 text-right">
                                         <Link
                                             to={`/resale/apartment-types/${type.id}/edit`}
@@ -72,7 +70,7 @@ export function ApartmentTypesList() {
                             ))}
                             {types?.data?.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className="px-4 py-8 text-center text-white/50">
+                                    <td colSpan={3} className="px-4 py-8 text-center text-white/50">
                                         No types yet
                                     </td>
                                 </tr>

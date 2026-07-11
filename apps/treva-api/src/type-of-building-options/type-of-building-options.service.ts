@@ -15,12 +15,12 @@ export class TypeOfBuildingOptionsService {
       throw new ConflictException('Type of building option with this value already exists');
     }
     return this.prisma.typeOfBuildingOption.create({
-      data: { value: createDto.value, order: createDto.order ?? 0 },
+      data: { value: createDto.value },
     });
   }
 
   async findAll() {
-    return this.prisma.typeOfBuildingOption.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.typeOfBuildingOption.findMany({ orderBy: { value: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -43,7 +43,6 @@ export class TypeOfBuildingOptionsService {
       where: { id },
       data: {
         ...(updateDto.value && { value: updateDto.value }),
-        ...(updateDto.order !== undefined && { order: updateDto.order }),
       },
     });
   }

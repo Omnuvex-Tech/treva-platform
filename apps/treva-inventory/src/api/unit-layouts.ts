@@ -39,7 +39,7 @@ export interface UnitLayout {
     name: string;
     slug: string;
     statusOptionId?: string;
-    statusOption?: { id: string; value: string; order: number };
+    statusOption?: { id: string; value: string };
     floor: number;
     number?: number;
     totalArea: number;
@@ -57,8 +57,8 @@ export interface UnitLayout {
     categoryId: string;
     category: Category;
     roomOptionId?: string;
-    roomOption?: { id: string; value: string; order: number };
-    viewOption?: { id: string; value: string; order: number };
+    roomOption?: { id: string; name: string; title: string; type: string };
+    viewOption?: { id: string; name: string; title: string };
     lcd?: string;
     typeOfBuilding?: string;
     defaultPropertyType?: string;

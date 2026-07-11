@@ -21,26 +21,26 @@ export function ViewOptionsSection() {
         queryKey: ["view-options"],
         queryFn: () => viewOptionsApi.getAll(),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
-        createEmptyForm: () => ({ value: "", order: "" }),
+        createEmptyForm: () => ({ name: "", title: "" }),
         mapItemToForm: (item: ViewOption) => ({
-            value: item.value,
-            order: item.order != null ? String(item.order) : "",
+            name: item.name,
+            title: item.title,
         }),
         buildPayload: (nextForm) => ({
-            value: nextForm.value,
-            order: nextForm.order ? Number(nextForm.order) : undefined,
+            name: nextForm.name,
+            title: nextForm.title,
         }),
         createFn: (payload) => viewOptionsApi.create(payload),
         updateFn: (itemId, payload) => viewOptionsApi.update(itemId, payload),
         deleteFn: (itemId) => viewOptionsApi.delete(itemId),
         getItemId: (item: ViewOption) => item.id,
-        getDeleteLabel: (item: ViewOption) => item.value,
+        getDeleteLabel: (item: ViewOption) => item.title,
         entityName: "View option",
         buildDuplicatePayload: (item: ViewOption) => {
             const token = createDuplicateToken();
             return {
-                value: duplicateText(item.value, token),
-                order: item.order,
+                name: duplicateText(item.name, token),
+                title: duplicateText(item.title, token),
             };
         },
     });
@@ -55,12 +55,12 @@ export function ViewOptionsSection() {
                 <form onSubmit={submitForm} className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
                     <div className="mb-4 grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1 block text-xs text-[#666666]">Value</label>
-                            <input value={form.value} onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
+                            <label className="mb-1 block text-xs text-[#666666]">Name</label>
+                            <input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
                         </div>
                         <div>
-                            <label className="mb-1 block text-xs text-[#666666]">Order</label>
-                            <input type="number" value={form.order} onChange={(e) => setForm((prev) => ({ ...prev, order: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" />
+                            <label className="mb-1 block text-xs text-[#666666]">Title</label>
+                            <input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -75,16 +75,16 @@ export function ViewOptionsSection() {
             }
             isLoading={isLoading}
             columns={[
-                { key: "value", label: "Value" },
-                { key: "order", label: "Order" },
+                { key: "name", label: "Name" },
+                { key: "title", label: "Title" },
             ]}
             items={items}
             emptyText="No view options yet"
             getRowKey={(item) => item.id}
             renderCells={(item) => (
                 <>
-                    <td className="px-4 py-3 text-[#1A1A1A]">{item.value}</td>
-                    <td className="px-4 py-3 text-[#666666]">{item.order}</td>
+                    <td className="px-4 py-3 text-[#666666]">{item.name}</td>
+                    <td className="px-4 py-3 text-[#1A1A1A]">{item.title}</td>
                 </>
             )}
             onEdit={openEdit}

@@ -64,6 +64,27 @@ function AuthEventBridge() {
     return null;
 }
 
+function PreventNumberInputWheel() {
+    useEffect(() => {
+        const handler = (event: WheelEvent) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            if (target.type !== "number") return;
+            if (document.activeElement !== target) return;
+
+            event.preventDefault();
+        };
+
+        document.addEventListener("wheel", handler, { passive: false });
+
+        return () => {
+            document.removeEventListener("wheel", handler);
+        };
+    }, []);
+
+    return null;
+}
+
 function App() {
     return (
         <ErrorBoundary>
@@ -71,6 +92,7 @@ function App() {
                 <MessageCenterProvider>
                     <BrowserRouter>
                         <AuthEventBridge />
+                        <PreventNumberInputWheel />
                         <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route
@@ -155,6 +177,30 @@ function App() {
                         />
                         <Route
                             path="/dashboard/resale/currencies"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/location-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/view-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/resale/heating-type-options"
                             element={
                                 <ProtectedRoute>
                                     <Dashboard />

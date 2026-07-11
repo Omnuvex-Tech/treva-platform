@@ -15,12 +15,12 @@ export class PropertyTypeOptionsService {
       throw new ConflictException('Property type option with this value already exists');
     }
     return this.prisma.propertyTypeOption.create({
-      data: { value: createDto.value, order: createDto.order ?? 0 },
+      data: { value: createDto.value },
     });
   }
 
   async findAll() {
-    return this.prisma.propertyTypeOption.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.propertyTypeOption.findMany({ orderBy: { value: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -43,7 +43,6 @@ export class PropertyTypeOptionsService {
       where: { id },
       data: {
         ...(updateDto.value && { value: updateDto.value }),
-        ...(updateDto.order !== undefined && { order: updateDto.order }),
       },
     });
   }

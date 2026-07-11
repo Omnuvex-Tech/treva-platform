@@ -1,11 +1,7 @@
-import { IsString, IsNotEmpty, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateLcdOptionDto {
   @IsString()
   @IsNotEmpty()
   value: string;
-
-  @IsInt()
-  @IsOptional()
-  order?: number;
 }

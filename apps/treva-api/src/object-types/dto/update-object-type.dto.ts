@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateObjectTypeDto {
@@ -16,9 +16,4 @@ export class UpdateObjectTypeDto {
   @IsOptional()
   @IsString()
   slug?: string;
-
-  @ApiPropertyOptional({ example: 0 })
-  @IsOptional()
-  @IsNumber()
-  order?: number;
 }

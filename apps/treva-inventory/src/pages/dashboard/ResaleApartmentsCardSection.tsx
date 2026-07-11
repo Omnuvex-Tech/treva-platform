@@ -8,6 +8,7 @@ import {
 } from "../../api/apartments";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
+import { RowActions } from "../../components/RowActions";
 import { PropertyCard } from "../resale/PropertyCard";
 import { buildApartmentDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -60,6 +61,8 @@ export function ResaleApartmentsCardSection() {
         ? response.data.data
         : [];
     const pagination = response?.data?.pagination;
+    const formatPrice = (value: number) =>
+        value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
     return (
         <main
@@ -139,15 +142,126 @@ export function ResaleApartmentsCardSection() {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 w-full">
-                    {apartments.map((apt: Apartment) => (
-                        <PropertyCard
-                            key={apt.id}
-                            apartment={apt}
-                            onDuplicate={(apartment) => duplicateMut.mutate(apartment)}
-                        />
-                    ))}
-                </div>
+                viewMode === "grid" ? (
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 w-full">
+                        {apartments.map((apt: Apartment) => (
+                            <PropertyCard
+                                key={apt.id}
+                                apartment={apt}
+                                onDuplicate={(apartment) => duplicateMut.mutate(apartment)}
+                                onDelete={(apartment) => {
+                                    if (window.confirm(`Delete "${apartment.title}"?`)) {
+                                        deleteMut.mutate(apartment.id);
+                                    }
+                                }}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="overflow-hidden rounded-[24px] border border-[#EBEBEB] bg-white">
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[980px] text-left text-sm">
+                                <thead className="border-b border-[#EBEBEB] bg-[#F8F9FA]">
+                                    <tr>
+                                        <th className="px-5 py-4 font-medium text-[#4E525D]">Listing</th>
+                                        <th className="px-4 py-4 font-medium text-[#4E525D]">Type</th>
+                                        <th className="px-4 py-4 font-medium text-[#4E525D]">Price</th>
+                                        <th className="px-4 py-4 font-medium text-[#4E525D]">Area</th>
+                                        <th className="px-4 py-4 font-medium text-[#4E525D]">Rooms</th>
+                                        <th className="px-4 py-4 font-medium text-[#4E525D]">Owner</th>
+                                        <th className="px-4 py-4 font-medium text-[#4E525D]">Status</th>
+                                        <th className="px-5 py-4 text-right font-medium text-[#4E525D]">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {apartments.map((apt: Apartment) => {
+                                        const primaryPrice = apt.prices?.[0];
+                                        const price = primaryPrice?.priceTotal ?? apt.priceTotal ?? 0;
+                                        const currencyCode = primaryPrice?.currency?.value || apt.currency?.value || "";
+                                        const status = apt.status || "active";
+
+                                        return (
+                                            <tr
+                                                key={apt.id}
+                                                className="border-b border-[#F1F2F4] align-middle transition-colors hover:bg-[#FAFAFB]"
+                                            >
+                                                <td className="px-5 py-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
+                                                        className="flex items-center gap-3 text-left cursor-pointer"
+                                                    >
+                                                        <div className="h-14 w-14 overflow-hidden rounded-2xl bg-[#F4F5F6] flex-shrink-0">
+                                                            {apt.image ? (
+                                                                <img
+                                                                    src={apt.image}
+                                                                    alt={apt.title}
+                                                                    className="h-full w-full object-cover"
+                                                                    loading="lazy"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-full w-full items-center justify-center text-[11px] text-[#999999]">
+                                                                    No Image
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <div className="truncate font-semibold text-[#1A1A1A]">
+                                                                {apt.title}
+                                                            </div>
+                                                            <div className="mt-1 truncate text-xs text-[#808191]">
+                                                                {apt.locationTitle || "—"}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                                <td className="px-4 py-4 text-[#4E525D]">
+                                                    {apt.apartmentType?.title || "—"}
+                                                </td>
+                                                <td className="px-4 py-4 font-medium text-[#1A1A1A]">
+                                                    {formatPrice(price)}{currencyCode ? ` ${currencyCode}` : ""}
+                                                </td>
+                                                <td className="px-4 py-4 text-[#4E525D]">
+                                                    {apt.area} m²
+                                                </td>
+                                                <td className="px-4 py-4 text-[#4E525D]">
+                                                    {apt.roomCount}
+                                                </td>
+                                                <td className="px-4 py-4 text-[#4E525D]">
+                                                    {apt.owner ? `${apt.owner.firstName} ${apt.owner.lastName}` : "—"}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    <span
+                                                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                                                            status === "active"
+                                                                ? "bg-[#E7F6ED] text-[#2D9A5B]"
+                                                                : status === "pending"
+                                                                    ? "bg-[#FDF4E0] text-[#967B38]"
+                                                                    : "bg-[#FDECEC] text-[#C3362B]"
+                                                        }`}
+                                                    >
+                                                        {status === "non-active" ? "Non Active" : status.charAt(0).toUpperCase() + status.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-5 py-4">
+                                                    <RowActions
+                                                        onEdit={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
+                                                        onDuplicate={() => duplicateMut.mutate(apt)}
+                                                        onDelete={() => {
+                                                            if (window.confirm(`Delete "${apt.title}"?`)) {
+                                                                deleteMut.mutate(apt.id);
+                                                            }
+                                                        }}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )
             )}
 
             {/* Pagination */}

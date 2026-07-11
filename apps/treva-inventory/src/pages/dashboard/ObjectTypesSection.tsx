@@ -21,18 +21,16 @@ export function ObjectTypesSection() {
         queryKey: ["object-types"],
         queryFn: () => objectTypesApi.getAll(),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
-        createEmptyForm: () => ({ name: "", title: "", slug: "", order: "" }),
+        createEmptyForm: () => ({ name: "", title: "", slug: "" }),
         mapItemToForm: (item: ObjectType) => ({
             name: item.name,
             title: item.title,
             slug: item.slug,
-            order: item.order != null ? String(item.order) : "",
         }),
         buildPayload: (nextForm) => ({
             name: nextForm.name,
             title: nextForm.title,
             slug: nextForm.slug,
-            order: nextForm.order ? Number(nextForm.order) : undefined,
         }),
         createFn: (payload) => objectTypesApi.create(payload),
         updateFn: (itemId, payload) => objectTypesApi.update(itemId, payload),
@@ -46,7 +44,6 @@ export function ObjectTypesSection() {
                 name: item.name,
                 title: duplicateText(item.title, token),
                 slug: duplicateText(item.slug, token),
-                order: item.order,
             };
         },
     });
@@ -59,7 +56,7 @@ export function ObjectTypesSection() {
             showForm={showForm}
             formContent={
                 <form onSubmit={submitForm} className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <div className="mb-4 grid grid-cols-2 gap-4">
+                    <div className="mb-4 grid grid-cols-3 gap-4">
                         <div>
                             <label className="mb-1 block text-xs text-[#666666]">Name</label>
                             <input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
@@ -71,10 +68,6 @@ export function ObjectTypesSection() {
                         <div>
                             <label className="mb-1 block text-xs text-[#666666]">Slug</label>
                             <input value={form.slug} onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs text-[#666666]">Order</label>
-                            <input type="number" value={form.order} onChange={(e) => setForm((prev) => ({ ...prev, order: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" />
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -92,7 +85,6 @@ export function ObjectTypesSection() {
                 { key: "title", label: "Title" },
                 { key: "name", label: "Name" },
                 { key: "slug", label: "Slug" },
-                { key: "order", label: "Order" },
             ]}
             items={items}
             emptyText="No object types yet"
@@ -102,7 +94,6 @@ export function ObjectTypesSection() {
                     <td className="px-4 py-3 text-[#1A1A1A]">{item.title}</td>
                     <td className="px-4 py-3 text-[#666666]">{item.name}</td>
                     <td className="px-4 py-3 text-[#666666]">{item.slug}</td>
-                    <td className="px-4 py-3 text-[#666666]">{item.order}</td>
                 </>
             )}
             onEdit={openEdit}

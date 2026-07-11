@@ -8,7 +8,6 @@ export function StatusOptionList() {
     const [showForm, setShowForm] = useState(false);
     const [editItem, setEditItem] = useState<StatusOption | null>(null);
     const [value, setValue] = useState("");
-    const [order, setOrder] = useState<number>(0);
     const [error, setError] = useState("");
 
     const { data: statusOptions, isLoading } = useQuery({
@@ -17,7 +16,7 @@ export function StatusOptionList() {
     });
 
     const createMutation = useMutation({
-        mutationFn: () => statusOptionsApi.create({ value: value.trim(), order }),
+        mutationFn: () => statusOptionsApi.create({ value: value.trim() }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["status-options"] });
             resetForm();
@@ -29,7 +28,7 @@ export function StatusOptionList() {
 
     const updateMutation = useMutation({
         mutationFn: () =>
-            statusOptionsApi.update(editItem!.id, { value: value.trim(), order }),
+            statusOptionsApi.update(editItem!.id, { value: value.trim() }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["status-options"] });
             resetForm();
@@ -50,14 +49,12 @@ export function StatusOptionList() {
         setShowForm(false);
         setEditItem(null);
         setValue("");
-        setOrder(0);
         setError("");
     };
 
     const handleEdit = (item: StatusOption) => {
         setEditItem(item);
         setValue(item.value);
-        setOrder(item.order);
         setError("");
         setShowForm(true);
     };
@@ -107,7 +104,7 @@ export function StatusOptionList() {
                                 {error}
                             </div>
                         )}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label className="mb-1.5 block text-xs font-medium text-white/70">
                                     Value <span className="text-red-400">*</span>
@@ -116,29 +113,13 @@ export function StatusOptionList() {
                                     type="text"
                                     value={value}
                                     onChange={(e) => setValue(e.target.value)}
-                                    placeholder="e.g. Available, Sold, Reserved"
+                                    placeholder="Available, Sold, Reserved"
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                     required
                                     autoFocus
                                 />
                                 <p className="mt-1 text-xs text-white/40">
                                     The status label shown in the filter (e.g. "Available")
-                                </p>
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                    Order
-                                </label>
-                                <input
-                                    type="number"
-                                    value={order}
-                                    onChange={(e) => setOrder(parseInt(e.target.value) || 0)}
-                                    placeholder="e.g. 0"
-                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                    min={0}
-                                />
-                                <p className="mt-1 text-xs text-white/40">
-                                    Sort order (lower = shown first)
                                 </p>
                             </div>
                         </div>
@@ -172,7 +153,6 @@ export function StatusOptionList() {
                         <thead className="border-b border-white/10 bg-white/5">
                             <tr>
                                 <th className="px-4 py-3 font-medium">Value</th>
-                                <th className="px-4 py-3 font-medium">Order</th>
                                 <th className="px-4 py-3 font-medium">Created</th>
                                 <th className="px-4 py-3 font-medium text-right">Actions</th>
                             </tr>
@@ -188,7 +168,6 @@ export function StatusOptionList() {
                                             {item.value}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-white/70">{item.order}</td>
                                     <td className="px-4 py-3 text-white/50">
                                         {new Date(item.createdAt).toLocaleDateString()}
                                     </td>
@@ -210,7 +189,7 @@ export function StatusOptionList() {
                             ))}
                             {items.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className="px-4 py-8 text-center text-white/50">
+                                    <td colSpan={3} className="px-4 py-8 text-center text-white/50">
                                         No status options yet. Add "Available", "Sold", "Reserved" to get started.
                                     </td>
                                 </tr>

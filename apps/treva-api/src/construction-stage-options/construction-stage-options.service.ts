@@ -15,12 +15,12 @@ export class ConstructionStageOptionsService {
       throw new ConflictException('Construction stage option with this value already exists');
     }
     return this.prisma.constructionStageOption.create({
-      data: { value: createDto.value, order: createDto.order ?? 0 },
+      data: { value: createDto.value },
     });
   }
 
   async findAll() {
-    return this.prisma.constructionStageOption.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.constructionStageOption.findMany({ orderBy: { value: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -43,7 +43,6 @@ export class ConstructionStageOptionsService {
       where: { id },
       data: {
         ...(updateDto.value && { value: updateDto.value }),
-        ...(updateDto.order !== undefined && { order: updateDto.order }),
       },
     });
   }

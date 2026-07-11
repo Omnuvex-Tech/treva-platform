@@ -2,23 +2,20 @@ import apiClient from "./client";
 
 export interface ApartmentType {
     id: string;
+    name: string;
     title: string;
-    slug: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateApartmentTypeData {
+    name: string;
     title: string;
-    slug: string;
-    order?: number;
 }
 
 export interface UpdateApartmentTypeData {
+    name?: string;
     title?: string;
-    slug?: string;
-    order?: number;
 }
 
 export const apartmentTypesApi = {

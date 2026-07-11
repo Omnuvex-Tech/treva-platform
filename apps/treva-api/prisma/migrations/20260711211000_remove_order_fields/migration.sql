@@ -1,0 +1,12 @@
+ALTER TABLE "Category" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "ObjectType" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "RoomOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "ViewOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "Currency" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "StatusOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "LcdOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "TypeOfBuildingOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "PropertyTypeOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "ConstructionStageOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "SalesOfficeOption" DROP COLUMN IF EXISTS "order";
+ALTER TABLE "ApartmentType" DROP COLUMN IF EXISTS "order";

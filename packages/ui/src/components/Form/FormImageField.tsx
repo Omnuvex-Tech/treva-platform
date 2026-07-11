@@ -10,6 +10,8 @@ interface FormImageFieldProps {
     uploadFn: (file: File) => Promise<{ url: string }>;
     accept?: string;
     required?: boolean;
+    previewClassName?: string;
+    uploadClassName?: string;
 }
 
 export function FormImageField({
@@ -19,6 +21,8 @@ export function FormImageField({
     uploadFn,
     accept = "image/*",
     required,
+    previewClassName,
+    uploadClassName,
 }: FormImageFieldProps) {
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,7 +58,7 @@ export function FormImageField({
                 className="hidden"
             />
             {value ? (
-                <div className="relative w-full h-[200px] rounded-xl overflow-hidden bg-[#F4F5F6]">
+                <div className={cn("relative w-full h-[200px] rounded-xl overflow-hidden bg-[#F4F5F6]", previewClassName)}>
                     <img src={value} alt={label} className="w-full h-full object-cover" />
                     <button
                         type="button"
@@ -69,7 +73,7 @@ export function FormImageField({
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="w-full h-[180px] rounded-xl border-2 border-dashed border-[#CCCCCC] bg-[#F4F5F6] flex flex-col items-center justify-center gap-2 hover:border-gray-400 transition-colors cursor-pointer"
+                    className={cn("w-full h-[180px] rounded-xl border-2 border-dashed border-[#CCCCCC] bg-[#F4F5F6] flex flex-col items-center justify-center gap-2 hover:border-gray-400 transition-colors cursor-pointer", uploadClassName)}
                 >
                     {uploading ? (
                         <span className="text-sm text-[#666666]">Uploading...</span>

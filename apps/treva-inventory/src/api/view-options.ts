@@ -2,15 +2,15 @@ import apiClient from "./client";
 
 export interface ViewOption {
     id: string;
-    value: string;
-    order: number;
+    name: string;
+    title: string;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateViewOptionData {
-    value: string;
-    order?: number;
+    name: string;
+    title: string;
 }
 
 export const viewOptionsApi = {

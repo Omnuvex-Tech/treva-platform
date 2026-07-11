@@ -3,19 +3,16 @@ import apiClient from "./client";
 export interface ConstructionStageOption {
     id: string;
     value: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateConstructionStageOptionData {
     value: string;
-    order?: number;
 }
 
 export interface UpdateConstructionStageOptionData {
     value?: string;
-    order?: number;
 }
 
 export const constructionStageOptionsApi = {

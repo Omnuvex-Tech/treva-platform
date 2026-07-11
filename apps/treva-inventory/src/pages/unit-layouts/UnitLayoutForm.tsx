@@ -15,6 +15,7 @@ import { statusOptionsApi, StatusOption } from "../../api/status-options";
 import { FileUpload } from "../../components/FileUpload";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { IoClose } from "react-icons/io5";
 
 type Tab = "basic" | "area" | "location" | "documents" | "gallery" | "similar";
 
@@ -518,7 +519,7 @@ export function UnitLayoutForm() {
                                         type="text"
                                         value={form.title}
                                         onChange={(e) => handleSlugFromTitle(e.target.value)}
-                                        placeholder="e.g. Sea Breeze Residence"
+                                        placeholder="Sea Breeze Residence"
                                         className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
@@ -531,7 +532,7 @@ export function UnitLayoutForm() {
                                         type="text"
                                         value={form.name}
                                         onChange={(e) => updateField("name", e.target.value)}
-                                        placeholder="e.g. Block A, Apartment 12"
+                                        placeholder="Block A, Apartment 12"
                                         className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
@@ -544,7 +545,7 @@ export function UnitLayoutForm() {
                                         type="text"
                                         value={form.slug}
                                         onChange={(e) => { setSlugManuallyEdited(true); updateField("slug", e.target.value); }}
-                                        placeholder="e.g. sea-breeze-residence-a-12"
+                                        placeholder="sea-breeze-residence-a-12"
                                         className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
@@ -615,7 +616,7 @@ export function UnitLayoutForm() {
                                                                 : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
-                                                        — None
+                                                        â€” None
                                                     </button>
                                                     {statusOptions.map((opt) => (
                                                         <button
@@ -652,7 +653,7 @@ export function UnitLayoutForm() {
                                             className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
                                         >
                                             <span className={form.roomOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
-                                                {roomOptions.find((r) => r.id === form.roomOptionId)?.value || "Select room option (optional)"}
+                                                {roomOptions.find((r) => r.id === form.roomOptionId)?.title || "Select room option (optional)"}
                                             </span>
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${roomOptionOpen ? "rotate-180" : ""}`}>
                                                 <path d="M6 9l6 6 6-6" />
@@ -669,7 +670,7 @@ export function UnitLayoutForm() {
                                                             : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                     }`}
                                                 >
-                                                    — None
+                                                    â€” None
                                                 </button>
                                                 {roomOptions.map((opt) => (
                                                     <button
@@ -682,7 +683,7 @@ export function UnitLayoutForm() {
                                                                 : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
-                                                        {opt.value}
+                                                        {opt.title}
                                                     </button>
                                                 ))}
                                                 {roomOptions.length === 0 && (
@@ -705,7 +706,7 @@ export function UnitLayoutForm() {
                                             onChange={(e) =>
                                                 updateField("floor", e.target.value ? parseInt(e.target.value) : 0)
                                             }
-                                            placeholder="e.g. 5"
+                                            placeholder="5"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
@@ -724,7 +725,7 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : 0
                                                 )
                                             }
-                                            placeholder="e.g. 12"
+                                            placeholder="12"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
@@ -741,7 +742,7 @@ export function UnitLayoutForm() {
                                                 className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
                                             >
                                                 <span className={form.viewOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
-                                                    {viewOptions.find((v) => v.id === form.viewOptionId)?.value || "Select view option (optional)"}
+                                                    {viewOptions.find((v) => v.id === form.viewOptionId)?.title || "Select view option (optional)"}
                                                 </span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${viewOptionOpen ? "rotate-180" : ""}`}>
                                                     <path d="M6 9l6 6 6-6" />
@@ -758,7 +759,7 @@ export function UnitLayoutForm() {
                                                                 : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
-                                                        — None
+                                                        â€” None
                                                     </button>
                                                     {viewOptions.map((opt) => (
                                                         <button
@@ -771,7 +772,7 @@ export function UnitLayoutForm() {
                                                                     : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                             }`}
                                                         >
-                                                            {opt.value}
+                                                            {opt.title}
                                                         </button>
                                                     ))}
                                                     {viewOptions.length === 0 && (
@@ -792,7 +793,7 @@ export function UnitLayoutForm() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                            Total Area (m²)
+                                            Total Area (mÂ²)
                                         </label>
                                         <input
                                             type="number"
@@ -803,7 +804,7 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
-                                            placeholder="e.g. 85.5"
+                                            placeholder="85.5"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
                                             step={0.1}
@@ -812,7 +813,7 @@ export function UnitLayoutForm() {
                                     </div>
                                     <div>
                                         <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                            Internal Area (m²)
+                                            Internal Area (mÂ²)
                                         </label>
                                         <input
                                             type="number"
@@ -823,7 +824,7 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseFloat(e.target.value) : 0
                                                 )
                                             }
-                                            placeholder="e.g. 72.3"
+                                            placeholder="72.3"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
                                             step={0.1}
@@ -833,7 +834,7 @@ export function UnitLayoutForm() {
                                 </div>
                                 <div>
                                     <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                        Balcony Area (m²)
+                                        Balcony Area (mÂ²)
                                     </label>
                                         <input
                                             type="number"
@@ -846,7 +847,7 @@ export function UnitLayoutForm() {
                                                         : 0
                                                 )
                                             }
-                                            placeholder="e.g. 8.5"
+                                            placeholder="8.5"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
                                             step={0.1}
@@ -857,7 +858,7 @@ export function UnitLayoutForm() {
                                     {currencies.map((curr) => (
                                         <div key={curr.id}>
                                             <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                                Price ({curr.value})
+                                                Price ({curr.title || curr.name || curr.value})
                                             </label>
                                             <input
                                                 type="number"
@@ -895,7 +896,7 @@ export function UnitLayoutForm() {
                                                             }
                                                         )
                                                     }
-                                                    placeholder="e.g. 120,000"
+                                                    placeholder="120,000"
                                                     className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                                     min={0}
                                                 />
@@ -916,7 +917,7 @@ export function UnitLayoutForm() {
                                                             }
                                                         )
                                                     }
-                                                    placeholder="e.g. 204,000"
+                                                    placeholder="204,000"
                                                     className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                                     min={0}
                                                 />
@@ -939,7 +940,7 @@ export function UnitLayoutForm() {
                                         onChange={(e) =>
                                             updateLocation("title", e.target.value)
                                         }
-                                        placeholder="e.g. Sea Breeze Resort, Nardaran District"
+                                        placeholder="Sea Breeze Resort, Nardaran District"
                                         className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         required
                                     />
@@ -954,7 +955,7 @@ export function UnitLayoutForm() {
                                             onChange={(e) =>
                                                 updateLocation("url", e.target.value)
                                             }
-                                            placeholder="e.g. https://maps.google.com/..."
+                                            placeholder="https://maps.google.com/..."
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             required
                                         />
@@ -987,7 +988,7 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : 0
                                             )
                                         }
-                                            placeholder="e.g. 2026"
+                                            placeholder="2026"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={2020}
                                             max={2100}
@@ -1008,7 +1009,7 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : 0
                                                 )
                                             }
-                                            placeholder="e.g. 1"
+                                            placeholder="1"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
@@ -1027,7 +1028,7 @@ export function UnitLayoutForm() {
                                                     e.target.value ? parseInt(e.target.value) : 0
                                                 )
                                             }
-                                            placeholder="e.g. 15"
+                                            placeholder="15"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={1}
                                             required
@@ -1121,12 +1122,14 @@ export function UnitLayoutForm() {
                                                         />
                                                         <button
                                                             type="button"
+                                                            aria-label={`Remove gallery image ${index + 1}`}
                                                             onClick={() =>
                                                                 removeGalleryImage(index)
                                                             }
-                                                            className="absolute top-1 right-1 rounded-full bg-[#4E525D] p-1 text-xs text-white hover:opacity-80"
+                                                            className="absolute right-3 top-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-[0px] text-white backdrop-blur-sm transition-opacity hover:opacity-85"
                                                         >
-                                                            ✕
+                                                            <IoClose size={18} />
+                                                            âœ•
                                                         </button>
                                                     </div>
                                                 )
@@ -1182,10 +1185,10 @@ export function UnitLayoutForm() {
                                                             </span>
                                                         </div>
                                                         <div className="p-3">
-                                                            <div className="text-xs text-[#666666]">N° {layout.number || '?'} · {layout.floor} floor</div>
+                                                            <div className="text-xs text-[#666666]">NÂ° {layout.number || '?'} Â· {layout.floor} floor</div>
                                                             <div className="mt-0.5 text-sm font-medium text-[#1A1A1A]">{layout.title}</div>
                                                             <div className="mt-1 flex items-center justify-between">
-                                                                <span className="text-xs text-[#666666]">{layout.totalArea} m²</span>
+                                                                <span className="text-xs text-[#666666]">{layout.totalArea} mÂ²</span>
                                                                  <span className="text-sm font-semibold text-[#1A1A1A]">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
                                                             </div>
                                                         </div>
@@ -1261,10 +1264,10 @@ export function UnitLayoutForm() {
                                                             </span>
                                                         </div>
                                                         <div className="p-3">
-                                                            <div className="text-xs text-[#666666]">N° {layout.number || '?'} · {layout.floor} floor</div>
+                                                            <div className="text-xs text-[#666666]">NÂ° {layout.number || '?'} Â· {layout.floor} floor</div>
                                                             <div className="mt-0.5 text-sm font-medium text-[#1A1A1A]">{layout.title}</div>
                                                             <div className="mt-1 flex items-center justify-between">
-                                                                <span className="text-xs text-[#666666]">{layout.totalArea} m²</span>
+                                                                <span className="text-xs text-[#666666]">{layout.totalArea} mÂ²</span>
                                                                  <span className="text-sm font-semibold text-[#1A1A1A]">{Object.entries(layout.prices || {}).map(([curr, price]) => `${curr} ${price?.toLocaleString()}`).join(' / ')}</span>
                                                             </div>
                                                         </div>

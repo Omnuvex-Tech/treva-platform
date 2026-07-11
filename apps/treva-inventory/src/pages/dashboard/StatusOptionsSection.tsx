@@ -21,14 +21,12 @@ export function StatusOptionsSection() {
         queryKey: ["status-options"],
         queryFn: () => statusOptionsApi.getAll(),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
-        createEmptyForm: () => ({ value: "", order: "" }),
+        createEmptyForm: () => ({ value: "" }),
         mapItemToForm: (item: StatusOption) => ({
             value: item.value,
-            order: item.order != null ? String(item.order) : "",
         }),
         buildPayload: (nextForm) => ({
             value: nextForm.value,
-            order: nextForm.order ? Number(nextForm.order) : undefined,
         }),
         createFn: (payload) => statusOptionsApi.create(payload),
         updateFn: (itemId, payload) => statusOptionsApi.update(itemId, payload),
@@ -40,7 +38,6 @@ export function StatusOptionsSection() {
             const token = createDuplicateToken();
             return {
                 value: duplicateText(item.value, token),
-                order: item.order,
             };
         },
     });
@@ -53,14 +50,10 @@ export function StatusOptionsSection() {
             showForm={showForm}
             formContent={
                 <form onSubmit={submitForm} className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <div className="mb-4 grid grid-cols-2 gap-4">
+                    <div className="mb-4 grid grid-cols-1 gap-4">
                         <div>
                             <label className="mb-1 block text-xs text-[#666666]">Value</label>
                             <input value={form.value} onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs text-[#666666]">Order</label>
-                            <input type="number" value={form.order} onChange={(e) => setForm((prev) => ({ ...prev, order: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" />
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -76,7 +69,6 @@ export function StatusOptionsSection() {
             isLoading={isLoading}
             columns={[
                 { key: "value", label: "Value" },
-                { key: "order", label: "Order" },
             ]}
             items={items}
             emptyText="No status options yet"
@@ -84,7 +76,6 @@ export function StatusOptionsSection() {
             renderCells={(item) => (
                 <>
                     <td className="px-4 py-3 text-[#1A1A1A]">{item.value}</td>
-                    <td className="px-4 py-3 text-[#666666]">{item.order}</td>
                 </>
             )}
             onEdit={openEdit}

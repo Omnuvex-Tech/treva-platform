@@ -1,9 +1,14 @@
-import { IsOptional, IsString, IsNumber, IsArray, ValidateNested } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, ValidateNested, IsIn } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ApartmentPriceInput } from './create-apartment.dto';
 
 export class UpdateApartmentDto {
+  @ApiPropertyOptional({ example: 'Sea Breeze' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
   @ApiPropertyOptional({ example: '2-Room Flat' })
   @IsOptional()
   @IsString()
@@ -19,10 +24,40 @@ export class UpdateApartmentDto {
   @IsString()
   description?: string;
 
+  @ApiPropertyOptional({ example: 'Sea Breeze Residence | For Sale in Baku' })
+  @IsOptional()
+  @IsString()
+  seoTitle?: string;
+
+  @ApiPropertyOptional({ example: 'Spacious apartment listing with rich details and pricing.' })
+  @IsOptional()
+  @IsString()
+  seoDescription?: string;
+
+  @ApiPropertyOptional({ example: 'baku apartment, sea breeze, for sale' })
+  @IsOptional()
+  @IsString()
+  seoKeywords?: string;
+
+  @ApiPropertyOptional({ example: 'https://treva.az/resale/sea-breeze-residence' })
+  @IsOptional()
+  @IsString()
+  canonicalUrl?: string;
+
+  @ApiPropertyOptional({ example: '/uploads/images/apartment-seo.jpg' })
+  @IsOptional()
+  @IsString()
+  seoImage?: string;
+
   @ApiPropertyOptional({ example: '/uploads/images/apartment.jpg' })
   @IsOptional()
   @IsString()
   image?: string;
+
+  @ApiPropertyOptional({ example: '/uploads/images/apartment-cover.jpg' })
+  @IsOptional()
+  @IsString()
+  coverImage?: string;
 
   @ApiPropertyOptional({ example: [] })
   @IsOptional()
@@ -49,6 +84,31 @@ export class UpdateApartmentDto {
   @IsNumber()
   area?: number;
 
+  @ApiPropertyOptional({ example: 54 })
+  @IsOptional()
+  @IsNumber()
+  netArea?: number;
+
+  @ApiPropertyOptional({ example: 67 })
+  @IsOptional()
+  @IsNumber()
+  grossArea?: number;
+
+  @ApiPropertyOptional({ example: 32 })
+  @IsOptional()
+  @IsNumber()
+  livingArea?: number;
+
+  @ApiPropertyOptional({ example: 12 })
+  @IsOptional()
+  @IsNumber()
+  kitchenArea?: number;
+
+  @ApiPropertyOptional({ example: 8 })
+  @IsOptional()
+  @IsNumber()
+  balconyArea?: number;
+
   @ApiPropertyOptional({ example: 8 })
   @IsOptional()
   @IsNumber()
@@ -58,6 +118,26 @@ export class UpdateApartmentDto {
   @IsOptional()
   @IsNumber()
   floorTo?: number;
+
+  @ApiPropertyOptional({ example: 2 })
+  @IsOptional()
+  @IsNumber()
+  bathroomCount?: number;
+
+  @ApiPropertyOptional({ example: 'sale', enum: ['sale', 'rent'] })
+  @IsOptional()
+  @IsString()
+  purpose?: string;
+
+  @ApiPropertyOptional({ example: 'Baku' })
+  @IsOptional()
+  @IsString()
+  region?: string;
+
+  @ApiPropertyOptional({ example: 'Nasimi' })
+  @IsOptional()
+  @IsString()
+  city?: string;
 
   @ApiPropertyOptional({ example: 'Baku city' })
   @IsOptional()
@@ -69,20 +149,47 @@ export class UpdateApartmentDto {
   @IsString()
   locationUrl?: string;
 
-  @ApiPropertyOptional({ example: 'Renovated' })
+  @ApiPropertyOptional({ example: 'renovated', enum: ['renovated', 'non-renovated'] })
   @IsOptional()
   @IsString()
+  @IsIn(['renovated', 'non-renovated'])
   renovation?: string;
 
-  @ApiPropertyOptional({ example: 15 })
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  parking?: boolean;
+
+  @ApiPropertyOptional({ example: 8 })
   @IsOptional()
   @IsNumber()
-  kitchenSize?: number;
+  buildingAge?: number;
 
-  @ApiPropertyOptional({ example: 'Brick' })
+  @ApiPropertyOptional({ example: 'furnished', enum: ['furnished', 'unfurnished'] })
   @IsOptional()
   @IsString()
-  wallMaterial?: string;
+  @IsIn(['furnished', 'unfurnished'])
+  furnishing?: string;
+
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  elevator?: boolean;
+
+  @ApiPropertyOptional({ example: 2.8 })
+  @IsOptional()
+  @IsNumber()
+  ceilingHeight?: number;
+
+  @ApiPropertyOptional({ example: ['heating-type-id'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  heatingTypeIds?: string[];
+
+  @ApiPropertyOptional({ example: ['view-option-id'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  viewOptionIds?: string[];
 
   @ApiPropertyOptional({ example: 'apartment-type-id' })
   @IsOptional()

@@ -322,7 +322,7 @@ export function PropertyConfigPage({ embedded = false }: { embedded?: boolean } 
                                         >
                                             Edit
                                         </button>
-                                        <p className="text-[12px] text-[#999]">{house.totalArea} m² · {house.roomOption?.value || `${house.number || 0} rooms`}</p>
+                                        <p className="text-[12px] text-[#999]">{house.totalArea} mÂ² Â· {house.roomOption?.title || `${house.number || 0} rooms`}</p>
                                     </div>
                                 </div>
                             );

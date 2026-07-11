@@ -9,22 +9,22 @@ export class ViewOptionsService {
 
   async create(createDto: CreateViewOptionDto) {
     const existing = await this.prisma.viewOption.findUnique({
-      where: { value: createDto.value },
+      where: { name: createDto.name },
     });
     if (existing) {
-      throw new ConflictException('View option with this value already exists');
+      throw new ConflictException('View option with this name already exists');
     }
     return this.prisma.viewOption.create({
       data: {
-        value: createDto.value,
-        order: createDto.order ?? 0,
+        name: createDto.name,
+        title: createDto.title,
       },
     });
   }
 
   async findAll() {
     return this.prisma.viewOption.findMany({
-      orderBy: { order: 'asc' },
+      orderBy: { title: 'asc' },
     });
   }
 
@@ -37,20 +37,20 @@ export class ViewOptionsService {
   async update(id: string, updateDto: UpdateViewOptionDto) {
     await this.findOne(id); // verify existence
 
-    if (updateDto.value) {
+    if (updateDto.name) {
       const existing = await this.prisma.viewOption.findFirst({
-        where: { value: updateDto.value, NOT: { id } },
+        where: { name: updateDto.name, NOT: { id } },
       });
       if (existing) {
-        throw new ConflictException('Another view option has this value');
+        throw new ConflictException('Another view option has this name');
       }
     }
 
     return this.prisma.viewOption.update({
       where: { id },
       data: {
-        ...(updateDto.value && { value: updateDto.value }),
-        ...(updateDto.order !== undefined && { order: updateDto.order }),
+        ...(updateDto.name !== undefined && { name: updateDto.name }),
+        ...(updateDto.title !== undefined && { title: updateDto.title }),
       },
     });
   }

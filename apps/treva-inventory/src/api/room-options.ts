@@ -2,27 +2,27 @@ import apiClient from "./client";
 
 export interface RoomOption {
     id: string;
-    value: string;
+    name: string;
+    title: string;
     type: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateRoomOptionData {
-    value: string;
+    name: string;
+    title: string;
     type?: string;
-    order?: number;
 }
 
 export interface UpdateRoomOptionData {
-    value?: string;
+    name?: string;
+    title?: string;
     type?: string;
-    order?: number;
 }
 
 export const roomOptionsApi = {
-    getAll: () => apiClient.get<RoomOption[]>("/room-options"),
+    getAll: (type?: string) => apiClient.get<RoomOption[]>(`/room-options${type ? `?type=${encodeURIComponent(type)}` : ""}`),
 
     getById: (id: string) => apiClient.get<RoomOption>(`/room-options/${id}`),
 

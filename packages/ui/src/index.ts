@@ -20,6 +20,7 @@ export {
     FormImageField,
     FormTabSwitcher,
     FormAddButton,
+    FormKeywordInput,
 } from "./components/Form";
 
 export { cn } from "./lib/utils";

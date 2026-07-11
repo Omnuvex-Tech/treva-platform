@@ -3,19 +3,16 @@ import apiClient from "./client";
 export interface PropertyTypeOption {
     id: string;
     value: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreatePropertyTypeOptionData {
     value: string;
-    order?: number;
 }
 
 export interface UpdatePropertyTypeOptionData {
     value?: string;
-    order?: number;
 }
 
 export const propertyTypeOptionsApi = {

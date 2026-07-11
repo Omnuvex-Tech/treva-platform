@@ -3,19 +3,16 @@ import apiClient from "./client";
 export interface SalesOfficeOption {
     id: string;
     value: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateSalesOfficeOptionData {
     value: string;
-    order?: number;
 }
 
 export interface UpdateSalesOfficeOptionData {
     value?: string;
-    order?: number;
 }
 
 export const salesOfficeOptionsApi = {

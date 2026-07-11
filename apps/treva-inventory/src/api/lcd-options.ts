@@ -3,19 +3,16 @@ import apiClient from "./client";
 export interface LcdOption {
     id: string;
     value: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateLcdOptionData {
     value: string;
-    order?: number;
 }
 
 export interface UpdateLcdOptionData {
     value?: string;
-    order?: number;
 }
 
 export const lcdOptionsApi = {

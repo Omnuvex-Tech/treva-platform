@@ -81,7 +81,7 @@ export function OwnerForm() {
                             onChange={(e) =>
                                 setForm((f) => ({ ...f, firstName: e.target.value }))
                             }
-                            placeholder="e.g. Farid"
+                            placeholder="Farid"
                             required
                         />
                     </div>
@@ -93,7 +93,7 @@ export function OwnerForm() {
                             onChange={(e) =>
                                 setForm((f) => ({ ...f, lastName: e.target.value }))
                             }
-                            placeholder="e.g. Aliyev"
+                            placeholder="Aliyev"
                             required
                         />
                     </div>
@@ -107,7 +107,7 @@ export function OwnerForm() {
                             onChange={(e) =>
                                 setForm((f) => ({ ...f, profession: e.target.value }))
                             }
-                            placeholder="e.g. Engineer"
+                            placeholder="Engineer"
                         />
                     </div>
                     <div>
@@ -118,7 +118,7 @@ export function OwnerForm() {
                             onChange={(e) =>
                                 setForm((f) => ({ ...f, phoneNumber: e.target.value }))
                             }
-                            placeholder="e.g. +994501234567"
+                            placeholder="+994501234567"
                             required
                         />
                     </div>

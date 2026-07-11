@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateObjectTypeDto {
   @ApiProperty({ example: 'Resident Complex' })
@@ -16,9 +16,4 @@ export class CreateObjectTypeDto {
   @IsString()
   @IsNotEmpty()
   slug: string;
-
-  @ApiPropertyOptional({ example: 0 })
-  @IsOptional()
-  @IsNumber()
-  order?: number;
 }

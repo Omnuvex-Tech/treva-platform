@@ -47,12 +47,11 @@ async function main() {
   // Create categories
   const category1 = await prisma.category.upsert({
     where: { slug: 'panorama-by-elie-saab' },
-    update: { order: 5, type: 'object' },
+    update: { type: 'object' },
     create: {
       title: 'Panorama by ELIE SAAB',
       name: 'Panorama by ELIE SAAB',
       slug: 'panorama-by-elie-saab',
-      order: 5,
       type: 'object',
     },
   });
@@ -60,12 +59,11 @@ async function main() {
 
   const category2 = await prisma.category.upsert({
     where: { slug: 'treva-residences' },
-    update: { order: 6, type: 'object' },
+    update: { type: 'object' },
     create: {
       title: 'TREVA Residences',
       name: 'TREVA Residences',
       slug: 'treva-residences',
-      order: 6,
       type: 'object',
     },
   });
@@ -73,12 +71,12 @@ async function main() {
 
   // Create Layihelerimiz categories
   const layihelerimizCategories = [
-    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights', order: 0, type: 'category' },
-    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches', order: 1, type: 'category' },
-    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village', order: 2, type: 'category' },
-    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island', order: 3, type: 'category' },
-    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence', order: 4, type: 'category' },
-    { title: 'Toronto', name: 'Toronto', slug: 'toronto', order: 7, type: 'category' },
+    { title: 'Reportage Heights', name: 'Reportage Heights', slug: 'reportage-heights', type: 'category' },
+    { title: 'Arabian Ranches', name: 'Arabian Ranches', slug: 'arabian-ranches', type: 'category' },
+    { title: 'Marina Village', name: 'Marina Village', slug: 'marina-village', type: 'category' },
+    { title: 'Brabus Island', name: 'Brabus Island', slug: 'brabus-island', type: 'category' },
+    { title: 'Sabah Residence', name: 'Sabah Residence', slug: 'sabah-residence', type: 'category' },
+    { title: 'Toronto', name: 'Toronto', slug: 'toronto', type: 'category' },
   ];
 
   for (const cat of layihelerimizCategories) {
@@ -93,9 +91,9 @@ async function main() {
 
   // Create default currencies
   const currencies = [
-    { name: 'US Dollar', value: 'USD', order: 0 },
-    { name: 'Azerbaijani Manat', value: 'AZN', order: 1 },
-    { name: 'Euro', value: 'EUR', order: 2 },
+      { name: 'usd', title: 'US Dollar', value: 'USD' },
+      { name: 'azn', title: 'Azerbaijani Manat', value: 'AZN' },
+      { name: 'eur', title: 'Euro', value: 'EUR' },
   ];
 
   for (const currency of currencies) {
@@ -112,9 +110,9 @@ async function main() {
 
   // Create LCD options
   const lcdOptions = [
-    { value: 'LCD-1', order: 0 },
-    { value: 'LCD-2', order: 1 },
-    { value: 'LCD-3', order: 2 },
+    { value: 'LCD-1' },
+    { value: 'LCD-2' },
+    { value: 'LCD-3' },
   ];
   for (const opt of lcdOptions) {
     const existing = await prisma.lcdOption.findUnique({ where: { value: opt.value } });
@@ -128,9 +126,9 @@ async function main() {
 
   // Create Type of building options
   const typeOfBuildingOptions = [
-    { value: 'Residential', order: 0 },
-    { value: 'Commercial', order: 1 },
-    { value: 'Mixed', order: 2 },
+    { value: 'Residential' },
+    { value: 'Commercial' },
+    { value: 'Mixed' },
   ];
   for (const opt of typeOfBuildingOptions) {
     const existing = await prisma.typeOfBuildingOption.findUnique({ where: { value: opt.value } });
@@ -144,10 +142,10 @@ async function main() {
 
   // Create Property type options
   const propertyTypeOptions = [
-    { value: 'Apartment', order: 0 },
-    { value: 'Penthouse', order: 1 },
-    { value: 'Studio', order: 2 },
-    { value: 'Duplex', order: 3 },
+    { value: 'Apartment' },
+    { value: 'Penthouse' },
+    { value: 'Studio' },
+    { value: 'Duplex' },
   ];
   for (const opt of propertyTypeOptions) {
     const existing = await prisma.propertyTypeOption.findUnique({ where: { value: opt.value } });
@@ -161,9 +159,9 @@ async function main() {
 
   // Create Construction stage options
   const constructionStageOptions = [
-    { value: 'Pre-construction', order: 0 },
-    { value: 'Under construction', order: 1 },
-    { value: 'Completed', order: 2 },
+    { value: 'Pre-construction' },
+    { value: 'Under construction' },
+    { value: 'Completed' },
   ];
   for (const opt of constructionStageOptions) {
     const existing = await prisma.constructionStageOption.findUnique({ where: { value: opt.value } });
@@ -177,9 +175,9 @@ async function main() {
 
   // Create Sales office options
   const salesOfficeOptions = [
-    { value: 'Main Office', order: 0 },
-    { value: 'Branch 1', order: 1 },
-    { value: 'Branch 2', order: 2 },
+    { value: 'Main Office' },
+    { value: 'Branch 1' },
+    { value: 'Branch 2' },
   ];
   for (const opt of salesOfficeOptions) {
     const existing = await prisma.salesOfficeOption.findUnique({ where: { value: opt.value } });

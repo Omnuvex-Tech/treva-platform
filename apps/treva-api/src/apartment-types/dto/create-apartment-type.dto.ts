@@ -1,19 +1,14 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateApartmentTypeDto {
+  @ApiProperty({ example: 'studio' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
   @ApiProperty({ example: 'Modern Renovation' })
   @IsString()
   @IsNotEmpty()
   title: string;
-
-  @ApiProperty({ example: 'modern-renovation' })
-  @IsString()
-  @IsNotEmpty()
-  slug: string;
-
-  @ApiPropertyOptional({ example: 0 })
-  @IsOptional()
-  @IsNumber()
-  order?: number;
 }

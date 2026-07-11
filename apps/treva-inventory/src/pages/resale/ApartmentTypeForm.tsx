@@ -20,17 +20,15 @@ export function ApartmentTypeForm() {
     });
 
     const [form, setForm] = useState<CreateApartmentTypeData>({
+        name: "",
         title: "",
-        slug: "",
-        order: 0,
     });
 
     useEffect(() => {
         if (existing?.data) {
             setForm({
+                name: existing.data.name,
                 title: existing.data.title,
-                slug: existing.data.slug,
-                order: existing.data.order,
             });
         }
     }, [existing?.data]);
@@ -73,37 +71,24 @@ export function ApartmentTypeForm() {
 
             <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
                 <div>
+                    <label className="mb-1 block text-xs text-white/60">Name</label>
+                    <input
+                        className={inputClass}
+                        value={form.name}
+                        onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                        placeholder="studio"
+                        required
+                    />
+                </div>
+                <div>
                     <label className="mb-1 block text-xs text-white/60">Title</label>
                     <input
                         className={inputClass}
                         value={form.title}
                         onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                        placeholder="e.g. 1 Room"
+                        placeholder="1 Room"
                         required
                     />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="mb-1 block text-xs text-white/60">Slug</label>
-                        <input
-                            className={inputClass}
-                            value={form.slug}
-                            onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                            placeholder="e.g. 1-room"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="mb-1 block text-xs text-white/60">Order</label>
-                        <input
-                            className={inputClass}
-                            type="number"
-                            value={form.order}
-                            onChange={(e) =>
-                                setForm((f) => ({ ...f, order: parseInt(e.target.value) || 0 }))
-                            }
-                        />
-                    </div>
                 </div>
                 <div className="flex gap-3 pt-2">
                     <button

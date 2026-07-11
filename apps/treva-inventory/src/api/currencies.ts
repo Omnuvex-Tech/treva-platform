@@ -3,22 +3,22 @@ import apiClient from "./client";
 export interface Currency {
     id: string;
     name: string;
+    title: string;
     value: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateCurrencyData {
     name: string;
+    title: string;
     value: string;
-    order?: number;
 }
 
 export interface UpdateCurrencyData {
     name?: string;
+    title?: string;
     value?: string;
-    order?: number;
 }
 
 export const currenciesApi = {

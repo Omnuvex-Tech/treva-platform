@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayoutStats } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
 import { apartmentsApi, type Apartment } from "../api/apartments";
 import { apartmentTypesApi, type ApartmentType } from "../api/apartment-types";
+import { ownersApi, type Owner } from "../api/owners";
+import { attributesApi, type Attribute } from "../api/attributes";
+import { requestsApi, type Request } from "../api/requests";
+import { locationOptionsApi, type LocationOption } from "../api/location-options";
+import { viewOptionsApi, type ViewOption as ResaleViewOption } from "../api/view-options";
+import { heatingTypeOptionsApi, type HeatingTypeOption } from "../api/heating-type-options";
+import { roomOptionsApi, type RoomOption } from "../api/room-options";
+import { currenciesApi, type Currency } from "../api/currencies";
 import { CategoriesSection } from "./dashboard/CategoriesSection";
 import { UnitLayoutsSection } from "./dashboard/UnitLayoutsSection";
 import { ViewOptionsSection } from "./dashboard/ViewOptionsSection";
 import { StatusOptionsSection } from "./dashboard/StatusOptionsSection";
 import { RoomOptionsSection } from "./dashboard/RoomOptionsSection";
 import { CurrenciesSection } from "./dashboard/CurrenciesSection";
+import { LocationOptionsSection } from "./dashboard/LocationOptionsSection";
+import { HeatingTypeOptionsSection } from "./dashboard/HeatingTypeOptionsSection";
 import { ResaleApartmentsCardSection } from "./dashboard/ResaleApartmentsCardSection";
 import { ApartmentForm } from "./resale/ApartmentForm";
 import { ApartmentTypesSection } from "./dashboard/ApartmentTypesSection";
@@ -30,7 +40,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 type MenuKey = "offplan" | "resale"
     | "categories" | "unitLayouts" | "viewOptions" | "statusOptions"
     | "roomOptions" | "currencies"
-    | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests"
+    | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests" | "locationOptions" | "resaleViewOptions" | "heatingTypeOptions"
     | "objects" | "objectTypes";
 
 const pageNames: Record<MenuKey, string> = {
@@ -47,6 +57,9 @@ const pageNames: Record<MenuKey, string> = {
     owners: "Owners",
     attributes: "Attributes",
     requests: "Requests",
+    locationOptions: "Location Options",
+    resaleViewOptions: "Views",
+    heatingTypeOptions: "Heating Types",
     objects: "Objects",
     objectTypes: "Object Types",
 };
@@ -65,6 +78,9 @@ const pageSubtitles: Record<MenuKey, string> = {
     owners: "Manage apartment owners",
     attributes: "Manage apartment attributes",
     requests: "View buyer requests",
+    locationOptions: "Manage city and region options",
+    resaleViewOptions: "Manage apartment view options",
+    heatingTypeOptions: "Manage heating type options",
     objects: "Manage off-plan project objects",
     objectTypes: "Manage object types",
 };
@@ -83,6 +99,9 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
             { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
             { key: "attributes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg> },
             { key: "owners", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
+            { key: "locationOptions", label: "Locations", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" /><circle cx="12" cy="11" r="2.5" /></svg> },
+            { key: "resaleViewOptions", label: "Views", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
+            { key: "heatingTypeOptions", label: "Heating Types", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v12" /><path d="M9 7h6" /><path d="M12 14a4 4 0 1 0 4 4" /></svg> },
             { key: "requests", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg> },
             { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
         ],
@@ -118,6 +137,9 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
     if (key === "apartmentTypes") return "/dashboard/resale/apartment-types";
     if (key === "owners") return "/dashboard/resale/owners";
     if (key === "attributes") return "/dashboard/resale/attributes";
+    if (key === "locationOptions") return "/dashboard/resale/location-options";
+    if (key === "resaleViewOptions") return "/dashboard/resale/view-options";
+    if (key === "heatingTypeOptions") return "/dashboard/resale/heating-type-options";
     if (key === "requests") return "/dashboard/resale/requests";
 
     if (key === "categories") return "/dashboard/offplan/categories";
@@ -140,6 +162,9 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["roomOptions", (value) => value === "/dashboard/resale/room-options" || value === "/dashboard/offplan/room-options"],
         ["attributes", (value) => value === "/dashboard/resale/attributes"],
         ["owners", (value) => value === "/dashboard/resale/owners"],
+        ["locationOptions", (value) => value === "/dashboard/resale/location-options"],
+        ["resaleViewOptions", (value) => value === "/dashboard/resale/view-options"],
+        ["heatingTypeOptions", (value) => value === "/dashboard/resale/heating-type-options"],
         ["requests", (value) => value === "/dashboard/resale/requests"],
         ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
         ["categories", (value) => value === "/dashboard/offplan/categories"],
@@ -154,6 +179,34 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
 
     return routeMatchers.find(([, matches]) => matches(path))?.[0] ?? null;
 }
+
+const RESALE_DONUT_COLORS = ["#4E79FF", "#00C377", "#FFBB00", "#E95B5B", "#7C5CFC", "#14B8A6"];
+
+const formatChartValue = (value: number) =>
+    new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value);
+
+const getPrimaryListingPrice = (apartment: Apartment) =>
+    apartment.prices?.[0]?.priceTotal ?? apartment.priceTotal ?? 0;
+
+const buildChartPoints = (values: number[]) => {
+    const axisMax = Math.max(...values, 1);
+    return values.map((value, index) => {
+        const x = values.length === 1 ? 50 : (index / (values.length - 1)) * 100;
+        const y = 92 - (value / axisMax) * 72;
+        return { x, y };
+    });
+};
+
+const buildLinePath = (points: { x: number; y: number }[]) =>
+    points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+
+const buildAreaPath = (points: { x: number; y: number }[]) => {
+    if (points.length === 0) return "";
+
+    const first = points[0];
+    const last = points[points.length - 1];
+    return `${buildLinePath(points)} L ${last.x} 100 L ${first.x} 100 Z`;
+};
 
 export function Dashboard() {
     const location = useLocation();
@@ -208,6 +261,15 @@ export function Dashboard() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [apartments, setApartments] = useState<Apartment[]>([]);
     const [apartmentTypes, setApartmentTypes] = useState<ApartmentType[]>([]);
+    const [owners, setOwners] = useState<Owner[]>([]);
+    const [attributes, setAttributes] = useState<Attribute[]>([]);
+    const [requests, setRequests] = useState<Request[]>([]);
+    const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
+    const [resaleViewOptions, setResaleViewOptions] = useState<ResaleViewOption[]>([]);
+    const [heatingTypeOptions, setHeatingTypeOptions] = useState<HeatingTypeOption[]>([]);
+    const [resaleRoomOptions, setResaleRoomOptions] = useState<RoomOption[]>([]);
+    const [resaleCurrencies, setResaleCurrencies] = useState<Currency[]>([]);
+    const [resaleListingsTotal, setResaleListingsTotal] = useState(0);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -226,17 +288,212 @@ export function Dashboard() {
         } else if (activeMenu === "resale") {
             setLoading(true);
             Promise.all([
-                apartmentsApi.getAll({ limit: 100 }),
+                apartmentsApi.getAll({ limit: 500 }),
                 apartmentTypesApi.getAll(),
-            ]).then(([aptsRes, typesRes]) => {
+                ownersApi.getAll(),
+                attributesApi.getAll(),
+                requestsApi.getAll(),
+                locationOptionsApi.getAll(),
+                viewOptionsApi.getAll(),
+                heatingTypeOptionsApi.getAll(),
+                roomOptionsApi.getAll("resale"),
+                currenciesApi.getAll(),
+            ]).then(([aptsRes, typesRes, ownersRes, attributesRes, requestsRes, locationsRes, viewsRes, heatingRes, roomOptionsRes, currenciesRes]) => {
                 setApartments(aptsRes.data.data);
+                setResaleListingsTotal(aptsRes.data.pagination.total);
                 setApartmentTypes(typesRes.data);
+                setOwners(ownersRes.data);
+                setAttributes(attributesRes.data);
+                setRequests(requestsRes.data);
+                setLocationOptions(locationsRes.data);
+                setResaleViewOptions(viewsRes.data);
+                setHeatingTypeOptions(heatingRes.data);
+                setResaleRoomOptions(roomOptionsRes.data);
+                setResaleCurrencies(currenciesRes.data);
             }).catch(() => {
                 setApartments([]);
+                setResaleListingsTotal(0);
                 setApartmentTypes([]);
+                setOwners([]);
+                setAttributes([]);
+                setRequests([]);
+                setLocationOptions([]);
+                setResaleViewOptions([]);
+                setHeatingTypeOptions([]);
+                setResaleRoomOptions([]);
+                setResaleCurrencies([]);
             }).finally(() => setLoading(false));
         }
     }, [activeMenu]);
+
+    const resaleDashboard = useMemo(() => {
+        const totalListings = resaleListingsTotal || apartments.length;
+        const activeListings = apartments.filter((apartment) => (apartment.status || "active") === "active").length;
+        const pendingListings = apartments.filter((apartment) => apartment.status === "pending").length;
+        const nonActiveListings = apartments.filter((apartment) => apartment.status === "non-active").length;
+        const pricedListings = apartments.filter((apartment) => getPrimaryListingPrice(apartment) > 0);
+        const apartmentsWithSeo = apartments.filter((apartment) =>
+            Boolean(
+                apartment.seoTitle ||
+                apartment.seoDescription ||
+                apartment.seoKeywords ||
+                apartment.canonicalUrl ||
+                apartment.seoImage,
+            ),
+        ).length;
+        const apartmentsWithImages = apartments.filter((apartment) =>
+            Boolean(apartment.image || apartment.coverImage || apartment.gallery?.length),
+        ).length;
+        const saleListings = apartments.filter((apartment) => apartment.purpose !== "rent").length;
+        const rentListings = apartments.filter((apartment) => apartment.purpose === "rent").length;
+        const averageRooms = apartments.length > 0
+            ? apartments.reduce((sum, apartment) => sum + (apartment.roomCount || 0), 0) / apartments.length
+            : 0;
+        const averageArea = apartments.length > 0
+            ? apartments.reduce((sum, apartment) => sum + (apartment.area || 0), 0) / apartments.length
+            : 0;
+        const listingsWithOwner = apartments.filter((apartment) => apartment.ownerId).length;
+        const linkedRequestCount = apartments.reduce((sum, apartment) => sum + (apartment.requestIds?.length || 0), 0);
+        const usedRegionCount = new Set(apartments.map((apartment) => apartment.region).filter(Boolean)).size;
+        const usedCityCount = new Set(apartments.map((apartment) => apartment.city).filter(Boolean)).size;
+
+        const monthDates = Array.from({ length: 6 }, (_, index) => {
+            const date = new Date();
+            date.setDate(1);
+            date.setHours(0, 0, 0, 0);
+            date.setMonth(date.getMonth() - (5 - index));
+            return date;
+        });
+
+        const listingActivity = monthDates.map((date) => {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const count = apartments.filter((apartment) => {
+                const createdAt = new Date(apartment.createdAt);
+                return createdAt.getFullYear() === year && createdAt.getMonth() === month;
+            }).length;
+
+            return {
+                label: date.toLocaleString("en-US", { month: "short" }),
+                count,
+            };
+        });
+
+        const chartValues = listingActivity.map((entry) => entry.count);
+        const chartPoints = buildChartPoints(chartValues);
+        const chartLinePath = buildLinePath(chartPoints);
+        const chartAreaPath = buildAreaPath(chartPoints);
+        const chartMax = Math.max(...chartValues, 1);
+        const chartTicks = Array.from({ length: 6 }, (_, index) => {
+            const ratio = (5 - index) / 5;
+            return Math.round(chartMax * ratio);
+        });
+        const highlightedActivityIndex = chartValues.findIndex((value) => value === Math.max(...chartValues));
+
+        const typeCountMap = new Map<string, number>();
+        apartments.forEach((apartment) => {
+            const label = apartment.apartmentType?.title || "Unassigned";
+            typeCountMap.set(label, (typeCountMap.get(label) || 0) + 1);
+        });
+
+        const sortedTypeDistribution = Array.from(typeCountMap.entries())
+            .map(([label, count]) => ({ label, count }))
+            .sort((a, b) => b.count - a.count);
+
+        const topTypes = sortedTypeDistribution.slice(0, 4);
+        const remainingTypeCount = sortedTypeDistribution.slice(4).reduce((sum, item) => sum + item.count, 0);
+        const typeDistribution = remainingTypeCount > 0
+            ? [...topTypes, { label: "Other", count: remainingTypeCount }]
+            : topTypes;
+        const totalTypeCount = typeDistribution.reduce((sum, item) => sum + item.count, 0) || 1;
+
+        let accumulatedLength = 0;
+        const donutCircumference = 2 * Math.PI * 50;
+        const donutSegments = typeDistribution.map((item, index) => {
+            const segmentLength = (item.count / totalTypeCount) * donutCircumference;
+            const segment = {
+                ...item,
+                color: RESALE_DONUT_COLORS[index % RESALE_DONUT_COLORS.length],
+                dasharray: `${segmentLength} ${Math.max(donutCircumference - segmentLength, 0)}`,
+                dashoffset: -accumulatedLength,
+            };
+            accumulatedLength += segmentLength;
+            return segment;
+        });
+
+        const topCards = [
+            {
+                label: "Resale Listings",
+                value: totalListings,
+                hint: `${activeListings} active, ${pendingListings} pending`,
+                accent: "text-[#2D9A5B]",
+                icon: "/images/pages/inv-dashboard/first-img.svg",
+            },
+            {
+                label: "Priced Listings",
+                value: pricedListings.length,
+                hint: `${apartmentsWithImages} with images, ${apartmentsWithSeo} with SEO`,
+                accent: "text-[#4E525D]",
+                icon: "/images/pages/inv-dashboard/third-img.svg",
+            },
+            {
+                label: "Listing Mix",
+                value: `${saleListings}/${rentListings}`,
+                hint: "sale / rent",
+                accent: "text-[#4E525D]",
+                icon: "/images/pages/inv-dashboard/second-img.svg",
+            },
+            {
+                label: "Average Footprint",
+                value: apartments.length > 0 ? `${averageArea.toFixed(1)} m²` : "0 m²",
+                hint: `${averageRooms.toFixed(1)} average rooms`,
+                accent: "text-[#4E525D]",
+                icon: "/images/pages/inv-dashboard/forth-img.svg",
+            },
+        ];
+
+        const dataCoverage = [
+            { label: "Owners", value: owners.length, hint: `${listingsWithOwner} linked to listings` },
+            { label: "Attributes", value: attributes.length, hint: `${apartments.reduce((sum, apartment) => sum + (apartment.attributeIds?.length || 0), 0)} assigned` },
+            { label: "Requests", value: requests.length, hint: `${linkedRequestCount} attached to listings` },
+            { label: "Regions", value: locationOptions.filter((option) => option.type === "region").length, hint: `${usedRegionCount} already used` },
+            { label: "Cities", value: locationOptions.filter((option) => option.type === "city").length, hint: `${usedCityCount} already used` },
+            { label: "Views", value: resaleViewOptions.length, hint: `${apartments.reduce((sum, apartment) => sum + (apartment.viewOptionIds?.length || 0), 0)} linked` },
+            { label: "Heating", value: heatingTypeOptions.length, hint: `${apartments.reduce((sum, apartment) => sum + (apartment.heatingTypeIds?.length || 0), 0)} linked` },
+            { label: "Room Options", value: resaleRoomOptions.length, hint: "resale-specific options" },
+            { label: "Currencies", value: resaleCurrencies.length, hint: `${pricedListings.length} listings carry price data` },
+        ];
+
+        return {
+            topCards,
+            chartTicks,
+            chartLinePath,
+            chartAreaPath,
+            chartPoints,
+            listingActivity,
+            highlightedActivityIndex: highlightedActivityIndex >= 0 ? highlightedActivityIndex : listingActivity.length - 1,
+            donutSegments,
+            totalListings,
+            activeListings,
+            pendingListings,
+            nonActiveListings,
+            averageRooms,
+            averageArea,
+            dataCoverage,
+        };
+    }, [
+        apartments,
+        apartmentTypes,
+        attributes,
+        heatingTypeOptions,
+        locationOptions,
+        owners,
+        requests,
+        resaleCurrencies,
+        resaleListingsTotal,
+        resaleRoomOptions,
+        resaleViewOptions,
+    ]);
 
     return (
         <div className="flex min-h-screen w-full bg-white font-sans overflow-hidden">
@@ -262,6 +519,8 @@ export function Dashboard() {
                             <div key={section.key} className="mb-1">
                                 {/* Section header */}
                                 <button onClick={() => toggleSection(section.key)}
+                                    type="button"
+                                    aria-expanded={isOpen}
                                     className="flex items-center gap-3 w-full px-4 h-10 rounded-xl font-medium text-[13px] transition-colors cursor-pointer"
                                     style={{ color: "#808191" }}>
                                     {section.icon}
@@ -273,8 +532,11 @@ export function Dashboard() {
                                 </button>
 
                                 {/* Children */}
-                                {isOpen && (
-                                    <div className="flex flex-col gap-0.5 ml-2">
+                                <div
+                                    className={`inventory-sidebar__submenu ${isOpen ? "inventory-sidebar__submenu--open" : ""}`}
+                                    aria-hidden={!isOpen}
+                                >
+                                    <div className="inventory-sidebar__submenu-inner inventory-sidebar__submenu-list flex flex-col gap-1">
                                         {section.children.map((item) => {
                                             const to = getRouteForMenu(item.key, section.key);
                                             const isActive = location.pathname === to;
@@ -284,7 +546,8 @@ export function Dashboard() {
                                                     key={item.key}
                                                     type="button"
                                                     onClick={() => handleMenuClick(item.key, section.key)}
-                                                    className="relative flex items-center gap-3 px-4 h-9 rounded-xl font-medium text-[12px] transition-colors cursor-pointer"
+                                                    tabIndex={isOpen ? 0 : -1}
+                                                    className="inventory-sidebar__submenu-item relative flex items-center gap-3 rounded-xl font-medium text-[12px] transition-colors cursor-pointer"
                                                     style={{
                                                         background: isActive ? "#4C525E" : "transparent",
                                                         color: isActive ? "#FFFFFF" : "#808191"
@@ -296,7 +559,7 @@ export function Dashboard() {
                                             );
                                         })}
                                     </div>
-                                )}
+                                </div>
                             </div>
                         );
                     })}
@@ -596,56 +859,42 @@ export function Dashboard() {
                     ) : (
                     <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Resale Listings</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{apartments.length}</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+9% from last month</span>
+                        {resaleDashboard.topCards.map((card) => (
+                            <div key={card.label} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                                <div>
+                                    <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>{card.label}</p>
+                                    <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{card.value}</h3>
+                                    <span className={card.accent} style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>{card.hint}</span>
+                                </div>
+                                <img src={card.icon} alt="" className="h-10 w-10" />
                             </div>
-                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Apartment Types</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{apartmentTypes.length}</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+5% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>With Prices</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{apartments.filter(a => a.prices && a.prices.length > 0).length}</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+18% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Avg Room Count</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>
-                                    {apartments.length > 0 ? (apartments.reduce((s, a) => s + a.roomCount, 0) / apartments.length).toFixed(1) : "0"}
-                                </h3>
-                                <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-1.8% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
-                        </div>
+                        ))}
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                             <div className="flex items-center justify-between mb-6">
-                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Revenue Overview</h4>
-                                <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
+                                <div>
+                                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Listing Activity</h4>
+                                    <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Listings created in the last 6 months</span>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
+                                    <span className="rounded-full bg-[#E7F6ED] px-3 py-1 font-medium text-[#2D9A5B]">{resaleDashboard.activeListings} active</span>
+                                    <span className="rounded-full bg-[#FDF4E0] px-3 py-1 font-medium text-[#967B38]">{resaleDashboard.pendingListings} pending</span>
+                                    <span className="rounded-full bg-[#FDECEC] px-3 py-1 font-medium text-[#C3362B]">{resaleDashboard.nonActiveListings} non-active</span>
+                                </div>
                             </div>
                             <div className="relative w-full flex-1 min-h-[260px]">
                                 <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "0%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "20%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "40%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "60%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "80%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "100%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
+                                    {resaleDashboard.chartTicks.map((tick, index) => (
+                                        <span
+                                            key={index}
+                                            className="absolute w-full right-0 pr-3 text-[#1A1A1A]"
+                                            style={{ top: `${index * 20}%`, transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}
+                                        >
+                                            {formatChartValue(tick)}
+                                        </span>
+                                    ))}
                                 </div>
                                 <div className="ml-[72px] relative" style={{ height: "calc(100% - 32px)" }}>
                                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
@@ -664,82 +913,154 @@ export function Dashboard() {
                                                 <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
                                             </linearGradient>
                                         </defs>
-                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15 L 100 100 L 0 100 Z" fill="url(#revenueAreaFillResale)" stroke="none" vectorEffect="non-scaling-stroke" />
-                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15" fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+                                        <path d={resaleDashboard.chartAreaPath} fill="url(#revenueAreaFillResale)" stroke="none" vectorEffect="non-scaling-stroke" />
+                                        <path d={resaleDashboard.chartLinePath} fill="none" stroke="#4E525D" strokeWidth="1.6" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
                                     </svg>
 
-                                    <div className="absolute flex items-center justify-center" style={{ left: "5%", top: "51%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "22%", top: "46%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute" style={{ left: "38%", top: "73%", width: 0, height: 0 }}>
-                                        <div className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }} />
-                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
-                                            <div className="relative">
-                                                <div className="flex items-center justify-center text-white" style={{ width: 45, height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
-                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
-                                                </div>
-                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
+                                    {resaleDashboard.chartPoints.map((point, index) => {
+                                        const isHighlighted = index === resaleDashboard.highlightedActivityIndex;
+                                        const activity = resaleDashboard.listingActivity[index];
+
+                                        return (
+                                            <div key={activity.label} className="absolute" style={{ left: `${point.x}%`, top: `${point.y}%`, width: 0, height: 0 }}>
+                                                <div
+                                                    className={`absolute rounded-full ${isHighlighted ? "bg-[#4E525D]" : "bg-white"}`}
+                                                    style={{
+                                                        left: "50%",
+                                                        top: "50%",
+                                                        width: 14,
+                                                        height: 14,
+                                                        border: "2px solid #4E525D",
+                                                        transform: "translate(-50%, -50%)",
+                                                        boxShadow: isHighlighted ? "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" : "none",
+                                                    }}
+                                                />
+                                                {isHighlighted ? (
+                                                    <>
+                                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
+                                                            <div className="relative">
+                                                                <div className="flex min-w-[54px] items-center justify-center text-white" style={{ height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
+                                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>{activity.count}</span>
+                                                                </div>
+                                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
+                                                    </>
+                                                ) : null}
                                             </div>
-                                        </div>
-                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "55%", top: "69%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "72%", top: "55%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "90%", top: "40%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "38%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Mar</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "55%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Apr</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "72%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>May</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "90%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jun</span>
+                                    {resaleDashboard.chartPoints.map((point, index) => (
+                                        <span
+                                            key={resaleDashboard.listingActivity[index].label}
+                                            className="absolute text-[#1A1A1A]"
+                                            style={{ left: `${point.x}%`, transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}
+                                        >
+                                            {resaleDashboard.listingActivity[index].label}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
                             <div>
                                 <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Type Distribution</h4>
-                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>By apartment type</p>
+                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Live mix from current resale listings</p>
                             </div>
                             <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
                                 <svg width="140" height="140" viewBox="0 0 128 128">
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
-                                        strokeDasharray="150.1 164.1" strokeLinecap="butt" transform="rotate(184 64 64)" />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
-                                        strokeDasharray="57.6 256.6" strokeLinecap="butt" transform="rotate(4 64 64)" />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#0075E3" strokeWidth="13"
-                                        strokeDasharray="68.1 246.1" strokeLinecap="butt" transform="rotate(76 64 64)" />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#E6211B" strokeWidth="13"
-                                        strokeDasharray="15.7 298.5" strokeLinecap="butt" transform="rotate(160 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#EEF1F4" strokeWidth="13" />
+                                    {resaleDashboard.donutSegments.map((segment) => (
+                                        <circle
+                                            key={segment.label}
+                                            cx="64"
+                                            cy="64"
+                                            r="50"
+                                            fill="none"
+                                            stroke={segment.color}
+                                            strokeWidth="13"
+                                            strokeDasharray={segment.dasharray}
+                                            strokeDashoffset={segment.dashoffset}
+                                            strokeLinecap="butt"
+                                            transform="rotate(-90 64 64)"
+                                        />
+                                    ))}
                                 </svg>
+                                <div className="absolute flex flex-col items-center justify-center">
+                                    <span className="text-[28px] font-semibold leading-none text-[#1A1A1A]">{resaleDashboard.totalListings}</span>
+                                    <span className="mt-1 text-[12px] text-[#7F8C8D]">listings</span>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
-                                    <span>{apartmentTypes[0]?.title ?? "Type A"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => a.apartmentType?.id === apartmentTypes[0]?.id).length}</span></span>
+                                {resaleDashboard.donutSegments.length > 0 ? resaleDashboard.donutSegments.map((segment) => (
+                                    <div key={segment.label} className="flex items-center gap-2.5 text-[#555555]">
+                                        <span className="w-3.5 h-3.5 rounded-full flex-shrink-0" style={{ backgroundColor: segment.color }} />
+                                        <span>{segment.label} <span className="font-semibold text-[#2C3E50] ml-0.5">{segment.count}</span></span>
+                                    </div>
+                                )) : (
+                                    <div className="col-span-2 rounded-2xl bg-[#F8F9FA] px-4 py-5 text-center text-sm text-[#7F8C8D]">
+                                        No listing types are in use yet.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>Data Coverage</h4>
+                                    <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Everything already configured for the resale module</p>
                                 </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
-                                    <span>{apartmentTypes[1]?.title ?? "Type B"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => a.apartmentType?.id === apartmentTypes[1]?.id).length}</span></span>
+                                <div className="rounded-full bg-[#F4F5F6] px-3 py-1 text-xs font-medium text-[#4E525D]">
+                                    live inventory snapshot
                                 </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
-                                    <span>{apartmentTypes[2]?.title ?? "Type C"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => a.apartmentType?.id === apartmentTypes[2]?.id).length}</span></span>
+                            </div>
+
+                            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                                {resaleDashboard.dataCoverage.map((item) => (
+                                    <div key={item.label} className="rounded-2xl border border-[#EEF1F4] bg-[#FBFCFD] px-4 py-4">
+                                        <div className="text-sm font-medium text-[#4E525D]">{item.label}</div>
+                                        <div className="mt-2 text-[28px] font-semibold leading-none text-[#1A1A1A]">{item.value}</div>
+                                        <div className="mt-2 text-xs text-[#808191]">{item.hint}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>Listing Quality</h4>
+                            <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>How complete the current resale inventory looks</p>
+
+                            <div className="mt-5 space-y-4">
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Average rooms</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{resaleDashboard.averageRooms.toFixed(1)}</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
-                                    <span>{apartmentTypes[3]?.title ?? "Other"} <span className="font-semibold text-[#2C3E50] ml-0.5">{apartments.filter(a => !apartmentTypes.slice(0, 3).some(t => t.id === a.apartmentType?.id)).length}</span></span>
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Average area</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{resaleDashboard.averageArea.toFixed(1)} m²</span>
+                                    </div>
+                                </div>
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Configured apartment types</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{apartmentTypes.length}</span>
+                                    </div>
+                                </div>
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Listings with price data</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{apartments.filter((apartment) => getPrimaryListingPrice(apartment) > 0).length}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -761,6 +1082,9 @@ export function Dashboard() {
                 {activeMenu === "apartments" && (apartmentId || isCreatingApartment ? <ApartmentForm embedded /> : <ResaleApartmentsCardSection />)}
                 {activeMenu === "apartmentTypes" && <ApartmentTypesSection />}
                 {activeMenu === "owners" && <OwnersSection />}
+                {activeMenu === "locationOptions" && <LocationOptionsSection />}
+                {activeMenu === "resaleViewOptions" && <ViewOptionsSection />}
+                {activeMenu === "heatingTypeOptions" && <HeatingTypeOptionsSection />}
                 {activeMenu === "attributes" && <AttributesSection />}
                 {activeMenu === "requests" && <RequestsSection />}
             </div>

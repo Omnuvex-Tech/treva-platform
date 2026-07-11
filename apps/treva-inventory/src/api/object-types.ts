@@ -5,7 +5,6 @@ export interface ObjectType {
   name: string;
   title: string;
   slug: string;
-  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -14,14 +13,12 @@ export interface CreateObjectTypeData {
   name: string;
   title: string;
   slug: string;
-  order?: number;
 }
 
 export interface UpdateObjectTypeData {
   name?: string;
   title?: string;
   slug?: string;
-  order?: number;
 }
 
 export const objectTypesApi = {

@@ -116,7 +116,7 @@ export function AttributeForm() {
                             className={inputClass}
                             value={form.name}
                             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                            placeholder="e.g. renovation"
+                            placeholder="renovation"
                             required
                         />
                     </div>
@@ -126,7 +126,7 @@ export function AttributeForm() {
                             className={inputClass}
                             value={form.title}
                             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                            placeholder="e.g. Renovation"
+                            placeholder="Renovation"
                             required
                         />
                     </div>
@@ -137,7 +137,7 @@ export function AttributeForm() {
                         className={inputClass}
                         value={form.value}
                         onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}
-                        placeholder="e.g. Modern"
+                        placeholder="Modern"
                         required
                     />
                 </div>
@@ -155,7 +155,7 @@ export function AttributeForm() {
                                 className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/80 text-xs text-white hover:bg-red-500"
                                 title="Remove"
                             >
-                                ✕
+                                âœ•
                             </button>
                             <button
                                 type="button"

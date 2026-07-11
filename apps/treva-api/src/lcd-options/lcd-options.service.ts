@@ -15,12 +15,12 @@ export class LcdOptionsService {
       throw new ConflictException('LCD option with this value already exists');
     }
     return this.prisma.lcdOption.create({
-      data: { value: createDto.value, order: createDto.order ?? 0 },
+      data: { value: createDto.value },
     });
   }
 
   async findAll() {
-    return this.prisma.lcdOption.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.lcdOption.findMany({ orderBy: { value: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -43,7 +43,6 @@ export class LcdOptionsService {
       where: { id },
       data: {
         ...(updateDto.value && { value: updateDto.value }),
-        ...(updateDto.order !== undefined && { order: updateDto.order }),
       },
     });
   }

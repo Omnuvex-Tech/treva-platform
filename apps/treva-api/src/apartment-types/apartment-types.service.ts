@@ -9,16 +9,16 @@ export class ApartmentTypesService {
 
   async create(dto: CreateApartmentTypeDto) {
     const existing = await this.prisma.apartmentType.findUnique({
-      where: { slug: dto.slug },
+      where: { name: dto.name },
     });
     if (existing) {
-      throw new ConflictException('ApartmentType with this slug already exists');
+      throw new ConflictException('ApartmentType with this name already exists');
     }
     return this.prisma.apartmentType.create({ data: dto });
   }
 
   async findAll() {
-    return this.prisma.apartmentType.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.apartmentType.findMany({ orderBy: { title: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -31,9 +31,9 @@ export class ApartmentTypesService {
     const type = await this.prisma.apartmentType.findUnique({ where: { id } });
     if (!type) throw new NotFoundException('ApartmentType not found');
 
-    if (dto.slug && dto.slug !== type.slug) {
-      const existing = await this.prisma.apartmentType.findUnique({ where: { slug: dto.slug } });
-      if (existing) throw new ConflictException('ApartmentType with this slug already exists');
+    if (dto.name && dto.name !== type.name) {
+      const existing = await this.prisma.apartmentType.findUnique({ where: { name: dto.name } });
+      if (existing) throw new ConflictException('ApartmentType with this name already exists');
     }
 
     return this.prisma.apartmentType.update({ where: { id }, data: dto });

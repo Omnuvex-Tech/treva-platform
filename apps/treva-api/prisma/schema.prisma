@@ -22,7 +22,6 @@ model Category {
   slug            String   @unique
   image           String?
   status          String   @default("active")
-  order           Int      @default(0)
   housesCount     Int      @default(0)
   propertiesCount Int      @default(0)
   reservedCount   Int      @default(0)
@@ -52,7 +51,6 @@ model ObjectType {
   name      String
   title     String
   slug      String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -107,21 +105,21 @@ model UnitLayout {
 
 model RoomOption {
   id        String   @id @default(cuid())
-  value     String
+  name      String
+  title     String
   type      String   @default("off-plan") // "resale" | "off-plan"
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   unitLayouts UnitLayout[]
 
-  @@unique([value, type])
+  @@unique([name, type])
 }
 
 model ViewOption {
   id        String       @id @default(cuid())
-  value     String       @unique
-  order     Int          @default(0)
+  name      String       @unique
+  title     String
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 
@@ -131,8 +129,8 @@ model ViewOption {
 model Currency {
   id              String           @id @default(cuid())
   name            String           @unique
+  title           String
   value           String           @unique
-  order           Int              @default(0)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -142,7 +140,6 @@ model Currency {
 model StatusOption {
   id        String   @id @default(cuid())
   value     String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -152,7 +149,6 @@ model StatusOption {
 model LcdOption {
   id        String   @id @default(cuid())
   value     String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -160,7 +156,6 @@ model LcdOption {
 model TypeOfBuildingOption {
   id        String   @id @default(cuid())
   value     String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -168,7 +163,6 @@ model TypeOfBuildingOption {
 model PropertyTypeOption {
   id        String   @id @default(cuid())
   value     String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -176,7 +170,6 @@ model PropertyTypeOption {
 model ConstructionStageOption {
   id        String   @id @default(cuid())
   value     String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -184,7 +177,6 @@ model ConstructionStageOption {
 model SalesOfficeOption {
   id        String   @id @default(cuid())
   value     String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -193,9 +185,8 @@ model SalesOfficeOption {
 
 model ApartmentType {
   id        String   @id @default(cuid())
+  name      String   @unique
   title     String
-  slug      String   @unique
-  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -234,22 +225,45 @@ model Request {
 
 model Apartment {
   id              String        @id @default(cuid())
+  name            String?
   title           String
   slug            String        @unique
   description     String?
+  seoTitle        String?
+  seoDescription  String?
+  seoKeywords     String?
+  canonicalUrl    String?
+  seoImage        String?
   image           String?
+  coverImage      String?
   gallery         Json[]
   priceTotal      Float         @default(0)
   priceByArea     Float         @default(0)
   roomCount       Int
   area            Float
+  netArea         Float?
+  grossArea       Float?
+  livingArea      Float?
+  kitchenArea     Float?
+  balconyArea     Float?
   floorFrom       Int
   floorTo         Int
+  bathroomCount   Int?
+  purpose         String        @default("sale")
+  region          String?
+  city            String?
   locationTitle   String?
   locationUrl     String?
   renovation      String?
+  parking         Boolean?
+  buildingAge     Int?
+  furnishing      String?
+  elevator        Boolean?
+  ceilingHeight   Float?
   kitchenSize     Float?
   wallMaterial    String?
+  heatingTypeIds  String[]      @default([])
+  viewOptionIds   String[]      @default([])
   attributeIds    String[]
   requestIds      String[]
   status          String        @default("active")
@@ -260,6 +274,25 @@ model Apartment {
   prices          ApartmentPrice[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+}
+
+model LocationOption {
+  id        String   @id @default(cuid())
+  type      String
+  name      String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, name])
+}
+
+model HeatingTypeOption {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ApartmentPrice {

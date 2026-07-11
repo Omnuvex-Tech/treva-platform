@@ -27,6 +27,9 @@ const TABS: { key: TabKey; label: string }[] = [
     { key: "description", label: "Description" },
 ];
 
+const SUPPORTED_IMAGE_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
+const IMAGE_UPLOAD_ACCEPT = SUPPORTED_IMAGE_UPLOAD_TYPES.join(",");
+
 function slugify(text: string): string {
     return text
         .toLowerCase()
@@ -277,7 +280,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
             setForm({
                 title: house.title || house.name || "",
                 slug: house.slug || "",
-                apartmentTypeId: findOptionId(roomOptions, firstValue(house.roomOptionId, house.apartmentTypeId, house.houseNameId, house.roomOption?.id, house.roomOption?.value, house.apartmentType?.id, house.apartmentType?.value)),
+                apartmentTypeId: findOptionId(roomOptions, firstValue(house.roomOptionId, house.apartmentTypeId, house.houseNameId, house.roomOption?.id, house.roomOption?.title, house.roomOption?.value, house.apartmentType?.id, house.apartmentType?.value)),
                 ownerId: findOptionId(viewOptions, firstValue(house.viewOptionId, house.ownerId, house.viewOption?.id, house.viewOption?.value)),
                 status: findOptionId(statusOptions, firstValue(house.statusOptionId, house.statusId, house.status, house.statusOption?.id, house.statusOption?.value)) || "active",
                 floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
@@ -370,11 +373,11 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                 if (!form.slug?.trim()) errors.push("Slug is required");
                 if (!form.apartmentTypeId) errors.push("Type is required");
                 if (!form.floorFrom || form.floorFrom < 1) errors.push("Floor From is required");
-                if (form.floorFrom && form.floorFrom > 999) errors.push("Floor From must be ≤ 999");
+                if (form.floorFrom && form.floorFrom > 999) errors.push("Floor From must be â‰¤ 999");
                 if (!form.floorTo || form.floorTo < 1) errors.push("Floor To is required");
-                if (form.floorTo && form.floorTo > 999) errors.push("Floor To must be ≤ 999");
+                if (form.floorTo && form.floorTo > 999) errors.push("Floor To must be â‰¤ 999");
                 if (!form.roomCount || form.roomCount < 1) errors.push("Room Count is required");
-                if (form.roomCount && form.roomCount > 999) errors.push("Room Count must be ≤ 999");
+                if (form.roomCount && form.roomCount > 999) errors.push("Room Count must be â‰¤ 999");
                 break;
             case "area":
                 if (!form.area || form.area <= 0) errors.push("Area is required");
@@ -384,7 +387,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                     const hasAnyTotal = form.prices.some((p) => p.priceTotal && p.priceTotal > 0);
                     const hasAnyPerArea = form.prices.some((p) => p.priceByArea && p.priceByArea > 0);
                     if (!hasAnyTotal) errors.push("Price Total is required");
-                    if (!hasAnyPerArea) errors.push("Price per m² is required");
+                    if (!hasAnyPerArea) errors.push("Price per mÂ² is required");
                 }
                 break;
             case "location":
@@ -480,7 +483,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
     })();
 
     const inputClass =
-        "w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400";
+        "w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none focus:border-gray-400 focus:bg-white";
 
     const renderTabErrors = (tab: TabKey) => {
         const errors = tabErrors[tab];
@@ -501,7 +504,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
         );
     };
 
-    // ─── Gallery Upload ────────────────────────────────────────
+    // â”€â”€â”€ Gallery Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
     const [mainDrag, setMainDrag] = useState(false);
@@ -509,21 +512,37 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
     const fileInputRef = useRef<HTMLInputElement>(null);
     const galleryInputRef = useRef<HTMLInputElement>(null);
 
+    const validateImageFiles = (files: FileList | File[]) => {
+        const items = Array.from(files);
+        const hasUnsupportedFile = items.some((file) => !SUPPORTED_IMAGE_UPLOAD_TYPES.includes(file.type as typeof SUPPORTED_IMAGE_UPLOAD_TYPES[number]));
+
+        if (hasUnsupportedFile) {
+            setUploadError("Only JPEG, PNG, WebP and GIF images are allowed");
+            return null;
+        }
+
+        return items;
+    };
+
     const handleMainImageUpload = async (file: File) => {
+        if (!validateImageFiles([file])) return;
+
         setUploading(true);
         setUploadError("");
         try {
             const res = await unitLayoutsApi.uploadFile(file);
             updateField("image", res.data.url);
-        } catch {
-            setUploadError("Main image upload failed");
+        } catch (error) {
+            setUploadError(getApiErrorMessage(error, "Main image upload failed"));
         } finally {
             setUploading(false);
         }
     };
 
     const handleGalleryUpload = async (files: FileList | File[]) => {
-        const arr = Array.from(files);
+        const arr = validateImageFiles(files);
+        if (!arr) return;
+
         const currentCount = form.gallery?.length || 0;
         if (currentCount + arr.length > 20) {
             setUploadError(`Maximum 20 gallery images allowed. You can add ${20 - currentCount} more.`);
@@ -538,8 +557,8 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                 newItems.push(res.data);
             }
             setForm((f) => ({ ...f, gallery: [...(f.gallery || []), ...newItems] }));
-        } catch {
-            setUploadError("Gallery upload failed");
+        } catch (error) {
+            setUploadError(getApiErrorMessage(error, "Gallery upload failed"));
         } finally {
             setUploading(false);
         }
@@ -560,7 +579,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
         e.stopPropagation();
         setMainDrag(false);
         const file = e.dataTransfer.files?.[0];
-        if (file && file.type.startsWith("image/")) handleMainImageUpload(file);
+        if (file) handleMainImageUpload(file);
     };
 
     const onGalleryDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
@@ -574,7 +593,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
         if (files && files.length > 0) handleGalleryUpload(files);
     };
 
-    // ─── Render ────────────────────────────────────────────────
+    // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (isEditMode && isLoadingHouse) {
         return (
             <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
@@ -629,7 +648,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
             )}
 
             <form onSubmit={handleSubmit}>
-                {/* ─── Tab: Basic Info ──────────────────────── */}
+                {/* â”€â”€â”€ Tab: Basic Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 {activeTab === "basic" && (
                     <div className="space-y-4">
                         {renderTabErrors("basic")}
@@ -642,14 +661,14 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     updateField("title", e.target.value);
                                     handleSlugFromTitle(e.target.value);
                                 }}
-                                placeholder="e.g. Sea Breeze Residence"
+                                placeholder="Sea Breeze Residence"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <FormDropdown
                                 label="House name *"
                                 value={form.apartmentTypeId || ""}
-                                options={dropdownOptions(roomOptions, form.apartmentTypeId || "", (t) => ({ id: t.id, label: t.value }))}
+                                options={dropdownOptions(roomOptions, form.apartmentTypeId || "", (t) => ({ id: t.id, label: t.title }))}
                                 placeholder="Select house name"
                                 onChange={(id) => updateField("apartmentTypeId", id)}
                             />
@@ -700,7 +719,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     className={inputClass}
                                     value={form.renovation || ""}
                                     onChange={(e) => updateField("renovation", e.target.value)}
-                                    placeholder="e.g. Renovated"
+                                    placeholder="Renovated"
                                 />
                             </div>
                             <div>
@@ -709,7 +728,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     className={inputClass}
                                     value={form.wallMaterial || ""}
                                     onChange={(e) => updateField("wallMaterial", e.target.value)}
-                                    placeholder="e.g. Brick"
+                                    placeholder="Brick"
                                 />
                             </div>
                         </div>
@@ -723,7 +742,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                         setSlugManuallyEdited(true);
                                         updateField("slug", e.target.value);
                                     }}
-                                    placeholder="e.g. sea-breeze-residence"
+                                    placeholder="sea-breeze-residence"
                                 />
                             </div>
                             <FormDropdown
@@ -742,7 +761,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     type="number"
                                     value={form.floorFrom ?? ""}
                                     onChange={(e) => updateField("floorFrom", parseInt(e.target.value) || undefined)}
-                                    placeholder="e.g. 8"
+                                    placeholder="8"
                                     min={1}
                                     max={999}
                                 />
@@ -754,7 +773,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     type="number"
                                     value={form.floorTo ?? ""}
                                     onChange={(e) => updateField("floorTo", parseInt(e.target.value) || undefined)}
-                                    placeholder="e.g. 16"
+                                    placeholder="16"
                                     min={1}
                                     max={999}
                                 />
@@ -766,7 +785,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     type="number"
                                     value={form.roomCount ?? ""}
                                     onChange={(e) => updateField("roomCount", parseInt(e.target.value) || undefined)}
-                                    placeholder="e.g. 2"
+                                    placeholder="2"
                                     min={1}
                                     max={999}
                                 />
@@ -808,14 +827,14 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="mb-1 block text-xs text-[#4E525D]">Kitchen Size (m²)</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Kitchen Size (mÂ²)</label>
                                 <input
                                     className={inputClass}
                                     type="number"
                                     step="0.1"
                                     value={form.kitchenSize ?? ""}
                                     onChange={(e) => updateField("kitchenSize", parseFloat(e.target.value) || undefined)}
-                                    placeholder="e.g. 15"
+                                    placeholder="15"
                                     min={0}
                                 />
                             </div>
@@ -906,20 +925,20 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                     </div>
                 )}
 
-                {/* ─── Tab: Area & Pricing ──────────────────── */}
+                {/* â”€â”€â”€ Tab: Area & Pricing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 {activeTab === "area" && (
                     <div className="space-y-4">
                         {renderTabErrors("area")}
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="mb-1 block text-xs text-[#4E525D]">Area (m²)</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Area (mÂ²)</label>
                                 <input
                                     className={inputClass}
                                     type="number"
                                     step="0.1"
                                     value={form.area ?? ""}
                                     onChange={(e) => updateField("area", parseFloat(e.target.value) || undefined)}
-                                    placeholder="e.g. 60.5"
+                                    placeholder="60.5"
                                     min={0}
                                 />
                             </div>
@@ -933,7 +952,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                         const existingPrice = form.prices?.find((p: any) => p.currencyId === cur.id);
                                         return (
                                             <div key={cur.id} className="rounded-xl border border-gray-200 bg-[#F4F5F6] p-3">
-                                                <div className="mb-2 text-xs font-medium text-[#666666]">{cur.name} ({cur.value})</div>
+                                                <div className="mb-2 text-xs font-medium text-[#666666]">{cur.title || cur.name} ({cur.value})</div>
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>
                                                         <label className="mb-1 block text-xs text-[#4E525D]">Price Total</label>
@@ -957,12 +976,12 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                                                 }
                                                                 updateField("prices", prices);
                                                             }}
-                                                            placeholder="e.g. 175,000"
+                                                            placeholder="175,000"
                                                             min={0}
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="mb-1 block text-xs text-[#4E525D]">Price per m²</label>
+                                                        <label className="mb-1 block text-xs text-[#4E525D]">Price per mÂ²</label>
                                                         <input
                                                             className={inputClass}
                                                             type="number"
@@ -983,7 +1002,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                                                 }
                                                                 updateField("prices", prices);
                                                             }}
-                                                            placeholder="e.g. 2,917"
+                                                            placeholder="2,917"
                                                             min={0}
                                                         />
                                                     </div>
@@ -997,7 +1016,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                     </div>
                 )}
 
-                {/* ─── Tab: Location ─────────────────────────── */}
+                {/* â”€â”€â”€ Tab: Location â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 {activeTab === "location" && (
                     <div className="space-y-4">
                         {renderTabErrors("location")}
@@ -1007,7 +1026,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                 className={inputClass}
                                 value={form.locationTitle || ""}
                                 onChange={(e) => updateField("locationTitle", e.target.value)}
-                                placeholder="e.g. Baku city, Murtuza Mukhtarov str, house 31"
+                                placeholder="Baku city, Murtuza Mukhtarov str, house 31"
                             />
                         </div>
                         <div>
@@ -1016,7 +1035,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                 className={inputClass}
                                 value={form.locationUrl || ""}
                                 onChange={(e) => updateField("locationUrl", e.target.value)}
-                                placeholder="e.g. https://maps.google.com/..."
+                                placeholder="https://maps.google.com/..."
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -1026,7 +1045,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     className={inputClass}
                                     value={form.street || ""}
                                     onChange={(e) => updateField("street", e.target.value)}
-                                    placeholder="e.g. Neftchilar Avenue"
+                                    placeholder="Neftchilar Avenue"
                                 />
                             </div>
                             <div>
@@ -1035,7 +1054,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     className={inputClass}
                                     value={form.houseNumber || ""}
                                     onChange={(e) => updateField("houseNumber", e.target.value)}
-                                    placeholder="e.g. 42"
+                                    placeholder="42"
                                 />
                             </div>
                         </div>
@@ -1045,7 +1064,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                 className={inputClass}
                                 value={form.contractAddress || ""}
                                 onChange={(e) => updateField("contractAddress", e.target.value)}
-                                placeholder="e.g. 123 Main Street, Building 5"
+                                placeholder="123 Main Street, Building 5"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -1055,7 +1074,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     className={inputClass}
                                     value={form.landCadastralNumber || ""}
                                     onChange={(e) => updateField("landCadastralNumber", e.target.value)}
-                                    placeholder="e.g. 123456789"
+                                    placeholder="123456789"
                                 />
                             </div>
                             <div>
@@ -1064,7 +1083,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     className={inputClass}
                                     value={form.showroomAvailability || ""}
                                     onChange={(e) => updateField("showroomAvailability", e.target.value)}
-                                    placeholder="e.g. Yes / No"
+                                    placeholder="Yes / No"
                                 />
                             </div>
                         </div>
@@ -1080,7 +1099,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                     </div>
                 )}
 
-                {/* ─── Tab: Gallery ─────────────────────────── */}
+                {/* â”€â”€â”€ Tab: Gallery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 {activeTab === "gallery" && (
                     <div className="space-y-6">
                         {renderTabErrors("gallery")}
@@ -1100,7 +1119,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                         className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#C3362B] text-xs text-white hover:opacity-90"
                                         title="Remove"
                                     >
-                                        ✕
+                                        âœ•
                                     </button>
                                     <button
                                         type="button"
@@ -1139,7 +1158,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept="image/*"
+                                accept={IMAGE_UPLOAD_ACCEPT}
                                 className="hidden"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
@@ -1183,7 +1202,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                             <input
                                 ref={galleryInputRef}
                                 type="file"
-                                accept="image/*"
+                                accept={IMAGE_UPLOAD_ACCEPT}
                                 multiple
                                 className="hidden"
                                 onChange={(e) => {
@@ -1206,7 +1225,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                                 onClick={() => removeGalleryItem(idx)}
                                                 className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#C3362B] text-[10px] text-white opacity-0 transition-opacity hover:opacity-90 group-hover:opacity-100"
                                             >
-                                                ✕
+                                                âœ•
                                             </button>
                                             <div className="absolute bottom-1 left-1 rounded bg-[#4E525D] px-1 py-0.5 text-[9px] text-white opacity-0 transition-opacity group-hover:opacity-100">
                                                 {idx + 1}
@@ -1219,7 +1238,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                     </div>
                 )}
 
-                {/* ─── Tab: Description ─────────────────────── */}
+                {/* â”€â”€â”€ Tab: Description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 {activeTab === "description" && (
                     <div className="space-y-4">
                         <div>
@@ -1234,7 +1253,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                     </div>
                 )}
 
-                {/* ─── Actions ──────────────────────────────── */}
+                {/* â”€â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 <div className="mt-6 flex gap-3 pt-2">
                     <button
                         type="submit"

@@ -8,11 +8,16 @@ export class CurrenciesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createDto: CreateCurrencyDto) {
-    const existing = await this.prisma.currency.findUnique({
-      where: { value: createDto.value },
-    });
+    const [existingByName, existingByValue] = await Promise.all([
+      this.prisma.currency.findUnique({ where: { name: createDto.name } }),
+      this.prisma.currency.findUnique({ where: { value: createDto.value } }),
+    ]);
 
-    if (existing) {
+    if (existingByName) {
+      throw new ConflictException('Currency with this name already exists');
+    }
+
+    if (existingByValue) {
       throw new ConflictException('Currency with this value already exists');
     }
 
@@ -20,7 +25,7 @@ export class CurrenciesService {
   }
 
   async findAll() {
-    return this.prisma.currency.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.currency.findMany({ orderBy: { title: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -37,11 +42,20 @@ export class CurrenciesService {
       throw new NotFoundException('Currency not found');
     }
 
+    if (updateDto.name && updateDto.name !== currency.name) {
+      const existingByName = await this.prisma.currency.findUnique({
+        where: { name: updateDto.name },
+      });
+      if (existingByName) {
+        throw new ConflictException('Currency with this name already exists');
+      }
+    }
+
     if (updateDto.value && updateDto.value !== currency.value) {
-      const existing = await this.prisma.currency.findUnique({
+      const existingByValue = await this.prisma.currency.findUnique({
         where: { value: updateDto.value },
       });
-      if (existing) {
+      if (existingByValue) {
         throw new ConflictException('Currency with this value already exists');
       }
     }

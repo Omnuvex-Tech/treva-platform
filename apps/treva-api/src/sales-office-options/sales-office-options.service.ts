@@ -15,12 +15,12 @@ export class SalesOfficeOptionsService {
       throw new ConflictException('Sales office option with this value already exists');
     }
     return this.prisma.salesOfficeOption.create({
-      data: { value: createDto.value, order: createDto.order ?? 0 },
+      data: { value: createDto.value },
     });
   }
 
   async findAll() {
-    return this.prisma.salesOfficeOption.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.salesOfficeOption.findMany({ orderBy: { value: 'asc' } });
   }
 
   async findOne(id: string) {
@@ -43,7 +43,6 @@ export class SalesOfficeOptionsService {
       where: { id },
       data: {
         ...(updateDto.value && { value: updateDto.value }),
-        ...(updateDto.order !== undefined && { order: updateDto.order }),
       },
     });
   }

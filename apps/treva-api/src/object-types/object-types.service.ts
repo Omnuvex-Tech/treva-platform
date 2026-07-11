@@ -18,7 +18,7 @@ export class ObjectTypesService {
   }
 
   async findAll() {
-    return this.prisma.objectType.findMany({ orderBy: { order: 'asc' } });
+    return this.prisma.objectType.findMany({ orderBy: { title: 'asc' } });
   }
 
   async findOne(id: string) {

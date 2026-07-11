@@ -7,8 +7,8 @@ export function ViewOptionList() {
     const queryClient = useQueryClient();
     const [showForm, setShowForm] = useState(false);
     const [editItem, setEditItem] = useState<ViewOption | null>(null);
-    const [value, setValue] = useState("");
-    const [order, setOrder] = useState<number>(0);
+    const [name, setName] = useState("");
+    const [title, setTitle] = useState("");
     const [error, setError] = useState("");
 
     const { data: viewOptions, isLoading } = useQuery({
@@ -17,7 +17,7 @@ export function ViewOptionList() {
     });
 
     const createMutation = useMutation({
-        mutationFn: () => viewOptionsApi.create({ value: value.trim(), order }),
+        mutationFn: () => viewOptionsApi.create({ name: name.trim(), title: title.trim() }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["view-options"] });
             resetForm();
@@ -29,7 +29,7 @@ export function ViewOptionList() {
 
     const updateMutation = useMutation({
         mutationFn: () =>
-            viewOptionsApi.update(editItem!.id, { value: value.trim(), order }),
+            viewOptionsApi.update(editItem!.id, { name: name.trim(), title: title.trim() }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["view-options"] });
             resetForm();
@@ -49,15 +49,15 @@ export function ViewOptionList() {
     const resetForm = () => {
         setShowForm(false);
         setEditItem(null);
-        setValue("");
-        setOrder(0);
+        setName("");
+        setTitle("");
         setError("");
     };
 
     const handleEdit = (item: ViewOption) => {
         setEditItem(item);
-        setValue(item.value);
-        setOrder(item.order);
+        setName(item.name);
+        setTitle(item.title);
         setError("");
         setShowForm(true);
     };
@@ -65,8 +65,12 @@ export function ViewOptionList() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        if (!value.trim()) {
-            setError("Value is required");
+        if (!name.trim()) {
+            setError("Name is required");
+            return;
+        }
+        if (!title.trim()) {
+            setError("Title is required");
             return;
         }
         if (editItem) {
@@ -76,8 +80,8 @@ export function ViewOptionList() {
         }
     };
 
-    const handleDelete = (id: string, val: string) => {
-        if (window.confirm(`Delete view option "${val}"?`)) {
+    const handleDelete = (id: string, itemTitle: string) => {
+        if (window.confirm(`Delete view option "${itemTitle}"?`)) {
             deleteMutation.mutate(id);
         }
     };
@@ -110,35 +114,35 @@ export function ViewOptionList() {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                    Value <span className="text-red-400">*</span>
+                                    Name <span className="text-red-400">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    value={value}
-                                    onChange={(e) => setValue(e.target.value)}
-                                    placeholder="e.g. Sea view, City view, Park view"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="sea-view"
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                     required
                                     autoFocus
                                 />
                                 <p className="mt-1 text-xs text-white/40">
-                                    The label shown on the filter button (e.g. "Sea view")
+                                    Internal unique name used in the system.
                                 </p>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                    Order
+                                    Title <span className="text-red-400">*</span>
                                 </label>
                                 <input
-                                    type="number"
-                                    value={order}
-                                    onChange={(e) => setOrder(parseInt(e.target.value) || 0)}
-                                    placeholder="e.g. 0"
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="Sea View"
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                    min={0}
+                                    required
                                 />
                                 <p className="mt-1 text-xs text-white/40">
-                                    Sort order on the filter (lower = shown first)
+                                    Label shown in dropdowns and filters.
                                 </p>
                             </div>
                         </div>
@@ -171,8 +175,8 @@ export function ViewOptionList() {
                     <table className="w-full text-left text-sm">
                         <thead className="border-b border-white/10 bg-white/5">
                             <tr>
-                                <th className="px-4 py-3 font-medium">Value</th>
-                                <th className="px-4 py-3 font-medium">Order</th>
+                                <th className="px-4 py-3 font-medium">Name</th>
+                                <th className="px-4 py-3 font-medium">Title</th>
                                 <th className="px-4 py-3 font-medium">Created</th>
                                 <th className="px-4 py-3 font-medium text-right">Actions</th>
                             </tr>
@@ -185,10 +189,10 @@ export function ViewOptionList() {
                                 >
                                     <td className="px-4 py-3">
                                         <span className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-bold tracking-wider">
-                                            {item.value}
+                                            {item.name}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-white/70">{item.order}</td>
+                                    <td className="px-4 py-3 text-white/80">{item.title}</td>
                                     <td className="px-4 py-3 text-white/50">
                                         {new Date(item.createdAt).toLocaleDateString()}
                                     </td>
@@ -200,7 +204,7 @@ export function ViewOptionList() {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(item.id, item.value)}
+                                            onClick={() => handleDelete(item.id, item.title)}
                                             className="text-red-400 hover:text-red-300"
                                         >
                                             Delete
@@ -211,7 +215,7 @@ export function ViewOptionList() {
                             {items.length === 0 && (
                                 <tr>
                                     <td colSpan={4} className="px-4 py-8 text-center text-white/50">
-                                        No view options yet. Add "Sea view", "City view" to get started.
+                                        No view options yet. Add "sea-view / Sea View" to get started.
                                     </td>
                                 </tr>
                             )}

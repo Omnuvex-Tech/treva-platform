@@ -3,19 +3,16 @@ import apiClient from "./client";
 export interface StatusOption {
     id: string;
     value: string;
-    order: number;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateStatusOptionData {
     value: string;
-    order?: number;
 }
 
 export interface UpdateStatusOptionData {
     value?: string;
-    order?: number;
 }
 
 export const statusOptionsApi = {

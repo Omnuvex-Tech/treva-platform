@@ -8,8 +8,8 @@ export function CurrencyList() {
     const [showForm, setShowForm] = useState(false);
     const [editItem, setEditItem] = useState<Currency | null>(null);
     const [name, setName] = useState("");
+    const [title, setTitle] = useState("");
     const [value, setValue] = useState("");
-    const [order, setOrder] = useState<number>(0);
     const [error, setError] = useState("");
 
     const { data: currencies, isLoading } = useQuery({
@@ -18,7 +18,7 @@ export function CurrencyList() {
     });
 
     const createMutation = useMutation({
-        mutationFn: () => currenciesApi.create({ name: name.trim(), value: value.trim().toUpperCase(), order }),
+        mutationFn: () => currenciesApi.create({ name: name.trim(), title: title.trim(), value: value.trim().toUpperCase() }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["currencies"] });
             resetForm();
@@ -30,7 +30,7 @@ export function CurrencyList() {
 
     const updateMutation = useMutation({
         mutationFn: () =>
-            currenciesApi.update(editItem!.id, { name: name.trim(), value: value.trim().toUpperCase(), order }),
+            currenciesApi.update(editItem!.id, { name: name.trim(), title: title.trim(), value: value.trim().toUpperCase() }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["currencies"] });
             resetForm();
@@ -51,16 +51,16 @@ export function CurrencyList() {
         setShowForm(false);
         setEditItem(null);
         setName("");
+        setTitle("");
         setValue("");
-        setOrder(0);
         setError("");
     };
 
     const handleEdit = (item: Currency) => {
         setEditItem(item);
         setName(item.name);
+        setTitle(item.title);
         setValue(item.value);
-        setOrder(item.order);
         setError("");
         setShowForm(true);
     };
@@ -74,6 +74,10 @@ export function CurrencyList() {
         }
         if (!value.trim()) {
             setError("Value is required");
+            return;
+        }
+        if (!title.trim()) {
+            setError("Title is required");
             return;
         }
         if (editItem) {
@@ -123,13 +127,29 @@ export function CurrencyList() {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="e.g. US Dollar"
+                                    placeholder="US Dollar"
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                     required
                                     autoFocus
                                 />
                                 <p className="mt-1 text-xs text-white/40">
-                                    Full name of the currency
+                                    System name of the currency
+                                </p>
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-white/70">
+                                    Title <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="US Dollar"
+                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                                    required
+                                />
+                                <p className="mt-1 text-xs text-white/40">
+                                    Visible title of the currency
                                 </p>
                             </div>
                             <div>
@@ -140,28 +160,12 @@ export function CurrencyList() {
                                     type="text"
                                     value={value}
                                     onChange={(e) => setValue(e.target.value)}
-                                    placeholder="e.g. USD"
+                                    placeholder="USD"
                                     className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                                     required
                                 />
                                 <p className="mt-1 text-xs text-white/40">
                                     Currency code (e.g. "USD", "AZN", "EUR")
-                                </p>
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-white/70">
-                                    Order
-                                </label>
-                                <input
-                                    type="number"
-                                    value={order}
-                                    onChange={(e) => setOrder(parseInt(e.target.value) || 0)}
-                                    placeholder="e.g. 0"
-                                    className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
-                                    min={0}
-                                />
-                                <p className="mt-1 text-xs text-white/40">
-                                    Sort order (lower = shown first)
                                 </p>
                             </div>
                         </div>
@@ -195,8 +199,8 @@ export function CurrencyList() {
                         <thead className="border-b border-white/10 bg-white/5">
                             <tr>
                                 <th className="px-4 py-3 font-medium">Name</th>
+                                <th className="px-4 py-3 font-medium">Title</th>
                                 <th className="px-4 py-3 font-medium">Value</th>
-                                <th className="px-4 py-3 font-medium">Order</th>
                                 <th className="px-4 py-3 font-medium">Created</th>
                                 <th className="px-4 py-3 font-medium text-right">Actions</th>
                             </tr>
@@ -208,12 +212,12 @@ export function CurrencyList() {
                                     className="border-b border-white/5 transition-colors hover:bg-white/3"
                                 >
                                     <td className="px-4 py-3 text-white/80">{item.name}</td>
+                                    <td className="px-4 py-3 text-white/80">{item.title}</td>
                                     <td className="px-4 py-3">
                                         <span className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-bold tracking-wider">
                                             {item.value}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-white/70">{item.order}</td>
                                     <td className="px-4 py-3 text-white/50">
                                         {new Date(item.createdAt).toLocaleDateString()}
                                     </td>

@@ -1,12 +1,6 @@
-/*
-  Warnings:
-
-  - Made the column `documents` on table `Category` required. This step will fail if there are existing NULL values in that column.
-
-*/
 -- AlterTable
 ALTER TABLE "Category" ADD COLUMN     "type" TEXT NOT NULL DEFAULT 'object',
-ALTER COLUMN "documents" SET NOT NULL;
+ADD COLUMN IF NOT EXISTS "documents" JSONB NOT NULL DEFAULT '[]';
 
 -- CreateTable
 CREATE TABLE "LcdOption" (

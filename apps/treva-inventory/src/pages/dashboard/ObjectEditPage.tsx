@@ -187,7 +187,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    {/* ── Section 1: Edit Object Form ── */}
+                    {/* â”€â”€ Section 1: Edit Object Form â”€â”€ */}
                     <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
                         <div className="flex items-center gap-1.5 pb-4">
                             <h2 style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">Object information</h2>
@@ -209,7 +209,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className={inputClass}
                                         value={formData.propertyName || ""}
                                         onChange={(e) => updateField("propertyName", e.target.value)}
-                                        placeholder="e.g. Sea Breeze Residence"
+                                        placeholder="Sea Breeze Residence"
                                     />
                                 </div>
                             </div>
@@ -221,7 +221,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className={inputClass}
                                         value={formData.slug || ""}
                                         onChange={(e) => updateField("slug", e.target.value)}
-                                        placeholder="e.g. sea-breeze-residence"
+                                        placeholder="sea-breeze-residence"
                                     />
                                 </div>
                                 <FormDropdown
@@ -245,7 +245,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className={inputClass}
                                         value={formData.region || ""}
                                         onChange={(e) => updateField("region", e.target.value)}
-                                        placeholder="e.g. Dubai Marina"
+                                        placeholder="Dubai Marina"
                                     />
                                 </div>
                                 <div>
@@ -254,7 +254,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className={inputClass}
                                         value={formData.area || ""}
                                         onChange={(e) => updateField("area", e.target.value)}
-                                        placeholder="e.g. 2500 m²"
+                                        placeholder="2500 mÂ²"
                                     />
                                 </div>
                             </div>
@@ -266,7 +266,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className={inputClass}
                                         value={formData.city || ""}
                                         onChange={(e) => updateField("city", e.target.value)}
-                                        placeholder="e.g. Baku"
+                                        placeholder="Baku"
                                     />
                                 </div>
                                 <div>
@@ -275,7 +275,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className={inputClass}
                                         value={formData.developerBrand || ""}
                                         onChange={(e) => updateField("developerBrand", e.target.value)}
-                                        placeholder="e.g. ABC Development"
+                                        placeholder="ABC Development"
                                     />
                                 </div>
                             </div>
@@ -286,7 +286,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                     className={inputClass}
                                     value={formData.website || ""}
                                     onChange={(e) => updateField("website", e.target.value)}
-                                    placeholder="e.g. https://example.com"
+                                    placeholder="https://example.com"
                                 />
                             </div>
 
@@ -296,7 +296,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                     className={inputClass}
                                     value={formData.banks || ""}
                                     onChange={(e) => updateField("banks", e.target.value)}
-                                    placeholder="e.g. Kapital Bank, PASHA Bank"
+                                    placeholder="Kapital Bank, PASHA Bank"
                                 />
                             </div>
 
@@ -306,7 +306,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                     className={inputClass}
                                     value={formData.infrastructure || ""}
                                     onChange={(e) => updateField("infrastructure", e.target.value)}
-                                    placeholder="e.g. Swimming pool, Gym, Parking"
+                                    placeholder="Swimming pool, Gym, Parking"
                                 />
                             </div>
 
@@ -316,7 +316,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                     className={inputClass}
                                     value={formData.salesDepartment || ""}
                                     onChange={(e) => updateField("salesDepartment", e.target.value)}
-                                    placeholder="e.g. sales@example.com"
+                                    placeholder="sales@example.com"
                                 />
                             </div>
 
@@ -345,7 +345,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                         </div>
                     </div>
 
-                    {/* ── Section 2: Property Information (read-only) ── */}
+                    {/* â”€â”€ Section 2: Property Information (read-only) â”€â”€ */}
                     <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
                         <div className="flex items-center gap-1.5 pb-4">
                             <h2 style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">Property Information</h2>
@@ -390,7 +390,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     </div>
                 </form>
 
-                {/* ── Section 3: General Plans ── */}
+                {/* â”€â”€ Section 3: General Plans â”€â”€ */}
                 <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs min-h-[200px]">
                     <div className="flex items-center gap-1.5 pb-4">
                         <h2 style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px" }} className="text-[#1A1A1A]">General plans</h2>
@@ -459,7 +459,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     )}
                 </div>
 
-                {/* ── Section 4: Make a home (inline HouseForm) ── */}
+                {/* â”€â”€ Section 4: Make a home (inline HouseForm) â”€â”€ */}
                 <div ref={houseFormRef}>
                     <HouseForm
                         inline
@@ -472,7 +472,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     />
                 </div>
 
-                {/* ── Section 5: List of Houses ── */}
+                {/* â”€â”€ Section 5: List of Houses â”€â”€ */}
                 <div className="bg-white border border-[#EAECEF] rounded-[16px] p-5 mb-6 shadow-xs">
                     <div className="w-full flex items-center justify-between mb-4">
                         <h2 style={{ fontWeight: 500, fontSize: 16, lineHeight: "20px" }} className="text-[#1A1A1A]">List of houses</h2>
@@ -517,7 +517,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                             </div>
                                             <div className="px-1 pb-1">
                                                 <p className="text-[14px] font-semibold text-[#1A1A1A] truncate">{house.title}</p>
-                                                <p className="text-[12px] text-[#999]">{house.totalArea} m² · {house.roomOption?.value || `${house.number || 0} rooms`}</p>
+                                                <p className="text-[12px] text-[#999]">{house.totalArea} mÃ‚Â² Ã‚Â· {house.roomOption?.title || `${house.number || 0} rooms`}</p>
                                             </div>
                                             <div className="flex gap-1 px-1 pb-1">
                                                 <button

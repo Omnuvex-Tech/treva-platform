@@ -1,7 +1,7 @@
 import { apartmentTypesApi, type ApartmentType } from "../../api/apartment-types";
 import { CrudSection } from "../../components/CrudSection";
 import { useEntityCrud } from "../../hooks/useEntityCrud";
-import { createDuplicateToken, duplicateSlug, duplicateText } from "../../utils/duplicate";
+import { createDuplicateToken, duplicateText } from "../../utils/duplicate";
 
 export function ApartmentTypesSection() {
     const {
@@ -21,16 +21,14 @@ export function ApartmentTypesSection() {
         queryKey: ["apartment-types"],
         queryFn: () => apartmentTypesApi.getAll(),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
-        createEmptyForm: () => ({ title: "", slug: "", order: "" }),
+        createEmptyForm: () => ({ name: "", title: "" }),
         mapItemToForm: (item: ApartmentType) => ({
+            name: item.name,
             title: item.title,
-            slug: item.slug,
-            order: item.order != null ? String(item.order) : "",
         }),
         buildPayload: (nextForm) => ({
+            name: nextForm.name,
             title: nextForm.title,
-            slug: nextForm.slug,
-            order: nextForm.order ? Number(nextForm.order) : undefined,
         }),
         createFn: (payload) => apartmentTypesApi.create(payload),
         updateFn: (itemId, payload) => apartmentTypesApi.update(itemId, payload),
@@ -41,9 +39,8 @@ export function ApartmentTypesSection() {
         buildDuplicatePayload: (item: ApartmentType) => {
             const token = createDuplicateToken();
             return {
+                name: duplicateText(item.name, token),
                 title: duplicateText(item.title, token),
-                slug: duplicateSlug(item.slug, token),
-                order: item.order,
             };
         },
     });
@@ -56,18 +53,14 @@ export function ApartmentTypesSection() {
             showForm={showForm}
             formContent={
                 <form onSubmit={submitForm} className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <div className="mb-4 grid grid-cols-3 gap-4">
+                    <div className="mb-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="mb-1 block text-xs text-[#666666]">Name</label>
+                            <input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
+                        </div>
                         <div>
                             <label className="mb-1 block text-xs text-[#666666]">Title</label>
                             <input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs text-[#666666]">Slug</label>
-                            <input value={form.slug} onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" required />
-                        </div>
-                        <div>
-                            <label className="mb-1 block text-xs text-[#666666]">Order</label>
-                            <input type="number" value={form.order} onChange={(e) => setForm((prev) => ({ ...prev, order: e.target.value }))} className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400" />
                         </div>
                     </div>
                     <div className="flex gap-2">
@@ -82,18 +75,16 @@ export function ApartmentTypesSection() {
             }
             isLoading={isLoading}
             columns={[
+                { key: "name", label: "Name" },
                 { key: "title", label: "Title" },
-                { key: "slug", label: "Slug" },
-                { key: "order", label: "Order" },
             ]}
             items={items}
             emptyText="No apartment types yet"
             getRowKey={(item) => item.id}
             renderCells={(item) => (
                 <>
+                    <td className="px-4 py-3 text-[#666666]">{item.name}</td>
                     <td className="px-4 py-3 text-[#1A1A1A]">{item.title}</td>
-                    <td className="px-4 py-3 text-[#666666]">{item.slug}</td>
-                    <td className="px-4 py-3 text-[#666666]">{item.order}</td>
                 </>
             )}
             onEdit={openEdit}

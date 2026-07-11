@@ -9,9 +9,36 @@ const APARTMENT_INCLUDE = {
   prices: { include: { currency: true } },
 };
 
+const isDefined = <T>(value: T | undefined): value is T => value !== undefined;
+
 @Injectable()
 export class ApartmentsService {
   constructor(private prisma: PrismaService) {}
+
+  private async attachOptionRelations<T extends { heatingTypeIds: string[]; viewOptionIds: string[] }>(
+    apartments: T[],
+  ) {
+    const heatingTypeIds = [...new Set(apartments.flatMap((apartment) => apartment.heatingTypeIds || []))];
+    const viewOptionIds = [...new Set(apartments.flatMap((apartment) => apartment.viewOptionIds || []))];
+
+    const [heatingTypes, viewOptions] = await Promise.all([
+      heatingTypeIds.length > 0
+        ? this.prisma.heatingTypeOption.findMany({ where: { id: { in: heatingTypeIds } } })
+        : Promise.resolve([]),
+      viewOptionIds.length > 0
+        ? this.prisma.viewOption.findMany({ where: { id: { in: viewOptionIds } } })
+        : Promise.resolve([]),
+    ]);
+
+    const heatingTypeMap = new Map(heatingTypes.map((item) => [item.id, item]));
+    const viewOptionMap = new Map(viewOptions.map((item) => [item.id, item]));
+
+    return apartments.map((apartment) => ({
+      ...apartment,
+      heatingTypes: (apartment.heatingTypeIds || []).map((id) => heatingTypeMap.get(id)).filter(isDefined),
+      viewOptions: (apartment.viewOptionIds || []).map((id) => viewOptionMap.get(id)).filter(isDefined),
+    }));
+  }
 
   private async resolveAttributes(attributeIds: string[]) {
     if (!attributeIds || attributeIds.length === 0) return [];
@@ -45,7 +72,7 @@ export class ApartmentsService {
 
     const { prices, ...apartmentData } = dto;
 
-    return this.prisma.apartment.create({
+    const created = await this.prisma.apartment.create({
       data: {
         ...apartmentData,
         ...(prices && prices.length > 0
@@ -62,6 +89,9 @@ export class ApartmentsService {
       },
       include: APARTMENT_INCLUDE,
     });
+
+    const [apartmentWithOptions] = await this.attachOptionRelations([created]);
+    return apartmentWithOptions;
   }
 
   async findAll(query: {
@@ -122,8 +152,10 @@ export class ApartmentsService {
       attributes: apartment.attributeIds.map((id) => attrMap.get(id)).filter(Boolean),
     }));
 
+    const dataWithOptions = await this.attachOptionRelations(dataWithAttributes);
+
     return {
-      data: dataWithAttributes,
+      data: dataWithOptions,
       pagination: {
         page,
         limit,
@@ -140,7 +172,8 @@ export class ApartmentsService {
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
-    return { ...apartment, attributes };
+    const [apartmentWithOptions] = await this.attachOptionRelations([{ ...apartment, attributes }]);
+    return apartmentWithOptions;
   }
 
   async findBySlug(slug: string) {
@@ -150,7 +183,8 @@ export class ApartmentsService {
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
-    return { ...apartment, attributes };
+    const [apartmentWithOptions] = await this.attachOptionRelations([{ ...apartment, attributes }]);
+    return apartmentWithOptions;
   }
 
   async update(id: string, dto: UpdateApartmentDto) {
@@ -178,11 +212,14 @@ export class ApartmentsService {
       }
     }
 
-    return this.prisma.apartment.update({
+    const updated = await this.prisma.apartment.update({
       where: { id },
       data: apartmentData,
       include: APARTMENT_INCLUDE,
     });
+
+    const [apartmentWithOptions] = await this.attachOptionRelations([updated]);
+    return apartmentWithOptions;
   }
 
   async remove(id: string) {

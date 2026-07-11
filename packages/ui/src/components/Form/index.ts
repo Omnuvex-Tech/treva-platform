@@ -6,3 +6,4 @@ export { FormDropdown } from "./FormDropdown";
 export { FormImageField } from "./FormImageField";
 export { FormTabSwitcher } from "./FormTabSwitcher";
 export { FormAddButton } from "./FormAddButton";
+export { FormKeywordInput } from "./FormKeywordInput";

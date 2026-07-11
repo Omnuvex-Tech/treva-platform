@@ -26,6 +26,8 @@ import { TypeOfBuildingOptionsModule } from './type-of-building-options/type-of-
 import { PropertyTypeOptionsModule } from './property-type-options/property-type-options.module';
 import { ConstructionStageOptionsModule } from './construction-stage-options/construction-stage-options.module';
 import { SalesOfficeOptionsModule } from './sales-office-options/sales-office-options.module';
+import { LocationOptionsModule } from './location-options/location-options.module';
+import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-options.module';
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { SalesOfficeOptionsModule } from './sales-office-options/sales-office-op
     PropertyTypeOptionsModule,
     ConstructionStageOptionsModule,
     SalesOfficeOptionsModule,
+    LocationOptionsModule,
+    HeatingTypeOptionsModule,
   ],
   controllers: [AppController],
   providers: [
