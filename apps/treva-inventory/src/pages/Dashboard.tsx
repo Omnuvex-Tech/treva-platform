@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { unitLayoutsApi, type UnitLayoutStats } from "../api/unit-layouts";
+import { unitLayoutsApi, type UnitLayoutStats, type UnitLayout } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
 import { apartmentsApi, type Apartment } from "../api/apartments";
 import { apartmentTypesApi, type ApartmentType } from "../api/apartment-types";
@@ -129,11 +129,11 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
         icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21H21M12 3L3 10V21H9V14H15V21H21V10L12 3Z" /><rect x="10" y="14" width="4" height="7" /><path d="M8 7L16 7" /><path d="M9 5L12 3L15 5" /></svg>,
         children: [
             { key: "offplan", label: "Dashboard", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
-            { key: "objects", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
-            { key: "objectTypes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
-            { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg> },
+            { key: "objects", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> },
+            { key: "objectTypes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><path d="M12 6v3M12 15v3M6 12h3M15 12h3" /></svg> },
+            { key: "categories", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg> },
             { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
-            { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
+            { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg> },
             { key: "statusOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
             { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
             { key: "locationOptions", label: "Locations", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" /><circle cx="12" cy="11" r="2.5" /></svg> },
@@ -282,6 +282,7 @@ export function Dashboard() {
 
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [unitLayouts, setUnitLayouts] = useState<UnitLayout[]>([]);
     const [apartments, setApartments] = useState<Apartment[]>([]);
     const [apartmentTypes, setApartmentTypes] = useState<ApartmentType[]>([]);
     const [owners, setOwners] = useState<Owner[]>([]);
@@ -301,12 +302,15 @@ export function Dashboard() {
             Promise.all([
                 unitLayoutsApi.getStats(),
                 categoriesApi.getAll(),
-            ]).then(([statsRes, catsRes]) => {
+                unitLayoutsApi.getAll({ limit: 500 }),
+            ]).then(([statsRes, catsRes, layoutsRes]) => {
                 setUnitStats(statsRes.data);
                 setCategories(catsRes.data);
+                setUnitLayouts(layoutsRes.data.data);
             }).catch(() => {
                 setUnitStats(null);
                 setCategories([]);
+                setUnitLayouts([]);
             }).finally(() => setLoading(false));
         } else if (activeMenu === "resale") {
             setLoading(true);
@@ -348,6 +352,54 @@ export function Dashboard() {
             }).finally(() => setLoading(false));
         }
     }, [activeMenu]);
+
+    const offplanDashboard = useMemo(() => {
+        const now = new Date();
+        const months: { label: string; count: number }[] = [];
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const label = d.toLocaleString("en", { month: "short" });
+            const year = d.getFullYear();
+            const month = d.getMonth();
+            const count = unitLayouts.filter((u) => {
+                const cd = new Date(u.createdAt);
+                return cd.getFullYear() === year && cd.getMonth() === month;
+            }).length;
+            months.push({ label, count });
+        }
+        const maxCount = Math.max(...months.map((m) => m.count), 1);
+        const chartPoints = months.map((m, i) => {
+            const x = (i / (months.length - 1)) * 100;
+            const y = 100 - (m.count / maxCount) * 80;
+            return { x, y, ...m };
+        });
+        let pathD = "";
+        let areaD = "";
+        chartPoints.forEach((pt, i) => {
+            if (i === 0) {
+                pathD += `M ${pt.x} ${pt.y}`;
+                areaD += `M ${pt.x} 100 L ${pt.x} ${pt.y}`;
+            } else {
+                const prev = chartPoints[i - 1]!;
+                const cpx1 = prev.x + (pt.x - prev.x) / 3;
+                const cpx2 = pt.x - (pt.x - prev.x) / 3;
+                pathD += ` C ${cpx1} ${prev.y}, ${cpx2} ${pt.y}, ${pt.x} ${pt.y}`;
+                areaD += ` C ${cpx1} ${prev.y}, ${cpx2} ${pt.y}, ${pt.x} ${pt.y}`;
+            }
+        });
+        areaD += ` L ${chartPoints[chartPoints.length - 1]!.x} 100 Z`;
+
+        const total = unitStats?.total ?? 0;
+        const available = unitStats?.available ?? 0;
+        const sold = unitStats?.sold ?? 0;
+        const reserved = unitStats?.reserved ?? 0;
+        const circumference = 2 * Math.PI * 50;
+        const donutAvailable = total > 0 ? (available / total) * circumference : 0;
+        const donutSold = total > 0 ? (sold / total) * circumference : 0;
+        const donutReserved = total > 0 ? (reserved / total) * circumference : 0;
+
+        return { months, chartPoints, pathD, areaD, maxCount, donutAvailable, donutSold, donutReserved, total };
+    }, [unitLayouts, unitStats]);
 
     const resaleDashboard = useMemo(() => {
         const totalListings = resaleListingsTotal || apartments.length;
@@ -672,75 +724,48 @@ export function Dashboard() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                             <div className="flex items-center justify-between mb-6">
-                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Revenue Overview</h4>
+                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Listing Activity</h4>
                                 <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
                             </div>
                             <div className="relative w-full flex-1 min-h-[260px]">
                                 <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "0%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>2200000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "20%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1650000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "40%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>1100000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "60%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>550000</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "80%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>100</span>
-                                    <span className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: "100%", transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>0</span>
+                                    {[...Array(6)].map((_, i) => (
+                                        <span key={i} className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: `${i * 20}%`, transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>
+                                            {Math.round(offplanDashboard.maxCount * (1 - i / 5))}
+                                        </span>
+                                    ))}
                                 </div>
                                 <div className="ml-[72px] relative" style={{ height: "calc(100% - 32px)" }}>
                                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
-                                        <div className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        {[...Array(6)].map((_, i) => (
+                                            <div key={i} className="border-b border-dotted w-full h-0" style={{ borderColor: "#D0D0D0" }} />
+                                        ))}
                                     </div>
 
                                     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                                         <defs>
-                                            <linearGradient id="revenueAreaFill" x1="0" y1="0" x2="0" y2="1">
+                                            <linearGradient id="listingAreaFill" x1="0" y1="0" x2="0" y2="1">
                                                 <stop offset="0%" stopColor="#4E525D" stopOpacity="0.35" />
                                                 <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
                                             </linearGradient>
                                         </defs>
-                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15 L 100 100 L 0 100 Z" fill="url(#revenueAreaFill)" stroke="none" vectorEffect="non-scaling-stroke" />
-                                        <path d="M 0 55 C 2 53, 3 52, 5 51 C 9 45, 13 38, 16 38 C 19 38, 20 42, 22 46 C 26 54, 33 65, 38 73 C 42 80, 45 82, 48 82 C 51 82, 53 74, 55 69 C 59 59, 65 53, 68 53 C 70 53, 71 54, 72 55 C 75 58, 78 59, 80 59 C 84 59, 87 48, 90 40 C 94 30, 98 20, 100 15" fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+                                        <path d={offplanDashboard.areaD} fill="url(#listingAreaFill)" stroke="none" vectorEffect="non-scaling-stroke" />
+                                        <path d={offplanDashboard.pathD} fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
                                     </svg>
 
-                                    <div className="absolute flex items-center justify-center" style={{ left: "5%", top: "51%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "22%", top: "46%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute" style={{ left: "38%", top: "73%", width: 0, height: 0 }}>
-                                        <div className="absolute w-[14px] h-[14px] rounded-full bg-[#4E525D]" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", boxShadow: "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" }} />
-                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
-                                            <div className="relative">
-                                                <div className="flex items-center justify-center text-white" style={{ width: 45, height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
-                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>10</span>
-                                                </div>
-                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
-                                            </div>
+                                    {offplanDashboard.chartPoints.map((pt, i) => (
+                                        <div key={i} className="absolute flex items-center justify-center" style={{ left: `${pt.x}%`, top: `${pt.y}%` }}>
+                                            <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
                                         </div>
-                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "55%", top: "69%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "72%", top: "55%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
-                                    <div className="absolute flex items-center justify-center" style={{ left: "90%", top: "40%" }}>
-                                        <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                    </div>
+                                    ))}
                                 </div>
 
                                 <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "5%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jan</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "22%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Feb</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "38%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Mar</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "55%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Apr</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "72%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>May</span>
-                                    <span className="absolute text-[#1A1A1A]" style={{ left: "90%", transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>Jun</span>
+                                    {offplanDashboard.months.map((m, i) => (
+                                        <span key={i} className="absolute text-[#1A1A1A]" style={{ left: `${(i / (offplanDashboard.months.length - 1)) * 100}%`, transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>
+                                            {m.label}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -751,14 +776,15 @@ export function Dashboard() {
                             </div>
                             <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
                                 <svg width="140" height="140" viewBox="0 0 128 128">
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
-                                        strokeDasharray="150.1 164.1" strokeLinecap="butt" transform="rotate(184 64 64)" />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
-                                        strokeDasharray="57.6 256.6" strokeLinecap="butt" transform="rotate(4 64 64)" />
                                     <circle cx="64" cy="64" r="50" fill="none" stroke="#0075E3" strokeWidth="13"
-                                        strokeDasharray="68.1 246.1" strokeLinecap="butt" transform="rotate(76 64 64)" />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#E6211B" strokeWidth="13"
-                                        strokeDasharray="15.7 298.5" strokeLinecap="butt" transform="rotate(160 64 64)" />
+                                        strokeDasharray={`${offplanDashboard.donutAvailable} ${offplanDashboard.donutAvailable + offplanDashboard.donutSold + offplanDashboard.donutReserved}`}
+                                        strokeLinecap="butt" transform="rotate(184 64 64)" />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
+                                        strokeDasharray={`${offplanDashboard.donutSold} ${offplanDashboard.donutAvailable + offplanDashboard.donutSold + offplanDashboard.donutReserved}`}
+                                        strokeLinecap="butt" transform={`rotate(${184 + (offplanDashboard.donutAvailable / (2 * Math.PI * 50)) * 360} 64 64)`} />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
+                                        strokeDasharray={`${offplanDashboard.donutReserved} ${offplanDashboard.donutAvailable + offplanDashboard.donutSold + offplanDashboard.donutReserved}`}
+                                        strokeLinecap="butt" transform={`rotate(${184 + ((offplanDashboard.donutAvailable + offplanDashboard.donutSold) / (2 * Math.PI * 50)) * 360} 64 64)`} />
                                 </svg>
                             </div>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
@@ -772,11 +798,11 @@ export function Dashboard() {
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
-                                    <span>Active <span className="font-semibold text-[#2C3E50] ml-0.5">{categories.length}</span></span>
+                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.reserved ?? 0}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2.5 text-[#555555]">
                                     <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
-                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.reserved ?? 0}</span></span>
+                                    <span>Total <span className="font-semibold text-[#2C3E50] ml-0.5">{offplanDashboard.total}</span></span>
                                 </div>
                             </div>
                         </div>

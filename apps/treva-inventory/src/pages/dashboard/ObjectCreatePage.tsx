@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi, type CategoryDocument } from "../../api/categories";
@@ -82,6 +82,10 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const formData = draftState.formData;
     const updateFormData = (field: string, value: string | boolean) =>
         setDraftState((prev) => ({ ...prev, formData: { ...prev.formData, [field]: value } }));
+
+    useEffect(() => {
+        return () => { clearDraft(); };
+    }, [clearDraft]);
 
     const { data: categoriesResponse } = useQuery({
         queryKey: ["categories"],

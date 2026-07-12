@@ -115,7 +115,7 @@ export function OffPlanObjectsSection() {
 
                 {/* Add Object Button */}
                 <FormAddButton
-                    onClick={() => navigate("/dashboard/offplan/objects/create")}
+                    onClick={() => { localStorage.removeItem("treva-object-create-draft"); navigate("/dashboard/offplan/objects/create"); }}
                     icon={<img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />}
                     className="w-[124px]"
                 >
