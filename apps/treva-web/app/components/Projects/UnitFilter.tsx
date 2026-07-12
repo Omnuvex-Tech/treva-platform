@@ -206,7 +206,7 @@ export default function UnitLayout() {
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setPriceMinInput(''); return; }
-                      if (!/^\d+$/.test(raw)) return;
+                      if (!/^\d+(\.\d+)?$/.test(raw)) return;
                       setPriceMinInput(Number(raw));
                     }}
                     onBlur={() => {
@@ -225,7 +225,7 @@ export default function UnitLayout() {
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setPriceMaxInput(''); return; }
-                      if (!/^\d+$/.test(raw)) return;
+                      if (!/^\d+(\.\d+)?$/.test(raw)) return;
                       setPriceMaxInput(Number(raw));
                     }}
                     onBlur={() => {
@@ -312,7 +312,7 @@ export default function UnitLayout() {
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setAreaMinInput(''); return; }
-                      if (!/^\d+$/.test(raw)) return;
+                      if (!/^\d+(\.\d+)?$/.test(raw)) return;
                       setAreaMinInput(Number(raw));
                     }}
                     onBlur={() => {
@@ -331,7 +331,7 @@ export default function UnitLayout() {
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setAreaMaxInput(''); return; }
-                      if (!/^\d+$/.test(raw)) return;
+                      if (!/^\d+(\.\d+)?$/.test(raw)) return;
                       setAreaMaxInput(Number(raw));
                     }}
                     onBlur={() => {

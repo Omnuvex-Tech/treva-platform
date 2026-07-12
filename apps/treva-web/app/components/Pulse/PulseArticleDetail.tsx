@@ -3,7 +3,7 @@
 import { ButtonText } from '@/app/components/ButtonText';
 /* eslint-disable @next/next/no-img-element, react/no-unknown-property */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
@@ -103,7 +103,34 @@ const ArticleHero: React.FC<{ article: Article }> = ({ article }) => (
   </>
 );
 
-const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ locale, articles }) => (
+const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ locale, articles }) => {
+  const [email, setEmail] = useState('');
+  const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubscribe = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!email.trim() || !email.includes('@')) return;
+    setSubStatus('loading');
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021';
+      const res = await fetch(`${apiBase}/newsletter/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setSubStatus('success');
+        setEmail('');
+      } else {
+        throw new Error('Failed');
+      }
+    } catch {
+      setSubStatus('error');
+      setTimeout(() => setSubStatus('idle'), 3000);
+    }
+  };
+
+  return (
   <div className="article_sidebar">
     <div className="article_sidebar-featured">
       <div className="article_sidebar-top">
@@ -143,14 +170,28 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
         <h3 className="heading-style-h3-small no-animate">Xəbər bülletenimizə abunə olun</h3>
       </div>
       <div className="article_form-block w-form">
-        <form className="article_form">
-          <input className="article_input-field w-input" placeholder="E-poçt ünvanı" type="email" required />
-          <input type="submit" className="article_submit-btn w-button" value="Abunə ol" />
-        </form>
+        {subStatus === 'success' ? (
+          <div style={{ padding: '12px 0', color: '#22c55e', fontWeight: 500 }}>Abunəliyiniz uğurla qeydiyyatdan keçdi!</div>
+        ) : (
+          <form className="article_form" onSubmit={handleSubscribe}>
+            <input
+              className="article_input-field w-input"
+              placeholder="E-poçt ünvanı"
+              type="email"
+              name="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input type="submit" className="article_submit-btn w-button" value={subStatus === 'loading' ? 'Göndərilir...' : 'Abunə ol'} disabled={subStatus === 'loading'} />
+          </form>
+        )}
+        {subStatus === 'error' && <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '8px' }}>Xəta baş verdi. Yenidən cəhd edin.</div>}
       </div>
     </div>
   </div>
-);
+  );
+};
 
 const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; articles: Article[] }> = ({ locale, currentSlug, articles }) => (
   <section className="section_f-articles">
