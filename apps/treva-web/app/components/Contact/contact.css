@@ -103,6 +103,18 @@
   border-bottom-color: #fd515180;
 }
 
+.connect_input-field:-webkit-autofill,
+.connect_input-field:-webkit-autofill:hover,
+.connect_input-field:-webkit-autofill:focus,
+.connect_input-field:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #4e525d inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #4e525d !important;
+  background: #4e525d !important;
+  caret-color: white;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* --- Connect contact blocks --- */
 .connect_contact-wrap {
   grid-column-gap: 3rem;
@@ -614,8 +626,8 @@
   align-items: center;
   justify-content: center;
   padding: 0.875rem 2rem;
-  background: #fff;
-  color: #1a1a1a;
+  background: #3F4249;
+  color: #fff;
   border: none;
   border-radius: 12px;
   font-size: 0.9375rem;
@@ -626,7 +638,7 @@
 }
 
 .contact-success-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: #2F3134;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

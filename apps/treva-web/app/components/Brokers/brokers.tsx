@@ -567,7 +567,8 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                           </div>
 
                           <button type="submit" className="button white" disabled={status === 'loading'} style={{ border: 'none', cursor: status === 'loading' ? 'wait' : 'pointer', fontFamily: 'inherit' }}>
-                            {status === 'loading' ? 'Göndərilir...' : 'İndi qeydiyyatdan keç'}
+                            {status === 'loading' && <span className="contact-spinner" style={{ marginRight: 8, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} />}
+                            İndi qeydiyyatdan keç
                           </button>
                         </form>
                         )}

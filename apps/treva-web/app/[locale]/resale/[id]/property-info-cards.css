@@ -234,10 +234,12 @@
   width: 280px;
   max-height: 300px;
   overflow-y: auto;
-  background: #ffffff;
-  border: 1px solid var(--input-border-color);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  background: #3F4249;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   z-index: 100;
 }
 
@@ -245,13 +247,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.18s ease;
 }
 
 .ap-country-option:hover {
-  background: #f5f2eb;
+  background: #2F3134;
 }
 
 .ap-country-flag-img {
@@ -264,16 +266,20 @@
 
 .ap-country-name {
   flex: 1;
-  font-size: 14px;
-  font-weight: 400;
-  color: #000000;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #ffffff;
   font-family: var(--font-sans);
 }
 
 .ap-country-code {
-  font-size: 14px;
-  font-weight: 400;
-  color: #00000080;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
   font-family: var(--font-sans);
 }
 
@@ -350,7 +356,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.875rem 2rem;
-  background: #17191c;
+  background: #3F4249;
   color: #fff;
   border: none;
   border-radius: 80px;
@@ -362,7 +368,7 @@
 }
 
 .property-success-btn:hover {
-  background: #2e3035;
+  background: #2F3134;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

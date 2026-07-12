@@ -187,6 +187,17 @@
   border-bottom-color: #4e5362;
 }
 
+.inputField:-webkit-autofill,
+.inputField:-webkit-autofill:hover,
+.inputField:-webkit-autofill:focus,
+.inputField:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #333333 !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* Əsas Təsdiq Düyməsi */
 .submitButton {
   width: 100%;
@@ -223,6 +234,119 @@
 
 .submitButton:active {
   background-color: #484d55;
+}
+
+/* Submit button loading state */
+.submitButton.is-loading {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.callback-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: callback-spin 0.7s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+@keyframes callback-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Phone group with country code selector */
+.phoneGroup {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  border-bottom: 1px solid #a0a5b0;
+  position: relative;
+}
+
+.phoneGroup:focus-within {
+  border-bottom-color: #4e5362;
+}
+
+.phoneGroup .phoneInput {
+  border: none;
+  border-bottom: none;
+}
+
+.flagSelector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px 12px 4px;
+  cursor: pointer;
+  user-select: none;
+  color: #333;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.flagImg {
+  width: 28px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.countryDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 280px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--treva-pill-bg, #3F4249);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.countryOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.18s ease;
+  color: #ffffff;
+}
+
+.countryOption:hover {
+  background: var(--treva-pill-hover-bg, #2F3134);
+}
+
+.countryFlagImg {
+  width: 28px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.countryName {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.countryCode {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* Hüquqi xəbərdarlıq mətni */
@@ -279,7 +403,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.875rem 2rem;
-  background: #17191c;
+  background: #3F4249;
   color: #fff;
   border: none;
   border-radius: 80px;
@@ -291,7 +415,7 @@
 }
 
 .callback-success-btn:hover {
-  background: #2e3035;
+  background: #2F3134;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -367,6 +491,14 @@
     margin-bottom: 40px;
     width: 100%;
     padding: 0 10px;
+  }
+
+  .phoneGroup {
+    width: 100%;
+  }
+
+  .countryDropdown {
+    width: 260px;
   }
 
   .inputField {

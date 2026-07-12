@@ -285,7 +285,7 @@ input:focus::placeholder, textarea:focus::placeholder {
   transition: transform 0.3s ease;
 }
 
-/* Specific Select Field */
+/* Specific Select Field — original border-bottom style */
 .connect_input-field.is-select {
   position: relative;
   display: flex;
@@ -293,43 +293,63 @@ input:focus::placeholder, textarea:focus::placeholder {
   align-items: center;
 }
 
-/* Custom Dropdown (navbar style) */
+/* Custom Dropdown list — language switcher style (padding: 0, no gaps) */
 .broker-dropdown-list {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   min-width: 180px;
-  padding: 6px 0;
-  background: #3F4249;
+  padding: 0;
+  background: var(--treva-pill-bg, #3F4249);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   z-index: 999;
+  animation: broker-dropdown-in 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes broker-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .broker-dropdown-item {
   display: block;
   width: 100%;
-  padding: 10px 16px;
+  padding: 8px 14px;
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.18s ease, color 0.18s ease;
   white-space: nowrap;
 }
 
 .broker-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--treva-pill-hover-bg, #2F3134);
+}
+
+.broker-dropdown-item:active {
+  background: var(--treva-pill-pressed-bg, #000000);
 }
 
 .broker-dropdown-item--active {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   font-weight: 600;
 }
 
@@ -366,8 +386,8 @@ input:focus::placeholder, textarea:focus::placeholder {
   align-items: center;
   justify-content: center;
   padding: 0.875rem 2rem;
-  background: #fff;
-  color: #1a1a1a;
+  background: #3F4249;
+  color: #fff;
   border: none;
   border-radius: 12px;
   font-size: 0.9375rem;
@@ -378,7 +398,7 @@ input:focus::placeholder, textarea:focus::placeholder {
 }
 
 .broker-success-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: #2F3134;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

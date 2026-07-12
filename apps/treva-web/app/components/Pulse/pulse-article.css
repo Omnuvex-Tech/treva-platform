@@ -157,7 +157,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.625rem 1.5rem;
-  background: #17191c;
+  background: #3F4249;
   color: #fff;
   border: none;
   border-radius: 80px;
@@ -169,7 +169,7 @@
 }
 
 .newsletter-success-btn:hover {
-  background: #2d3036;
+  background: #2F3134;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -181,4 +181,21 @@
 .article_submit-btn.is-loading {
   pointer-events: none;
   opacity: 0.85;
+}
+
+.article-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: article-spin 0.7s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+@keyframes article-spin {
+  to { transform: rotate(360deg); }
 }

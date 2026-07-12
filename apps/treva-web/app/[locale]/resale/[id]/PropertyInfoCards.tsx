@@ -243,7 +243,8 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
               className="ap-submit-btn"
               disabled={createRequest.isPending}
             >
-              {createRequest.isPending ? 'Sending...' : 'Send request'}
+              {createRequest.isPending && <span className="contact-spinner" style={{ marginRight: 8, borderTopColor: '#dcdcdf', borderColor: 'rgba(220,220,223,0.3)', width: 18, height: 18 }} />}
+              Send request
             </button>
           </form>
         )}

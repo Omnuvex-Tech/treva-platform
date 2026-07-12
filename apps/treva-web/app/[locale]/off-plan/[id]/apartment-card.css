@@ -1,9 +1,9 @@
 :root {
-  --sand-bg: #f5f2eb;       
-  --dark-charcoal: #2e3035; 
-  --slate-gray: #6d717a;    
-  --line-gray: #e1ded7;     
-  --text-gray: #7a7e85;     
+  --sand-bg: #f5f2eb;
+  --dark-charcoal: #2e3035;
+  --slate-gray: #6d717a;
+  --line-gray: #e1ded7;
+  --text-gray: #7a7e85;
 }
 
 .apt-wrapper {
@@ -66,7 +66,7 @@
 
 /* MAIN CARD CONTAINER */
 .apt-main-card {
-  background-color: var(--sand-bg); 
+  background-color: var(--sand-bg);
   display: flex;
   width: 100%;
   box-sizing: border-box;
@@ -114,7 +114,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; 
+  align-items: flex-end;
 }
 
 /* Typography */
@@ -179,7 +179,12 @@
   background-color: #555961;
 }
 
-/* Share Button */
+/* Share Button & Dropdown (matches resale) */
+.apt-share-container {
+  position: relative;
+  display: inline-block;
+}
+
 .apt-share-btn {
   background-color: #4E525D;
   color: #ffffff;
@@ -192,7 +197,7 @@
   justify-content: center;
   cursor: pointer;
   opacity: 0.8;
-  transition: opacity 0.2s, background-color 0.2s;
+  transition: opacity 0.18s ease, background-color 0.18s ease;
   line-height: 1;
 }
 
@@ -208,6 +213,60 @@
   top: -1px;
 }
 
+.apt-share-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #3F4249;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  min-width: 180px;
+  z-index: 100;
+  animation: aptShareIn 0.2s ease-out;
+}
+
+@keyframes aptShareIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.apt-share-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.15s;
+}
+
+.apt-share-option:hover {
+  background: #2F3134;
+}
+
+.apt-share-option svg {
+  flex-shrink: 0;
+}
+
 /* Specs Table */
 .apt-specs-list {
   width: 100%;
@@ -221,7 +280,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 13px 0; 
+  padding: 13px 0;
   border-bottom: 1px solid var(--line-gray);
 }
 
@@ -303,15 +362,18 @@
 
 .apt-currency-dropdown {
   position: absolute;
-  bottom: calc(100% + 6px); 
+  top: calc(100% + 6px);
   left: 0;
   background: #3F4249;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   overflow: hidden;
   z-index: 99;
   min-width: 90px;
-  padding: 6px 0;
+  padding: 0;
 }
 
 .apt-currency-option {
@@ -319,16 +381,16 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 38px;
-  padding: 8px 18px;
+  padding: 8px 14px;
   border: none;
   background: transparent;
   color: #ffffff;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 500;
+  letter-spacing: 0.6px;
   cursor: pointer;
   font-family: inherit;
-  text-transform: none;
+  text-transform: uppercase;
   transition: background 0.18s ease;
 }
 
@@ -357,7 +419,7 @@
     display: flex;
     /* align-items: stretch sağ və sol div-lərin hündürlüyünü kilidləyir. 
        Bununla şəkil, böyüyən 103px-lik başlıq və alt USD düyməsi ilə tam eyni hizada açılır */
-    align-items: stretch; 
+    align-items: stretch;
     justify-content: space-between;
     border-radius: 0;
   }
@@ -365,10 +427,10 @@
   /* SOL BLOK: Şəkil sahəsi */
   .apt-image-section {
     width: auto;
-    flex: 1 1 54%; 
+    flex: 1 1 54%;
     min-width: 0;
     display: flex;
-    align-items: stretch; 
+    align-items: stretch;
     justify-content: flex-start;
   }
 
@@ -376,7 +438,7 @@
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center; 
+    align-items: center;
     justify-content: flex-start;
   }
 
@@ -384,22 +446,24 @@
   .apt-plan-img {
     width: 100%;
     max-width: 695px;
-    height: 100%; 
-    object-fit: contain; /* Şəkli sıxılmadan və kəsilmədən çərçivə daxilində saxlayır */
+    height: 100%;
+    object-fit: contain;
+    /* Şəkli sıxılmadan və kəsilmədən çərçivə daxilində saxlayır */
     object-position: left center;
   }
 
   /* SAĞ BLOK: Yazı sahəsi */
   .apt-details-section {
     width: auto;
-    max-width: 540px; 
-    flex: 0 1 42%;   
+    max-width: 540px;
+    flex: 0 1 42%;
     min-width: 340px;
-    height: auto; 
+    height: auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Elementləri tam olaraq üst başlıq və alt düymə sərhədlərinə yayır */
-    padding: 0; 
+    justify-content: space-between;
+    /* Elementləri tam olaraq üst başlıq və alt düymə sərhədlərinə yayır */
+    padding: 0;
   }
 
   .apt-header {
@@ -411,7 +475,7 @@
 
   /* İstədiyiniz xüsusi böyük ölçü bura inteqrasiya olundu */
   .apt-title {
-    font-size: clamp(32px, 5.5vw, 64px); 
+    font-size: clamp(32px, 5.5vw, 64px);
     line-height: 1.12;
     margin: 0 0 16px 0;
     letter-spacing: -3px;
@@ -438,17 +502,17 @@
 
   /* Spesifikasiya siyahısı */
   .apt-specs-list {
-    margin: 0; 
+    margin: 0;
     padding: 12px 0;
     width: 100%;
-    flex-grow: 1; 
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
   .apt-spec-item {
-    height: 42px; 
+    height: 42px;
     padding: 0;
     border-bottom-color: #b8b4ab;
   }
@@ -461,7 +525,7 @@
 
   /* Footer - Tam şəklin bitdiyi alt künclə sıfırlanır */
   .apt-footer {
-    margin-top: 0; 
+    margin-top: 0;
     width: 100%;
   }
 

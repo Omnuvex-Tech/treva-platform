@@ -82,7 +82,7 @@ export default function ProjectDetailPage() {
             <p>Yüklənir...</p>
           </div>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter locale={locale} />
       </div>
     );
@@ -113,7 +113,7 @@ export default function ProjectDetailPage() {
             </Link>
           </div>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter locale={locale} />
       </div>
     );
@@ -183,7 +183,7 @@ export default function ProjectDetailPage() {
 
       <DynamicProjectLayouts categorySlug={slug} locale={locale} />
 
-      <CallbackForm />
+      <CallbackForm allowedRoles={['Client']} />
 
       <HomeFooter locale={locale} />
     </div>

@@ -246,7 +246,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
             </div>
           </section>
         </main>
-        <CallbackForm />
+        <CallbackForm allowedRoles={['Client']} />
         <HomeFooter locale={locale} />
       </div>
     </>

@@ -193,7 +193,10 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <input type="submit" className={`article_submit-btn w-button ${subStatus === 'loading' ? 'is-loading' : ''}`} value={subStatus === 'loading' ? 'Göndərilir...' : 'Abunə ol'} disabled={subStatus === 'loading'} />
+            <button type="submit" className={`article_submit-btn w-button ${subStatus === 'loading' ? 'is-loading' : ''}`} disabled={subStatus === 'loading'}>
+              {subStatus === 'loading' && <span className="article-spinner" />}
+              {subStatus === 'loading' ? 'Göndərilir...' : 'Abunə ol'}
+            </button>
           </form>
         )}
         {subStatus === 'error' && <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '8px' }}>Xəta baş verdi. Yenidən cəhd edin.</div>}
