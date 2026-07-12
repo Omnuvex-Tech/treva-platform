@@ -53,7 +53,7 @@ export default function ResaleDetailPage() {
         id: apartment.id,
         slug: apartment.slug,
         type: 'resale',
-        image: apartment.gallery?.[0] || apartment.image || '',
+        image: (typeof apartment.gallery?.[0] === 'string' ? apartment.gallery[0] : apartment.gallery?.[0]?.url) || apartment.image || '',
         price: apartment.prices?.[0]?.priceTotal ?? apartment.priceTotal ?? 0,
         currency: apartment.prices?.[0]?.currency?.value ?? 'AZN',
         rooms: String(apartment.roomCount ?? ''),
@@ -324,7 +324,14 @@ export default function ResaleDetailPage() {
                       <span>{showPhone ? (apartment.owner?.phoneNumber || '—') : 'View phone number'}</span>
                     </button>
 
-                    <button type="button" className="pdet-btn-secondary">
+                    <button
+                      type="button"
+                      className="pdet-btn-secondary"
+                      onClick={() => {
+                        const el = document.getElementById('developers-callback-cta') || document.querySelector('.callbackContainer');
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                    >
                       Request a call
                     </button>
                   </div>

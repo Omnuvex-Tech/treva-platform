@@ -57,7 +57,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ locale }) => {
                       TREVA Real Estate şirkəti məlumatları üçüncü şəxslərə ötürmür və əməkdaşların girişini məhdudlaşdırmaq, həmçinin mesajların şifrələnməsi də daxil olmaqla texniki və təşkilati təhlükəsizlik tədbirlərini tətbiq edir.
                     </div>
                     
-                    <Link href={`/${locale}/contacts`} className="button w-inline-block">
+                    <Link href={`/${locale}/contact`} className="button w-inline-block">
                       <ButtonText>SATIŞLA ƏLAQƏ SAXLAYIN</ButtonText>
                     </Link>
                   </div>
