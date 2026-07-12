@@ -342,7 +342,6 @@ export default function ResaleDetailPage() {
           </div>
         </PageContainer>
       </main>
-      <CallbackForm allowedRoles={['Client']} />
       <HomeFooter />
     </div>
   );
