@@ -40,6 +40,7 @@ export interface UnitLayout {
     slug: string;
     statusOptionId?: string;
     statusOption?: { id: string; value: string };
+    archived?: boolean;
     floor: number;
     number?: number;
     totalArea: number;
@@ -111,6 +112,7 @@ export interface CreateUnitLayoutData {
     name: string;
     slug: string;
     statusOptionId?: string;
+    archived?: boolean;
     categoryId: string;
     floor: number;
     number: number;
@@ -158,6 +160,7 @@ export interface UnitLayoutFilters {
     categoryId?: string;
     categorySlug?: string;
     statusOptionId?: string;
+    archived?: boolean;
     search?: string;
     minPrice?: number;
     maxPrice?: number;

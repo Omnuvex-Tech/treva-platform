@@ -122,8 +122,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const allHouses: UnitLayout[] = layoutsRes?.data?.data || [];
     const filteredHouses = activeHouseTab === "Active"
-        ? allHouses.filter((h) => h.statusOption?.value !== "Sold")
-        : allHouses.filter((h) => h.statusOption?.value === "Sold");
+        ? allHouses.filter((h) => !h.archived)
+        : allHouses.filter((h) => h.archived);
 
     const restoredFromDraft = useRef(false);
     useEffect(() => {
@@ -193,6 +193,14 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const deleteMutation = useMutation({
         mutationFn: (houseId: string) => unitLayoutsApi.delete(houseId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
+        },
+    });
+
+    const archiveMutation = useMutation({
+        mutationFn: ({ id, archived }: { id: string; archived: boolean }) =>
+            unitLayoutsApi.update(id, { archived }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
         },
@@ -755,6 +763,14 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer"
                                             >
                                                 Edit
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => archiveMutation.mutate({ id: house.id, archived: !house.archived })}
+                                                disabled={archiveMutation.isPending}
+                                                className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+                                            >
+                                                {house.archived ? "Restore" : "Archive"}
                                             </button>
                                             <button
                                                 type="button"

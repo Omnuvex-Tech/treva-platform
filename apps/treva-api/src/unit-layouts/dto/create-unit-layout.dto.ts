@@ -101,6 +101,10 @@ export class CreateUnitLayoutDto {
   @IsString()
   statusOptionId?: string;
 
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  archived?: boolean;
+
   @ApiProperty({ example: 'clx1234567890' })
   @IsString()
   @IsNotEmpty()

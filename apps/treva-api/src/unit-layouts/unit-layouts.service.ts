@@ -81,6 +81,7 @@ export class UnitLayoutsService {
     floor?: number;
     viewOptionId?: string;
     roomOptionId?: string;
+    archived?: boolean;
   }) {
     const page = query.page || 1;
     const limit = query.limit || 12;
@@ -104,6 +105,10 @@ export class UnitLayoutsService {
 
     if (query.statusOptionId) {
       where.statusOptionId = query.statusOptionId;
+    }
+
+    if (query.archived !== undefined) {
+      where.archived = query.archived;
     }
 
     if (query.search) {
@@ -268,6 +273,7 @@ export class UnitLayoutsService {
     if (updateDto.name !== undefined) data.name = updateDto.name;
     if (updateDto.slug !== undefined) data.slug = updateDto.slug;
     if (updateDto.statusOptionId !== undefined) data.statusOptionId = updateDto.statusOptionId;
+    if (updateDto.archived !== undefined) data.archived = updateDto.archived;
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
     if (updateDto.roomOptionId !== undefined) data.roomOptionId = updateDto.roomOptionId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;

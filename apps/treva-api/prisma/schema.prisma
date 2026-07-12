@@ -105,6 +105,7 @@ model UnitLayout {
   attributeIds                String[]    @default([])
   locationTitle               String?
   locationUrl                 String?
+  archived                    Boolean     @default(false)
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 }

@@ -121,8 +121,8 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const allHouses: UnitLayout[] = layoutsRes?.data?.data || [];
     const filteredHouses = activeHouseTab === "Active"
-        ? allHouses.filter((h) => h.statusOption?.value !== "Sold")
-        : allHouses.filter((h) => h.statusOption?.value === "Sold");
+        ? allHouses.filter((h) => !h.archived)
+        : allHouses.filter((h) => h.archived);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -190,6 +190,14 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         },
         onError: (error) => {
             showError({ title: "Could not create object", description: getApiErrorMessage(error, "Please try again.") });
+        },
+    });
+
+    const archiveHouseMutation = useMutation({
+        mutationFn: ({ id, archived }: { id: string; archived: boolean }) =>
+            unitLayoutsApi.update(id, { archived }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug] });
         },
     });
 
@@ -687,6 +695,16 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         <div className="px-1 pb-1">
                                             <p className="text-sm font-semibold text-[#1A1A1A] truncate">{house.title}</p>
                                             <p className="text-xs text-[#999]">{house.totalArea} m² · {house.roomOption?.title || `${house.number || 0} rooms`}</p>
+                                        </div>
+                                        <div className="px-1 pb-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => archiveHouseMutation.mutate({ id: house.id, archived: !house.archived })}
+                                                disabled={archiveHouseMutation.isPending}
+                                                className="w-full rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+                                            >
+                                                {house.archived ? "Restore" : "Archive"}
+                                            </button>
                                         </div>
                                     </div>
                                 );

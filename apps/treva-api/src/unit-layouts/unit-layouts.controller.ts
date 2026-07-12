@@ -51,6 +51,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'floor', required: false, type: Number })
   @ApiQuery({ name: 'viewOptionId', required: false })
   @ApiQuery({ name: 'roomOptionId', required: false })
+  @ApiQuery({ name: 'archived', required: false, type: Boolean })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -66,6 +67,7 @@ export class UnitLayoutsController {
     @Query('floor') floor?: string,
     @Query('viewOptionId') viewOptionId?: string,
     @Query('roomOptionId') roomOptionId?: string,
+    @Query('archived') archived?: string,
   ) {
     return this.unitLayoutsService.findAll({
       page: page ? parseInt(page, 10) : undefined,
@@ -82,6 +84,7 @@ export class UnitLayoutsController {
       floor: floor ? parseInt(floor, 10) : undefined,
       viewOptionId,
       roomOptionId,
+      archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
     });
   }
 

@@ -72,6 +72,21 @@ export function OffPlanObjectsSection() {
         },
     });
 
+    const statusMut = useMutation({
+        mutationFn: ({ id, status }: { id: string; status: string }) =>
+            categoriesApi.update(id, { status }),
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ["categories", "object"] });
+            showSuccess({ title: "Status updated" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Failed to update status",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
     const categories: Category[] = Array.isArray(response?.data)
         ? response.data
         : [];
@@ -250,6 +265,25 @@ export function OffPlanObjectsSection() {
                                             <rect x="9" y="9" width="10" height="10" rx="2" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
                                         </svg>
+                                    </button>
+
+                                    {/* Archive/Restore Button */}
+                                    <button
+                                        onClick={() => statusMut.mutate({ id: cat.id, status: (cat.status || "active") === "active" ? "archive" : "active" })}
+                                        disabled={statusMut.isPending}
+                                        aria-label={(cat.status || "active") === "active" ? "Archive" : "Restore"}
+                                        title={(cat.status || "active") === "active" ? "Move to Archive" : "Restore"}
+                                        className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer disabled:opacity-50"
+                                    >
+                                        {(cat.status || "active") === "active" ? (
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                            </svg>
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                            </svg>
+                                        )}
                                     </button>
 
                                     {/* Edit Button */}
