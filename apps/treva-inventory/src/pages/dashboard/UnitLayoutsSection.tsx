@@ -122,11 +122,7 @@ export function UnitLayoutsSection() {
                                                 <RowActions
                                                     onEdit={() => navigate(`/unit-layouts/${layout.id}/edit`)}
                                                     onDuplicate={() => duplicateMut.mutate(layout)}
-                                                    onDelete={() => {
-                                                        if (window.confirm(`Delete "${layout.title}"?`)) {
-                                                            deleteMut.mutate(layout.id);
-                                                        }
-                                                    }}
+                                                    onDelete={() => deleteMut.mutate(layout.id)}
                                                 />
                                             </td>
                                         </tr>

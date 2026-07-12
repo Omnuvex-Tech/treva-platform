@@ -73,10 +73,8 @@ export function StatusOptionList() {
         }
     };
 
-    const handleDelete = (id: string, val: string) => {
-        if (window.confirm(`Delete status option "${val}"?`)) {
-            deleteMutation.mutate(id);
-        }
+    const handleDelete = (id: string) => {
+        deleteMutation.mutate(id);
     };
 
     const items = Array.isArray(statusOptions?.data) ? (statusOptions.data as StatusOption[]) : [];
@@ -179,7 +177,7 @@ export function StatusOptionList() {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(item.id, item.value)}
+                                            onClick={() => handleDelete(item.id)}
                                             className="text-red-400 hover:text-red-300"
                                         >
                                             Delete

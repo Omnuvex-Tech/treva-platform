@@ -87,10 +87,8 @@ export function CurrencyList() {
         }
     };
 
-    const handleDelete = (id: string, val: string) => {
-        if (window.confirm(`Delete currency "${val}"?`)) {
-            deleteMutation.mutate(id);
-        }
+    const handleDelete = (id: string) => {
+        deleteMutation.mutate(id);
     };
 
     const items = Array.isArray(currencies?.data) ? (currencies.data as Currency[]) : [];
@@ -229,7 +227,7 @@ export function CurrencyList() {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(item.id, item.value)}
+                                            onClick={() => handleDelete(item.id)}
                                             className="text-red-400 hover:text-red-300"
                                         >
                                             Delete

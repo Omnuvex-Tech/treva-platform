@@ -129,10 +129,11 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     useEffect(() => {
         if (category && !restoredFromDraft.current) {
             restoredFromDraft.current = true;
+            const matchedType = objectTypes.find((t) => t.title === category.objectType);
             setDraftState((prev) => ({
                 ...prev,
                 formData: {
-                    objectType: category.objectType || "",
+                    objectType: matchedType?.id || category.objectType || "",
                     propertyName: category.propertyName || "",
                     slug: category.slug || "",
                     currency: category.currency || "Rubels",
@@ -149,13 +150,13 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 },
             }));
         }
-    }, [category]);
+    }, [category, objectTypes]);
 
     const updateMutation = useMutation({
         mutationFn: (data: typeof formData) => {
             const selectedType = objectTypes.find((t) => t.id === data.objectType);
             return categoriesApi.update(category!.id, {
-                objectType: data.objectType,
+                objectType: selectedType?.title || data.objectType,
                 propertyName: data.propertyName,
                 slug: data.slug,
                 currency: data.currency,
@@ -287,7 +288,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 <div className="flex items-center gap-3">
                     <button
                         type="button"
-                        onClick={() => navigate(`/dashboard/offplan/objects/${slug}/config`)}
+                        onClick={() => navigate("/dashboard/offplan/objects")}
                         className="text-[#718096] hover:text-[#1A1C1E] transition-colors p-1 cursor-pointer"
                         aria-label="Back to config"
                     >

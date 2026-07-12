@@ -80,10 +80,8 @@ export function ViewOptionList() {
         }
     };
 
-    const handleDelete = (id: string, itemTitle: string) => {
-        if (window.confirm(`Delete view option "${itemTitle}"?`)) {
-            deleteMutation.mutate(id);
-        }
+    const handleDelete = (id: string) => {
+        deleteMutation.mutate(id);
     };
 
     const items = Array.isArray(viewOptions?.data) ? viewOptions.data as ViewOption[] : [];
@@ -204,7 +202,7 @@ export function ViewOptionList() {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(item.id, item.title)}
+                                            onClick={() => handleDelete(item.id)}
                                             className="text-red-400 hover:text-red-300"
                                         >
                                             Delete

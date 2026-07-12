@@ -188,6 +188,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             const slug = response?.data?.slug;
             if (slug) {
                 setCreatedSlug(slug);
+                setActiveTab("property");
                 showSuccess({ title: "Object created" });
                 clearDraft();
             }

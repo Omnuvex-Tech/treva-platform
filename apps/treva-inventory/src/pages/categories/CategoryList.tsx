@@ -18,10 +18,8 @@ export function CategoryList() {
         },
     });
 
-    const handleDelete = (id: string, title: string) => {
-        if (window.confirm(`Delete "${title}"?`)) {
-            deleteMutation.mutate(id);
-        }
+    const handleDelete = (id: string) => {
+        deleteMutation.mutate(id);
     };
 
     return (
@@ -77,7 +75,7 @@ export function CategoryList() {
                                         </Link>
                                         <button
                                             onClick={() =>
-                                                handleDelete(category.id, category.title)
+                                                handleDelete(category.id)
                                             }
                                             className="text-red-400 hover:text-red-300"
                                         >

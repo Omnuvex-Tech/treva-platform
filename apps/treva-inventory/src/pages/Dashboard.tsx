@@ -309,13 +309,13 @@ export function Dashboard() {
             setLoading(true);
             Promise.all([
                 unitLayoutsApi.getStats(),
-                categoriesApi.getAll(),
+                categoriesApi.getAll("object"),
                 unitLayoutsApi.getAll({ limit: 500 }),
                 ownersApi.getAll(),
                 attributesApi.getAll(),
                 viewOptionsApi.getAll(),
                 heatingTypeOptionsApi.getAll(),
-                roomOptionsApi.getAll("offplan"),
+                roomOptionsApi.getAll("off-plan"),
                 currenciesApi.getAll(),
                 objectTypesApi.getAll(),
             ]).then(([statsRes, catsRes, layoutsRes, ownersRes, attributesRes, viewsRes, heatingRes, roomRes, currenciesRes, objectTypesRes]) => {
@@ -386,20 +386,31 @@ export function Dashboard() {
         const totalObjects = categories.length;
         const activeObjects = categories.filter((c) => c.status === "active").length;
         const archivedObjects = categories.filter((c) => c.status === "archive").length;
+
+        const metricsHouses = categories.reduce((sum, c) => sum + (c.metrics?.houses ?? 0), 0);
+        const metricsProperties = categories.reduce((sum, c) => sum + (c.metrics?.properties ?? 0), 0);
+        const metricsReserved = categories.reduce((sum, c) => sum + (c.metrics?.reserved ?? 0), 0);
+        const metricsSold = categories.reduce((sum, c) => sum + (c.metrics?.sold ?? 0), 0);
+        const metricsAvailable = categories.reduce((sum, c) => sum + (c.metrics?.available ?? 0), 0);
+
         const totalHouses = unitLayouts.length;
-        const activeHouses = unitLayouts.filter((h) => !h.archived).length;
+        const activeHouses = unitLayouts.filter((h) => h.statusOption?.value === "Available").length;
+        const soldHouses = unitLayouts.filter((h) => h.statusOption?.value === "Sold").length;
+        const reservedHouses = unitLayouts.filter((h) => h.statusOption?.value === "Reserved").length;
         const archivedHouses = unitLayouts.filter((h) => h.archived).length;
-        const objectsWithHouses = categories.filter((c) => unitLayouts.some((h) => h.categoryId === c.id)).length;
+        const categoryIdsWithHouses = new Set(unitLayouts.map((h) => h.categoryId));
+        const objectsWithHouses = categories.filter((c) => categoryIdsWithHouses.has(c.id)).length;
+
         const housesWithPrice = unitLayouts.filter((h) => Object.values(h.prices ?? {}).some((v) => v > 0)).length;
 
-        const avgArea = totalHouses > 0
-            ? unitLayouts.reduce((sum, h) => sum + (h.totalArea || 0), 0) / totalHouses
+        const avgArea = unitLayouts.length > 0
+            ? unitLayouts.reduce((sum, h) => sum + (h.totalArea || 0), 0) / unitLayouts.length
             : 0;
-        const avgRooms = totalHouses > 0
+        const avgRooms = unitLayouts.length > 0
             ? unitLayouts.reduce((sum, h) => {
                 const match = h.roomOption?.name?.match(/(\d+)/);
                 return sum + (match?.[1] ? parseInt(match[1], 10) : 0);
-            }, 0) / totalHouses
+            }, 0) / unitLayouts.length
             : 0;
         const allPrices = unitLayouts.flatMap((h) => Object.values(h.prices ?? {}));
         const avgPrice = allPrices.length > 0
@@ -447,7 +458,6 @@ export function Dashboard() {
         let accumulatedOffset = 0;
         const donutSegments = typeDistribution.map((item) => {
             const ratio = totalHouses > 0 ? item.count / totalHouses : 0;
-            const dasharray = `${ratio * circumference} ${circumference}`;
             const dashoffset = -accumulatedOffset;
             accumulatedOffset += ratio * circumference;
             const index = typeCountMap.size - sortedTypeDistribution.length + sortedTypeDistribution.indexOf(item);
@@ -467,14 +477,14 @@ export function Dashboard() {
 
         const topCards = [
             { label: "Objects", value: totalObjects, hint: `${activeObjects} active, ${archivedObjects} archived`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/second-img.svg" },
-            { label: "Houses", value: totalHouses, hint: `${activeHouses} active, ${archivedHouses} archived`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/first-img.svg" },
+            { label: "Houses", value: totalHouses, hint: `${activeHouses} available, ${soldHouses} sold`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/first-img.svg" },
             { label: "Active Projects", value: objectsWithHouses, hint: `${objectsWithHouses} objects with houses`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/third-img.svg" },
             { label: "Average Price", value: formatChartValue(avgPrice), hint: `${avgArea.toFixed(0)} m² avg area`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/forth-img.svg" },
         ];
 
         return {
             totalObjects, activeObjects, archivedObjects,
-            totalHouses, activeHouses, archivedHouses,
+            totalHouses, activeHouses, soldHouses, reservedHouses, archivedHouses,
             objectsWithHouses, housesWithPrice,
             avgArea, avgRooms, avgPrice,
             listingActivity, chartPoints, chartLinePath, chartAreaPath, chartTicks, highlightedActivityIndex, chartMax,
@@ -789,8 +799,9 @@ export function Dashboard() {
                                     <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Houses created in the last 6 months</span>
                                 </div>
                                 <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
-                                    <span className="rounded-full bg-[#E7F6ED] px-3 py-1 font-medium text-[#2D9A5B]">{offplanDashboard.activeHouses} active</span>
-                                    <span className="rounded-full bg-[#FDECEC] px-3 py-1 font-medium text-[#C3362B]">{offplanDashboard.archivedHouses} archived</span>
+                                    <span className="rounded-full bg-[#E7F6ED] px-3 py-1 font-medium text-[#2D9A5B]">{offplanDashboard.activeHouses} available</span>
+                                    <span className="rounded-full bg-[#FDF4E0] px-3 py-1 font-medium text-[#967B38]">{offplanDashboard.soldHouses} sold</span>
+                                    <span className="rounded-full bg-[#FDECEC] px-3 py-1 font-medium text-[#C3362B]">{offplanDashboard.reservedHouses} reserved</span>
                                 </div>
                             </div>
                             <div className="relative w-full flex-1 min-h-[260px]">

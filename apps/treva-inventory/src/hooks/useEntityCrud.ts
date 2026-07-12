@@ -175,10 +175,7 @@ export function useEntityCrud<TQueryData, TItem, TForm, TPayload>({
     };
 
     const confirmAndDelete = (item: TItem) => {
-        const label = getDeleteLabel?.(item) ?? "this item";
-        if (window.confirm(`Delete "${label}"?`)) {
-            deleteMutation.mutate(getItemId(item));
-        }
+        deleteMutation.mutate(getItemId(item));
     };
 
     const duplicateItem = buildDuplicatePayload

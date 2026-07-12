@@ -83,10 +83,8 @@ export function RoomOptionList() {
         }
     };
 
-    const handleDelete = (id: string, itemTitle: string) => {
-        if (window.confirm(`Delete room option "${itemTitle}"?`)) {
-            deleteMutation.mutate(id);
-        }
+    const handleDelete = (id: string) => {
+        deleteMutation.mutate(id);
     };
 
     const items = Array.isArray(roomOptions?.data) ? roomOptions.data as RoomOption[] : [];
@@ -233,7 +231,7 @@ export function RoomOptionList() {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(item.id, item.title)}
+                                            onClick={() => handleDelete(item.id)}
                                             className="text-red-400 hover:text-red-300"
                                         >
                                             Delete
