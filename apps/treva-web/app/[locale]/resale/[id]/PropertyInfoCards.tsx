@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import { usePathname } from 'next/navigation';
 import type { ResaleApartment } from '@/lib/resale.types';
 import { useCreateRequest } from '@/hooks/use-resale-apartments';
+import '../../../components/Contact/contact.css';
 import './property-info-cards.css';
 
 interface PropertyInfoCardsProps {
@@ -11,6 +12,17 @@ interface PropertyInfoCardsProps {
 }
 
 export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps) {
+  const pathname = usePathname();
+  const detectedLocale = pathname?.split('/')[1];
+  const locale = (detectedLocale && ['az', 'en', 'ru'].includes(detectedLocale)) ? detectedLocale : 'az';
+
+  const successTexts = {
+    az: { title: 'Sorğunuz göndərildi!', text: 'Tezliklə sizinlə əlaqə saxlayacağıq.', btn: 'Yeni sorğu' },
+    en: { title: 'Request Sent!', text: "We'll get in touch with you soon.", btn: 'New request' },
+    ru: { title: 'Запрос отправлен!', text: 'Мы свяжемся с вами в ближайшее время.', btn: 'Новый запрос' },
+  };
+  const t = successTexts[locale as keyof typeof successTexts] || successTexts.az;
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+994');
@@ -19,13 +31,6 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const flagRef = useRef<HTMLDivElement>(null);
   const createRequest = useCreateRequest();
-
-  useEffect(() => {
-    if (submitSuccess) {
-      const timer = setTimeout(() => setSubmitSuccess(false), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [submitSuccess]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -165,93 +170,86 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
           A real estate consultant will confirm your appointment shortly to coordinate the meeting and provide a comprehensive guided tour.
         </p>
 
-        <form onSubmit={handleSubmit} className="ap-viewing-form">
-          <input 
-            type="text" 
-            placeholder="Your Name" 
-            className="ap-form-input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          
-          <div className="ap-phone-group">
-            <div className="ap-flag-selector" ref={flagRef} onClick={() => setShowCountryDropdown(!showCountryDropdown)}>
-              <img src={countryFlag} alt="" className="ap-flag-img" />
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <path d="M6 9l6 6 6-6"/>
+        {submitSuccess ? (
+          <div className="property-success-inline">
+            <div className="contact-success-icon">
+              <svg viewBox="0 0 52 52" className="contact-checkmark">
+                <circle className="contact-checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                <path className="contact-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
               </svg>
-              {showCountryDropdown && (
-                <div className="ap-country-dropdown">
-                  {countries.map((c) => (
-                    <div
-                      key={`${c.code}-${c.name}`}
-                      className="ap-country-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCountryCode(c.code);
-                        setCountryFlag(c.flag);
-                        setShowCountryDropdown(false);
-                      }}
-                    >
-                      <img src={c.flag} alt="" className="ap-country-flag-img" />
-                      <span className="ap-country-name">{c.name}</span>
-                      <span className="ap-country-code">{c.code}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
+            <h3 className="property-success-title">{t.title}</h3>
+            <p className="property-success-text">{t.text}</p>
+            <button type="button" className="property-success-btn" onClick={() => setSubmitSuccess(false)}>{t.btn}</button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="ap-viewing-form">
             <input 
-              type="tel" 
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder={countryCode} 
-              className="ap-form-input ap-phone-input"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
+              type="text" 
+              placeholder="Your Name" 
+              className="ap-form-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
-          </div>
-
-          {createRequest.isError && (
-            <div className="ap-form-error">
-              Something went wrong. Please try again.
+            
+            <div className="ap-phone-group">
+              <div className="ap-flag-selector" ref={flagRef} onClick={() => setShowCountryDropdown(!showCountryDropdown)}>
+                <img src={countryFlag} alt="" className="ap-flag-img" />
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+                {showCountryDropdown && (
+                  <div className="ap-country-dropdown">
+                    {countries.map((c) => (
+                      <div
+                        key={`${c.code}-${c.name}`}
+                        className="ap-country-option"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCountryCode(c.code);
+                          setCountryFlag(c.flag);
+                          setShowCountryDropdown(false);
+                        }}
+                      >
+                        <img src={c.flag} alt="" className="ap-country-flag-img" />
+                        <span className="ap-country-name">{c.name}</span>
+                        <span className="ap-country-code">{c.code}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <input 
+                type="tel" 
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder={countryCode} 
+                className="ap-form-input ap-phone-input"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                required
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            className="ap-submit-btn"
-            disabled={createRequest.isPending}
-          >
-            {createRequest.isPending ? 'Sending...' : 'Send request'}
-          </button>
-        </form>
+            {createRequest.isError && (
+              <div className="ap-form-error">
+                Something went wrong. Please try again.
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="ap-submit-btn"
+              disabled={createRequest.isPending}
+            >
+              {createRequest.isPending ? 'Sending...' : 'Send request'}
+            </button>
+          </form>
+        )}
       </section>
 
     </div>
-
-    {submitSuccess && createPortal(
-      <div className="treva-toast" role="alert">
-        <div className="treva-toast-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-        <div className="treva-toast-content">
-          <span className="treva-toast-title">Request Sent</span>
-          <span className="treva-toast-desc">We'll get in touch with you soon</span>
-        </div>
-        <button className="treva-toast-close" onClick={() => setSubmitSuccess(false)} aria-label="Close">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      </div>,
-      document.body
-    )}
     </>
   );
 }

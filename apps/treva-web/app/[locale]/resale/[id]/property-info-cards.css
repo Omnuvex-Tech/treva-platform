@@ -317,107 +317,58 @@
   text-align: center;
 }
 
-.treva-toast {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: #2e3035;
-  color: #ffffff;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
-  font-family: 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  max-width: 380px;
-  opacity: 0;
-  transform: translateX(120%);
-  animation: trevaToastIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s forwards;
-}
-
-@keyframes trevaToastIn {
-  0% {
-    opacity: 0;
-    transform: translateX(120%);
-  }
-  60% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.treva-toast-icon {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4a7c59, #3d6b4a);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  animation: trevaIconPulse 0.6s ease 0.4s;
-}
-
-@keyframes trevaIconPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-
-.treva-toast-content {
+/* Property Viewing Success Inline */
+.property-success-inline {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.treva-toast-title {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  color: #ffffff;
-}
-
-.treva-toast-desc {
-  font-size: 12px;
-  font-weight: 400;
-  color: #9ca0a8;
-  letter-spacing: 0.1px;
-}
-
-.treva-toast-close {
-  flex-shrink: 0;
-  background: transparent;
-  border: none;
-  color: #6b6f78;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s, background 0.15s;
+  text-align: center;
+  padding: 4rem 2rem;
+  min-height: 360px;
+  animation: contact-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.treva-toast-close:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+.property-success-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #17191c;
+  margin: 0 0 0.75rem;
+  animation: contact-text-up 0.4s ease 0.5s both;
 }
 
-@media (max-width: 768px) {
-  .treva-toast {
-    top: 16px;
-    right: 16px;
-    left: 16px;
-    max-width: none;
-  }
+.property-success-text {
+  font-size: 1rem;
+  color: rgba(23, 25, 28, 0.6);
+  margin: 0 0 2rem;
+  line-height: 1.5;
+  animation: contact-text-up 0.4s ease 0.6s both;
+}
+
+.property-success-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  background: #17191c;
+  color: #fff;
+  border: none;
+  border-radius: 80px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: contact-text-up 0.4s ease 0.7s both;
+}
+
+.property-success-btn:hover {
+  background: #2e3035;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.property-success-btn:active {
+  transform: translateY(0);
 }
 
 .ap-submit-btn:disabled {

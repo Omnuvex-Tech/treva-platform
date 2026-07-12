@@ -245,6 +245,61 @@
   text-transform: lowercase;
 }
 
+/* Callback Success Overlay */
+.callback-success-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  min-height: 360px;
+  width: 100%;
+  animation: contact-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.callback-success-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #17191c;
+  margin: 0 0 0.75rem;
+  animation: contact-text-up 0.4s ease 0.5s both;
+}
+
+.callback-success-text {
+  font-size: 1rem;
+  color: rgba(23, 25, 28, 0.6);
+  margin: 0 0 2rem;
+  line-height: 1.5;
+  animation: contact-text-up 0.4s ease 0.6s both;
+}
+
+.callback-success-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  background: #17191c;
+  color: #fff;
+  border: none;
+  border-radius: 80px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: contact-text-up 0.4s ease 0.7s both;
+}
+
+.callback-success-btn:hover {
+  background: #2e3035;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.callback-success-btn:active {
+  transform: translateY(0);
+}
+
 /* ==========================================================================
    MOBILE RESPONSIVE DIZAYN (Desktop effektləri qorunmaqla)
    ========================================================================== */

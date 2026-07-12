@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import './call-back.css';
+import '../../Contact/contact.css';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { ButtonText } from '@/app/components/ButtonText';
 
@@ -18,6 +19,9 @@ const callbackDictionary: Record<Locale, {
   phonePlaceholder: string;
   submitLabel: string;
   disclaimerParts: { before: string; bold: string; after: string };
+  successTitle: string;
+  successText: string;
+  resetBtn: string;
 }> = {
   az: {
     titleTop: "İLK ADDIMI",
@@ -28,6 +32,9 @@ const callbackDictionary: Record<Locale, {
     phonePlaceholder: "Telefon nömrəniz",
     submitLabel: "Əlaqə saxla",
     disclaimerParts: { before: "Düyməyə basmaqla, ", bold: "şəxsi məlumatların", after: " işlənməsinə razılığınızı təsdiq edirsiniz." },
+    successTitle: "Sorğunuz göndərildi!",
+    successText: "Tezliklə sizinlə əlaqə saxlayacağıq.",
+    resetBtn: "Yeni sorğu",
   },
   en: {
     titleTop: "READY TO TAKE",
@@ -38,6 +45,9 @@ const callbackDictionary: Record<Locale, {
     phonePlaceholder: "Phone Number",
     submitLabel: "Contact me",
     disclaimerParts: { before: "By clicking the button, you confirm your consent to the processing of ", bold: "personal data", after: "." },
+    successTitle: "Request Sent!",
+    successText: "We'll get in touch with you soon.",
+    resetBtn: "New request",
   },
   ru: {
     titleTop: "ГОТОВЫ СТАТЬ",
@@ -48,6 +58,9 @@ const callbackDictionary: Record<Locale, {
     phonePlaceholder: "Номер телефона",
     submitLabel: "Связаться со мной",
     disclaimerParts: { before: "Нажимая кнопку, вы подтверждаете согласие на обработку ", bold: "персональных данных", after: "." },
+    successTitle: "Запрос отправлен!",
+    successText: "Мы свяжемся с вами в ближайшее время.",
+    resetBtn: "Новый запрос",
   },
 };
 
@@ -146,69 +159,84 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
 
   return (
     <PageContainer as="main" className="callbackContainer" {...(sectionId ? { id: sectionId } : {})}>
-      <form onSubmit={handleSubmit} className="formWrapper">
-        
-        <div className="headerContainer">
-          {hasExtraLine && <div className="bgLineTopExtra"></div>}
-          <div className="bgLineTop"></div>
-          <div className="bgLineBottom"></div>
-          <h1 className="title no-animate">
-            <span className="titleTop">{content.titleTop}</span>
-            {hasExtraLine && <span className="titleMiddle">{content.titleExtra}</span>}
-            <span className="titleBottom">{content.titleBottom}</span>
-          </h1>
+      {submitted ? (
+        <div className="formWrapper">
+          <div className="callback-success-overlay">
+            <div className="contact-success-icon">
+              <svg viewBox="0 0 52 52" className="contact-checkmark">
+                <circle className="contact-checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                <path className="contact-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+              </svg>
+            </div>
+            <h3 className="callback-success-title">{content.successTitle}</h3>
+            <p className="callback-success-text">{content.successText}</p>
+            <button type="button" className="callback-success-btn" onClick={() => setSubmitted(false)}>{content.resetBtn}</button>
+          </div>
         </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="formWrapper">
+          
+          <div className="headerContainer">
+            {hasExtraLine && <div className="bgLineTopExtra"></div>}
+            <div className="bgLineTop"></div>
+            <div className="bgLineBottom"></div>
+            <h1 className="title no-animate">
+              <span className="titleTop">{content.titleTop}</span>
+              {hasExtraLine && <span className="titleMiddle">{content.titleExtra}</span>}
+              <span className="titleBottom">{content.titleBottom}</span>
+            </h1>
+          </div>
 
-        <p className="subtitle no-animate">
-          {content.subtitle}
-        </p>
+          <p className="subtitle no-animate">
+            {content.subtitle}
+          </p>
 
-        {visibleRoles.length > 1 && (
-        <div className="roleSelector">
-          {visibleRoles.map((role) => (
-            <RoleButton
-              key={role}
-              label={roleLabels[role]}
-              isActive={activeRole === role}
-              onClick={() => setActiveRole(role)}
+          {visibleRoles.length > 1 && (
+          <div className="roleSelector">
+            {visibleRoles.map((role) => (
+              <RoleButton
+                key={role}
+                label={roleLabels[role]}
+                isActive={activeRole === role}
+                onClick={() => setActiveRole(role)}
+              />
+            ))}
+          </div>
+          )}
+
+          <div className="inputGroup">
+            <input
+              type="text"
+              placeholder={content.namePlaceholder}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="inputField"
+              required
+              suppressHydrationWarning
             />
-          ))}
-        </div>
-        )}
+            <input
+              type="tel"
+              placeholder={content.phonePlaceholder}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="inputField"
+              required
+              suppressHydrationWarning
+            />
+          </div>
 
-        <div className="inputGroup">
-          <input
-            type="text"
-            placeholder={content.namePlaceholder}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="inputField"
-            required
-            suppressHydrationWarning
-          />
-          <input
-            type="tel"
-            placeholder={content.phonePlaceholder}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="inputField"
-            required
-            suppressHydrationWarning
-          />
-        </div>
+          <CallbackSubmitButton label={submitting ? '...' : content.submitLabel} disabled={submitting} />
 
-        <CallbackSubmitButton label={submitting ? '...' : (submitted ? (locale === 'az' ? 'Göndərildi!' : locale === 'en' ? 'Sent!' : 'Отправлено!') : content.submitLabel)} disabled={submitting} />
+          {error && <p style={{ color: '#ff4444', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</p>}
 
-        {error && <p style={{ color: '#ff4444', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{error}</p>}
-        {submitted && <p style={{ color: '#22c55e', fontSize: 13, marginTop: 8, textAlign: 'center' }}>{locale === 'az' ? 'Sorğunuz qəbul edildi. Tezliklə əlaqə saxlayacağıq.' : locale === 'en' ? 'Your request has been received. We will contact you shortly.' : 'Ваш запрос принят. Мы свяжемся с вами в ближайшее время.'}</p>}
+          <p className="disclaimer">
+            {content.disclaimerParts.before}
+            <strong>{content.disclaimerParts.bold}</strong>
+            {content.disclaimerParts.after}
+          </p>
 
-        <p className="disclaimer">
-          {content.disclaimerParts.before}
-          <strong>{content.disclaimerParts.bold}</strong>
-          {content.disclaimerParts.after}
-        </p>
-
-      </form>
+        </form>
+      )}
     </PageContainer>
   );
 }
