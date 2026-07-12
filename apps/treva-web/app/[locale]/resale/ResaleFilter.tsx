@@ -309,6 +309,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
               ></div>
               <input
                 type="range"
+                step="0.01"
                 min={totalAreaMin}
                 max={totalAreaMax}
                 value={safeAreaMin}
@@ -321,6 +322,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
               />
               <input
                 type="range"
+                step="0.01"
                 min={totalAreaMin}
                 max={totalAreaMax}
                 value={safeAreaMax}

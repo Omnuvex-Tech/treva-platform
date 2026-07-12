@@ -8,12 +8,10 @@ import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { getSaved, removeSaved, type SavedProperty } from '@/lib/saved-properties';
-import '@/app/[locale]/resale/resale-listing.css';
 import './saved.css';
 
 const savedDictionary = {
   az: {
-    title: 'SEVİLMİŞ ƏMLAKLAR',
     properties: 'əmlak',
     loading: 'Yüklənir...',
     emptyTitle: 'Hələ saxlanılmış əmlak yoxdur',
@@ -22,7 +20,6 @@ const savedDictionary = {
     viewDetails: 'Mənzil detallarına bax',
   },
   en: {
-    title: 'SAVED PROPERTIES',
     properties: 'properties',
     loading: 'Loading...',
     emptyTitle: 'No saved properties yet',
@@ -31,7 +28,6 @@ const savedDictionary = {
     viewDetails: 'View apartment details',
   },
   ru: {
-    title: 'СОХРАНЕННЫЕ ОБЪЕКТЫ',
     properties: 'объектов',
     loading: 'Загрузка...',
     emptyTitle: 'Сохраненных объектов пока нет',
@@ -62,14 +58,17 @@ export default function SavedPage() {
     p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
   return (
-    <div className="re-page-wrapper">
+    <div className="page-wrapper">
       <Navbar variant="solid" />
-      <main className="re-main-wrapper">
+      <main className="main-wrapper">
         <PageContainer className="saved-page-container">
-          <header className="re-header">
-            <h1 className="re-main-title">{content.title}</h1>
-            <div className="re-controls-row">
-              <div className="re-property-count">{items.length} {content.properties}</div>
+          <header className="saved-header">
+            <div className="saved-title-wrap">
+              <h1 className="saved-title">
+                <span className="saved-title-thin">SEÇİLMİŞ</span>
+                <span className="saved-title-bold">ƏMLAKLAR</span>
+              </h1>
+              <span className="saved-count">({items.length})</span>
             </div>
           </header>
 
@@ -92,24 +91,24 @@ export default function SavedPage() {
               </div>
             </div>
           ) : (
-            <main className="re-grid">
+            <main className="saved-grid">
               {items.map((item) => (
-                <div key={item.id} className="re-card-wrapper">
-                  <article className="re-card">
-                    <div className="re-card-media">
+                <div key={item.id} className="saved-card-wrapper">
+                  <article className="saved-card">
+                    <div className="saved-card-media">
                       <img
                         src={item.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
                         alt={item.location || item.title}
-                        className="re-card-img"
+                        className="saved-card-img"
                       />
                     </div>
 
-                    <div className="re-card-body">
-                      <div className="re-card-meta-row">
-                        <span className="re-badge">{item.rooms ? `${item.rooms} ROOM` : ''}</span>
+                    <div className="saved-card-body">
+                      <div className="saved-card-meta-row">
+                        <span className="saved-badge">{item.rooms ? `${item.rooms} ROOM` : ''}</span>
                         <button
                           type="button"
-                          className="re-bookmark-btn active"
+                          className="saved-bookmark-btn active"
                           onClick={() => handleRemove(item.id)}
                           aria-label={content.removeLabel}
                         >
@@ -119,21 +118,21 @@ export default function SavedPage() {
                         </button>
                       </div>
 
-                      <div className="re-price-block">
-                        <h2 className="re-main-price">{formatPrice(item.price)} {item.currency}</h2>
+                      <div className="saved-price-block">
+                        <h2 className="saved-main-price">{formatPrice(item.price)} {item.currency}</h2>
                       </div>
 
-                      <div className="re-tags-row">
-                        {item.rooms && <span className="re-tag">{item.rooms}-room sq.</span>}
-                        {item.area && <span className="re-tag">{item.area} m²</span>}
-                        {item.floor && <span className="re-tag">{item.floor} floor</span>}
+                      <div className="saved-tags-row">
+                        {item.rooms && <span className="saved-tag">{item.rooms}-room sq.</span>}
+                        {item.area && <span className="saved-tag">{item.area} m²</span>}
+                        {item.floor && <span className="saved-tag">{item.floor} floor</span>}
                       </div>
 
-                      <p className="re-address">{item.location || '—'}</p>
+                      <p className="saved-address">{item.location || '—'}</p>
                     </div>
                   </article>
 
-                  <Link href={`/${locale}/resale/${item.slug}`} className="re-action-btn">
+                  <Link href={`/${locale}/resale/${item.slug}`} className="saved-action-btn">
                     {content.viewDetails}
                   </Link>
                 </div>

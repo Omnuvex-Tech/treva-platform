@@ -66,3 +66,119 @@
     position: static;
   }
 }
+
+/* Newsletter success state */
+.newsletter-success-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  animation: nl-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes nl-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.newsletter-success-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: nl-icon-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes nl-icon-pop {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.newsletter-checkmark {
+  width: 32px;
+  height: 32px;
+}
+
+.newsletter-checkmark-circle {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: nl-circle-draw 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards;
+}
+
+@keyframes nl-circle-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.newsletter-checkmark-check {
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: nl-check-draw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.9s forwards;
+}
+
+@keyframes nl-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.newsletter-success-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #17191c;
+  margin: 0 0 0.5rem;
+  animation: nl-text-up 0.4s ease 0.5s both;
+}
+
+.newsletter-success-text {
+  font-size: 0.9375rem;
+  color: rgba(23, 25, 28, 0.6);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+  animation: nl-text-up 0.4s ease 0.6s both;
+}
+
+@keyframes nl-text-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.newsletter-success-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.5rem;
+  background: #17191c;
+  color: #fff;
+  border: none;
+  border-radius: 80px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: nl-text-up 0.4s ease 0.7s both;
+}
+
+.newsletter-success-btn:hover {
+  background: #2d3036;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.newsletter-success-btn:active {
+  transform: translateY(0);
+}
+
+.article_submit-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.85;
+}

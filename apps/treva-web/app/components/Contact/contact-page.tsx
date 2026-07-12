@@ -1,7 +1,6 @@
 'use client'
 import { ButtonText } from '@/app/components/ButtonText';
 
-
 import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
@@ -34,12 +33,6 @@ const ArrowDiagSVG = ({ fill = '#2E3139' }) => (
 const LinkArrowSVG = ({ fill = 'white' }) => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.1859 5.5V14.4375C17.1859 14.6198 17.1135 14.7947 16.9846 14.9236C16.8556 15.0526 16.6808 15.125 16.4984 15.125C16.3161 15.125 16.1412 15.0526 16.0123 14.9236C15.8834 14.7947 15.8109 14.6198 15.8109 14.4375V7.15945L5.98484 16.9864C5.85583 17.1154 5.68087 17.1879 5.49843 17.1879C5.31599 17.1879 5.14103 17.1154 5.01202 16.9864C4.88302 16.8574 4.81055 16.6824 4.81055 16.5C4.81055 16.3176 4.88302 16.1426 5.01202 16.0136L14.839 6.1875H7.56093C7.37859 6.1875 7.20372 6.11507 7.07479 5.98614C6.94586 5.8572 6.87343 5.68234 6.87343 5.5C6.87343 5.31766 6.94586 5.1428 7.07479 5.01386C7.20372 4.88493 7.37859 4.8125 7.56093 4.8125H16.4984C16.6808 4.8125 16.8556 4.88493 16.9846 5.01386C17.1135 5.1428 17.1859 5.31766 17.1859 5.5Z" fill={fill}/>
-  </svg>
-)
-
-const CheckCircleSVG = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#ffffff" viewBox="0 0 256 256">
-    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"/>
   </svg>
 )
 
@@ -205,13 +198,19 @@ function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="cs_form-success" style={{ display: 'block' }}>
-        <div className="cs_form-success-content">
-          <div className="icon-huge"><CheckCircleSVG /></div>
-          <div>
-            Qeydiyyat üçün təşəkkür edirik! <br />
-            Komandamız tezliklə sizinlə əlaqə saxlayacaq.
+      <div className="connect_form-wrap animate-up">
+        <div className="contact-success-inline">
+          <div className="contact-success-icon">
+            <svg viewBox="0 0 52 52" className="contact-checkmark">
+              <circle className="contact-checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+              <path className="contact-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
           </div>
+          <h3 className="contact-success-title">Mesajınız göndərildi!</h3>
+          <p className="contact-success-text">Tezliklə sizinlə əlaqə saxlayacağıq.</p>
+          <button type="button" className="contact-success-btn" onClick={() => setStatus('idle')}>
+            Yeni mesaj göndər
+          </button>
         </div>
       </div>
     )
@@ -229,6 +228,7 @@ function ContactForm() {
             type="text"
             value={fields.name}
             onChange={handleChange}
+            disabled={status === 'loading'}
           />
           {errors.name && <div className="connect_error" style={{ display: 'block' }}>{errors.name}</div>}
         </div>
@@ -242,6 +242,7 @@ function ContactForm() {
             type="email"
             value={fields.email}
             onChange={handleChange}
+            disabled={status === 'loading'}
           />
           {errors.email && <div className="connect_error" style={{ display: 'block' }}>{errors.email}</div>}
         </div>
@@ -255,6 +256,7 @@ function ContactForm() {
             type="tel"
             value={fields.phone}
             onChange={handlePhoneChange}
+            disabled={status === 'loading'}
           />
           {errors.phone && <div className="connect_error" style={{ display: 'block' }}>{errors.phone}</div>}
         </div>
@@ -267,15 +269,23 @@ function ContactForm() {
           type="text"
           value={fields.message}
           onChange={handleChange}
+          disabled={status === 'loading'}
         />
 
         <button
           type="submit"
-          className="button white"
+          className={`button white contact-submit-btn${status === 'loading' ? ' is-loading' : ''}`}
           disabled={status === 'loading'}
-          style={{ cursor: status === 'loading' ? 'wait' : 'pointer' }}
         >
-          {status === 'loading' ? 'Göndərilir...' : 'MESAJ GÖNDƏR'}
+          {status === 'loading' ? (
+            <span className="contact-btn-loading">
+              <span className="contact-spinner"></span>
+              <span className="contact-btn-text">Göndərilir...</span>
+            </span>
+
+          ) : (
+            <span className="contact-btn-text">MESAJ GÖNDƏR</span>
+          )}
         </button>
       </form>
 

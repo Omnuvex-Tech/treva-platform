@@ -71,6 +71,7 @@ export interface UnitLayoutFilters {
     categorySlug?: string;
     statusOptionId?: string;
     search?: string;
+    currency?: string;
     minPrice?: number;
     maxPrice?: number;
     minArea?: number;

@@ -171,7 +171,17 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
       </div>
       <div className="article_form-block w-form">
         {subStatus === 'success' ? (
-          <div style={{ padding: '12px 0', color: '#22c55e', fontWeight: 500 }}>Abunəliyiniz uğurla qeydiyyatdan keçdi!</div>
+          <div className="newsletter-success-inline">
+            <div className="newsletter-success-icon">
+              <svg className="newsletter-checkmark" viewBox="0 0 52 52">
+                <circle className="newsletter-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path className="newsletter-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+            <p className="newsletter-success-title">Abunəliyiniz uğurla qeydiyyatdan keçdi!</p>
+            <p className="newsletter-success-text">TREVA ilə əlaqədə qaldığınız üçün təşəkkür edirik.</p>
+            <button className="newsletter-success-btn" onClick={() => setSubStatus('idle')}>Yeni abunəlik</button>
+          </div>
         ) : (
           <form className="article_form" onSubmit={handleSubscribe}>
             <input
@@ -183,7 +193,7 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <input type="submit" className="article_submit-btn w-button" value={subStatus === 'loading' ? 'Göndərilir...' : 'Abunə ol'} disabled={subStatus === 'loading'} />
+            <input type="submit" className={`article_submit-btn w-button ${subStatus === 'loading' ? 'is-loading' : ''}`} value={subStatus === 'loading' ? 'Göndərilir...' : 'Abunə ol'} disabled={subStatus === 'loading'} />
           </form>
         )}
         {subStatus === 'error' && <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '8px' }}>Xəta baş verdi. Yenidən cəhd edin.</div>}

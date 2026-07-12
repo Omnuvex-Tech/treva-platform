@@ -7,6 +7,7 @@ import { SplitText } from 'gsap/SplitText'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
+import { getAssetUrl } from '@/lib/asset-url'
 import './projects.css'
 
 gsap.registerPlugin(ScrollTrigger, SplitText)
@@ -213,7 +214,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                 <div className="projects_img-holder">
                                   {cat.image ? (
                                     <img
-                                      src={cat.image.startsWith('http') ? cat.image : `${CMS_API}${cat.image}`}
+                                      src={getAssetUrl(cat.image || undefined)}
                                       loading="lazy"
                                       alt={getLocalized(cat.title, locale)}
                                       className="fullwidth-img"

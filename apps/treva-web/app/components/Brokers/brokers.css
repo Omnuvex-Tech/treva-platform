@@ -332,3 +332,53 @@ input:focus::placeholder, textarea:focus::placeholder {
   background: rgba(255, 255, 255, 0.15);
   font-weight: 600;
 }
+
+/* Broker success state */
+.broker-success-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  min-height: 360px;
+  animation: contact-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.broker-success-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.75rem;
+  animation: contact-text-up 0.4s ease 0.5s both;
+}
+
+.broker-success-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 2rem;
+  line-height: 1.5;
+  animation: contact-text-up 0.4s ease 0.6s both;
+}
+
+.broker-success-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  background: #fff;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: contact-text-up 0.4s ease 0.7s both;
+}
+
+.broker-success-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

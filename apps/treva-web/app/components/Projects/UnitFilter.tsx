@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useViewOptions } from '@/hooks/use-view-options';
@@ -16,14 +16,15 @@ import './unit-filter.css';
 export default function UnitLayout() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const locale = params?.locale || 'az';
   const categorySlug = searchParams.get('category') || '';
 
-  const [currency, setCurrency] = useState('USD');
-  const [floor, setFloor] = useState('');
-  const [selectedView, setSelectedView] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedRooms, setSelectedRooms] = useState<string>('');
+  const [currency, setCurrency] = useState(searchParams.get('currency') || 'USD');
+  const [floor, setFloor] = useState(searchParams.get('floor') || '');
+  const [selectedView, setSelectedView] = useState(searchParams.get('view') || '');
+  const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
+  const [selectedRooms, setSelectedRooms] = useState<string>(searchParams.get('rooms') || '');
 
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [floorOpen, setFloorOpen] = useState(false);
@@ -34,19 +35,19 @@ export default function UnitLayout() {
   const viewRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
-  const [priceMin, setPriceMin] = useState<number | ''>(0);
-  const [priceMax, setPriceMax] = useState<number | ''>('');
-  const [priceMinInput, setPriceMinInput] = useState<number | ''>(0);
-  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>('');
+  const [priceMin, setPriceMin] = useState<number | ''>(Number(searchParams.get('priceMin')) || 0);
+  const [priceMax, setPriceMax] = useState<number | ''>(Number(searchParams.get('priceMax')) || '');
+  const [priceMinInput, setPriceMinInput] = useState<number | ''>(Number(searchParams.get('priceMin')) || 0);
+  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(Number(searchParams.get('priceMax')) || '');
   const totalPriceMin = 0;
 
-  const [areaMin, setAreaMin] = useState<number | ''>(0);
-  const [areaMax, setAreaMax] = useState<number | ''>('');
-  const [areaMinInput, setAreaMinInput] = useState<number | ''>(0);
-  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>('');
+  const [areaMin, setAreaMin] = useState<number | ''>(Number(searchParams.get('areaMin')) || 0);
+  const [areaMax, setAreaMax] = useState<number | ''>(Number(searchParams.get('areaMax')) || '');
+  const [areaMinInput, setAreaMinInput] = useState<number | ''>(Number(searchParams.get('areaMin')) || 0);
+  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(Number(searchParams.get('areaMax')) || '');
   const totalAreaMin = 0;
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const limit = 12;
 
   const { data: roomOptionsData } = useRoomOptions('off-plan');
@@ -74,6 +75,10 @@ export default function UnitLayout() {
       setPriceMaxInput(rangeData.maxPrice);
       setAreaMax(rangeData.maxTotalArea);
       setAreaMaxInput(rangeData.maxTotalArea);
+      setPriceMin(0);
+      setPriceMinInput(0);
+      setAreaMin(0);
+      setAreaMinInput(0);
     }
   }, [rangeData]);
 
@@ -87,6 +92,23 @@ export default function UnitLayout() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const sp = new URLSearchParams();
+    if (categorySlug) sp.set('category', categorySlug);
+    if (currency && currency !== 'USD') sp.set('currency', currency);
+    if (floor) sp.set('floor', floor);
+    if (selectedView) sp.set('view', selectedView);
+    if (selectedStatus) sp.set('status', selectedStatus);
+    if (selectedRooms) sp.set('rooms', selectedRooms);
+    if (typeof priceMin === 'number' && priceMin > 0) sp.set('priceMin', String(priceMin));
+    if (typeof priceMax === 'number' && priceMax > 0 && priceMax < totalPriceMax) sp.set('priceMax', String(priceMax));
+    if (typeof areaMin === 'number' && areaMin > 0) sp.set('areaMin', String(areaMin));
+    if (typeof areaMax === 'number' && areaMax > 0 && areaMax < totalAreaMax) sp.set('areaMax', String(areaMax));
+    if (page > 1) sp.set('page', String(page));
+    const qs = sp.toString();
+    router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
+  }, [currency, floor, selectedView, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, categorySlug, router]);
 
   const debouncedPriceMin = useDebounce(priceMin, 1000);
   const debouncedPriceMax = useDebounce(priceMax, 1000);
@@ -172,6 +194,7 @@ export default function UnitLayout() {
     setAreaMax(totalAreaMax);
     setAreaMaxInput(totalAreaMax);
     setPage(1);
+    router.replace(window.location.pathname, { scroll: false });
   };
 
   const getCardCode = (layout: UnitLayout) => {
@@ -214,6 +237,7 @@ export default function UnitLayout() {
                       const val = Math.max(totalPriceMin, Math.min(raw, safePriceMax - 1000));
                       setPriceMin(val);
                       setPriceMinInput(val);
+                      setPage(1);
                     }}
                   />
                 </div>
@@ -233,6 +257,7 @@ export default function UnitLayout() {
                       const val = Math.max(safePriceMin + 1000, Math.min(raw, totalPriceMax));
                       setPriceMax(val);
                       setPriceMaxInput(val);
+                      setPage(1);
                     }}
                   />
                 </div>
@@ -282,6 +307,7 @@ export default function UnitLayout() {
                   const val = Math.min(Number(e.target.value), safePriceMax - 1000);
                   setPriceMin(val);
                   setPriceMinInput(val);
+                  setPage(1);
                 }}
               />
               <input 
@@ -294,6 +320,7 @@ export default function UnitLayout() {
                   const val = Math.max(Number(e.target.value), safePriceMin + 1000);
                   setPriceMax(val);
                   setPriceMaxInput(val);
+                  setPage(1);
                 }}
               />
             </div>
@@ -320,6 +347,7 @@ export default function UnitLayout() {
                       const val = Math.max(totalAreaMin, Math.min(raw, safeAreaMax - 5));
                       setAreaMin(val);
                       setAreaMinInput(val);
+                      setPage(1);
                     }}
                   />
                 </div>
@@ -339,6 +367,7 @@ export default function UnitLayout() {
                       const val = Math.max(safeAreaMin + 5, Math.min(raw, totalAreaMax));
                       setAreaMax(val);
                       setAreaMaxInput(val);
+                      setPage(1);
                     }}
                   />
                 </div>
@@ -352,6 +381,7 @@ export default function UnitLayout() {
                 ></div>
                 <input 
                   type="range" 
+                  step="0.01"
                   min={totalAreaMin} 
                   max={totalAreaMax} 
                   value={safeAreaMin}
@@ -360,10 +390,12 @@ export default function UnitLayout() {
                     const val = Math.min(Number(e.target.value), safeAreaMax - 5);
                     setAreaMin(val);
                     setAreaMinInput(val);
+                    setPage(1);
                   }}
                 />
                 <input 
                   type="range" 
+                  step="0.01"
                   min={totalAreaMin} 
                   max={totalAreaMax} 
                   value={safeAreaMax}
@@ -372,6 +404,7 @@ export default function UnitLayout() {
                     const val = Math.max(Number(e.target.value), safeAreaMin + 5);
                     setAreaMax(val);
                     setAreaMaxInput(val);
+                    setPage(1);
                   }}
                 />
               </div>

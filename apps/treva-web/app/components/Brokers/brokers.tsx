@@ -10,6 +10,7 @@ import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
 import './brokers.css'
+import '../Contact/contact.css'
 
 declare global {
   interface Window {
@@ -18,12 +19,6 @@ declare global {
     SplitText?: any
   }
 }
-
-const CheckCircleSVG = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#ffffff" viewBox="0 0 256 256">
-    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"/>
-  </svg>
-)
 
 type BrokerFields = {
   name: string
@@ -466,6 +461,21 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                         <div className="text-color-white60">TREVA ilə tərəfdaşlıq edərək, satışlarınızı artırmaq və şəbəkənizi genişləndirmək üçün nəzərdə tutulmuş güclü resurslara çıxış əldə edirsiniz.</div>
                       </div>
                       <div className="connect_form-wrap animate-up w-form">
+                        {status === 'success' ? (
+                          <div className="broker-success-wrap">
+                            <div className="contact-success-icon">
+                              <svg viewBox="0 0 52 52" className="contact-checkmark">
+                                <circle className="contact-checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                                <path className="contact-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                              </svg>
+                            </div>
+                            <h3 className="broker-success-title">Qeydiyyat uğurla tamamlandı!</h3>
+                            <p className="broker-success-text">Komandamız tezliklə sizinlə əlaqə saxlayacaq.</p>
+                            <button type="button" className="broker-success-btn" onClick={() => { setStatus('idle'); setFields(INITIAL_FIELDS) }}>
+                              Yeni qeydiyyat
+                            </button>
+                          </div>
+                        ) : (
                         <form id="wf-form-Broker-Form" name="wf-form-Broker-Form" data-name="Broker Form" method="get" className="broker_form" onSubmit={handleSubmit}>
                           <div className="field_wrap">
                             <input className={`connect_input-field w-input ${errors.name ? 'error' : ''}`} maxLength={256} name="name" data-name="name" placeholder="Tam ad *" type="text" id="name" value={fields.name} onChange={handleChange} />
@@ -560,20 +570,11 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                             {status === 'loading' ? 'Göndərilir...' : 'İndi qeydiyyatdan keç'}
                           </button>
                         </form>
-                        
-                        {status === 'success' && (
-                          <div className="cs_form-success w-form-done" style={{ display: 'block' }}>
-                            <div className="cs_form-success-content">
-                              <div className="icon-huge w-embed">
-                                <CheckCircleSVG />
-                              </div>
-                              <div>Qeydiyyat üçün təşəkkür edirik! <br/>Komandamız tezliklə sizinlə əlaqə saxlayacaq.</div>
-                            </div>
-                          </div>
                         )}
+
                         {status === 'error' && (
                           <div className="cs_error w-form-fail" style={{ display: 'block' }}>
-                            <div>Oops! Something went wrong.</div>
+                            <div>Göndərilmədi. Yenidən cəhd edin.</div>
                           </div>
                         )}
                       </div>

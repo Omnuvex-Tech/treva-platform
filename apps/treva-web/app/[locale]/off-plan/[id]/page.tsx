@@ -33,6 +33,7 @@ export default function ApartmentCard() {
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
   const [similarPage, setSimilarPage] = useState(1);
+  const [shareCopied, setShareCopied] = useState(false);
   const similarLimit = 6;
 
   useEffect(() => {
@@ -64,7 +65,12 @@ export default function ApartmentCard() {
 
   const handleShare = () => {
     if (layout?.location?.url) {
-      window.open(layout.location.url, '_blank');
+      navigator.clipboard.writeText(layout.location.url).then(() => {
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      }).catch(() => {
+        window.open(layout.location.url, '_blank');
+      });
     }
   };
 
@@ -205,12 +211,16 @@ export default function ApartmentCard() {
                         <span className="apt-badge__text">PDF</span>
                       </a>
                     )}
-                    <button type="button" className="apt-share-btn" aria-label="Share" onClick={handleShare}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                        <polyline points="16 6 12 2 8 6"/>
-                        <line x1="12" y1="2" x2="12" y2="15"/>
-                      </svg>
+                    <button type="button" className="apt-share-btn" aria-label="Share" onClick={handleShare} style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {shareCopied ? (
+                        <span>Copied!</span>
+                      ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                          <polyline points="16 6 12 2 8 6"/>
+                          <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                      )}
                     </button>
                   </div>
                 </div>

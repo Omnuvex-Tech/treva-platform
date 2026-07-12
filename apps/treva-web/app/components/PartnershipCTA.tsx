@@ -305,7 +305,7 @@ export default function PartnershipCTA({
             <img
               width="Auto"
               sizes="100vw"
-              alt="A large house with a pool in front of it  - villa siena"
+              alt="A large house with a pool in front of it - villa siena"
               src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif"
               loading="lazy"
               srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif 1014w"
