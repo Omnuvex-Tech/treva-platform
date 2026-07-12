@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayoutStats, type UnitLayout } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
+import { objectTypesApi, type ObjectType } from "../api/object-types";
 import { apartmentsApi, type Apartment } from "../api/apartments";
 import { apartmentTypesApi, type ApartmentType } from "../api/apartment-types";
 import { ownersApi, type Owner } from "../api/owners";
@@ -283,6 +284,13 @@ export function Dashboard() {
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [unitLayouts, setUnitLayouts] = useState<UnitLayout[]>([]);
+    const [offplanOwners, setOffplanOwners] = useState<Owner[]>([]);
+    const [offplanAttributes, setOffplanAttributes] = useState<Attribute[]>([]);
+    const [offplanViewOptions, setOffplanViewOptions] = useState<ResaleViewOption[]>([]);
+    const [offplanHeatingTypeOptions, setOffplanHeatingTypeOptions] = useState<HeatingTypeOption[]>([]);
+    const [offplanRoomOptions, setOffplanRoomOptions] = useState<RoomOption[]>([]);
+    const [offplanCurrencies, setOffplanCurrencies] = useState<Currency[]>([]);
+    const [offplanObjectTypes, setOffplanObjectTypes] = useState<ObjectType[]>([]);
     const [apartments, setApartments] = useState<Apartment[]>([]);
     const [apartmentTypes, setApartmentTypes] = useState<ApartmentType[]>([]);
     const [owners, setOwners] = useState<Owner[]>([]);
@@ -303,14 +311,35 @@ export function Dashboard() {
                 unitLayoutsApi.getStats(),
                 categoriesApi.getAll(),
                 unitLayoutsApi.getAll({ limit: 500 }),
-            ]).then(([statsRes, catsRes, layoutsRes]) => {
+                ownersApi.getAll(),
+                attributesApi.getAll(),
+                viewOptionsApi.getAll(),
+                heatingTypeOptionsApi.getAll(),
+                roomOptionsApi.getAll("offplan"),
+                currenciesApi.getAll(),
+                objectTypesApi.getAll(),
+            ]).then(([statsRes, catsRes, layoutsRes, ownersRes, attributesRes, viewsRes, heatingRes, roomRes, currenciesRes, objectTypesRes]) => {
                 setUnitStats(statsRes.data);
                 setCategories(catsRes.data);
                 setUnitLayouts(layoutsRes.data.data);
+                setOffplanOwners(ownersRes.data);
+                setOffplanAttributes(attributesRes.data);
+                setOffplanViewOptions(viewsRes.data);
+                setOffplanHeatingTypeOptions(heatingRes.data);
+                setOffplanRoomOptions(roomRes.data);
+                setOffplanCurrencies(currenciesRes.data);
+                setOffplanObjectTypes(objectTypesRes.data);
             }).catch(() => {
                 setUnitStats(null);
                 setCategories([]);
                 setUnitLayouts([]);
+                setOffplanOwners([]);
+                setOffplanAttributes([]);
+                setOffplanViewOptions([]);
+                setOffplanHeatingTypeOptions([]);
+                setOffplanRoomOptions([]);
+                setOffplanCurrencies([]);
+                setOffplanObjectTypes([]);
             }).finally(() => setLoading(false));
         } else if (activeMenu === "resale") {
             setLoading(true);
@@ -354,52 +383,105 @@ export function Dashboard() {
     }, [activeMenu]);
 
     const offplanDashboard = useMemo(() => {
-        const now = new Date();
-        const months: { label: string; count: number }[] = [];
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const label = d.toLocaleString("en", { month: "short" });
-            const year = d.getFullYear();
-            const month = d.getMonth();
+        const totalObjects = categories.length;
+        const activeObjects = categories.filter((c) => c.status === "active").length;
+        const archivedObjects = categories.filter((c) => c.status === "archive").length;
+        const totalHouses = unitLayouts.length;
+        const activeHouses = unitLayouts.filter((h) => !h.archived).length;
+        const archivedHouses = unitLayouts.filter((h) => h.archived).length;
+        const objectsWithHouses = categories.filter((c) => unitLayouts.some((h) => h.categoryId === c.id)).length;
+        const housesWithPrice = unitLayouts.filter((h) => Object.values(h.prices ?? {}).some((v) => v > 0)).length;
+
+        const avgArea = totalHouses > 0
+            ? unitLayouts.reduce((sum, h) => sum + (h.totalArea || 0), 0) / totalHouses
+            : 0;
+        const avgRooms = totalHouses > 0
+            ? unitLayouts.reduce((sum, h) => {
+                const match = h.roomOption?.name?.match(/(\d+)/);
+                return sum + (match?.[1] ? parseInt(match[1], 10) : 0);
+            }, 0) / totalHouses
+            : 0;
+        const allPrices = unitLayouts.flatMap((h) => Object.values(h.prices ?? {}));
+        const avgPrice = allPrices.length > 0
+            ? allPrices.reduce((sum, p) => sum + p, 0) / allPrices.length
+            : 0;
+
+        const monthDates = Array.from({ length: 6 }, (_, index) => {
+            const date = new Date();
+            date.setDate(1);
+            date.setHours(0, 0, 0, 0);
+            date.setMonth(date.getMonth() - (5 - index));
+            return date;
+        });
+        const listingActivity = monthDates.map((date) => {
+            const year = date.getFullYear();
+            const month = date.getMonth();
             const count = unitLayouts.filter((u) => {
                 const cd = new Date(u.createdAt);
                 return cd.getFullYear() === year && cd.getMonth() === month;
             }).length;
-            months.push({ label, count });
-        }
-        const maxCount = Math.max(...months.map((m) => m.count), 1);
-        const chartPoints = months.map((m, i) => {
-            const x = (i / (months.length - 1)) * 100;
-            const y = 100 - (m.count / maxCount) * 80;
-            return { x, y, ...m };
+            return { label: date.toLocaleString("en-US", { month: "short" }), count };
         });
-        let pathD = "";
-        let areaD = "";
-        chartPoints.forEach((pt, i) => {
-            if (i === 0) {
-                pathD += `M ${pt.x} ${pt.y}`;
-                areaD += `M ${pt.x} 100 L ${pt.x} ${pt.y}`;
-            } else {
-                const prev = chartPoints[i - 1]!;
-                const cpx1 = prev.x + (pt.x - prev.x) / 3;
-                const cpx2 = pt.x - (pt.x - prev.x) / 3;
-                pathD += ` C ${cpx1} ${prev.y}, ${cpx2} ${pt.y}, ${pt.x} ${pt.y}`;
-                areaD += ` C ${cpx1} ${prev.y}, ${cpx2} ${pt.y}, ${pt.x} ${pt.y}`;
-            }
-        });
-        areaD += ` L ${chartPoints[chartPoints.length - 1]!.x} 100 Z`;
+        const chartValues = listingActivity.map((m) => m.count);
+        const chartPoints = buildChartPoints(chartValues);
+        const chartLinePath = buildLinePath(chartPoints);
+        const chartAreaPath = buildAreaPath(chartPoints);
+        const chartMax = Math.max(...chartValues, 1);
+        const chartTicks = Array.from({ length: 6 }, (_, i) => Math.round(chartMax * (1 - i / 5)));
+        const highlightedActivityIndex = chartValues.indexOf(Math.max(...chartValues));
 
-        const total = unitStats?.total ?? 0;
-        const available = unitStats?.available ?? 0;
-        const sold = unitStats?.sold ?? 0;
-        const reserved = unitStats?.reserved ?? 0;
+        const typeCountMap = new Map<string, number>();
+        unitLayouts.forEach((h) => {
+            const label = h.category?.title || "Unassigned";
+            typeCountMap.set(label, (typeCountMap.get(label) || 0) + 1);
+        });
+        const sortedTypeDistribution = Array.from(typeCountMap.entries())
+            .map(([label, count]) => ({ label, count }))
+            .sort((a, b) => b.count - a.count);
+        const topTypes = sortedTypeDistribution.slice(0, 4);
+        const remainingTypeCount = sortedTypeDistribution.slice(4).reduce((sum, item) => sum + item.count, 0);
+        const typeDistribution = remainingTypeCount > 0
+            ? [...topTypes, { label: "Other", count: remainingTypeCount }]
+            : topTypes;
         const circumference = 2 * Math.PI * 50;
-        const donutAvailable = total > 0 ? (available / total) * circumference : 0;
-        const donutSold = total > 0 ? (sold / total) * circumference : 0;
-        const donutReserved = total > 0 ? (reserved / total) * circumference : 0;
+        let accumulatedOffset = 0;
+        const donutSegments = typeDistribution.map((item) => {
+            const ratio = totalHouses > 0 ? item.count / totalHouses : 0;
+            const dasharray = `${ratio * circumference} ${circumference}`;
+            const dashoffset = -accumulatedOffset;
+            accumulatedOffset += ratio * circumference;
+            const index = typeCountMap.size - sortedTypeDistribution.length + sortedTypeDistribution.indexOf(item);
+            return { label: item.label, count: item.count, color: RESALE_DONUT_COLORS[index % RESALE_DONUT_COLORS.length], dasharray: `${ratio * circumference} ${circumference - ratio * circumference}`, dashoffset };
+        });
 
-        return { months, chartPoints, pathD, areaD, maxCount, donutAvailable, donutSold, donutReserved, total };
-    }, [unitLayouts, unitStats]);
+        const dataCoverage = [
+            { label: "Owners", value: offplanOwners.length, hint: `${unitLayouts.filter((h) => h.ownerId).length} linked to houses` },
+            { label: "Attributes", value: offplanAttributes.length, hint: `${unitLayouts.reduce((sum, h) => sum + (h.attributeIds?.length || 0), 0)} assigned` },
+            { label: "Views", value: offplanViewOptions.length, hint: `${unitLayouts.reduce((sum, h) => sum + (h.viewOptionId ? 1 : 0), 0)} linked` },
+            { label: "Heating", value: offplanHeatingTypeOptions.length, hint: `${unitLayouts.reduce((sum, h) => sum + (h.heatingTypeIds?.length || 0), 0)} linked` },
+            { label: "Room Options", value: offplanRoomOptions.length, hint: "offplan-specific options" },
+            { label: "Currencies", value: offplanCurrencies.length, hint: `${housesWithPrice} houses carry price data` },
+            { label: "Object Types", value: offplanObjectTypes.length, hint: "configured types" },
+            { label: "Objects", value: totalObjects, hint: `${activeObjects} active, ${archivedObjects} archived` },
+        ];
+
+        const topCards = [
+            { label: "Objects", value: totalObjects, hint: `${activeObjects} active, ${archivedObjects} archived`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/second-img.svg" },
+            { label: "Houses", value: totalHouses, hint: `${activeHouses} active, ${archivedHouses} archived`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/first-img.svg" },
+            { label: "Active Projects", value: objectsWithHouses, hint: `${objectsWithHouses} objects with houses`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/third-img.svg" },
+            { label: "Average Price", value: formatChartValue(avgPrice), hint: `${avgArea.toFixed(0)} m² avg area`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/forth-img.svg" },
+        ];
+
+        return {
+            totalObjects, activeObjects, archivedObjects,
+            totalHouses, activeHouses, archivedHouses,
+            objectsWithHouses, housesWithPrice,
+            avgArea, avgRooms, avgPrice,
+            listingActivity, chartPoints, chartLinePath, chartAreaPath, chartTicks, highlightedActivityIndex, chartMax,
+            donutSegments, typeDistribution,
+            dataCoverage, topCards,
+        };
+    }, [unitLayouts, unitStats, categories, offplanOwners, offplanAttributes, offplanViewOptions, offplanHeatingTypeOptions, offplanRoomOptions, offplanCurrencies, offplanObjectTypes]);
 
     const resaleDashboard = useMemo(() => {
         const totalListings = resaleListingsTotal || apartments.length;
@@ -687,51 +769,39 @@ export function Dashboard() {
                     ) : (
                     <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Off-plan Sales</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{unitStats?.total ?? 0}</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+15% from last month</span>
+                        {offplanDashboard.topCards.map((card) => (
+                            <div key={card.label} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                                <div>
+                                    <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>{card.label}</p>
+                                    <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{card.value}</h3>
+                                    <span className={card.accent} style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>{card.hint}</span>
+                                </div>
+                                <img src={card.icon} alt="" className="h-10 w-10" />
                             </div>
-                            <img src="/images/pages/inv-dashboard/first-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Active Projects</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{categories.length}</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+22% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/second-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Units Sold</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{unitStats?.sold ?? 0}</h3>
-                                <span className="text-[#2D9A5B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>+31% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/third-img.svg" alt="" className="h-10 w-10" />
-                        </div>
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p className="m-0 text-[#4E525D]" style={{ fontWeight: 500, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Reserved Units</p>
-                                <h3 className="mt-2 mb-1 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 32, lineHeight: "40px", letterSpacing: 0 }}>{unitStats?.reserved ?? 0}</h3>
-                                <span className="text-[#C3362B]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>-3.2% from last month</span>
-                            </div>
-                            <img src="/images/pages/inv-dashboard/forth-img.svg" alt="" className="h-10 w-10" />
-                        </div>
+                        ))}
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                             <div className="flex items-center justify-between mb-6">
-                                <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Listing Activity</h4>
-                                <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Last 6 months performance</span>
+                                <div>
+                                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px", letterSpacing: 0 }}>Listing Activity</h4>
+                                    <span className="text-[#4E525D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>Houses created in the last 6 months</span>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
+                                    <span className="rounded-full bg-[#E7F6ED] px-3 py-1 font-medium text-[#2D9A5B]">{offplanDashboard.activeHouses} active</span>
+                                    <span className="rounded-full bg-[#FDECEC] px-3 py-1 font-medium text-[#C3362B]">{offplanDashboard.archivedHouses} archived</span>
+                                </div>
                             </div>
                             <div className="relative w-full flex-1 min-h-[260px]">
                                 <div className="absolute left-0 top-0 text-right pr-3" style={{ width: 72, bottom: 32 }}>
-                                    {[...Array(6)].map((_, i) => (
-                                        <span key={i} className="absolute w-full right-0 pr-3 text-[#1A1A1A]" style={{ top: `${i * 20}%`, transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>
-                                            {Math.round(offplanDashboard.maxCount * (1 - i / 5))}
+                                    {offplanDashboard.chartTicks.map((tick, index) => (
+                                        <span
+                                            key={index}
+                                            className="absolute w-full right-0 pr-3 text-[#1A1A1A]"
+                                            style={{ top: `${index * 20}%`, transform: "translateY(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}
+                                        >
+                                            {formatChartValue(tick)}
                                         </span>
                                     ))}
                                 </div>
@@ -744,26 +814,59 @@ export function Dashboard() {
 
                                     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                                         <defs>
-                                            <linearGradient id="listingAreaFill" x1="0" y1="0" x2="0" y2="1">
+                                            <linearGradient id="revenueAreaFillOffplan" x1="0" y1="0" x2="0" y2="1">
                                                 <stop offset="0%" stopColor="#4E525D" stopOpacity="0.35" />
                                                 <stop offset="100%" stopColor="#4E525D" stopOpacity="0" />
                                             </linearGradient>
                                         </defs>
-                                        <path d={offplanDashboard.areaD} fill="url(#listingAreaFill)" stroke="none" vectorEffect="non-scaling-stroke" />
-                                        <path d={offplanDashboard.pathD} fill="none" stroke="#4E525D" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
+                                        <path d={offplanDashboard.chartAreaPath} fill="url(#revenueAreaFillOffplan)" stroke="none" vectorEffect="non-scaling-stroke" />
+                                        <path d={offplanDashboard.chartLinePath} fill="none" stroke="#4E525D" strokeWidth="1.6" vectorEffect="non-scaling-stroke" strokeLinecap="round" />
                                     </svg>
 
-                                    {offplanDashboard.chartPoints.map((pt, i) => (
-                                        <div key={i} className="absolute flex items-center justify-center" style={{ left: `${pt.x}%`, top: `${pt.y}%` }}>
-                                            <div className="w-[14px] h-[14px] rounded-full bg-white" style={{ border: "2px solid #4E525D", transform: "translate(-50%, -50%)" }} />
-                                        </div>
-                                    ))}
+                                    {offplanDashboard.chartPoints.map((point, index) => {
+                                        const isHighlighted = index === offplanDashboard.highlightedActivityIndex;
+                                        const activity = offplanDashboard.listingActivity[index]!;
+
+                                        return (
+                                            <div key={activity.label} className="absolute" style={{ left: `${point.x}%`, top: `${point.y}%`, width: 0, height: 0 }}>
+                                                <div
+                                                    className={`absolute rounded-full ${isHighlighted ? "bg-[#4E525D]" : "bg-white"}`}
+                                                    style={{
+                                                        left: "50%",
+                                                        top: "50%",
+                                                        width: 14,
+                                                        height: 14,
+                                                        border: "2px solid #4E525D",
+                                                        transform: "translate(-50%, -50%)",
+                                                        boxShadow: isHighlighted ? "0px 0px 1px 0px #00000040, 0px 2px 1px 0px #0000000D" : "none",
+                                                    }}
+                                                />
+                                                {isHighlighted ? (
+                                                    <>
+                                                        <div className="absolute" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)" }}>
+                                                            <div className="relative">
+                                                                <div className="flex min-w-[54px] items-center justify-center text-white" style={{ height: 42, padding: "12px 16px", borderRadius: 8, background: "#00000080", opacity: 0.8 }}>
+                                                                    <span style={{ fontWeight: 500, fontSize: 14, lineHeight: "18px" }}>{activity.count}</span>
+                                                                </div>
+                                                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-[5px] w-0 h-0" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "6px solid #00000080" }} />
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute" style={{ left: "50%", top: 0, height: 60, borderLeft: "2px dashed #4E525D", transform: "translateX(-50%)" }} />
+                                                    </>
+                                                ) : null}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
-                                    {offplanDashboard.months.map((m, i) => (
-                                        <span key={i} className="absolute text-[#1A1A1A]" style={{ left: `${(i / (offplanDashboard.months.length - 1)) * 100}%`, transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}>
-                                            {m.label}
+                                    {offplanDashboard.chartPoints.map((point, index) => (
+                                        <span
+                                            key={offplanDashboard.listingActivity[index]!.label}
+                                            className="absolute text-[#1A1A1A]"
+                                            style={{ left: `${point.x}%`, transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}
+                                        >
+                                            {offplanDashboard.listingActivity[index]!.label}
                                         </span>
                                     ))}
                                 </div>
@@ -771,38 +874,99 @@ export function Dashboard() {
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
                             <div>
-                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Unit Distribution</h4>
-                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Current inventory status</p>
+                                <h4 className="m-0 text-[#2C3E50]" style={{ fontWeight: 600, fontSize: 18, lineHeight: "24px" }}>Type Distribution</h4>
+                                <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Live mix from current off-plan houses</p>
                             </div>
                             <div className="flex flex-1 items-center justify-center relative min-h-[180px] my-4">
                                 <svg width="140" height="140" viewBox="0 0 128 128">
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#0075E3" strokeWidth="13"
-                                        strokeDasharray={`${offplanDashboard.donutAvailable} ${offplanDashboard.donutAvailable + offplanDashboard.donutSold + offplanDashboard.donutReserved}`}
-                                        strokeLinecap="butt" transform="rotate(184 64 64)" />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#00C377" strokeWidth="13"
-                                        strokeDasharray={`${offplanDashboard.donutSold} ${offplanDashboard.donutAvailable + offplanDashboard.donutSold + offplanDashboard.donutReserved}`}
-                                        strokeLinecap="butt" transform={`rotate(${184 + (offplanDashboard.donutAvailable / (2 * Math.PI * 50)) * 360} 64 64)`} />
-                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#FFBB00" strokeWidth="13"
-                                        strokeDasharray={`${offplanDashboard.donutReserved} ${offplanDashboard.donutAvailable + offplanDashboard.donutSold + offplanDashboard.donutReserved}`}
-                                        strokeLinecap="butt" transform={`rotate(${184 + ((offplanDashboard.donutAvailable + offplanDashboard.donutSold) / (2 * Math.PI * 50)) * 360} 64 64)`} />
+                                    <circle cx="64" cy="64" r="50" fill="none" stroke="#EEF1F4" strokeWidth="13" />
+                                    {offplanDashboard.donutSegments.map((segment) => (
+                                        <circle
+                                            key={segment.label}
+                                            cx="64"
+                                            cy="64"
+                                            r="50"
+                                            fill="none"
+                                            stroke={segment.color}
+                                            strokeWidth="13"
+                                            strokeDasharray={segment.dasharray}
+                                            strokeDashoffset={segment.dashoffset}
+                                            strokeLinecap="butt"
+                                            transform="rotate(-90 64 64)"
+                                        />
+                                    ))}
                                 </svg>
+                                <div className="absolute flex flex-col items-center justify-center">
+                                    <span className="text-[28px] font-semibold leading-none text-[#1A1A1A]">{offplanDashboard.totalHouses}</span>
+                                    <span className="mt-1 text-[12px] text-[#7F8C8D]">houses</span>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-[14px] mt-2">
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#0075E3] flex-shrink-0" />
-                                    <span>Available <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.available ?? 0}</span></span>
+                                {offplanDashboard.donutSegments.length > 0 ? offplanDashboard.donutSegments.map((segment) => (
+                                    <div key={segment.label} className="flex items-center gap-2.5 text-[#555555]">
+                                        <span className="w-3.5 h-3.5 rounded-full flex-shrink-0" style={{ backgroundColor: segment.color }} />
+                                        <span>{segment.label} <span className="font-semibold text-[#2C3E50] ml-0.5">{segment.count}</span></span>
+                                    </div>
+                                )) : (
+                                    <div className="col-span-2 rounded-2xl bg-[#F8F9FA] px-4 py-5 text-center text-sm text-[#7F8C8D]">
+                                        No house types are in use yet.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>Data Coverage</h4>
+                                    <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>Everything already configured for the off-plan module</p>
                                 </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#00C377] flex-shrink-0" />
-                                    <span>Sold <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.sold ?? 0}</span></span>
+                                <div className="rounded-full bg-[#F4F5F6] px-3 py-1 text-xs font-medium text-[#4E525D]">
+                                    live inventory snapshot
                                 </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#FFBB00] flex-shrink-0" />
-                                    <span>Reserved <span className="font-semibold text-[#2C3E50] ml-0.5">{unitStats?.reserved ?? 0}</span></span>
+                            </div>
+
+                            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                                {offplanDashboard.dataCoverage.map((item) => (
+                                    <div key={item.label} className="rounded-2xl border border-[#EEF1F4] bg-[#FBFCFD] px-4 py-4">
+                                        <div className="text-sm font-medium text-[#4E525D]">{item.label}</div>
+                                        <div className="mt-2 text-[28px] font-semibold leading-none text-[#1A1A1A]">{item.value}</div>
+                                        <div className="mt-2 text-xs text-[#808191]">{item.hint}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <h4 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 16, lineHeight: "20px" }}>Listing Quality</h4>
+                            <p className="m-0 mt-1 text-[#7F8C8D]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px" }}>How complete the current off-plan inventory looks</p>
+
+                            <div className="mt-5 space-y-4">
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Average rooms</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{offplanDashboard.avgRooms.toFixed(1)}</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2.5 text-[#555555]">
-                                    <span className="w-3.5 h-3.5 rounded-full bg-[#E6211B] flex-shrink-0" />
-                                    <span>Total <span className="font-semibold text-[#2C3E50] ml-0.5">{offplanDashboard.total}</span></span>
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Average area</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{offplanDashboard.avgArea.toFixed(1)} m²</span>
+                                    </div>
+                                </div>
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Objects with houses</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{offplanDashboard.objectsWithHouses}</span>
+                                    </div>
+                                </div>
+                                <div className="rounded-2xl bg-[#F8F9FA] px-4 py-4">
+                                    <div className="flex items-center justify-between text-sm text-[#4E525D]">
+                                        <span>Houses with price data</span>
+                                        <span className="font-semibold text-[#1A1A1A]">{offplanDashboard.housesWithPrice}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
