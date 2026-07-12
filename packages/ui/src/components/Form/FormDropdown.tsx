@@ -12,6 +12,8 @@ interface FormDropdownProps {
     required?: boolean;
     noOptionsLabel?: string;
     onNoOptionsClick?: () => void;
+    onCreateClick?: () => void;
+    createLabel?: string;
 }
 
 export function FormDropdown({
@@ -23,6 +25,8 @@ export function FormDropdown({
     required,
     noOptionsLabel,
     onNoOptionsClick,
+    onCreateClick,
+    createLabel,
 }: FormDropdownProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -63,6 +67,22 @@ export function FormDropdown({
             </button>
             {open && (
                 <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                    {onCreateClick && (
+                        <>
+                            <button
+                                type="button"
+                                className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer"
+                                style={{ lineHeight: "20px" }}
+                                onClick={() => {
+                                    onCreateClick();
+                                    setOpen(false);
+                                }}
+                            >
+                                {createLabel || "+ Create new"}
+                            </button>
+                            <div className="h-px bg-gray-100" />
+                        </>
+                    )}
                     {options.map((opt) => (
                         <button
                             key={opt.id}

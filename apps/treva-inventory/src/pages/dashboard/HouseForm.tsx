@@ -6,6 +6,8 @@ import { roomOptionsApi, type RoomOption } from "../../api/room-options";
 import { viewOptionsApi, type ViewOption } from "../../api/view-options";
 import { statusOptionsApi, type StatusOption } from "../../api/status-options";
 import { attributesApi, type Attribute } from "../../api/attributes";
+import { heatingTypeOptionsApi, type HeatingTypeOption } from "../../api/heating-type-options";
+import { ownersApi, type Owner } from "../../api/owners";
 import { currenciesApi, type Currency } from "../../api/currencies";
 import { categoriesApi } from "../../api/categories";
 import { lcdOptionsApi, type LcdOption } from "../../api/lcd-options";
@@ -13,6 +15,7 @@ import { typeOfBuildingOptionsApi, type TypeOfBuildingOption } from "../../api/t
 import { propertyTypeOptionsApi, type PropertyTypeOption } from "../../api/property-type-options";
 import { constructionStageOptionsApi, type ConstructionStageOption } from "../../api/construction-stage-options";
 import { salesOfficeOptionsApi, type SalesOfficeOption } from "../../api/sales-office-options";
+import { houseMaterialOptionsApi, type HouseMaterialOption } from "../../api/house-material-options";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { FormDropdown } from "@repo/ui";
@@ -69,8 +72,9 @@ const toDateInputValue = (value: unknown): string => {
     return String(value).split("T")[0] || "";
 };
 
-export function HouseForm({ embedded = false, inline = false, houseId, onSuccess }: { embedded?: boolean; inline?: boolean; houseId?: string; onSuccess?: () => void } = {}) {
-    const { slug } = useParams<{ slug: string }>();
+export function HouseForm({ embedded = false, inline = false, houseId, onSuccess, categorySlug: categorySlugProp }: { embedded?: boolean; inline?: boolean; houseId?: string; onSuccess?: () => void; categorySlug?: string } = {}) {
+    const { slug: urlSlug } = useParams<{ slug: string }>();
+    const slug = categorySlugProp || urlSlug;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { showError, showSuccess } = useMessageCenter();
@@ -130,6 +134,21 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
         queryFn: () => salesOfficeOptionsApi.getAll(),
     });
 
+    const { data: houseMaterialOptionsRes } = useQuery({
+        queryKey: ["house-material-options"],
+        queryFn: () => houseMaterialOptionsApi.getAll(),
+    });
+
+    const { data: heatingTypeOptionsRes } = useQuery({
+        queryKey: ["heating-type-options"],
+        queryFn: () => heatingTypeOptionsApi.getAll(),
+    });
+
+    const { data: ownersRes } = useQuery({
+        queryKey: ["owners"],
+        queryFn: () => ownersApi.getAll(),
+    });
+
     const { data: categoryRes } = useQuery({
         queryKey: ["category", slug],
         queryFn: () => categoriesApi.getBySlug(slug!),
@@ -157,6 +176,9 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
     const propertyTypeOptions = useMemo(() => responseArray<PropertyTypeOption>(propertyTypeOptionsRes), [propertyTypeOptionsRes]);
     const constructionStageOptions = useMemo(() => responseArray<ConstructionStageOption>(constructionStageOptionsRes), [constructionStageOptionsRes]);
     const salesOfficeOptions = useMemo(() => responseArray<SalesOfficeOption>(salesOfficeOptionsRes), [salesOfficeOptionsRes]);
+    const houseMaterialOptions = useMemo(() => responseArray<HouseMaterialOption>(houseMaterialOptionsRes), [houseMaterialOptionsRes]);
+    const heatingTypeOptions = useMemo(() => responseArray<HeatingTypeOption>(heatingTypeOptionsRes), [heatingTypeOptionsRes]);
+    const owners = useMemo(() => responseArray<Owner>(ownersRes), [ownersRes]);
     const categoryId = category?.id || "";
 
     const monthOptions = Array.from({ length: 12 }, (_, i) => ({
@@ -229,6 +251,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
         floorTo: undefined as unknown as number,
         roomCount: undefined as unknown as number,
         attributeIds: [] as string[],
+        heatingTypeIds: [] as string[],
         renovation: "",
         kitchenSize: undefined as unknown as number,
         wallMaterial: "",
@@ -281,12 +304,13 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                 title: house.title || house.name || "",
                 slug: house.slug || "",
                 apartmentTypeId: findOptionId(roomOptions, firstValue(house.roomOptionId, house.apartmentTypeId, house.houseNameId, house.roomOption?.id, house.roomOption?.title, house.roomOption?.value, house.apartmentType?.id, house.apartmentType?.value)),
-                ownerId: findOptionId(viewOptions, firstValue(house.viewOptionId, house.ownerId, house.viewOption?.id, house.viewOption?.value)),
+                ownerId: findOptionId(owners, firstValue(house.ownerId, house.owner?.id)),
                 status: findOptionId(statusOptions, firstValue(house.statusOptionId, house.statusId, house.status, house.statusOption?.id, house.statusOption?.value)) || "active",
                 floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
                 floorTo: toNumberOrUndefined(house.floorTo, house.numberOfFloors?.end, house.floor),
                 roomCount: toNumberOrUndefined(house.roomCount, house.numberOfRooms, house.number),
                 attributeIds: house.attributeIds || house.similarApartmentIds || [],
+                heatingTypeIds: house.heatingTypeIds || [],
                 renovation: house.renovation || "",
                 kitchenSize: toNumberOrUndefined(house.kitchenSize, house.balconyArea),
                 wallMaterial: house.wallMaterial || "",
@@ -319,7 +343,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
             });
             setSlugManuallyEdited(true);
         }
-    }, [existingHouseData, isEditMode, currencies, roomOptions, viewOptions, statusOptions, lcdOptions, typeOfBuildingOptions, propertyTypeOptions, constructionStageOptions, salesOfficeOptions]);
+    }, [existingHouseData, isEditMode, currencies, roomOptions, viewOptions, statusOptions, lcdOptions, typeOfBuildingOptions, propertyTypeOptions, constructionStageOptions, salesOfficeOptions, owners, heatingTypeOptions]);
 
     const handleSlugFromTitle = (title: string) => {
         if (!slugManuallyEdited) {
@@ -354,7 +378,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
             if (onSuccess) {
                 onSuccess();
             } else if (!inline) {
-                navigate(`/dashboard/offplan/objects/${slug}/config/properties`);
+                navigate(`/dashboard/offplan/objects/${slug}/edit`);
             }
         },
         onError: (error) => {
@@ -435,12 +459,17 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
             completionYear: form.completionOfConstructionYear ? Number(form.completionOfConstructionYear) : 2030,
             numberOfFloors: { start: form.floorFrom, end: form.floorTo || form.floorFrom },
             similarApartmentIds: form.attributeIds,
+            attributeIds: form.attributeIds,
+            heatingTypeIds: form.heatingTypeIds,
+            ownerId: form.ownerId || undefined,
             mainImage: form.image ? { url: form.image } : undefined,
             gallery: form.gallery,
             documents: [],
             location: form.locationTitle ? { title: form.locationTitle, type: "custom", url: form.locationUrl } : undefined,
+            locationTitle: form.locationTitle || undefined,
+            locationUrl: form.locationUrl || undefined,
             statusOptionId: form.status || undefined,
-            viewOptionId: form.ownerId || undefined,
+            viewOptionId: undefined,
             roomOptionId: form.apartmentTypeId || undefined,
             lcd: form.lcd || undefined,
             typeOfBuilding: form.typeOfBuilding || undefined,
@@ -694,6 +723,8 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                 options={dropdownOptions(propertyTypeOptions, form.defaultPropertyType || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select property type"
                                 onChange={(val) => updateField("defaultPropertyType", val)}
+                                onCreateClick={() => navigate("/dashboard/offplan/property-type-options")}
+                                createLabel="+ Create property type"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -710,6 +741,8 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                 options={dropdownOptions(salesOfficeOptions, form.salesOffice || "", (o) => ({ id: o.value, label: o.value }))}
                                 placeholder="Select office"
                                 onChange={(val) => updateField("salesOffice", val)}
+                                onCreateClick={() => navigate("/dashboard/offplan/sales-office-options")}
+                                createLabel="+ Create sales office"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -722,15 +755,15 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                     placeholder="Renovated"
                                 />
                             </div>
-                            <div>
-                                <label className="mb-1 block text-xs text-[#4E525D]">House material</label>
-                                <input
-                                    className={inputClass}
-                                    value={form.wallMaterial || ""}
-                                    onChange={(e) => updateField("wallMaterial", e.target.value)}
-                                    placeholder="Brick"
-                                />
-                            </div>
+                            <FormDropdown
+                                label="House material"
+                                value={form.wallMaterial || ""}
+                                options={dropdownOptions(houseMaterialOptions, form.wallMaterial || "", (o) => ({ id: o.value, label: o.value }))}
+                                placeholder="Select material"
+                                onChange={(val) => updateField("wallMaterial", val)}
+                                onCreateClick={() => navigate("/dashboard/offplan/house-material-options")}
+                                createLabel="+ Create material"
+                            />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -825,9 +858,47 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                                 )}
                             </div>
                         </div>
+                        <div>
+                            <label className="mb-1 block text-xs text-[#4E525D]">Heating Types</label>
+                            <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 py-2">
+                                {heatingTypeOptions.map((ht: HeatingTypeOption) => {
+                                    const selected = form.heatingTypeIds?.includes(ht.id);
+                                    return (
+                                        <button
+                                            key={ht.id}
+                                            type="button"
+                                            onClick={() => {
+                                                const current = form.heatingTypeIds || [];
+                                                const next = selected
+                                                    ? current.filter((id) => id !== ht.id)
+                                                    : [...current, ht.id];
+                                                updateField("heatingTypeIds", next);
+                                            }}
+                                            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                                                selected
+                                                    ? "bg-orange-500/20 text-orange-600 border border-orange-400/30"
+                                                    : "bg-white text-[#666666] border border-gray-200 hover:bg-gray-50 hover:text-[#1A1A1A]"
+                                            }`}
+                                        >
+                                            {ht.title}
+                                        </button>
+                                    );
+                                })}
+                                {heatingTypeOptions.length === 0 && (
+                                    <span className="text-xs text-[#999]">No heating types created yet</span>
+                                )}
+                            </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
+                            <FormDropdown
+                                label="Owner"
+                                value={form.ownerId || ""}
+                                options={dropdownOptions(owners, form.ownerId || "", (o) => ({ id: o.id, label: `${o.firstName} ${o.lastName}` }))}
+                                placeholder="Select owner"
+                                onChange={(id) => updateField("ownerId", id)}
+                            />
                             <div>
-                                <label className="mb-1 block text-xs text-[#4E525D]">Kitchen Size (mÂ²)</label>
+                                <label className="mb-1 block text-xs text-[#4E525D]">Kitchen Size (m²)</label>
                                 <input
                                     className={inputClass}
                                     type="number"
@@ -1268,7 +1339,7 @@ export function HouseForm({ embedded = false, inline = false, houseId, onSuccess
                             if (onSuccess) {
                                 onSuccess();
                             } else if (!inline) {
-                                navigate(`/dashboard/offplan/objects/${slug}/config/properties`);
+                                navigate(`/dashboard/offplan/objects/${slug}/edit`);
                             }
                         }}
                         disabled={createMutation.isPending}

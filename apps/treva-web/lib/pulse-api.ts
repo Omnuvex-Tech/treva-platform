@@ -83,6 +83,10 @@ export async function getArticles(params?: {
     const res = await fetch(url, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error("Failed to fetch articles");
     const data = await res.json();
+    // Handle cms-api { value, Count } format
+    if (data && Array.isArray(data.value)) {
+        return { data: data.value, pagination: { page: 1, limit: data.Count ?? data.value.length, total: data.Count ?? data.value.length, totalPages: 1 } };
+    }
     // Handle both paginated and plain array responses
     if (Array.isArray(data)) {
         return { data, pagination: { page: 1, limit: data.length, total: data.length, totalPages: 1 } };

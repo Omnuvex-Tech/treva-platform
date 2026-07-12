@@ -59,6 +59,12 @@ export interface UnitLayout {
     roomOptionId?: string;
     roomOption?: { id: string; name: string; title: string; type: string };
     viewOption?: { id: string; name: string; title: string };
+    ownerId?: string;
+    owner?: { id: string; firstName: string; lastName: string; phoneNumber: string };
+    heatingTypeIds?: string[];
+    attributeIds?: string[];
+    locationTitle?: string;
+    locationUrl?: string;
     lcd?: string;
     typeOfBuilding?: string;
     defaultPropertyType?: string;
@@ -121,6 +127,11 @@ export interface CreateUnitLayoutData {
     documents?: Document[];
     location?: Location;
     roomOptionId?: string;
+    ownerId?: string;
+    heatingTypeIds?: string[];
+    attributeIds?: string[];
+    locationTitle?: string;
+    locationUrl?: string;
     lcd?: string;
     typeOfBuilding?: string;
     defaultPropertyType?: string;
@@ -174,7 +185,7 @@ const cleanString = (value: string | undefined) => {
 const sanitizeUnitLayoutData = (
     data: Partial<CreateUnitLayoutData>
 ): Partial<CreateUnitLayoutData> => {
-    const locationTitle = cleanString(data.location?.title);
+    const locationTitle = cleanString(data.location?.title) || cleanString(data.locationTitle);
     const locationType = cleanString(data.location?.type);
     const mainImageUrl = cleanString(data.mainImage?.url);
 
@@ -186,6 +197,11 @@ const sanitizeUnitLayoutData = (
         number: data.number,
         balconyArea: data.balconyArea,
         similarApartmentIds: data.similarApartmentIds?.filter(Boolean),
+        ownerId: cleanString(data.ownerId),
+        heatingTypeIds: data.heatingTypeIds?.filter(Boolean) || [],
+        attributeIds: data.attributeIds?.filter(Boolean) || [],
+        locationTitle: cleanString(data.locationTitle) || cleanString(data.location?.title),
+        locationUrl: cleanString(data.locationUrl) || cleanString(data.location?.url),
         mainImage: mainImageUrl
             ? {
                   url: mainImageUrl,
@@ -209,7 +225,7 @@ const sanitizeUnitLayoutData = (
                 ? {
                       title: locationTitle,
                       type: locationType,
-                      url: cleanString(data.location?.url),
+                      url: cleanString(data.location?.url) || cleanString(data.locationUrl),
                   }
                 : undefined,
     };

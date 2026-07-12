@@ -99,6 +99,12 @@ model UnitLayout {
   renovation                  String?
   wallMaterial                String?
   description                 String?
+  ownerId                     String?
+  owner                       Owner?      @relation(fields: [ownerId], references: [id])
+  heatingTypeIds              String[]    @default([])
+  attributeIds                String[]    @default([])
+  locationTitle               String?
+  locationUrl                 String?
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 }
@@ -181,6 +187,13 @@ model SalesOfficeOption {
   updatedAt DateTime @updatedAt
 }
 
+model HouseMaterialOption {
+  id        String   @id @default(cuid())
+  value     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // ─── Resale Models ───────────────────────────────────────────
 
 model ApartmentType {
@@ -202,7 +215,8 @@ model Owner {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  apartments Apartment[]
+  apartments  Apartment[]
+  unitLayouts UnitLayout[]
 }
 
 model Attribute {

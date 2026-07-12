@@ -26,22 +26,25 @@ import { ApartmentTypesSection } from "./dashboard/ApartmentTypesSection";
 import { OwnersSection } from "./dashboard/OwnersSection";
 import { AttributesSection } from "./dashboard/AttributesSection";
 import { RequestsSection } from "./dashboard/RequestsSection";
+import { SalesOfficeOptionsSection } from "./dashboard/SalesOfficeOptionsSection";
+import { PropertyTypeOptionsSection } from "./dashboard/PropertyTypeOptionsSection";
+import { HouseMaterialOptionsSection } from "./dashboard/HouseMaterialOptionsSection";
 import { OffPlanObjectsSection } from "./dashboard/OffPlanObjectsSection";
 import { CategoryEdit } from "./categories/CategoryEdit";
 import { CategoryCreate } from "./categories/CategoryCreate";
 import { ObjectEditPage } from "./dashboard/ObjectEditPage";
 import { ObjectCreatePage } from "./dashboard/ObjectCreatePage";
 import { ObjectTypesSection } from "./dashboard/ObjectTypesSection";
-import { ResidentComplexConfigPage } from "./dashboard/ResidentComplexConfigPage";
-import { PropertyConfigPage } from "./dashboard/PropertyConfigPage";
-import { HouseForm } from "./dashboard/HouseForm";
+
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type MenuKey = "offplan" | "resale"
     | "categories" | "unitLayouts" | "viewOptions" | "statusOptions"
     | "roomOptions" | "currencies"
     | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests" | "locationOptions" | "resaleViewOptions" | "heatingTypeOptions"
-    | "objects" | "objectTypes";
+    | "objects" | "objectTypes"
+    | "offplanLocationOptions" | "offplanHeatingTypeOptions" | "offplanOwners" | "offplanAttributes"
+    | "salesOfficeOptions" | "propertyTypeOptions" | "houseMaterialOptions";
 
 const pageNames: Record<MenuKey, string> = {
     offplan: "Off-plan",
@@ -62,6 +65,13 @@ const pageNames: Record<MenuKey, string> = {
     heatingTypeOptions: "Heating Types",
     objects: "Objects",
     objectTypes: "Object Types",
+    offplanLocationOptions: "Location Options",
+    offplanHeatingTypeOptions: "Heating Types",
+    offplanOwners: "Owners",
+    offplanAttributes: "Attributes",
+    salesOfficeOptions: "Sales Offices",
+    propertyTypeOptions: "Property Types",
+    houseMaterialOptions: "House Materials",
 };
 
 const pageSubtitles: Record<MenuKey, string> = {
@@ -83,6 +93,13 @@ const pageSubtitles: Record<MenuKey, string> = {
     heatingTypeOptions: "Manage heating type options",
     objects: "Manage off-plan project objects",
     objectTypes: "Manage object types",
+    offplanLocationOptions: "Manage city and region options",
+    offplanHeatingTypeOptions: "Manage heating type options",
+    offplanOwners: "Manage property owners",
+    offplanAttributes: "Manage property attributes",
+    salesOfficeOptions: "Manage sales office options",
+    propertyTypeOptions: "Manage property type options",
+    houseMaterialOptions: "Manage house material options",
 };
 
 type SectionKey = "offplan" | "resale";
@@ -119,13 +136,20 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
             { key: "viewOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /></svg> },
             { key: "statusOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg> },
             { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
+            { key: "locationOptions", label: "Locations", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" /><circle cx="12" cy="11" r="2.5" /></svg> },
+            { key: "heatingTypeOptions", label: "Heating Types", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v12" /><path d="M9 7h6" /><path d="M12 14a4 4 0 1 0 4 4" /></svg> },
+            { key: "owners", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
+            { key: "attributes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg> },
             { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
+            { key: "salesOfficeOptions", label: "Sales Offices", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg> },
+            { key: "propertyTypeOptions", label: "Property Types", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
+            { key: "houseMaterialOptions", label: "House Materials", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M12 12h.01" /><path d="M17 12h.01" /><path d="M7 12h.01" /></svg> },
         ],
     },
 ];
 
 const getParentSection = (key: MenuKey): SectionKey | null => {
-    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions" || key === "objects" || key === "objectTypes") return "offplan";
+    if (key === "offplan" || key === "categories" || key === "unitLayouts" || key === "viewOptions" || key === "statusOptions" || key === "objects" || key === "objectTypes" || key === "offplanLocationOptions" || key === "offplanHeatingTypeOptions" || key === "offplanOwners" || key === "offplanAttributes" || key === "salesOfficeOptions" || key === "propertyTypeOptions" || key === "houseMaterialOptions") return "offplan";
     return "resale";
 };
 
@@ -135,12 +159,13 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
 
     if (key === "apartments") return "/dashboard/resale/apartments";
     if (key === "apartmentTypes") return "/dashboard/resale/apartment-types";
-    if (key === "owners") return "/dashboard/resale/owners";
-    if (key === "attributes") return "/dashboard/resale/attributes";
-    if (key === "locationOptions") return "/dashboard/resale/location-options";
     if (key === "resaleViewOptions") return "/dashboard/resale/view-options";
-    if (key === "heatingTypeOptions") return "/dashboard/resale/heating-type-options";
     if (key === "requests") return "/dashboard/resale/requests";
+
+    if (key === "locationOptions") return `/dashboard/${parent}/location-options`;
+    if (key === "heatingTypeOptions") return `/dashboard/${parent}/heating-type-options`;
+    if (key === "owners") return `/dashboard/${parent}/owners`;
+    if (key === "attributes") return `/dashboard/${parent}/attributes`;
 
     if (key === "categories") return "/dashboard/offplan/categories";
     if (key === "objects") return "/dashboard/offplan/objects";
@@ -152,6 +177,10 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
     if (key === "roomOptions") return `/dashboard/${parent}/room-options`;
     if (key === "currencies") return `/dashboard/${parent}/currencies`;
 
+    if (key === "salesOfficeOptions") return `/dashboard/${parent}/sales-office-options`;
+    if (key === "propertyTypeOptions") return `/dashboard/${parent}/property-type-options`;
+    if (key === "houseMaterialOptions") return `/dashboard/${parent}/house-material-options`;
+
     return "/";
 }
 
@@ -160,15 +189,18 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["apartments", (value) => value === "/dashboard/resale/apartments" || value.startsWith("/dashboard/resale/apartments/")],
         ["apartmentTypes", (value) => value === "/dashboard/resale/apartment-types"],
         ["roomOptions", (value) => value === "/dashboard/resale/room-options" || value === "/dashboard/offplan/room-options"],
-        ["attributes", (value) => value === "/dashboard/resale/attributes"],
-        ["owners", (value) => value === "/dashboard/resale/owners"],
-        ["locationOptions", (value) => value === "/dashboard/resale/location-options"],
+        ["attributes", (value) => value === "/dashboard/resale/attributes" || value === "/dashboard/offplan/attributes"],
+        ["owners", (value) => value === "/dashboard/resale/owners" || value === "/dashboard/offplan/owners"],
+        ["locationOptions", (value) => value === "/dashboard/resale/location-options" || value === "/dashboard/offplan/location-options"],
         ["resaleViewOptions", (value) => value === "/dashboard/resale/view-options"],
-        ["heatingTypeOptions", (value) => value === "/dashboard/resale/heating-type-options"],
+        ["heatingTypeOptions", (value) => value === "/dashboard/resale/heating-type-options" || value === "/dashboard/offplan/heating-type-options"],
         ["requests", (value) => value === "/dashboard/resale/requests"],
         ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
+        ["salesOfficeOptions", (value) => value === "/dashboard/offplan/sales-office-options" || value === "/dashboard/resale/sales-office-options"],
+        ["propertyTypeOptions", (value) => value === "/dashboard/offplan/property-type-options" || value === "/dashboard/resale/property-type-options"],
+        ["houseMaterialOptions", (value) => value === "/dashboard/offplan/house-material-options" || value === "/dashboard/resale/house-material-options"],
         ["categories", (value) => value === "/dashboard/offplan/categories"],
-        ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create" || /^\/dashboard\/offplan\/objects\/[^/]+\/config$/.test(value) || /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties$/.test(value) || /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties\/houses\/create$/.test(value) || /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties\/houses\/[^/]+\/edit$/.test(value)],
+        ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create"],
         ["objectTypes", (value) => value === "/dashboard/offplan/object-types"],
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["viewOptions", (value) => value === "/dashboard/offplan/view-options"],
@@ -203,8 +235,8 @@ const buildLinePath = (points: { x: number; y: number }[]) =>
 const buildAreaPath = (points: { x: number; y: number }[]) => {
     if (points.length === 0) return "";
 
-    const first = points[0];
-    const last = points[points.length - 1];
+    const first = points[0]!;
+    const last = points[points.length - 1]!;
     return `${buildLinePath(points)} L ${last.x} 100 L ${first.x} 100 Z`;
 };
 
@@ -216,16 +248,7 @@ export function Dashboard() {
     const isCreatingApartment = location.pathname === "/dashboard/resale/apartments/create";
     const isEditingObject = /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(location.pathname);
     const isCreatingObject = location.pathname === "/dashboard/offplan/objects/create";
-    const isConfiguringObject = /^\/dashboard\/offplan\/objects\/[^/]+\/config$/.test(location.pathname);
-    const isPropertyConfig = /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties$/.test(location.pathname);
-    const isCreatingHouse = /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties\/houses\/create$/.test(location.pathname);
-    const isEditingHouse = /^\/dashboard\/offplan\/objects\/[^/]+\/config\/properties\/houses\/[^/]+\/edit$/.test(location.pathname);
     const objectId = isEditingObject ? location.pathname.split("/")[4] : null;
-    const configObjectSlug = isConfiguringObject ? location.pathname.split("/")[4] : null;
-    const propertyConfigSlug = isPropertyConfig ? location.pathname.split("/")[4] : null;
-    const creatingHouseSlug = isCreatingHouse ? location.pathname.split("/")[4] : null;
-    const editingHouseSlug = isEditingHouse ? location.pathname.split("/")[4] : null;
-    const editingHouseId = isEditingHouse ? routeParams.houseId ?? location.pathname.split("/")[8] : null;
     const activeMenu = getMenuKeyFromPath(location.pathname) ?? "resale";
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
 
@@ -570,99 +593,14 @@ export function Dashboard() {
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Header Navbar */}
                 <header className="relative h-[80px] w-full bg-white flex items-center justify-between px-8 flex-shrink-0">
-                    {!isConfiguringObject && !isPropertyConfig && !isCreatingHouse && !isEditingHouse && (
-                        <div>
-                            <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
-                                {pageNames[activeMenu]}
-                            </h2>
-                            <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>
-                                {pageSubtitles[activeMenu]}
-                            </p>
-                        </div>
-                    )}
-                    {isConfiguringObject && (
-                        <div className="flex items-center gap-2 text-[14px]">
-                            <span
-                                onClick={() => navigate("/dashboard/offplan/objects")}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                objects
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span className="text-[#333333] font-medium">{configObjectSlug}</span>
-                        </div>
-                    )}
-                    {isPropertyConfig && (
-                        <div className="flex items-center gap-2 text-[14px]">
-                            <span
-                                onClick={() => navigate("/dashboard/offplan/objects")}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                objects
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span
-                                onClick={() => navigate(`/dashboard/offplan/objects/${propertyConfigSlug}/config`)}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                {propertyConfigSlug}
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span className="text-[#333333] font-medium">properties</span>
-                        </div>
-                    )}
-                    {isCreatingHouse && (
-                        <div className="flex items-center gap-2 text-[14px]">
-                            <span
-                                onClick={() => navigate("/dashboard/offplan/objects")}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                objects
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span
-                                onClick={() => navigate(`/dashboard/offplan/objects/${creatingHouseSlug}/config`)}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                {creatingHouseSlug}
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span
-                                onClick={() => navigate(`/dashboard/offplan/objects/${creatingHouseSlug}/config/properties`)}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                properties
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span className="text-[#333333] font-medium">Make a home</span>
-                        </div>
-                    )}
-                    {isEditingHouse && (
-                        <div className="flex items-center gap-2 text-[14px]">
-                            <span
-                                onClick={() => navigate("/dashboard/offplan/objects")}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                objects
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span
-                                onClick={() => navigate(`/dashboard/offplan/objects/${editingHouseSlug}/config`)}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                {editingHouseSlug}
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span
-                                onClick={() => navigate(`/dashboard/offplan/objects/${editingHouseSlug}/config/properties`)}
-                                className="text-[#666666] hover:text-[#333333] cursor-pointer transition-colors"
-                            >
-                                properties
-                            </span>
-                            <img src="/images/inv-dashboard/right.svg" alt="" className="w-4 h-4" />
-                            <span className="text-[#333333] font-medium">Edit house</span>
-                        </div>
-                    )}
+                    <div>
+                        <h2 className="m-0 text-[#1A1A1A]" style={{ fontWeight: 500, fontSize: 24, lineHeight: "32px", letterSpacing: 0 }}>
+                            {pageNames[activeMenu]}
+                        </h2>
+                        <p className="m-0 mt-0.5 text-[#666666]" style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0 }}>
+                            {pageSubtitles[activeMenu]}
+                        </p>
+                    </div>
 
                     <div className="ml-6 flex min-w-0 flex-1 items-center justify-end gap-4">
                         <div className="relative flex min-w-[180px] max-w-[392px] flex-1 items-center" style={{ height: 44 }}>
@@ -919,7 +857,7 @@ export function Dashboard() {
 
                                     {resaleDashboard.chartPoints.map((point, index) => {
                                         const isHighlighted = index === resaleDashboard.highlightedActivityIndex;
-                                        const activity = resaleDashboard.listingActivity[index];
+                                        const activity = resaleDashboard.listingActivity[index]!;
 
                                         return (
                                             <div key={activity.label} className="absolute" style={{ left: `${point.x}%`, top: `${point.y}%`, width: 0, height: 0 }}>
@@ -956,11 +894,11 @@ export function Dashboard() {
                                 <div className="absolute bottom-0 left-[72px] right-0 px-2" style={{ height: 18 }}>
                                     {resaleDashboard.chartPoints.map((point, index) => (
                                         <span
-                                            key={resaleDashboard.listingActivity[index].label}
+                                            key={resaleDashboard.listingActivity[index]!.label}
                                             className="absolute text-[#1A1A1A]"
                                             style={{ left: `${point.x}%`, transform: "translateX(-50%)", fontWeight: 400, fontSize: 12, lineHeight: "18px", letterSpacing: 0 }}
                                         >
-                                            {resaleDashboard.listingActivity[index].label}
+                                            {resaleDashboard.listingActivity[index]!.label}
                                         </span>
                                     ))}
                                 </div>
@@ -1072,7 +1010,7 @@ export function Dashboard() {
 
                 {/* Management Content Sections */}
                 {activeMenu === "categories" && <CategoriesSection />}
-                {activeMenu === "objects" && (isCreatingHouse || isEditingHouse ? <HouseForm embedded houseId={isEditingHouse ? editingHouseId ?? undefined : undefined} key={isCreatingHouse ? creatingHouseSlug : editingHouseId} /> : isPropertyConfig ? <PropertyConfigPage embedded key={propertyConfigSlug} /> : isConfiguringObject ? <ResidentComplexConfigPage embedded key={configObjectSlug} /> : isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
+                {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
                 {activeMenu === "objectTypes" && <ObjectTypesSection />}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
                 {activeMenu === "viewOptions" && <ViewOptionsSection />}
@@ -1085,6 +1023,9 @@ export function Dashboard() {
                 {activeMenu === "locationOptions" && <LocationOptionsSection />}
                 {activeMenu === "resaleViewOptions" && <ViewOptionsSection />}
                 {activeMenu === "heatingTypeOptions" && <HeatingTypeOptionsSection />}
+                {activeMenu === "salesOfficeOptions" && <SalesOfficeOptionsSection />}
+                {activeMenu === "propertyTypeOptions" && <PropertyTypeOptionsSection />}
+                {activeMenu === "houseMaterialOptions" && <HouseMaterialOptionsSection />}
                 {activeMenu === "attributes" && <AttributesSection />}
                 {activeMenu === "requests" && <RequestsSection />}
             </div>

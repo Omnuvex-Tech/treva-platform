@@ -278,4 +278,31 @@ export class CreateUnitLayoutDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional({ example: 'clx1234567890' })
+  @IsOptional()
+  @IsString()
+  ownerId?: string;
+
+  @ApiPropertyOptional({ example: ['id1', 'id2'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  heatingTypeIds?: string[];
+
+  @ApiPropertyOptional({ example: ['id1', 'id2'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  attributeIds?: string[];
+
+  @ApiPropertyOptional({ example: 'Seafront Boulevard' })
+  @IsOptional()
+  @IsString()
+  locationTitle?: string;
+
+  @ApiPropertyOptional({ example: 'https://maps.example.com/...' })
+  @IsOptional()
+  @IsString()
+  locationUrl?: string;
 }

@@ -56,8 +56,13 @@ export class UnitLayoutsService {
         renovation: createDto.renovation,
         wallMaterial: createDto.wallMaterial,
         description: createDto.description,
+        ownerId: createDto.ownerId,
+        heatingTypeIds: createDto.heatingTypeIds || [],
+        attributeIds: createDto.attributeIds || [],
+        locationTitle: createDto.locationTitle,
+        locationUrl: createDto.locationUrl,
       },
-      include: { category: true },
+      include: { category: true, owner: true },
     });
   }
 
@@ -181,6 +186,7 @@ export class UnitLayoutsService {
           roomOption: true,
           viewOption: true,
           statusOption: true,
+          owner: true,
         },
       }),
       this.prisma.unitLayout.count({ where }),
@@ -200,7 +206,7 @@ export class UnitLayoutsService {
   async findOne(id: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { id },
-      include: { category: true, roomOption: true, viewOption: true, statusOption: true },
+      include: { category: true, roomOption: true, viewOption: true, statusOption: true, owner: true },
     });
 
     if (!unitLayout) {
@@ -221,7 +227,7 @@ export class UnitLayoutsService {
   async findBySlug(slug: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { slug },
-      include: { category: true, roomOption: true, viewOption: true, statusOption: true },
+      include: { category: true, roomOption: true, viewOption: true, statusOption: true, owner: true },
     });
 
     if (!unitLayout) {
@@ -296,11 +302,16 @@ export class UnitLayoutsService {
     if (updateDto.renovation !== undefined) data.renovation = updateDto.renovation;
     if (updateDto.wallMaterial !== undefined) data.wallMaterial = updateDto.wallMaterial;
     if (updateDto.description !== undefined) data.description = updateDto.description;
+    if (updateDto.ownerId !== undefined) data.ownerId = updateDto.ownerId;
+    if (updateDto.heatingTypeIds !== undefined) data.heatingTypeIds = updateDto.heatingTypeIds;
+    if (updateDto.attributeIds !== undefined) data.attributeIds = updateDto.attributeIds;
+    if (updateDto.locationTitle !== undefined) data.locationTitle = updateDto.locationTitle;
+    if (updateDto.locationUrl !== undefined) data.locationUrl = updateDto.locationUrl;
 
     return this.prisma.unitLayout.update({
       where: { id },
       data,
-      include: { category: true, roomOption: true, statusOption: true },
+      include: { category: true, roomOption: true, statusOption: true, owner: true },
     });
   }
 

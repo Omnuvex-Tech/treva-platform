@@ -26,6 +26,7 @@ import { TypeOfBuildingOptionsModule } from './type-of-building-options/type-of-
 import { PropertyTypeOptionsModule } from './property-type-options/property-type-options.module';
 import { ConstructionStageOptionsModule } from './construction-stage-options/construction-stage-options.module';
 import { SalesOfficeOptionsModule } from './sales-office-options/sales-office-options.module';
+import { HouseMaterialOptionsModule } from './house-material-options/house-material-options.module';
 import { LocationOptionsModule } from './location-options/location-options.module';
 import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-options.module';
 
@@ -66,6 +67,7 @@ import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-op
     PropertyTypeOptionsModule,
     ConstructionStageOptionsModule,
     SalesOfficeOptionsModule,
+    HouseMaterialOptionsModule,
     LocationOptionsModule,
     HeatingTypeOptionsModule,
   ],
