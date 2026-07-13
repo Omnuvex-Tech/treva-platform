@@ -4,6 +4,52 @@
   scroll-margin-top: calc(var(--treva-nav-height, 64px) + 24px);
 }
 
+#broker-registration .broker_component {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 3rem !important;
+  align-items: stretch !important;
+}
+
+/* MOBİL: broker_component tək sütuna düşəndə sütunlar arası boşluq */
+@media screen and (max-width: 991px) {
+  #broker-registration .broker_component {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+}
+
+/* Başlıq bloku: label + h2 + note_wrap indi burada, aralarında bərabər boşluq */
+#broker-registration .broker_title-wrap {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 2.5rem !important;
+  height: 100% !important;
+}
+
+#broker-registration .broker_title-wrap h2 {
+  margin: 0 !important;
+}
+
+#broker-registration .broker_title-wrap p {
+  margin: 0 !important;
+}
+
+#broker-registration .broker_title-wrap .note_wrap {
+  margin: 0 !important;
+}
+
+#broker-registration .broker_wrap {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem !important;
+}
+
 .header-services_video-wrap:hover .header-services_video-overlay {
   opacity: 1;
   transition-delay: 0.05s;
@@ -293,20 +339,17 @@ input:focus::placeholder, textarea:focus::placeholder {
   align-items: center;
 }
 
-/* Custom Dropdown list — language switcher style (padding: 0, no gaps) */
+/* Custom Dropdown list — hero location style */
 .broker-dropdown-list {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 8px);
   left: 0;
   right: 0;
   min-width: 180px;
   padding: 0;
-  background: var(--treva-pill-bg, #3F4249);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: #3f4249;
+  border-radius: 12px;
+  box-shadow: var(--treva-shadow);
   overflow: hidden;
   z-index: 999;
   animation: broker-dropdown-in 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -326,31 +369,65 @@ input:focus::placeholder, textarea:focus::placeholder {
 .broker-dropdown-item {
   display: block;
   width: 100%;
-  padding: 8px 14px;
+  min-height: 42px;
+  padding: 18px 20px;
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
   text-transform: uppercase;
   text-align: left;
   cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 0.18s ease;
   white-space: nowrap;
 }
 
 .broker-dropdown-item:hover {
-  background: var(--treva-pill-hover-bg, #2F3134);
+  background: #2f3134;
 }
 
 .broker-dropdown-item:active {
-  background: var(--treva-pill-pressed-bg, #000000);
+  background: #000000;
 }
 
 .broker-dropdown-item--active {
-  background: rgba(255, 255, 255, 0.12);
-  font-weight: 600;
+  background: #2f3134;
+  font-weight: 400;
+}
+
+/* Broker submit button */
+.broker-submit-btn {
+  width: auto;
+  border: 1px solid #ffffff !important;
+  background-color: #ffffff;
+  color: #1a1a2e;
+  white-space: nowrap;
+  border-radius: 80px;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem 0.875rem;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  display: flex;
+  overflow: hidden;
+  cursor: pointer;
+  margin-top: 0;
+  font-family: inherit;
+  position: relative;
+}
+
+.broker-submit-btn:hover:not(:disabled) {
+  background-color: transparent;
+  border-color: #ffffff !important;
+  color: #ffffff;
+  transform: none;
+}
+
+.broker-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 /* Broker success state */
@@ -364,21 +441,21 @@ input:focus::placeholder, textarea:focus::placeholder {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 2rem;
-  min-height: 360px;
+  padding: 5rem 2.5rem;
+  min-height: 420px;
   animation: contact-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .broker-success-title {
-  font-size: 1.5rem;
+  font-size: 2.25rem;
   font-weight: 600;
   color: #fff;
-  margin: 0 0 0.75rem;
+  margin: 1.25rem 0 0.75rem;
   animation: contact-text-up 0.4s ease 0.5s both;
 }
 
 .broker-success-text {
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: rgba(255, 255, 255, 0.7);
   margin: 0 0 2rem;
   line-height: 1.5;
@@ -389,12 +466,12 @@ input:focus::placeholder, textarea:focus::placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.875rem 2rem;
+  padding: 1rem 2.5rem;
   background: #3F4249;
   color: #fff;
   border: none;
   border-radius: 12px;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;

@@ -126,6 +126,9 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
   const [phone, setPhone] = useState<string>('');
   const [countryCode, setCountryCode] = useState('+994');
   const [countryFlag, setCountryFlag] = useState('/images/flags/az.png');
+  const [phonePlaceholder, setPhonePlaceholder] = useState('050 123 45 67');
+  const [phoneMaxLength, setPhoneMaxLength] = useState(10);
+  const [phoneFormat, setPhoneFormat] = useState('XXX XXX XX XX');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -133,52 +136,52 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
   const flagRef = useRef<HTMLDivElement>(null);
 
   const countries = [
-    { code: '+994', flag: '/images/flags/az.png', name: 'Azerbaijan' },
-    { code: '+90', flag: '/images/flags/tr.png', name: 'Turkey' },
-    { code: '+7', flag: '/images/flags/ru.png', name: 'Russia' },
-    { code: '+1', flag: '/images/flags/us.png', name: 'United States' },
-    { code: '+44', flag: '/images/flags/gb.png', name: 'United Kingdom' },
-    { code: '+49', flag: '/images/flags/de.png', name: 'Germany' },
-    { code: '+33', flag: '/images/flags/fr.png', name: 'France' },
-    { code: '+39', flag: '/images/flags/it.png', name: 'Italy' },
-    { code: '+34', flag: '/images/flags/es.png', name: 'Spain' },
-    { code: '+31', flag: '/images/flags/nl.png', name: 'Netherlands' },
-    { code: '+32', flag: '/images/flags/be.png', name: 'Belgium' },
-    { code: '+48', flag: '/images/flags/pl.png', name: 'Poland' },
-    { code: '+380', flag: '/images/flags/ua.png', name: 'Ukraine' },
-    { code: '+40', flag: '/images/flags/ro.png', name: 'Romania' },
-    { code: '+995', flag: '/images/flags/ge.png', name: 'Georgia' },
-    { code: '+998', flag: '/images/flags/uz.png', name: 'Uzbekistan' },
-    { code: '+98', flag: '/images/flags/ir.png', name: 'Iran' },
-    { code: '+964', flag: '/images/flags/iq.png', name: 'Iraq' },
-    { code: '+966', flag: '/images/flags/sa.png', name: 'Saudi Arabia' },
-    { code: '+971', flag: '/images/flags/ae.png', name: 'UAE' },
-    { code: '+974', flag: '/images/flags/qa.png', name: 'Qatar' },
-    { code: '+965', flag: '/images/flags/kw.png', name: 'Kuwait' },
-    { code: '+972', flag: '/images/flags/il.png', name: 'Israel' },
-    { code: '+20', flag: '/images/flags/eg.png', name: 'Egypt' },
-    { code: '+91', flag: '/images/flags/in.png', name: 'India' },
-    { code: '+86', flag: '/images/flags/cn.png', name: 'China' },
-    { code: '+81', flag: '/images/flags/jp.png', name: 'Japan' },
-    { code: '+82', flag: '/images/flags/kr.png', name: 'South Korea' },
-    { code: '+92', flag: '/images/flags/pk.png', name: 'Pakistan' },
-    { code: '+55', flag: '/images/flags/br.png', name: 'Brazil' },
-    { code: '+52', flag: '/images/flags/mx.png', name: 'Mexico' },
-    { code: '+54', flag: '/images/flags/ar.png', name: 'Argentina' },
-    { code: '+61', flag: '/images/flags/au.png', name: 'Australia' },
-    { code: '+27', flag: '/images/flags/za.png', name: 'South Africa' },
-    { code: '+30', flag: '/images/flags/gr.png', name: 'Greece' },
-    { code: '+351', flag: '/images/flags/pt.png', name: 'Portugal' },
-    { code: '+36', flag: '/images/flags/hu.png', name: 'Hungary' },
-    { code: '+420', flag: '/images/flags/cz.png', name: 'Czech Republic' },
-    { code: '+43', flag: '/images/flags/at.png', name: 'Austria' },
-    { code: '+41', flag: '/images/flags/ch.png', name: 'Switzerland' },
-    { code: '+46', flag: '/images/flags/se.png', name: 'Sweden' },
-    { code: '+47', flag: '/images/flags/no.png', name: 'Norway' },
-    { code: '+45', flag: '/images/flags/dk.png', name: 'Denmark' },
-    { code: '+358', flag: '/images/flags/fi.png', name: 'Finland' },
-    { code: '+353', flag: '/images/flags/ie.png', name: 'Ireland' },
-    { code: '+359', flag: '/images/flags/bg.png', name: 'Bulgaria' },
+    { code: '+994', flag: '/images/flags/az.png', name: 'Azerbaijan', placeholder: '050 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
+    { code: '+90', flag: '/images/flags/tr.png', name: 'Turkey', placeholder: '532 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
+    { code: '+7', flag: '/images/flags/ru.png', name: 'Russia', placeholder: '905 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
+    { code: '+1', flag: '/images/flags/us.png', name: 'United States', placeholder: '202 555 1234', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+44', flag: '/images/flags/gb.png', name: 'United Kingdom', placeholder: '7911 123456', maxLength: 10, format: 'XXXX XXXXXX' },
+    { code: '+49', flag: '/images/flags/de.png', name: 'Germany', placeholder: '170 1234567', maxLength: 11, format: 'XXX XXXXXXX' },
+    { code: '+33', flag: '/images/flags/fr.png', name: 'France', placeholder: '612 345 678', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+39', flag: '/images/flags/it.png', name: 'Italy', placeholder: '320 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+34', flag: '/images/flags/es.png', name: 'Spain', placeholder: '612 345 678', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+31', flag: '/images/flags/nl.png', name: 'Netherlands', placeholder: '612345678', maxLength: 9, format: 'XXXXXXXXX' },
+    { code: '+32', flag: '/images/flags/be.png', name: 'Belgium', placeholder: '470 123 456', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+48', flag: '/images/flags/pl.png', name: 'Poland', placeholder: '501 234 567', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+380', flag: '/images/flags/ua.png', name: 'Ukraine', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+40', flag: '/images/flags/ro.png', name: 'Romania', placeholder: '721 234 567', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+995', flag: '/images/flags/ge.png', name: 'Georgia', placeholder: '555 123 456', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+998', flag: '/images/flags/uz.png', name: 'Uzbekistan', placeholder: '90 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+98', flag: '/images/flags/ir.png', name: 'Iran', placeholder: '912 345 6789', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+964', flag: '/images/flags/iq.png', name: 'Iraq', placeholder: '770 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+966', flag: '/images/flags/sa.png', name: 'Saudi Arabia', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+971', flag: '/images/flags/ae.png', name: 'UAE', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+974', flag: '/images/flags/qa.png', name: 'Qatar', placeholder: '5512 3456', maxLength: 8, format: 'XXXX XXXX' },
+    { code: '+965', flag: '/images/flags/kw.png', name: 'Kuwait', placeholder: '5012 3456', maxLength: 8, format: 'XXXX XXXX' },
+    { code: '+972', flag: '/images/flags/il.png', name: 'Israel', placeholder: '50 123 4567', maxLength: 10, format: 'XX XXX XXXX' },
+    { code: '+20', flag: '/images/flags/eg.png', name: 'Egypt', placeholder: '100 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+91', flag: '/images/flags/in.png', name: 'India', placeholder: '98765 43210', maxLength: 10, format: 'XXXXX XXXXX' },
+    { code: '+86', flag: '/images/flags/cn.png', name: 'China', placeholder: '138 1234 5678', maxLength: 11, format: 'XXX XXXX XXXX' },
+    { code: '+81', flag: '/images/flags/jp.png', name: 'Japan', placeholder: '90 1234 5678', maxLength: 10, format: 'XX XXXX XXXX' },
+    { code: '+82', flag: '/images/flags/kr.png', name: 'South Korea', placeholder: '10 1234 5678', maxLength: 10, format: 'XX XXXX XXXX' },
+    { code: '+92', flag: '/images/flags/pk.png', name: 'Pakistan', placeholder: '300 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+55', flag: '/images/flags/br.png', name: 'Brazil', placeholder: '11 91234 5678', maxLength: 11, format: 'XX XXXXX XXXX' },
+    { code: '+52', flag: '/images/flags/mx.png', name: 'Mexico', placeholder: '55 1234 5678', maxLength: 10, format: 'XX XXXX XXXX' },
+    { code: '+54', flag: '/images/flags/ar.png', name: 'Argentina', placeholder: '11 1234 5678', maxLength: 10, format: 'XX XXXX XXXX' },
+    { code: '+61', flag: '/images/flags/au.png', name: 'Australia', placeholder: '412 345 678', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+27', flag: '/images/flags/za.png', name: 'South Africa', placeholder: '82 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+30', flag: '/images/flags/gr.png', name: 'Greece', placeholder: '691 234 5678', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+351', flag: '/images/flags/pt.png', name: 'Portugal', placeholder: '912 345 678', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+36', flag: '/images/flags/hu.png', name: 'Hungary', placeholder: '20 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+420', flag: '/images/flags/cz.png', name: 'Czech Republic', placeholder: '601 234 567', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+43', flag: '/images/flags/at.png', name: 'Austria', placeholder: '660 123456', maxLength: 10, format: 'XXX XXXXXX' },
+    { code: '+41', flag: '/images/flags/ch.png', name: 'Switzerland', placeholder: '76 123 45 67', maxLength: 9, format: 'XX XXX XX XX' },
+    { code: '+46', flag: '/images/flags/se.png', name: 'Sweden', placeholder: '70 123 45 67', maxLength: 9, format: 'XX XXX XX XX' },
+    { code: '+47', flag: '/images/flags/no.png', name: 'Norway', placeholder: '401 23 456', maxLength: 8, format: 'XXX XX XXX' },
+    { code: '+45', flag: '/images/flags/dk.png', name: 'Denmark', placeholder: '20 12 34 56', maxLength: 8, format: 'XX XX XX XX' },
+    { code: '+358', flag: '/images/flags/fi.png', name: 'Finland', placeholder: '40 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+353', flag: '/images/flags/ie.png', name: 'Ireland', placeholder: '86 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+359', flag: '/images/flags/bg.png', name: 'Bulgaria', placeholder: '87 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
   ];
 
   useEffect(() => {
@@ -203,7 +206,8 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
     setError('');
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021';
-      const fullPhone = `${countryCode}${phone.trim()}`;
+      const rawPhone = phone.replace(/\s/g, '');
+      const fullPhone = `${countryCode}${rawPhone}`;
       const res = await fetch(`${apiBase}/callback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -215,6 +219,9 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
       setPhone('');
       setCountryCode('+994');
       setCountryFlag('/images/flags/az.png');
+      setPhonePlaceholder('050 123 45 67');
+      setPhoneMaxLength(10);
+      setPhoneFormat('XXX XXX XX XX');
       setActiveRole(visibleRoles[0] ?? 'Client');
     } catch {
       setError('Göndərilmədi. Yenidən cəhd edin.');
@@ -224,6 +231,17 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
   };
 
   const hasExtraLine = !!content.titleExtra;
+
+  function formatPhoneNumber(raw: string, fmt: string): string {
+    let idx = 0;
+    let out = '';
+    for (const ch of fmt) {
+      if (idx >= raw.length) break;
+      if (ch === 'X') { out += raw[idx]; idx++; }
+      else { out += ch; }
+    }
+    return out;
+  }
 
   return (
     <PageContainer as="main" className="callbackContainer" {...(sectionId ? { id: sectionId } : {})}>
@@ -299,6 +317,10 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
                           e.stopPropagation();
                           setCountryCode(c.code);
                           setCountryFlag(c.flag);
+                          setPhonePlaceholder(c.placeholder);
+                          setPhoneMaxLength(c.maxLength);
+                          setPhoneFormat(c.format);
+                          setPhone('');
                           setShowCountryDropdown(false);
                         }}
                       >
@@ -313,10 +335,13 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
               <input
                 type="tel"
                 inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder={content.phonePlaceholder}
+                placeholder={phonePlaceholder}
+                maxLength={phoneMaxLength}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, '');
+                  setPhone(formatPhoneNumber(raw, phoneFormat));
+                }}
                 className="inputField phoneInput"
                 required
                 suppressHydrationWarning

@@ -225,7 +225,7 @@ export default function ApartmentCard() {
               <div className="apt-details-section">
                 <div className="apt-header">
                   <h1 className="apt-title">
-                    {layout.title} <span className="apt-title-sub">{layout.category?.title || "Apartment"}</span>
+                    {layout.title}
                   </h1>
 
                   <div className="apt-badge-row">

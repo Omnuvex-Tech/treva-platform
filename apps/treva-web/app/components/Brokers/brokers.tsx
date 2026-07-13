@@ -455,11 +455,11 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                     <div className="broker_title-wrap is-az">
                       <p className="text-color-white60">TREVA ilə Əlaqədə Qalın</p>
                       <h2 className="text-color-white">Tərəfdaş broker olmaq üçün indi qeydiyyatdan keçin</h2>
-                    </div>
-                    <div className="broker_wrap">
                       <div className="note_wrap is-white is-wide">
                         <div className="text-color-white60">TREVA ilə tərəfdaşlıq edərək, satışlarınızı artırmaq və şəbəkənizi genişləndirmək üçün nəzərdə tutulmuş güclü resurslara çıxış əldə edirsiniz.</div>
                       </div>
+                    </div>
+                    <div className="broker_wrap">
                       <div className="connect_form-wrap animate-up w-form">
                         {status === 'success' ? (
                           <div className="broker-success-wrap">
@@ -566,7 +566,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                             <input className="connect_input-field w-input" maxLength={256} name="message" data-name="message" placeholder="Şərhlər / Suallar" type="text" id="message" value={fields.message} onChange={handleChange} />
                           </div>
 
-                          <button type="submit" className="button white broker-submit-btn" disabled={status === 'loading'} style={{ border: 'none', cursor: status === 'loading' ? 'wait' : 'pointer', fontFamily: 'inherit', position: 'relative' }}>
+                          <button type="submit" className="broker-submit-btn" disabled={status === 'loading'}>
                             {status === 'loading' && <span className="contact-spinner" style={{ position: 'absolute', top: '50%', left: '50%', marginLeft: -10, marginTop: -10, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} />}
                             <span className={status === 'loading' ? 'broker-btn-text-hidden' : ''}>İndi qeydiyyatdan keç</span>
                           </button>

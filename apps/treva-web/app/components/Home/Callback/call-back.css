@@ -32,6 +32,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 /* Başlıq sahəsi */
@@ -392,22 +393,27 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 2rem;
-  min-height: 360px;
+  padding: 5rem 2.5rem;
+  min-height: 420px;
   width: 100%;
   animation: contact-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.callback-success-overlay .contact-success-icon svg {
+  width: 64px;
+  height: 64px;
+}
+
 .callback-success-title {
-  font-size: 1.5rem;
+  font-size: 2.25rem;
   font-weight: 600;
   color: #17191c;
-  margin: 0 0 0.75rem;
+  margin: 1.25rem 0 0.75rem;
   animation: contact-text-up 0.4s ease 0.5s both;
 }
 
 .callback-success-text {
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: rgba(23, 25, 28, 0.6);
   margin: 0 0 2rem;
   line-height: 1.5;
@@ -418,12 +424,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.875rem 2rem;
+  padding: 1rem 2.5rem;
   background: #3F4249;
   color: #fff;
   border: none;
   border-radius: 80px;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
