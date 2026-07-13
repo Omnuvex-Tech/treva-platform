@@ -1,6 +1,6 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateApartmentDto } from './dto/create-apartment.dto';
+import { CreateApartmentDto, MAX_RESALE_FLOOR } from './dto/create-apartment.dto';
 import { UpdateApartmentDto } from './dto/update-apartment.dto';
 
 const APARTMENT_INCLUDE = {
@@ -10,6 +10,9 @@ const APARTMENT_INCLUDE = {
 };
 
 const isDefined = <T>(value: T | undefined): value is T => value !== undefined;
+
+const isValidResaleFloor = (value: number) =>
+  Number.isFinite(value) && value >= 1 && value <= MAX_RESALE_FLOOR;
 
 @Injectable()
 export class ApartmentsService {
@@ -62,7 +65,19 @@ export class ApartmentsService {
     return { some: priceFilter };
   }
 
+  private validateFloorRange(floorFrom?: number, floorTo?: number) {
+    if (floorFrom === undefined || floorTo === undefined) return;
+    if (!isValidResaleFloor(floorFrom) || !isValidResaleFloor(floorTo)) {
+      throw new BadRequestException(`Floor must be between 1 and ${MAX_RESALE_FLOOR}`);
+    }
+    if (floorFrom > floorTo) {
+      throw new BadRequestException('Floor cannot be greater than number of floors');
+    }
+  }
+
   async create(dto: CreateApartmentDto) {
+    this.validateFloorRange(dto.floorFrom, dto.floorTo);
+
     const existing = await this.prisma.apartment.findUnique({
       where: { slug: dto.slug },
     });
@@ -198,6 +213,8 @@ export class ApartmentsService {
     const apartment = await this.prisma.apartment.findUnique({ where: { id } });
     if (!apartment) throw new NotFoundException('Apartment not found');
 
+    this.validateFloorRange(dto.floorFrom ?? apartment.floorFrom, dto.floorTo ?? apartment.floorTo);
+
     if (dto.slug && dto.slug !== apartment.slug) {
       const existing = await this.prisma.apartment.findUnique({ where: { slug: dto.slug } });
       if (existing) throw new ConflictException('Apartment with this slug already exists');
@@ -259,5 +276,49 @@ export class ApartmentsService {
       maxTotalArea: areaResult._max.area ?? 0,
       minTotalArea: areaResult._min.area ?? 0,
     };
+  }
+
+  async getFloors(): Promise<number[]> {
+    const apartments = await this.prisma.apartment.findMany({
+      select: { floorFrom: true, floorTo: true },
+      orderBy: [{ floorFrom: 'asc' }, { floorTo: 'asc' }],
+    });
+
+    const floors = new Set<number>();
+    for (const apartment of apartments) {
+      const from = Number(apartment.floorFrom);
+      const to = Number(apartment.floorTo);
+      const hasValidFrom = isValidResaleFloor(from);
+      const hasValidTo = isValidResaleFloor(to);
+      if (!hasValidFrom && !hasValidTo) continue;
+      if (!hasValidFrom || !hasValidTo) {
+        floors.add(Math.floor(hasValidFrom ? from : to));
+        continue;
+      }
+
+      const start = Math.max(1, Math.floor(Math.min(from || to, to || from)));
+      const end = Math.min(MAX_RESALE_FLOOR, Math.max(start, Math.floor(Math.max(from || to, to || from))));
+
+      for (let floor = start; floor <= end; floor += 1) floors.add(floor);
+    }
+
+    return [...floors].sort((a, b) => a - b);
+  }
+
+  async getRoomCounts(): Promise<number[]> {
+    const apartments = await this.prisma.apartment.findMany({
+      select: { roomCount: true },
+      orderBy: { roomCount: 'asc' },
+    });
+
+    const rooms = new Set<number>();
+    for (const apartment of apartments) {
+      const roomCount = Number(apartment.roomCount);
+      if (Number.isFinite(roomCount) && roomCount >= 1 && roomCount <= 20) {
+        rooms.add(Math.floor(roomCount));
+      }
+    }
+
+    return [...rooms].sort((a, b) => a - b);
   }
 }

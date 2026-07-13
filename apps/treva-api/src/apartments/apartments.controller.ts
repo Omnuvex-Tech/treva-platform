@@ -71,6 +71,18 @@ export class ApartmentsController {
     return this.service.getRange(currency);
   }
 
+  @Get('floors')
+  @ApiOperation({ summary: 'Get available floor numbers' })
+  async getFloors() {
+    return this.service.getFloors();
+  }
+
+  @Get('rooms')
+  @ApiOperation({ summary: 'Get available room counts' })
+  async getRoomCounts() {
+    return this.service.getRoomCounts();
+  }
+
   @Get('slug/:slug')
   @ApiOperation({ summary: 'Get apartment by slug' })
   async findBySlug(@Param('slug') slug: string) {

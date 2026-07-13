@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useResaleApartmentRange, useResaleCurrencies } from '@/hooks/use-resale-apartments';
+import { useResaleApartmentRange, useResaleCurrencies, useResaleFloors, useResaleRooms } from '@/hooks/use-resale-apartments';
 import { useRoomOptions } from '@/hooks/use-room-options';
+import { useViewOptions } from '@/hooks/use-view-options';
 import { useDebounce } from '@/hooks/use-debounce';
 import './unit-filter.css';
 
-const FLOOR_OPTIONS = ['All', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
-const VIEW_OPTIONS = ['All', 'City', 'Sea', 'Mountain', 'Park', 'Courtyard'];
-const STATUS_OPTIONS = ['All', 'Renovated', 'Without renovation', 'Euro renovation', 'Cosmic renovation', 'Designer renovation'];
 export interface ResaleFilterState {
   minPrice?: number;
   maxPrice?: number;
@@ -17,14 +15,33 @@ export interface ResaleFilterState {
   floor?: number;
   roomCount?: number;
   currency?: string;
+  viewOptionIds?: string;
+  status?: string;
 }
+
+const resaleStatusOptions = [
+  { id: 'active', value: 'Active' },
+  { id: 'pending', value: 'Pending' },
+  { id: 'non-active', value: 'Non Active' },
+];
 
 export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingChange }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number; onDebouncingChange?: (v: boolean) => void }) {
   const { data: currenciesData } = useResaleCurrencies();
   const { data: roomOptionsData } = useRoomOptions('resale');
+  const { data: roomCountsData } = useResaleRooms();
 
   const currencies = currenciesData || [];
   const roomOptions = roomOptionsData || [];
+  const roomButtons = roomCountsData?.length
+    ? roomCountsData.map((roomCount) => ({ value: String(roomCount), label: String(roomCount) }))
+    : roomOptions
+        .map((room: any) => {
+          const rawValue = room.value ?? room.name ?? room.title;
+          const match = String(rawValue ?? '').match(/\d+/);
+          const value = match?.[0] ?? '';
+          return value ? { value, label: String(rawValue) } : null;
+        })
+        .filter((room): room is { value: string; label: string } => Boolean(room));
 
   const [currency, setCurrency] = useState('');
   const { data: rangeData } = useResaleApartmentRange(currency || undefined);
@@ -34,9 +51,15 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const totalPriceMin = 0;
   const totalAreaMin = 0;
 
+  const { data: viewOptionsData } = useViewOptions();
+  const viewOptions = viewOptionsData || [];
+
+  const { data: floorOptionsData } = useResaleFloors();
+  const floorOptions = floorOptionsData || [];
+
   const [floor, setFloor] = useState('All');
-  const [selectedView, setSelectedView] = useState('All');
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedView, setSelectedView] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedRooms, setSelectedRooms] = useState('');
 
   const [currencyOpen, setCurrencyOpen] = useState(false);
@@ -108,14 +131,19 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     if (debouncedPriceMax < totalPriceMax) f.maxPrice = debouncedPriceMax;
     if (debouncedAreaMin > 0) f.minArea = debouncedAreaMin;
     if (debouncedAreaMax < totalAreaMax) f.maxArea = debouncedAreaMax;
-    if (floor !== 'All') f.floor = parseInt(floor);
+    if (floor !== 'All') {
+      const parsedFloor = parseInt(floor, 10);
+      if (Number.isFinite(parsedFloor)) f.floor = parsedFloor;
+    }
     if (selectedRooms) {
-      const rc = selectedRooms === '5+' ? 5 : parseInt(selectedRooms);
-      f.roomCount = rc;
+      const rc = parseInt(selectedRooms, 10);
+      if (Number.isFinite(rc)) f.roomCount = rc;
     }
     if (currency) f.currency = currency;
+    if (selectedView) f.viewOptionIds = selectedView;
+    if (selectedStatus) f.status = selectedStatus;
     onFilterChange(f);
-  }, [debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, floor, selectedRooms, currency, onFilterChange, totalPriceMax, totalAreaMax]);
+  }, [debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, floor, selectedRooms, currency, selectedView, selectedStatus, onFilterChange, totalPriceMax, totalAreaMax]);
 
   useEffect(() => { fireFilters(); }, [fireFilters]);
 
@@ -127,8 +155,8 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
 
   const handleReset = () => {
     setFloor('All');
-    setSelectedView('All');
-    setSelectedStatus('All');
+    setSelectedView('');
+    setSelectedStatus('');
     setSelectedRooms('');
     setPriceMin(0);
     setPriceMinInput(0);
@@ -206,18 +234,20 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
               </button>
               {currencyOpen && (
                 <div className="custom-select__dropdown">
-                  {(currencies.length
-                    ? currencies.map((c) => ({ value: c.value, label: c.value }))
-                    : [{ value: 'USD', label: 'USD' }, { value: 'AZN', label: 'AZN' }]).map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      className={`custom-select__option ${currency === opt.value ? 'custom-select__option--active' : ''}`}
-                      onClick={() => { setCurrency(opt.value); setCurrencyOpen(false); }}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                  {currencies.length === 0 ? (
+                    <span className="custom-select__option" style={{ color: '#9ca3af', pointerEvents: 'none' }}>AZN</span>
+                  ) : (
+                    currencies.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`custom-select__option ${currency === opt.value ? 'custom-select__option--active' : ''}`}
+                        onClick={() => { setCurrency(opt.value); setCurrencyOpen(false); }}
+                      >
+                        {opt.value}
+                      </button>
+                    ))
+                  )}
                 </div>
               )}
             </div>
@@ -340,18 +370,26 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             <label className="filter-label">Floor</label>
             <div className="custom-select" ref={floorRef}>
               <button type="button" className="custom-select__trigger" aria-expanded={floorOpen} onClick={() => setFloorOpen((p) => !p)}>
-                <span>{floor}</span>
+                <span>{floor || 'All'}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {floorOpen && (
                 <div className="custom-select__dropdown">
-                  {FLOOR_OPTIONS.map((f) => (
-                    <button key={f} type="button" className={`custom-select__option ${floor === f ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(f); setFloorOpen(false); }}>
-                      {f}
-                    </button>
-                  ))}
+                  <button type="button" className={`custom-select__option ${!floor || floor === 'All' ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor('All'); setFloorOpen(false); }}>
+                    All
+                  </button>
+                  {floorOptions.map((f, idx) => {
+                    let val = typeof f === 'object' ? (f as any).value || (f as any).floor || (f as any).name : f;
+                    if (typeof val === 'object') val = JSON.stringify(val);
+                    const valStr = String(val);
+                    return (
+                      <button key={idx} type="button" className={`custom-select__option ${floor === valStr ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(valStr); setFloorOpen(false); }}>
+                        {valStr}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -364,16 +402,19 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             <label className="filter-label">View</label>
             <div className="custom-select" ref={viewRef}>
               <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
-                <span>{selectedView}</span>
+                <span>{viewOptions.find(v => v.id === selectedView)?.title || viewOptions.find(v => v.id === selectedView)?.value || 'All'}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {viewOpen && (
                 <div className="custom-select__dropdown">
+                  <button type="button" className={`custom-select__option ${!selectedView ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(''); setViewOpen(false); }}>
+                    All
+                  </button>
                   {viewOptions.map((opt) => (
                     <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setViewOpen(false); }}>
-                      {opt.title || opt.name}
+                      {opt.value || opt.title || opt.name}
                     </button>
                   ))}
                 </div>
@@ -385,16 +426,19 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             <label className="filter-label">Status</label>
             <div className="custom-select" ref={statusRef}>
               <button type="button" className="custom-select__trigger" aria-expanded={statusOpen} onClick={() => setStatusOpen((p) => !p)}>
-                <span>{selectedStatus}</span>
+                <span>{resaleStatusOptions.find(s => s.id === selectedStatus)?.value || 'All'}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
               {statusOpen && (
                 <div className="custom-select__dropdown">
-                  {STATUS_OPTIONS.map((s) => (
-                    <button key={s} type="button" className={`custom-select__option ${selectedStatus === s ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(s); setStatusOpen(false); }}>
-                      {s}
+                  <button type="button" className={`custom-select__option ${!selectedStatus ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(''); setStatusOpen(false); }}>
+                    All
+                  </button>
+                  {resaleStatusOptions.map((opt) => (
+                    <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(opt.id); setStatusOpen(false); }}>
+                      {opt.value}
                     </button>
                   ))}
                 </div>
@@ -407,17 +451,18 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
         <div className="filter-group filter-group--rooms">
           <label className="filter-label">Number of rooms</label>
           <div className="rooms-group">
-            {roomOptions.length === 0 ? (
+            {roomButtons.length === 0 ? (
               <span style={{ fontSize: 13, color: '#9ca3af' }}>Otaq yoxdur</span>
             ) : (
-              roomOptions.map((room) => (
+              roomButtons.map((room) => (
                 <button
-                  key={room.id}
+                  key={room.value}
                   type="button"
                   className={`room-btn ${selectedRooms === room.value ? 'room-btn--active' : ''}`}
                   onClick={() => setSelectedRooms(selectedRooms === room.value ? '' : room.value)}
+                  aria-pressed={selectedRooms === room.value}
                 >
-                  {room.value}
+                  <span className="room-btn__text">{room.label}</span>
                 </button>
               ))
             )}

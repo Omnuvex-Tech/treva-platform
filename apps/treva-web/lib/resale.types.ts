@@ -89,4 +89,6 @@ export interface ResaleFilters {
     maxArea?: number;
     floor?: number;
     currency?: string;
+    viewOptionIds?: string;
+    status?: string;
 }

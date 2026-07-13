@@ -90,6 +90,32 @@ export function useResaleCurrencies() {
     });
 }
 
+export function useResaleFloors() {
+    return useQuery({
+        queryKey: ["resale-floors"],
+        queryFn: async () => {
+            const response = await api.get<number[]>(
+                endpoints.resale.apartments.floors
+            );
+            return response.data;
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+}
+
+export function useResaleRooms() {
+    return useQuery({
+        queryKey: ["resale-rooms"],
+        queryFn: async () => {
+            const response = await api.get<number[]>(
+                endpoints.resale.apartments.rooms
+            );
+            return response.data;
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+}
+
 export function useCreateRequest() {
     const queryClient = useQueryClient();
     return useMutation({

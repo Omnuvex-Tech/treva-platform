@@ -28,6 +28,7 @@ const TABS: { key: TabKey; label: string }[] = [
 
 const SUPPORTED_IMAGE_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_UPLOAD_ACCEPT = SUPPORTED_IMAGE_UPLOAD_TYPES.join(",");
+const MAX_RESALE_FLOOR = 999;
 
 function slugify(text: string): string {
     return text
@@ -391,7 +392,10 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 if (!sourceForm.purpose?.trim()) errors.push("Offer Type is required");
                 if (!sourceForm.apartmentTypeId) errors.push("Type is required");
                 if (!sourceForm.floorTo || sourceForm.floorTo < 1) errors.push("Number Of Floor is required");
+                if (sourceForm.floorTo && sourceForm.floorTo > MAX_RESALE_FLOOR) errors.push(`Number Of Floor must be <= ${MAX_RESALE_FLOOR}`);
                 if (!sourceForm.floorFrom || sourceForm.floorFrom < 1) errors.push("Floor is required");
+                if (sourceForm.floorFrom && sourceForm.floorFrom > MAX_RESALE_FLOOR) errors.push(`Floor must be <= ${MAX_RESALE_FLOOR}`);
+                if (sourceForm.floorFrom && sourceForm.floorTo && sourceForm.floorFrom > sourceForm.floorTo) errors.push("Floor cannot be greater than Number Of Floor");
                 if (!sourceForm.roomCount || sourceForm.roomCount < 1) errors.push("Room Count is required");
                 if (!sourceForm.image?.trim()) errors.push("Main Image is required");
                 break;
@@ -827,6 +831,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         onChange={(e) => updateField("floorTo", parseInt(e.target.value) || undefined)}
                                         placeholder="16"
                                         min={1}
+                                        max={MAX_RESALE_FLOOR}
                                     />
                                 </div>
                                 <div>
@@ -838,6 +843,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         onChange={(e) => updateField("floorFrom", parseInt(e.target.value) || undefined)}
                                         placeholder="8"
                                         min={1}
+                                        max={MAX_RESALE_FLOOR}
                                     />
                                 </div>
                                 <div>

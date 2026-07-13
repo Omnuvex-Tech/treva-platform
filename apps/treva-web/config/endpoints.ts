@@ -45,6 +45,8 @@ export const endpoints = {
     resale: {
         apartments: {
             list: "/apartments",
+            floors: "/apartments/floors",
+            rooms: "/apartments/rooms",
             detail: (id: string) => `/apartments/${id}`,
             bySlug: (slug: string) => `/apartments/slug/${slug}`,
         },

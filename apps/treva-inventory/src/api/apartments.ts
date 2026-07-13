@@ -171,6 +171,12 @@ export interface ApartmentFilters {
     minPrice?: number;
     maxPrice?: number;
     roomCount?: number;
+    minArea?: number;
+    maxArea?: number;
+    floor?: number;
+    currency?: string;
+    viewOptionIds?: string;
+    status?: "active" | "pending" | "non-active";
 }
 
 export interface UploadResponse {

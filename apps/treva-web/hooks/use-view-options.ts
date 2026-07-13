@@ -6,8 +6,9 @@ import { endpoints } from "@/config/endpoints";
 
 export interface ViewOption {
     id: string;
-    name: string;
-    title: string;
+    name?: string;
+    title?: string;
+    value?: string;
 }
 
 export function useViewOptions() {

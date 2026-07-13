@@ -270,28 +270,23 @@ export default function UnitLayout() {
                   />
                 </div>
               </div>
-              
               <div className="custom-select currency-select" ref={currencyRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={currencyOpen} onClick={() => setCurrencyOpen((p) => !p)}>
-                  <span>{currency}</span>
+                  <span>{currency || 'USD'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
                 {currencyOpen && (
                   <div className="custom-select__dropdown">
-                    {(currencies.length ? currencies.map((c) => ({ value: c.value, label: c.value })) : [{ value: "USD", label: "USD" }, { value: "AZN", label: "AZN" }]).map((opt) => (
+                    {(currencies.length ? currencies.map(c => c.value) : ['USD', 'AZN']).map((c) => (
                       <button
-                        key={opt.value}
+                        key={c}
                         type="button"
-                        className={`custom-select__option ${currency === opt.value ? "custom-select__option--active" : ""}`}
-                        onClick={() => {
-                          setCurrency(opt.value);
-                          setPage(1);
-                          setCurrencyOpen(false);
-                        }}
+                        className={`custom-select__option ${currency === c ? 'custom-select__option--active' : ''}`}
+                        onClick={() => { setCurrency(c); setPage(1); setCurrencyOpen(false); }}
                       >
-                        {opt.label}
+                        {c}
                       </button>
                     ))}
                   </div>
@@ -437,11 +432,19 @@ export default function UnitLayout() {
                 </button>
                 {floorOpen && (
                   <div className="custom-select__dropdown">
-                    {[{ value: '', label: 'All' }, ...floors.map((f) => ({ value: String(f), label: String(f) }))].map((opt) => (
-                      <button key={opt.value} type="button" className={`custom-select__option ${floor === opt.value ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(opt.value); setPage(1); setFloorOpen(false); }}>
-                        {opt.label}
-                      </button>
-                    ))}
+                    <button type="button" className={`custom-select__option ${!floor || floor === 'All' ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(''); setPage(1); setFloorOpen(false); }}>
+                      All
+                    </button>
+                    {floors.map((f, idx) => {
+                      let val = typeof f === 'object' ? (f as any).value || (f as any).floor || (f as any).name : f;
+                      if (typeof val === 'object') val = JSON.stringify(val);
+                      const valStr = String(val);
+                      return (
+                        <button key={idx} type="button" className={`custom-select__option ${floor === valStr ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(valStr); setPage(1); setFloorOpen(false); }}>
+                          {valStr}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -454,7 +457,7 @@ export default function UnitLayout() {
               <label className="filter-label">View</label>
               <div className="custom-select" ref={viewRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
-                  <span>{viewOptions.find(v => v.id === selectedView)?.title || 'All'}</span>
+                  <span>{viewOptions.find(v => v.id === selectedView)?.title || viewOptions.find(v => v.id === selectedView)?.value || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -466,14 +469,13 @@ export default function UnitLayout() {
                     </button>
                     {viewOptions.map((opt) => (
                       <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setPage(1); setViewOpen(false); }}>
-                        {opt.title || opt.name}
+                        {opt.value || opt.title || opt.name}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
             </div>
-
             <div className="filter-group filter-group--status">
               <label className="filter-label">Status</label>
               <div className="custom-select" ref={statusRef}>
@@ -493,9 +495,6 @@ export default function UnitLayout() {
                         {opt.value}
                       </button>
                     ))}
-                    {statusOptions.length === 0 && (
-                      <span className="custom-select__option" style={{ color: '#9ca3af', cursor: 'default' }}>Status yoxdur</span>
-                    )}
                   </div>
                 )}
               </div>
@@ -561,55 +560,63 @@ export default function UnitLayout() {
         <div style={{ position: 'relative', minHeight: '300px' }}>
           <style>{`
             @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .spinner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.6); display: flex; justify-content: center; align-items: flex-start; padding-top: 80px; z-index: 10; border-radius: 12px; }
+            .spinner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10; border-radius: 12px; }
             .spinner-icon { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3F4249; border-radius: 50%; animation: spin 1s linear infinite; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+            .cards-grid--fadein { animation: fadeIn 0.35s ease-out; }
           `}</style>
-          
-          {showSpinner && (
+
+          {isLoading ? (
             <div className="spinner-overlay">
               <div className="spinner-icon"></div>
             </div>
-          )}
-          
-          <div className="cards-grid" style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
-            {layouts.map((layout: UnitLayout) => (
-              <Link key={layout.id} href={`/${locale}/off-plan/${layout.slug}`} className="layout-card-wrapper">
-                <div className="layout-card">
-                  <div className="layout-card__header">
-                    <div className="layout-card__title-block">
-                      <span className="layout-card__code">{getCardCode(layout)}</span>
-                      <span className="layout-card__floor">{layout.floor} floor</span>
-                    </div>
-                    <div className="layout-card__number-block">
-                      <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
-                      <span className="layout-card__status">{formatStatus(layout.statusOption?.value || '')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="layout-card__visual">
-                    {layout.mainImage ? (
-                      <img src={getAssetUrl(layout.mainImage.url)} alt={layout.mainImage.alt || layout.title} className="layout-card__blueprint" />
-                    ) : (
-                      <div className="layout-card__blueprint layout-card__blueprint--placeholder">
-                        <span>No image</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="layout-card__footer">
-                    <h2 className="layout-card__name">{layout.title}, {layout.totalArea} m²</h2>
-                    <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
-                  </div>
+          ) : layouts.length === 0 && !showSpinner ? (
+            <div className="empty-state">
+              <p>No apartments found matching your filters.</p>
+            </div>
+          ) : (
+            <div style={{ position: 'relative' }}>
+              {showSpinner && (
+                <div className="spinner-overlay">
+                  <div className="spinner-icon"></div>
                 </div>
-                <span className="layout-card__cta">VIew Apartment DetaIls</span>
-              </Link>
-            ))}
-            {layouts.length === 0 && !showSpinner && (
-              <div className="empty-state">
-                <p>No apartments found matching your filters.</p>
+              )}
+              <div className={`cards-grid${!showSpinner ? ' cards-grid--fadein' : ''}`} style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
+                {layouts.map((layout: UnitLayout) => (
+                  <Link key={layout.id} href={`/${locale}/off-plan/${layout.slug}`} className="layout-card-wrapper">
+                    <div className="layout-card">
+                      <div className="layout-card__header">
+                        <div className="layout-card__title-block">
+                          <span className="layout-card__code">{getCardCode(layout)}</span>
+                          <span className="layout-card__floor">{layout.floor} floor</span>
+                        </div>
+                        <div className="layout-card__number-block">
+                          <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
+                          <span className="layout-card__status">{formatStatus(layout.statusOption?.value || '')}</span>
+                        </div>
+                      </div>
+
+                      <div className="layout-card__visual">
+                        {layout.mainImage ? (
+                          <img src={getAssetUrl(layout.mainImage.url)} alt={layout.mainImage.alt || layout.title} className="layout-card__blueprint" />
+                        ) : (
+                          <div className="layout-card__blueprint layout-card__blueprint--placeholder">
+                            <span>No image</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="layout-card__footer">
+                        <h2 className="layout-card__name">{layout.title}, {layout.totalArea} m²</h2>
+                        <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
+                      </div>
+                    </div>
+                    <span className="layout-card__cta">VIew Apartment DetaIls</span>
+                  </Link>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {pagination && (

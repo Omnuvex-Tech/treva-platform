@@ -1,7 +1,7 @@
-import { IsOptional, IsString, IsNumber, IsArray, ValidateNested, IsIn } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, ValidateNested, IsIn, Min, Max } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ApartmentPriceInput } from './create-apartment.dto';
+import { ApartmentPriceInput, MAX_RESALE_FLOOR } from './create-apartment.dto';
 
 export class UpdateApartmentDto {
   @ApiPropertyOptional({ example: 'Sea Breeze' })
@@ -112,11 +112,15 @@ export class UpdateApartmentDto {
   @ApiPropertyOptional({ example: 8 })
   @IsOptional()
   @IsNumber()
+  @Min(1)
+  @Max(MAX_RESALE_FLOOR)
   floorFrom?: number;
 
   @ApiPropertyOptional({ example: 16 })
   @IsOptional()
   @IsNumber()
+  @Min(1)
+  @Max(MAX_RESALE_FLOOR)
   floorTo?: number;
 
   @ApiPropertyOptional({ example: 2 })
