@@ -494,6 +494,11 @@
 .contact-submit-btn.is-loading {
   pointer-events: none;
   opacity: 0.85;
+  position: relative;
+}
+
+.contact-submit-btn.is-loading .contact-btn-text {
+  visibility: hidden;
 }
 
 .contact-btn-loading {
@@ -509,6 +514,11 @@
 
 /* Modern spinner */
 .contact-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
   width: 20px;
   height: 20px;
   border: 2.5px solid rgba(0, 0, 0, 0.15);

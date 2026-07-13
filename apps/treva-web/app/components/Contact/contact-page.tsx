@@ -277,15 +277,8 @@ function ContactForm() {
           className={`button white contact-submit-btn${status === 'loading' ? ' is-loading' : ''}`}
           disabled={status === 'loading'}
         >
-          {status === 'loading' ? (
-            <span className="contact-btn-loading">
-              <span className="contact-spinner"></span>
-              <span className="contact-btn-text">Göndərilir...</span>
-            </span>
-
-          ) : (
-            <span className="contact-btn-text">MESAJ GÖNDƏR</span>
-          )}
+          {status === 'loading' && <span className="contact-spinner"></span>}
+          <span className="contact-btn-text">MESAJ GÖNDƏR</span>
         </button>
       </form>
 

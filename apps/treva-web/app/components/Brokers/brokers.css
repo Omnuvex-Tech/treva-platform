@@ -354,6 +354,10 @@ input:focus::placeholder, textarea:focus::placeholder {
 }
 
 /* Broker success state */
+.broker-btn-text-hidden {
+  visibility: hidden;
+}
+
 .broker-success-wrap {
   display: flex;
   flex-direction: column;

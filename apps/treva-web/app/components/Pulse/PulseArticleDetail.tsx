@@ -195,7 +195,7 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
             />
             <button type="submit" className={`article_submit-btn w-button ${subStatus === 'loading' ? 'is-loading' : ''}`} disabled={subStatus === 'loading'}>
               {subStatus === 'loading' && <span className="article-spinner" />}
-              {subStatus === 'loading' ? 'Göndərilir...' : 'Abunə ol'}
+              <span>Abunə ol</span>
             </button>
           </form>
         )}

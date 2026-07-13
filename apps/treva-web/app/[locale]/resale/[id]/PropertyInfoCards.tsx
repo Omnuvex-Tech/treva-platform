@@ -242,9 +242,10 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
               type="submit"
               className="ap-submit-btn"
               disabled={createRequest.isPending}
+              style={{ position: 'relative' }}
             >
-              {createRequest.isPending && <span className="contact-spinner" style={{ marginRight: 8, borderTopColor: '#dcdcdf', borderColor: 'rgba(220,220,223,0.3)', width: 18, height: 18 }} />}
-              Send request
+              {createRequest.isPending && <span className="contact-spinner" style={{ position: 'absolute', top: '50%', left: '50%', marginLeft: -9, marginTop: -9, borderTopColor: '#dcdcdf', borderColor: 'rgba(220,220,223,0.3)', width: 18, height: 18 }} />}
+              <span style={createRequest.isPending ? { visibility: 'hidden' } : undefined}>Send request</span>
             </button>
           </form>
         )}

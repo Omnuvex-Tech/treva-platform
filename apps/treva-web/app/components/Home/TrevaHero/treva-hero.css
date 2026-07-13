@@ -240,11 +240,8 @@
   z-index: 9999999;
   padding: 0;
   background: #3f4249;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-radius: 12px;
+  box-shadow: var(--treva-shadow);
   overflow: hidden;
 }
 
@@ -309,11 +306,8 @@
   width: 100%;
   padding: 0;
   background: #3f4249;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-radius: 12px;
+  box-shadow: var(--treva-shadow);
   overflow: hidden;
   z-index: 9999999;
 }
@@ -323,13 +317,13 @@
   align-items: center;
   width: 100%;
   justify-content: flex-start;
-  padding: 8px 14px;
+  min-height: 42px;
+  padding: 18px 20px;
   color: #ffffff;
   background: transparent;
   font-family: var(--treva-font-oak);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  font-size: 13px;
+  font-weight: 400;
   line-height: 1;
   text-align: start;
   text-transform: uppercase;
@@ -402,7 +396,7 @@
     flex: 1;
   }
   .treva-filter-bar__deal-menu {
-    border-radius: 6px;
+    border-radius: 12px;
   }
   .treva-filter-bar__home-btn {
     width: auto;
@@ -456,11 +450,12 @@
     min-width: 72px;
   }
   .treva-filter-bar__deal-menu {
-    border-radius: 6px;
+    border-radius: 12px;
     padding: 0px 0;
   }
   .treva-filter-bar__deal-option {
-    padding: 8px 14px;
+    min-height: 36px;
+    font-size: 11px;
   }
   .treva-filter-bar__location-text,
   .treva-filter-bar__dropdown-btn {

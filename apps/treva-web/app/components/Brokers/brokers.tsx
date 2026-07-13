@@ -566,9 +566,9 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                             <input className="connect_input-field w-input" maxLength={256} name="message" data-name="message" placeholder="Şərhlər / Suallar" type="text" id="message" value={fields.message} onChange={handleChange} />
                           </div>
 
-                          <button type="submit" className="button white" disabled={status === 'loading'} style={{ border: 'none', cursor: status === 'loading' ? 'wait' : 'pointer', fontFamily: 'inherit' }}>
-                            {status === 'loading' && <span className="contact-spinner" style={{ marginRight: 8, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} />}
-                            İndi qeydiyyatdan keç
+                          <button type="submit" className="button white broker-submit-btn" disabled={status === 'loading'} style={{ border: 'none', cursor: status === 'loading' ? 'wait' : 'pointer', fontFamily: 'inherit', position: 'relative' }}>
+                            {status === 'loading' && <span className="contact-spinner" style={{ position: 'absolute', top: '50%', left: '50%', marginLeft: -10, marginTop: -10, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} />}
+                            <span className={status === 'loading' ? 'broker-btn-text-hidden' : ''}>İndi qeydiyyatdan keç</span>
                           </button>
                         </form>
                         )}

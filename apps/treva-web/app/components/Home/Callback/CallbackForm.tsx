@@ -285,6 +285,7 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
             <div className="phoneGroup">
               <div className="flagSelector" ref={flagRef} onClick={() => setShowCountryDropdown(!showCountryDropdown)}>
                 <img src={countryFlag} alt="" className="flagImg" />
+                <span className="countryCodeDisplay">{countryCode}</span>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                   <path d="M6 9l6 6 6-6"/>
                 </svg>
