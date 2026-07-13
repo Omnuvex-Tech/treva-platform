@@ -228,9 +228,13 @@ export default function UnitLayout() {
                     value={priceMinInput} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setPriceMinInput(''); return; }
+                      if (raw === '') { setPriceMinInput(''); setPriceMin(0); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      setPriceMinInput(Number(raw));
+                      const val = Number(raw);
+                      setPriceMinInput(val);
+                      const clamped = Math.max(totalPriceMin, Math.min(val, safePriceMax - 1000));
+                      setPriceMin(clamped);
+                      setPage(1);
                     }}
                     onBlur={() => {
                       const raw = priceMinInput === '' ? 0 : Number(priceMinInput);
@@ -250,7 +254,11 @@ export default function UnitLayout() {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setPriceMaxInput(''); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      setPriceMaxInput(Number(raw));
+                      const val = Number(raw);
+                      setPriceMaxInput(val);
+                      const clamped = Math.max(safePriceMin + 1000, Math.min(val, totalPriceMax));
+                      setPriceMax(clamped);
+                      setPage(1);
                     }}
                     onBlur={() => {
                       const raw = priceMaxInput === '' ? totalPriceMax : Number(priceMaxInput);
@@ -338,9 +346,13 @@ export default function UnitLayout() {
                     value={areaMinInput} 
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setAreaMinInput(''); return; }
+                      if (raw === '') { setAreaMinInput(''); setAreaMin(0); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      setAreaMinInput(Number(raw));
+                      const val = Number(raw);
+                      setAreaMinInput(val);
+                      const clamped = Math.max(totalAreaMin, Math.min(val, safeAreaMax - 5));
+                      setAreaMin(clamped);
+                      setPage(1);
                     }}
                     onBlur={() => {
                       const raw = areaMinInput === '' ? 0 : Number(areaMinInput);
@@ -360,7 +372,11 @@ export default function UnitLayout() {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setAreaMaxInput(''); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      setAreaMaxInput(Number(raw));
+                      const val = Number(raw);
+                      setAreaMaxInput(val);
+                      const clamped = Math.max(safeAreaMin + 5, Math.min(val, totalAreaMax));
+                      setAreaMax(clamped);
+                      setPage(1);
                     }}
                     onBlur={() => {
                       const raw = areaMaxInput === '' ? totalAreaMax : Number(areaMaxInput);
@@ -438,7 +454,7 @@ export default function UnitLayout() {
               <label className="filter-label">View</label>
               <div className="custom-select" ref={viewRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
-                  <span>{viewOptions.find(v => v.id === selectedView)?.value || 'All'}</span>
+                  <span>{viewOptions.find(v => v.id === selectedView)?.title || 'All'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -450,7 +466,7 @@ export default function UnitLayout() {
                     </button>
                     {viewOptions.map((opt) => (
                       <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setPage(1); setViewOpen(false); }}>
-                        {opt.value}
+                        {opt.title || opt.name}
                       </button>
                     ))}
                   </div>

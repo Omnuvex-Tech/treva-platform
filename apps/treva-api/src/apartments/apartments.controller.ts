@@ -31,6 +31,8 @@ export class ApartmentsController {
   @ApiQuery({ name: 'maxArea', required: false })
   @ApiQuery({ name: 'floor', required: false })
   @ApiQuery({ name: 'currency', required: false })
+  @ApiQuery({ name: 'viewOptionIds', required: false })
+  @ApiQuery({ name: 'status', required: false })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -43,6 +45,8 @@ export class ApartmentsController {
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
     @Query('currency') currency?: string,
+    @Query('viewOptionIds') viewOptionIds?: string,
+    @Query('status') status?: string,
   ) {
     return this.service.findAll({
       page: page ? parseInt(page) : 1,
@@ -56,6 +60,8 @@ export class ApartmentsController {
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor) : undefined,
       currency,
+      viewOptionIds,
+      status,
     });
   }
 

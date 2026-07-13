@@ -6,8 +6,8 @@ import { endpoints } from "@/config/endpoints";
 
 export interface ViewOption {
     id: string;
-    value: string;
-    order: number;
+    name: string;
+    title: string;
 }
 
 export function useViewOptions() {
@@ -17,6 +17,6 @@ export function useViewOptions() {
             const response = await api.get<ViewOption[]>(endpoints.viewOptions.list);
             return response.data;
         },
-        staleTime: 1000 * 60 * 5, // 5 minutes cache
+        staleTime: 1000 * 60 * 5,
     });
 }

@@ -306,7 +306,7 @@
 }
 
 .countryCodeDisplay {
-  font-size: 14px;
+  font-size: 20px;
   color: #333;
   font-weight: 400;
   line-height: 1;
@@ -320,12 +320,12 @@
   width: 280px;
   max-height: 300px;
   overflow-y: auto;
-  background: var(--treva-pill-bg, #3F4249);
+  background: #ffffff;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #E5E7EB;
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
 
@@ -336,11 +336,11 @@
   padding: 8px 14px;
   cursor: pointer;
   transition: background 0.18s ease;
-  color: #ffffff;
+  color: #3F4249;
 }
 
 .countryOption:hover {
-  background: var(--treva-pill-hover-bg, #2F3134);
+  background: #f0f0f0;
 }
 
 .countryFlagImg {
@@ -357,13 +357,13 @@
   font-weight: 500;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #3F4249;
 }
 
 .countryCode {
   font-size: 11px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: #888888;
 }
 
 /* Hüquqi xəbərdarlıq mətni */
@@ -425,19 +425,35 @@
   align-items: center;
   justify-content: center;
   padding: 1rem 2.5rem;
-  background: #3F4249;
-  color: #fff;
-  border: none;
-  border-radius: 80px;
+  background: #4E525D;
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 30px;
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
   animation: contact-text-up 0.4s ease 0.7s both;
 }
 
+.callback-success-btn .button-text-wrap {
+  height: 22px;
+  line-height: 22px;
+}
+
+.callback-success-btn .button-text {
+  height: 22px;
+  line-height: 22px;
+}
+
+.callback-success-btn:hover .button-text {
+  transform: translateY(-100%);
+}
+
 .callback-success-btn:hover {
-  background: #2F3134;
+  background: #ffffff;
+  color: #4E525D;
+  border-color: #4E525D;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -538,5 +554,9 @@
   .disclaimer {
     font-size: 13px;
     padding: 0 15px;
+  }
+
+  .countryCodeDisplay {
+    font-size: 18px;
   }
 }

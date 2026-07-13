@@ -141,25 +141,25 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
     { code: '+7', flag: '/images/flags/ru.png', name: 'Russia', placeholder: '905 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
     { code: '+1', flag: '/images/flags/us.png', name: 'United States', placeholder: '202 555 1234', maxLength: 10, format: 'XXX XXX XXXX' },
     { code: '+44', flag: '/images/flags/gb.png', name: 'United Kingdom', placeholder: '7911 123456', maxLength: 10, format: 'XXXX XXXXXX' },
-    { code: '+49', flag: '/images/flags/de.png', name: 'Germany', placeholder: '170 1234567', maxLength: 11, format: 'XXX XXXXXXX' },
-    { code: '+33', flag: '/images/flags/fr.png', name: 'France', placeholder: '612 345 678', maxLength: 9, format: 'XXX XXX XXX' },
+    { code: '+49', flag: '/images/flags/de.png', name: 'Germany', placeholder: '151 12345678', maxLength: 11, format: 'XXX XXXXXXXX' },
+    { code: '+33', flag: '/images/flags/fr.png', name: 'France', placeholder: '6 12 34 56 78', maxLength: 9, format: 'X XX XX XX XX' },
     { code: '+39', flag: '/images/flags/it.png', name: 'Italy', placeholder: '320 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
     { code: '+34', flag: '/images/flags/es.png', name: 'Spain', placeholder: '612 345 678', maxLength: 9, format: 'XXX XXX XXX' },
-    { code: '+31', flag: '/images/flags/nl.png', name: 'Netherlands', placeholder: '612345678', maxLength: 9, format: 'XXXXXXXXX' },
+    { code: '+31', flag: '/images/flags/nl.png', name: 'Netherlands', placeholder: '6 12345678', maxLength: 9, format: 'X XXXXXXXX' },
     { code: '+32', flag: '/images/flags/be.png', name: 'Belgium', placeholder: '470 123 456', maxLength: 9, format: 'XXX XXX XXX' },
     { code: '+48', flag: '/images/flags/pl.png', name: 'Poland', placeholder: '501 234 567', maxLength: 9, format: 'XXX XXX XXX' },
-    { code: '+380', flag: '/images/flags/ua.png', name: 'Ukraine', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+380', flag: '/images/flags/ua.png', name: 'Ukraine', placeholder: '50 123 45 67', maxLength: 9, format: 'XX XXX XX XX' },
     { code: '+40', flag: '/images/flags/ro.png', name: 'Romania', placeholder: '721 234 567', maxLength: 9, format: 'XXX XXX XXX' },
     { code: '+995', flag: '/images/flags/ge.png', name: 'Georgia', placeholder: '555 123 456', maxLength: 9, format: 'XXX XXX XXX' },
-    { code: '+998', flag: '/images/flags/uz.png', name: 'Uzbekistan', placeholder: '90 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+998', flag: '/images/flags/uz.png', name: 'Uzbekistan', placeholder: '90 123 45 67', maxLength: 9, format: 'XX XXX XX XX' },
     { code: '+98', flag: '/images/flags/ir.png', name: 'Iran', placeholder: '912 345 6789', maxLength: 10, format: 'XXX XXX XXXX' },
     { code: '+964', flag: '/images/flags/iq.png', name: 'Iraq', placeholder: '770 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
     { code: '+966', flag: '/images/flags/sa.png', name: 'Saudi Arabia', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
     { code: '+971', flag: '/images/flags/ae.png', name: 'UAE', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
     { code: '+974', flag: '/images/flags/qa.png', name: 'Qatar', placeholder: '5512 3456', maxLength: 8, format: 'XXXX XXXX' },
     { code: '+965', flag: '/images/flags/kw.png', name: 'Kuwait', placeholder: '5012 3456', maxLength: 8, format: 'XXXX XXXX' },
-    { code: '+972', flag: '/images/flags/il.png', name: 'Israel', placeholder: '50 123 4567', maxLength: 10, format: 'XX XXX XXXX' },
-    { code: '+20', flag: '/images/flags/eg.png', name: 'Egypt', placeholder: '100 123 4567', maxLength: 10, format: 'XXX XXX XXXX' },
+    { code: '+972', flag: '/images/flags/il.png', name: 'Israel', placeholder: '50 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
+    { code: '+20', flag: '/images/flags/eg.png', name: 'Egypt', placeholder: '10 0123 4567', maxLength: 10, format: 'XX XXXX XXXX' },
     { code: '+91', flag: '/images/flags/in.png', name: 'India', placeholder: '98765 43210', maxLength: 10, format: 'XXXXX XXXXX' },
     { code: '+86', flag: '/images/flags/cn.png', name: 'China', placeholder: '138 1234 5678', maxLength: 11, format: 'XXX XXXX XXXX' },
     { code: '+81', flag: '/images/flags/jp.png', name: 'Japan', placeholder: '90 1234 5678', maxLength: 10, format: 'XX XXXX XXXX' },
@@ -174,7 +174,7 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
     { code: '+351', flag: '/images/flags/pt.png', name: 'Portugal', placeholder: '912 345 678', maxLength: 9, format: 'XXX XXX XXX' },
     { code: '+36', flag: '/images/flags/hu.png', name: 'Hungary', placeholder: '20 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
     { code: '+420', flag: '/images/flags/cz.png', name: 'Czech Republic', placeholder: '601 234 567', maxLength: 9, format: 'XXX XXX XXX' },
-    { code: '+43', flag: '/images/flags/at.png', name: 'Austria', placeholder: '660 123456', maxLength: 10, format: 'XXX XXXXXX' },
+    { code: '+43', flag: '/images/flags/at.png', name: 'Austria', placeholder: '660 1234567', maxLength: 10, format: 'XXX XXXXXXX' },
     { code: '+41', flag: '/images/flags/ch.png', name: 'Switzerland', placeholder: '76 123 45 67', maxLength: 9, format: 'XX XXX XX XX' },
     { code: '+46', flag: '/images/flags/se.png', name: 'Sweden', placeholder: '70 123 45 67', maxLength: 9, format: 'XX XXX XX XX' },
     { code: '+47', flag: '/images/flags/no.png', name: 'Norway', placeholder: '401 23 456', maxLength: 8, format: 'XXX XX XXX' },
@@ -256,7 +256,9 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
             </div>
             <h3 className="callback-success-title">{content.successTitle}</h3>
             <p className="callback-success-text">{content.successText}</p>
-            <button type="button" className="callback-success-btn" onClick={() => setSubmitted(false)}>{content.resetBtn}</button>
+            <button type="button" className="callback-success-btn" onClick={() => setSubmitted(false)}>
+              <ButtonText>{content.resetBtn}</ButtonText>
+            </button>
           </div>
         </div>
       ) : (

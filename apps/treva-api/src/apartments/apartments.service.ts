@@ -106,8 +106,10 @@ export class ApartmentsService {
     maxArea?: number;
     floor?: number;
     currency?: string;
+    viewOptionIds?: string;
+    status?: string;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, floor, currency } = query;
+    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, floor, currency, viewOptionIds, status } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
@@ -129,6 +131,11 @@ export class ApartmentsService {
       where.floorFrom = { lte: floor };
       where.floorTo = { gte: floor };
     }
+    if (viewOptionIds) {
+      const ids = viewOptionIds.split(',').filter(Boolean);
+      if (ids.length > 0) where.viewOptionIds = { hasSome: ids };
+    }
+    if (status) where.status = status;
 
     const [data, total] = await Promise.all([
       this.prisma.apartment.findMany({

@@ -371,9 +371,9 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
               </button>
               {viewOpen && (
                 <div className="custom-select__dropdown">
-                  {VIEW_OPTIONS.map((v) => (
-                    <button key={v} type="button" className={`custom-select__option ${selectedView === v ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(v); setViewOpen(false); }}>
-                      {v}
+                  {viewOptions.map((opt) => (
+                    <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setViewOpen(false); }}>
+                      {opt.title || opt.name}
                     </button>
                   ))}
                 </div>
