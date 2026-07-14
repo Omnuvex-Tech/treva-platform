@@ -453,12 +453,17 @@
   right: 0;
   z-index: 9999;
   font-family: var(--font-inter), Arial, sans-serif;
-  background: rgba(0,0,0,0.92);
+  background: rgba(63, 66, 73, 0.92);
   backdrop-filter: blur(14px);
   border-bottom: none;
   overflow-y: auto;
   max-height: 0;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.treva-navbar__mobile::-webkit-scrollbar {
+  display: none;
 }
 .treva-navbar__mobile.treva-navbar__mobile--open {
   max-height: calc(100dvh - var(--treva-nav-height));

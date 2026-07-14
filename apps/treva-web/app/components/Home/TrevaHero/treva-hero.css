@@ -155,6 +155,11 @@
   flex-wrap: wrap;
 }
 
+/* Wrapper only groups Off-Plan + Search on mobile; transparent elsewhere */
+.treva-filter-bar__actions {
+  display: contents;
+}
+
 /* LOCATION BUTTON (input qrupu) */
 .treva-filter-bar__input-group {
   display: flex;
@@ -338,6 +343,30 @@
   background: #2f3134;
 }
 
+.treva-filter-bar__deal-menu--scroll {
+  max-height: 196px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #5a5e66 #3f4249;
+}
+
+.treva-filter-bar__deal-menu--scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.treva-filter-bar__deal-menu--scroll::-webkit-scrollbar-track {
+  background: #3f4249;
+}
+
+.treva-filter-bar__deal-menu--scroll::-webkit-scrollbar-thumb {
+  background: #5a5e66;
+  border-radius: 3px;
+}
+
+.treva-filter-bar__deal-menu--scroll::-webkit-scrollbar-thumb:hover {
+  background: #6b6f78;
+}
+
 /* HOME BUTTON */
 .treva-filter-bar__home-btn {
   display: flex;
@@ -373,7 +402,7 @@
   .treva-filter-bar__input-group {
     width: auto;
     min-width: 220px;
-    flex: 1;
+    flex: 0 1 auto;
     padding: 0 14px 0 16px;
     gap: 12px;
     height: 44px;
@@ -393,7 +422,7 @@
   .treva-filter-bar__location-group {
     width: auto;
     min-width: 220px;
-    flex: 1;
+    flex: 0 1 auto;
   }
   .treva-filter-bar__deal-menu {
     border-radius: 12px;
@@ -409,9 +438,9 @@
     font-size: 14px;
   }
   .treva-filter-bar__dropdown-btn svg {
-    width: 9px !important;
-    height: 9px !important;
-    flex-basis: 9px;
+    width: 14px !important;
+    height: 14px !important;
+    flex-basis: 14px;
   }
   .treva-filter-bar__icon {
     width: 13px !important;
@@ -432,22 +461,31 @@
     max-width: 100%;
   }
   .treva-filter-bar {
-    flex-wrap: nowrap;
-    gap: 7px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  /* Fixed widths so buttons don't scale with the window; actions forced onto its own row */
+  .treva-filter-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 100%;
   }
   .treva-filter-bar__input-group {
     padding-left: 12px;
     gap: 8px;
     min-width: 0;
-    height: 40px;
-    border-radius: 16px;
+    width: 100%;
+    height: 48px;
+    border-radius: 20px;
   }
   .treva-filter-bar__location-group {
-    min-width: 0;
-    flex: 1;
+    width: 300px;
+    flex: none;
   }
   .treva-filter-bar__deal {
-    min-width: 72px;
+    width: 236px;
+    flex: none;
   }
   .treva-filter-bar__deal-menu {
     border-radius: 12px;
@@ -459,31 +497,36 @@
   }
   .treva-filter-bar__location-text,
   .treva-filter-bar__dropdown-btn {
-    font-size: 11px;
+    font-size: 14px;
   }
   .treva-filter-bar__dropdown-btn {
     padding: 6px 12px;
-    min-width: 72px;
-    height: 40px;
-    border-radius: 16px;
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    border-radius: 20px;
+    justify-content: space-between;
+  }
+  .treva-filter-bar__location-chevron {
+    margin-left: auto;
   }
   .treva-filter-bar__dropdown-btn svg {
-    width: 7px !important;
-    height: 7px !important;
-    flex-basis: 7px;
+    width: 14px !important;
+    height: 14px !important;
+    flex-basis: 14px;
   }
   .treva-filter-bar__home-btn {
-    width: 42px;
-    height: 40px;
-    border-radius: 16px;
+    width: 50px;
+    height: 48px;
+    border-radius: 20px;
   }
   .treva-filter-bar__icon {
     width: 12px !important;
     height: 15px !important;
   }
   .treva-filter-bar__home-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -495,9 +538,6 @@
     flex-wrap: wrap;
   }
   .treva-filter-bar__input-group {
-    width: 100%;
-  }
-  .treva-filter-bar__location-group {
     width: 100%;
   }
 

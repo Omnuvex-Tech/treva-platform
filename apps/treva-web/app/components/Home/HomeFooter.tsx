@@ -124,7 +124,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
     if (typeof window === "undefined") return;
 
     window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
   return (

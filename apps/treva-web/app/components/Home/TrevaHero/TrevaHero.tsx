@@ -186,15 +186,7 @@ export default function TrevaHero() {
               </PillButton>
 
               {locationMenuOpen && (
-                <div className="treva-filter-bar__deal-menu treva-filter-bar__deal-menu--location" role="listbox">
-                  <button
-                    className={`treva-filter-bar__deal-option ${!selectedCategorySlug ? 'treva-filter-bar__deal-option--active' : ''}`}
-                    type="button"
-                    role="option"
-                    onClick={() => handleCategoryClick('')}
-                  >
-                    {content.location}
-                  </button>
+                <div className="treva-filter-bar__deal-menu treva-filter-bar__deal-menu--location treva-filter-bar__deal-menu--scroll" role="listbox">
                   {categories.map((cat) => {
                     const catTitle = getCatTitle(cat.title, locale);
                     return (
@@ -213,6 +205,7 @@ export default function TrevaHero() {
               )}
             </div>
 
+            <div className="treva-filter-bar__actions">
             {/* Deal type dropdown */}
             <div className="treva-filter-bar__deal" ref={dealDropdownRef}>
               <PillButton
@@ -252,6 +245,7 @@ export default function TrevaHero() {
             <PillButton className="treva-filter-bar__home-btn" aria-label="Go to section" onClick={handleHomeClick}>
               <Search size={24} strokeWidth={2} />
             </PillButton>
+            </div>
           </div>
         </PageContainer>
       </div>
