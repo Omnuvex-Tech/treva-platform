@@ -72,6 +72,7 @@ type CallbackFormProps = {
 };
 
 const defaultRoles: RoleType[] = ['Client', 'Developer', 'Broker'];
+const DEFAULT_COUNTRY_CODE = '+994';
 
 type RoleButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
@@ -124,11 +125,11 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
   const [activeRole, setActiveRole] = useState<RoleType>(visibleRoles[0] ?? 'Client');
   const [name, setName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
-  const [countryCode, setCountryCode] = useState('+994');
+  const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE);
   const [countryFlag, setCountryFlag] = useState('/images/flags/az.png');
-  const [phonePlaceholder, setPhonePlaceholder] = useState('050 123 45 67');
-  const [phoneMaxLength, setPhoneMaxLength] = useState(10);
-  const [phoneFormat, setPhoneFormat] = useState('XXX XXX XX XX');
+  const [phonePlaceholder, setPhonePlaceholder] = useState('50 123 45 67');
+  const [phoneMaxLength, setPhoneMaxLength] = useState(9);
+  const [phoneFormat, setPhoneFormat] = useState('XX XXX XX XX');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -136,9 +137,9 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
   const flagRef = useRef<HTMLDivElement>(null);
 
   const countries = [
-    { code: '+994', flag: '/images/flags/az.png', name: 'Azerbaijan', placeholder: '050 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
-    { code: '+90', flag: '/images/flags/tr.png', name: 'Turkey', placeholder: '532 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
-    { code: '+7', flag: '/images/flags/ru.png', name: 'Russia', placeholder: '905 123 45 67', maxLength: 10, format: 'XXX XXX XX XX' },
+    { code: '+994', flag: '/images/flags/az.png', name: 'Azerbaijan', placeholder: '50 123 45 67', maxLength: 9, format: 'XX XXX XX XX', stripLeadingZero: true },
+    { code: '+90', flag: '/images/flags/tr.png', name: 'Turkey', placeholder: '532 123 45 67', maxLength: 10, format: 'XXX XXX XX XX', stripLeadingZero: true },
+    { code: '+7', flag: '/images/flags/ru.png', name: 'Russia', placeholder: '905 123 45 67', maxLength: 10, format: 'XXX XXX XX XX', stripLeadingZero: false },
     { code: '+1', flag: '/images/flags/us.png', name: 'United States', placeholder: '202 555 1234', maxLength: 10, format: 'XXX XXX XXXX' },
     { code: '+44', flag: '/images/flags/gb.png', name: 'United Kingdom', placeholder: '7911 123456', maxLength: 10, format: 'XXXX XXXXXX' },
     { code: '+49', flag: '/images/flags/de.png', name: 'Germany', placeholder: '151 12345678', maxLength: 11, format: 'XXX XXXXXXXX' },
@@ -184,6 +185,16 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
     { code: '+359', flag: '/images/flags/bg.png', name: 'Bulgaria', placeholder: '87 123 4567', maxLength: 9, format: 'XX XXX XXXX' },
   ];
 
+  const normalizePhoneDigits = (raw: string, stripLeadingZero = false) => {
+    let digits = raw.replace(/[^0-9]/g, '');
+
+    if (stripLeadingZero && digits.startsWith('0')) {
+      digits = digits.slice(1);
+    }
+
+    return digits;
+  };
+
   useEffect(() => {
     if (!visibleRoles.includes(activeRole)) {
       setActiveRole(visibleRoles[0] ?? 'Client');
@@ -206,7 +217,11 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
     setError('');
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021';
-      const rawPhone = phone.replace(/\s/g, '');
+      const selectedCountry = countries.find((country) => country.code === countryCode);
+      const rawPhone = normalizePhoneDigits(
+        phone,
+        selectedCountry?.stripLeadingZero ?? false,
+      );
       const fullPhone = `${countryCode}${rawPhone}`;
       const res = await fetch(`${apiBase}/callback`, {
         method: 'POST',
@@ -217,11 +232,11 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
       setSubmitted(true);
       setName('');
       setPhone('');
-      setCountryCode('+994');
+      setCountryCode(DEFAULT_COUNTRY_CODE);
       setCountryFlag('/images/flags/az.png');
-      setPhonePlaceholder('050 123 45 67');
-      setPhoneMaxLength(10);
-      setPhoneFormat('XXX XXX XX XX');
+      setPhonePlaceholder('50 123 45 67');
+      setPhoneMaxLength(9);
+      setPhoneFormat('XX XXX XX XX');
       setActiveRole(visibleRoles[0] ?? 'Client');
     } catch {
       setError('Göndərilmədi. Yenidən cəhd edin.');
@@ -243,8 +258,14 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
     return out;
   }
 
+  const getFormatCharacterLimit = (fmt: string) => fmt.length;
+
   return (
-    <PageContainer as="main" className="callbackContainer" {...(sectionId ? { id: sectionId } : {})}>
+    <PageContainer
+      as="main"
+      className={`callbackContainer ${submitted ? 'is-submitted' : ''}`}
+      {...(sectionId ? { id: sectionId } : {})}
+    >
       {submitted ? (
         <div className="formWrapper">
           <div className="callback-success-overlay">
@@ -338,10 +359,14 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
                 type="tel"
                 inputMode="numeric"
                 placeholder={phonePlaceholder}
-                maxLength={phoneMaxLength}
+                maxLength={getFormatCharacterLimit(phoneFormat)}
                 value={phone}
                 onChange={(e) => {
-                  const raw = e.target.value.replace(/[^0-9]/g, '');
+                  const selectedCountry = countries.find((country) => country.code === countryCode);
+                  const raw = normalizePhoneDigits(
+                    e.target.value,
+                    selectedCountry?.stripLeadingZero ?? false,
+                  ).slice(0, phoneMaxLength);
                   setPhone(formatPhoneNumber(raw, phoneFormat));
                 }}
                 className="inputField phoneInput"

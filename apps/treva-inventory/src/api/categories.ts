@@ -19,6 +19,7 @@ export interface Category {
     name: string;
     slug: string;
     image?: string;
+    coverImage?: string;
     status?: string;
     type?: string;
     housesCount: number;
@@ -49,6 +50,7 @@ export interface CreateCategoryData {
     slug: string;
     type?: string;
     image?: string;
+    coverImage?: string;
     status?: string;
     housesCount?: number;
     propertiesCount?: number;
@@ -73,6 +75,7 @@ export interface UpdateCategoryData {
     name?: string;
     slug?: string;
     image?: string;
+    coverImage?: string;
     status?: string;
     housesCount?: number;
     propertiesCount?: number;

@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi, type CategoryDocument } from "../../api/categories";
 import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
 import { objectTypesApi, type ObjectType } from "../../api/object-types";
 import { currenciesApi, type Currency } from "../../api/currencies";
-import { FormDropdown, FormTabSwitcher, FormAddButton } from "@repo/ui";
+import { locationOptionsApi, type LocationOption } from "../../api/location-options";
+import { FormAddButton, FormDropdown, FormTabSwitcher } from "@repo/ui";
 import { HouseForm } from "./HouseForm";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -34,10 +35,33 @@ const PROPERTY_SUB_TABS: { key: PropertySubTab; label: string }[] = [
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
 
+function SectionBlock({
+    title,
+    description,
+    children,
+}: {
+    title: string;
+    description?: string;
+    children: ReactNode;
+}) {
+    return (
+        <section className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+            <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
+                <div className="min-w-0">
+                    <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">{title}</h5>
+                    {description ? <p className="mt-1 text-xs leading-5 text-[#808191]">{description}</p> : null}
+                </div>
+                <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
+            </div>
+            <div className="space-y-4">{children}</div>
+        </section>
+    );
+}
+
 const defaultFormData = {
+    name: "",
+    title: "",
     objectType: "",
-    propertyName: "",
-    slug: "",
     currency: "",
     region: "",
     area: "",
@@ -49,6 +73,7 @@ const defaultFormData = {
     salesDepartment: "",
     fedLaw214: false,
     image: "",
+    coverImage: "",
 };
 
 export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}) {
@@ -62,8 +87,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     const docInputRef = useRef<HTMLInputElement>(null);
     const houseFormRef = useRef<HTMLDivElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
+    const coverImageInputRef = useRef<HTMLInputElement>(null);
     const [imageUploading, setImageUploading] = useState(false);
+    const [coverImageUploading, setCoverImageUploading] = useState(false);
     const [imageDrag, setImageDrag] = useState(false);
+    const [coverImageDrag, setCoverImageDrag] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const { state: draftState, setState: setDraftState, clearDraft } = useFormDraft({
         key: `treva-object-edit-${slug || "unknown"}`,
@@ -78,7 +107,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     const setActiveTab = (tab: TabKey) => setDraftState((prev) => ({ ...prev, activeTab: tab }));
     const [activePropertySubTab, setActivePropertySubTab] = useState<PropertySubTab>("properties");
     const activeHouseTab = draftState.activeHouseTab;
-    const setActiveHouseTab = (tab: "Active" | "Archive") => setDraftState((prev) => ({ ...prev, activeHouseTab: tab }));
+    const setActiveHouseTab = (tab: "Active" | "Archive") =>
+        setDraftState((prev) => ({ ...prev, activeHouseTab: tab }));
     const formData = draftState.formData;
     const updateFormData = (field: string, value: string | boolean) =>
         setDraftState((prev) => ({ ...prev, formData: { ...prev.formData, [field]: value } }));
@@ -114,6 +144,29 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     });
     const currencies: Currency[] = Array.isArray(currenciesResponse?.data) ? currenciesResponse.data : [];
 
+    const { data: locationOptionsResponse } = useQuery({
+        queryKey: ["location-options"],
+        queryFn: () => locationOptionsApi.getAll(),
+    });
+    const locationOptionItems: LocationOption[] = Array.isArray(locationOptionsResponse?.data)
+        ? locationOptionsResponse.data
+        : [];
+
+    const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string) => {
+        const mapped = locationOptionItems
+            .filter((item) => item.type === type)
+            .map((item) => ({
+                id: item.title,
+                label: item.title,
+            }));
+
+        if (selectedValue && !mapped.some((item) => item.id === selectedValue)) {
+            mapped.unshift({ id: selectedValue, label: selectedValue });
+        }
+
+        return mapped;
+    };
+
     const { data: layoutsRes } = useQuery({
         queryKey: ["unit-layouts", slug],
         queryFn: () => unitLayoutsApi.getAll({ categorySlug: slug! }),
@@ -127,16 +180,16 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const restoredFromDraft = useRef(false);
     useEffect(() => {
-        if (category && !restoredFromDraft.current) {
+        if (category && objectTypes.length > 0 && !restoredFromDraft.current) {
             restoredFromDraft.current = true;
             const matchedType = objectTypes.find((t) => t.title === category.objectType);
             setDraftState((prev) => ({
                 ...prev,
                 formData: {
+                    name: category.name || category.propertyName || "",
+                    title: category.title || "",
                     objectType: matchedType?.id || category.objectType || "",
-                    propertyName: category.propertyName || "",
-                    slug: category.slug || "",
-                    currency: category.currency || "Rubels",
+                    currency: category.currency || "",
                     region: category.region || "",
                     area: category.area || "",
                     city: category.city || "",
@@ -147,18 +200,48 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     salesDepartment: category.salesDepartment || "",
                     fedLaw214: category.fedLaw214 || false,
                     image: category.image || "",
+                    coverImage: category.coverImage || "",
                 },
             }));
         }
-    }, [category, objectTypes]);
+    }, [category, objectTypes, setDraftState]);
+
+    const validate = (): boolean => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.objectType) newErrors.objectType = "Object type is required";
+        if (!formData.name.trim()) newErrors.name = "Name is required";
+        if (!formData.title.trim()) newErrors.title = "Title is required";
+        if (!formData.currency) newErrors.currency = "Currency is required";
+        if (!formData.city.trim()) newErrors.city = "City is required";
+        if (!formData.region.trim()) newErrors.region = "Region is required";
+        if (!formData.area.trim()) newErrors.area = "Area is required";
+        if (!formData.developerBrand.trim()) newErrors.developerBrand = "Developer brand is required";
+        if (!formData.website.trim()) newErrors.website = "Website is required";
+        if (!formData.banks.trim()) newErrors.banks = "Banks is required";
+        if (!formData.infrastructure.trim()) newErrors.infrastructure = "Infrastructure is required";
+        if (!formData.salesDepartment.trim()) newErrors.salesDepartment = "Sales department is required";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const clearError = (field: string) => {
+        if (errors[field]) {
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+            });
+        }
+    };
 
     const updateMutation = useMutation({
         mutationFn: (data: typeof formData) => {
             const selectedType = objectTypes.find((t) => t.id === data.objectType);
             return categoriesApi.update(category!.id, {
+                name: data.name,
+                title: data.title,
                 objectType: selectedType?.title || data.objectType,
-                propertyName: data.propertyName,
-                slug: data.slug,
+                propertyName: data.name || data.title,
                 currency: data.currency,
                 region: data.region,
                 area: data.area,
@@ -169,7 +252,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 infrastructure: data.infrastructure,
                 salesDepartment: data.salesDepartment,
                 fedLaw214: data.fedLaw214,
-                image: data.image,
+                image: data.image || undefined,
+                coverImage: data.coverImage || undefined,
             });
         },
         onSuccess: () => {
@@ -184,9 +268,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     });
 
     const updateDocsMutation = useMutation({
-        mutationFn: (docs: CategoryDocument[]) => {
-            return categoriesApi.update(category!.id, { documents: docs });
-        },
+        mutationFn: (nextDocs: CategoryDocument[]) => categoriesApi.update(category!.id, { documents: nextDocs }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["category", slug] });
         },
@@ -209,24 +291,28 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validate()) return;
         updateMutation.mutate(formData);
     };
 
-    const handleImageUpload = async (file: File) => {
+    const handleImageUpload = async (file: File, field: "image" | "coverImage", setUploading: (value: boolean) => void) => {
         const items = [file];
-        const hasUnsupported = items.some((f) => !SUPPORTED_IMAGE_TYPES.includes(f.type as typeof SUPPORTED_IMAGE_TYPES[number]));
+        const hasUnsupported = items.some(
+            (item) => !SUPPORTED_IMAGE_TYPES.includes(item.type as (typeof SUPPORTED_IMAGE_TYPES)[number]),
+        );
         if (hasUnsupported) {
             showError({ title: "Unsupported file type", description: "Please upload JPG, PNG, WebP, or GIF images." });
             return;
         }
-        setImageUploading(true);
+
+        setUploading(true);
         try {
             const res = await unitLayoutsApi.uploadFile(file);
-            updateFormData("image", res.data.url);
+            updateFormData(field, res.data.url);
         } catch (error) {
             showError({ title: "Upload failed", description: getApiErrorMessage(error, "Please try again.") });
         } finally {
-            setImageUploading(false);
+            setUploading(false);
         }
     };
 
@@ -238,7 +324,18 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         e.stopPropagation();
         setImageDrag(false);
         const file = e.dataTransfer.files?.[0];
-        if (file) handleImageUpload(file);
+        if (file) handleImageUpload(file, "image", setImageUploading);
+    };
+
+    const onCoverImageDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
+    const onCoverImageDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setCoverImageDrag(true); };
+    const onCoverImageDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setCoverImageDrag(false); };
+    const onCoverImageDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCoverImageDrag(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleImageUpload(file, "coverImage", setCoverImageUploading);
     };
 
     const handleDocUpload = async (files: FileList | File[]) => {
@@ -262,12 +359,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     };
 
     const handleRemoveDoc = (index: number) => {
-        updateDocsMutation.mutate(documents.filter((_, i) => i !== index));
+        updateDocsMutation.mutate(documents.filter((_, itemIndex) => itemIndex !== index));
     };
 
     if (isLoading) {
         return (
-            <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+            <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
                 <div className="py-8 text-center text-[#666666]">Loading...</div>
             </main>
         );
@@ -275,212 +372,253 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     if (!category) {
         return (
-            <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+            <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
                 <div className="py-8 text-center text-[#C3362B]">Object not found</div>
             </main>
         );
     }
 
     const formContent = (
-        <div className="w-full max-w-[1000px] mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
+        <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
+            <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
+                {TABS.map((tab) => (
                     <button
+                        key={tab.key}
                         type="button"
-                        onClick={() => navigate("/dashboard/offplan/objects")}
-                        className="text-[#718096] hover:text-[#1A1C1E] transition-colors p-1 cursor-pointer"
-                        aria-label="Back to config"
+                        onClick={() => setActiveTab(tab.key)}
+                        className={`relative cursor-pointer rounded-2xl px-4 py-2.5 text-sm font-medium transition-colors ${
+                            activeTab === tab.key
+                                ? "bg-[#4E525D] text-white shadow-sm"
+                                : "text-[#808191] hover:bg-[#F4F5F6] hover:text-[#4E525D]"
+                        }`}
                     >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
+                        {tab.label}
                     </button>
-                    <h2 className="text-[16px] font-bold text-[#333333]" style={{ lineHeight: "20px" }}>
-                        {formData.propertyName || "Edit Object"}
-                    </h2>
-                </div>
-                <button
-                    type="button"
-                    onClick={() => navigate("/dashboard/offplan/objects")}
-                    className="text-[#718096] hover:text-[#1A1C1E] transition-colors p-1 cursor-pointer"
-                    aria-label="Close form"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+                ))}
             </div>
 
-            {/* Tab Bar */}
-            <div className="rounded-[24px] border border-[#ECEEF2] bg-white p-2 mb-6">
-                <div className="flex gap-1">
-                    {TABS.map((tab) => (
-                        <button
-                            key={tab.key}
-                            type="button"
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`flex-1 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all cursor-pointer ${
-                                activeTab === tab.key
-                                    ? "bg-[#4E525D] text-white shadow-sm"
-                                    : "text-[#808191] hover:bg-[#F4F5F6] hover:text-[#4E525D]"
-                            }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Tab: Object Info */}
             {activeTab === "info" && (
-                <form onSubmit={handleSubmit}>
-                    {/* Project Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Project</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Core project details</p>
-                            </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="grid gap-5 lg:grid-cols-2">
-                            <div>
-                                <FormDropdown
-                                    label="Object type *"
-                                    value={formData.objectType}
-                                    options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
-                                    placeholder="Select object type"
-                                    onChange={(id) => updateFormData("objectType", id)}
-                                    onCreateClick={() => navigate("/dashboard/offplan/object-types")}
-                                    createLabel="+ Create object type"
-                                />
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Property Name *</label>
-                                <input className={inputClass} value={formData.propertyName} onChange={(e) => updateFormData("propertyName", e.target.value)} placeholder="Sea Breeze Residence" />
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Slug</label>
-                                <input className={inputClass} value={formData.slug} onChange={(e) => updateFormData("slug", e.target.value)} placeholder="auto-generated-from-name" />
-                            </div>
-                            <div>
-                                <FormDropdown
-                                    label="Currency *"
-                                    value={formData.currency}
-                                    options={currencies.map((c) => ({ id: c.value, label: c.title }))}
-                                    placeholder="Select currency"
-                                    onChange={(id) => updateFormData("currency", id)}
-                                    onCreateClick={() => navigate("/dashboard/offplan/currencies")}
-                                    createLabel="+ Create currency"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                <form onSubmit={handleSubmit} className="max-w-5xl">
+                    <div className="space-y-5">
+                        <SectionBlock title="Identity" description="Core object information and listing basics.">
+                            <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+                                <div className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
+                                    <div className="space-y-4">
+                                        <ImageAssetCard
+                                            label="Main Image"
+                                            description="Primary thumbnail used in cards and object listing views."
+                                            alt="Project"
+                                            imageUrl={formData.image || null}
+                                            widthClass="w-[90px]"
+                                            previewClassName="h-[90px] w-[90px] rounded-[24px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
+                                            emptyPreviewClassName={`flex h-[90px] w-[90px] items-center justify-center rounded-[24px] border-2 border-dashed bg-white ${imageDrag ? "border-blue-400 bg-blue-50" : imageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
+                                            placeholderTitle="Upload"
+                                            isDragging={imageDrag}
+                                            uploading={imageUploading}
+                                            onOpen={() => imageInputRef.current?.click()}
+                                            onRemove={() => updateFormData("image", "")}
+                                            onDragOver={onImageDragOver}
+                                            onDragEnter={onImageDragEnter}
+                                            onDragLeave={onImageDragLeave}
+                                            onDrop={onImageDrop}
+                                        />
+                                        <input
+                                            ref={imageInputRef}
+                                            type="file"
+                                            accept={IMAGE_ACCEPT}
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) handleImageUpload(file, "image", setImageUploading);
+                                                if (imageInputRef.current) imageInputRef.current.value = "";
+                                            }}
+                                        />
 
-                    {/* Location Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Location</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Project location details</p>
-                            </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="grid gap-5 lg:grid-cols-3">
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Region *</label>
-                                <input className={inputClass} value={formData.region} onChange={(e) => updateFormData("region", e.target.value)} placeholder="Dubai Marina" />
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">City *</label>
-                                <input className={inputClass} value={formData.city} onChange={(e) => updateFormData("city", e.target.value)} placeholder="Baku" />
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
-                                <input className={inputClass} value={formData.area} onChange={(e) => updateFormData("area", e.target.value)} placeholder="2500 m²" />
-                            </div>
-                        </div>
-                    </div>
+                                        <div className="border-t border-[#EEF1F5] pt-4">
+                                            <ImageAssetCard
+                                                label="Cover Image"
+                                                description="Optional portrait-style visual for richer object presentation."
+                                                alt="Cover"
+                                                imageUrl={formData.coverImage || null}
+                                                widthClass="w-[112px]"
+                                                previewClassName="h-[148px] w-[112px] rounded-[24px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
+                                                emptyPreviewClassName={`flex h-[148px] w-[112px] items-center justify-center rounded-[24px] border-2 border-dashed bg-white ${coverImageDrag ? "border-blue-400 bg-blue-50" : coverImageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
+                                                placeholderTitle="Upload cover"
+                                                placeholderHint="Portrait image"
+                                                isDragging={coverImageDrag}
+                                                uploading={coverImageUploading}
+                                                onOpen={() => coverImageInputRef.current?.click()}
+                                                onRemove={() => updateFormData("coverImage", "")}
+                                                onDragOver={onCoverImageDragOver}
+                                                onDragEnter={onCoverImageDragEnter}
+                                                onDragLeave={onCoverImageDragLeave}
+                                                onDrop={onCoverImageDrop}
+                                            />
+                                            <input
+                                                ref={coverImageInputRef}
+                                                type="file"
+                                                accept={IMAGE_ACCEPT}
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleImageUpload(file, "coverImage", setCoverImageUploading);
+                                                    if (coverImageInputRef.current) coverImageInputRef.current.value = "";
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
 
-                    {/* Developer Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Developer</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Developer and sales information</p>
+                                <div className="space-y-4">
+                                    <div className="grid gap-4 lg:grid-cols-2">
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Name *</label>
+                                            <input
+                                                className={inputClass}
+                                                value={formData.name}
+                                                onChange={(e) => { updateFormData("name", e.target.value); clearError("name"); }}
+                                                placeholder="Sea Breeze"
+                                            />
+                                            {errors.name && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.name}</p>}
+                                        </div>
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Title *</label>
+                                            <input
+                                                className={inputClass}
+                                                value={formData.title}
+                                                onChange={(e) => { updateFormData("title", e.target.value); clearError("title"); }}
+                                                placeholder="Sea Breeze Residence"
+                                            />
+                                            {errors.title && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.title}</p>}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid gap-4 lg:grid-cols-2">
+                                        <div>
+                                            <FormDropdown
+                                                label="Type *"
+                                                value={formData.objectType}
+                                                options={objectTypes.map((item) => ({ id: item.id, label: item.title }))}
+                                                placeholder="Select type"
+                                                onChange={(id) => { updateFormData("objectType", id); clearError("objectType"); }}
+                                                onCreateClick={() => navigate("/dashboard/offplan/object-types")}
+                                                createLabel="Create object type"
+                                            />
+                                            {errors.objectType && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.objectType}</p>}
+                                        </div>
+                                        <div>
+                                            <FormDropdown
+                                                label="Currency *"
+                                                value={formData.currency}
+                                                options={currencies.map((item) => ({ id: item.value, label: item.title }))}
+                                                placeholder="Select currency"
+                                                onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
+                                                onCreateClick={() => navigate("/dashboard/offplan/currencies")}
+                                                createLabel="Create currency"
+                                            />
+                                            {errors.currency && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.currency}</p>}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="space-y-4">
+                        </SectionBlock>
+
+                        <SectionBlock title="Location" description="Region, city and area details for the object.">
+                            <div className="grid gap-5 lg:grid-cols-3">
+                                <div>
+                                    <FormDropdown
+                                        label="City *"
+                                        value={formData.city}
+                                        options={toLocationDropdownOptions("city", formData.city)}
+                                        placeholder="Select city"
+                                        onChange={(id) => { updateFormData("city", id); clearError("city"); }}
+                                        onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                        createLabel="Create city"
+                                    />
+                                    {errors.city && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.city}</p>}
+                                </div>
+                                <div>
+                                    <FormDropdown
+                                        label="Region *"
+                                        value={formData.region}
+                                        options={toLocationDropdownOptions("region", formData.region)}
+                                        placeholder="Select region"
+                                        onChange={(id) => { updateFormData("region", id); clearError("region"); }}
+                                        onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                        createLabel="Create region"
+                                    />
+                                    {errors.region && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.region}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.area}
+                                        onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }}
+                                        placeholder="2500 m²"
+                                    />
+                                    {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
+                                </div>
+                            </div>
+                        </SectionBlock>
+
+                        <SectionBlock title="Commercial" description="Developer, sales and infrastructure details shown for the project.">
                             <div className="grid gap-5 lg:grid-cols-2">
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Developer Brand *</label>
-                                    <input className={inputClass} value={formData.developerBrand} onChange={(e) => updateFormData("developerBrand", e.target.value)} placeholder="ABC Development" />
+                                    <input
+                                        className={inputClass}
+                                        value={formData.developerBrand}
+                                        onChange={(e) => { updateFormData("developerBrand", e.target.value); clearError("developerBrand"); }}
+                                        placeholder="ABC Development"
+                                    />
+                                    {errors.developerBrand && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.developerBrand}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Website *</label>
-                                    <input className={inputClass} value={formData.website} onChange={(e) => updateFormData("website", e.target.value)} placeholder="https://example.com" />
+                                    <input
+                                        className={inputClass}
+                                        value={formData.website}
+                                        onChange={(e) => { updateFormData("website", e.target.value); clearError("website"); }}
+                                        placeholder="https://example.com"
+                                    />
+                                    {errors.website && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.website}</p>}
                                 </div>
-                            </div>
-                            <div className="grid gap-5 lg:grid-cols-2">
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Banks *</label>
-                                    <input className={inputClass} value={formData.banks} onChange={(e) => updateFormData("banks", e.target.value)} placeholder="Kapital Bank, PASHA Bank" />
+                                    <input
+                                        className={inputClass}
+                                        value={formData.banks}
+                                        onChange={(e) => { updateFormData("banks", e.target.value); clearError("banks"); }}
+                                        placeholder="Kapital Bank, PASHA Bank"
+                                    />
+                                    {errors.banks && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.banks}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Sales Department *</label>
-                                    <input className={inputClass} value={formData.salesDepartment} onChange={(e) => updateFormData("salesDepartment", e.target.value)} placeholder="sales@example.com" />
+                                    <input
+                                        className={inputClass}
+                                        value={formData.salesDepartment}
+                                        onChange={(e) => { updateFormData("salesDepartment", e.target.value); clearError("salesDepartment"); }}
+                                        placeholder="sales@example.com"
+                                    />
+                                    {errors.salesDepartment && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.salesDepartment}</p>}
+                                </div>
+                                <div className="lg:col-span-2">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Infrastructure *</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.infrastructure}
+                                        onChange={(e) => { updateFormData("infrastructure", e.target.value); clearError("infrastructure"); }}
+                                        placeholder="Swimming pool, Gym, Parking"
+                                    />
+                                    {errors.infrastructure && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.infrastructure}</p>}
                                 </div>
                             </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Infrastructure *</label>
-                                <input className={inputClass} value={formData.infrastructure} onChange={(e) => updateFormData("infrastructure", e.target.value)} placeholder="Swimming pool, Gym, Parking" />
-                            </div>
-                        </div>
-                    </div>
+                        </SectionBlock>
 
-                    {/* Media & Legal Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Media & Legal</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Project image and legal status</p>
-                            </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="space-y-4">
-                            <ImageAssetCard
-                                label="Project Image"
-                                description="Primary thumbnail used in cards and listing views."
-                                alt="Project"
-                                imageUrl={formData.image || null}
-                                widthClass="w-[120px]"
-                                previewClassName="h-[120px] w-[120px] rounded-[18px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
-                                emptyPreviewClassName={`flex h-[120px] w-[120px] items-center justify-center rounded-[18px] border-2 border-dashed bg-white ${imageDrag ? "border-blue-400 bg-blue-50" : imageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
-                                placeholderTitle="Upload"
-                                isDragging={imageDrag}
-                                uploading={imageUploading}
-                                onOpen={() => imageInputRef.current?.click()}
-                                onRemove={() => updateFormData("image", "")}
-                                onDragOver={onImageDragOver}
-                                onDragEnter={onImageDragEnter}
-                                onDragLeave={onImageDragLeave}
-                                onDrop={onImageDrop}
-                            />
-                            <input
-                                ref={imageInputRef}
-                                type="file"
-                                accept={IMAGE_ACCEPT}
-                                className="hidden"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) handleImageUpload(file);
-                                    if (imageInputRef.current) imageInputRef.current.value = "";
-                                }}
-                            />
-                            <label className="flex items-center gap-3 group cursor-pointer select-none">
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                            <label className="group flex cursor-pointer select-none items-center gap-3">
                                 <div className="relative">
                                     <input
                                         type="checkbox"
@@ -489,17 +627,21 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         className="sr-only"
                                     />
                                     {formData.fedLaw214 ? (
-                                        <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="w-5 h-5" />
+                                        <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="h-5 w-5" />
                                     ) : (
-                                        <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5 opacity-60" />
+                                        <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="h-5 w-5 opacity-60" />
                                     )}
                                 </div>
-                                <span className="text-sm text-[#4E525D]">Possibility of Purchase under Federal Law No. 214</span>
+                                <div>
+                                    <div className="text-sm font-semibold text-[#1A1A1A]">Federal Law No. 214</div>
+                                    <div className="mt-1 text-xs leading-5 text-[#808191]">
+                                        Mark this if the project supports purchase under the related federal law.
+                                    </div>
+                                </div>
                             </label>
                         </div>
                     </div>
 
-                    {/* Submit Bar */}
                     <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
                         <button
                             type="submit"
@@ -525,10 +667,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 </form>
             )}
 
-            {/* Tab: Property */}
             {activeTab === "property" && (
-                <div className="space-y-5">
-                    {/* Sub-tabs */}
+                <div className="max-w-5xl space-y-5">
                     <div className="rounded-[24px] border border-[#ECEEF2] bg-white p-1.5">
                         <div className="flex gap-1">
                             {PROPERTY_SUB_TABS.map((tab) => (
@@ -548,10 +688,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                         </div>
                     </div>
 
-                    {/* Sub-tab: Properties */}
                     {activePropertySubTab === "properties" && (
                         <div className="space-y-5">
-                            {/* Property Information Card */}
                             <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                                 <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
                                     <div className="min-w-0">
@@ -559,51 +697,54 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         <p className="mt-1 text-xs leading-5 text-[#808191]">Key details about this object</p>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3.5 pt-1">
+                                <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 pt-1 sm:grid-cols-2">
                                     <div className="space-y-3.5">
                                         <div className="flex items-start">
-                                            <span className="w-[100px] text-xs text-[#4E525D] shrink-0">Object type</span>
+                                            <span className="w-[100px] shrink-0 text-xs text-[#4E525D]">Type</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{category?.objectType || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[100px] text-xs text-[#4E525D] shrink-0">Name</span>
-                                            <span className="text-sm font-medium text-[#1A1A1A]">{category?.propertyName || category?.title || "not specified"}</span>
+                                            <span className="w-[100px] shrink-0 text-xs text-[#4E525D]">Name</span>
+                                            <span className="text-sm font-medium text-[#1A1A1A]">{category?.name || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[100px] text-xs text-[#4E525D] shrink-0">Address</span>
-                                            <span className="text-sm font-medium text-[#1A1A1A]">{category?.region || "not specified"}</span>
+                                            <span className="w-[100px] shrink-0 text-xs text-[#4E525D]">Title</span>
+                                            <span className="text-sm font-medium text-[#1A1A1A]">{category?.title || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[100px] text-xs text-[#4E525D] shrink-0">Developer</span>
+                                            <span className="w-[100px] shrink-0 text-xs text-[#4E525D]">Address</span>
+                                            <span className="text-sm font-medium text-[#1A1A1A]">{[category?.city, category?.region].filter(Boolean).join(", ") || "not specified"}</span>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <span className="w-[100px] shrink-0 text-xs text-[#4E525D]">Developer</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{category?.developerBrand || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[100px] text-xs text-[#4E525D] shrink-0">Banks</span>
+                                            <span className="w-[100px] shrink-0 text-xs text-[#4E525D]">Banks</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{cmsData?.banks || category?.banks || "not specified"}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-3.5">
                                         <div className="flex items-start">
-                                            <span className="w-[110px] text-xs text-[#4E525D] shrink-0">Currency</span>
+                                            <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Currency</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{category?.currency || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[110px] text-xs text-[#4E525D] shrink-0">Infrastructure</span>
+                                            <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Infrastructure</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{cmsData?.infrastructure || category?.infrastructure || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[110px] text-xs text-[#4E525D] shrink-0">Website</span>
+                                            <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Website</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{category?.website || "not specified"}</span>
                                         </div>
                                         <div className="flex items-start">
-                                            <span className="w-[110px] text-xs text-[#4E525D] shrink-0">Sales department</span>
+                                            <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Sales department</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{cmsData?.salesDepartment || category?.salesDepartment || "not specified"}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* General Plans */}
                             <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                                 <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
                                     <div className="min-w-0">
@@ -611,47 +752,72 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         <p className="mt-1 text-xs leading-5 text-[#808191]">Upload master plans and documents</p>
                                     </div>
                                 </div>
-                                <input ref={docInputRef} type="file" accept=".pdf,image/jpeg,image/png,image/webp" multiple className="hidden"
-                                    onChange={(e) => { if (e.target.files && e.target.files.length > 0) handleDocUpload(e.target.files); }} />
+                                <input
+                                    ref={docInputRef}
+                                    type="file"
+                                    accept=".pdf,image/jpeg,image/png,image/webp"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files.length > 0) handleDocUpload(e.target.files);
+                                    }}
+                                />
                                 {documents.length > 0 ? (
                                     <div>
-                                        <div className="space-y-2 mb-4">
+                                        <div className="mb-4 space-y-2">
                                             {documents.map((doc, idx) => (
-                                                <div key={idx} className="flex items-center justify-between rounded-xl border border-[#ECEEF2] px-3 py-2.5 group">
-                                                    <div className="flex items-center gap-2.5 min-w-0">
-                                                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 rounded-lg" style={{ background: doc.type === "pdf" ? "#FEE2E2" : "#DBEAFE" }}>
-                                                            <span className="text-xs font-bold" style={{ color: doc.type === "pdf" ? "#DC2626" : "#2563EB" }}>
+                                                <div key={idx} className="group flex items-center justify-between rounded-xl border border-[#ECEEF2] px-3 py-2.5">
+                                                    <div className="flex min-w-0 items-center gap-2.5">
+                                                        <div
+                                                            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg"
+                                                            style={{ background: doc.type === "pdf" ? "#FEE2E2" : "#DBEAFE" }}
+                                                        >
+                                                            <span
+                                                                className="text-xs font-bold"
+                                                                style={{ color: doc.type === "pdf" ? "#DC2626" : "#2563EB" }}
+                                                            >
                                                                 {doc.type === "pdf" ? "PDF" : "IMG"}
                                                             </span>
                                                         </div>
-                                                        <span className="text-sm text-[#1A1A1A] truncate">{doc.url.split("/").pop() || `Plan ${idx + 1}`}</span>
+                                                        <span className="truncate text-sm text-[#1A1A1A]">{doc.url.split("/").pop() || `Plan ${idx + 1}`}</span>
                                                     </div>
-                                                    <button type="button" onClick={() => handleRemoveDoc(idx)}
-                                                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50 cursor-pointer">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveDoc(idx)}
+                                                        className="flex-shrink-0 rounded p-1 opacity-0 transition-opacity hover:bg-red-50 group-hover:opacity-100 cursor-pointer"
+                                                    >
                                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C3362B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                                            <line x1="6" y1="6" x2="18" y2="18" />
                                                         </svg>
                                                     </button>
                                                 </div>
                                             ))}
                                         </div>
-                                        <FormAddButton icon={<span className="text-sm font-light">+</span>}
+                                        <FormAddButton
+                                            icon={<span className="text-sm font-light">+</span>}
                                             className="!bg-white !border !border-[#CBD5E1] !text-[#1A1C1E] hover:!bg-gray-50"
-                                            onClick={() => docInputRef.current?.click()} disabled={docUploading}>
+                                            onClick={() => docInputRef.current?.click()}
+                                            disabled={docUploading}
+                                        >
                                             {docUploading ? "Uploading..." : "Add master plan"}
                                         </FormAddButton>
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center text-center py-8">
-                                        <div className="w-10 h-10 rounded-full bg-[#EBEBEB] flex items-center justify-center mb-3">
+                                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                                        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#EBEBEB]">
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#718096" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                                <circle cx="12" cy="10" r="3" />
                                             </svg>
                                         </div>
-                                        <p className="text-sm font-medium text-[#718096] mb-4">No plans uploaded yet</p>
-                                        <FormAddButton icon={<span className="text-sm font-light">+</span>}
+                                        <p className="mb-4 text-sm font-medium text-[#718096]">No plans uploaded yet</p>
+                                        <FormAddButton
+                                            icon={<span className="text-sm font-light">+</span>}
                                             className="!bg-white !border !border-[#CBD5E1] !text-[#1A1C1E] hover:!bg-gray-50"
-                                            onClick={() => docInputRef.current?.click()} disabled={docUploading}>
+                                            onClick={() => docInputRef.current?.click()}
+                                            disabled={docUploading}
+                                        >
                                             {docUploading ? "Uploading..." : "Add master plan"}
                                         </FormAddButton>
                                     </div>
@@ -660,50 +826,46 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                         </div>
                     )}
 
-                    {/* Sub-tab: Payment Methods */}
                     {activePropertySubTab === "payments" && (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="flex flex-col items-center justify-center text-center">
-                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
-                                    <img src="/images/inv-dashboard/inv-offplan/payment.svg" alt="" className="w-8 h-8 opacity-50" />
+                                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#F0F1F3]">
+                                    <img src="/images/inv-dashboard/inv-offplan/payment.svg" alt="" className="h-8 w-8 opacity-50" />
                                 </div>
                                 <p className="text-sm font-medium text-[#667085]">Payment Methods</p>
-                                <p className="text-xs text-[#999] mt-1">Coming soon</p>
+                                <p className="mt-1 text-xs text-[#999]">Coming soon</p>
                             </div>
                         </div>
                     )}
 
-                    {/* Sub-tab: Options */}
                     {activePropertySubTab === "options" && (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="flex flex-col items-center justify-center text-center">
-                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
-                                    <img src="/images/inv-dashboard/inv-offplan/options.svg" alt="" className="w-8 h-8 opacity-50" />
+                                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#F0F1F3]">
+                                    <img src="/images/inv-dashboard/inv-offplan/options.svg" alt="" className="h-8 w-8 opacity-50" />
                                 </div>
                                 <p className="text-sm font-medium text-[#667085]">Options</p>
-                                <p className="text-xs text-[#999] mt-1">Coming soon</p>
+                                <p className="mt-1 text-xs text-[#999]">Coming soon</p>
                             </div>
                         </div>
                     )}
 
-                    {/* Sub-tab: Stock */}
                     {activePropertySubTab === "stock" && (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="flex flex-col items-center justify-center text-center">
-                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
-                                    <img src="/images/inv-dashboard/inv-offplan/stock.svg" alt="" className="w-8 h-8 opacity-50" />
+                                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#F0F1F3]">
+                                    <img src="/images/inv-dashboard/inv-offplan/stock.svg" alt="" className="h-8 w-8 opacity-50" />
                                 </div>
                                 <p className="text-sm font-medium text-[#667085]">Stock</p>
-                                <p className="text-xs text-[#999] mt-1">Coming soon</p>
+                                <p className="mt-1 text-xs text-[#999]">Coming soon</p>
                             </div>
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Tab: Houses */}
             {activeTab === "houses" && (
-                <div className="space-y-5">
+                <div className="max-w-5xl space-y-5">
                     <div className="flex items-center justify-between">
                         <FormTabSwitcher
                             tabs={[{ id: "Active", label: "Active houses" }, { id: "Archive", label: "Archive" }]}
@@ -712,8 +874,11 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             size="md"
                         />
                         <FormAddButton
-                            icon={<span className="text-base font-light mr-0.5">+</span>}
-                            onClick={() => { setEditingHouseId(null); setShowHouseForm(true); }}
+                            icon={<span className="mr-0.5 text-base font-light">+</span>}
+                            onClick={() => {
+                                setEditingHouseId(null);
+                                setShowHouseForm(true);
+                            }}
                         >
                             Add House
                         </FormAddButton>
@@ -745,23 +910,27 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             filteredHouses.map((house) => {
                                 const imageUrl = house.mainImage?.url || house.gallery?.[0]?.url;
                                 return (
-                                    <div key={house.id} className="bg-white border border-[#EBEBEB] rounded-[16px] p-2 flex flex-col gap-2 w-[220px] shrink-0">
-                                        <div className="relative w-full h-[140px] rounded-[12px] overflow-hidden bg-[#F3F4F6]">
+                                    <div key={house.id} className="w-[220px] shrink-0 rounded-[16px] border border-[#EBEBEB] bg-white p-2 flex flex-col gap-2">
+                                        <div className="relative h-[140px] w-full overflow-hidden rounded-[12px] bg-[#F3F4F6]">
                                             {imageUrl ? (
-                                                <img src={imageUrl} alt={house.title} className="w-full h-full object-cover" loading="lazy" />
+                                                <img src={imageUrl} alt={house.title} className="h-full w-full object-cover" loading="lazy" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-[#999] text-xs">No Image</div>
+                                                <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">No Image</div>
                                             )}
                                         </div>
                                         <div className="px-1 pb-1">
-                                            <p className="text-sm font-semibold text-[#1A1A1A] truncate">{house.title}</p>
+                                            <p className="truncate text-sm font-semibold text-[#1A1A1A]">{house.title}</p>
                                             <p className="text-xs text-[#999]">{house.totalArea} m² · {house.roomOption?.title || `${house.number || 0} rooms`}</p>
                                         </div>
                                         <div className="flex gap-1 px-1 pb-1">
                                             <button
                                                 type="button"
-                                                onClick={() => { setEditingHouseId(house.id); setShowHouseForm(true); setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50); }}
-                                                className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer"
+                                                onClick={() => {
+                                                    setEditingHouseId(house.id);
+                                                    setShowHouseForm(true);
+                                                    setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+                                                }}
+                                                className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer"
                                             >
                                                 Edit
                                             </button>
@@ -769,14 +938,14 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 type="button"
                                                 onClick={() => archiveMutation.mutate({ id: house.id, archived: !house.archived })}
                                                 disabled={archiveMutation.isPending}
-                                                className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+                                                className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
                                             >
                                                 {house.archived ? "Restore" : "Archive"}
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => deleteMutation.mutate(house.id)}
-                                                className="flex-1 rounded-lg border border-[#FECACA] py-1.5 text-[12px] font-medium text-[#C3362B] hover:bg-red-50 transition-colors cursor-pointer"
+                                                className="flex-1 rounded-lg border border-[#FECACA] py-1.5 text-[12px] font-medium text-[#C3362B] transition-colors hover:bg-red-50 cursor-pointer"
                                             >
                                                 Delete
                                             </button>
@@ -792,7 +961,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     );
 
     return (
-        <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+        <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
             {formContent}
         </main>
     );

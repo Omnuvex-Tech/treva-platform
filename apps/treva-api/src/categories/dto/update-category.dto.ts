@@ -29,6 +29,11 @@ export class UpdateCategoryDto {
   @IsString()
   image?: string;
 
+  @ApiPropertyOptional({ example: '/uploads/images/cover-example.webp' })
+  @IsOptional()
+  @IsString()
+  coverImage?: string;
+
   @ApiPropertyOptional({ example: 0 })
   @IsOptional()
   @IsNumber()

@@ -457,6 +457,9 @@
     --treva-hero-heading-size: 32px;
     --treva-hero-padding-b: 36px;
   }
+  .treva-hero-title {
+    line-height: 1.18;
+  }
   .treva-hero-content {
     max-width: 100%;
   }
@@ -543,5 +546,6 @@
 
   .treva-hero-title{
     font-size: 29px;
+    line-height: 1.22;
   }
 }

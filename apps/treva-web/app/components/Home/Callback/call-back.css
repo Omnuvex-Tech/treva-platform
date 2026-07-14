@@ -21,6 +21,10 @@
   margin-top: 80px;
 }
 
+.callbackContainer.is-submitted {
+  min-height: 760px;
+}
+
 .section_projects {
   padding-bottom: 0;
 }
@@ -28,6 +32,7 @@
 .formWrapper {
   width: 100%;
   max-width: 960px;
+  min-height: 620px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -374,6 +379,8 @@
   line-height: 1.5;
   font-weight: 300;
   text-transform: lowercase;
+  margin: 0;
+  padding-bottom: 8px;
 }
 
 .disclaimer::first-letter {
@@ -394,7 +401,7 @@
   justify-content: center;
   text-align: center;
   padding: 5rem 2.5rem;
-  min-height: 420px;
+  min-height: 100%;
   width: 100%;
   animation: contact-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -473,16 +480,28 @@
     --callback-title-bottom-indent: 50px;
     --callback-title-middle-indent: 40px;
     padding-top: 30px;
-    padding-bottom: 30px;
+    padding-bottom: 44px;
+  }
+
+  .callbackContainer.is-submitted {
+    min-height: 680px;
   }
 
   .home-page .callbackContainer {
     margin-top: 48px;
   }
 
+  .formWrapper {
+    max-width: 100%;
+    min-height: 560px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
   .headerContainer {
     margin-bottom: 25px;
     max-width: 100%;
+    min-height: 90px;
   }
 
   /* Mobildə xətlərin proporsional şəkildə yenidən mövqeləndirilməsi */
@@ -511,6 +530,7 @@
   .roleSelector {
     gap: 10px;
     width: 100%;
+    flex-wrap: wrap;
     justify-content: center;
     margin-bottom: 40px;
   }
@@ -518,8 +538,9 @@
   .roleButton {
     padding: 8px 16px;
     font-size: 15px;
-    flex: 1;
-    max-width: 110px;
+    flex: 1 1 calc(33.333% - 7px);
+    min-width: 96px;
+    max-width: none;
     text-align: center;
   }
 
@@ -528,7 +549,8 @@
     gap: 24px;
     margin-bottom: 40px;
     width: 100%;
-    padding: 0 10px;
+    max-width: 100%;
+    padding: 0;
   }
 
   .phoneGroup {
@@ -536,7 +558,7 @@
   }
 
   .countryDropdown {
-    width: 260px;
+    width: min(280px, calc(100vw - 48px));
   }
 
   .inputField {
@@ -548,15 +570,163 @@
     border-radius: 40px;
     padding: 16px 0;
     font-size: 18px;
-    width: calc(100% - 20px);
+    width: 100%;
+    max-width: 100%;
   }
 
   .disclaimer {
     font-size: 13px;
-    padding: 0 15px;
+    max-width: 100%;
+    padding: 0 6px;
+    padding-bottom: 10px;
   }
+
+  .callback-success-overlay {
+    min-height: 100%;
+    padding: 3.5rem 1.5rem;
+  }
+
+
 
   .countryCodeDisplay {
     font-size: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .callbackContainer {
+    --callback-line-top: 27px;
+    --callback-line-bottom: 60px;
+    --callback-title-top-indent: 10px;
+    --callback-title-bottom-indent: 34px;
+    --callback-title-middle-indent: 26px;
+  }
+
+  .callbackContainer.is-submitted {
+    min-height: 620px;
+  }
+
+  .formWrapper {
+    padding: 0 14px;
+    min-height: 520px;
+  }
+
+  .headerContainer {
+    min-height: 80px;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: 28px;
+    line-height: 1.12;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    margin-top: 16px;
+    margin-bottom: 28px;
+    padding: 0;
+  }
+
+  .roleSelector {
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .roleButton {
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 999px;
+  }
+
+  .inputGroup {
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .flagSelector {
+    padding: 10px 6px 10px 2px;
+    gap: 5px;
+  }
+
+  .flagImg {
+    width: 24px;
+    height: 18px;
+  }
+
+  .countryCodeDisplay,
+  .inputField {
+    font-size: 16px;
+  }
+
+  .submitButton {
+    padding: 14px 0;
+    font-size: 16px;
+    margin-bottom: 18px;
+  }
+
+  .disclaimer {
+    font-size: 12px;
+    line-height: 1.45;
+    padding-bottom: 14px;
+  }
+
+  .callback-success-overlay {
+    padding: 3rem 1.25rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .callbackContainer {
+    --callback-line-top: 23px;
+    --callback-line-bottom: 52px;
+    --callback-title-top-indent: 6px;
+    --callback-title-bottom-indent: 24px;
+    --callback-title-middle-indent: 18px;
+  }
+
+  .callbackContainer.is-submitted {
+    min-height: 580px;
+  }
+
+  .formWrapper {
+    padding: 0 12px;
+    min-height: 480px;
+  }
+
+  .headerContainer {
+    min-height: 72px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .roleButton {
+    flex-basis: 100%;
+  }
+
+  .countryName,
+  .countryCode {
+    font-size: 10px;
+  }
+
+  .countryDropdown {
+    left: -4px;
+    width: min(280px, calc(100vw - 24px));
+  }
+
+  .callbackContainer {
+    padding-bottom: 52px;
+  }
+
+  .callback-success-overlay {
+    padding: 2.5rem 1rem;
   }
 }

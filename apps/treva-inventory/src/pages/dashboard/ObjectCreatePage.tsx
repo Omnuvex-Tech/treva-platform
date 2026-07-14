@@ -5,6 +5,7 @@ import { categoriesApi, type CategoryDocument } from "../../api/categories";
 import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
 import { objectTypesApi, type ObjectType } from "../../api/object-types";
 import { currenciesApi, type Currency } from "../../api/currencies";
+import { locationOptionsApi, type LocationOption } from "../../api/location-options";
 import { FormDropdown, FormAddButton, FormTabSwitcher } from "@repo/ui";
 import { HouseForm } from "./HouseForm";
 import { useMessageCenter } from "../../components/MessageCenter";
@@ -36,9 +37,33 @@ const inputClass =
 
 const DRAFT_KEY = "treva-object-create-draft";
 
+function SectionBlock({
+    title,
+    description,
+    children,
+}: {
+    title: string;
+    description?: string;
+    children: any;
+}) {
+    return (
+        <section className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+            <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
+                <div className="min-w-0">
+                    <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">{title}</h5>
+                    {description ? <p className="mt-1 text-xs leading-5 text-[#808191]">{description}</p> : null}
+                </div>
+                <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
+            </div>
+            <div className="space-y-4">{children}</div>
+        </section>
+    );
+}
+
 const defaultFormData = {
+    name: "",
+    title: "",
     objectType: "",
-    propertyName: "",
     slug: "",
     currency: "",
     region: "",
@@ -51,6 +76,7 @@ const defaultFormData = {
     salesDepartment: "",
     fedLaw214: false,
     image: "",
+    coverImage: "",
 };
 
 export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = {}) {
@@ -62,8 +88,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [docUploading, setDocUploading] = useState(false);
     const docInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
+    const coverImageInputRef = useRef<HTMLInputElement>(null);
     const [imageUploading, setImageUploading] = useState(false);
+    const [coverImageUploading, setCoverImageUploading] = useState(false);
     const [imageDrag, setImageDrag] = useState(false);
+    const [coverImageDrag, setCoverImageDrag] = useState(false);
 
     const { state: draftState, setState: setDraftState, clearDraft } = useFormDraft({
         key: DRAFT_KEY,
@@ -108,6 +137,30 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const currencies: Currency[] = Array.isArray(currenciesResponse?.data) ? currenciesResponse.data : [];
 
+    const { data: locationOptionsResponse } = useQuery({
+        queryKey: ["location-options"],
+        queryFn: () => locationOptionsApi.getAll(),
+    });
+
+    const locationOptionItems: LocationOption[] = Array.isArray(locationOptionsResponse?.data)
+        ? locationOptionsResponse.data
+        : [];
+
+    const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string) => {
+        const mapped = locationOptionItems
+            .filter((item) => item.type === type)
+            .map((item) => ({
+                id: item.title,
+                label: item.title,
+            }));
+
+        if (selectedValue && !mapped.some((item) => item.id === selectedValue)) {
+            mapped.unshift({ id: selectedValue, label: selectedValue });
+        }
+
+        return mapped;
+    };
+
     const { data: categoryRes } = useQuery({
         queryKey: ["category", createdSlug],
         queryFn: () => categoriesApi.getBySlug(createdSlug!),
@@ -133,7 +186,8 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
         if (!formData.objectType) newErrors.objectType = "Object type is required";
-        if (!formData.propertyName.trim()) newErrors.propertyName = "Name is required";
+        if (!(formData.name || "").trim()) newErrors.name = "Name is required";
+        if (!(formData.title || "").trim()) newErrors.title = "Title is required";
         if (!formData.currency) newErrors.currency = "Currency is required";
         if (!formData.region.trim()) newErrors.region = "Region is required";
         if (!formData.area.trim()) newErrors.area = "Area is required";
@@ -160,16 +214,17 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const createMutation = useMutation({
         mutationFn: () => {
             const selectedType = objectTypes.find((t) => t.id === formData.objectType);
-            const finalSlug = formData.slug || `${formData.propertyName
-                ? formData.propertyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+            const slugSource = formData.title || formData.name;
+            const finalSlug = formData.slug || `${slugSource
+                ? slugSource.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
                 : "untitled"}-${Date.now()}`;
             return categoriesApi.create({
-                title: formData.propertyName || "Untitled",
-                name: formData.propertyName || "untitled",
+                title: formData.title || formData.name || "Untitled",
+                name: formData.name || "untitled",
                 slug: finalSlug,
                 type: "object",
                 objectType: selectedType?.title || formData.objectType,
-                propertyName: formData.propertyName,
+                propertyName: formData.name || formData.title,
                 currency: formData.currency,
                 region: formData.region,
                 area: formData.area,
@@ -181,6 +236,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 salesDepartment: formData.salesDepartment,
                 fedLaw214: formData.fedLaw214,
                 image: formData.image || undefined,
+                coverImage: formData.coverImage || undefined,
             });
         },
         onSuccess: (response) => {
@@ -240,6 +296,24 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         }
     };
 
+    const handleCoverImageUpload = async (file: File) => {
+        const items = [file];
+        const hasUnsupported = items.some((f) => !SUPPORTED_IMAGE_TYPES.includes(f.type as typeof SUPPORTED_IMAGE_TYPES[number]));
+        if (hasUnsupported) {
+            showError({ title: "Unsupported file type", description: "Please upload JPG, PNG, WebP, or GIF images." });
+            return;
+        }
+        setCoverImageUploading(true);
+        try {
+            const res = await unitLayoutsApi.uploadFile(file);
+            updateFormData("coverImage", res.data.url);
+        } catch (error) {
+            showError({ title: "Upload failed", description: getApiErrorMessage(error, "Please try again.") });
+        } finally {
+            setCoverImageUploading(false);
+        }
+    };
+
     const onImageDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
     const onImageDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setImageDrag(true); };
     const onImageDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setImageDrag(false); };
@@ -249,6 +323,17 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         setImageDrag(false);
         const file = e.dataTransfer.files?.[0];
         if (file) handleImageUpload(file);
+    };
+
+    const onCoverImageDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
+    const onCoverImageDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setCoverImageDrag(true); };
+    const onCoverImageDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setCoverImageDrag(false); };
+    const onCoverImageDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCoverImageDrag(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleCoverImageUpload(file);
     };
 
     const handleDocUpload = async (files: FileList | File[]) => {
@@ -276,209 +361,245 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     };
 
     const formContent = (
-        <div className="w-full max-w-[1000px] mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-[16px] font-bold text-[#333333]" style={{ lineHeight: "20px" }}>
-                    {createdSlug ? formData.propertyName || "Object" : "Creating an Object"}
-                </h2>
-                <button
-                    type="button"
-                    onClick={() => navigate("/dashboard/offplan/objects")}
-                    className="text-[#718096] hover:text-[#1A1C1E] transition-colors p-1 cursor-pointer"
-                    aria-label="Close form"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-
-            {/* Tab Bar */}
-            <div className="rounded-[24px] border border-[#ECEEF2] bg-white p-2 mb-6">
-                <div className="flex gap-1">
-                    {TABS.map((tab) => {
-                        const disabled = tab.key !== "info" && !createdSlug;
-                        return (
-                            <button
-                                key={tab.key}
-                                type="button"
-                                disabled={disabled}
-                                onClick={() => setActiveTab(tab.key)}
-                                className={`flex-1 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all cursor-pointer ${
-                                    activeTab === tab.key
-                                        ? "bg-[#4E525D] text-white shadow-sm"
-                                        : disabled
-                                            ? "text-[#D0D0D0] cursor-not-allowed"
-                                            : "text-[#808191] hover:bg-[#F4F5F6] hover:text-[#4E525D]"
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        );
-                    })}
-                </div>
+        <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
+            <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
+                {TABS.map((tab) => {
+                    return (
+                        <button
+                            key={tab.key}
+                            type="button"
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`relative cursor-pointer rounded-2xl px-4 py-2.5 text-sm font-medium transition-colors ${
+                                activeTab === tab.key
+                                    ? "bg-[#4E525D] text-white shadow-sm"
+                                    : "text-[#808191] hover:bg-[#F4F5F6] hover:text-[#4E525D]"
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Tab: Object Info */}
             {activeTab === "info" && (
-                <form onSubmit={handleSubmit}>
-                    {/* Project Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Project</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Core project details</p>
+                <form onSubmit={handleSubmit} className="max-w-5xl">
+                    <div className="space-y-5">
+                        <SectionBlock title="Identity" description="Core object information and listing basics.">
+                            <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+                                <div className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
+                                    <div className="space-y-4">
+                                        <ImageAssetCard
+                                            label="Main Image"
+                                            description="Primary thumbnail used in cards and object listing views."
+                                            alt="Project"
+                                            imageUrl={formData.image || null}
+                                            widthClass="w-[90px]"
+                                            previewClassName="h-[90px] w-[90px] rounded-[24px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
+                                            emptyPreviewClassName={`flex h-[90px] w-[90px] items-center justify-center rounded-[24px] border-2 border-dashed bg-white ${imageDrag ? "border-blue-400 bg-blue-50" : imageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
+                                            placeholderTitle="Upload"
+                                            isDragging={imageDrag}
+                                            uploading={imageUploading}
+                                            onOpen={() => imageInputRef.current?.click()}
+                                            onRemove={() => updateFormData("image", "")}
+                                            onDragOver={onImageDragOver}
+                                            onDragEnter={onImageDragEnter}
+                                            onDragLeave={onImageDragLeave}
+                                            onDrop={onImageDrop}
+                                        />
+                                        <input
+                                            ref={imageInputRef}
+                                            type="file"
+                                            accept={IMAGE_ACCEPT}
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) handleImageUpload(file);
+                                                if (imageInputRef.current) imageInputRef.current.value = "";
+                                            }}
+                                        />
+                                        <div className="border-t border-[#EEF1F5] pt-4">
+                                            <ImageAssetCard
+                                                label="Cover Image"
+                                                description="Optional portrait-style visual for richer object presentation."
+                                                alt="Cover"
+                                                imageUrl={formData.coverImage || null}
+                                                widthClass="w-[112px]"
+                                                previewClassName="h-[148px] w-[112px] rounded-[24px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
+                                                emptyPreviewClassName={`flex h-[148px] w-[112px] items-center justify-center rounded-[24px] border-2 border-dashed bg-white ${coverImageDrag ? "border-blue-400 bg-blue-50" : coverImageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
+                                                placeholderTitle="Upload cover"
+                                                placeholderHint="Portrait image"
+                                                isDragging={coverImageDrag}
+                                                uploading={coverImageUploading}
+                                                onOpen={() => coverImageInputRef.current?.click()}
+                                                onRemove={() => updateFormData("coverImage", "")}
+                                                onDragOver={onCoverImageDragOver}
+                                                onDragEnter={onCoverImageDragEnter}
+                                                onDragLeave={onCoverImageDragLeave}
+                                                onDrop={onCoverImageDrop}
+                                            />
+                                            <input
+                                                ref={coverImageInputRef}
+                                                type="file"
+                                                accept={IMAGE_ACCEPT}
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleCoverImageUpload(file);
+                                                    if (coverImageInputRef.current) coverImageInputRef.current.value = "";
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="grid gap-4 lg:grid-cols-2">
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Name *</label>
+                                            <input
+                                                className={inputClass}
+                                                value={formData.name || ""}
+                                                onChange={(e) => { updateFormData("name", e.target.value); clearError("name"); }}
+                                                placeholder="Sea Breeze"
+                                            />
+                                            {errors.name && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.name}</p>}
+                                        </div>
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Title *</label>
+                                            <input
+                                                className={inputClass}
+                                                value={formData.title || ""}
+                                                onChange={(e) => { updateFormData("title", e.target.value); clearError("title"); }}
+                                                placeholder="Sea Breeze Residence"
+                                            />
+                                            {errors.title && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.title}</p>}
+                                        </div>
+                                    </div>
+                                    <div className="grid gap-4 lg:grid-cols-2">
+                                        <div>
+                                            <FormDropdown
+                                                label="Type *"
+                                                value={formData.objectType}
+                                                options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
+                                                placeholder="Select type"
+                                                onChange={(id) => { updateFormData("objectType", id); clearError("objectType"); }}
+                                                onCreateClick={() => navigate("/dashboard/offplan/object-types")}
+                                                createLabel="Create object type"
+                                            />
+                                            {errors.objectType && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.objectType}</p>}
+                                        </div>
+                                        <div>
+                                            <FormDropdown
+                                                label="Currency *"
+                                                value={formData.currency}
+                                                options={currencies.map((c) => ({ id: c.value, label: c.title }))}
+                                                placeholder="Select currency"
+                                                onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
+                                                onCreateClick={() => navigate("/dashboard/offplan/currencies")}
+                                                createLabel="Create currency"
+                                            />
+                                            {errors.currency && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.currency}</p>}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="grid gap-5 lg:grid-cols-2">
-                            <div>
-                                <FormDropdown
-                                    label="Object type *"
-                                    value={formData.objectType}
-                                    options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
-                                    placeholder="Select object type"
-                                    onChange={(id) => { updateFormData("objectType", id); clearError("objectType"); }}
-                                    onCreateClick={() => navigate("/dashboard/offplan/object-types")}
-                                    createLabel="+ Create object type"
-                                />
-                                {errors.objectType && <p className="text-[12px] text-[#C3362B] mt-1">{errors.objectType}</p>}
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Property Name *</label>
-                                <input className={inputClass} value={formData.propertyName} onChange={(e) => { updateFormData("propertyName", e.target.value); clearError("propertyName"); }} placeholder="Sea Breeze Residence" />
-                                {errors.propertyName && <p className="text-[12px] text-[#C3362B] mt-1">{errors.propertyName}</p>}
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Slug</label>
-                                <input className={inputClass} value={formData.slug} onChange={(e) => updateFormData("slug", e.target.value)} placeholder="auto-generated-from-name" />
-                            </div>
-                            <div>
-                                <FormDropdown
-                                    label="Currency *"
-                                    value={formData.currency}
-                                    options={currencies.map((c) => ({ id: c.value, label: c.title }))}
-                                    placeholder="Select currency"
-                                    onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
-                                    onCreateClick={() => navigate("/dashboard/offplan/currencies")}
-                                    createLabel="+ Create currency"
-                                />
-                                {errors.currency && <p className="text-[12px] text-[#C3362B] mt-1">{errors.currency}</p>}
-                            </div>
-                        </div>
-                    </div>
+                        </SectionBlock>
 
-                    {/* Location Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Location</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Project location details</p>
+                        <SectionBlock title="Location" description="Region, city and area details for the object.">
+                            <div className="grid gap-5 lg:grid-cols-3">
+                                <div>
+                                    <FormDropdown
+                                        label="City *"
+                                        value={formData.city}
+                                        options={toLocationDropdownOptions("city", formData.city)}
+                                        placeholder="Select city"
+                                        onChange={(id) => { updateFormData("city", id); clearError("city"); }}
+                                        onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                        createLabel="Create city"
+                                    />
+                                    {errors.city && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.city}</p>}
+                                </div>
+                                <div>
+                                    <FormDropdown
+                                        label="Region *"
+                                        value={formData.region}
+                                        options={toLocationDropdownOptions("region", formData.region)}
+                                        placeholder="Select region"
+                                        onChange={(id) => { updateFormData("region", id); clearError("region"); }}
+                                        onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                        createLabel="Create region"
+                                    />
+                                    {errors.region && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.region}</p>}
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.area}
+                                        onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }}
+                                        placeholder="2500 m²"
+                                    />
+                                    {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
+                                </div>
                             </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="grid gap-5 lg:grid-cols-3">
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Region *</label>
-                                <input className={inputClass} value={formData.region} onChange={(e) => { updateFormData("region", e.target.value); clearError("region"); }} placeholder="Dubai Marina" />
-                                {errors.region && <p className="text-[12px] text-[#C3362B] mt-1">{errors.region}</p>}
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">City *</label>
-                                <input className={inputClass} value={formData.city} onChange={(e) => { updateFormData("city", e.target.value); clearError("city"); }} placeholder="Baku" />
-                                {errors.city && <p className="text-[12px] text-[#C3362B] mt-1">{errors.city}</p>}
-                            </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
-                                <input className={inputClass} value={formData.area} onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }} placeholder="2500 m²" />
-                                {errors.area && <p className="text-[12px] text-[#C3362B] mt-1">{errors.area}</p>}
-                            </div>
-                        </div>
-                    </div>
+                        </SectionBlock>
 
-                    {/* Developer Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Developer</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Developer and sales information</p>
-                            </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="space-y-4">
+                        <SectionBlock title="Commercial" description="Developer, sales and infrastructure details shown for the project.">
                             <div className="grid gap-5 lg:grid-cols-2">
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Developer Brand *</label>
-                                    <input className={inputClass} value={formData.developerBrand} onChange={(e) => { updateFormData("developerBrand", e.target.value); clearError("developerBrand"); }} placeholder="ABC Development" />
-                                    {errors.developerBrand && <p className="text-[12px] text-[#C3362B] mt-1">{errors.developerBrand}</p>}
+                                    <input
+                                        className={inputClass}
+                                        value={formData.developerBrand}
+                                        onChange={(e) => { updateFormData("developerBrand", e.target.value); clearError("developerBrand"); }}
+                                        placeholder="ABC Development"
+                                    />
+                                    {errors.developerBrand && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.developerBrand}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Website *</label>
-                                    <input className={inputClass} value={formData.website} onChange={(e) => { updateFormData("website", e.target.value); clearError("website"); }} placeholder="https://example.com" />
-                                    {errors.website && <p className="text-[12px] text-[#C3362B] mt-1">{errors.website}</p>}
+                                    <input
+                                        className={inputClass}
+                                        value={formData.website}
+                                        onChange={(e) => { updateFormData("website", e.target.value); clearError("website"); }}
+                                        placeholder="https://example.com"
+                                    />
+                                    {errors.website && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.website}</p>}
                                 </div>
-                            </div>
-                            <div className="grid gap-5 lg:grid-cols-2">
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Banks *</label>
-                                    <input className={inputClass} value={formData.banks} onChange={(e) => { updateFormData("banks", e.target.value); clearError("banks"); }} placeholder="Kapital Bank, PASHA Bank" />
-                                    {errors.banks && <p className="text-[12px] text-[#C3362B] mt-1">{errors.banks}</p>}
+                                    <input
+                                        className={inputClass}
+                                        value={formData.banks}
+                                        onChange={(e) => { updateFormData("banks", e.target.value); clearError("banks"); }}
+                                        placeholder="Kapital Bank, PASHA Bank"
+                                    />
+                                    {errors.banks && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.banks}</p>}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Sales Department *</label>
-                                    <input className={inputClass} value={formData.salesDepartment} onChange={(e) => { updateFormData("salesDepartment", e.target.value); clearError("salesDepartment"); }} placeholder="sales@example.com" />
-                                    {errors.salesDepartment && <p className="text-[12px] text-[#C3362B] mt-1">{errors.salesDepartment}</p>}
+                                    <input
+                                        className={inputClass}
+                                        value={formData.salesDepartment}
+                                        onChange={(e) => { updateFormData("salesDepartment", e.target.value); clearError("salesDepartment"); }}
+                                        placeholder="sales@example.com"
+                                    />
+                                    {errors.salesDepartment && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.salesDepartment}</p>}
+                                </div>
+                                <div className="lg:col-span-2">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Infrastructure *</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.infrastructure}
+                                        onChange={(e) => { updateFormData("infrastructure", e.target.value); clearError("infrastructure"); }}
+                                        placeholder="Swimming pool, Gym, Parking"
+                                    />
+                                    {errors.infrastructure && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.infrastructure}</p>}
                                 </div>
                             </div>
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Infrastructure *</label>
-                                <input className={inputClass} value={formData.infrastructure} onChange={(e) => { updateFormData("infrastructure", e.target.value); clearError("infrastructure"); }} placeholder="Swimming pool, Gym, Parking" />
-                                {errors.infrastructure && <p className="text-[12px] text-[#C3362B] mt-1">{errors.infrastructure}</p>}
-                            </div>
-                        </div>
-                    </div>
+                        </SectionBlock>
 
-                    {/* Image + FedLaw Section */}
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 mb-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
-                            <div className="min-w-0">
-                                <h5 className="text-[15px] font-semibold leading-5 text-[#1A1A1A]">Media & Legal</h5>
-                                <p className="mt-1 text-xs leading-5 text-[#808191]">Project image and legal status</p>
-                            </div>
-                            <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#D8DCE5]" />
-                        </div>
-                        <div className="space-y-4">
-                            <ImageAssetCard
-                                label="Project Image"
-                                description="Primary thumbnail used in cards and listing views."
-                                alt="Project"
-                                imageUrl={formData.image || null}
-                                widthClass="w-[120px]"
-                                previewClassName="h-[120px] w-[120px] rounded-[18px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
-                                emptyPreviewClassName={`flex h-[120px] w-[120px] items-center justify-center rounded-[18px] border-2 border-dashed bg-white ${imageDrag ? "border-blue-400 bg-blue-50" : imageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
-                                placeholderTitle="Upload"
-                                isDragging={imageDrag}
-                                uploading={imageUploading}
-                                onOpen={() => imageInputRef.current?.click()}
-                                onRemove={() => updateFormData("image", "")}
-                                onDragOver={onImageDragOver}
-                                onDragEnter={onImageDragEnter}
-                                onDragLeave={onImageDragLeave}
-                                onDrop={onImageDrop}
-                            />
-                            <input
-                                ref={imageInputRef}
-                                type="file"
-                                accept={IMAGE_ACCEPT}
-                                className="hidden"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) handleImageUpload(file);
-                                    if (imageInputRef.current) imageInputRef.current.value = "";
-                                }}
-                            />
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <label className="flex items-center gap-3 group cursor-pointer select-none">
                                 <div className="relative">
                                     <input
@@ -488,12 +609,17 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         className="sr-only"
                                     />
                                     {formData.fedLaw214 ? (
-                                        <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="w-5 h-5" />
+                                        <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="h-5 w-5" />
                                     ) : (
-                                        <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="w-5 h-5 opacity-60" />
+                                        <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="h-5 w-5 opacity-60" />
                                     )}
                                 </div>
-                                <span className="text-sm text-[#4E525D]">Possibility of Purchase under Federal Law No. 214</span>
+                                <div>
+                                    <div className="text-sm font-semibold text-[#1A1A1A]">Federal Law No. 214</div>
+                                    <div className="mt-1 text-xs leading-5 text-[#808191]">
+                                        Mark this if the project supports purchase under the related federal law.
+                                    </div>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -525,8 +651,20 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             )}
 
             {/* Tab: Property */}
-            {activeTab === "property" && createdSlug && (
-                <div className="space-y-5">
+            {activeTab === "property" && (
+                <div className="max-w-5xl space-y-5">
+                    {!createdSlug ? (
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
+                                    <img src="/images/inv-dashboard/inv-offplan/options.svg" alt="" className="w-8 h-8 opacity-50" />
+                                </div>
+                                <p className="text-sm font-medium text-[#667085]">Property section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">You can review the tabs now. Save the object when you are ready to start adding plans and property data.</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
                     {/* Sub-tabs */}
                     <div className="rounded-[24px] border border-[#ECEEF2] bg-white p-1.5">
                         <div className="flex gap-1">
@@ -645,12 +783,26 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             </div>
                         </div>
                     )}
+                        </>
+                    )}
                 </div>
             )}
 
             {/* Tab: Houses */}
-            {activeTab === "houses" && createdSlug && (
-                <div className="space-y-5">
+            {activeTab === "houses" && (
+                <div className="max-w-5xl space-y-5">
+                    {!createdSlug ? (
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
+                                    <img src="/images/inv-dashboard/inv-offplan/stock.svg" alt="" className="w-8 h-8 opacity-50" />
+                                </div>
+                                <p className="text-sm font-medium text-[#667085]">Houses section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">You can switch here before saving. Add houses after the object is created.</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
                     <div className="flex items-center justify-between">
                         <FormTabSwitcher
                             tabs={[{ id: "Active", label: "Active houses" }, { id: "Archive", label: "Archive" }]}
@@ -716,13 +868,15 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             })
                         )}
                     </div>
+                        </>
+                    )}
                 </div>
             )}
         </div>
     );
 
     return (
-        <main className="flex-1 p-8 overflow-y-auto" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+        <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
             {formContent}
         </main>
     );

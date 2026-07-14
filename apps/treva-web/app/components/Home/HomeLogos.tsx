@@ -244,7 +244,7 @@ const productionStyles = `
       grid-template-columns: repeat(3, 1fr) !important;
       background-color: transparent !important;
       position: relative !important;
-      gap: 0 !important;          /* Ensure no gap between cells */
+      gap: 0 !important;
     }
 
     .mobile-partner-cell {
@@ -257,16 +257,14 @@ const productionStyles = `
       position: relative !important;
       border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-      box-sizing: border-box !important;   /* ← FIX: borders included in aspect-ratio */
+      box-sizing: border-box !important;
     }
 
-    /* 3-cü sütunun sağ xətləri yoxdur */
     .mobile-partner-cell:nth-child(3n) {
       border-right: none !important;
     }
 
-    /* Son sətirin alt xətləri yoxdur (indekslər 13, 14, 15) */
-    .mobile-partner-cell:nth-child(n+13) {
+    .mobile-partner-cell:nth-child(n+10) {
       border-bottom: none !important;
     }
 
@@ -291,17 +289,13 @@ const productionStyles = `
       transform: translate(-50%, -50%) !important;
     }
 
-    /* Daxili şaquli xətlər: 33.33% və 66.66% */
-    /* Daxili üfüqi xətlər: 20%, 40%, 60%, 80% (5 sıra üçün) */
-    .decor-x1-y1 { left: 33.33%; top: 20%; }
-    .decor-x1-y2 { left: 33.33%; top: 40%; }
-    .decor-x1-y3 { left: 33.33%; top: 60%; }
-    .decor-x1-y4 { left: 33.33%; top: 80%; }
+    .decor-x1-y1 { left: 33.33%; top: 25%; }
+    .decor-x1-y2 { left: 33.33%; top: 50%; }
+    .decor-x1-y3 { left: 33.33%; top: 75%; }
 
-    .decor-x2-y1 { left: 66.66%; top: 20%; }
-    .decor-x2-y2 { left: 66.66%; top: 40%; }
-    .decor-x2-y3 { left: 66.66%; top: 60%; }
-    .decor-x2-y4 { left: 66.66%; top: 80%; }
+    .decor-x2-y1 { left: 66.66%; top: 25%; }
+    .decor-x2-y2 { left: 66.66%; top: 50%; }
+    .decor-x2-y3 { left: 66.66%; top: 75%; }
     
     .n-testimonials_quote {
       font-size: 21px !important;
@@ -352,20 +346,11 @@ const testimonials = [
     author: "bazis real estate"
   },
   {
-    quote: 'TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkaanları yaradır.',
-    author: "AUF Invest"
-  },
-  {
-    quote: 'TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.',
-    author: "megapolis estate"
-  },
-  {
     quote: 'TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.',
     author: "Sabah Investment Group"
   }
 ];
 
-// Mobil massiv – yalnız 15 xana (5 sətir x 3 sütun)
 type MobilePartnerCell = {
   order: number;
   logo?: {
@@ -375,27 +360,18 @@ type MobilePartnerCell = {
 };
 
 const mobilePartners: MobilePartnerCell[] = [
-  /* Sətir 1 */
   { order: 1 },
-  /* Sətir 2 */
   { order: 2, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
-  /* Sətir 3 */
   { order: 3 },
-  /* Sətir 4 */
   { order: 4, logo: { alt: "sig", src: "/cdn-assets/15ca682d3f-6880c7caac01b2176b7a2840_SIG-blue-2.png" } },
-  /* Sətir 5 */
   { order: 5, logo: { alt: "reportage", src: "/cdn-assets/38b92121c7-6880c7cfb2730b05a0143175_reportage-4.png" } },
-  /* Sətir 6 */
   { order: 6, logo: { alt: "trident", src: "/cdn-assets/8def5f3166-6880c7cadbe0002df55f8ea0_Logo-Trident-1.png" } },
-  { order: 7, logo: { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" } },
+  { order: 7, logo: { alt: "best home", src: "/cdn-assets/best-home.png" } },
   { order: 8, logo: { alt: "etagi", src: "/cdn-assets/7423ec34f5-6880c7ca81f1ddf220343938_Etagi-logo-1.png" } },
-  { order: 9, logo: { alt: "megapolis", src: "/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png" } },
+  { order: 9, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
   { order: 10 },
-  { order: 11 },
-  { order: 12, logo: { alt: "rns", src: "/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png" } },
-  { order: 13 },
-  { order: 14, logo: { alt: "sea breeze", src: "/cdn-assets/b4ff8cd415-6887158ebff1d28bc62ec9f0_seabreeze-1.png" } },
-  { order: 15 }
+  { order: 11, logo: { alt: "bazis", src: "/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png" } },
+  { order: 12 }
 ];
 
 const logosDictionary = {
@@ -420,8 +396,6 @@ const logosDictionary = {
       { quote: 'TREVA ilə aramızda formalaşan etimad hər bir layihədə daha da möhkəmlənir. Onlar qiymət strategiyasından tutmuş müştəri axınına qədər hər detala dəqiqliklə yanaşmışdırlar. Onların yaradıcı dəstəyi, layihələrin düzgün paketlənməsi və ardıcıl izləmələri bizə güclü marağı təsirli nəticələrə çevirməyə kömək etmişdir.', author: "TRIDENT Investment" },
       { quote: 'TREVA-nı digərlərindən fərqləndirən iş prosesindəki aydınlıq və davamlılıqdır. Broker olaraq hər zaman məlumatlısınız: elanlar aktualdır, əlaqə çevikdir, və bütün alətlər satış prosesini asanlaşdırır.', author: "rnS estate" },
       { quote: 'TREVA brokerlərə lazım olan hər şeyi təqdim edir: yüksək keyfiyyətli vizuallar və effektiv lead sistemi. Biz artıq sadəcə obyekt göstərmirik, onu düzgün təqdim edirik.', author: "bazis real estate" },
-      { quote: 'TREVA ilə tərəfdaşlığımız iş prosesimizə tam struktur gətirdi. Onların strateji planlaşdırması, brokerlərlə koordinasiyası və gündəlik dəstəyi satış prosesinə maneə yaratmadan çalışmaq imkaanları yaradır.', author: "AUF Invest" },
-      { quote: 'TREVA-nın kampaniyaları məqsədli şəkildə hazırlanır və komandası brokerlərin səylərini aktiv şəkildə dəstəkləyərək izləmə, müştəriylə üzbəüz görüşlər və ağıllı mövqeləndirmə zamanı fəal iştirak edir. Bu cür tərəfdaşlıq real satışlarla nəticələnir.', author: "megapolis estate" },
       { quote: 'TREVA satış prosesində etibar edə biləcəyimiz bir tərəfdaşdır. Onların komandası bir tikinti şirkətinin ehtiyaclarını yaxşı anlayır - şəffaf hesabatlılıq, bazar tələblərinə uyğun strategiya və alıcılarla real ünsiyyət. Onların hər layihəyə göstərdiyi ardıcıl və peşəkar yanaşmanı yüksək qiymətləndiririk.', author: "Sabah Investment Group" },
     ],
   },
@@ -446,8 +420,6 @@ const logosDictionary = {
       { quote: 'The trust formed between us and TREVA strengthens with every project. They approach every detail with precision, from pricing strategy to customer flow. Their creative support, proper packaging of projects, and consistent follow-ups have helped us turn strong interest into effective results.', author: "TRIDENT Investment" },
       { quote: 'What sets TREVA apart from others is the clarity and consistency in their work process. As a broker, you are always informed: listings are up-to-date, communication is flexible, and all tools simplify the sales process.', author: "rnS estate" },
       { quote: 'TREVA provides brokers with everything they need: high-quality visuals and an effective lead system. We no longer just show properties — we present them correctly.', author: "bazis real estate" },
-      { quote: 'Our partnership with TREVA brought complete structure to our workflow. Their strategic planning, coordination with brokers, and daily support create opportunities to work without hindering the sales process.', author: "AUF Invest" },
-      { quote: 'TREVA\'s campaigns are purposefully crafted, and their team actively supports brokers\' efforts by participating in follow-ups, face-to-face meetings, and smart positioning. This kind of partnership results in real sales.', author: "megapolis estate" },
       { quote: 'TREVA is a partner we can trust in the sales process. Their team understands the needs of a construction company well — transparent reporting, strategy aligned with market demands, and real communication with buyers. We highly value their consistent and professional approach to every project.', author: "Sabah Investment Group" },
     ],
   },
@@ -472,8 +444,6 @@ const logosDictionary = {
       { quote: 'Доверие, сформированное между нами и TREVA, крепнет с каждым проектом. Они подходят к каждой детали с точностью — от ценообразования до потока клиентов. Их творческая поддержка, правильная упаковка проектов и постоянное сопровождение помогли нам превратить сильный интерес в результаты.', author: "TRIDENT Investment" },
       { quote: 'То, что отличает TREVA от других — ясность и последовательность в работе. Как брокер, вы всегда в курсе: объявления актуальны, связь гибкая, а все инструменты упрощают процесс продажи.', author: "rnS estate" },
       { quote: 'TREVA предоставляет брокерам всё необходимое: качественные визуалы и эффективную систему лидов. Мы больше не просто показываем объекты — мы правильно их презентуем.', author: "bazis real estate" },
-      { quote: 'Наше партнёрство с TREVA привнесло полную структуру в наш рабочий процесс. Их стратегическое планирование, координация с брокерами и ежедневная поддержка создают возможности для работы без помех в процессе продаж.', author: "AUF Invest" },
-      { quote: 'Кампании TREVA целенаправленно разработаны, а их команда активно поддерживает усилия брокеров, участвуя в сопровождении, личных встречах и грамотной позиционировании. Такое партнёрство приводит к реальным продажам.', author: "megapolis estate" },
       { quote: 'TREVA — это партнёр, которому можно доверять в процессе продаж. Их команда хорошо понимает потребности строительной компании — прозрачная отчётность, стратегия, соответствующая требованиям рынка, и реальное общение с покупателями. Мы высоко ценим их последовательный и профессиональный подход к каждому проекту.', author: "Sabah Investment Group" },
     ],
   },
@@ -640,7 +610,22 @@ export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
                   </div>
                 </div>
                 <div className="logos_cell-holder">
-                  <div className="logos_cell"></div>
+                  <div className="logos_cell">
+                    <div className="logos_img-wrap">
+                      <img
+                        width="92"
+                        loading="lazy"
+                        alt="bazis real estate"
+                        src="/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png"
+                        className="logos_img"
+                      />
+                    </div>
+                    <div className="logos_cell-decoration is-up">
+                      <div className="icon-large w-embed">
+                        <DecorativeIcon />
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="logos_cell-holder no-left">
                   <div className="logos_cell is-half"></div>
@@ -707,10 +692,10 @@ export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
                   <div className="logos_cell">
                     <div className="logos_img-wrap">
                       <img
-                        width="81"
+                        width="120"
                         loading="lazy"
-                        alt="megapolis estate"
-                        src="/cdn-assets/157518584b-6880c7caaa52d1681e827451_megapolis-logo-1.png"
+                        alt="best home"
+                        src="/cdn-assets/best-home.png"
                         className="logos_img"
                       />
                     </div>
@@ -725,17 +710,12 @@ export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
                   <div className="logos_cell">
                     <div className="logos_img-wrap">
                       <img
-                        width="215"
+                        width="57"
                         loading="lazy"
-                        alt="auf invest"
-                        src="/cdn-assets/7a685b68a5-688c5e4e39e6dc2ebee591e2_AUF-1.png"
+                        alt="rns real estate"
+                        src="/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png"
                         className="logos_img"
                       />
-                    </div>
-                    <div className="logos_cell-decoration">
-                      <div className="icon-large w-embed">
-                        <DecorativeIcon />
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -798,53 +778,13 @@ export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
                   <div className="logos_cell"></div>
                 </div>
                 <div className="logos_cell-holder">
-                  <div className="logos_cell">
-                    <div className="logos_img-wrap">
-                      <img
-                        width="57"
-                        loading="lazy"
-                        alt="rns real estate"
-                        src="/cdn-assets/828fcfb4ae-6880c7cad8c0aa9c2bf2abc3_Logo-RNS-1.png"
-                        className="logos_img"
-                      />
-                    </div>
-                  </div>
+                  <div className="logos_cell"></div>
                 </div>
                 <div className="logos_cell-holder">
-                  <div className="logos_cell">
-                    <div className="logos_img-wrap">
-                      <img
-                        width="155"
-                        loading="lazy"
-                        alt="villa az"
-                        src="/cdn-assets/94147fe51b-6887158e4499458c3bafba1f_villa-1.png"
-                        className="logos_img"
-                      />
-                    </div>
-                    <div className="logos_cell-decoration is-up">
-                      <div className="icon-large w-embed">
-                        <DecorativeIcon />
-                      </div>
-                    </div>
-                  </div>
+                  <div className="logos_cell"></div>
                 </div>
                 <div className="logos_cell-holder">
-                  <div className="logos_cell">
-                    <div className="logos_img-wrap">
-                      <img
-                        width="92"
-                        loading="lazy"
-                        alt="bazis real estate"
-                        src="/cdn-assets/4c1106d90c-6885e01df74b709059435ec2_bazis-real-estate-logo-3.png"
-                        className="logos_img"
-                      />
-                    </div>
-                    <div className="logos_cell-decoration is-up">
-                      <div className="icon-large w-embed">
-                        <DecorativeIcon />
-                      </div>
-                    </div>
-                  </div>
+                  <div className="logos_cell"></div>
                 </div>
                 <div className="logos_cell-holder">
                   <div className="logos_cell"></div>
@@ -874,16 +814,12 @@ export const HomeLogos = ({ locale = 'az' }: HomeLogosProps) => {
                       </div>
                     ))}
                 </div>
-
-                {/* MOBİL GRİDDƏ KƏSİŞƏN BÜTÜN DAXİLİ XƏTLƏRİN ÜZƏRİNƏ YERLƏŞDİRİLƏN 8 ƏDƏD NAXIŞ */}
                 <div className="mobile-grid-decor decor-x1-y1"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y2"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x1-y3"><DecorativeIcon /></div>
-                <div className="mobile-grid-decor decor-x1-y4"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y1"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y2"><DecorativeIcon /></div>
                 <div className="mobile-grid-decor decor-x2-y3"><DecorativeIcon /></div>
-                <div className="mobile-grid-decor decor-x2-y4"><DecorativeIcon /></div>
               </div>
             </div>
 

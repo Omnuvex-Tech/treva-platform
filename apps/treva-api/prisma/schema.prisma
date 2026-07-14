@@ -37,6 +37,7 @@ model Category {
   banks           String?
   infrastructure  String?
   salesDepartment String?
+  coverImage      String?
   documents       Json       @default("[]")
   fedLaw214       Boolean  @default(false)
   type            String   @default("object") // "category" | "object"

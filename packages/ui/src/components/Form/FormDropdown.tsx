@@ -43,80 +43,78 @@ export function FormDropdown({
 
     return (
         <div ref={ref} className="relative">
-            <label
-                className="mb-1 block text-xs font-semibold text-[#333333]"
-                style={{ lineHeight: "18px" }}
-            >
+            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">
                 {label}
                 {required && <span style={{ color: "#F31100" }}>*</span>}
             </label>
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] placeholder-[#999] focus:bg-white focus:border-gray-400 focus:outline-none cursor-pointer"
-                style={{ lineHeight: "20px" }}
+                className="flex h-11 w-full items-center justify-between rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-[#C8CDD8] cursor-pointer"
             >
-                <span className={selected ? "text-[#1A1A1A]" : "text-[#999]"}>
+                <span className={cn("truncate text-left", selected ? "text-[#1A1A1A]" : "text-[#999]")}>
                     {selected?.label || placeholder}
                 </span>
-                <img
-                    src="/images/inv-dashboard/inv-offplan/arrow.svg"
-                    alt=""
+                <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
                     className={cn("transition-transform", open && "rotate-180")}
-                />
+                >
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
             </button>
             {open && (
-                <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                    {onCreateClick && (
-                        <>
-                            <button
-                                type="button"
-                                className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer"
-                                style={{ lineHeight: "20px" }}
-                                onClick={() => {
-                                    onCreateClick();
-                                    setOpen(false);
-                                }}
-                            >
-                                {createLabel || "+ Create new"}
-                            </button>
-                            <div className="h-px bg-gray-100" />
-                        </>
-                    )}
+                <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#E7E9EE] bg-white shadow-lg">
+                    <button
+                        type="button"
+                        className="w-full px-4 py-2.5 text-left text-sm text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
+                        onClick={() => {
+                            onChange("");
+                            setOpen(false);
+                        }}
+                    >
+                        -- None
+                    </button>
                     {options.map((opt) => (
                         <button
                             key={opt.id}
                             type="button"
                             className={cn(
-                                "w-full px-4 py-2.5 text-left text-sm font-normal transition-colors",
+                                "flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors",
                                 value === opt.id
                                     ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
-                                    : "text-[#1A1A1A] hover:bg-gray-50"
+                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                             )}
-                            style={{ lineHeight: "20px" }}
                             onClick={() => {
                                 onChange(opt.id);
                                 setOpen(false);
                             }}
                         >
-                            {opt.label}
+                            <span>{opt.label}</span>
+                            {value === opt.id ? (
+                                <span className="text-xs font-semibold text-[#4E525D]">Selected</span>
+                            ) : null}
                         </button>
                     ))}
-                    {options.length === 0 && noOptionsLabel && onNoOptionsClick && (
+                    {options.length === 0 && ((onNoOptionsClick && noOptionsLabel) || onCreateClick) && (
                         <button
                             type="button"
-                            className="w-full px-4 py-2.5 text-left text-sm font-normal text-[#1A1A1A] hover:bg-gray-50 transition-colors cursor-pointer"
-                            style={{ lineHeight: "20px" }}
+                            className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 hover:text-[#1A1A1A] cursor-pointer"
                             onClick={() => {
-                                onNoOptionsClick();
+                                if (onNoOptionsClick) onNoOptionsClick();
+                                else if (onCreateClick) onCreateClick();
                                 setOpen(false);
                             }}
                         >
-                            {noOptionsLabel}
+                            {noOptionsLabel || createLabel || "Create"}
                         </button>
                     )}
-                    {options.length === 0 && !noOptionsLabel && (
-                        <div className="px-4 py-2.5 text-sm text-[#999]" style={{ lineHeight: "20px" }}>
+                    {options.length === 0 && !noOptionsLabel && !onCreateClick && (
+                        <div className="px-4 py-2.5 text-sm text-[#999]">
                             No options
                         </div>
                     )}

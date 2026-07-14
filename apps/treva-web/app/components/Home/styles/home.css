@@ -1813,18 +1813,21 @@ body.gsap-hidden {
 
 
 
-/* Mobil modda treva logosunun kiçildilməsi və sola yerləşdirilməsi */
+/* Mobil modda treva logosunu tam en göstər */
 @media (max-width: 768px) {
   .footer_logo-wrap {
     display: flex !important;
-    justify-content: flex-start !important;
+    justify-content: stretch !important;
+    align-items: center !important;
     width: 100% !important;
     text-align: left !important;
   }
 
   .footer_logo-wrap img {
-    height: 28px !important; /* Mobil üçün kiçildilmiş hündürlük */
-    width: auto !important;   /* Proporsiyanın qorunması */
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
     margin-left: 0 !important;
   }
 
