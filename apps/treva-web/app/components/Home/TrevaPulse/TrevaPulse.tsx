@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import PageContainer from '@/app/components/Container/PageContainer';
@@ -172,7 +173,13 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                     >
                       <div className="blog-card__inner">
                         <div className="blog-card__img-wrapper">
-                          <img src={imageSrc} alt={post.title} className="blog-card__img" loading="lazy" />
+                          <Image
+                            src={imageSrc}
+                            alt={post.title}
+                            className="blog-card__img"
+                            fill
+                            sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 30vw"
+                          />
                         </div>
 
                         <div className="blog-card__meta">
@@ -184,7 +191,13 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
 
                         <div className="blog-card__author">
                           {authorImageSrc && (
-                            <img src={authorImageSrc} alt={post.author ?? ''} className="blog-card__avatar" loading="lazy" />
+                            <Image
+                              src={authorImageSrc}
+                              alt={post.author ?? ''}
+                              className="blog-card__avatar"
+                              width={32}
+                              height={32}
+                            />
                           )}
                           <span className="blog-card__author-name">{post.author}</span>
                         </div>

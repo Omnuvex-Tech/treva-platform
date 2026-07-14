@@ -188,8 +188,41 @@
   visibility: hidden;
 }
 
+.callbackContainer .roleButton {
+  border: 1px solid #565a63 !important;
+  background-color: transparent !important;
+  color: #565a63 !important;
+}
+
+.callbackContainer .roleButton:hover {
+  background-color: #565a63 !important;
+  color: #ffffff !important;
+  border-color: #565a63 !important;
+}
+
+.callbackContainer .activeRole {
+  background-color: #565a63 !important;
+  color: #ffffff !important;
+  border-color: #565a63 !important;
+}
+
 .pulse-article-callback-wrap {
   padding-bottom: 40px;
+}
+
+.article_cover-wrap,
+.article_sidebar-img,
+.news_middle-img-holder {
+  position: relative;
+}
+
+.article_sidebar-img {
+  overflow: hidden;
+}
+
+.pulse-article-cover-image,
+.pulse-article-card-image {
+  object-fit: cover;
 }
 
 .article-spinner {

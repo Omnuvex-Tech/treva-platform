@@ -1,8 +1,8 @@
+import dynamic from "next/dynamic";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeHeroSection } from "./HomeHeroSection";
 import { HomeServices } from "./HomeServices";
 import { HomeProjects } from "./HomeProjects";
-import { HomeLogos } from "./HomeLogos";
 import { HomeOffices } from "./HomeOffices";
 import { HomeFooter } from "./HomeFooter";
 import TrevaHero from "./TrevaHero/TrevaHero";
@@ -20,6 +20,10 @@ type HomeProps = {
   pulseArticles?: Article[];
   pulseCategories?: PulseCategory[];
 };
+
+const HomeLogos = dynamic(
+  () => import("./HomeLogos").then((mod) => mod.HomeLogos)
+);
 
 const Home = ({ locale, design = 2, pulseArticles = [], pulseCategories = [] }: HomeProps) => {
   return (

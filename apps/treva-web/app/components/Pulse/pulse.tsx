@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import React, { useState, useMemo } from 'react';
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
@@ -106,7 +107,13 @@ function AuthorBlock({ author, authorImage }: Pick<Article, "author" | "authorIm
     <div className="news_author-wrap hide-landscape">
       {authorImage && (
         <div className="news_author-headshot">
-          <img src={toAbsUrl(authorImage)} loading="lazy" alt={author} className="fullwidth-img" />
+          <Image
+            src={toAbsUrl(authorImage)}
+            alt={author}
+            className="fullwidth-img"
+            width={48}
+            height={48}
+          />
         </div>
       )}
       <div>{author}</div>
@@ -114,7 +121,17 @@ function AuthorBlock({ author, authorImage }: Pick<Article, "author" | "authorIm
   );
 }
 
-function NewsCard({ article, locale, variant = "middle" }: { article: Article; locale: string; variant?: "middle" | "left" | "week" }) {
+function NewsCard({
+  article,
+  locale,
+  variant = "middle",
+  priority = false,
+}: {
+  article: Article;
+  locale: string;
+  variant?: "middle" | "left" | "week";
+  priority?: boolean;
+}) {
   const isWeek = variant === "week";
   const linkClass =
     variant === "left"
@@ -134,7 +151,18 @@ function NewsCard({ article, locale, variant = "middle" }: { article: Article; l
       <Link href={`/${locale}/pulse/${article.slug}`} className={linkClass}>
         <div className={imgWrapClass}>
           <div className={variant === "left" ? "news_leftcol-img-holder" : isWeek ? "news_week-img-holder" : "news_middle-img-holder"}>
-            {article.image ? <img src={toAbsUrl(article.image)} loading="lazy" alt={article.title} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
+            {article.image ? (
+              <Image
+                src={toAbsUrl(article.image)}
+                alt={article.title}
+                className="fullwidth-img"
+                fill
+                priority={priority}
+                sizes={variant === "left" ? "(max-width: 991px) 100vw, 26vw" : isWeek ? "(max-width: 991px) 100vw, 110px" : "(max-width: 767px) 100vw, (max-width: 991px) 50vw, 33vw"}
+              />
+            ) : (
+              <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />
+            )}
           </div>
           {!isWeek && (
             <>
@@ -186,8 +214,14 @@ function PulseHeaderSection({
               <div className="news-header_left-col">
                 <div className="w-dyn-list">
                   <div role="list" className="news_header-list w-dyn-items">
-                    {leftArticles.map((article) => (
-                      <NewsCard key={article.slug} article={article} locale={locale} variant="left" />
+                    {leftArticles.map((article, index) => (
+                      <NewsCard
+                        key={article.slug}
+                        article={article}
+                        locale={locale}
+                        variant="left"
+                        priority={index === 0}
+                      />
                     ))}
                   </div>
                 </div>
@@ -202,11 +236,13 @@ function PulseHeaderSection({
                           <div className="news-header_middle-img-wrap">
                             <div className="news_middle-img-holder">
                               {centerArticle.image ? (
-                                <img
+                                <Image
                                   src={toAbsUrl(centerArticle.image)}
-                                  loading="lazy"
                                   alt={centerArticle.title}
                                   className="fullwidth-img"
+                                  fill
+                                  priority
+                                  sizes="(max-width: 991px) 100vw, 48vw"
                                 />
                               ) : (
                                 <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />
@@ -319,11 +355,12 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
               {/* 1. ÜST HİSSƏ: Kampaniya Baneri */}
               <div className="news_top-full-banner-container">
                 <div className="news_top-full-banner">
-                  <img 
+                  <Image
                     src="/images/pulse/treva-flag.png" 
                     alt="Reportage Heights 30/70 Kampaniyası" 
                     className="fullwidth-img"
-                    loading="lazy"
+                    fill
+                    sizes="100vw"
                   />
                 </div>
               </div>

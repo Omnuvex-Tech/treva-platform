@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { ChevronDown, Search } from 'lucide-react';
@@ -148,10 +149,13 @@ export default function TrevaHero() {
       {/* ========== HERO SECTION ========== */}
       <div className="treva-hero-container">
         <div className="treva-hero-bg">
-          <img
+          <Image
             src="/images/treva-hero-bg.jpg"
             alt="Luxury coastal skyline and modern residence architecture"
             className="treva-hero-bg__image"
+            fill
+            priority
+            sizes="100vw"
           />
           <div className="treva-hero-bg__overlay" />
         </div>

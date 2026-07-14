@@ -48,6 +48,14 @@
   aspect-ratio: 16 / 10.5;
 }
 
+.news_leftcol-img-holder,
+.news_middle-img-holder,
+.news_week-img-holder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .news-header_middle-img-wrap img,
 .news_leftcol-img-wrap img,
 .news_middle-img-wrap img {
@@ -91,6 +99,7 @@
 }
 
 .news_top-full-banner {
+  position: relative;
   width: 100%;
   height: 520px;
   overflow: hidden;

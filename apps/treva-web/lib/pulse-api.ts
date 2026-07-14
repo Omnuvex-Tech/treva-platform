@@ -67,6 +67,12 @@ export interface PaginatedResponse<T> {
     };
 }
 
+async function parseJsonResponse<T>(res: Response): Promise<T | null> {
+    const text = await res.text();
+    if (!text) return null;
+    return JSON.parse(text) as T;
+}
+
 export async function getArticles(params?: {
     q?: string;
     category?: string;
@@ -82,7 +88,10 @@ export async function getArticles(params?: {
     const url = `${API}/pulse/articles${searchParams.toString() ? `?${searchParams}` : ""}`;
     const res = await fetch(url, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error("Failed to fetch articles");
-    const data = await res.json();
+    const data = await parseJsonResponse<any>(res);
+    if (!data) {
+        return { data: [], pagination: { page: 1, limit: params?.limit ?? 0, total: 0, totalPages: 0 } };
+    }
     // Handle cms-api { value, Count } format
     if (data && Array.isArray(data.value)) {
         return { data: data.value, pagination: { page: 1, limit: data.Count ?? data.value.length, total: data.Count ?? data.value.length, totalPages: 1 } };
@@ -105,7 +114,20 @@ export async function getArticleBySlug(
         error.status = res.status;
         throw error;
     }
-    return res.json();
+    const article = await parseJsonResponse<ApiArticle>(res);
+    if (article) {
+        return article;
+    }
+
+    const fallbackArticles = await getArticles({ limit: 500 });
+    const fallbackArticle = fallbackArticles.data.find((item) => item.slug === slug);
+    if (fallbackArticle) {
+        return fallbackArticle;
+    }
+
+    const error = new Error("Article not found") as Error & { status?: number };
+    error.status = 404;
+    throw error;
 }
 
 export async function getFeaturedArticles(): Promise<ApiArticle[]> {
@@ -113,7 +135,7 @@ export async function getFeaturedArticles(): Promise<ApiArticle[]> {
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Failed to fetch featured articles");
-    return res.json();
+    return (await parseJsonResponse<ApiArticle[]>(res)) ?? [];
 }
 
 export async function getHeaderArticles(
@@ -124,7 +146,7 @@ export async function getHeaderArticles(
         { next: { revalidate: 60 } },
     );
     if (!res.ok) throw new Error("Failed to fetch header articles");
-    return res.json();
+    return (await parseJsonResponse<ApiArticle[]>(res)) ?? [];
 }
 
 export interface PulseCategory {
@@ -140,7 +162,7 @@ export async function getPulseCategories(): Promise<PulseCategory[]> {
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Failed to fetch categories");
-    return res.json();
+    return (await parseJsonResponse<PulseCategory[]>(res)) ?? [];
 }
 
 export async function getAuthors(): Promise<ApiAuthor[]> {
@@ -148,7 +170,7 @@ export async function getAuthors(): Promise<ApiAuthor[]> {
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Failed to fetch authors");
-    return res.json();
+    return (await parseJsonResponse<ApiAuthor[]>(res)) ?? [];
 }
 
 export async function getAuthorBySlug(
@@ -158,7 +180,9 @@ export async function getAuthorBySlug(
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Author not found");
-    return res.json();
+    const author = await parseJsonResponse<ApiAuthor & { articles: ApiArticle[] }>(res);
+    if (!author) throw new Error("Author not found");
+    return author;
 }
 
 const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";

@@ -182,6 +182,7 @@
 }
 
 .blog-card__img-wrapper {
+  position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
   border-radius: 8px;

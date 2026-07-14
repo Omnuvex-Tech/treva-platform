@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import PageContainer from '@/app/components/Container/PageContainer';
@@ -196,10 +197,13 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                       style={{ height: '100%' }}
                     >
                       {card.image && (
-                        <img
+                        <Image
                           className="property-card__bg"
                           src={card.image}
                           alt={`${getLocalized(card.title, activeLocale)} background`}
+                          fill
+                          sizes="(max-width: 767px) 80vw, (max-width: 1023px) 42vw, (max-width: 1279px) 30vw, 23vw"
+                          priority={i < 2}
                         />
                       )}
                       <div className="property-card__overlay"></div>

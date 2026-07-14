@@ -1,8 +1,8 @@
 "use client";
 
 import { ButtonText } from '@/app/components/ButtonText';
-/* eslint-disable @next/next/no-img-element, react/no-unknown-property */
 
+import Image from "next/image";
 import React, { useEffect, useState, FormEvent } from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
@@ -89,11 +89,13 @@ const ArticleHero: React.FC<{ article: Article }> = ({ article }) => (
 
     <div className="article_cover-wrap img-reveal">
       {article.image ? (
-        <img
+        <Image
           src={toAbsUrl(article.image)}
-          loading="lazy"
           alt={article.title}
-          className="fullwidth-img"
+          className="fullwidth-img pulse-article-cover-image"
+          fill
+          priority
+          sizes="(max-width: 767px) 100vw, (max-width: 991px) 92vw, 68vw"
         />
       ) : (
         <div className="fullwidth-img" style={{ background: "#f1f5f9", minHeight: 200 }} />
@@ -142,7 +144,17 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
             <div key={item.slug} role="listitem" className="w-dyn-item">
               <a href={`/${locale}/pulse/${item.slug}`} className="article_sidebar-link w-inline-block">
                 <div className="article_sidebar-img">
-                  {item.image ? <img src={toAbsUrl(item.image)} loading="lazy" alt="" className="fullwidth-img ease0-6" /> : <div className="fullwidth-img ease0-6" style={{ background: "#f1f5f9" }} />}
+                  {item.image ? (
+                    <Image
+                      src={toAbsUrl(item.image)}
+                      alt={item.title}
+                      className="fullwidth-img ease0-6 pulse-article-card-image"
+                      fill
+                      sizes="(max-width: 767px) 100vw, (max-width: 991px) 44vw, 22vw"
+                    />
+                  ) : (
+                    <div className="fullwidth-img ease0-6" style={{ background: "#f1f5f9" }} />
+                  )}
                 </div>
                 <div className="article_sidebar-content">
                   <h4 className="no-animate">{item.title}</h4>
@@ -226,7 +238,17 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                       <a href={`/${locale}/pulse/${item.slug}`} className={`f-articles_link w-inline-block${item.slug === currentSlug ? " w--current" : ""}`}>
                         <div className="f-articles_img-wrap">
                           <div className="news_middle-img-holder">
-                            {item.image ? <img src={toAbsUrl(item.image)} loading="lazy" alt={item.title} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
+                            {item.image ? (
+                              <Image
+                                src={toAbsUrl(item.image)}
+                                alt={item.title}
+                                className="fullwidth-img pulse-article-card-image"
+                                fill
+                                sizes="(max-width: 767px) 100vw, (max-width: 991px) 44vw, 30vw"
+                              />
+                            ) : (
+                              <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />
+                            )}
                           </div>
                           <div className="projects_overlay hide-tablet">
                             <div className="news_btn">
@@ -264,22 +286,6 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
       </div>
     </div>
   </section>
-);
-
-const ArticleAuthorBlock: React.FC<{ locale: string; article: Article }> = ({ locale, article }) => (
-  <div className="article-author-block">
-    {article.author && (
-      <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
-        <div className="article_author-avatar">
-          <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
-        </div>
-        <div className="article_author-content">
-          <div className="text-color-blue400">{article.author}</div>
-          <div className="text-size-small">{article.authorTitle || "Ekspert"}</div>
-        </div>
-      </a>
-    )}
-  </div>
 );
 
 const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; slug: string }[] }> = ({ keywords }) => {
