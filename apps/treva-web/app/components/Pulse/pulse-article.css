@@ -188,6 +188,10 @@
   visibility: hidden;
 }
 
+.pulse-article-callback-wrap {
+  padding-bottom: 40px;
+}
+
 .article-spinner {
   position: absolute;
   top: 50%;
@@ -205,4 +209,10 @@
 
 @keyframes article-spin {
   to { transform: rotate(360deg); }
+}
+
+@media screen and (max-width: 768px) {
+  .pulse-article-callback-wrap {
+    padding-bottom: 28px;
+  }
 }

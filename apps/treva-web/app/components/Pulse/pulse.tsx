@@ -54,7 +54,9 @@ const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, w
       />
       <PulseNewsSection locale={locale} articles={articles} weekArticles={weekArticles} categories={categories} />
       <PulseKeywordsSection />
-      <CallbackForm />
+      <div className="pulse-callback-wrap">
+        <CallbackForm />
+      </div>
       <HomeFooter locale={locale} />
     </main>
   );

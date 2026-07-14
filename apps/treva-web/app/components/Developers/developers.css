@@ -179,7 +179,7 @@
   display: flex;
   align-items: center;
   padding-top: 14px !important;
-  padding-bottom: 14px !important;
+  padding-bottom: 8px !important;
   border-top: 0 !important;
   border-bottom: 0 !important;
 }
@@ -187,7 +187,8 @@
 .features_toggle-title {
   flex: 1 1 auto;
   padding-right: 48px;
-  height: 1.6em !important;
+  height: auto !important;
+  line-height: 1.25 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin-top: 0 !important;
@@ -197,7 +198,7 @@
 @media screen and (max-width: 1000px) {
   .features_toggle {
     padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding-bottom: 7px !important;
   }
 
   .features_toggle-title {
@@ -522,6 +523,18 @@ html.disable-smooth-scroll {
 }
 
 @media (max-width: 768px) {
+  .section_projects-prev .projects-prev_cta-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.875rem;
+  }
+
+  .section_projects-prev .projects-prev_cta-wrap .button {
+    width: 100%;
+    justify-content: center;
+  }
+
   .header-services_title {
     grid-template-columns: 1fr;
     row-gap: 1rem;
@@ -529,5 +542,44 @@ html.disable-smooth-scroll {
 
   .header-services_title .developers-header-title {
     justify-self: start;
+  }
+
+  .header-services_content-wrap.is-services .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .header-services_content-wrap.is-services .button-group .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .developers-callback-wrap {
+    margin-top: -7rem;
+  }
+
+  .developers-callback-wrap .callbackContainer {
+    padding-top: 0 !important;
+    padding-bottom: 32px;
+  }
+}
+
+@media (max-width: 479px) {
+  .section_projects-prev .projects-prev_cta-wrap {
+    gap: 0.75rem;
+  }
+
+  .header-services_content-wrap.is-services .button-group {
+    gap: 0.625rem;
+  }
+
+  .developers-callback-wrap {
+    margin-top: -7rem;
+  }
+
+  .developers-callback-wrap .callbackContainer {
+    padding-bottom: 24px;
   }
 }

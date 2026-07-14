@@ -721,12 +721,16 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
             </section>
 
             <PartnershipCTA
+              hideImagesOnMobile
+              centerContentOnMobile
               primaryAction={{ href: `/${locale}/contact#get-in-touch`, label: 'Əlaqə saxlayın' }}
               secondaryAction={{ href: '#developers-callback-cta', label: 'Şəbəkəmizə qoşulun' }}
             />
           </main>
 
-          <CallbackForm allowedRoles={['Developer']} sectionId="developers-callback-cta" />
+          <div className="developers-callback-wrap">
+            <CallbackForm allowedRoles={['Developer']} sectionId="developers-callback-cta" />
+          </div>
           <HomeFooter locale={locale} />
       </div>
     </>

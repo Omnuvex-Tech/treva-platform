@@ -377,7 +377,9 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
         <RelatedArticlesSection locale={locale} currentSlug={article.slug} articles={relatedArticles} />
       </main>
 
-      <CallbackForm />
+      <div className="pulse-article-callback-wrap">
+        <CallbackForm />
+      </div>
       <HomeFooter locale={locale} />
     </div>
   );

@@ -100,6 +100,7 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
       { name: "Brokers", href: "/brokers" },
     ]},
     { name: "PULSE", href: "/pulse" },
+    { name: "HAQQIMIZDA", href: "/about-us" },
     { name: "ƏLAQƏ", href: "/contact" },
   ],
   en: [
@@ -113,6 +114,7 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
       { name: "Brokers", href: "/brokers" },
     ]},
     { name: "PULSE", href: "/pulse" },
+    { name: "ABOUT US", href: "/about-us" },
     { name: "CONTACT", href: "/contact" },
   ],
   ru: [
@@ -126,6 +128,7 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
       { name: "Брокеры", href: "/brokers" },
     ]},
     { name: "PULSE", href: "/pulse" },
+    { name: "О НАС", href: "/about-us" },
     { name: "КОНТАКТ", href: "/contact" },
   ],
 };

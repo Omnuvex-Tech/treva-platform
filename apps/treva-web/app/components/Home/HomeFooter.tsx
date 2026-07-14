@@ -115,6 +115,7 @@ function FooterActionLink({ label, icon, ...props }: FooterActionLinkProps) {
 
 export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
   const homeHref = `/${locale}`;
+  const aboutHref = `/${locale}/about-us`;
   const contactHref = `/${locale}/contact`;
   const pulseHref = `/${locale}/pulse`;
 
@@ -147,6 +148,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                           <div className="footer_link-text">Home</div>
                         </div>
                       </Link>
+                      <FooterNavLink href={aboutHref} label="About Us" />
                       <FooterNavLink href={`/${locale}/projects`} label="Projects" />
                       <FooterNavLink href={`/${locale}/developers`} label="Developers" />
                       <FooterNavLink href={`/${locale}/brokers`} label="Brokers" />

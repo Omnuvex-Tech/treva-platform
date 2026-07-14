@@ -6,13 +6,11 @@ import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay, EffectFade } from 'swiper/modules'
+import { Autoplay } from 'swiper/modules'
 import Header from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
-import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
 import PartnershipCTA from '@/app/components/PartnershipCTA'
 import 'swiper/css'
-import 'swiper/css/effect-fade'
 import './contact.css'  // ayrıca CSS faylı
 
 declare global {
@@ -80,11 +78,6 @@ const officeGalleryImages = {
     '/images/contact/sea-breeze/office3.PNG',
     '/images/contact/sea-breeze/office4.PNG',
   ],
-  reportage: [
-    '/images/contact/reportage/office1.JPG',
-    '/images/contact/reportage/office2.JPG',
-    '/images/contact/reportage/office3.JPG',
-  ],
 }
 
 type OfficeImageSliderProps = {
@@ -96,16 +89,16 @@ type OfficeImageSliderProps = {
 function OfficeImageSlider({ images, alt, delay = 2800 }: OfficeImageSliderProps) {
   return (
     <Swiper
-      modules={[Autoplay, EffectFade]}
-      effect="fade"
-      fadeEffect={{ crossFade: true }}
+      modules={[Autoplay]}
       loop={images.length > 1}
-      speed={1200}
+      speed={900}
       autoplay={{
         delay: delay,
         disableOnInteraction: false,
       }}
       allowTouchMove={false}
+      slidesPerView={1}
+      spaceBetween={0}
       className="office_image-swiper"
     >
       {images.map((src, index) => (
@@ -509,59 +502,31 @@ export function ContactPage({ locale }: ContactPageProps) {
                           </div>
                         </a>
 
-                        <div className="contact_offices-right-col">
-                          <a
-                            href="https://maps.app.goo.gl/fU1nX7dWJVy4KTkA9"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="offices_item"
-                          >
-                            <div className="offices_img-wrap img-reveal">
-                              <div className="offices_overlay">
-                                <div className="offices_btn"><div>Xəritədə göstər</div></div>
-                              </div>
-                              <OfficeImageSlider
-                                images={officeGalleryImages.seaBreeze}
-                                alt="Sea Breeze Satış Ofisi"
-                                delay={5500}
-                              />
-                              <div className="img-cover" />
+                        <a
+                          href="https://maps.app.goo.gl/fU1nX7dWJVy4KTkA9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="offices_item"
+                        >
+                          <div className="offices_img-wrap img-reveal">
+                            <div className="offices_overlay">
+                              <div className="offices_btn"><div>Xəritədə göstər</div></div>
                             </div>
-                            <div className="offices_content-wrap">
-                              <div className="offices_title-wrap">
-                                <div>Sea Breeze Satış Ofisi</div>
-                                <div className="offices_caption">Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097</div>
-                              </div>
-                              <div className="icon-xxlarge"><ArrowDiagSVG /></div>
+                            <OfficeImageSlider
+                              images={officeGalleryImages.seaBreeze}
+                              alt="Sea Breeze Satış Ofisi"
+                              delay={5500}
+                            />
+                            <div className="img-cover" />
+                          </div>
+                          <div className="offices_content-wrap">
+                            <div className="offices_title-wrap">
+                              <div>Sea Breeze Satış Ofisi</div>
+                              <div className="offices_caption">Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097</div>
                             </div>
-                          </a>
-
-                          <a
-                            href="https://maps.app.goo.gl/reportageBaku"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="offices_item"
-                          >
-                            <div className="offices_img-wrap img-reveal">
-                              <div className="offices_overlay">
-                                <div className="offices_btn"><div>Xəritədə göstər</div></div>
-                              </div>
-                              <OfficeImageSlider
-                                images={officeGalleryImages.reportage}
-                                alt="Reportage Satış Ofisi"
-                                delay={6000}
-                              />
-                              <div className="img-cover" />
-                            </div>
-                            <div className="offices_content-wrap">
-                              <div className="offices_title-wrap">
-                                <div>Reportage Satış Ofisi</div>
-                                <div className="offices_caption">Bakı şəhəri, Səbail rayonu, Üzeyir Hacıbəyli küçəsi 33/35</div>
-                              </div>
-                              <div className="icon-xxlarge"><ArrowDiagSVG /></div>
-                            </div>
-                          </a>
-                        </div>
+                            <div className="icon-xxlarge"><ArrowDiagSVG /></div>
+                          </div>
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -610,6 +575,8 @@ export function ContactPage({ locale }: ContactPageProps) {
 
             {/* SECTION 3: CTA */}
             <PartnershipCTA
+              hideImagesOnMobile
+              centerContentOnMobile
               primaryAction={{
                 href: '#get-in-touch',
                 label: 'Əlaqə saxlayın',
@@ -623,7 +590,6 @@ export function ContactPage({ locale }: ContactPageProps) {
 
           </main>
 
-          <CallbackForm />
           <HomeFooter locale={locale} />
       </div>
     </>

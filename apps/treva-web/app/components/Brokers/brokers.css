@@ -470,7 +470,7 @@ input:focus::placeholder, textarea:focus::placeholder {
   background: #3F4249;
   color: #fff;
   border: none;
-  border-radius: 12px;
+  border-radius: 80px;
   font-size: 1.125rem;
   font-weight: 500;
   cursor: pointer;

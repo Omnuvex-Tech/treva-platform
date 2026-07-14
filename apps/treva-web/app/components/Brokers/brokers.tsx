@@ -567,7 +567,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
                           </div>
 
                           <button type="submit" className="broker-submit-btn" disabled={status === 'loading'}>
-                            {status === 'loading' && <span className="contact-spinner" style={{ position: 'absolute', top: '50%', left: '50%', marginLeft: -10, marginTop: -10, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} />}
+                            {status === 'loading' && <span className="contact-spinner" style={{ position: 'absolute', top: '50%', left: '50%', marginLeft: -10, marginTop: -10, borderTopColor: '#3f4249', borderColor: 'rgba(63,66,73,0.22)' }} />}
                             <span className={status === 'loading' ? 'broker-btn-text-hidden' : ''}>İndi qeydiyyatdan keç</span>
                           </button>
                         </form>

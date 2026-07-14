@@ -6,7 +6,6 @@ import { HomeLogos } from "./HomeLogos";
 import { HomeOffices } from "./HomeOffices";
 import { HomeFooter } from "./HomeFooter";
 import TrevaHero from "./TrevaHero/TrevaHero";
-import AboutUs from "./AboutUs/AboutUs";
 import TrevaPage from "./FeaturesProperties/FeaturesProperties";
 import FeaturedProperties from "./FeaturesProperties/FeaturesProperties";
 import TrevaPulse from "./TrevaPulse/TrevaPulse";
@@ -39,7 +38,6 @@ const Home = ({ locale, design = 2, pulseArticles = [], pulseCategories = [] }: 
         
       )}
       
-      <AboutUs locale={locale}/>
       <FeaturedProperties locale={locale}/>
       <TrevaPulse locale={locale} articles={pulseArticles} categories={pulseCategories}/>
             <HomeLogos locale={locale}/>
