@@ -389,6 +389,15 @@
   margin-top: 40px;
 }
 
+.empty-state {
+  margin-top: 40px;
+  padding-top: 24px;
+  text-align: center;
+  color: #8e949a;
+  font-size: 16px;
+  font-weight: 400;
+}
+
 /* ========================================================
    CARD WRAPPER
    overflow: visible — card button-un üzərinə çıxa bilsin
