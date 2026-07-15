@@ -63,7 +63,13 @@
   line-height: 1.2;
   text-align: right;
   margin: 0;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 520px;
+}
+
+.featured__title-featured,
+.featured__title-properties {
+  display: block;
 }
 
 .featured__title-featured {
