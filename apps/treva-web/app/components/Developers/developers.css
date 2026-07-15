@@ -142,6 +142,10 @@
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
   }
+
+  .features_toggle-text.is-bottom {
+    display: none !important;
+  }
 }
 
 /* Disable hover effect if dropdown is open */
