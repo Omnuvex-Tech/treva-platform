@@ -121,11 +121,6 @@
   text-decoration: none;
 }
 
-.property-card--highlighted {
-  outline: 3px solid #7c3aed;
-  outline-offset: -3px;
-}
-
 .property-card__bg {
   position: absolute;
   top: 0;

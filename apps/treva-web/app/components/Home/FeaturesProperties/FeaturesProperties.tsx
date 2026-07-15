@@ -193,7 +193,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                   <SwiperSlide key={card.slug || i} style={{ height: 'auto' }}>
                     <a
                       href={card.slug ? `/${activeLocale}/projects/${card.slug}` : "#"}
-                      className={`property-card${i === 3 ? ' property-card--highlighted' : ''}`}
+                      className="property-card"
                       style={{ height: '100%' }}
                     >
                       {card.image && (
