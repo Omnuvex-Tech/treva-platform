@@ -136,15 +136,11 @@
 
 @media screen and (min-width: 991px) {
   .features_toggle:hover .features_toggle-text {
-    transform: translateY(-115%); /* Increased slightly to ensure full clearance */
+    transform: translateY(-1.25em);
     color: rgba(255, 255, 255, 0.6);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform-style: preserve-3d;
-  }
-
-  .features_toggle-text.is-bottom {
-    display: none !important;
   }
 }
 
@@ -197,6 +193,27 @@
   padding-bottom: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+}
+
+@media screen and (min-width: 991px) {
+  .features_toggle .features_toggle-title {
+    position: relative;
+    display: block;
+    overflow: hidden !important;
+    height: 1.25em !important;
+  }
+
+  .features_toggle .features_toggle-text {
+    display: block;
+    line-height: 1.25 !important;
+  }
+
+  .features_toggle .features_toggle-text.is-bottom {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 1000px) {
@@ -486,7 +503,7 @@ html.disable-smooth-scroll {
 /* Page-specific hover translation adjustment to match global line-height (1.4) */
 @media screen and (min-width: 991px) {
   .features_toggle:hover .features_toggle-text {
-    transform: translateY(-1.6em); /* Move exactly one line up */
+    transform: translateY(-1.25em);
     color: rgba(255, 255, 255, 0.6);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
