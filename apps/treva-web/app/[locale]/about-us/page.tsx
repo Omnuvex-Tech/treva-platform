@@ -4,6 +4,7 @@ import AboutUs from "@/app/components/Home/AboutUs/AboutUs";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import GsapScripts from "@/app/components/GsapScripts";
 import PartnershipCTA from "@/app/components/PartnershipCTA";
+import AboutTeam from "@/app/components/Home/AboutTeam/AboutTeam";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import { config } from "@/config";
 
@@ -50,6 +51,7 @@ export default async function AboutUsRoute({
       <GsapScripts />
       <Navbar locale={locale} variant="solid" />
       <AboutUs locale={locale} />
+      <AboutTeam locale={locale} />
       <PartnershipCTA
         hideImagesOnMobile
         centerContentOnMobile

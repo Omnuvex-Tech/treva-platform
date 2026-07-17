@@ -1,0 +1,256 @@
+:root {
+    --color-team-accent: #000;
+    --color-team-text: #242424;
+    --color-white: #ffffff;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.about-team {
+    width: 100%;
+    padding: 64px 0;
+    box-sizing: border-box;
+}
+
+.about-team__inner {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 78px;
+    align-items: start;
+}
+
+.about-team__left {
+    display: flex;
+    flex-direction: column; 
+    gap: 20px;
+    position: sticky;
+    top: 64px;
+}
+
+.about-team__title {
+    font-family: var(--font-family);
+    font-size: 28px;
+    line-height: 118%;
+    color: var(--color-team-accent);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.about-team__description {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 144%;
+    color: var(--color-team-text);
+    margin: 0;
+}
+
+.about-team__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 310px));
+    gap: 20px;
+    justify-content: start;
+}
+
+.about-team__card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    display: block;
+    cursor: pointer;
+    width: 100%;
+    height: 351px;
+    transition: transform 250ms ease-out;
+}
+
+.about-team__card:hover {
+    transform: translateY(-8px);
+    z-index: 10;
+}
+
+.about-team__card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.about-team__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.about-team__card-info {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.about-team__member-name {
+    font-family: 'Inter', var(--font-family);
+    font-weight: 300;
+    font-size: 28px;
+    line-height: 30px;
+    color: var(--color-white);
+    max-width: 245px;
+}
+
+.about-team__member-role {
+    font-family: 'Inter', var(--font-family);
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--color-white);
+}
+
+@media (min-width: 1600px) {
+    .about-team__card {
+        height: auto;
+        aspect-ratio: 3 / 4;
+    }
+
+    .about-team__title {
+        font-size: 33px;
+    }
+
+    .about-team__description {
+        font-size: 16px;
+        line-height: 152%;
+    }
+
+}
+
+@media (max-width: 1100px) {
+    .about-team__inner {
+        grid-template-columns: 240px 1fr;
+        gap: 32px;
+    }
+
+    .about-team__card {
+        aspect-ratio: 3 / 4;
+    }
+
+    .about-team__member-name {
+        font-size: 20px;
+    }
+
+    .about-team__member-role {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 900px) {
+    .about-team {
+        padding: 48px 0;
+    }
+
+    .about-team__inner {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .about-team__left {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .about-team__title {
+        flex: 1 1 100%;
+        font-size: 24px;
+    }
+
+    .about-team__description {
+        flex: 1 1 60%;
+    }
+
+    .about-team__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .about-team__card {
+        aspect-ratio: 3 / 4;
+    }
+
+    .about-team__member-name {
+        font-size: 16px;
+    }
+
+    .about-team__member-role {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-team {
+        padding: 32px 0;
+    }
+
+    .about-team__left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .about-team__title {
+        font-size: 20px;
+    }
+
+    .about-team__description {
+        font-size: 12px;
+    }
+
+    .about-team__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        width: 100%;
+    }
+
+    .about-team__card {
+        aspect-ratio: 4 / 3;
+        height: auto;
+    }
+
+    .about-team__member-name {
+        font-size: 13px;
+        line-height: 1.3;
+    }
+
+    .about-team__member-role {
+        font-size: 10px;
+    }
+
+    .about-team__card-info {
+        bottom: 12px;
+        left: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .about-team__grid {
+        gap: 10px;
+    }
+
+    .about-team__card {
+        aspect-ratio: 4 / 3;
+        height: auto;
+    }
+
+    .about-team__member-name {
+        font-size: 12px;
+    }
+
+    .about-team__member-role {
+        font-size: 9px;
+    }
+}
