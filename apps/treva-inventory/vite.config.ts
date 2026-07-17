@@ -37,5 +37,8 @@ export default defineConfig(({ mode }) => {
         "Cache-Control": "no-store, no-cache, must-revalidate",
       },
     },
+    preview: {
+      allowedHosts: ["inventory.pre.treva.realestate"],
+    },
   };
 });
