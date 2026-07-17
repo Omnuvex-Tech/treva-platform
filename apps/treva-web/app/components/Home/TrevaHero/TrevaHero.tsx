@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, Search, ArrowLeft, ArrowRight } from 'lucide-react'; 
 import './treva-hero.css';
 import PageContainer from '@/app/components/Container/PageContainer';
 import Navbar from './navbar';
@@ -75,6 +75,14 @@ const heroDictionary = {
 
 const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
 
+const heroImages = [
+  "/images/treva-hero-bg.jpg",
+  "/images/features-pro/brabus-cover.jpg",
+  "/images/features-pro/arabian-cover.jpg",
+];
+
+const SLIDE_INTERVAL = 6000;
+
 export default function TrevaHero() {
   const pathname = usePathname();
   const router = useRouter();
@@ -86,10 +94,20 @@ export default function TrevaHero() {
   const [dealMenuOpen, setDealMenuOpen] = useState(false);
   const dealDropdownRef = useRef<HTMLDivElement>(null);
 
-  const [locationMenuOpen, setLocationMenuOpen] = useState(false);
+const [locationMenuOpen, setLocationMenuOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('');
   const locationDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  }, []);
 
   useEffect(() => {
     const savedCategorySlug = localStorage.getItem('treva_selectedCategorySlug');
@@ -110,7 +128,7 @@ export default function TrevaHero() {
         });
         setCategories(cats);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -122,9 +140,14 @@ export default function TrevaHero() {
         setLocationMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+  document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, SLIDE_INTERVAL);
+    return () => clearInterval(timer);
+  }, [nextSlide, currentSlide]);
 
   const handleHomeClick = useCallback(() => {
     const path = dealType === "Resale" ? "resale" : "off-plan";
@@ -149,14 +172,17 @@ export default function TrevaHero() {
       {/* ========== HERO SECTION ========== */}
       <div className="treva-hero-container">
         <div className="treva-hero-bg">
-          <Image
-            src="/images/treva-hero-bg.jpg"
-            alt="Luxury coastal skyline and modern residence architecture"
-            className="treva-hero-bg__image"
-            fill
-            priority
-            sizes="100vw"
-          />
+          {heroImages.map((src, index) => (
+            <Image
+              key={src}
+              src={src}
+              alt="Luxury coastal skyline and modern residence architecture"
+              className={`treva-hero-bg__image ${index === currentSlide ? 'treva-hero-bg__image--active' : ''}`}
+              fill
+              priority={index === 0}
+              sizes="100vw"
+            />
+          ))}
           <div className="treva-hero-bg__overlay" />
         </div>
 
@@ -178,11 +204,11 @@ export default function TrevaHero() {
                 onClick={() => { setLocationMenuOpen((prev) => !prev); setDealMenuOpen(false); }}
               >
                 <svg width="21" height="21" viewBox="0 0 23 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="treva-filter-bar__icon">
-                  <path d="M11.5 30C17.3333 22.1923 22 15.5 22 11.0385C22 8.3761 20.8938 5.82277 18.9246 3.9402C16.9555 2.05762 14.2848 1 11.5 1C8.71523 1 6.04451 2.05762 4.07538 3.9402C2.10625 5.82277 1 8.3761 1 11.0385C1 15.5 5.66667 22.1923 11.5 30Z" stroke="#ffffff" strokeWidth="2"/>
-                  <path d="M15 11.5C15 12.4283 14.6313 13.3185 13.9749 13.9749C13.3185 14.6313 12.4283 15 11.5 15C10.5717 15 9.6815 14.6313 9.02513 13.9749C8.36875 13.3185 8 12.4283 8 11.5C8 10.5717 8.36875 9.6815 9.02513 9.02513C9.6815 8.36875 10.5717 8 11.5 8C12.4283 8 13.3185 8.36875 13.9749 9.02513C14.6313 9.6815 15 10.5717 15 11.5Z" stroke="#ffffff" strokeWidth="2"/>
+                  <path d="M11.5 30C17.3333 22.1923 22 15.5 22 11.0385C22 8.3761 20.8938 5.82277 18.9246 3.9402C16.9555 2.05762 14.2848 1 11.5 1C8.71523 1 6.04451 2.05762 4.07538 3.9402C2.10625 5.82277 1 8.3761 1 11.0385C1 15.5 5.66667 22.1923 11.5 30Z" stroke="#ffffff" strokeWidth="2" />
+                  <path d="M15 11.5C15 12.4283 14.6313 13.3185 13.9749 13.9749C13.3185 14.6313 12.4283 15 11.5 15C10.5717 15 9.6815 14.6313 9.02513 13.9749C8.36875 13.3185 8 12.4283 8 11.5C8 10.5717 8.36875 9.6815 9.02513 9.02513C9.6815 8.36875 10.5717 8 11.5 8C12.4283 8 13.3185 8.36875 13.9749 9.02513C14.6313 9.6815 15 10.5717 15 11.5Z" stroke="#ffffff" strokeWidth="2" />
                 </svg>
                 <span className="treva-filter-bar__location-text">
-                  {selectedCategorySlug 
+                  {selectedCategorySlug
                     ? getCatTitle(categories.find(c => c.slug === selectedCategorySlug)?.title, locale) || content.location
                     : content.location}
                 </span>
@@ -210,48 +236,84 @@ export default function TrevaHero() {
             </div>
 
             <div className="treva-filter-bar__actions">
-            {/* Deal type dropdown */}
-            <div className="treva-filter-bar__deal" ref={dealDropdownRef}>
-              <PillButton
-                className="treva-filter-bar__dropdown-btn"
-                isPressed={dealMenuOpen}
-                aria-haspopup="listbox"
-                aria-expanded={dealMenuOpen}
-                onClick={() => { setDealMenuOpen((prev) => !prev); setLocationMenuOpen(false); }}
-              >
-                <span>{dealType}</span>
-                <ChevronDown size={14} strokeWidth={2} />
+              {/* Deal type dropdown */}
+              <div className="treva-filter-bar__deal" ref={dealDropdownRef}>
+                <PillButton
+                  className="treva-filter-bar__dropdown-btn"
+                  isPressed={dealMenuOpen}
+                  aria-haspopup="listbox"
+                  aria-expanded={dealMenuOpen}
+                  onClick={() => { setDealMenuOpen((prev) => !prev); setLocationMenuOpen(false); }}
+                >
+                  <span>{dealType}</span>
+                  <ChevronDown size={14} strokeWidth={2} />
+                </PillButton>
+
+                {dealMenuOpen && (
+                  <div className="treva-filter-bar__deal-menu" role="listbox">
+                    {content.dealOptions.map((option) => (
+                      <button
+                        key={option}
+                        className="treva-filter-bar__deal-option"
+                        type="button"
+                        role="option"
+                        aria-selected={dealType === option}
+                        onClick={() => {
+                          setDealType(option);
+                          localStorage.setItem('treva_dealType', option);
+                          setDealMenuOpen(false);
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <PillButton className="treva-filter-bar__home-btn" aria-label="Go to section" onClick={handleHomeClick}>
+                <Search size={24} strokeWidth={2} />
               </PillButton>
-
-              {dealMenuOpen && (
-                <div className="treva-filter-bar__deal-menu" role="listbox">
-                  {content.dealOptions.map((option) => (
-                    <button
-                      key={option}
-                      className="treva-filter-bar__deal-option"
-                      type="button"
-                      role="option"
-                      aria-selected={dealType === option}
-                      onClick={() => {
-                        setDealType(option);
-                        localStorage.setItem('treva_dealType', option);
-                        setDealMenuOpen(false);
-                      }}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
-
-            {/* Search button — navigates based on deal type */}
-            <PillButton className="treva-filter-bar__home-btn" aria-label="Go to section" onClick={handleHomeClick}>
-              <Search size={24} strokeWidth={2} />
-            </PillButton>
-            </div>
-          </div>
+</div>
         </PageContainer>
+
+<div className="treva-hero-slider-controls">
+          <div className="treva-hero-progress">
+            {heroImages.map((_, index) => (
+              <div key={index} className="treva-hero-progress__segment">
+                <div
+                  className={`treva-hero-progress__fill ${
+                    index < currentSlide
+                      ? 'treva-hero-progress__fill--complete'
+                      : index === currentSlide
+                      ? 'treva-hero-progress__fill--active'
+                      : ''
+                  }`}
+                  style={index === currentSlide ? { animationDuration: `${SLIDE_INTERVAL}ms` } : undefined}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="treva-hero-slider-nav">
+            <button
+              type="button"
+              className="treva-hero-slider-nav__arrow treva-hero-slider-nav__arrow--prev"
+              onClick={prevSlide}
+              aria-label="Previous slide"
+            >
+              <ArrowLeft size={18} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              className="treva-hero-slider-nav__arrow treva-hero-slider-nav__arrow--next"
+              onClick={nextSlide}
+              aria-label="Next slide"
+            >
+              <ArrowRight size={18} strokeWidth={2} />
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
