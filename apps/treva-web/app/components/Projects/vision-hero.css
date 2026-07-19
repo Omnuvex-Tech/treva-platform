@@ -228,10 +228,17 @@
 
   .vision-hero__container {
     padding: 0 24px;
-    padding-top: 120px; 
-    padding-bottom: 60px;  
+    padding-top: calc(var(--treva-nav-height, 64px) + 24px);
+    padding-bottom: 84px;
     height: 100%;
-    display: block !important; 
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .vision-hero__content {
+    max-width: 100%;
+    width: 100%;
   }
 
   .vision-hero__slider-controls {
