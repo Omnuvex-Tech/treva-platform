@@ -5,6 +5,11 @@
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+.about-page-container {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
 .about-team {
     width: 100%;
     padding: 64px 0 100px;
@@ -194,6 +199,11 @@
 }
 
 @media (max-width: 768px) {
+    .about-page-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
     .about-team {
         padding: 32px 0 52px;
     }
@@ -239,6 +249,11 @@
 }
 
 @media (max-width: 400px) {
+    .about-page-container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
     .about-team__grid {
         gap: 10px;
     }
