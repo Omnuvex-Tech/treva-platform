@@ -5,7 +5,7 @@
     "private": true,
     "scripts": {
         "dev": "node ../../scripts/run-with-env.cjs .env.development next dev --port 10010",
-        "build": "node --max-old-space-size=2048 ../../scripts/run-with-env.cjs .env.production next build",
+        "build": "node ../../scripts/run-with-env.cjs .env.production next build",
         "start": "node ../../scripts/run-with-env.cjs .env.production next start -p 10010",
         "lint": "eslint --max-warnings 0",
         "check-types": "next typegen && tsc --noEmit"
