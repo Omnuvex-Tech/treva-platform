@@ -12,6 +12,9 @@
 
 .about-team {
     width: 100%;
+    position: relative;
+    z-index: 1;
+    background-color: var(--color-white);
     padding: 64px 0 100px;
     box-sizing: border-box;
 }
