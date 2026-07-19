@@ -10,6 +10,11 @@ const APARTMENT_INCLUDE = {
 };
 
 const isDefined = <T>(value: T | undefined): value is T => value !== undefined;
+const normalizeOptionalString = (value?: string | null) => {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
 
 const isValidResaleFloor = (value: number) =>
   Number.isFinite(value) && value >= 1 && value <= MAX_RESALE_FLOOR;
@@ -17,6 +22,27 @@ const isValidResaleFloor = (value: number) =>
 @Injectable()
 export class ApartmentsService {
   constructor(private prisma: PrismaService) {}
+
+  private normalizeApartmentDto<T extends Record<string, any>>(dto: T): T {
+    return {
+      ...dto,
+      name: normalizeOptionalString(dto.name),
+      description: normalizeOptionalString(dto.description),
+      seoTitle: normalizeOptionalString(dto.seoTitle),
+      seoDescription: normalizeOptionalString(dto.seoDescription),
+      seoKeywords: normalizeOptionalString(dto.seoKeywords),
+      canonicalUrl: normalizeOptionalString(dto.canonicalUrl),
+      seoImage: normalizeOptionalString(dto.seoImage),
+      image: normalizeOptionalString(dto.image),
+      coverImage: normalizeOptionalString(dto.coverImage),
+      region: normalizeOptionalString(dto.region),
+      city: normalizeOptionalString(dto.city),
+      locationTitle: normalizeOptionalString(dto.locationTitle),
+      locationUrl: normalizeOptionalString(dto.locationUrl),
+      locationGoogleMapsUrl: normalizeOptionalString(dto.locationGoogleMapsUrl),
+      ownerId: normalizeOptionalString(dto.ownerId),
+    };
+  }
 
   private async attachOptionRelations<T extends { heatingTypeIds: string[]; viewOptionIds: string[] }>(
     apartments: T[],
@@ -76,16 +102,17 @@ export class ApartmentsService {
   }
 
   async create(dto: CreateApartmentDto) {
-    this.validateFloorRange(dto.floorFrom, dto.floorTo);
+    const normalizedDto = this.normalizeApartmentDto(dto);
+    this.validateFloorRange(normalizedDto.floorFrom, normalizedDto.floorTo);
 
     const existing = await this.prisma.apartment.findUnique({
-      where: { slug: dto.slug },
+      where: { slug: normalizedDto.slug },
     });
     if (existing) {
       throw new ConflictException('Apartment with this slug already exists');
     }
 
-    const { prices, ...apartmentData } = dto;
+    const { prices, ...apartmentData } = normalizedDto;
 
     const created = await this.prisma.apartment.create({
       data: {
@@ -113,6 +140,11 @@ export class ApartmentsService {
     page?: number;
     limit?: number;
     apartmentTypeId?: string;
+    city?: string;
+    region?: string;
+    purpose?: string;
+    mortgage?: boolean;
+    extract?: boolean;
     ownerId?: string;
     minPrice?: number;
     maxPrice?: number;
@@ -121,18 +153,24 @@ export class ApartmentsService {
     maxArea?: number;
     minGrossArea?: number;
     maxGrossArea?: number;
+    completionYear?: number;
     floor?: number;
     currency?: string;
     viewOptionIds?: string;
     status?: string;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, viewOptionIds, status } = query;
+    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, completionYear, floor, currency, viewOptionIds, status } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
 
     const where: any = {};
     if (apartmentTypeId) where.apartmentTypeId = apartmentTypeId;
+    if (city) where.city = city;
+    if (region) where.region = region;
+    if (purpose) where.purpose = purpose;
+    if (mortgage !== undefined) where.mortgage = mortgage;
+    if (extract !== undefined) where.extract = extract;
     if (ownerId) where.ownerId = ownerId;
     if (roomCount) where.roomCount = roomCount;
 
@@ -149,6 +187,7 @@ export class ApartmentsService {
       if (minGrossArea) where.grossArea.gte = minGrossArea;
       if (maxGrossArea) where.grossArea.lte = maxGrossArea;
     }
+    if (completionYear) where.completionYear = completionYear;
     if (floor) {
       where.floorFrom = { lte: floor };
       where.floorTo = { gte: floor };
@@ -220,14 +259,16 @@ export class ApartmentsService {
     const apartment = await this.prisma.apartment.findUnique({ where: { id } });
     if (!apartment) throw new NotFoundException('Apartment not found');
 
-    this.validateFloorRange(dto.floorFrom ?? apartment.floorFrom, dto.floorTo ?? apartment.floorTo);
+    const normalizedDto = this.normalizeApartmentDto(dto);
 
-    if (dto.slug && dto.slug !== apartment.slug) {
-      const existing = await this.prisma.apartment.findUnique({ where: { slug: dto.slug } });
+    this.validateFloorRange(normalizedDto.floorFrom ?? apartment.floorFrom, normalizedDto.floorTo ?? apartment.floorTo);
+
+    if (normalizedDto.slug && normalizedDto.slug !== apartment.slug) {
+      const existing = await this.prisma.apartment.findUnique({ where: { slug: normalizedDto.slug } });
       if (existing) throw new ConflictException('Apartment with this slug already exists');
     }
 
-    const { prices, ...apartmentData } = dto;
+    const { prices, ...apartmentData } = normalizedDto;
 
     if (prices) {
       await this.prisma.apartmentPrice.deleteMany({ where: { apartmentId: id } });
@@ -327,5 +368,23 @@ export class ApartmentsService {
     }
 
     return [...rooms].sort((a, b) => a - b);
+  }
+
+  async getCompletionYears(): Promise<number[]> {
+    const apartments = await this.prisma.apartment.findMany({
+      select: { completionYear: true },
+      where: { completionYear: { not: null } },
+      orderBy: { completionYear: 'asc' },
+    });
+
+    const years = new Set<number>();
+    for (const apartment of apartments) {
+      const year = Number(apartment.completionYear);
+      if (Number.isFinite(year) && year > 0) {
+        years.add(Math.floor(year));
+      }
+    }
+
+    return [...years].sort((a, b) => a - b);
   }
 }

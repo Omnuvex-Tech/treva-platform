@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
@@ -8,27 +8,96 @@ import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
-import { useResaleApartments, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
+import { useResaleApartments } from '@/hooks/use-resale-apartments';
 import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
 import type { ResaleApartment } from '@/lib/resale.types';
 import './resale-listing.css';
 
+function getLocalizedApartmentTypeLabel(
+  apartmentType: { slug?: string; title?: string } | undefined,
+  locale: 'az' | 'en' | 'ru'
+) {
+  const normalized = String(apartmentType?.slug || apartmentType?.title || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '_');
+
+  const translations = {
+    country_house: {
+      az: 'Həyət evi/Bağ evi',
+      en: 'Country House',
+      ru: 'Отдельный дом',
+    },
+    detached_house: {
+      az: 'Həyət evi/Bağ evi',
+      en: 'Country House',
+      ru: 'Отдельный дом',
+    },
+    new_constructed: {
+      az: 'Yeni tikili',
+      en: 'New Constructed',
+      ru: 'Новостройка',
+    },
+    object: {
+      az: 'Obyekt',
+      en: 'Object',
+      ru: 'Объект',
+    },
+    ofice: {
+      az: 'Ofis',
+      en: 'Office',
+      ru: 'Офис',
+    },
+    old_constructed: {
+      az: 'Köhnə tikili',
+      en: 'Old Constructed',
+      ru: 'Старый фонд',
+    },
+  } as const;
+
+  return translations[normalized as keyof typeof translations]?.[locale] ?? apartmentType?.title ?? '';
+}
+
 export default function ResalePage() {
   const params = useParams();
-  const locale = (params?.locale as string) || 'az';
+  const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
+  const dictionary = {
+    az: {
+      pageTitle: 'BAKIDA TƏKRAR SATIŞ MƏNZİLLƏRİ',
+      properties: 'elan',
+      noApartments: 'Mənzil tapılmadı',
+      saveListing: 'Elanı yadda saxla',
+      room: 'otaqlı',
+      floor: 'mərtəbə',
+      details: 'Mənzilə bax',
+    },
+    en: {
+      pageTitle: 'PURCHASE APARTMENTS IN BAKU',
+      properties: 'properties',
+      noApartments: 'No apartments found',
+      saveListing: 'Save listing',
+      room: 'room',
+      floor: 'floor',
+      details: 'View Apartment Details',
+    },
+    ru: {
+      pageTitle: 'КВАРТИРЫ НА ВТОРИЧНОМ РЫНКЕ В БАКУ',
+      properties: 'объектов',
+      noApartments: 'Квартиры не найдены',
+      saveListing: 'Сохранить объявление',
+      room: 'комн.',
+      floor: 'этаж',
+      details: 'Смотреть квартиру',
+    },
+  } as const;
+  const t = dictionary[locale] || dictionary.az;
   const [savedItems, setSavedItems] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<ResaleFilterState>({});
-  const [selectedTypeId, setSelectedTypeId] = useState<string>('');
-  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
-  const typeDropdownRef = useRef<HTMLDivElement>(null);
   const [isDebouncing, setIsDebouncing] = useState(false);
-
-  const { data: apartmentTypes } = useResaleApartmentTypes();
 
   const { data: response, isLoading, isFetching } = useResaleApartments({
     ...filters,
-    apartmentTypeId: selectedTypeId || undefined,
     page,
     limit: 12,
   });
@@ -52,12 +121,15 @@ export default function ResalePage() {
         type: 'resale',
         image: apt.image || '',
         price: apt.prices?.[0]?.priceTotal ?? apt.priceTotal ?? 0,
+        priceByArea: apt.prices?.[0]?.priceByArea ?? apt.priceByArea ?? 0,
         currency: apt.prices?.[0]?.currency?.value ?? 'AZN',
         rooms: String(apt.roomCount ?? ''),
         area: String(apt.area ?? ''),
         floor: `${apt.floorFrom}/${apt.floorTo}`,
         location: apt.locationTitle || '',
         title: apt.title || '',
+        apartmentTypeSlug: apt.apartmentType?.slug,
+        apartmentTypeTitle: apt.apartmentType?.title,
       });
       setSavedItems(prev => [...prev, apt.id]);
     }
@@ -66,16 +138,6 @@ export default function ResalePage() {
   const handleFilterChange = useCallback((f: ResaleFilterState) => {
     setFilters(f);
     setPage(1);
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target as Node)) {
-        setTypeDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const formatPrice = (p: number) =>
@@ -111,48 +173,10 @@ export default function ResalePage() {
           <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
 
           <header className="re-header">
-            <h1 className="re-main-title">PURCHASE APARTMENTS IN BAKU</h1>
+            <h1 className="re-main-title">{t.pageTitle}</h1>
 
             <div className="re-controls-row">
-              <div className="re-property-count">{pagination?.total ?? 0} properties</div>
-
-              <div className="re-sort-wrapper">
-                <span className="re-sort-label">Sort:</span>
-                <div className="re-sort-dropdown" ref={typeDropdownRef}>
-                  <button
-                    type="button"
-                    className="re-sort-trigger"
-                    aria-expanded={typeDropdownOpen}
-                    onClick={() => setTypeDropdownOpen((p) => !p)}
-                  >
-                    <span>{selectedTypeId ? (apartmentTypes?.find((t: any) => t.id === selectedTypeId)?.title || 'Type') : 'Recommended'}</span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                  </button>
-                  {typeDropdownOpen && (
-                    <div className="re-sort-dropdown-menu">
-                      <button
-                        type="button"
-                        className={`re-sort-dropdown-item ${!selectedTypeId ? 're-sort-dropdown-item--active' : ''}`}
-                        onClick={() => { setSelectedTypeId(''); setTypeDropdownOpen(false); setPage(1); }}
-                      >
-                        Recommended
-                      </button>
-                      {apartmentTypes?.map((t: any) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          className={`re-sort-dropdown-item ${selectedTypeId === t.id ? 're-sort-dropdown-item--active' : ''}`}
-                          onClick={() => { setSelectedTypeId(t.id); setTypeDropdownOpen(false); setPage(1); }}
-                        >
-                          {t.title}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <div className="re-property-count">{pagination?.total ?? 0} {t.properties}</div>
             </div>
           </header>
 
@@ -173,7 +197,7 @@ export default function ResalePage() {
                   <div className="re-spinner-icon"></div>
                 </div>
               ) : apartments.length === 0 && !showSpinner ? (
-                <div className="py-16 text-center text-white/50">No apartments found</div>
+                <div className="py-16 text-center text-white/50">{t.noApartments}</div>
               ) : (
                 <div style={{ position: 'relative' }}>
                   {showSpinner && (
@@ -186,22 +210,24 @@ export default function ResalePage() {
                       return (
                     <div key={apt.id} className="re-card-wrapper">
                       <article className="re-card">
-                        <div className="re-card-media">
-                          <img
-                            src={apt.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
-                            alt={apt.locationTitle || apt.title}
-                            className="re-card-img"
-                          />
-                        </div>
+                        <Link href={`/${locale}/resale/${apt.slug}`} className="re-card-media-link" aria-label={t.details}>
+                          <div className="re-card-media">
+                            <img
+                              src={apt.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
+                              alt={apt.locationTitle || apt.title}
+                              className="re-card-img"
+                            />
+                          </div>
+                        </Link>
 
                         <div className="re-card-body">
                           <div className="re-card-meta-row">
-                            <span className="re-badge">{apt.apartmentType?.title || ''}</span>
+                            <span className="re-badge">{getLocalizedApartmentTypeLabel(apt.apartmentType, locale)}</span>
                             <button
                               type="button"
                               className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
                               onClick={() => toggleSave(apt)}
-                              aria-label="Save listing"
+                              aria-label={t.saveListing}
                             >
                               <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
@@ -215,9 +241,9 @@ export default function ResalePage() {
                           </div>
 
                           <div className="re-tags-row">
-                            <span className="re-tag">{apt.roomCount}-room sq.</span>
+                            <span className="re-tag">{apt.roomCount}-{t.room}</span>
                             <span className="re-tag">{apt.area} m²</span>
-                            <span className="re-tag">{apt.floorFrom}/{apt.floorTo} floor</span>
+                            <span className="re-tag">{apt.floorFrom}/{apt.floorTo} {t.floor}</span>
                           </div>
 
                           <p className="re-address">{apt.locationTitle || '—'}</p>
@@ -225,7 +251,7 @@ export default function ResalePage() {
                       </article>
 
                       <Link href={`/${locale}/resale/${apt.slug}`} className="re-action-btn">
-                        VIew Apartment DetaIls
+                        {t.details}
                       </Link>
                     </div>
                       );

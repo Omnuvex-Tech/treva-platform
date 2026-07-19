@@ -23,6 +23,11 @@ export class ApartmentsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'apartmentTypeId', required: false })
+  @ApiQuery({ name: 'city', required: false })
+  @ApiQuery({ name: 'region', required: false })
+  @ApiQuery({ name: 'purpose', required: false })
+  @ApiQuery({ name: 'mortgage', required: false })
+  @ApiQuery({ name: 'extract', required: false })
   @ApiQuery({ name: 'ownerId', required: false })
   @ApiQuery({ name: 'minPrice', required: false })
   @ApiQuery({ name: 'maxPrice', required: false })
@@ -31,6 +36,7 @@ export class ApartmentsController {
   @ApiQuery({ name: 'maxArea', required: false })
   @ApiQuery({ name: 'minGrossArea', required: false })
   @ApiQuery({ name: 'maxGrossArea', required: false })
+  @ApiQuery({ name: 'completionYear', required: false })
   @ApiQuery({ name: 'floor', required: false })
   @ApiQuery({ name: 'currency', required: false })
   @ApiQuery({ name: 'viewOptionIds', required: false })
@@ -39,6 +45,11 @@ export class ApartmentsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('apartmentTypeId') apartmentTypeId?: string,
+    @Query('city') city?: string,
+    @Query('region') region?: string,
+    @Query('purpose') purpose?: string,
+    @Query('mortgage') mortgage?: string,
+    @Query('extract') extract?: string,
     @Query('ownerId') ownerId?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
@@ -47,6 +58,7 @@ export class ApartmentsController {
     @Query('maxArea') maxArea?: string,
     @Query('minGrossArea') minGrossArea?: string,
     @Query('maxGrossArea') maxGrossArea?: string,
+    @Query('completionYear') completionYear?: string,
     @Query('floor') floor?: string,
     @Query('currency') currency?: string,
     @Query('viewOptionIds') viewOptionIds?: string,
@@ -56,6 +68,11 @@ export class ApartmentsController {
       page: page ? parseInt(page) : 1,
       limit: limit ? parseInt(limit) : 12,
       apartmentTypeId,
+      city,
+      region,
+      purpose,
+      mortgage: mortgage === undefined ? undefined : mortgage === 'true',
+      extract: extract === undefined ? undefined : extract === 'true',
       ownerId,
       minPrice: minPrice ? parseFloat(minPrice) : undefined,
       maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
@@ -64,6 +81,7 @@ export class ApartmentsController {
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       minGrossArea: minGrossArea ? parseFloat(minGrossArea) : undefined,
       maxGrossArea: maxGrossArea ? parseFloat(maxGrossArea) : undefined,
+      completionYear: completionYear ? parseInt(completionYear) : undefined,
       floor: floor ? parseInt(floor) : undefined,
       currency,
       viewOptionIds,
@@ -87,6 +105,12 @@ export class ApartmentsController {
   @ApiOperation({ summary: 'Get available room counts' })
   async getRoomCounts() {
     return this.service.getRoomCounts();
+  }
+
+  @Get('completion-years')
+  @ApiOperation({ summary: 'Get available completion years' })
+  async getCompletionYears() {
+    return this.service.getCompletionYears();
   }
 
   @Get('slug/:slug')

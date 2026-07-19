@@ -32,6 +32,7 @@ model Category {
   region          String?
   area            String?
   city            String?
+  locationGoogleMapsUrl String?
   developerBrand  String?
   website         String?
   banks           String?
@@ -266,11 +267,13 @@ model Apartment {
   city            String?
   locationTitle   String?
   locationUrl     String?
+  locationGoogleMapsUrl String?
   renovation      String?
   mortgage        Boolean?
   extract         Boolean?
   parking         Boolean?
   buildingAge     Int?
+  completionYear  Int?
   furnishing      String?
   elevator        Boolean?
   ceilingHeight   Float?

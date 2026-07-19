@@ -342,7 +342,10 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                     <div className="article_content-row">
                       {article.author && (
                         <div className="article_content-author">
-                          <a href={`/${locale}/authors/${article.author.toLowerCase().replace(/\s+/g, '-')}`} className="article_specs-author w-inline-block">
+                          <a
+                            href={`/${locale}/authors/${article.authorObj?.slug || article.author.toLowerCase().replace(/\s+/g, '-')}`}
+                            className="article_specs-author w-inline-block"
+                          >
                             <div className="article_author-avatar">
           <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
                             </div>

@@ -69,6 +69,7 @@ const defaultFormData = {
     region: "",
     area: "",
     city: "",
+    locationGoogleMapsUrl: "",
     developerBrand: "",
     website: "",
     banks: "",
@@ -235,6 +236,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 region: formData.region,
                 area: formData.area,
                 city: formData.city,
+                locationGoogleMapsUrl: formData.locationGoogleMapsUrl || undefined,
                 developerBrand: formData.developerBrand,
                 website: formData.website,
                 banks: formData.banks,
@@ -551,6 +553,15 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         placeholder="2500 m²"
                                     />
                                     {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
+                                </div>
+                                <div className="lg:col-span-3">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location URL</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.locationGoogleMapsUrl}
+                                        onChange={(e) => updateFormData("locationGoogleMapsUrl", e.target.value)}
+                                        placeholder="https://www.google.com/maps/embed?pb=..."
+                                    />
                                 </div>
                             </div>
                         </SectionBlock>

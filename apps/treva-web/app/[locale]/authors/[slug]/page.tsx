@@ -89,13 +89,13 @@ export default async function AuthorPage({ params }: Props) {
         </section>
 
         {/* Author's Articles */}
-        <section className="section_news" style={{ paddingTop: "3rem" }}>
+        <section className="section_news author-articles-section" style={{ paddingTop: "3rem" }}>
           <div className="global-padding">
             <div className="container-large">
               <h2 className="heading-style-h3-small" style={{ marginBottom: "2rem" }}>Müəllifin bütün məqalələri</h2>
               <div className="news_middle-wrap">
                 <div className="w-dyn-list">
-                  <div role="list" className="news_middle-list w-dyn-items" style={{ borderRight: "1px solid rgba(23, 25, 28, 0.1)" }}>
+                  <div role="list" className="news_middle-list w-dyn-items author-articles-grid" style={{ borderRight: "1px solid rgba(23, 25, 28, 0.1)" }}>
                     {authorArticles.map((article) => (
                       <div key={article.slug} role="listitem" className="news_header-item w-dyn-item">
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_middle-link w-inline-block">
@@ -127,7 +127,7 @@ export default async function AuthorPage({ params }: Props) {
         </section>
 
         {/* SEO Keywords Section */}
-        <section className="section_keywords">
+        <section className="section_keywords author-keywords-section">
           <div className="global-padding">
             <div className="container-large">
               <div className="keywords_component">

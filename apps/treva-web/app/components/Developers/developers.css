@@ -647,7 +647,6 @@ html.disable-smooth-scroll {
 
   .developers-callback-wrap .callbackContainer {
     padding-top: 0 !important;
-    padding-bottom: 32px;
   }
 }
 
@@ -684,9 +683,5 @@ html.disable-smooth-scroll {
 
   .developers-callback-wrap {
     margin-top: -7rem;
-  }
-
-  .developers-callback-wrap .callbackContainer {
-    padding-bottom: 24px;
   }
 }

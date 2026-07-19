@@ -21,6 +21,19 @@ export interface ResaleAttribute {
     icon?: string;
 }
 
+export interface ResaleLocationOption {
+    id: string;
+    type: "region" | "city";
+    name: string;
+    title: string;
+    cityId?: string | null;
+    city?: {
+        id: string;
+        name: string;
+        title: string;
+    } | null;
+}
+
 export interface ResaleCurrency {
     id: string;
     name: string;
@@ -52,6 +65,8 @@ export interface ResaleApartment {
     floorTo: number;
     locationTitle?: string;
     locationUrl?: string;
+    locationGoogleMapsUrl?: string;
+    completionYear?: number;
     renovation?: string;
     kitchenSize?: number;
     wallMaterial?: string;
@@ -81,12 +96,18 @@ export interface ResaleFilters {
     page?: number;
     limit?: number;
     apartmentTypeId?: string;
+    city?: string;
+    region?: string;
+    purpose?: "sale" | "rent";
+    mortgage?: boolean;
+    extract?: boolean;
     ownerId?: string;
     minPrice?: number;
     maxPrice?: number;
     roomCount?: number;
     minArea?: number;
     maxArea?: number;
+    completionYear?: number;
     floor?: number;
     currency?: string;
     viewOptionIds?: string;

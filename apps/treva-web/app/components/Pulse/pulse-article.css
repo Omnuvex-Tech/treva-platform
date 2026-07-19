@@ -207,7 +207,7 @@
 }
 
 .pulse-article-callback-wrap {
-  padding-bottom: 40px;
+  padding-bottom: 0;
 }
 
 .article_cover-wrap,
@@ -246,6 +246,6 @@
 
 @media screen and (max-width: 768px) {
   .pulse-article-callback-wrap {
-    padding-bottom: 28px;
+    padding-bottom: 0;
   }
 }

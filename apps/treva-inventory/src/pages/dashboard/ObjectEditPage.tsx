@@ -66,6 +66,7 @@ const defaultFormData = {
     region: "",
     area: "",
     city: "",
+    locationGoogleMapsUrl: "",
     developerBrand: "",
     website: "",
     banks: "",
@@ -199,6 +200,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                     region: category.region || "",
                     area: category.area || "",
                     city: category.city || "",
+                    locationGoogleMapsUrl: category.locationGoogleMapsUrl || "",
                     developerBrand: category.developerBrand || "",
                     website: category.website || "",
                     banks: category.banks || "",
@@ -252,6 +254,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                 region: data.region,
                 area: data.area,
                 city: data.city,
+                locationGoogleMapsUrl: data.locationGoogleMapsUrl || undefined,
                 developerBrand: data.developerBrand,
                 website: data.website,
                 banks: data.banks,
@@ -570,6 +573,15 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                     />
                                     {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
                                 </div>
+                                <div className="lg:col-span-3">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location URL</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.locationGoogleMapsUrl}
+                                        onChange={(e) => updateFormData("locationGoogleMapsUrl", e.target.value)}
+                                        placeholder="https://www.google.com/maps/embed?pb=..."
+                                    />
+                                </div>
                             </div>
                         </SectionBlock>
 
@@ -747,6 +759,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         <div className="flex items-start">
                                             <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Website</span>
                                             <span className="text-sm font-medium text-[#1A1A1A]">{category?.website || "not specified"}</span>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Location URL</span>
+                                            <span className="break-all text-sm font-medium text-[#1A1A1A]">
+                                                {category?.locationGoogleMapsUrl || "not specified"}
+                                            </span>
                                         </div>
                                         <div className="flex items-start">
                                             <span className="w-[110px] shrink-0 text-xs text-[#4E525D]">Sales department</span>

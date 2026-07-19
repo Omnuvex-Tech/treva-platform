@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { trevaApi as api } from "@/lib/api";
 import { endpoints } from "@/config/endpoints";
-import type { ResaleApartment, ResaleApartmentListResponse, ResaleFilters, ResaleCurrency } from "@/lib/resale.types";
+import type { ResaleApartment, ResaleApartmentListResponse, ResaleFilters, ResaleCurrency, ResaleLocationOption } from "@/lib/resale.types";
 
 export function useResaleApartments(filters?: ResaleFilters) {
     return useQuery({
@@ -109,6 +109,32 @@ export function useResaleRooms() {
         queryFn: async () => {
             const response = await api.get<number[]>(
                 endpoints.resale.apartments.rooms
+            );
+            return response.data;
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+}
+
+export function useResaleCompletionYears() {
+    return useQuery({
+        queryKey: ["resale-completion-years"],
+        queryFn: async () => {
+            const response = await api.get<number[]>(
+                `${endpoints.resale.apartments.list}/completion-years`
+            );
+            return response.data;
+        },
+        staleTime: 1000 * 60 * 5,
+    });
+}
+
+export function useResaleLocationOptions() {
+    return useQuery({
+        queryKey: ["resale-location-options"],
+        queryFn: async () => {
+            const response = await api.get<ResaleLocationOption[]>(
+                endpoints.locationOptions.list
             );
             return response.data;
         },

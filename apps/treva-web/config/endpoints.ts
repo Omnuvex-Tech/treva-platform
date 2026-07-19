@@ -42,6 +42,10 @@ export const endpoints = {
         list: "/currencies",
     },
 
+    locationOptions: {
+        list: "/location-options",
+    },
+
     resale: {
         apartments: {
             list: "/apartments",

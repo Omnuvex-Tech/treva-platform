@@ -147,6 +147,33 @@
   display: none;
 }
 
+.ap-map-card {
+  overflow: hidden;
+}
+
+.ap-map-address {
+  margin: -8px 0 20px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #0000008c;
+  text-transform: none;
+}
+
+.ap-map-frame-wrap {
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: #e6e1d7;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+}
+
+.ap-map-frame {
+  display: block;
+  width: 100%;
+  height: 360px;
+  border: 0;
+}
+
 .ap-viewing-desc {
   font-size: 15px;
   font-weight: 400;
@@ -192,6 +219,7 @@
   border: 1px solid var(--input-border-color);
   border-radius: 8px;
   overflow: visible;
+  position: relative;
 }
 
 .ap-phone-group .ap-form-input {
@@ -205,26 +233,35 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0 12px 0 16px;
+  padding: 12px 10px 12px 12px;
   border-right: 1px solid var(--input-border-color);
   height: 100%;
   cursor: pointer;
   user-select: none;
-  color: #000000;
+  color: #333333;
   font-weight: 400;
   font-style: normal;
   text-transform: none;
   position: relative;
   border-top-left-radius: 7px;
   border-bottom-left-radius: 7px;
+  flex-shrink: 0;
 }
 
 .ap-flag-img {
-  width: 32px;
-  height: 22px;
+  width: 28px;
+  height: 20px;
   border-radius: 3px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.ap-country-code-display {
+  font-size: 16px;
+  color: #333333;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .ap-country-dropdown {
@@ -234,12 +271,12 @@
   width: 280px;
   max-height: 300px;
   overflow-y: auto;
-  background: #3F4249;
+  background: #ffffff;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
 
@@ -250,10 +287,11 @@
   padding: 8px 14px;
   cursor: pointer;
   transition: background 0.18s ease;
+  color: #3f4249;
 }
 
 .ap-country-option:hover {
-  background: #2F3134;
+  background: #f0f0f0;
 }
 
 .ap-country-flag-img {
@@ -270,39 +308,41 @@
   font-weight: 500;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #3f4249;
   font-family: var(--font-sans);
 }
 
 .ap-country-code {
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: #888888;
   font-family: var(--font-sans);
 }
 
 .ap-submit-btn {
-  background-color: var(--slate-dark-gray);
-  color: #dcdcdf;
-  border: none;
-  border-radius: 8px;
-  padding: 14px 32px;
-  font-size: 21px;
-  font-weight: 400;
+  background-color: #4a4e57;
+  color: #ffffff;
+  border: 1px solid #4a4e57;
+  border-radius: 12px;
+  min-height: 48px;
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   font-style: normal;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.2s;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
   font-family: var(--font-sans);
   text-transform: none;
   flex: 1;
   text-align: center;
+  letter-spacing: 0.1px;
 }
 
 .ap-submit-btn:hover {
-  opacity: 0.93;
+  background-color: transparent;
+  color: #4a4e57;
+  border-color: #4a4e57;
 }
 
 .ap-form-success {
@@ -382,7 +422,73 @@
   cursor: not-allowed;
 }
 
+.ap-viewing-card {
+  margin: 0;
+}
+
+.pdet-sidebar-viewing-card {
+  background-color: #f2efe8;
+  border: 1px solid #d8d5ce;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.pdet-sidebar-viewing-card .ap-info-title {
+  margin-bottom: 18px;
+}
+
+.pdet-sidebar-viewing-card .ap-viewing-desc {
+  margin-bottom: 20px;
+  color: #00000099;
+}
+
+.pdet-sidebar-viewing-card .ap-viewing-form {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pdet-sidebar-viewing-card .ap-phone-group,
+.pdet-sidebar-viewing-card .ap-submit-btn {
+  width: 100%;
+}
+
+.pdet-sidebar-viewing-card .ap-submit-btn {
+  padding: 15px 18px;
+  font-size: 15px;
+}
+
+.pdet-mobile-viewing-card {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  .pdet-sidebar-viewing-card {
+    display: none;
+  }
+
+  .pdet-mobile-viewing-card {
+    display: block;
+    background-color: #f4f1ea;
+    border: 1px solid #d8d5ce;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .pdet-mobile-viewing-card .ap-info-title {
+    margin-bottom: 14px;
+    font-size: 20px;
+  }
+
+  .pdet-mobile-viewing-card .ap-viewing-desc {
+    margin-bottom: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .pdet-mobile-viewing-card.ap-info-card {
+    padding: 16px;
+  }
+
   .ap-info-card {
     padding: 24px 16px;
   }
@@ -403,6 +509,15 @@
   .ap-mobile-only {
     display: inline-block;
     margin-top: 16px;
+  }
+
+  .ap-map-address {
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .ap-map-frame {
+    height: 280px;
   }
 
   .ap-viewing-form {

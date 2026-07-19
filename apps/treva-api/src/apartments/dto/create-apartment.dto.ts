@@ -153,6 +153,11 @@ export class CreateApartmentDto {
   @IsString()
   locationUrl?: string;
 
+  @ApiPropertyOptional({ example: 'https://www.google.com/maps/embed?pb=...' })
+  @IsOptional()
+  @IsString()
+  locationGoogleMapsUrl?: string;
+
   @ApiPropertyOptional({ example: 'renovated', enum: ['renovated', 'non-renovated'] })
   @IsOptional()
   @IsString()
@@ -175,6 +180,11 @@ export class CreateApartmentDto {
   @IsOptional()
   @IsNumber()
   buildingAge?: number;
+
+  @ApiPropertyOptional({ example: 2028 })
+  @IsOptional()
+  @IsNumber()
+  completionYear?: number;
 
   @ApiPropertyOptional({ example: 'furnished', enum: ['furnished', 'unfurnished'] })
   @IsOptional()

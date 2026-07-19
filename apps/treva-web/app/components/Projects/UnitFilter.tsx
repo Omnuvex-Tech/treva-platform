@@ -515,7 +515,7 @@ export default function UnitLayout() {
                     className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
                     onClick={() => { setSelectedRooms(selectedRooms === room.id ? '' : room.id); setPage(1); }}
                   >
-                    {room.value}
+                    <span className="room-btn__text">{room.value}</span>
                   </button>
                 ))
               )}

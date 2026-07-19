@@ -47,6 +47,12 @@ function parseKeywordString(value?: string | null) {
         .filter(Boolean);
 }
 
+function normalizeOptionalText(value: string | undefined) {
+    if (typeof value !== "string") return undefined;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+}
+
 function SectionBlock({
     title,
     description,
@@ -266,11 +272,13 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         city: "",
         locationTitle: "",
         locationUrl: "",
+        locationGoogleMapsUrl: "",
         renovation: undefined,
         mortgage: undefined,
         extract: undefined,
         parking: undefined,
         buildingAge: undefined as unknown as number,
+        completionYear: undefined as unknown as number,
         furnishing: undefined,
         elevator: undefined,
         ceilingHeight: undefined as unknown as number,
@@ -313,11 +321,13 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 city: d.city || "",
                 locationTitle: d.locationTitle || "",
                 locationUrl: d.locationUrl || "",
+                locationGoogleMapsUrl: d.locationGoogleMapsUrl || "",
                 renovation: d.renovation || undefined,
                 mortgage: d.mortgage ?? undefined,
                 extract: d.extract ?? undefined,
                 parking: d.parking ?? undefined,
                 buildingAge: d.buildingAge ?? undefined,
+                completionYear: d.completionYear ?? undefined,
                 furnishing: d.furnishing || undefined,
                 elevator: d.elevator ?? undefined,
                 ceilingHeight: d.ceilingHeight ?? undefined,
@@ -438,6 +448,21 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         }
         const submitData = {
             ...form,
+            name: normalizeOptionalText(form.name),
+            description: normalizeOptionalText(form.description),
+            seoTitle: normalizeOptionalText(form.seoTitle),
+            seoDescription: normalizeOptionalText(form.seoDescription),
+            seoKeywords: normalizeOptionalText(form.seoKeywords),
+            canonicalUrl: normalizeOptionalText(form.canonicalUrl),
+            seoImage: normalizeOptionalText(form.seoImage),
+            image: normalizeOptionalText(form.image),
+            coverImage: normalizeOptionalText(form.coverImage),
+            region: normalizeOptionalText(form.region),
+            city: normalizeOptionalText(form.city),
+            locationTitle: normalizeOptionalText(form.locationTitle),
+            locationUrl: normalizeOptionalText(form.locationUrl),
+            locationGoogleMapsUrl: normalizeOptionalText(form.locationGoogleMapsUrl),
+            ownerId: normalizeOptionalText(form.ownerId),
             prices: (form.prices || []).map((p: any) => ({
                 currencyId: p.currencyId,
                 priceTotal: p.priceTotal,
@@ -874,6 +899,17 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     />
                                 </div>
                                 <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Completion Year</label>
+                                    <input
+                                        className={inputClass}
+                                        type="number"
+                                        value={form.completionYear ?? ""}
+                                        onChange={(e) => updateField("completionYear", parseInt(e.target.value) || undefined)}
+                                        placeholder="2028"
+                                        min={1900}
+                                    />
+                                </div>
+                                <div>
                                     <CustomSelect
                                         label="Renovation"
                                         value={form.renovation || ""}
@@ -1146,6 +1182,15 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     value={form.locationUrl || ""}
                                     onChange={(e) => updateField("locationUrl", e.target.value)}
                                     placeholder="https://maps.google.com/..."
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location Embed URL</label>
+                                <input
+                                    className={inputClass}
+                                    value={form.locationGoogleMapsUrl || ""}
+                                    onChange={(e) => updateField("locationGoogleMapsUrl", e.target.value)}
+                                    placeholder="https://www.google.com/maps/embed?pb=..."
                                 />
                             </div>
                         </SectionBlock>

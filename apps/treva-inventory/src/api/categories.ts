@@ -32,6 +32,7 @@ export interface Category {
     region?: string;
     area?: string;
     city?: string;
+    locationGoogleMapsUrl?: string;
     developerBrand?: string;
     website?: string;
     banks?: string;
@@ -62,6 +63,7 @@ export interface CreateCategoryData {
     region?: string;
     area?: string;
     city?: string;
+    locationGoogleMapsUrl?: string;
     developerBrand?: string;
     website?: string;
     banks?: string;
@@ -87,6 +89,7 @@ export interface UpdateCategoryData {
     region?: string;
     area?: string;
     city?: string;
+    locationGoogleMapsUrl?: string;
     developerBrand?: string;
     website?: string;
     banks?: string;

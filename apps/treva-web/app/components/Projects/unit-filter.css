@@ -170,8 +170,17 @@
 }
 
 .currency-select {
-  width: 75px;
+  width: 96px;
   flex-shrink: 0;
+}
+
+.currency-select .custom-select__trigger {
+  padding: 0 14px;
+  gap: 8px;
+}
+
+.currency-select .custom-select__trigger span {
+  justify-content: center;
 }
 
 /* ========================================================
@@ -266,19 +275,31 @@
   text-transform: none !important;
   letter-spacing: 0;
   overflow: visible;
+  position: relative;
 }
 
 .room-btn:hover {
-  background-color: #2F3134;
-  color: #ffffff;
-  border-color: #2F3134;
+  background-color: #3F4249 !important;
+  color: #ffffff !important;
+  border-color: #3F4249 !important;
 }
 
 .room-btn:active,
 .room-btn--active {
-  background-color: #000000 !important;
+  background-color: #3F4249 !important;
   color: #ffffff !important;
-  border-color: #000000 !important;
+  border-color: #3F4249 !important;
+}
+
+.room-btn__text {
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-width: 1ch;
+  position: relative;
+  z-index: 1;
 }
 
 /* Results Info Row */
@@ -812,20 +833,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  padding: 0 14px;
+  gap: 14px;
+  padding: 0 18px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #ffffff;
+  color: #3f4249;
+  font-size: 15px;
+  font-family: var(--treva-font-oak, 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
   cursor: pointer;
   text-transform: none;
-  transition: border-color 0.2s ease;
+  box-shadow: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .custom-select__trigger:hover {
+  border-color: #999;
+}
+
+.custom-select__trigger[aria-expanded="true"] {
   border-color: #999;
 }
 
@@ -837,14 +866,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 100%;
+  text-align: left;
+  transform: translateY(1px);
 }
 
 .custom-select__trigger svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
+  stroke-width: 2px;
   transition: transform 0.2s ease;
-  color: #555;
+  color: #3f4249;
 }
 
 .custom-select__trigger[aria-expanded="true"] svg {
@@ -856,10 +889,10 @@
   top: calc(100% + 8px);
   left: 0;
   width: 100%;
-  background: #3F4249;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #ffffff;
+  border: 1px solid rgba(63, 66, 73, 0.1);
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   overflow: hidden;
@@ -870,7 +903,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 .custom-select__option {
@@ -878,25 +911,26 @@
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  padding: 8px 14px;
+  min-height: 44px;
+  padding: 12px 18px;
   border: none;
   background: transparent;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  color: #3F4249;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
   line-height: 1;
   cursor: pointer;
   font-family: var(--treva-font-oak, 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-  text-transform: uppercase;
-  transition: background 0.18s ease;
+  text-transform: none;
+  transition: background 0.18s ease, color 0.18s ease;
   text-align: left;
 }
 
 .custom-select__option:hover {
-  background: #2F3134;
+  background: #f4f1eb;
 }
 
 .custom-select__option--active {
-  background: #2F3134;
+  background: #ebe5db;
 }

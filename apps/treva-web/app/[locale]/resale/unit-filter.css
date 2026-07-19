@@ -60,10 +60,16 @@
    ======================================================== */
 .filters-grid {
   display: grid;
-  grid-template-columns: 2.2fr 1.8fr 0.6fr 1.1fr 1.1fr 1.3fr;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 16px;
   align-items: start;
   width: 100%;
+}
+
+.filter-group--price,
+.filter-group--area,
+.filter-group--rooms {
+  grid-column: span 2;
 }
 
 .mobile-flex-row {
@@ -170,8 +176,17 @@
 }
 
 .currency-select {
-  width: 75px;
+  width: 96px;
   flex-shrink: 0;
+}
+
+.currency-select .custom-select__trigger {
+  padding: 0 14px;
+  gap: 8px;
+}
+
+.currency-select .custom-select__trigger span {
+  justify-content: center;
 }
 
 /* ========================================================
@@ -270,16 +285,16 @@
 }
 
 .room-btn:hover {
-  background-color: #2F3134 !important;
+  background-color: #3F4249 !important;
   color: #ffffff !important;
-  border-color: #2F3134 !important;
+  border-color: #3F4249 !important;
 }
 
 .room-btn:active,
 .room-btn--active {
-  background-color: #000000 !important;
+  background-color: #3F4249 !important;
   color: #ffffff !important;
-  border-color: #000000 !important;
+  border-color: #3F4249 !important;
 }
 
 .room-btn__text {
@@ -692,11 +707,20 @@
 @media (max-width: 1024px) {
   .layout-title {
     font-size: 36px;
+    white-space: normal;
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
 
   .filters-grid {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+
+  .filter-group--price,
+  .filter-group--area,
+  .filter-group--rooms {
+    grid-column: span 1;
   }
 
   .cards-grid {
@@ -735,10 +759,12 @@
   .rooms-group {
     justify-content: flex-start;
     gap: 8px;
+    flex-wrap: wrap;
+    height: auto;
   }
 
   .room-btn {
-    width: 48px;
+    min-width: 48px;
     height: 48px;
     font-size: 15px;
   }
@@ -780,6 +806,107 @@
 }
 
 @media (max-width: 768px) {
+  .layout-section {
+    padding: 28px 0 52px;
+  }
+
+  .layout-header {
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .layout-title {
+    font-size: 28px;
+    line-height: 1.15;
+  }
+
+  .filter-label {
+    font-size: 13px;
+  }
+
+  .filter-inputs-wrapper {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .currency-select {
+    width: 100%;
+  }
+
+  .currency-select .custom-select__trigger span {
+    justify-content: flex-start;
+  }
+
+  .dual-inputs,
+  .custom-select__trigger {
+    height: 44px;
+  }
+
+  .dual-inputs {
+    min-height: 44px;
+  }
+
+  .input-with-prefix {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 4px;
+    min-width: 0;
+    min-height: 44px;
+    height: 100%;
+  }
+
+  .input-with-prefix span {
+    display: flex;
+    align-items: center;
+    height: auto;
+    margin-right: 0;
+    line-height: 1;
+  }
+
+  .input-with-prefix input {
+    display: block;
+    height: auto;
+    min-width: 0;
+    line-height: 1.2;
+    font-size: 13px;
+  }
+
+  .custom-select__trigger {
+    font-size: 14px;
+    padding: 0 14px;
+    gap: 10px;
+  }
+
+  .custom-select__option {
+    min-height: 42px;
+    padding: 11px 14px;
+    font-size: 13px;
+  }
+
+  .results-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .results-count,
+  .reset-btn {
+    font-size: 13px;
+  }
+
+  .rooms-group {
+    gap: 8px;
+  }
+
+  .room-btn {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+
   .cards-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -813,20 +940,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  padding: 0 14px;
+  gap: 14px;
+  padding: 0 18px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #ffffff;
+  color: #3f4249;
+  font-size: 15px;
+  font-family: var(--treva-font-oak, 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
   cursor: pointer;
   text-transform: none;
-  transition: border-color 0.2s;
+  box-shadow: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .custom-select__trigger:hover {
+  border-color: #999;
+}
+
+.custom-select__trigger[aria-expanded="true"] {
   border-color: #999;
 }
 
@@ -838,14 +973,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 100%;
+  text-align: left;
+  transform: translateY(1px);
 }
 
 .custom-select__trigger svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
+  stroke-width: 2px;
   transition: transform 0.2s ease;
-  color: #555;
+  color: #3f4249;
 }
 
 .custom-select__trigger[aria-expanded="true"] svg {
@@ -858,9 +997,9 @@
   left: 0;
   width: 100%;
   background: #ffffff;
-  border: 1px solid #E5E7EB;
+  border: 1px solid rgba(63, 66, 73, 0.1);
   border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   overflow: hidden;
@@ -879,25 +1018,26 @@
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  padding: 8px 14px;
+  min-height: 44px;
+  padding: 12px 18px;
   border: none;
   background: transparent;
   color: #3F4249;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
   line-height: 1;
   cursor: pointer;
   font-family: var(--treva-font-oak, 'Oak Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-  text-transform: uppercase;
-  transition: background 0.18s ease;
+  text-transform: none;
+  transition: background 0.18s ease, color 0.18s ease;
   text-align: left;
 }
 
 .custom-select__option:hover {
-  background: #f0f0f0;
+  background: #f4f1eb;
 }
 
 .custom-select__option--active {
-  background: #e0e0e0;
+  background: #ebe5db;
 }

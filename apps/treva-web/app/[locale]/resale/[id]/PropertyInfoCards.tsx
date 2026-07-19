@@ -1,117 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import React from 'react';
 import type { ResaleApartment } from '@/lib/resale.types';
-import { useCreateRequest } from '@/hooks/use-resale-apartments';
-import '../../../components/Contact/contact.css';
 import './property-info-cards.css';
+import RequestViewingCard from './RequestViewingCard';
 
 interface PropertyInfoCardsProps {
   apartment: ResaleApartment;
+  mapEmbedUrl?: string;
+  locationTitle?: string;
+  showViewingCard?: boolean;
 }
 
-export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps) {
-  const pathname = usePathname();
-  const detectedLocale = pathname?.split('/')[1];
-  const locale = (detectedLocale && ['az', 'en', 'ru'].includes(detectedLocale)) ? detectedLocale : 'az';
-
-  const successTexts = {
-    az: { title: 'Sorğunuz göndərildi!', text: 'Tezliklə sizinlə əlaqə saxlayacağıq.', btn: 'Yeni sorğu' },
-    en: { title: 'Request Sent!', text: "We'll get in touch with you soon.", btn: 'New request' },
-    ru: { title: 'Запрос отправлен!', text: 'Мы свяжемся с вами в ближайшее время.', btn: 'Новый запрос' },
-  };
-  const t = successTexts[locale as keyof typeof successTexts] || successTexts.az;
-
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [countryCode, setCountryCode] = useState('+994');
-  const [countryFlag, setCountryFlag] = useState('/images/flags/az.png');
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const flagRef = useRef<HTMLDivElement>(null);
-  const createRequest = useCreateRequest();
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (flagRef.current && !flagRef.current.contains(e.target as Node)) {
-        setShowCountryDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const countries = [
-    { code: '+994', flag: '/images/flags/az.png', name: 'Azerbaijan' },
-    { code: '+90', flag: '/images/flags/tr.png', name: 'Turkey' },
-    { code: '+7', flag: '/images/flags/ru.png', name: 'Russia' },
-    { code: '+1', flag: '/images/flags/us.png', name: 'United States' },
-    { code: '+44', flag: '/images/flags/gb.png', name: 'United Kingdom' },
-    { code: '+49', flag: '/images/flags/de.png', name: 'Germany' },
-    { code: '+33', flag: '/images/flags/fr.png', name: 'France' },
-    { code: '+39', flag: '/images/flags/it.png', name: 'Italy' },
-    { code: '+34', flag: '/images/flags/es.png', name: 'Spain' },
-    { code: '+31', flag: '/images/flags/nl.png', name: 'Netherlands' },
-    { code: '+32', flag: '/images/flags/be.png', name: 'Belgium' },
-    { code: '+48', flag: '/images/flags/pl.png', name: 'Poland' },
-    { code: '+380', flag: '/images/flags/ua.png', name: 'Ukraine' },
-    { code: '+40', flag: '/images/flags/ro.png', name: 'Romania' },
-    { code: '+995', flag: '/images/flags/ge.png', name: 'Georgia' },
-    { code: '+7', flag: '/images/flags/kz.png', name: 'Kazakhstan' },
-    { code: '+998', flag: '/images/flags/uz.png', name: 'Uzbekistan' },
-    { code: '+98', flag: '/images/flags/ir.png', name: 'Iran' },
-    { code: '+964', flag: '/images/flags/iq.png', name: 'Iraq' },
-    { code: '+966', flag: '/images/flags/sa.png', name: 'Saudi Arabia' },
-    { code: '+971', flag: '/images/flags/ae.png', name: 'UAE' },
-    { code: '+974', flag: '/images/flags/qa.png', name: 'Qatar' },
-    { code: '+965', flag: '/images/flags/kw.png', name: 'Kuwait' },
-    { code: '+972', flag: '/images/flags/il.png', name: 'Israel' },
-    { code: '+20', flag: '/images/flags/eg.png', name: 'Egypt' },
-    { code: '+91', flag: '/images/flags/in.png', name: 'India' },
-    { code: '+86', flag: '/images/flags/cn.png', name: 'China' },
-    { code: '+81', flag: '/images/flags/jp.png', name: 'Japan' },
-    { code: '+82', flag: '/images/flags/kr.png', name: 'South Korea' },
-    { code: '+92', flag: '/images/flags/pk.png', name: 'Pakistan' },
-    { code: '+55', flag: '/images/flags/br.png', name: 'Brazil' },
-    { code: '+52', flag: '/images/flags/mx.png', name: 'Mexico' },
-    { code: '+54', flag: '/images/flags/ar.png', name: 'Argentina' },
-    { code: '+1', flag: '/images/flags/ca.png', name: 'Canada' },
-    { code: '+61', flag: '/images/flags/au.png', name: 'Australia' },
-    { code: '+27', flag: '/images/flags/za.png', name: 'South Africa' },
-    { code: '+234', flag: '/images/flags/ng.png', name: 'Nigeria' },
-    { code: '+212', flag: '/images/flags/ma.png', name: 'Morocco' },
-    { code: '+30', flag: '/images/flags/gr.png', name: 'Greece' },
-    { code: '+351', flag: '/images/flags/pt.png', name: 'Portugal' },
-    { code: '+36', flag: '/images/flags/hu.png', name: 'Hungary' },
-    { code: '+420', flag: '/images/flags/cz.png', name: 'Czech Republic' },
-    { code: '+43', flag: '/images/flags/at.png', name: 'Austria' },
-    { code: '+41', flag: '/images/flags/ch.png', name: 'Switzerland' },
-    { code: '+46', flag: '/images/flags/se.png', name: 'Sweden' },
-    { code: '+47', flag: '/images/flags/no.png', name: 'Norway' },
-    { code: '+45', flag: '/images/flags/dk.png', name: 'Denmark' },
-    { code: '+358', flag: '/images/flags/fi.png', name: 'Finland' },
-    { code: '+353', flag: '/images/flags/ie.png', name: 'Ireland' },
-    { code: '+359', flag: '/images/flags/bg.png', name: 'Bulgaria' },
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitSuccess(false);
-    const fullName = name.trim();
-    const phoneNumber = `${countryCode}${phone.trim()}`;
-    if (!fullName || !phone.trim()) return;
-    createRequest.mutate(
-      { fullName, phoneNumber },
-      {
-        onSuccess: () => {
-          setSubmitSuccess(true);
-          setName('');
-          setPhone('');
-        },
-      }
-    );
-  };
+export default function PropertyInfoCards({ apartment, mapEmbedUrl, locationTitle, showViewingCard = true }: PropertyInfoCardsProps) {
 
   const fallbackIcons = [
     '/images/resale/img1.png',
@@ -164,92 +65,24 @@ export default function PropertyInfoCards({ apartment }: PropertyInfoCardsProps)
         </button>
       </section>
 
-      <section className="ap-info-card">
-        <h2 className="ap-info-title">Request a Viewing</h2>
-        <p className="ap-viewing-desc">
-          A real estate consultant will confirm your appointment shortly to coordinate the meeting and provide a comprehensive guided tour.
-        </p>
-
-        {submitSuccess ? (
-          <div className="property-success-inline">
-            <div className="contact-success-icon">
-              <svg viewBox="0 0 52 52" className="contact-checkmark">
-                <circle className="contact-checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                <path className="contact-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-              </svg>
-            </div>
-            <h3 className="property-success-title">{t.title}</h3>
-            <p className="property-success-text">{t.text}</p>
-            <button type="button" className="property-success-btn" onClick={() => setSubmitSuccess(false)}>{t.btn}</button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="ap-viewing-form">
-            <input 
-              type="text" 
-              placeholder="Your Name" 
-              className="ap-form-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+      {mapEmbedUrl && (
+        <section className="ap-info-card ap-map-card">
+          <h2 className="ap-info-title">Location</h2>
+          {locationTitle && <p className="ap-map-address">{locationTitle}</p>}
+          <div className="ap-map-frame-wrap">
+            <iframe
+              src={mapEmbedUrl}
+              className="ap-map-frame"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Resale Property Location Map"
             />
-            
-            <div className="ap-phone-group">
-              <div className="ap-flag-selector" ref={flagRef} onClick={() => setShowCountryDropdown(!showCountryDropdown)}>
-                <img src={countryFlag} alt="" className="ap-flag-img" />
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <path d="M6 9l6 6 6-6"/>
-                </svg>
-                {showCountryDropdown && (
-                  <div className="ap-country-dropdown">
-                    {countries.map((c) => (
-                      <div
-                        key={`${c.code}-${c.name}`}
-                        className="ap-country-option"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCountryCode(c.code);
-                          setCountryFlag(c.flag);
-                          setShowCountryDropdown(false);
-                        }}
-                      >
-                        <img src={c.flag} alt="" className="ap-country-flag-img" />
-                        <span className="ap-country-name">{c.name}</span>
-                        <span className="ap-country-code">{c.code}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <input 
-                type="tel" 
-                inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder={countryCode} 
-                className="ap-form-input ap-phone-input"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                required
-              />
-            </div>
+          </div>
+        </section>
+      )}
 
-            {createRequest.isError && (
-              <div className="ap-form-error">
-                Something went wrong. Please try again.
-              </div>
-            )}
-
-            <button
-              type="submit"
-              className="ap-submit-btn"
-              disabled={createRequest.isPending}
-              style={{ position: 'relative' }}
-            >
-              {createRequest.isPending && <span className="contact-spinner" style={{ position: 'absolute', top: '50%', left: '50%', marginLeft: -9, marginTop: -9, borderTopColor: '#dcdcdf', borderColor: 'rgba(220,220,223,0.3)', width: 18, height: 18 }} />}
-              <span style={createRequest.isPending ? { visibility: 'hidden' } : undefined}>Send request</span>
-            </button>
-          </form>
-        )}
-      </section>
+      {showViewingCard && <RequestViewingCard />}
 
     </div>
     </>

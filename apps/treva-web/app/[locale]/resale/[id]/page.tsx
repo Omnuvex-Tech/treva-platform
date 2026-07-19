@@ -3,14 +3,52 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { IoMdClose } from 'react-icons/io';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import PropertyInfoCards from './PropertyInfoCards';
+import RequestViewingCard from './RequestViewingCard';
 import { useResaleApartmentBySlug } from '@/hooks/use-resale-apartments';
 import { isSaved as isSavedProp, addSaved, removeSaved } from '@/lib/saved-properties';
 import './resale-detail.css';
+
+function toGoogleMapsEmbed(url: string): string {
+  if (!url) return '';
+
+  if (url.includes('/maps/embed')) return url;
+  if (url.includes('/maps/embed/v1')) return url;
+
+  const placeMatch = url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*),(\d+\.?\d*)/);
+  if (placeMatch) {
+    const [, lat, lng, zoom] = placeMatch;
+    return `https://maps.google.com/maps?q=${lat},${lng}&z=${Math.round(Number(zoom))}&output=embed`;
+  }
+
+  const llMatch = url.match(/[?&]ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+  if (llMatch) {
+    const [, lat, lng] = llMatch;
+    const zoomMatch = url.match(/[?&]z=(\d+)/);
+    const zoom = zoomMatch ? zoomMatch[1] : '15';
+    return `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`;
+  }
+
+  const qMatch = url.match(/[?&]q=([^&]+)/);
+  if (qMatch) {
+    const query = decodeURIComponent(qMatch[1]!);
+    return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  }
+
+  const placeNameMatch = url.match(/\/maps\/place\/([^/@]+)/);
+  if (placeNameMatch) {
+    const placeName = decodeURIComponent(placeNameMatch[1]!.replace(/\+/g, ' '));
+    return `https://maps.google.com/maps?q=${encodeURIComponent(placeName)}&output=embed`;
+  }
+
+  return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
+}
 
 export default function ResaleDetailPage() {
   const params = useParams();
@@ -22,6 +60,8 @@ export default function ResaleDetailPage() {
   const [showPhone, setShowPhone] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [activeThumb, setActiveThumb] = useState(0);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
@@ -43,6 +83,70 @@ export default function ResaleDetailPage() {
     }
   }, [apartment]);
 
+  const gallery: string[] = apartment?.gallery?.length
+    ? apartment.gallery.map((g: any) => g.url || g)
+    : apartment?.image
+      ? [apartment.image]
+      : [];
+
+  const openGallery = (index: number) => {
+    setLightboxIndex(index);
+    setIsGalleryOpen(true);
+  };
+
+  const closeGallery = () => {
+    setIsGalleryOpen(false);
+  };
+
+  const showPrevImage = () => {
+    if (gallery.length === 0) return;
+    setLightboxIndex((current) => (current - 1 + gallery.length) % gallery.length);
+  };
+
+  const showNextImage = () => {
+    if (gallery.length === 0) return;
+    setLightboxIndex((current) => (current + 1) % gallery.length);
+  };
+
+  const showPrevMainImage = () => {
+    if (gallery.length === 0) return;
+    setActiveThumb((current) => (current - 1 + gallery.length) % gallery.length);
+  };
+
+  const showNextMainImage = () => {
+    if (gallery.length === 0) return;
+    setActiveThumb((current) => (current + 1) % gallery.length);
+  };
+
+  useEffect(() => {
+    if (!isGalleryOpen || typeof document === 'undefined') {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeGallery();
+      }
+
+      if (event.key === 'ArrowLeft') {
+        showPrevImage();
+      }
+
+      if (event.key === 'ArrowRight') {
+        showNextImage();
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isGalleryOpen, gallery.length]);
+
   const toggleSaveProp = () => {
     if (!apartment) return;
     if (isSavedProp(apartment.id)) {
@@ -55,12 +159,15 @@ export default function ResaleDetailPage() {
         type: 'resale',
         image: apartment.image || (typeof apartment.gallery?.[0] === 'string' ? apartment.gallery[0] : apartment.gallery?.[0]?.url) || '',
         price: apartment.prices?.[0]?.priceTotal ?? apartment.priceTotal ?? 0,
+        priceByArea: apartment.prices?.[0]?.priceByArea ?? apartment.priceByArea ?? 0,
         currency: apartment.prices?.[0]?.currency?.value ?? 'AZN',
         rooms: String(apartment.roomCount ?? ''),
         area: String(apartment.area ?? ''),
         floor: `${apartment.floorFrom}/${apartment.floorTo}`,
         location: apartment.locationTitle || '',
         title: apartment.title || '',
+        apartmentTypeSlug: apartment.apartmentType?.slug,
+        apartmentTypeTitle: apartment.apartmentType?.title,
       });
       setIsSaved(true);
     }
@@ -96,10 +203,6 @@ export default function ResaleDetailPage() {
     );
   }
 
-  const gallery: string[] = apartment.gallery?.length
-    ? apartment.gallery.map((g: any) => g.url || g)
-    : [apartment.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=800&fit=crop'];
-
   const mainImage = gallery[activeThumb] || gallery[0];
   const extraCount = Math.max(0, gallery.length - 5);
   const formatPrice = (p: number) => p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -117,10 +220,48 @@ export default function ResaleDetailPage() {
   };
 
   const title = `${apartment.roomCount}-ROOM FLAT, ${apartment.area} M², ${apartment.floorFrom}/${apartment.floorTo} FLOOR`;
+  const galleryDictionary = {
+    az: {
+      viewAll: 'Bütün',
+      images: 'şəkil',
+      close: 'Bağla',
+      closeGallery: 'Qalereyanı bağla',
+      previousImage: 'Əvvəlki şəkil',
+      nextImage: 'Növbəti şəkil',
+      morePhotos: 'daha çox şəkil',
+      image: 'Şəkil',
+      thumbnail: 'Miniatür',
+    },
+    en: {
+      viewAll: 'View all',
+      images: 'images',
+      close: 'Close',
+      closeGallery: 'Close gallery',
+      previousImage: 'Previous image',
+      nextImage: 'Next image',
+      morePhotos: 'more images',
+      image: 'Image',
+      thumbnail: 'Thumbnail',
+    },
+    ru: {
+      viewAll: 'Все',
+      images: 'изображения',
+      close: 'Закрыть',
+      closeGallery: 'Закрыть галерею',
+      previousImage: 'Предыдущее изображение',
+      nextImage: 'Следующее изображение',
+      morePhotos: 'больше фото',
+      image: 'Изображение',
+      thumbnail: 'Миниатюра',
+    },
+  } as const;
+  const gt = galleryDictionary[(locale as 'az' | 'en' | 'ru')] || galleryDictionary.az;
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
   const shareTitle = title;
   const locationLink = apartment.locationUrl || '';
+  const mapSource = apartment.locationGoogleMapsUrl || apartment.locationUrl || '';
+  const mapEmbedUrl = mapSource ? toGoogleMapsEmbed(mapSource) : '';
   const shareText = `Check out this apartment: ${title} — ${formatPrice(getPrice('total'))} ${getCurrencyValue()}${locationLink ? `\n📍 Location: ${locationLink}` : ''}`;
 
   const handleShare = (platform: string) => {
@@ -158,7 +299,7 @@ export default function ResaleDetailPage() {
 
   return (
     <div className="pdet-page-wrapper">
-      <Navbar variant="solid" />
+      {!isGalleryOpen && <Navbar variant="solid" />}
       <main className="pdet-main-wrapper">
         <PageContainer>
           <nav className="pdet-breadcrumb">
@@ -172,12 +313,42 @@ export default function ResaleDetailPage() {
           <div className="pdet-container">
             <div className="pdet-main-grid">
               <div className="pdet-gallery-pane">
-                <div className="pdet-image-wrapper">
+                <div
+                  className="pdet-image-wrapper"
+                  onClick={() => openGallery(activeThumb)}
+                >
                   <img
                     src={mainImage}
                     alt={title}
                     className="pdet-main-img"
                   />
+                  {gallery.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        className="pdet-main-image-nav pdet-main-image-nav--prev"
+                        aria-label={gt.previousImage}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          showPrevMainImage();
+                        }}
+                      >
+                        <ArrowLeft size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        className="pdet-main-image-nav pdet-main-image-nav--next"
+                        aria-label={gt.nextImage}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          showNextMainImage();
+                        }}
+                      >
+                        <ArrowRight size={18} />
+                      </button>
+                    </>
+                  )}
+                  <div className="pdet-gallery-badge">{gt.viewAll} {gallery.length} {gt.images}</div>
                   <div className="pdet-mobile-counter">{activeThumb + 1}/{gallery.length}</div>
                 </div>
 
@@ -188,13 +359,16 @@ export default function ResaleDetailPage() {
                       className={`pdet-thumb-box ${activeThumb === idx ? 'active' : ''}`}
                       onClick={() => setActiveThumb(idx)}
                     >
-                      <img src={img} alt={`View ${idx + 1}`} />
+                      <img src={img} alt={`${gt.image} ${idx + 1}`} />
                     </div>
                   ))}
                   {gallery.length > 5 && (
-                    <div className="pdet-thumb-box pdet-thumb-overlay" onClick={() => setActiveThumb(4)}>
-                      <img src={gallery[4]} alt="More views" />
-                      <div className="pdet-overlay-text">+{extraCount} photos</div>
+                    <div
+                      className="pdet-thumb-box pdet-thumb-overlay"
+                      onClick={() => setActiveThumb(4)}
+                    >
+                      <img src={gallery[4]} alt={gt.morePhotos} />
+                      <div className="pdet-overlay-text">+{extraCount} {gt.images}</div>
                     </div>
                   )}
                 </div>
@@ -212,7 +386,12 @@ export default function ResaleDetailPage() {
                 </div>
 
                 <div className="pdet-property-info-desktop">
-                  <PropertyInfoCards apartment={apartment} />
+                  <PropertyInfoCards
+                    apartment={apartment}
+                    mapEmbedUrl={mapEmbedUrl}
+                    locationTitle={apartment.locationTitle || ''}
+                    showViewingCard={false}
+                  />
                 </div>
               </div>
 
@@ -333,15 +512,96 @@ export default function ResaleDetailPage() {
                     </a>
                   </div>
                 </div>
+
+                <div className="pdet-viewing-card-desktop">
+                  <RequestViewingCard className="pdet-sidebar-viewing-card" />
+                </div>
+
+                <div className="pdet-viewing-card-mobile">
+                  <RequestViewingCard className="pdet-mobile-viewing-card" />
+                </div>
               </div>
             </div>
 
             <div className="pdet-property-info-mobile">
-              <PropertyInfoCards apartment={apartment} />
+              <PropertyInfoCards
+                apartment={apartment}
+                mapEmbedUrl={mapEmbedUrl}
+                locationTitle={apartment.locationTitle || ''}
+                showViewingCard={false}
+              />
             </div>
           </div>
         </PageContainer>
       </main>
+      {isGalleryOpen && (
+        <div className="pdet-lightbox" onClick={closeGallery}>
+          <div className="pdet-lightbox-dialog" onClick={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              className="pdet-lightbox-close"
+              aria-label={gt.closeGallery}
+              onClick={closeGallery}
+            >
+              <IoMdClose />
+            </button>
+
+            <div className="pdet-lightbox-counter">{lightboxIndex + 1} / {gallery.length}</div>
+
+            <div className="pdet-lightbox-stage">
+              {gallery.length > 1 && (
+                <button
+                  type="button"
+                  className="pdet-lightbox-nav pdet-lightbox-nav--prev"
+                  aria-label="Previous image"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showPrevImage();
+                  }}
+                >
+                  <ArrowLeft size={18} strokeWidth={2} />
+                </button>
+              )}
+
+              <img
+                src={gallery[lightboxIndex] || mainImage}
+                alt={`${title} ${lightboxIndex + 1}`}
+                className="pdet-lightbox-image"
+              />
+
+              {gallery.length > 1 && (
+                <button
+                  type="button"
+                  className="pdet-lightbox-nav pdet-lightbox-nav--next"
+                  aria-label="Next image"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showNextImage();
+                  }}
+                >
+                  <ArrowRight size={18} strokeWidth={2} />
+                </button>
+              )}
+            </div>
+
+            {gallery.length > 1 && (
+              <div className="pdet-lightbox-thumbs">
+                {gallery.map((img, idx) => (
+                  <button
+                    key={`${img}-${idx}`}
+                    type="button"
+                    className={`pdet-lightbox-thumb ${lightboxIndex === idx ? 'active' : ''}`}
+                    aria-label={`${gt.image} ${idx + 1}`}
+                    onClick={() => setLightboxIndex(idx)}
+                  >
+                    <img src={img} alt={`${gt.thumbnail} ${idx + 1}`} />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <HomeFooter />
     </div>
   );

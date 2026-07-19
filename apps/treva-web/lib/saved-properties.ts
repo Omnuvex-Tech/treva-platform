@@ -7,12 +7,15 @@ export type SavedProperty = {
   type: 'resale';
   image: string;
   price: number;
+  priceByArea?: number;
   currency: string;
   rooms: string;
   area: string;
   floor: string;
   location: string;
   title: string;
+  apartmentTypeSlug?: string;
+  apartmentTypeTitle?: string;
 };
 
 function readAll(): SavedProperty[] {

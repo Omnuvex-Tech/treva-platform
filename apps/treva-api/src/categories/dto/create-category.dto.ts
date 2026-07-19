@@ -90,6 +90,11 @@ export class CreateCategoryDto {
   @IsString()
   city?: string;
 
+  @ApiPropertyOptional({ example: 'https://www.google.com/maps/embed?pb=...' })
+  @IsOptional()
+  @IsString()
+  locationGoogleMapsUrl?: string;
+
   @ApiPropertyOptional({ example: 'ELIE SAAB' })
   @IsOptional()
   @IsString()
