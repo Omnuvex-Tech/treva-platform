@@ -221,15 +221,16 @@
 /* Mobil Ekran Rejimi */
 @media (max-width: 767px) {
   .vision-hero {
-    height: auto;
-    min-height: auto;
+    height: 100vh;
+    height: 100svh;
+    min-height: 620px;
   }
 
   .vision-hero__container {
     padding: 0 24px;
     padding-top: 120px; 
     padding-bottom: 60px;  
-    height: auto;
+    height: 100%;
     display: block !important; 
   }
 

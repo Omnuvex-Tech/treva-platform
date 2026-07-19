@@ -216,22 +216,94 @@
     .layouts-section {
         margin: 40px 0;
     }
+
     .layouts-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
         margin-bottom: 32px;
     }
+
+    .layouts-header__title {
+        font-size: 34px;
+        margin: 0;
+        line-height: 1.05;
+    }
+
     .layouts-controls {
         width: 100%;
         justify-content: space-between;
     }
+
+    .layouts-controls__view-all {
+        padding: 11px 20px;
+        font-size: 12px;
+    }
+
     .layouts-grid {
         grid-template-columns: 1fr;
         gap: 24px;
     }
+
     .layout-card {
         min-height: auto;
         padding: 24px;
+    }
+
+    .layout-card__visual {
+        min-height: 220px;
+        margin: 12px 0 18px;
+    }
+
+    .layout-card__name {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .layout-card__price {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .layouts-section {
+        margin: 32px 0 40px;
+    }
+
+    .layouts-header {
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .layouts-header__title {
+        font-size: 30px;
+    }
+
+    .layouts-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .layouts-controls__view-all {
+        width: 100%;
+        text-align: center;
+    }
+
+    .layout-card {
+        padding: 20px 16px;
+    }
+
+    .layout-card__header {
+        gap: 12px;
+    }
+
+    .layout-card__code,
+    .layout-card__floor,
+    .layout-card__number {
+        font-size: 13px;
+    }
+
+    .layout-card__visual {
+        min-height: 180px;
     }
 }
