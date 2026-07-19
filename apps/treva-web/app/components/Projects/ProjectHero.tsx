@@ -145,32 +145,31 @@ export default function ProjectHero({
 
         {/* Slider Controls */}
         {validImages.length > 1 && (
-          <div className="vision-hero__slider-arrows">
-            <DirectionButton
-              direction="previous"
-              label="Previous slide"
-              className="vision-hero__prev"
-            />
-            <DirectionButton
-              direction="next"
-              label="Next slide"
-              className="vision-hero__next"
-            />
+          <div className="vision-hero__slider-controls">
+            <div className="vision-hero__bottom-timeline">
+              {validImages.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`vision-hero__segment ${idx === activeIndex ? "vision-hero__segment--active" : ""}`}
+                />
+              ))}
+            </div>
+
+            <div className="vision-hero__slider-arrows">
+              <DirectionButton
+                direction="previous"
+                label="Previous slide"
+                className="vision-hero__prev"
+              />
+              <DirectionButton
+                direction="next"
+                label="Next slide"
+                className="vision-hero__next"
+              />
+            </div>
           </div>
         )}
       </PageContainer>
-
-      {/* Progress Timeline */}
-      {validImages.length > 1 && (
-        <div className="vision-hero__bottom-timeline">
-          {validImages.map((_, idx) => (
-            <span
-              key={idx}
-              className={`vision-hero__segment ${idx === activeIndex ? "vision-hero__segment--active" : ""}`}
-            />
-          ))}
-        </div>
-      )}
     </section>
   );
 }

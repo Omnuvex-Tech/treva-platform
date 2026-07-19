@@ -137,40 +137,64 @@
 /* ==========================================================================
    DESKTOP NAVİQASİYA DÜYMƏLƏRİ (SAĞDA MƏRKƏZƏ YAXIN VƏ YA AYRI)
    ========================================================================== */
-.vision-hero__slider-arrows {
+.vision-hero__slider-controls {
+  position: absolute;
+  left: 54px;
+  right: 54px;
+  bottom: 40px;
+  z-index: 5;
   display: flex;
-  gap: 12px;
-  align-self: flex-end;
-  margin-bottom: 80px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
 }
 
+.vision-hero__slider-arrows {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
 
+.vision-hero__slider-arrows .portfolio-direction-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff !important;
+  color: #161822;
+}
+
+.vision-hero__slider-arrows .portfolio-direction-button:hover {
+  opacity: 0.8;
+  border: none;
+  background: #ffffff !important;
+}
+
+.vision-hero__slider-arrows .portfolio-direction-button:active {
+  transform: scale(0.94);
+}
 
 /* ==========================================================================
-   SƏTİR ÜZRƏ BƏRABƏR BÖLÜNƏN TAM GENİŞLİKDƏ XƏTLƏR (DESKTOP)
+   SƏTİR ÜZRƏ BƏRABƏR BÖLÜNƏN XƏTLƏR
    ========================================================================== */
 .vision-hero__bottom-timeline {
   position: absolute;
-  left: 0;
-  bottom: 40px; 
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, calc(100% - 170px));
   display: flex;
-  gap: 16px; 
-  padding: 0 54px; 
-  z-index: 5;
+  gap: 6px;
 }
 
 .vision-hero__segment {
-  flex: 1; 
+  flex: 1;
   height: 3px;
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.35);
   border-radius: 2px;
-  opacity: 0.4;
 }
 
 .vision-hero__segment--active {
-  background-color: #2E3037; 
-  opacity: 1;
+  background-color: #ffffff;
 }
 
 /* ==========================================================================
@@ -187,8 +211,10 @@
     padding: 0 32px;
     padding-top: var(--treva-nav-height, 15px);
   }
-  .vision-hero__bottom-timeline {
-    padding: 0 32px;
+
+  .vision-hero__slider-controls {
+    left: 32px;
+    right: 32px;
   }
 }
 
@@ -207,9 +233,24 @@
     display: block !important; 
   }
 
-  .vision-hero__slider-arrows,
-  .vision-hero__timeline-container {
-    display: none !important;
+  .vision-hero__slider-controls {
+    left: 24px;
+    right: 24px;
+    bottom: 20px;
+    gap: 12px;
+  }
+
+  .vision-hero__slider-arrows {
+    justify-content: flex-end;
+  }
+
+  .vision-hero__slider-arrows .portfolio-direction-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .vision-hero__bottom-timeline {
+    width: 110px;
   }
 
   .vision-hero__title {
