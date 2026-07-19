@@ -53,7 +53,7 @@ export default function AboutTeam({
 
   return (
     <section className="about-team">
-      <PageContainer>
+      <PageContainer className="about-page-container">
         <div className="about-team__inner">
           <div className="about-team__left">
             <h2 className="about-team__title">{content.title}</h2>

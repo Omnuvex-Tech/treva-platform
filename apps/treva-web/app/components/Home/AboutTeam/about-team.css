@@ -23,7 +23,7 @@
     flex-direction: column; 
     gap: 20px;
     position: sticky;
-    top: 64px;
+    top: calc(var(--treva-nav-height, 64px) + 24px);
 }
 
 .about-team__title {

@@ -16,6 +16,11 @@
   box-sizing: border-box;
 }
 
+.about-page-container {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
 /* --- Hero Section --- */
 .about-hero {
   display: grid;
@@ -127,6 +132,11 @@
 }
 
 @media (max-width: 1024px) {
+  .about-page-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .about-hero { gap: 32px; }
   .services-list__item { gap: 32px; }
   .about-hero__title { font-size: 40px; }
@@ -152,4 +162,11 @@
   .services-list__icon { max-width: 20px; max-height: 20px; }
   .services-list__title { font-size: 16px; }
   .services-list__desc-text { font-size: 16.5px; line-height: 1.5; }
+}
+
+@media (max-width: 479px) {
+  .about-page-container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }

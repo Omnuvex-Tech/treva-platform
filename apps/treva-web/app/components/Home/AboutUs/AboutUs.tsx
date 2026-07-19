@@ -121,7 +121,7 @@ export default function AboutUs({ locale = "az" }: AboutUsProps) {
 
   return (
     <main className="about-container">
-      <PageContainer>
+      <PageContainer className="about-page-container">
         <section className="about-hero">
           <div className="about-hero__content">
             <h1 className="about-hero__title">
