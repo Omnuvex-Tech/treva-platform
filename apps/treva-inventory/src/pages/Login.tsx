@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { authApi } from "../api/auth";
 
 export function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -62,7 +64,7 @@ export function Login() {
                                 </span>
                                 <input
                                     type="email"
-                                    placeholder="admin@treva.az"
+                                    placeholder="info@treva.realestate"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full h-[52px] rounded-[16px] border bg-[#F4F5F5] pl-[44px] pr-3 text-[#666666] placeholder-[#666666] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
@@ -81,14 +83,22 @@ export function Login() {
                                     <img src="/images/pages/login/lock.svg" alt="" width={15} height={19} />
                                 </span>
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     placeholder="••••••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full h-[52px] rounded-[16px] border bg-[#F4F5F5] pl-[44px] pr-3 text-[#666666] placeholder-[#666666] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
+                                    className="w-full h-[52px] rounded-[16px] border bg-[#F4F5F5] pl-[44px] pr-12 text-[#666666] placeholder-[#666666] outline-none transition-all focus:border-[#CBD5E1] focus:bg-white"
                                     style={{ fontWeight: 400, fontSize: 14, lineHeight: "20px", letterSpacing: 0, borderColor: "#EBEBEB", paddingTop: 16, paddingBottom: 16 }}
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                    className="absolute right-4 flex h-5 w-5 items-center justify-center text-[#666666] transition-colors hover:text-[#1A1A1A]"
+                                >
+                                    {showPassword ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
+                                </button>
                             </div>
                         </div>
 

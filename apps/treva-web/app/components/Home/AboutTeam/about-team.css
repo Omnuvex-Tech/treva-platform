@@ -7,7 +7,7 @@
 
 .about-team {
     width: 100%;
-    padding: 64px 0;
+    padding: 64px 0 100px;
     box-sizing: border-box;
 }
 
@@ -148,7 +148,7 @@
 
 @media (max-width: 900px) {
     .about-team {
-        padding: 48px 0;
+        padding: 48px 0 72px;
     }
 
     .about-team__inner {
@@ -193,7 +193,7 @@
 
 @media (max-width: 768px) {
     .about-team {
-        padding: 32px 0;
+        padding: 32px 0 52px;
     }
 
     .about-team__left {

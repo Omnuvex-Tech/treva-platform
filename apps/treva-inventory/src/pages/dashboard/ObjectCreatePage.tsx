@@ -146,9 +146,15 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         ? locationOptionsResponse.data
         : [];
 
-    const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string) => {
+    const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string, cityTitle?: string) => {
         const mapped = locationOptionItems
-            .filter((item) => item.type === type)
+            .filter((item) => {
+                if (item.type !== type) return false;
+                if (type === "region" && cityTitle) {
+                    return item.city?.title === cityTitle;
+                }
+                return true;
+            })
             .map((item) => ({
                 id: item.title,
                 label: item.title,
@@ -513,7 +519,12 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         value={formData.city}
                                         options={toLocationDropdownOptions("city", formData.city)}
                                         placeholder="Select city"
-                                        onChange={(id) => { updateFormData("city", id); clearError("city"); }}
+                                        onChange={(id) => {
+                                            updateFormData("city", id);
+                                            updateFormData("region", "");
+                                            clearError("city");
+                                            clearError("region");
+                                        }}
                                         onCreateClick={() => navigate("/dashboard/resale/location-options")}
                                         createLabel="Create city"
                                     />
@@ -523,8 +534,8 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                     <FormDropdown
                                         label="Region *"
                                         value={formData.region}
-                                        options={toLocationDropdownOptions("region", formData.region)}
-                                        placeholder="Select region"
+                                        options={toLocationDropdownOptions("region", formData.region, formData.city)}
+                                        placeholder={formData.city ? "Select region" : "Select city first"}
                                         onChange={(id) => { updateFormData("region", id); clearError("region"); }}
                                         onCreateClick={() => navigate("/dashboard/resale/location-options")}
                                         createLabel="Create region"

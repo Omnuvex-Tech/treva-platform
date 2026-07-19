@@ -293,6 +293,13 @@ type ContactPageProps = {
 
 export function ContactPage({ locale }: ContactPageProps) {
   const gsapReady = useRef(false)
+  const officeDictionary = {
+    az: { mapLinkLabel: 'Xəritəyə bax' },
+    en: { mapLinkLabel: 'View map' },
+    ru: { mapLinkLabel: 'Смотреть карту' },
+  } as const
+  const officeContent =
+    officeDictionary[locale as keyof typeof officeDictionary] ?? officeDictionary.az
 
   const scrollToContactForm = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
@@ -498,7 +505,10 @@ export function ContactPage({ locale }: ContactPageProps) {
                               <div>Bakı Baş Ofisi</div>
                               <div className="offices_caption">Ziya Yusifzadə küçəsi 10, Sabah Residence</div>
                             </div>
-                            <div className="icon-xxlarge"><ArrowDiagSVG /></div>
+                            <div className="offices_map-link">
+                              <span>{officeContent.mapLinkLabel}</span>
+                              <div className="icon-xxlarge"><ArrowDiagSVG /></div>
+                            </div>
                           </div>
                         </a>
 
@@ -524,7 +534,10 @@ export function ContactPage({ locale }: ContactPageProps) {
                               <div>Sea Breeze Satış Ofisi</div>
                               <div className="offices_caption">Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097</div>
                             </div>
-                            <div className="icon-xxlarge"><ArrowDiagSVG /></div>
+                            <div className="offices_map-link">
+                              <span>{officeContent.mapLinkLabel}</span>
+                              <div className="icon-xxlarge"><ArrowDiagSVG /></div>
+                            </div>
                           </div>
                         </a>
                       </div>

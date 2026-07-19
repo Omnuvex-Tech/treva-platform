@@ -21,11 +21,7 @@ export interface Apartment {
     priceByArea: number;
     roomCount: number;
     area: number;
-    netArea: number | null;
     grossArea: number | null;
-    livingArea: number | null;
-    kitchenArea: number | null;
-    balconyArea: number | null;
     floorFrom: number;
     floorTo: number;
     bathroomCount: number | null;
@@ -35,6 +31,8 @@ export interface Apartment {
     locationTitle: string | null;
     locationUrl: string | null;
     renovation: ApartmentRenovation | null;
+    mortgage: boolean | null;
+    extract: boolean | null;
     parking: boolean | null;
     buildingAge: number | null;
     furnishing: ApartmentFurnishing | null;
@@ -46,7 +44,7 @@ export interface Apartment {
     viewOptions: { id: string; name: string; title: string }[];
     attributeIds: string[];
     requestIds: string[];
-    status?: "active" | "pending" | "non-active";
+    status?: "active" | "reserved" | "sold";
     apartmentTypeId: string;
     apartmentType: { id: string; title: string } | null;
     ownerId: string | null;
@@ -85,11 +83,7 @@ export interface CreateApartmentData {
     priceByArea: number;
     roomCount: number;
     area: number;
-    netArea?: number;
     grossArea?: number;
-    livingArea?: number;
-    kitchenArea?: number;
-    balconyArea?: number;
     floorFrom: number;
     floorTo: number;
     bathroomCount?: number;
@@ -99,6 +93,8 @@ export interface CreateApartmentData {
     locationTitle?: string;
     locationUrl?: string;
     renovation?: ApartmentRenovation;
+    mortgage?: boolean;
+    extract?: boolean;
     parking?: boolean;
     buildingAge?: number;
     furnishing?: ApartmentFurnishing;
@@ -110,7 +106,7 @@ export interface CreateApartmentData {
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
-    status?: "active" | "pending" | "non-active";
+    status?: "active" | "reserved" | "sold";
     currencyId?: string;
     prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
@@ -132,11 +128,7 @@ export interface UpdateApartmentData {
     priceByArea?: number;
     roomCount?: number;
     area?: number;
-    netArea?: number;
     grossArea?: number;
-    livingArea?: number;
-    kitchenArea?: number;
-    balconyArea?: number;
     floorFrom?: number;
     floorTo?: number;
     bathroomCount?: number;
@@ -146,6 +138,8 @@ export interface UpdateApartmentData {
     locationTitle?: string;
     locationUrl?: string;
     renovation?: ApartmentRenovation;
+    mortgage?: boolean;
+    extract?: boolean;
     parking?: boolean;
     buildingAge?: number;
     furnishing?: ApartmentFurnishing;
@@ -157,7 +151,7 @@ export interface UpdateApartmentData {
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
-    status?: "active" | "pending" | "non-active";
+    status?: "active" | "reserved" | "sold";
     currencyId?: string;
     prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
@@ -173,10 +167,12 @@ export interface ApartmentFilters {
     roomCount?: number;
     minArea?: number;
     maxArea?: number;
+    minGrossArea?: number;
+    maxGrossArea?: number;
     floor?: number;
     currency?: string;
     viewOptionIds?: string;
-    status?: "active" | "pending" | "non-active";
+    status?: "active" | "reserved" | "sold";
 }
 
 export interface UploadResponse {

@@ -257,11 +257,7 @@ model Apartment {
   priceByArea     Float         @default(0)
   roomCount       Int
   area            Float
-  netArea         Float?
   grossArea       Float?
-  livingArea      Float?
-  kitchenArea     Float?
-  balconyArea     Float?
   floorFrom       Int
   floorTo         Int
   bathroomCount   Int?
@@ -271,6 +267,8 @@ model Apartment {
   locationTitle   String?
   locationUrl     String?
   renovation      String?
+  mortgage        Boolean?
+  extract         Boolean?
   parking         Boolean?
   buildingAge     Int?
   furnishing      String?
@@ -297,10 +295,14 @@ model LocationOption {
   type      String
   name      String
   title     String
+  cityId    String?
+  city      LocationOption?  @relation("CityRegions", fields: [cityId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  regions   LocationOption[] @relation("CityRegions")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([type, name])
+  @@index([cityId])
 }
 
 model HeatingTypeOption {

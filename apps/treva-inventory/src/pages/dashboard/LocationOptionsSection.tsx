@@ -10,6 +10,7 @@ export function LocationOptionsSection() {
         type: "" | "region" | "city";
         name: string;
         title: string;
+        cityId: string;
     };
 
     const { showError } = useMessageCenter();
@@ -31,16 +32,18 @@ export function LocationOptionsSection() {
         queryKey: ["location-options"],
         queryFn: () => locationOptionsApi.getAll(),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
-        createEmptyForm: (): LocationOptionForm => ({ type: "", name: "", title: "" }),
+        createEmptyForm: (): LocationOptionForm => ({ type: "", name: "", title: "", cityId: "" }),
         mapItemToForm: (item: LocationOption): LocationOptionForm => ({
             type: item.type,
             name: item.name,
             title: item.title,
+            cityId: item.cityId || "",
         }),
         buildPayload: (nextForm: LocationOptionForm) => ({
             type: nextForm.type as "region" | "city",
             name: nextForm.name,
             title: nextForm.title,
+            cityId: nextForm.type === "region" ? nextForm.cityId : undefined,
         }),
         createFn: (payload) => locationOptionsApi.create(payload),
         updateFn: (itemId, payload) => locationOptionsApi.update(itemId, payload),
@@ -54,9 +57,17 @@ export function LocationOptionsSection() {
                 type: item.type,
                 name: duplicateText(item.name, token),
                 title: duplicateText(item.title, token),
+                cityId: item.cityId || undefined,
             };
         },
     });
+
+    const cityOptions = items
+        .filter((item): item is LocationOption => item.type === "city")
+        .map((item) => ({
+            id: item.id,
+            label: item.title,
+        }));
 
     return (
         <CrudSection
@@ -73,11 +84,16 @@ export function LocationOptionsSection() {
                             return;
                         }
 
+                        if (form.type === "region" && !form.cityId) {
+                            showError({ title: "City is required for region" });
+                            return;
+                        }
+
                         submitForm(e);
                     }}
                     className="mb-6 rounded-xl border border-gray-200 bg-gray-50 p-4"
                 >
-                    <div className="mb-4 grid grid-cols-3 gap-4">
+                    <div className={`mb-4 grid gap-4 ${form.type === "region" ? "grid-cols-4" : "grid-cols-3"}`}>
                         <div>
                             <FormDropdown
                                 label="Type"
@@ -87,9 +103,30 @@ export function LocationOptionsSection() {
                                     { id: "region", label: "Region" },
                                 ]}
                                 placeholder="Select type"
-                                onChange={(id) => setForm((prev) => ({ ...prev, type: id as "region" | "city" }))}
+                                onChange={(id) =>
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        type: id as "region" | "city",
+                                        cityId: id === "region" ? prev.cityId : "",
+                                    }))
+                                }
                             />
                         </div>
+                        {form.type === "region" ? (
+                            <div>
+                                <FormDropdown
+                                    label="City"
+                                    value={form.cityId}
+                                    options={cityOptions}
+                                    placeholder="Select city"
+                                    onChange={(id) => setForm((prev) => ({ ...prev, cityId: id }))}
+                                    onNoOptionsClick={cityOptions.length === 0
+                                        ? () => setForm((prev) => ({ ...prev, type: "city", cityId: "" }))
+                                        : undefined}
+                                    noOptionsLabel="Switch to city"
+                                />
+                            </div>
+                        ) : null}
                         <div>
                             <label className="mb-1 block text-xs text-[#666666]">Name</label>
                             <input
@@ -122,6 +159,7 @@ export function LocationOptionsSection() {
             isLoading={isLoading}
             columns={[
                 { key: "type", label: "Type" },
+                { key: "city", label: "City" },
                 { key: "name", label: "Name" },
                 { key: "title", label: "Title" },
             ]}
@@ -131,6 +169,7 @@ export function LocationOptionsSection() {
             renderCells={(item) => (
                 <>
                     <td className="px-4 py-3 text-[#666666] capitalize">{item.type}</td>
+                    <td className="px-4 py-3 text-[#666666]">{item.type === "region" ? item.city?.title || "-" : "-"}</td>
                     <td className="px-4 py-3 text-[#1A1A1A]">{item.name}</td>
                     <td className="px-4 py-3 text-[#666666]">{item.title}</td>
                 </>

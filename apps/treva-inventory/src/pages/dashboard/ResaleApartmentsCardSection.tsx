@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,6 +12,7 @@ import { RowActions } from "../../components/RowActions";
 import { PropertyCard } from "../resale/PropertyCard";
 import { buildApartmentDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { IoClose } from "react-icons/io5";
 
 export function ResaleApartmentsCardSection() {
     const navigate = useNavigate();
@@ -21,6 +22,17 @@ export function ResaleApartmentsCardSection() {
     const [filters, setFilters] = useState<ApartmentFilters>({
         page: 1,
         limit: 12,
+    });
+    const [filterOpen, setFilterOpen] = useState(false);
+    const filterPanelRef = useRef<HTMLDivElement>(null);
+    const [draftFilters, setDraftFilters] = useState({
+        minPrice: "",
+        maxPrice: "",
+        minArea: "",
+        maxArea: "",
+        minGrossArea: "",
+        maxGrossArea: "",
+        roomCount: "",
     });
 
     const { data: response, isLoading } = useQuery({
@@ -63,6 +75,75 @@ export function ResaleApartmentsCardSection() {
     const pagination = response?.data?.pagination;
     const formatPrice = (value: number) =>
         value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    const toNumberOrUndefined = (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return undefined;
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : undefined;
+    };
+    const activeFilterCount = [
+        filters.minPrice,
+        filters.maxPrice,
+        filters.minArea,
+        filters.maxArea,
+        filters.minGrossArea,
+        filters.maxGrossArea,
+        filters.roomCount,
+    ].filter((value) => value !== undefined).length;
+
+    const applyFilters = () => {
+        setFilters((prev) => ({
+            ...prev,
+            page: 1,
+            minPrice: toNumberOrUndefined(draftFilters.minPrice),
+            maxPrice: toNumberOrUndefined(draftFilters.maxPrice),
+            minArea: toNumberOrUndefined(draftFilters.minArea),
+            maxArea: toNumberOrUndefined(draftFilters.maxArea),
+            minGrossArea: toNumberOrUndefined(draftFilters.minGrossArea),
+            maxGrossArea: toNumberOrUndefined(draftFilters.maxGrossArea),
+            roomCount: toNumberOrUndefined(draftFilters.roomCount),
+        }));
+        setFilterOpen(false);
+    };
+
+    const clearFilters = () => {
+        setDraftFilters({
+            minPrice: "",
+            maxPrice: "",
+            minArea: "",
+            maxArea: "",
+            minGrossArea: "",
+            maxGrossArea: "",
+            roomCount: "",
+        });
+        setFilters((prev) => ({
+            ...prev,
+            page: 1,
+            minPrice: undefined,
+            maxPrice: undefined,
+            minArea: undefined,
+            maxArea: undefined,
+            minGrossArea: undefined,
+            maxGrossArea: undefined,
+            roomCount: undefined,
+        }));
+        setFilterOpen(false);
+    };
+
+    useEffect(() => {
+        if (!filterOpen) return;
+
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (filterPanelRef.current && !filterPanelRef.current.contains(event.target as Node)) {
+                setFilterOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => document.removeEventListener("mousedown", handleOutsideClick);
+    }, [filterOpen]);
+
+    const filterInputClass = "h-11 w-full rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 text-sm text-[#1A1A1A] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
 
     return (
         <main
@@ -70,11 +151,20 @@ export function ResaleApartmentsCardSection() {
             style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
         >
             {/* Action Bar */}
-            <div className="w-full flex items-center justify-end gap-3 mb-8">
+            <div className="relative mb-8 flex w-full items-center justify-end gap-3">
                 {/* Filter Pill Button */}
-                <button className="flex items-center justify-center gap-2 w-[85px] h-[44px] bg-[#EBEBEB] border border-white rounded-[16px] py-2 px-3.5 text-[14px] font-medium leading-[20px] tracking-[0px] text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer">
+                <button
+                    type="button"
+                    onClick={() => setFilterOpen((prev) => !prev)}
+                    className="flex items-center justify-center gap-2 w-[85px] h-[44px] bg-[#EBEBEB] border border-white rounded-[16px] py-2 px-3.5 text-[14px] font-medium leading-[20px] tracking-[0px] text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer"
+                >
                     <img src="/images/inv-resale/filter.svg" alt="" className="w-4 h-4" />
                     <span>Filter</span>
+                    {activeFilterCount > 0 ? (
+                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#4E525D] px-1 text-[11px] font-semibold text-white">
+                            {activeFilterCount}
+                        </span>
+                    ) : null}
                 </button>
 
                 {/* Segmented Layout Selector Toggle */}
@@ -112,6 +202,124 @@ export function ResaleApartmentsCardSection() {
                     <img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />
                     <span>Add Listing</span>
                 </button>
+
+                {filterOpen ? (
+                    <div
+                        ref={filterPanelRef}
+                        className="absolute right-0 top-[56px] z-20 w-full max-w-[440px] rounded-[28px] border border-[#E7E9EE] bg-white p-5 shadow-[0_20px_50px_rgba(17,24,39,0.12)]"
+                    >
+                        <div className="mb-4 flex items-center justify-between">
+                            <div>
+                                <h4 className="text-[16px] font-semibold text-[#1A1A1A]">Filter Listings</h4>
+                                <p className="mt-1 text-[13px] text-[#808191]">Price, area, gross area and room count</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setFilterOpen(false)}
+                                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4F5F6] text-[#4E525D] transition-colors hover:bg-[#E9ECF2]"
+                            >
+                                <IoClose size={18} />
+                            </button>
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Min Price</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={draftFilters.minPrice}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, minPrice: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="50000"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Max Price</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={draftFilters.maxPrice}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, maxPrice: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="250000"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Min Area</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={draftFilters.minArea}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, minArea: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="50"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Max Area</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={draftFilters.maxArea}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, maxArea: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="180"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Min Gross Area</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={draftFilters.minGrossArea}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, minGrossArea: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="60"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Max Gross Area</label>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={draftFilters.maxGrossArea}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, maxGrossArea: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="220"
+                                />
+                            </div>
+                            <div className="sm:col-span-2">
+                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Room Count</label>
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={draftFilters.roomCount}
+                                    onChange={(e) => setDraftFilters((prev) => ({ ...prev, roomCount: e.target.value }))}
+                                    className={filterInputClass}
+                                    placeholder="3"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mt-5 flex items-center justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                className="rounded-2xl border border-[#E7E9EE] px-4 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB]"
+                            >
+                                Clear
+                            </button>
+                            <button
+                                type="button"
+                                onClick={applyFilters}
+                                className="rounded-2xl bg-[#4E525D] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3D404A]"
+                            >
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                ) : null}
             </div>
 
             {/* Card Grid */}
@@ -235,12 +443,12 @@ export function ResaleApartmentsCardSection() {
                                                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
                                                             status === "active"
                                                                 ? "bg-[#E7F6ED] text-[#2D9A5B]"
-                                                                : status === "pending"
+                                                                : status === "reserved"
                                                                     ? "bg-[#FDF4E0] text-[#967B38]"
                                                                     : "bg-[#FDECEC] text-[#C3362B]"
                                                         }`}
                                                     >
-                                                        {status === "non-active" ? "Non Active" : status.charAt(0).toUpperCase() + status.slice(1)}
+                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-4">

@@ -257,11 +257,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         priceByArea: undefined as unknown as number,
         roomCount: undefined as unknown as number,
         area: undefined as unknown as number,
-        netArea: undefined as unknown as number,
         grossArea: undefined as unknown as number,
-        livingArea: undefined as unknown as number,
-        kitchenArea: undefined as unknown as number,
-        balconyArea: undefined as unknown as number,
         floorFrom: undefined as unknown as number,
         floorTo: undefined as unknown as number,
         bathroomCount: undefined as unknown as number,
@@ -271,6 +267,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         locationTitle: "",
         locationUrl: "",
         renovation: undefined,
+        mortgage: undefined,
+        extract: undefined,
         parking: undefined,
         buildingAge: undefined as unknown as number,
         furnishing: undefined,
@@ -282,7 +280,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         ownerId: "",
         attributeIds: [],
         requestIds: [],
-        status: "active" as "active" | "pending" | "non-active",
+        status: "active" as "active" | "reserved" | "sold",
         prices: [],
     });
 
@@ -306,11 +304,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 priceByArea: d.priceByArea,
                 roomCount: d.roomCount,
                 area: d.area,
-                netArea: d.netArea ?? undefined,
                 grossArea: d.grossArea ?? undefined,
-                livingArea: d.livingArea ?? undefined,
-                kitchenArea: d.kitchenArea ?? undefined,
-                balconyArea: d.balconyArea ?? undefined,
                 floorFrom: d.floorFrom,
                 floorTo: d.floorTo,
                 bathroomCount: d.bathroomCount ?? undefined,
@@ -320,6 +314,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 locationTitle: d.locationTitle || "",
                 locationUrl: d.locationUrl || "",
                 renovation: d.renovation || undefined,
+                mortgage: d.mortgage ?? undefined,
+                extract: d.extract ?? undefined,
                 parking: d.parking ?? undefined,
                 buildingAge: d.buildingAge ?? undefined,
                 furnishing: d.furnishing || undefined,
@@ -606,9 +602,15 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     const locationOptionItems = Array.isArray(locationOptions?.data) ? locationOptions.data : [];
     const viewOptionItems = Array.isArray(viewOptionsRes?.data) ? viewOptionsRes.data : [];
     const heatingTypeItems = Array.isArray(heatingTypeOptionsRes?.data) ? heatingTypeOptionsRes.data : [];
-    const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string) => {
+    const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string, cityTitle?: string) => {
         const mapped = locationOptionItems
-            .filter((item: LocationOption) => item.type === type)
+            .filter((item: LocationOption) => {
+                if (item.type !== type) return false;
+                if (type === "region" && cityTitle) {
+                    return item.city?.title === cityTitle;
+                }
+                return true;
+            })
             .map((item: LocationOption) => ({
                 id: item.title,
                 label: item.title,
@@ -778,8 +780,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         <CustomSelect
                                             label="Region"
                                             value={form.region || ""}
-                                            options={toLocationDropdownOptions("region", form.region)}
-                                            placeholder="Select region"
+                                            options={toLocationDropdownOptions("region", form.region, form.city)}
+                                            placeholder={form.city ? "Select region" : "Select city first"}
                                             onChange={(id) => updateField("region", id)}
                                             noOptionsLabel="Create Region"
                                             onNoOptionsClick={() => navigate("/dashboard/resale/location-options")}
@@ -789,7 +791,10 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                             value={form.city || ""}
                                             options={toLocationDropdownOptions("city", form.city)}
                                             placeholder="Select city"
-                                            onChange={(id) => updateField("city", id)}
+                                            onChange={(id) => {
+                                                updateField("city", id);
+                                                updateField("region", "");
+                                            }}
                                             noOptionsLabel="Create City"
                                             onNoOptionsClick={() => navigate("/dashboard/resale/location-options")}
                                         />
@@ -805,11 +810,11 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     value={form.status || "active"}
                                     options={[
                                         { id: "active", label: "Active" },
-                                        { id: "pending", label: "Pending" },
-                                        { id: "non-active", label: "Non Active" },
+                                        { id: "reserved", label: "Reserved" },
+                                        { id: "sold", label: "Sold" },
                                     ]}
                                     placeholder="Select status"
-                                    onChange={(id) => updateField("status", id as "active" | "pending" | "non-active")}
+                                    onChange={(id) => updateField("status", id as "active" | "reserved" | "sold")}
                                 />
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Room Count</label>
@@ -890,6 +895,30 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         ]}
                                         placeholder="Select furnishing"
                                         onChange={(id) => updateField("furnishing", id as ApartmentFurnishing)}
+                                    />
+                                </div>
+                                <div>
+                                    <CustomSelect
+                                        label="Mortgage"
+                                        value={form.mortgage === undefined ? "" : String(form.mortgage)}
+                                        options={[
+                                            { id: "true", label: "Yes" },
+                                            { id: "false", label: "No" },
+                                        ]}
+                                        placeholder="Select mortgage"
+                                        onChange={(id) => updateField("mortgage", id === "" ? undefined : id === "true")}
+                                    />
+                                </div>
+                                <div>
+                                    <CustomSelect
+                                        label="Extract"
+                                        value={form.extract === undefined ? "" : String(form.extract)}
+                                        options={[
+                                            { id: "true", label: "Yes" },
+                                            { id: "false", label: "No" },
+                                        ]}
+                                        placeholder="Select extract"
+                                        onChange={(id) => updateField("extract", id === "" ? undefined : id === "true")}
                                     />
                                 </div>
                                 <div>
@@ -982,7 +1011,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 {activeTab === "area" && (
                     <div className="space-y-5">
                         <SectionBlock title="Area Metrics" description="Primary sizing details grouped in a cleaner block.">
-                            <div className="grid gap-4 lg:grid-cols-3">
+                            <div className="grid gap-4 lg:grid-cols-2">
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area (m2)</label>
                                     <input
@@ -996,18 +1025,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Net Area (m2)</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        step="0.1"
-                                        value={form.netArea ?? ""}
-                                        onChange={(e) => updateField("netArea", parseFloat(e.target.value) || undefined)}
-                                        placeholder="54"
-                                        min={0}
-                                    />
-                                </div>
-                                <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Gross Area (m2)</label>
                                     <input
                                         className={inputClass}
@@ -1016,42 +1033,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         value={form.grossArea ?? ""}
                                         onChange={(e) => updateField("grossArea", parseFloat(e.target.value) || undefined)}
                                         placeholder="67"
-                                        min={0}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Living Area (m2)</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        step="0.1"
-                                        value={form.livingArea ?? ""}
-                                        onChange={(e) => updateField("livingArea", parseFloat(e.target.value) || undefined)}
-                                        placeholder="32"
-                                        min={0}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Kitchen Area (m2)</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        step="0.1"
-                                        value={form.kitchenArea ?? ""}
-                                        onChange={(e) => updateField("kitchenArea", parseFloat(e.target.value) || undefined)}
-                                        placeholder="12"
-                                        min={0}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Balcony / Terrace Area (m2)</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        step="0.1"
-                                        value={form.balconyArea ?? ""}
-                                        onChange={(e) => updateField("balconyArea", parseFloat(e.target.value) || undefined)}
-                                        placeholder="8"
                                         min={0}
                                     />
                                 </div>

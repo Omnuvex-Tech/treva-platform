@@ -8,7 +8,7 @@ import Script from 'next/script'
 import Link from 'next/link'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
-import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
+import PartnershipCTA from '@/app/components/PartnershipCTA'
 import './brokers.css'
 import '../Contact/contact.css'
 
@@ -585,72 +585,15 @@ export function BrokersPage({ locale }: BrokersPageProps) {
               </div>
             </section>
 
-            <section data-w-id="44345067-e7e2-e418-326c-dc1560d944bb" className="section_gallery">
-              <div className="global-padding">
-                <div className="container-large">
-                  <div className="gallery_component">
-                    <div className="gallery_wrap">
-                      <div className="gallery_content-wrap brokers-gallery-content">
-                        <div className="gallery_title-wrap is-az">
-                          <div className="text-color-blue60">(TREVA ilə tərəfdaş olun)</div>
-                          <h2>Daha çox komissiya qazanın, daha çox müqavilə bağlayın.</h2>
-                        </div>
-                        <div className="gallery_bottom-wrap brokers-gallery-bottom">
-                          <div className="max-width-40rem">
-                            <p className="text-color-blue60">HARADA YERLƏŞMƏYİNİZDƏN ASILI OLMAYARAQ — TREVA BROKERLƏRİ, ŞİRKƏTLƏRİ, BEYNƏLXALQ AGENTLƏRİ SATIŞ ŞƏBƏKƏMİZƏ QOŞULMAĞA DƏVƏT EDİR. TREVA İLƏ MÜQAVİLƏLƏRİ DAHA SÜRƏTLİ BAĞLAMAĞA, YÜKSƏK KOMİSSİYALAR QAZANMAĞA BAŞLAYIN.</p>
-                          </div>
-                          <a data-wf--button--variant="blue" href="#broker-registration" onClick={scrollToBrokerRegistration} className="button w-inline-block">
-                            <div className="svg-code">This is some text inside of a div block.</div>
-                            <ButtonText>Bizimlə tərəfdaş olun</ButtonText>
-                          </a>
-                        </div>
-                      </div>
-                      <div className="gallery_holder">
-                        <div className="gallery_track">
-                          <div style={{ WebkitTransform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)', MozTransform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)', msTransform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)', transform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)' }} className="gallery_block">
-                            <div className="gallery_lightbox">
-                              <div className="gallery_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6885e0ca09370b706fb69a48_treva-ofissss.avif" loading="lazy" alt="Two men in suits standing outside of a building." className="fullwidth-img ease0-6" />
-                              </div>
-                            </div>
-                            <div className="gallery_lightbox">
-                              <div className="gallery_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68836511b9a5b2f70263e946_IMG_2517.avif" loading="lazy" alt="A man and a woman standing in front of a group of people." className="fullwidth-img ease0-6" />
-                              </div>
-                            </div>
-                            <div className="gallery_lightbox">
-                              <div className="gallery_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68836511710deed268d458cd_IMG_2518.avif" loading="lazy" alt="A man sitting at a table writing on a piece of paper." className="fullwidth-img ease0-6" />
-                              </div>
-                            </div>
-                          </div>
-                          <div style={{ WebkitTransform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)', MozTransform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)', msTransform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)', transform: 'translate3d(0, -20%, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)' }} className="gallery_block">
-                            <div className="gallery_lightbox">
-                              <div className="gallery_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6885e0ca09370b706fb69a48_treva-ofissss.avif" loading="lazy" alt="Two men in suits standing outside of a building." className="fullwidth-img ease0-6" />
-                              </div>
-                            </div>
-                            <div className="gallery_lightbox">
-                              <div className="gallery_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68836511b9a5b2f70263e946_IMG_2517.avif" loading="lazy" alt="A man and a woman standing in front of a group of people." className="fullwidth-img ease0-6" />
-                              </div>
-                            </div>
-                            <div className="gallery_lightbox">
-                              <div className="gallery_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68836511710deed268d458cd_IMG_2518.avif" loading="lazy" alt="A man sitting at a table writing on a piece of paper." className="fullwidth-img ease0-6" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <PartnershipCTA
+              hideImagesOnMobile
+              centerContentOnMobile
+              primaryAction={{ href: `/${locale}/contact#get-in-touch`, label: 'Əlaqə saxlayın' }}
+              secondaryAction={{ href: '#broker-registration', label: 'Şəbəkəmizə qoşulun' }}
+            />
+
           </main>
-          
-          <CallbackForm allowedRoles={['Broker']} />
+
           <HomeFooter locale={locale} />
       </div>
     </>

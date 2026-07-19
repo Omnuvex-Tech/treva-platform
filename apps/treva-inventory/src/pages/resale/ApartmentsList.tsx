@@ -36,6 +36,12 @@ export function ApartmentsList() {
     const formatPrice = (p: number) =>
         p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
+    const formatBoolean = (value: boolean | null | undefined) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return "—";
+    };
+
     const getTypeTitle = (typeId: string) =>
         types?.data?.find((t: ApartmentType) => t.id === typeId)?.title || "—";
 
@@ -89,6 +95,8 @@ export function ApartmentsList() {
                                 <th className="px-4 py-3 font-medium">Area</th>
                                 <th className="px-4 py-3 font-medium">Rooms</th>
                                 <th className="px-4 py-3 font-medium">Floor</th>
+                                <th className="px-4 py-3 font-medium">Mortgage</th>
+                                <th className="px-4 py-3 font-medium">Extract</th>
                                 <th className="px-4 py-3 font-medium">Owner</th>
                                 <th className="px-4 py-3 font-medium text-right">Actions</th>
                             </tr>
@@ -112,6 +120,8 @@ export function ApartmentsList() {
                                         <td className="px-4 py-3 text-white/70">
                                             {apt.floorFrom}/{apt.floorTo}
                                         </td>
+                                        <td className="px-4 py-3 text-white/70">{formatBoolean(apt.mortgage)}</td>
+                                        <td className="px-4 py-3 text-white/70">{formatBoolean(apt.extract)}</td>
                                         <td className="px-4 py-3 text-white/70">
                                             {apt.owner
                                                 ? `${apt.owner.firstName} ${apt.owner.lastName}`
@@ -135,7 +145,7 @@ export function ApartmentsList() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={8} className="px-4 py-8 text-center text-white/50">
+                                    <td colSpan={10} className="px-4 py-8 text-center text-white/50">
                                         No apartments yet
                                     </td>
                                 </tr>

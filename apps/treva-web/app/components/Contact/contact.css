@@ -464,6 +464,16 @@
   line-height: 1.45;
 }
 
+.section_contact .offices_map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2e3139;
+  font-size: 1.0625rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
 
 /* --- Text Color White 60% --- */
 .text-color-white60 {

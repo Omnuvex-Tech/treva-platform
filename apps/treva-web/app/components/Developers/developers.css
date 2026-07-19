@@ -45,6 +45,70 @@
     transform: translate(-50%, -50%) scale(.6);
 }
 
+.developers-projects-slider {
+  position: relative;
+}
+
+.developers-projects-viewport {
+  width: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+}
+
+.developers-projects-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.developers-projects-track {
+  display: flex !important;
+  gap: 21px;
+  width: max-content;
+  will-change: transform;
+}
+
+.developers-projects-item {
+  flex: 0 0 auto;
+}
+
+.developers-projects-nav-btn {
+  position: absolute;
+  top: 48%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #161822;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.developers-projects-nav-btn:hover {
+  background: #ffffff;
+}
+
+.developers-projects-nav-btn--prev {
+  left: 12px;
+}
+
+.developers-projects-nav-btn--next {
+  right: 12px;
+}
+
+.developers-projects-nav-btn--prev:hover,
+.developers-projects-nav-btn--next:hover {
+  transform: translateY(-50%) scale(1.08);
+}
+
 @media screen and (min-width: 991px) {
 
   .projects-prev_item:hover .projects_overlay {
@@ -588,6 +652,28 @@ html.disable-smooth-scroll {
 }
 
 @media (max-width: 479px) {
+  .developers-projects-nav-btn {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+    width: 38px;
+    height: 38px;
+  }
+
+  .developers-projects-nav-btn--prev {
+    left: auto;
+    right: 58px;
+  }
+
+  .developers-projects-nav-btn--next {
+    right: 12px;
+  }
+
+  .developers-projects-nav-btn--prev:hover,
+  .developers-projects-nav-btn--next:hover {
+    transform: scale(1.08);
+  }
+
   .section_projects-prev .projects-prev_cta-wrap {
     gap: 0.75rem;
   }

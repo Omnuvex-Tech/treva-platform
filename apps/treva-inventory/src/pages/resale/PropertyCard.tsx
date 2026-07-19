@@ -53,13 +53,13 @@ export function PropertyCard({ apartment: apt, onDuplicate, onDelete }: Property
                         <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#2D9A5B] text-white">
                             Active
                         </span>
-                    ) : status === "pending" ? (
+                    ) : status === "reserved" ? (
                         <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#FDF4E0] text-[#967B38]">
-                            Pending
+                            Reserved
                         </span>
                     ) : (
                         <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#FDECEC] text-[#C3362B]">
-                            Non Active
+                            Sold
                         </span>
                     )}
                 </div>

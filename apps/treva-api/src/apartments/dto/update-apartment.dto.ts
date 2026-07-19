@@ -84,30 +84,10 @@ export class UpdateApartmentDto {
   @IsNumber()
   area?: number;
 
-  @ApiPropertyOptional({ example: 54 })
-  @IsOptional()
-  @IsNumber()
-  netArea?: number;
-
   @ApiPropertyOptional({ example: 67 })
   @IsOptional()
   @IsNumber()
   grossArea?: number;
-
-  @ApiPropertyOptional({ example: 32 })
-  @IsOptional()
-  @IsNumber()
-  livingArea?: number;
-
-  @ApiPropertyOptional({ example: 12 })
-  @IsOptional()
-  @IsNumber()
-  kitchenArea?: number;
-
-  @ApiPropertyOptional({ example: 8 })
-  @IsOptional()
-  @IsNumber()
-  balconyArea?: number;
 
   @ApiPropertyOptional({ example: 8 })
   @IsOptional()
@@ -158,6 +138,14 @@ export class UpdateApartmentDto {
   @IsString()
   @IsIn(['renovated', 'non-renovated'])
   renovation?: string;
+
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  mortgage?: boolean;
+
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  extract?: boolean;
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()
@@ -215,7 +203,7 @@ export class UpdateApartmentDto {
   @IsArray()
   requestIds?: string[];
 
-  @ApiPropertyOptional({ example: 'active', enum: ['active', 'pending', 'non-active'] })
+  @ApiPropertyOptional({ example: 'active', enum: ['active', 'reserved', 'sold'] })
   @IsOptional()
   @IsString()
   status?: string;

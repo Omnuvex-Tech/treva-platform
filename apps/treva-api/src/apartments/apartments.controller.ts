@@ -29,6 +29,8 @@ export class ApartmentsController {
   @ApiQuery({ name: 'roomCount', required: false })
   @ApiQuery({ name: 'minArea', required: false })
   @ApiQuery({ name: 'maxArea', required: false })
+  @ApiQuery({ name: 'minGrossArea', required: false })
+  @ApiQuery({ name: 'maxGrossArea', required: false })
   @ApiQuery({ name: 'floor', required: false })
   @ApiQuery({ name: 'currency', required: false })
   @ApiQuery({ name: 'viewOptionIds', required: false })
@@ -43,6 +45,8 @@ export class ApartmentsController {
     @Query('roomCount') roomCount?: string,
     @Query('minArea') minArea?: string,
     @Query('maxArea') maxArea?: string,
+    @Query('minGrossArea') minGrossArea?: string,
+    @Query('maxGrossArea') maxGrossArea?: string,
     @Query('floor') floor?: string,
     @Query('currency') currency?: string,
     @Query('viewOptionIds') viewOptionIds?: string,
@@ -58,6 +62,8 @@ export class ApartmentsController {
       roomCount: roomCount ? parseInt(roomCount) : undefined,
       minArea: minArea ? parseFloat(minArea) : undefined,
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
+      minGrossArea: minGrossArea ? parseFloat(minGrossArea) : undefined,
+      maxGrossArea: maxGrossArea ? parseFloat(maxGrossArea) : undefined,
       floor: floor ? parseInt(floor) : undefined,
       currency,
       viewOptionIds,

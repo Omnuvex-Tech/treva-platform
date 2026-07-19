@@ -2,15 +2,14 @@
 
 import { ButtonText } from '@/app/components/ButtonText';
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
 import Navbar from '@/app/components/Home/TrevaHero/navbar'
 import { HomeFooter } from '@/app/components/Home/HomeFooter'
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
-import PartnershipCTA from '@/app/components/PartnershipCTA'
 import './developers.css'
 
 declare global {
@@ -44,6 +43,10 @@ type FeaturedProjectCard = {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021'
 const FEATURED_PROJECT_PLACEHOLDER = '/assets/webflow-placeholder.svg'
+const DEVELOPERS_PROJECTS_GAP = 21
+const PROJECTS_SLIDER_SPEED_PX_PER_SEC = 40
+const PROJECTS_SLIDER_RESUME_DELAY = 3000
+const PROJECTS_SLIDER_STEP_TRANSITION_MS = 500
 
 const featuredProjectFallbackImages: Record<string, string> = {
   'arabian-ranches': '/images/features-pro/arabian-cover.jpg',
@@ -94,6 +97,23 @@ function toAssetUrl(value?: string | null): string {
 export function DevelopersPage({ locale }: DevelopersPageProps) {
   const gsapReady = useRef(false)
   const dropdownNavRefs = useRef<Array<HTMLDivElement | null>>([])
+  const projectsViewportRef = useRef<HTMLDivElement | null>(null)
+  const projectsTrackRef = useRef<HTMLDivElement | null>(null)
+  const projectsOffsetRef = useRef(0)
+  const projectsSingleSetWidthRef = useRef(0)
+  const projectsStepWidthRef = useRef(0)
+  const projectsPausedByHoverRef = useRef(false)
+  const projectsPausedByDragRef = useRef(false)
+  const projectsPausedByNavRef = useRef(false)
+  const projectsIsManualRef = useRef(false)
+  const projectsDragPointerIdRef = useRef<number | null>(null)
+  const projectsDragStartXRef = useRef(0)
+  const projectsDragStartOffsetRef = useRef(0)
+  const projectsSuppressClickRef = useRef(false)
+  const projectsRafRef = useRef<number | null>(null)
+  const projectsLastTimeRef = useRef<number | null>(null)
+  const projectsResumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const projectsStepTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const getScrollOffset = () => {
     if (typeof window === 'undefined') return 88
@@ -138,6 +158,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
 
   const [openDropdown, setOpenDropdown] = useState<number | null>(0)
   const [featuredProjects, setFeaturedProjects] = useState<FeaturedProjectCard[]>([])
+  const [isProjectsDragging, setIsProjectsDragging] = useState(false)
+  const [projectsCardWidth, setProjectsCardWidth] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchFeaturedProjects = async () => {
@@ -150,7 +172,6 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
 
         const nextProjects = list
           .sort((a: ProjectCategory, b: ProjectCategory) => (a.order ?? 0) - (b.order ?? 0))
-          .slice(0, 4)
           .map((item: ProjectCategory) => ({
             title: item.title,
             slug: item.slug,
@@ -201,6 +222,271 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
       }
     })
   }, [openDropdown])
+
+  const clearProjectsInteractionTimeouts = useCallback(() => {
+    if (projectsResumeTimeoutRef.current) {
+      clearTimeout(projectsResumeTimeoutRef.current)
+      projectsResumeTimeoutRef.current = null
+    }
+    if (projectsStepTimeoutRef.current) {
+      clearTimeout(projectsStepTimeoutRef.current)
+      projectsStepTimeoutRef.current = null
+    }
+  }, [])
+
+  const normalizeProjectsOffset = useCallback((value: number) => {
+    const singleSetWidth = projectsSingleSetWidthRef.current
+    if (singleSetWidth <= 0) return value
+
+    const relative = (((value - singleSetWidth) % singleSetWidth) + singleSetWidth) % singleSetWidth
+    return singleSetWidth + relative
+  }, [])
+
+  const scheduleProjectsAutoResume = useCallback(() => {
+    projectsResumeTimeoutRef.current = setTimeout(() => {
+      projectsResumeTimeoutRef.current = null
+      projectsPausedByNavRef.current = false
+      projectsLastTimeRef.current = null
+    }, PROJECTS_SLIDER_RESUME_DELAY)
+  }, [])
+
+  const animateProjectsToOffset = useCallback((targetOffset: number) => {
+    const track = projectsTrackRef.current
+    const singleSetWidth = projectsSingleSetWidthRef.current
+    if (!track || !singleSetWidth) return
+
+    projectsPausedByNavRef.current = true
+    projectsIsManualRef.current = true
+    clearProjectsInteractionTimeouts()
+
+    let currentOffset = projectsOffsetRef.current
+    let nextOffset = targetOffset
+
+    if (nextOffset >= singleSetWidth * 2) {
+      currentOffset -= singleSetWidth
+      nextOffset -= singleSetWidth
+    } else if (nextOffset < singleSetWidth) {
+      currentOffset += singleSetWidth
+      nextOffset += singleSetWidth
+    }
+
+    projectsOffsetRef.current = currentOffset
+    track.style.transition = 'none'
+    track.style.transform = `translateX(-${currentOffset}px)`
+    track.getBoundingClientRect()
+
+    projectsOffsetRef.current = nextOffset
+    track.style.transition = `transform ${PROJECTS_SLIDER_STEP_TRANSITION_MS}ms ease`
+    track.style.transform = `translateX(-${nextOffset}px)`
+
+    projectsStepTimeoutRef.current = setTimeout(() => {
+      projectsStepTimeoutRef.current = null
+      const nextTrack = projectsTrackRef.current
+      if (!nextTrack) return
+
+      nextTrack.style.transition = 'none'
+      projectsOffsetRef.current = normalizeProjectsOffset(projectsOffsetRef.current)
+      nextTrack.style.transform = `translateX(-${projectsOffsetRef.current}px)`
+
+      projectsIsManualRef.current = false
+      scheduleProjectsAutoResume()
+    }, PROJECTS_SLIDER_STEP_TRANSITION_MS)
+  }, [clearProjectsInteractionTimeouts, normalizeProjectsOffset, scheduleProjectsAutoResume])
+
+  const measureProjectsSlider = useCallback(() => {
+    const viewport = projectsViewportRef.current
+    const track = projectsTrackRef.current
+    const count = featuredProjects.length
+    if (!viewport || !track || count === 0 || track.children.length < count * 2) return
+
+    const viewportWidth = viewport.clientWidth
+    const cardsPerView = viewportWidth <= 479 ? 1 : viewportWidth <= 991 ? 2 : 4
+    const nextCardWidth = (viewportWidth - DEVELOPERS_PROJECTS_GAP * (cardsPerView - 1)) / cardsPerView
+    setProjectsCardWidth(nextCardWidth)
+
+    const first = track.children[0] as HTMLElement
+    const second = track.children[1] as HTMLElement
+    const startOfSecondSet = track.children[count] as HTMLElement
+    if (!first || !second || !startOfSecondSet) return
+
+    const r0 = first.getBoundingClientRect()
+    const r1 = second.getBoundingClientRect()
+    const rSet = startOfSecondSet.getBoundingClientRect()
+
+    projectsStepWidthRef.current = r1.left - r0.left
+    projectsSingleSetWidthRef.current = rSet.left - r0.left
+
+    if (projectsOffsetRef.current === 0) {
+      projectsOffsetRef.current = projectsSingleSetWidthRef.current
+      track.style.transition = 'none'
+      track.style.transform = `translateX(-${projectsOffsetRef.current}px)`
+    }
+  }, [featuredProjects.length])
+
+  useEffect(() => {
+    if (featuredProjects.length === 0) return
+
+    measureProjectsSlider()
+    const t1 = setTimeout(measureProjectsSlider, 150)
+    const t2 = setTimeout(measureProjectsSlider, 500)
+
+    const ro = new ResizeObserver(() => measureProjectsSlider())
+    if (projectsViewportRef.current) ro.observe(projectsViewportRef.current)
+
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+      ro.disconnect()
+    }
+  }, [featuredProjects.length, measureProjectsSlider])
+
+  useEffect(() => {
+    if (featuredProjects.length === 0) return
+
+    const loop = (timestamp: number) => {
+      if (projectsLastTimeRef.current == null) projectsLastTimeRef.current = timestamp
+      const dt = timestamp - projectsLastTimeRef.current
+      projectsLastTimeRef.current = timestamp
+
+      const singleSetWidth = projectsSingleSetWidthRef.current
+
+      if (
+        !projectsPausedByHoverRef.current &&
+        !projectsPausedByDragRef.current &&
+        !projectsPausedByNavRef.current &&
+        !projectsIsManualRef.current &&
+        singleSetWidth > 0 &&
+        projectsTrackRef.current
+      ) {
+        projectsOffsetRef.current += (PROJECTS_SLIDER_SPEED_PX_PER_SEC * dt) / 1000
+
+        if (projectsOffsetRef.current >= singleSetWidth * 2) {
+          projectsOffsetRef.current -= singleSetWidth
+        }
+
+        projectsTrackRef.current.style.transform = `translateX(-${projectsOffsetRef.current}px)`
+      }
+
+      projectsRafRef.current = requestAnimationFrame(loop)
+    }
+
+    projectsRafRef.current = requestAnimationFrame(loop)
+
+    return () => {
+      if (projectsRafRef.current != null) cancelAnimationFrame(projectsRafRef.current)
+      projectsRafRef.current = null
+      projectsLastTimeRef.current = null
+    }
+  }, [featuredProjects.length])
+
+  useEffect(() => {
+    return () => {
+      if (projectsResumeTimeoutRef.current) clearTimeout(projectsResumeTimeoutRef.current)
+      if (projectsStepTimeoutRef.current) clearTimeout(projectsStepTimeoutRef.current)
+    }
+  }, [])
+
+  const handleProjectsMouseEnter = () => {
+    projectsPausedByHoverRef.current = true
+  }
+
+  const handleProjectsMouseLeave = () => {
+    if (isProjectsDragging) return
+    projectsPausedByHoverRef.current = false
+    projectsLastTimeRef.current = null
+  }
+
+  const handleProjectsNav = (direction: 'prev' | 'next') => {
+    const stepWidth = projectsStepWidthRef.current
+    if (!stepWidth) return
+
+    const target = projectsOffsetRef.current + (direction === 'next' ? stepWidth : -stepWidth)
+    animateProjectsToOffset(target)
+  }
+
+  const handleProjectsPointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    if (!projectsViewportRef.current || !projectsTrackRef.current || !projectsSingleSetWidthRef.current) return
+
+    clearProjectsInteractionTimeouts()
+    projectsPausedByDragRef.current = true
+    projectsPausedByNavRef.current = true
+    projectsIsManualRef.current = true
+    projectsDragPointerIdRef.current = event.pointerId
+    projectsDragStartXRef.current = event.clientX
+    projectsOffsetRef.current = normalizeProjectsOffset(projectsOffsetRef.current)
+    projectsDragStartOffsetRef.current = projectsOffsetRef.current
+    projectsSuppressClickRef.current = false
+    projectsTrackRef.current.style.transition = 'none'
+    projectsTrackRef.current.style.transform = `translateX(-${projectsOffsetRef.current}px)`
+    projectsViewportRef.current.setPointerCapture(event.pointerId)
+    setIsProjectsDragging(true)
+  }, [clearProjectsInteractionTimeouts, normalizeProjectsOffset])
+
+  const handleProjectsPointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (projectsDragPointerIdRef.current !== event.pointerId || !projectsTrackRef.current) return
+
+    const deltaX = event.clientX - projectsDragStartXRef.current
+    if (Math.abs(deltaX) > 6) {
+      projectsSuppressClickRef.current = true
+    }
+
+    const nextOffset = normalizeProjectsOffset(projectsDragStartOffsetRef.current - deltaX)
+    projectsOffsetRef.current = nextOffset
+    projectsTrackRef.current.style.transform = `translateX(-${nextOffset}px)`
+  }, [normalizeProjectsOffset])
+
+  const finishProjectsDrag = useCallback((pointerId: number) => {
+    const viewport = projectsViewportRef.current
+    if (viewport?.hasPointerCapture(pointerId)) {
+      viewport.releasePointerCapture(pointerId)
+    }
+
+    const dragged = projectsSuppressClickRef.current
+    projectsDragPointerIdRef.current = null
+    projectsPausedByDragRef.current = false
+    setIsProjectsDragging(false)
+
+    if (!dragged) {
+      projectsIsManualRef.current = false
+      projectsPausedByNavRef.current = false
+      projectsLastTimeRef.current = null
+      return
+    }
+
+    const stepWidth = projectsStepWidthRef.current
+    const singleSetWidth = projectsSingleSetWidthRef.current
+    if (!stepWidth || !singleSetWidth) {
+      projectsIsManualRef.current = false
+      projectsPausedByNavRef.current = false
+      projectsLastTimeRef.current = null
+      return
+    }
+
+    const snappedOffset =
+      singleSetWidth + Math.round((projectsOffsetRef.current - singleSetWidth) / stepWidth) * stepWidth
+    animateProjectsToOffset(normalizeProjectsOffset(snappedOffset))
+  }, [animateProjectsToOffset, normalizeProjectsOffset])
+
+  const handleProjectsPointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (projectsDragPointerIdRef.current !== event.pointerId) return
+    finishProjectsDrag(event.pointerId)
+  }, [finishProjectsDrag])
+
+  const handleProjectsPointerCancel = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (projectsDragPointerIdRef.current !== event.pointerId) return
+    finishProjectsDrag(event.pointerId)
+  }, [finishProjectsDrag])
+
+  const handleProjectsClickCapture = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (!projectsSuppressClickRef.current) return
+    event.preventDefault()
+    event.stopPropagation()
+    projectsSuppressClickRef.current = false
+  }, [])
+
+  const renderedFeaturedProjects =
+    featuredProjects.length > 0 ? [...featuredProjects, ...featuredProjects, ...featuredProjects] : []
 
   const initGSAP = () => {
     if (gsapReady.current) return
@@ -668,22 +954,57 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                         <h2>Seçilmiş layihələr</h2>
                       </div>
                     </div>
-                    <div className="w-dyn-list">
-                      <div role="list" className="projects-prev_wrap w-dyn-items">
-                        {featuredProjects.map((project, index) => {
+                    <div
+                      className="w-dyn-list developers-projects-slider"
+                      onMouseEnter={handleProjectsMouseEnter}
+                      onMouseLeave={handleProjectsMouseLeave}
+                    >
+                      {featuredProjects.length > 0 && (
+                        <>
+                          <button
+                            type="button"
+                            aria-label="Previous"
+                            className="developers-projects-nav-btn developers-projects-nav-btn--prev"
+                            onClick={() => handleProjectsNav('prev')}
+                          >
+                            <ArrowLeft size={18} strokeWidth={2} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Next"
+                            className="developers-projects-nav-btn developers-projects-nav-btn--next"
+                            onClick={() => handleProjectsNav('next')}
+                          >
+                            <ArrowRight size={18} strokeWidth={2} />
+                          </button>
+                        </>
+                      )}
+                      <div
+                        className={`developers-projects-viewport${isProjectsDragging ? ' is-dragging' : ''}`}
+                        ref={projectsViewportRef}
+                        onPointerDown={handleProjectsPointerDown}
+                        onPointerMove={handleProjectsPointerMove}
+                        onPointerUp={handleProjectsPointerUp}
+                        onPointerCancel={handleProjectsPointerCancel}
+                        onClickCapture={handleProjectsClickCapture}
+                        onDragStart={(event) => event.preventDefault()}
+                      >
+                        <div role="list" className="projects-prev_wrap developers-projects-track w-dyn-items" ref={projectsTrackRef}>
+                          {renderedFeaturedProjects.map((project, index) => {
                           const title = getLocalizedValue(project.title, locale)
                           const location = getLocalizedValue(project.location, locale)
                           const href = `/${locale}/projects/${project.slug}`
 
                           return (
                             <div
-                              key={project.slug}
+                              key={`${project.slug}-${index}`}
                               role="listitem"
-                              className={`projects-prev_item img-reveal w-dyn-item${index === featuredProjects.length - 1 ? ' is-large' : ''}`}
+                              className="projects-prev_item developers-projects-item img-reveal w-dyn-item"
+                              style={projectsCardWidth ? { width: `${projectsCardWidth}px`, flex: `0 0 ${projectsCardWidth}px` } : undefined}
                             >
                               <div className="projects-prev_holder">
                                 <div className="projects-prev_img-wrap">
-                                  <img src={project.image} loading="lazy" alt={title} className="fullwidth-img ease0-6" />
+                                  <img src={project.image} loading="lazy" alt={title} className="fullwidth-img ease0-6" draggable={false} />
                                 </div>
                                 <Link aria-label={`go to ${title} project`} href={href} className="projects_overlay w-inline-block">
                                   <div className="projects_btn">
@@ -705,6 +1026,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             </div>
                           )
                         })}
+                        </div>
                       </div>
                     </div>
                     <div className="projects-prev_cta-wrap animate-up">
@@ -720,12 +1042,6 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
               </div>
             </section>
 
-            <PartnershipCTA
-              hideImagesOnMobile
-              centerContentOnMobile
-              primaryAction={{ href: `/${locale}/contact#get-in-touch`, label: 'Əlaqə saxlayın' }}
-              secondaryAction={{ href: '#developers-callback-cta', label: 'Şəbəkəmizə qoşulun' }}
-            />
           </main>
 
           <div className="developers-callback-wrap">

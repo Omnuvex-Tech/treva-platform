@@ -407,12 +407,19 @@
 .featured__viewport {
   width: 100%;
   overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
 }
 
 .featured__track {
   display: flex;
   gap: 20px;
   will-change: transform;
+}
+
+.featured__viewport.is-dragging {
+  cursor: grabbing;
 }
 
 .property-card {
@@ -532,7 +539,7 @@
    ======================================================== */
 .featured__nav-btn {
   position: absolute;
-  top: 44%;
+  top: 48%;
   transform: translateY(-50%);
   z-index: 20;
   width: 44px;
@@ -561,9 +568,6 @@
 .featured__nav-btn--prev {
   left: 12px;
 }
-.featured__nav-btn--prev svg {
-  transform: rotate(180deg);
-}
 
 .featured__nav-btn--next {
   right: 12px;
@@ -577,5 +581,25 @@
 }
 
 @media (max-width: 640px) {
-  .featured__nav-btn { display: none; }
+  .featured__nav-btn {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+    width: 38px;
+    height: 38px;
+  }
+
+  .featured__nav-btn--prev {
+    left: auto;
+    right: 58px;
+  }
+
+  .featured__nav-btn--next {
+    right: 12px;
+  }
+
+  .featured__nav-btn--prev:hover,
+  .featured__nav-btn--next:hover {
+    transform: scale(1.08);
+  }
 }

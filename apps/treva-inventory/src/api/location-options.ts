@@ -5,6 +5,12 @@ export interface LocationOption {
     type: "region" | "city";
     name: string;
     title: string;
+    cityId?: string | null;
+    city?: {
+        id: string;
+        name: string;
+        title: string;
+    } | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -13,12 +19,14 @@ export interface CreateLocationOptionData {
     type: "region" | "city";
     name: string;
     title: string;
+    cityId?: string;
 }
 
 export interface UpdateLocationOptionData {
     type?: "region" | "city";
     name?: string;
     title?: string;
+    cityId?: string;
 }
 
 export const locationOptionsApi = {

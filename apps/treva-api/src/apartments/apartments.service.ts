@@ -119,12 +119,14 @@ export class ApartmentsService {
     roomCount?: number;
     minArea?: number;
     maxArea?: number;
+    minGrossArea?: number;
+    maxGrossArea?: number;
     floor?: number;
     currency?: string;
     viewOptionIds?: string;
     status?: string;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, floor, currency, viewOptionIds, status } = query;
+    const { page = 1, limit = 12, apartmentTypeId, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, viewOptionIds, status } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
@@ -141,6 +143,11 @@ export class ApartmentsService {
       where.area = {};
       if (minArea) where.area.gte = minArea;
       if (maxArea) where.area.lte = maxArea;
+    }
+    if (minGrossArea || maxGrossArea) {
+      where.grossArea = {};
+      if (minGrossArea) where.grossArea.gte = minGrossArea;
+      if (maxGrossArea) where.grossArea.lte = maxGrossArea;
     }
     if (floor) {
       where.floorFrom = { lte: floor };

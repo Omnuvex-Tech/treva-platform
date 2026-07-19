@@ -269,6 +269,7 @@
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { ViewAllButton } from '@/app/components/Buttons/PortfolioButtons';
 import './features-properties.css';
@@ -276,12 +277,6 @@ import './features-properties.css';
 const arrowSvg = (
   <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M9 1L13 5M13 5L9 9M13 5H1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const navArrowSvg = (
-  <svg width="20" height="16" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 1L13 5M13 5L9 9M13 5H1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -362,6 +357,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
   const content = localeStrings[activeLocale];
 
   const [cards, setCards] = useState<FeaturedCard[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -371,8 +367,13 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
   const stepWidthRef = useRef(0);
 
   const pausedByHoverRef = useRef(false);
+  const pausedByDragRef = useRef(false);
   const pausedByNavRef = useRef(false);
   const isManualRef = useRef(false);
+  const dragPointerIdRef = useRef<number | null>(null);
+  const dragStartXRef = useRef(0);
+  const dragStartOffsetRef = useRef(0);
+  const suppressClickRef = useRef(false);
 
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
@@ -477,6 +478,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
 
       if (
         !pausedByHoverRef.current &&
+        !pausedByDragRef.current &&
         !pausedByNavRef.current &&
         !isManualRef.current &&
         singleSetWidth > 0 &&
@@ -511,26 +513,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
     };
   }, []);
 
-  // ---- Hover: DƏRHAL dayan / davam et ----
-  const handleMouseEnter = () => {
-    pausedByHoverRef.current = true;
-  };
-
-  const handleMouseLeave = () => {
-    pausedByHoverRef.current = false;
-    lastTimeRef.current = null; // dt sıçrayışının qarşısını al
-  };
-
-  // ---- Ox düymələri ----
-  const handleNav = (direction: 'prev' | 'next') => {
-    const track = trackRef.current;
-    const stepWidth = stepWidthRef.current;
-    const singleSetWidth = singleSetWidthRef.current;
-    if (!track || !stepWidth || !singleSetWidth) return;
-
-    pausedByNavRef.current = true;
-    isManualRef.current = true;
-
+  const clearInteractionTimeouts = useCallback(() => {
     if (resumeTimeoutRef.current) {
       clearTimeout(resumeTimeoutRef.current);
       resumeTimeoutRef.current = null;
@@ -539,36 +522,169 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
       clearTimeout(stepTimeoutRef.current);
       stepTimeoutRef.current = null;
     }
+  }, []);
 
-    const target = offsetRef.current + (direction === 'next' ? stepWidth : -stepWidth);
-    offsetRef.current = target;
+  const normalizeOffset = useCallback((value: number) => {
+    const singleSetWidth = singleSetWidthRef.current;
+    if (singleSetWidth <= 0) return value;
 
+    const relative = (((value - singleSetWidth) % singleSetWidth) + singleSetWidth) % singleSetWidth;
+    return singleSetWidth + relative;
+  }, []);
+
+  const scheduleAutoResume = useCallback(() => {
+    resumeTimeoutRef.current = setTimeout(() => {
+      resumeTimeoutRef.current = null;
+      pausedByNavRef.current = false;
+      lastTimeRef.current = null;
+    }, RESUME_DELAY);
+  }, []);
+
+  const animateToOffset = useCallback((targetOffset: number) => {
+    const track = trackRef.current;
+    const singleSetWidth = singleSetWidthRef.current;
+    if (!track || !singleSetWidth) return;
+
+    pausedByNavRef.current = true;
+    isManualRef.current = true;
+    clearInteractionTimeouts();
+
+    let currentOffset = offsetRef.current;
+    let nextOffset = targetOffset;
+
+    if (nextOffset >= singleSetWidth * 2) {
+      currentOffset -= singleSetWidth;
+      nextOffset -= singleSetWidth;
+    } else if (nextOffset < singleSetWidth) {
+      currentOffset += singleSetWidth;
+      nextOffset += singleSetWidth;
+    }
+
+    offsetRef.current = currentOffset;
+    track.style.transition = 'none';
+    track.style.transform = `translateX(-${currentOffset}px)`;
+
+    // Force layout so the browser applies the non-animated reposition before animating.
+    track.getBoundingClientRect();
+
+    offsetRef.current = nextOffset;
     track.style.transition = `transform ${STEP_TRANSITION_MS}ms ease`;
-    track.style.transform = `translateX(-${target}px)`;
+    track.style.transform = `translateX(-${nextOffset}px)`;
 
     stepTimeoutRef.current = setTimeout(() => {
       stepTimeoutRef.current = null;
-      if (trackRef.current) trackRef.current.style.transition = 'none';
+      const nextTrack = trackRef.current;
+      if (!nextTrack) return;
 
-      // Görünməz sərhəd düzəlişi (əgər lazımdırsa)
-      if (offsetRef.current >= singleSetWidth * 2) {
-        offsetRef.current -= singleSetWidth;
-      } else if (offsetRef.current < 0) {
-        offsetRef.current += singleSetWidth;
-      }
-      if (trackRef.current) {
-        trackRef.current.style.transform = `translateX(-${offsetRef.current}px)`;
-      }
+      nextTrack.style.transition = 'none';
+      offsetRef.current = normalizeOffset(offsetRef.current);
+      nextTrack.style.transform = `translateX(-${offsetRef.current}px)`;
 
       isManualRef.current = false;
-
-      resumeTimeoutRef.current = setTimeout(() => {
-        resumeTimeoutRef.current = null;
-        pausedByNavRef.current = false;
-        lastTimeRef.current = null;
-      }, RESUME_DELAY);
+      scheduleAutoResume();
     }, STEP_TRANSITION_MS);
+  }, [clearInteractionTimeouts, normalizeOffset, scheduleAutoResume]);
+
+  // ---- Hover: DƏRHAL dayan / davam et ----
+  const handleMouseEnter = () => {
+    pausedByHoverRef.current = true;
   };
+
+  const handleMouseLeave = () => {
+    if (isDragging) return;
+    pausedByHoverRef.current = false;
+    lastTimeRef.current = null; // dt sıçrayışının qarşısını al
+  };
+
+  // ---- Ox düymələri ----
+  const handleNav = (direction: 'prev' | 'next') => {
+    const stepWidth = stepWidthRef.current;
+    if (!stepWidth) return;
+
+    const target = offsetRef.current + (direction === 'next' ? stepWidth : -stepWidth);
+    animateToOffset(target);
+  };
+
+  const handlePointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (!viewportRef.current || !trackRef.current || !singleSetWidthRef.current) return;
+
+    clearInteractionTimeouts();
+    pausedByDragRef.current = true;
+    pausedByNavRef.current = true;
+    isManualRef.current = true;
+    dragPointerIdRef.current = event.pointerId;
+    dragStartXRef.current = event.clientX;
+    offsetRef.current = normalizeOffset(offsetRef.current);
+    dragStartOffsetRef.current = offsetRef.current;
+    suppressClickRef.current = false;
+    trackRef.current.style.transition = 'none';
+    trackRef.current.style.transform = `translateX(-${offsetRef.current}px)`;
+    viewportRef.current.setPointerCapture(event.pointerId);
+    setIsDragging(true);
+  }, [clearInteractionTimeouts, normalizeOffset]);
+
+  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragPointerIdRef.current !== event.pointerId || !trackRef.current) return;
+
+    const deltaX = event.clientX - dragStartXRef.current;
+    if (Math.abs(deltaX) > 6) {
+      suppressClickRef.current = true;
+    }
+
+    const nextOffset = normalizeOffset(dragStartOffsetRef.current - deltaX);
+    offsetRef.current = nextOffset;
+    trackRef.current.style.transform = `translateX(-${nextOffset}px)`;
+  }, [normalizeOffset]);
+
+  const finishDrag = useCallback((pointerId: number) => {
+    const viewport = viewportRef.current;
+    if (viewport?.hasPointerCapture(pointerId)) {
+      viewport.releasePointerCapture(pointerId);
+    }
+
+    const dragged = suppressClickRef.current;
+    dragPointerIdRef.current = null;
+    pausedByDragRef.current = false;
+    setIsDragging(false);
+
+    if (!dragged) {
+      isManualRef.current = false;
+      pausedByNavRef.current = false;
+      lastTimeRef.current = null;
+      return;
+    }
+
+    const stepWidth = stepWidthRef.current;
+    const singleSetWidth = singleSetWidthRef.current;
+    if (!stepWidth || !singleSetWidth) {
+      isManualRef.current = false;
+      pausedByNavRef.current = false;
+      lastTimeRef.current = null;
+      return;
+    }
+
+    const snappedOffset =
+      singleSetWidth + Math.round((offsetRef.current - singleSetWidth) / stepWidth) * stepWidth;
+    animateToOffset(normalizeOffset(snappedOffset));
+  }, [animateToOffset, normalizeOffset]);
+
+  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragPointerIdRef.current !== event.pointerId) return;
+    finishDrag(event.pointerId);
+  }, [finishDrag]);
+
+  const handlePointerCancel = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragPointerIdRef.current !== event.pointerId) return;
+    finishDrag(event.pointerId);
+  }, [finishDrag]);
+
+  const handleViewportClickCapture = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (!suppressClickRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+    suppressClickRef.current = false;
+  }, []);
 
   // 3 dəst: sonsuz dövr effekti üçün (əvvəl - hazırkı - sonra)
   const renderedCards = cards.length > 0 ? [...cards, ...cards, ...cards] : [];
@@ -621,7 +737,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                   className="featured__nav-btn featured__nav-btn--prev"
                   onClick={() => handleNav('prev')}
                 >
-                  {navArrowSvg}
+                  <ArrowLeft size={18} strokeWidth={2} />
                 </button>
                 <button
                   type="button"
@@ -629,10 +745,19 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                   className="featured__nav-btn featured__nav-btn--next"
                   onClick={() => handleNav('next')}
                 >
-                  {navArrowSvg}
+                  <ArrowRight size={18} strokeWidth={2} />
                 </button>
 
-                <div className="featured__viewport" ref={viewportRef}>
+                <div
+                  className={`featured__viewport${isDragging ? ' is-dragging' : ''}`}
+                  ref={viewportRef}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerCancel}
+                  onClickCapture={handleViewportClickCapture}
+                  onDragStart={(event) => event.preventDefault()}
+                >
                   <div className="featured__track" ref={trackRef}>
                     {renderedCards.map((card, i) => (
                       <a
@@ -646,6 +771,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                             src={card.image}
                             alt={`${getLocalized(card.title, activeLocale)} background`}
                             fill
+                            draggable={false}
                             sizes="(max-width: 767px) 80vw, (max-width: 1023px) 42vw, (max-width: 1279px) 30vw, 23vw"
                             priority={i < 4}
                           />
@@ -657,6 +783,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                             className="property-card__brand-logo"
                             src={card.brandImage}
                             alt={getLocalized(card.brand, activeLocale) || "Brand"}
+                            draggable={false}
                           />
                         ) : (
                           <div className="property-card__brand-text" style={{ color: card.brandTextColor === 'black' ? '#000' : '#fff' }}>

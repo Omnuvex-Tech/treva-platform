@@ -281,6 +281,11 @@ export function Dashboard() {
         navigate(getRouteForMenu(key, parent));
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/login");
+    };
+
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [unitLayouts, setUnitLayouts] = useState<UnitLayout[]>([]);
@@ -496,8 +501,8 @@ export function Dashboard() {
     const resaleDashboard = useMemo(() => {
         const totalListings = resaleListingsTotal || apartments.length;
         const activeListings = apartments.filter((apartment) => (apartment.status || "active") === "active").length;
-        const pendingListings = apartments.filter((apartment) => apartment.status === "pending").length;
-        const nonActiveListings = apartments.filter((apartment) => apartment.status === "non-active").length;
+        const reservedListings = apartments.filter((apartment) => apartment.status === "reserved").length;
+        const soldListings = apartments.filter((apartment) => apartment.status === "sold").length;
         const pricedListings = apartments.filter((apartment) => getPrimaryListingPrice(apartment) > 0);
         const apartmentsWithSeo = apartments.filter((apartment) =>
             Boolean(
@@ -590,32 +595,32 @@ export function Dashboard() {
 
         const topCards = [
             {
-                label: "Resale Listings",
+                label: "All Listings",
                 value: totalListings,
-                hint: `${activeListings} active, ${pendingListings} pending`,
-                accent: "text-[#2D9A5B]",
-                icon: "/images/pages/inv-dashboard/first-img.svg",
-            },
-            {
-                label: "Priced Listings",
-                value: pricedListings.length,
-                hint: `${apartmentsWithImages} with images, ${apartmentsWithSeo} with SEO`,
+                hint: `${activeListings} active, ${soldListings} sold, ${reservedListings} reserved`,
                 accent: "text-[#4E525D]",
                 icon: "/images/pages/inv-dashboard/third-img.svg",
             },
             {
-                label: "Listing Mix",
-                value: `${saleListings}/${rentListings}`,
-                hint: "sale / rent",
-                accent: "text-[#4E525D]",
-                icon: "/images/pages/inv-dashboard/second-img.svg",
+                label: "Active Listings",
+                value: activeListings,
+                hint: "currently available",
+                accent: "text-[#2D9A5B]",
+                icon: "/images/pages/inv-dashboard/first-img.svg",
             },
             {
-                label: "Average Footprint",
-                value: apartments.length > 0 ? `${averageArea.toFixed(1)} m²` : "0 m²",
-                hint: `${averageRooms.toFixed(1)} average rooms`,
-                accent: "text-[#4E525D]",
+                label: "Sold Listings",
+                value: soldListings,
+                hint: "closed listings",
+                accent: "text-[#C3362B]",
                 icon: "/images/pages/inv-dashboard/forth-img.svg",
+            },
+            {
+                label: "Reserved Listings",
+                value: reservedListings,
+                hint: "temporarily held",
+                accent: "text-[#967B38]",
+                icon: "/images/pages/inv-dashboard/second-img.svg",
             },
         ];
 
@@ -642,8 +647,8 @@ export function Dashboard() {
             donutSegments,
             totalListings,
             activeListings,
-            pendingListings,
-            nonActiveListings,
+            reservedListings,
+            soldListings,
             averageRooms,
             averageArea,
             dataCoverage,
@@ -678,7 +683,7 @@ export function Dashboard() {
                     <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-[#EBEBEB]" />
                 </div>
                 
-                <nav className="flex w-full flex-col pt-6">
+                <nav className="flex w-full flex-1 flex-col pt-6">
                     {/* Accordion sections */}
                     {accordionConfig.map((section) => {
                         const isOpen = expandedSections.has(section.key);
@@ -730,6 +735,22 @@ export function Dashboard() {
                             </div>
                         );
                     })}
+
+                    <div className="mt-auto pb-4 pt-6">
+                        <div className="mb-4 h-px w-full bg-[#EBEBEB]" />
+                        <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="flex h-11 w-full items-center gap-3 rounded-xl px-4 text-[13px] font-medium text-[#C3362B] transition-colors hover:bg-[#FDECEC] cursor-pointer"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            <span>Logout</span>
+                        </button>
+                    </div>
                 </nav>
             </div>
  
@@ -1019,8 +1040,8 @@ export function Dashboard() {
                                 </div>
                                 <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
                                     <span className="rounded-full bg-[#E7F6ED] px-3 py-1 font-medium text-[#2D9A5B]">{resaleDashboard.activeListings} active</span>
-                                    <span className="rounded-full bg-[#FDF4E0] px-3 py-1 font-medium text-[#967B38]">{resaleDashboard.pendingListings} pending</span>
-                                    <span className="rounded-full bg-[#FDECEC] px-3 py-1 font-medium text-[#C3362B]">{resaleDashboard.nonActiveListings} non-active</span>
+                                    <span className="rounded-full bg-[#FDF4E0] px-3 py-1 font-medium text-[#967B38]">{resaleDashboard.reservedListings} reserved</span>
+                                    <span className="rounded-full bg-[#FDECEC] px-3 py-1 font-medium text-[#C3362B]">{resaleDashboard.soldListings} sold</span>
                                 </div>
                             </div>
                             <div className="relative w-full flex-1 min-h-[260px]">
