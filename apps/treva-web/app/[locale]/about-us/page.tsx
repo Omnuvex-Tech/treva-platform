@@ -5,6 +5,7 @@ import GsapScripts from "@/app/components/GsapScripts";
 import AboutTeam from "@/app/components/Home/AboutTeam/AboutTeam";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import { config } from "@/config";
+import { getAuthors } from "@/lib/pulse-api";
 
 export const dynamicParams = false;
 
@@ -26,12 +27,14 @@ export default async function AboutUsRoute({
     notFound();
   }
 
+  const authors = await getAuthors().catch(() => []);
+
   return (
     <>
       <GsapScripts />
       <Navbar locale={locale} variant="solid" />
       <AboutUs locale={locale} />
-      <AboutTeam locale={locale} />
+      <AboutTeam locale={locale} authors={authors} />
       <HomeFooter locale={locale} />
     </>
   );
