@@ -25,16 +25,34 @@ interface Props {
 
 export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllHref }: Props) {
   const viewAllUrl = viewAllHref || (categorySlug ? `/off-plan?category=${categorySlug}` : "/off-plan");
+  const dictionary = {
+    az: {
+      titleThin: 'Mənzil',
+      titleBold: 'planları',
+      viewAll: 'Hamısına bax',
+    },
+    en: {
+      titleThin: 'Unit',
+      titleBold: 'Layouts',
+      viewAll: 'View All',
+    },
+    ru: {
+      titleThin: 'План',
+      titleBold: 'ировки',
+      viewAll: 'Смотреть все',
+    },
+  } as const;
+  const t = dictionary[(locale as 'az' | 'en' | 'ru')] || dictionary.az;
 
   return (
     <main className="layouts-section">
       <PageContainer>
         <header className="layouts-header">
           <h1 className="layouts-header__title">
-            Unit <span>Layouts</span>
+            {t.titleThin} <span>{t.titleBold}</span>
           </h1>
           <div className="layouts-controls">
-            <a href={viewAllUrl} className="layouts-controls__view-all">View All</a>
+            <a href={viewAllUrl} className="layouts-controls__view-all">{t.viewAll}</a>
           </div>
         </header>
 

@@ -54,7 +54,7 @@
   display: flex;
   align-items: center; 
   justify-content: space-between;
-  padding: 0 54px;
+  padding: 0 48px;
   padding-top: var(--treva-nav-height, 20px); 
 }
 
@@ -139,8 +139,8 @@
    ========================================================================== */
 .vision-hero__slider-controls {
   position: absolute;
-  left: 54px;
-  right: 54px;
+  left: 48px;
+  right: 48px;
   bottom: 40px;
   z-index: 5;
   display: flex;
@@ -227,7 +227,7 @@
   }
 
   .vision-hero__container {
-    padding: 0 24px;
+    padding: 0 20px;
     padding-top: calc(var(--treva-nav-height, 64px) + 24px);
     padding-bottom: 84px;
     height: 100%;
@@ -242,8 +242,8 @@
   }
 
   .vision-hero__slider-controls {
-    left: 24px;
-    right: 24px;
+    left: 20px;
+    right: 20px;
     bottom: 20px;
     gap: 12px;
   }

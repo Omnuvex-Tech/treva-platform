@@ -24,6 +24,114 @@ export default function ApartmentCard() {
   const id = params?.id as string | undefined;
   const localeParam = (params as any)?.locale as string | string[] | undefined;
   const locale = Array.isArray(localeParam) ? (localeParam[0] ?? "az") : (localeParam ?? "az");
+  const dictionary = {
+    az: {
+      apartmentNotFound: 'Mənzil tapılmadı',
+      backToListings: 'Elanlara qayıt',
+      main: 'Əsas',
+      offPlan: 'Off-plan',
+      noImage: 'Şəkil yoxdur',
+      share: 'Paylaş',
+      copied: 'Kopyalandı!',
+      copyLink: 'Linki kopyala',
+      floor: 'Mərtəbə',
+      totalArea: 'Ümumi sahə',
+      internalArea: 'Daxili sahə',
+      balcony: 'Balkon',
+      apartmentDetails: 'Mənzil detalları',
+      moreDetails: 'Ətraflı məlumat',
+      consultation: 'Konsultasiya alın',
+      complexInfo: 'Yaşayış kompleksi haqqında daha çox',
+      location: 'Məkan',
+      realEstateType: 'Əmlak növü',
+      completionYear: 'Təhvil ili',
+      numberOfFloors: 'Mərtəbə sayı',
+      floorsRange: 'Mərtəbələr',
+      similarApartmentsThin: 'OXŞAR',
+      similarApartmentsBold: 'MƏNZİLLƏR',
+      loading: 'Yüklənir...',
+      noSimilarApartments: 'Oxşar mənzil tapılmadı.',
+      shown: 'Göstərilib',
+      outOf: '/',
+      showMore: 'Daha çox göstər',
+      checkOutApartment: 'Bu mənzilə baxın',
+      available: 'Aktiv',
+      sold: 'Satılıb',
+      reserved: 'Bron edilib',
+      floorSuffix: 'mərtəbə',
+    },
+    en: {
+      apartmentNotFound: 'Apartment not found',
+      backToListings: 'Back to listings',
+      main: 'Main',
+      offPlan: 'Off Plan',
+      noImage: 'No image',
+      share: 'Share',
+      copied: 'Copied!',
+      copyLink: 'Copy link',
+      floor: 'Floor',
+      totalArea: 'Total Area',
+      internalArea: 'Internal Area',
+      balcony: 'Balcony',
+      apartmentDetails: 'Apartment details',
+      moreDetails: 'More details',
+      consultation: 'Get a Consultation',
+      complexInfo: 'More About the Residential Complex',
+      location: 'Location',
+      realEstateType: 'Real Estate Type',
+      completionYear: 'Year of Completion',
+      numberOfFloors: 'Number of Floors',
+      floorsRange: 'Floors',
+      similarApartmentsThin: 'SIMILAR',
+      similarApartmentsBold: 'APARTMENTS',
+      loading: 'Loading...',
+      noSimilarApartments: 'No similar apartments found.',
+      shown: 'Shown',
+      outOf: 'out of',
+      showMore: 'Show more',
+      checkOutApartment: 'Check out this apartment',
+      available: 'Available',
+      sold: 'Sold',
+      reserved: 'Reserved',
+      floorSuffix: 'floor',
+    },
+    ru: {
+      apartmentNotFound: 'Квартира не найдена',
+      backToListings: 'Назад к списку',
+      main: 'Главная',
+      offPlan: 'Off-plan',
+      noImage: 'Нет изображения',
+      share: 'Поделиться',
+      copied: 'Скопировано!',
+      copyLink: 'Скопировать ссылку',
+      floor: 'Этаж',
+      totalArea: 'Общая площадь',
+      internalArea: 'Внутренняя площадь',
+      balcony: 'Балкон',
+      apartmentDetails: 'Детали квартиры',
+      moreDetails: 'Подробнее',
+      consultation: 'Получить консультацию',
+      complexInfo: 'Подробнее о жилом комплексе',
+      location: 'Локация',
+      realEstateType: 'Тип недвижимости',
+      completionYear: 'Год сдачи',
+      numberOfFloors: 'Количество этажей',
+      floorsRange: 'Этажи',
+      similarApartmentsThin: 'ПОХОЖИЕ',
+      similarApartmentsBold: 'КВАРТИРЫ',
+      loading: 'Загрузка...',
+      noSimilarApartments: 'Похожие квартиры не найдены.',
+      shown: 'Показано',
+      outOf: 'из',
+      showMore: 'Показать еще',
+      checkOutApartment: 'Посмотрите эту квартиру',
+      available: 'Доступно',
+      sold: 'Продано',
+      reserved: 'Забронировано',
+      floorSuffix: 'этаж',
+    },
+  } as const;
+  const t = dictionary[(locale as 'az' | 'en' | 'ru')] || dictionary.az;
 
   const { data: layout, isLoading, error } = useUnitLayoutBySlug(id);
   const { data: currenciesData } = useCurrencies();
@@ -65,11 +173,15 @@ export default function ApartmentCard() {
   };
 
   const formatStatus = (statusValue: string) => {
+    const normalized = statusValue?.trim().toLowerCase();
+    if (normalized === 'available') return t.available;
+    if (normalized === 'sold') return t.sold;
+    if (normalized === 'reserved') return t.reserved;
     return statusValue ? statusValue.charAt(0).toUpperCase() + statusValue.slice(1) : '';
   };
 
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
-  const shareText = layout ? `Check out this apartment: ${layout.title}` : '';
+  const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
 
   const handleShare = (platform: string) => {
     switch (platform) {
@@ -153,14 +265,14 @@ export default function ApartmentCard() {
   if (isLoading) {
     return (
       <div className="page-wrapper">
-        <Navbar variant="solid" />
+        <Navbar locale={locale} variant="solid" />
         <main className="main-wrapper">
           <PageContainer>
             <div />
           </PageContainer>
         </main>
         <CallbackForm allowedRoles={['Client']} />
-        <HomeFooter />
+        <HomeFooter locale={locale} />
         <div className="apt-loading-overlay" role="status" aria-live="polite" aria-busy="true">
           <div className="apt-spinner" />
         </div>
@@ -171,33 +283,33 @@ export default function ApartmentCard() {
   if (error || !layout) {
     return (
       <div className="page-wrapper">
-        <Navbar variant="solid" />
+        <Navbar locale={locale} variant="solid" />
         <main className="main-wrapper">
           <PageContainer>
             <div className="loading-state" style={{ padding: '64px 0', textAlign: 'center' }}>
-              <p style={{ color: '#6d717a' }}>Apartment not found</p>
+              <p style={{ color: '#6d717a' }}>{t.apartmentNotFound}</p>
               <Link href={`/${locale}/off-plan`} style={{ color: '#3F4249', marginTop: 16, display: 'inline-block' }}>
-                ← Back to listings
+                ← {t.backToListings}
               </Link>
             </div>
           </PageContainer>
         </main>
         <CallbackForm allowedRoles={['Client']} />
-        <HomeFooter />
+        <HomeFooter locale={locale} />
       </div>
     );
   }
 
   return (
     <div className="page-wrapper">
-      <Navbar variant="solid" />
+      <Navbar locale={locale} variant="solid" />
       <main className="main-wrapper">
         <PageContainer>
           <div className="apt-wrapper">
             {/* Breadcrumbs */}
             <nav className="apt-breadcrumbs">
-              <Link href={`/${locale}`}>Main</Link> <span className="apt-separator">/</span>
-              <Link href={`/${locale}/off-plan?category=${layout.category?.slug || ''}`}>{layout.category?.title || 'Off Plan'}</Link> <span className="apt-separator">/</span>
+              <Link href={`/${locale}`}>{t.main}</Link> <span className="apt-separator">/</span>
+              <Link href={`/${locale}/off-plan?category=${layout.category?.slug || ''}`}>{layout.category?.title || t.offPlan}</Link> <span className="apt-separator">/</span>
               <span className="apt-crumb-active">N° {layout.number || layout.id.slice(-2)}</span>
             </nav>
 
@@ -215,7 +327,7 @@ export default function ApartmentCard() {
                     />
                   ) : (
                     <div className="apt-plan-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f2eb', color: '#6d717a' }}>
-                      No image
+                      {t.noImage}
                     </div>
                   )}
                 </div>
@@ -238,7 +350,7 @@ export default function ApartmentCard() {
                       </a>
                     )}
                     <div className="apt-share-container" ref={shareRef}>
-                      <button type="button" className="apt-share-btn" aria-label="Share" onClick={() => setShareOpen((prev) => !prev)} aria-haspopup="listbox" aria-expanded={shareOpen}>
+                      <button type="button" className="apt-share-btn" aria-label={t.share} onClick={() => setShareOpen((prev) => !prev)} aria-haspopup="listbox" aria-expanded={shareOpen}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="18" cy="5" r="3" />
                           <circle cx="6" cy="12" r="3" />
@@ -271,7 +383,7 @@ export default function ApartmentCard() {
                             ) : (
                               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                             )}
-                            <span>{shareCopied ? 'Copied!' : 'Copy link'}</span>
+                            <span>{shareCopied ? t.copied : t.copyLink}</span>
                           </button>
                         </div>
                       )}
@@ -281,20 +393,20 @@ export default function ApartmentCard() {
 
                 <div className="apt-specs-list">
                   <div className="apt-spec-item">
-                    <span className="apt-label">Floor</span>
+                    <span className="apt-label">{t.floor}</span>
                     <span className="apt-value">{layout.floor}</span>
                   </div>
                   <div className="apt-spec-item">
-                    <span className="apt-label">Total Area</span>
+                    <span className="apt-label">{t.totalArea}</span>
                     <span className="apt-value">{layout.totalArea} m²</span>
                   </div>
                   <div className="apt-spec-item">
-                    <span className="apt-label">Internal Area</span>
+                    <span className="apt-label">{t.internalArea}</span>
                     <span className="apt-value">{layout.internalArea} m²</span>
                   </div>
                   {layout.balconyArea && (
                     <div className="apt-spec-item">
-                      <span className="apt-label">Balcony</span>
+                      <span className="apt-label">{t.balcony}</span>
                       <span className="apt-value">{layout.balconyArea} m²</span>
                     </div>
                   )}
@@ -351,17 +463,17 @@ export default function ApartmentCard() {
               </div>
             </div>
 
-            <section className="panorama-section" aria-label="Apartment details">
+            <section className="panorama-section" aria-label={t.apartmentDetails}>
               <div className="panorama-banner">
                 <div className="panorama-overlay" />
                 <div className="panorama-content">
-                  <h2 className="panorama-title">{layout.category?.title || "More details"}</h2>
+                  <h2 className="panorama-title">{layout.category?.title || t.moreDetails}</h2>
                   <div className="panorama-button-group">
                     <a href="tel:+994502772662" className="panorama-btn">
                       <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
-                      <span>Get a Consultation</span>
+                      <span>{t.consultation}</span>
                     </a>
                     <a href="tel:+994502772662" className="panorama-btn">
                       <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -374,7 +486,7 @@ export default function ApartmentCard() {
                         <path d="M9 10h.01" />
                         <path d="M15 10h.01" />
                       </svg>
-                      <span>More About the Residential Complex</span>
+                      <span>{t.complexInfo}</span>
                     </a>
                   </div>
                 </div>
@@ -383,40 +495,40 @@ export default function ApartmentCard() {
               <div className="panorama-info-table">
                 {layout.location && (
                   <div className="panorama-row">
-                    <span className="panorama-label">Location</span>
+                    <span className="panorama-label">{t.location}</span>
                     <span className="panorama-value">{layout.location.title}</span>
                   </div>
                 )}
                 {layout.location && (
                   <div className="panorama-row">
-                    <span className="panorama-label">Real Estate Type</span>
+                    <span className="panorama-label">{t.realEstateType}</span>
                     <span className="panorama-value">{layout.location.type}</span>
                   </div>
                 )}
                 <div className="panorama-row">
-                  <span className="panorama-label">Year of Completion</span>
+                  <span className="panorama-label">{t.completionYear}</span>
                   <span className="panorama-value">{layout.completionYear}</span>
                 </div>
                 <div className="panorama-row">
-                  <span className="panorama-label">Number of Floors</span>
-                  <span className="panorama-value">From {layout.numberOfFloors?.start} to {layout.numberOfFloors?.end} Floors</span>
+                  <span className="panorama-label">{t.numberOfFloors}</span>
+                  <span className="panorama-value">{layout.numberOfFloors?.start} - {layout.numberOfFloors?.end} {t.floorsRange}</span>
                 </div>
               </div>
             </section>
 
             {(similarIds.length > 0 || (layout.similarApartments?.length ?? 0) > 0) && (
-              <section className="similar-section" aria-label="Similar apartments">
+              <section className="similar-section" aria-label={`${t.similarApartmentsThin} ${t.similarApartmentsBold}`}>
                 <div className="similar-header">
                   <h2 className="similar-title">
-                    <span className="similar-title-thin">SIMILAR</span>
-                    <span className="similar-title-bold">APARTMENTS</span>
+                    <span className="similar-title-thin">{t.similarApartmentsThin}</span>
+                    <span className="similar-title-bold">{t.similarApartmentsBold}</span>
                   </h2>
                 </div>
 
                 {similarQuery.isLoading && filteredSimilarLayouts.length === 0 ? (
-                  <div style={{ padding: "24px 0", color: "#6d717a" }}>Loading...</div>
+                  <div style={{ padding: "24px 0", color: "#6d717a" }}>{t.loading}</div>
                 ) : filteredSimilarLayouts.length === 0 ? (
-                  <div style={{ padding: "24px 0", color: "#6d717a" }}>No similar apartments found.</div>
+                  <div style={{ padding: "24px 0", color: "#6d717a" }}>{t.noSimilarApartments}</div>
                 ) : (
                   <>
                     <div className="similar-grid">
@@ -425,7 +537,7 @@ export default function ApartmentCard() {
                           <div className="layout-card__header">
                             <div className="layout-card__title-block">
                               <span className="layout-card__code">{item.name || item.title}</span>
-                              <span className="layout-card__floor">{item.floor} floor</span>
+                              <span className="layout-card__floor">{item.floor} {t.floorSuffix}</span>
                             </div>
                             <div className="layout-card__number-block">
                               <span className="layout-card__number">N° {item.number || item.id.slice(-2)}</span>
@@ -442,7 +554,7 @@ export default function ApartmentCard() {
                               />
                             ) : (
                               <div className="layout-card__blueprint layout-card__blueprint--placeholder">
-                                <span>No image</span>
+                                <span>{t.noImage}</span>
                               </div>
                             )}
                           </div>
@@ -464,7 +576,7 @@ export default function ApartmentCard() {
                     {similarTotalPages > 1 && (
                       <div className="pagination-mobile">
                         <span className="pagination-shown">
-                          Shown {similarShown} out of {similarTotal}
+                          {t.shown} {similarShown} {t.outOf} {similarTotal}
                         </span>
                         <div className="pagination-progress">
                           <div
@@ -482,10 +594,10 @@ export default function ApartmentCard() {
                             {isLoadingMoreSimilar ? (
                               <>
                                 <span className="pagination-show-more__spinner" aria-hidden="true" />
-                                Loading...
+                                {t.loading}
                               </>
                             ) : (
-                              "Show more"
+                              t.showMore
                             )}
                           </button>
                         )}
@@ -499,7 +611,7 @@ export default function ApartmentCard() {
         </PageContainer>
       </main>
       <CallbackForm allowedRoles={['Client']} />
-      <HomeFooter />
+      <HomeFooter locale={locale} />
     </div>
   );
 }

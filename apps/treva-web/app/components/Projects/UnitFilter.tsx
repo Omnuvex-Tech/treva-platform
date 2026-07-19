@@ -17,8 +17,100 @@ export default function UnitLayout() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const locale = params?.locale || 'az';
+  const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const categorySlug = searchParams.get('category') || '';
+
+  const dictionary = {
+    az: {
+      titleThin: 'Mənzil',
+      titleBold: 'planları',
+      price: 'Qiymət',
+      area: 'Sahə (m²)',
+      from: 'min',
+      to: 'max',
+      floor: 'Mərtəbə',
+      view: 'Mənzərə',
+      status: 'Status',
+      rooms: 'Otaq sayı',
+      noRooms: 'Otaq yoxdur',
+      results: 'mənzil tapıldı',
+      reset: 'Filtrləri sıfırla',
+      bannerTitle: 'Daha Ətraflı Məlumat Alın',
+      consultation: 'Konsultasiya alın',
+      complexInfo: 'Yaşayış kompleksi haqqında daha çox',
+      noResults: 'Filtrlərinizə uyğun mənzil tapılmadı.',
+      noImage: 'Şəkil yoxdur',
+      viewApartmentDetails: 'Mənzilə bax',
+      shown: 'Göstərilib',
+      outOf: '/',
+      showMore: 'Daha çox göstər',
+      all: 'Hamısı',
+      available: 'Aktiv',
+      sold: 'Satılıb',
+      reserved: 'Bron edilib',
+      floorSuffix: 'mərtəbə',
+    },
+    en: {
+      titleThin: 'Unit',
+      titleBold: 'layouts',
+      price: 'Price',
+      area: 'Area (m²)',
+      from: 'from',
+      to: 'to',
+      floor: 'Floor',
+      view: 'View',
+      status: 'Status',
+      rooms: 'Number of rooms',
+      noRooms: 'No rooms',
+      results: 'apartments found',
+      reset: 'Reset filters',
+      bannerTitle: 'Get More Information',
+      consultation: 'Get a Consultation',
+      complexInfo: 'More About the Residential Complex',
+      noResults: 'No apartments found matching your filters.',
+      noImage: 'No image',
+      viewApartmentDetails: 'View Apartment Details',
+      shown: 'Shown',
+      outOf: 'out of',
+      showMore: 'Show more',
+      all: 'All',
+      available: 'Available',
+      sold: 'Sold',
+      reserved: 'Reserved',
+      floorSuffix: 'floor',
+    },
+    ru: {
+      titleThin: 'План',
+      titleBold: 'ировки',
+      price: 'Цена',
+      area: 'Площадь (м²)',
+      from: 'от',
+      to: 'до',
+      floor: 'Этаж',
+      view: 'Вид',
+      status: 'Статус',
+      rooms: 'Количество комнат',
+      noRooms: 'Нет комнат',
+      results: 'квартир найдено',
+      reset: 'Сбросить фильтры',
+      bannerTitle: 'Получить больше информации',
+      consultation: 'Получить консультацию',
+      complexInfo: 'Подробнее о жилом комплексе',
+      noResults: 'Квартиры по вашим фильтрам не найдены.',
+      noImage: 'Нет изображения',
+      viewApartmentDetails: 'Смотреть квартиру',
+      shown: 'Показано',
+      outOf: 'из',
+      showMore: 'Показать еще',
+      all: 'Все',
+      available: 'Доступно',
+      sold: 'Продано',
+      reserved: 'Забронировано',
+      floorSuffix: 'этаж',
+    },
+  } as const;
+
+  const t = dictionary[locale] || dictionary.az;
 
   const [currency, setCurrency] = useState(searchParams.get('currency') || 'USD');
   const [floor, setFloor] = useState(searchParams.get('floor') || '');
@@ -177,8 +269,14 @@ export default function UnitLayout() {
   };
 
   const formatStatus = (status: string) => {
+    const normalized = status.trim().toLowerCase();
+    if (normalized === 'available') return t.available;
+    if (normalized === 'sold') return t.sold;
+    if (normalized === 'reserved') return t.reserved;
     return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
   };
+
+  const formatFloor = (floorValue: string | number) => `${floorValue} ${t.floorSuffix}`;
 
   const handleReset = () => {
     setFloor('');
@@ -207,8 +305,8 @@ export default function UnitLayout() {
         {/* HEADER */}
         <div className="layout-header">
           <h2 className="layout-title">
-            <span className="layout-title-thin">UnIt</span>
-            <span className="layout-title-bold">layouts</span>
+            <span className="layout-title-thin">{t.titleThin}</span>
+            <span className="layout-title-bold">{t.titleBold}</span>
             <span className="layout-count">({pagination?.total || 0})</span>
           </h2>
         </div>
@@ -218,11 +316,11 @@ export default function UnitLayout() {
           
           {/* Price Filter */}
           <div className="filter-group filter-group--price">
-            <label className="filter-label">Price</label>
+            <label className="filter-label">{t.price}</label>
             <div className="filter-inputs-wrapper">
               <div className="dual-inputs">
                 <div className="input-with-prefix">
-                  <span>from</span>
+                  <span>{t.from}</span>
                   <input 
                     type="text" 
                     value={priceMinInput} 
@@ -246,7 +344,7 @@ export default function UnitLayout() {
                   />
                 </div>
                 <div className="input-with-prefix">
-                  <span>to</span>
+                  <span>{t.to}</span>
                   <input 
                     type="text" 
                     value={priceMaxInput} 
@@ -332,10 +430,10 @@ export default function UnitLayout() {
           {/* Area & Floor Wrapper */}
           <div className="mobile-flex-row filter-group--area-floor">
             <div className="filter-group filter-group--area">
-              <label className="filter-label">Area (m²)</label>
+              <label className="filter-label">{t.area}</label>
               <div className="dual-inputs">
                 <div className="input-with-prefix">
-                  <span>from</span>
+                  <span>{t.from}</span>
                   <input 
                     type="text" 
                     value={areaMinInput} 
@@ -359,7 +457,7 @@ export default function UnitLayout() {
                   />
                 </div>
                 <div className="input-with-prefix">
-                  <span>to</span>
+                  <span>{t.to}</span>
                   <input 
                     type="text" 
                     value={areaMaxInput} 
@@ -422,10 +520,10 @@ export default function UnitLayout() {
             </div>
 
             <div className="filter-group filter-group--floor">
-              <label className="filter-label">Floor</label>
+              <label className="filter-label">{t.floor}</label>
               <div className="custom-select" ref={floorRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={floorOpen} onClick={() => setFloorOpen((p) => !p)}>
-                  <span>{floor || 'All'}</span>
+                  <span>{floor || t.all}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -433,7 +531,7 @@ export default function UnitLayout() {
                 {floorOpen && (
                   <div className="custom-select__dropdown">
                     <button type="button" className={`custom-select__option ${!floor || floor === 'All' ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(''); setPage(1); setFloorOpen(false); }}>
-                      All
+                      {t.all}
                     </button>
                     {floors.map((f, idx) => {
                       let val = typeof f === 'object' ? (f as any).value || (f as any).floor || (f as any).name : f;
@@ -454,10 +552,10 @@ export default function UnitLayout() {
           {/* View & Status Wrapper */}
           <div className="mobile-flex-row filter-group--view-status">
             <div className="filter-group filter-group--view">
-              <label className="filter-label">View</label>
+              <label className="filter-label">{t.view}</label>
               <div className="custom-select" ref={viewRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
-                  <span>{viewOptions.find(v => v.id === selectedView)?.title || viewOptions.find(v => v.id === selectedView)?.value || 'All'}</span>
+                  <span>{viewOptions.find(v => v.id === selectedView)?.title || viewOptions.find(v => v.id === selectedView)?.value || t.all}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -465,7 +563,7 @@ export default function UnitLayout() {
                 {viewOpen && (
                   <div className="custom-select__dropdown">
                     <button type="button" className={`custom-select__option ${!selectedView ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(''); setPage(1); setViewOpen(false); }}>
-                      All
+                      {t.all}
                     </button>
                     {viewOptions.map((opt) => (
                       <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setPage(1); setViewOpen(false); }}>
@@ -477,10 +575,10 @@ export default function UnitLayout() {
               </div>
             </div>
             <div className="filter-group filter-group--status">
-              <label className="filter-label">Status</label>
+              <label className="filter-label">{t.status}</label>
               <div className="custom-select" ref={statusRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={statusOpen} onClick={() => setStatusOpen((p) => !p)}>
-                  <span>{statusOptions.find(s => s.id === selectedStatus)?.value || 'All'}</span>
+                  <span>{selectedStatus ? formatStatus(statusOptions.find(s => s.id === selectedStatus)?.value || '') : t.all}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -488,11 +586,11 @@ export default function UnitLayout() {
                 {statusOpen && (
                   <div className="custom-select__dropdown">
                     <button type="button" className={`custom-select__option ${!selectedStatus ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(''); setPage(1); setStatusOpen(false); }}>
-                      All
+                      {t.all}
                     </button>
                     {statusOptions.map((opt) => (
                       <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(opt.id); setPage(1); setStatusOpen(false); }}>
-                        {opt.value}
+                        {formatStatus(opt.value)}
                       </button>
                     ))}
                   </div>
@@ -503,10 +601,10 @@ export default function UnitLayout() {
 
           {/* Number of Rooms Filter */}
           <div className="filter-group filter-group--rooms">
-            <label className="filter-label">Number of rooms</label>
+            <label className="filter-label">{t.rooms}</label>
             <div className="rooms-group">
               {roomOptions.length === 0 ? (
-                <span style={{ fontSize: 13, color: '#9ca3af' }}>Otaq yoxdur</span>
+                <span style={{ fontSize: 13, color: '#9ca3af' }}>{t.noRooms}</span>
               ) : (
                 roomOptions.map((room) => (
                   <button
@@ -526,21 +624,21 @@ export default function UnitLayout() {
 
         {/* RESULTS & RESET ROW */}
         <div className="results-row">
-          <span className="results-count">{pagination?.total || 0} apartments found</span>
-          <button type="button" className="reset-btn" onClick={handleReset}>Reset filters</button>
+          <span className="results-count">{pagination?.total || 0} {t.results}</span>
+          <button type="button" className="reset-btn" onClick={handleReset}>{t.reset}</button>
         </div>
 
         {/* BANNER CARD */}
         <div className="complex-banner">
           <div className="banner-overlay"></div>
           <div className="banner-content">
-            <h3 className="banner-title">Get More Information</h3>
+            <h3 className="banner-title">{t.bannerTitle}</h3>
             <div className="banner-actions">
               <a href="tel:+994502772662" className="action-btn">
                 <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
-                <span>Get a Consultation</span>
+                <span>{t.consultation}</span>
               </a>
               <a href="tel:+994502772662" className="action-btn">
                 <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -550,7 +648,7 @@ export default function UnitLayout() {
                   <line x1="9" y1="16" x2="15" y2="16"/>
                   <path d="M9 6h.01M15 6h.01M9 10h.01M15 10h.01"/>
                 </svg>
-                <span>More About the Residential Complex</span>
+                <span>{t.complexInfo}</span>
               </a>
             </div>
           </div>
@@ -572,7 +670,7 @@ export default function UnitLayout() {
             </div>
           ) : layouts.length === 0 && !showSpinner ? (
             <div className="empty-state">
-              <p>No apartments found matching your filters.</p>
+              <p>{t.noResults}</p>
             </div>
           ) : (
             <div style={{ position: 'relative' }}>
@@ -588,7 +686,7 @@ export default function UnitLayout() {
                       <div className="layout-card__header">
                         <div className="layout-card__title-block">
                           <span className="layout-card__code">{getCardCode(layout)}</span>
-                          <span className="layout-card__floor">{layout.floor} floor</span>
+                          <span className="layout-card__floor">{formatFloor(layout.floor)}</span>
                         </div>
                         <div className="layout-card__number-block">
                           <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
@@ -601,7 +699,7 @@ export default function UnitLayout() {
                           <img src={getAssetUrl(layout.mainImage.url)} alt={layout.mainImage.alt || layout.title} className="layout-card__blueprint" />
                         ) : (
                           <div className="layout-card__blueprint layout-card__blueprint--placeholder">
-                            <span>No image</span>
+                            <span>{t.noImage}</span>
                           </div>
                         )}
                       </div>
@@ -611,7 +709,7 @@ export default function UnitLayout() {
                         <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
                       </div>
                     </div>
-                    <span className="layout-card__cta">VIew Apartment DetaIls</span>
+                    <span className="layout-card__cta">{t.viewApartmentDetails}</span>
                   </Link>
                 ))}
               </div>
@@ -622,7 +720,7 @@ export default function UnitLayout() {
         {pagination && (
           <div className="pagination-mobile">
             <span className="pagination-shown">
-              Shown {Math.min(layouts.length, pagination.total)} out of {pagination.total}
+              {t.shown} {Math.min(layouts.length, pagination.total)} {t.outOf} {pagination.total}
             </span>
             <div className="pagination-progress">
               <div
@@ -632,7 +730,7 @@ export default function UnitLayout() {
             </div>
             {page < pagination.totalPages && (
               <button type="button" className="pagination-show-more" onClick={() => setPage((p) => p + 1)}>
-                Show more
+                {t.showMore}
               </button>
             )}
           </div>
