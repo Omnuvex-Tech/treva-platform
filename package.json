@@ -2,7 +2,7 @@
     "name": "treva-platform",
     "private": true,
     "scripts": {
-        "build": "turbo run build",
+        "build": "node --max-old-space-size=2048 ./node_modules/turbo/bin/turbo run build",
         "start": "npm --prefix apps/treva-web start",
         "dev": "turbo run dev",
         "api:db:dev": "npm --prefix apps/treva-api run db:dev",
