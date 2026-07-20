@@ -66,7 +66,6 @@ export interface ResaleApartment {
     locationTitle?: string;
     locationUrl?: string;
     locationGoogleMapsUrl?: string;
-    completionYear?: number;
     renovation?: string;
     kitchenSize?: number;
     wallMaterial?: string;
@@ -107,7 +106,6 @@ export interface ResaleFilters {
     roomCount?: number;
     minArea?: number;
     maxArea?: number;
-    completionYear?: number;
     floor?: number;
     currency?: string;
     viewOptionIds?: string;

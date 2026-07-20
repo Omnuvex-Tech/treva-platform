@@ -36,7 +36,6 @@ export class ApartmentsController {
   @ApiQuery({ name: 'maxArea', required: false })
   @ApiQuery({ name: 'minGrossArea', required: false })
   @ApiQuery({ name: 'maxGrossArea', required: false })
-  @ApiQuery({ name: 'completionYear', required: false })
   @ApiQuery({ name: 'floor', required: false })
   @ApiQuery({ name: 'currency', required: false })
   @ApiQuery({ name: 'viewOptionIds', required: false })
@@ -58,7 +57,6 @@ export class ApartmentsController {
     @Query('maxArea') maxArea?: string,
     @Query('minGrossArea') minGrossArea?: string,
     @Query('maxGrossArea') maxGrossArea?: string,
-    @Query('completionYear') completionYear?: string,
     @Query('floor') floor?: string,
     @Query('currency') currency?: string,
     @Query('viewOptionIds') viewOptionIds?: string,
@@ -81,7 +79,6 @@ export class ApartmentsController {
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       minGrossArea: minGrossArea ? parseFloat(minGrossArea) : undefined,
       maxGrossArea: maxGrossArea ? parseFloat(maxGrossArea) : undefined,
-      completionYear: completionYear ? parseInt(completionYear) : undefined,
       floor: floor ? parseInt(floor) : undefined,
       currency,
       viewOptionIds,
@@ -105,12 +102,6 @@ export class ApartmentsController {
   @ApiOperation({ summary: 'Get available room counts' })
   async getRoomCounts() {
     return this.service.getRoomCounts();
-  }
-
-  @Get('completion-years')
-  @ApiOperation({ summary: 'Get available completion years' })
-  async getCompletionYears() {
-    return this.service.getCompletionYears();
   }
 
   @Get('slug/:slug')

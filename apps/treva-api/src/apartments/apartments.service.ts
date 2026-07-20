@@ -153,13 +153,12 @@ export class ApartmentsService {
     maxArea?: number;
     minGrossArea?: number;
     maxGrossArea?: number;
-    completionYear?: number;
     floor?: number;
     currency?: string;
     viewOptionIds?: string;
     status?: string;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, completionYear, floor, currency, viewOptionIds, status } = query;
+    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, viewOptionIds, status } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
@@ -187,7 +186,6 @@ export class ApartmentsService {
       if (minGrossArea) where.grossArea.gte = minGrossArea;
       if (maxGrossArea) where.grossArea.lte = maxGrossArea;
     }
-    if (completionYear) where.completionYear = completionYear;
     if (floor) {
       where.floorFrom = { lte: floor };
       where.floorTo = { gte: floor };
@@ -370,21 +368,4 @@ export class ApartmentsService {
     return [...rooms].sort((a, b) => a - b);
   }
 
-  async getCompletionYears(): Promise<number[]> {
-    const apartments = await this.prisma.apartment.findMany({
-      select: { completionYear: true },
-      where: { completionYear: { not: null } },
-      orderBy: { completionYear: 'asc' },
-    });
-
-    const years = new Set<number>();
-    for (const apartment of apartments) {
-      const year = Number(apartment.completionYear);
-      if (Number.isFinite(year) && year > 0) {
-        years.add(Math.floor(year));
-      }
-    }
-
-    return [...years].sort((a, b) => a - b);
-  }
 }

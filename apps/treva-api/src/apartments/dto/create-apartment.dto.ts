@@ -181,11 +181,6 @@ export class CreateApartmentDto {
   @IsNumber()
   buildingAge?: number;
 
-  @ApiPropertyOptional({ example: 2028 })
-  @IsOptional()
-  @IsNumber()
-  completionYear?: number;
-
   @ApiPropertyOptional({ example: 'furnished', enum: ['furnished', 'unfurnished'] })
   @IsOptional()
   @IsString()

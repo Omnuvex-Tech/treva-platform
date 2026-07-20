@@ -38,6 +38,13 @@ const SECONDARY_BUTTON_CLASS =
 const PRIMARY_TEXT_CLASS = 'w-variant-396e566b-0a82-5a60-ac2f-21a23e91a30e'
 const SECONDARY_TEXT_CLASS = 'w-variant-6df2cdf2-59f5-a951-7112-29ad9c77d0eb'
 const PENDING_SCROLL_KEY = 'treva_pending_hash_scroll'
+const CTA_IMAGES = {
+  topLeft: '/assets/Brabus%201014x598.jpg',
+  topRight: '/assets/Sabah%20Towers%20536x620_.jpg',
+  middleRight: '/assets/Arabian%20536x620.jpg',
+  bottomLeft: '/assets/16X9.avif',
+  bottomRight: '/assets/700X800_MARI%CC%87NA.avif',
+} as const
 
 function CTAActionButton({
   action,
@@ -326,19 +333,17 @@ export default function PartnershipCTA({
             <img
               width="Auto"
               loading="lazy"
-              alt="A large white building with palm trees in front of it - arabian ranches"
-              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6877795ce390ea79b5c67e2e_1014X598.avif"
+              alt="Brabus"
+              src={CTA_IMAGES.topLeft}
               className="fullwidth-img"
             />
           </div>
           <div className="cta_img-wrap is-top-right is-az">
             <img
               width="Auto"
-              sizes="100vw"
-              alt="A building with a fountain in front of it - villa siena"
-              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080.avif"
+              alt="Sabah Towers"
+              src={CTA_IMAGES.topRight}
               loading="lazy"
-              srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080-p-1080.avif 1080w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e484afd3d27df4a880_1920X1080.avif 1920w"
               className="fullwidth-img"
             />
           </div>
@@ -347,11 +352,9 @@ export default function PartnershipCTA({
           <div className="cta_img-wrap is-middle-right">
             <img
               width="Auto"
-              sizes="100vw"
-              alt="A large house with a pool in front of it - villa siena"
-              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif"
+              alt="Arabian"
+              src={CTA_IMAGES.middleRight}
               loading="lazy"
-              srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687789e35e32834841daa30b_1014X598.avif 1014w"
               className="fullwidth-img"
             />
           </div>
@@ -359,10 +362,8 @@ export default function PartnershipCTA({
         <div className="cta_bg-bottom is-consultation">
           <div className="cta_img-wrap is-bottom-left">
             <img
-              sizes="100vw"
-              srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9.avif 1920w"
               alt="A plane flying over a building with a curved facade - Sabah Residence"
-              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68778c96c2e171e2e9f756e5_16X9.avif"
+              src={CTA_IMAGES.bottomLeft}
               loading="lazy"
               className="fullwidth-img"
             />
@@ -370,11 +371,9 @@ export default function PartnershipCTA({
           <div className="cta_img-wrap is-bottom-right">
             <img
               width="Auto"
-              sizes="100vw"
-              alt="A large building with a boat in front of it - marina village"
-              src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1.avif"
+              alt="Marina"
+              src={CTA_IMAGES.bottomRight}
               loading="lazy"
-              srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-1080.avif 1080w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1-p-1600.avif 1600w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/687785016cf80af995692f8b_2X1.avif 2000w"
               className="fullwidth-img"
             />
           </div>

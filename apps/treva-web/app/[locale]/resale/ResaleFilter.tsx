@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { useResaleApartmentRange, useResaleCompletionYears, useResaleCurrencies, useResaleLocationOptions, useResaleRooms, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
+import { useResaleApartmentRange, useResaleCurrencies, useResaleLocationOptions, useResaleRooms, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
 import { useRoomOptions } from '@/hooks/use-room-options';
 import { useDebounce } from '@/hooks/use-debounce';
 import type { ResaleLocationOption } from '@/lib/resale.types';
@@ -19,7 +19,6 @@ export interface ResaleFilterState {
   maxPrice?: number;
   minArea?: number;
   maxArea?: number;
-  completionYear?: number;
   roomCount?: number;
   currency?: string;
   status?: string;
@@ -37,7 +36,6 @@ const filterDictionary = {
     offerType: 'Elan növü',
     mortgage: 'İpoteka',
     extract: 'Çıxarış',
-    completionYear: 'Təhvil ili',
     status: 'Status',
     rooms: 'Otaq sayı',
     from: 'min',
@@ -46,7 +44,6 @@ const filterDictionary = {
     allRegions: 'Bütün rayonlar',
     allProjects: 'Bütün layihələr',
     all: 'Hamısı',
-    allYears: 'Bütün illər',
     sale: 'Satış',
     rent: 'Kirayə',
     yes: 'Bəli',
@@ -69,7 +66,6 @@ const filterDictionary = {
     offerType: 'Offer type',
     mortgage: 'Mortgage',
     extract: 'Extract',
-    completionYear: 'Completion year',
     status: 'Status',
     rooms: 'Number of rooms',
     from: 'from',
@@ -78,7 +74,6 @@ const filterDictionary = {
     allRegions: 'All regions',
     allProjects: 'All projects',
     all: 'All',
-    allYears: 'All years',
     sale: 'Sale',
     rent: 'Rent',
     yes: 'Yes',
@@ -101,7 +96,6 @@ const filterDictionary = {
     offerType: 'Тип предложения',
     mortgage: 'Ипотека',
     extract: 'Выписка',
-    completionYear: 'Год сдачи',
     status: 'Статус',
     rooms: 'Количество комнат',
     from: 'от',
@@ -110,7 +104,6 @@ const filterDictionary = {
     allRegions: 'Все районы',
     allProjects: 'Все проекты',
     all: 'Все',
-    allYears: 'Все годы',
     sale: 'Продажа',
     rent: 'Аренда',
     yes: 'Да',
@@ -192,7 +185,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const t = filterDictionary[locale] || filterDictionary.az;
   const { data: apartmentTypesData } = useResaleApartmentTypes();
-  const { data: completionYearsData } = useResaleCompletionYears();
   const { data: locationOptionsData } = useResaleLocationOptions();
   const { data: currenciesData } = useResaleCurrencies();
   const { data: roomOptionsData } = useRoomOptions('resale');
@@ -201,7 +193,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const apartmentTypes = [...(apartmentTypesData || [])].sort((a: any, b: any) => {
     return getApartmentTypeOrder(a) - getApartmentTypeOrder(b);
   });
-  const completionYears = completionYearsData || [];
   const locationOptions = locationOptionsData || [];
   const cities = locationOptions.filter((option) => option.type === 'city');
   const currencies = currenciesData || [];
@@ -247,7 +238,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const [selectedPurpose, setSelectedPurpose] = useState('');
   const [selectedMortgage, setSelectedMortgage] = useState('');
   const [selectedExtract, setSelectedExtract] = useState('');
-  const [selectedCompletionYear, setSelectedCompletionYear] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedRooms, setSelectedRooms] = useState('');
 
@@ -257,7 +247,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const [purposeOpen, setPurposeOpen] = useState(false);
   const [mortgageOpen, setMortgageOpen] = useState(false);
   const [extractOpen, setExtractOpen] = useState(false);
-  const [completionYearOpen, setCompletionYearOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
 
@@ -267,7 +256,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const purposeRef = useRef<HTMLDivElement>(null);
   const mortgageRef = useRef<HTMLDivElement>(null);
   const extractRef = useRef<HTMLDivElement>(null);
-  const completionYearRef = useRef<HTMLDivElement>(null);
   const currencyRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
@@ -312,7 +300,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
       if (purposeRef.current && !purposeRef.current.contains(e.target as Node)) setPurposeOpen(false);
       if (mortgageRef.current && !mortgageRef.current.contains(e.target as Node)) setMortgageOpen(false);
       if (extractRef.current && !extractRef.current.contains(e.target as Node)) setExtractOpen(false);
-      if (completionYearRef.current && !completionYearRef.current.contains(e.target as Node)) setCompletionYearOpen(false);
       if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
       if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
     };
@@ -349,10 +336,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     if (debouncedPriceMax < totalPriceMax) f.maxPrice = debouncedPriceMax;
     if (debouncedAreaMin > 0) f.minArea = debouncedAreaMin;
     if (debouncedAreaMax < totalAreaMax) f.maxArea = debouncedAreaMax;
-    if (selectedCompletionYear) {
-      const year = parseInt(selectedCompletionYear, 10);
-      if (Number.isFinite(year)) f.completionYear = year;
-    }
     if (selectedRooms) {
       const rc = parseInt(selectedRooms, 10);
       if (Number.isFinite(rc)) f.roomCount = rc;
@@ -360,7 +343,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     if (currency) f.currency = currency;
     if (selectedStatus) f.status = selectedStatus;
     onFilterChange(f);
-  }, [selectedCity, selectedRegion, selectedTypeId, selectedPurpose, selectedMortgage, selectedExtract, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, selectedCompletionYear, selectedRooms, currency, selectedStatus, onFilterChange, totalPriceMax, totalAreaMax]);
+  }, [selectedCity, selectedRegion, selectedTypeId, selectedPurpose, selectedMortgage, selectedExtract, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, selectedRooms, currency, selectedStatus, onFilterChange, totalPriceMax, totalAreaMax]);
 
   useEffect(() => { fireFilters(); }, [fireFilters]);
 
@@ -377,7 +360,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     setSelectedPurpose('');
     setSelectedMortgage('');
     setSelectedExtract('');
-    setSelectedCompletionYear('');
     setSelectedStatus('');
     setSelectedRooms('');
     setPriceMin(0);
@@ -730,31 +712,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                 {booleanOptions.map((option) => (
                   <button key={option.id} type="button" className={`custom-select__option ${selectedExtract === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedExtract(option.id); setExtractOpen(false); }}>
                     {option.value}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Completion Year Filter */}
-        <div className="filter-group filter-group--completion-year">
-          <label className="filter-label">{t.completionYear}</label>
-          <div className="custom-select" ref={completionYearRef}>
-            <button type="button" className="custom-select__trigger" aria-expanded={completionYearOpen} onClick={() => setCompletionYearOpen((p) => !p)}>
-              <span>{selectedCompletionYear || t.allYears}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-            {completionYearOpen && (
-              <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedCompletionYear ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedCompletionYear(''); setCompletionYearOpen(false); }}>
-                  {t.allYears}
-                </button>
-                {completionYears.map((year) => (
-                  <button key={year} type="button" className={`custom-select__option ${selectedCompletionYear === String(year) ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedCompletionYear(String(year)); setCompletionYearOpen(false); }}>
-                    {year}
                   </button>
                 ))}
               </div>

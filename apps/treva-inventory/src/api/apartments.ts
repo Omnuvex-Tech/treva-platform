@@ -36,7 +36,6 @@ export interface Apartment {
     extract: boolean | null;
     parking: boolean | null;
     buildingAge: number | null;
-    completionYear: number | null;
     furnishing: ApartmentFurnishing | null;
     elevator: boolean | null;
     ceilingHeight: number | null;
@@ -100,7 +99,6 @@ export interface CreateApartmentData {
     extract?: boolean;
     parking?: boolean;
     buildingAge?: number;
-    completionYear?: number;
     furnishing?: ApartmentFurnishing;
     elevator?: boolean;
     ceilingHeight?: number;
@@ -147,7 +145,6 @@ export interface UpdateApartmentData {
     extract?: boolean;
     parking?: boolean;
     buildingAge?: number;
-    completionYear?: number;
     furnishing?: ApartmentFurnishing;
     elevator?: boolean;
     ceilingHeight?: number;
@@ -173,7 +170,6 @@ export interface ApartmentFilters {
     roomCount?: number;
     minArea?: number;
     maxArea?: number;
-    completionYear?: number;
     minGrossArea?: number;
     maxGrossArea?: number;
     floor?: number;

@@ -43,7 +43,6 @@ export function buildApartmentDuplicatePayload(
         extract: apartment.extract ?? undefined,
         parking: apartment.parking ?? undefined,
         buildingAge: apartment.buildingAge ?? undefined,
-        completionYear: apartment.completionYear ?? undefined,
         furnishing: apartment.furnishing || undefined,
         elevator: apartment.elevator ?? undefined,
         ceilingHeight: apartment.ceilingHeight ?? undefined,

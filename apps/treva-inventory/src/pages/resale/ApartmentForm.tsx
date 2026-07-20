@@ -278,7 +278,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         extract: undefined,
         parking: undefined,
         buildingAge: undefined as unknown as number,
-        completionYear: undefined as unknown as number,
         furnishing: undefined,
         elevator: undefined,
         ceilingHeight: undefined as unknown as number,
@@ -327,7 +326,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 extract: d.extract ?? undefined,
                 parking: d.parking ?? undefined,
                 buildingAge: d.buildingAge ?? undefined,
-                completionYear: d.completionYear ?? undefined,
                 furnishing: d.furnishing || undefined,
                 elevator: d.elevator ?? undefined,
                 ceilingHeight: d.ceilingHeight ?? undefined,
@@ -896,17 +894,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         onChange={(e) => updateField("buildingAge", parseInt(e.target.value) || undefined)}
                                         placeholder="8"
                                         min={0}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Completion Year</label>
-                                    <input
-                                        className={inputClass}
-                                        type="number"
-                                        value={form.completionYear ?? ""}
-                                        onChange={(e) => updateField("completionYear", parseInt(e.target.value) || undefined)}
-                                        placeholder="2028"
-                                        min={1900}
                                     />
                                 </div>
                                 <div>
