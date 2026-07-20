@@ -12,7 +12,7 @@ import { BlockRenderer } from "./BlockRenderer";
 import { toAbsUrl } from "@/lib/pulse-api";
 import "./pulse-article.css";
 
-const AUTHOR_IMAGE_FALLBACK = "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg";
+const AUTHOR_IMAGE_FALLBACK = "/assets/webflow-placeholder.svg";
 
 type PulseArticleDetailProps = {
   locale: string;

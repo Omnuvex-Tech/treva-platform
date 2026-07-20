@@ -36,7 +36,7 @@ type AboutTeamProps = {
 };
 
 const AUTHOR_IMAGE_FALLBACK =
-  "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg";
+  "/assets/webflow-placeholder.svg";
 
 export default function AboutTeam({
   locale = "az",

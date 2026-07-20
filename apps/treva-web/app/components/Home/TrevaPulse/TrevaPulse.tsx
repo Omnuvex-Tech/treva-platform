@@ -56,7 +56,7 @@ type TrevaPulseProps = {
   categories?: PulseCategory[];
 };
 
-const AUTHOR_IMAGE_FALLBACK = 'https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg';
+const AUTHOR_IMAGE_FALLBACK = '/assets/webflow-placeholder.svg';
 
 const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], categories = [] }) => {
   const pathname = usePathname();
@@ -94,7 +94,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
   const cardWidth = totalItems === 0 ? "100%" : `${100 / totalItems}%`;
 
   const scrollSpeed = `${totalItems * 2}s`;
-  const placeholderImage = 'https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg';
+  const placeholderImage = '/assets/webflow-placeholder.svg';
 
   const normalizeAssetUrl = (url?: string) => {
     const absUrl = url ? toAbsUrl(url) : '';
