@@ -109,6 +109,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
   const projectsDragPointerIdRef = useRef<number | null>(null)
   const projectsDragStartXRef = useRef(0)
   const projectsDragStartOffsetRef = useRef(0)
+  const projectsHasPointerCaptureRef = useRef(false)
   const projectsSuppressClickRef = useRef(false)
   const projectsRafRef = useRef<number | null>(null)
   const projectsLastTimeRef = useRef<number | null>(null)
@@ -417,18 +418,22 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
     projectsOffsetRef.current = normalizeProjectsOffset(projectsOffsetRef.current)
     projectsDragStartOffsetRef.current = projectsOffsetRef.current
     projectsSuppressClickRef.current = false
+    projectsHasPointerCaptureRef.current = false
     projectsTrackRef.current.style.transition = 'none'
     projectsTrackRef.current.style.transform = `translateX(-${projectsOffsetRef.current}px)`
-    projectsViewportRef.current.setPointerCapture(event.pointerId)
     setIsProjectsDragging(true)
   }, [clearProjectsInteractionTimeouts, normalizeProjectsOffset])
 
   const handleProjectsPointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (projectsDragPointerIdRef.current !== event.pointerId || !projectsTrackRef.current) return
+    if (projectsDragPointerIdRef.current !== event.pointerId || !projectsTrackRef.current || !projectsViewportRef.current) return
 
     const deltaX = event.clientX - projectsDragStartXRef.current
     if (Math.abs(deltaX) > 6) {
       projectsSuppressClickRef.current = true
+      if (!projectsHasPointerCaptureRef.current) {
+        projectsViewportRef.current.setPointerCapture(event.pointerId)
+        projectsHasPointerCaptureRef.current = true
+      }
     }
 
     const nextOffset = normalizeProjectsOffset(projectsDragStartOffsetRef.current - deltaX)
@@ -438,9 +443,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
 
   const finishProjectsDrag = useCallback((pointerId: number) => {
     const viewport = projectsViewportRef.current
-    if (viewport?.hasPointerCapture(pointerId)) {
+    if (projectsHasPointerCaptureRef.current && viewport?.hasPointerCapture(pointerId)) {
       viewport.releasePointerCapture(pointerId)
     }
+    projectsHasPointerCaptureRef.current = false
 
     const dragged = projectsSuppressClickRef.current
     projectsDragPointerIdRef.current = null

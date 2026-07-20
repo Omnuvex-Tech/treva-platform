@@ -373,6 +373,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
   const dragPointerIdRef = useRef<number | null>(null);
   const dragStartXRef = useRef(0);
   const dragStartOffsetRef = useRef(0);
+  const hasPointerCaptureRef = useRef(false);
   const suppressClickRef = useRef(false);
 
   const rafRef = useRef<number | null>(null);
@@ -618,18 +619,22 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
     offsetRef.current = normalizeOffset(offsetRef.current);
     dragStartOffsetRef.current = offsetRef.current;
     suppressClickRef.current = false;
+    hasPointerCaptureRef.current = false;
     trackRef.current.style.transition = 'none';
     trackRef.current.style.transform = `translateX(-${offsetRef.current}px)`;
-    viewportRef.current.setPointerCapture(event.pointerId);
     setIsDragging(true);
   }, [clearInteractionTimeouts, normalizeOffset]);
 
   const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (dragPointerIdRef.current !== event.pointerId || !trackRef.current) return;
+    if (dragPointerIdRef.current !== event.pointerId || !trackRef.current || !viewportRef.current) return;
 
     const deltaX = event.clientX - dragStartXRef.current;
     if (Math.abs(deltaX) > 6) {
       suppressClickRef.current = true;
+      if (!hasPointerCaptureRef.current) {
+        viewportRef.current.setPointerCapture(event.pointerId);
+        hasPointerCaptureRef.current = true;
+      }
     }
 
     const nextOffset = normalizeOffset(dragStartOffsetRef.current - deltaX);
@@ -639,9 +644,10 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
 
   const finishDrag = useCallback((pointerId: number) => {
     const viewport = viewportRef.current;
-    if (viewport?.hasPointerCapture(pointerId)) {
+    if (hasPointerCaptureRef.current && viewport?.hasPointerCapture(pointerId)) {
       viewport.releasePointerCapture(pointerId);
     }
+    hasPointerCaptureRef.current = false;
 
     const dragged = suppressClickRef.current;
     dragPointerIdRef.current = null;
