@@ -169,7 +169,7 @@ export default function ResalePage() {
     <div className="re-page-wrapper" data-locale={locale}>
       <Navbar variant="solid" />
       <main className="re-main-wrapper">
-        <PageContainer>
+        <PageContainer className="re-page-container">
           <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
 
           <header className="re-header">

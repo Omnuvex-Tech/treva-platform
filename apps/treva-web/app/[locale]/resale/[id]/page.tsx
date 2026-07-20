@@ -178,7 +178,7 @@ export default function ResaleDetailPage() {
       <div className="pdet-page-wrapper">
         <Navbar variant="solid" />
         <main className="pdet-main-wrapper">
-          <PageContainer>
+          <PageContainer className="pdet-page-container">
             <div className="py-16 text-center text-white/50">Loading...</div>
           </PageContainer>
         </main>
@@ -193,7 +193,7 @@ export default function ResaleDetailPage() {
       <div className="pdet-page-wrapper">
         <Navbar variant="solid" />
         <main className="pdet-main-wrapper">
-          <PageContainer>
+          <PageContainer className="pdet-page-container">
             <div className="py-16 text-center text-white/50">Apartment not found</div>
           </PageContainer>
         </main>
@@ -301,7 +301,7 @@ export default function ResaleDetailPage() {
     <div className="pdet-page-wrapper" data-locale={locale}>
       {!isGalleryOpen && <Navbar variant="solid" />}
       <main className="pdet-main-wrapper">
-        <PageContainer>
+        <PageContainer className="pdet-page-container">
           <nav className="pdet-breadcrumb">
             <Link href={`/${locale}`} className="pdet-breadcrumb-link">Main</Link>
             <span className="pdet-breadcrumb-sep">/</span>

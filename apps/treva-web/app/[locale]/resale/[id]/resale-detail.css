@@ -3,6 +3,11 @@
   padding-bottom: 64px;
 }
 
+.pdet-page-container {
+  padding-left: 36px;
+  padding-right: 36px;
+}
+
 .pdet-breadcrumb {
   display: flex;
   align-items: center;
@@ -667,6 +672,11 @@
   .pdet-page-wrapper .pdet-main-wrapper {
     padding-top: calc(var(--treva-nav-height, 64px) + 16px);
     padding-bottom: 52px;
+  }
+
+  .pdet-page-container {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 
   .pdet-breadcrumb {
