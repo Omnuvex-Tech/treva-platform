@@ -189,12 +189,19 @@ const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021"
 
 export function toAbsUrl(path: string): string {
     if (!path) return "";
-    const absoluteUrl =
+
+    const rawUrl =
         path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")
             ? path
             : `${ABS_API}${path}`;
 
-    return encodeURI(absoluteUrl);
+    try {
+        // Normalize already-encoded avatar/file URLs so `%20` and `%2520`
+        // end up as the same valid final asset URL.
+        return encodeURI(decodeURI(rawUrl));
+    } catch {
+        return encodeURI(rawUrl);
+    }
 }
 
 export function formatDate(iso: string): string {
