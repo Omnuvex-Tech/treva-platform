@@ -69,14 +69,14 @@ const INITIAL_CONTACT_FIELDS: ContactFields = {
 
 const officeGalleryImages = {
   trevabaku: [
-    '/images/contact/trevabaku/office1.jpeg',
-    '/images/contact/trevabaku/office2.jpeg',
+    '/images/contact/trevabaku/office1.webp',
+    '/images/contact/trevabaku/office2.webp',
   ],
   seaBreeze: [
-    '/images/contact/sea-breeze/office1.png',
-    '/images/contact/sea-breeze/office2.PNG',
-    '/images/contact/sea-breeze/office3.PNG',
-    '/images/contact/sea-breeze/office4.PNG',
+    '/images/contact/sea-breeze/office1.webp',
+    '/images/contact/sea-breeze/office2.webp',
+    '/images/contact/sea-breeze/office3.webp',
+    '/images/contact/sea-breeze/office4.webp',
   ],
 }
 
