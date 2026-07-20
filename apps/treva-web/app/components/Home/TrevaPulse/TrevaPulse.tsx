@@ -56,6 +56,8 @@ type TrevaPulseProps = {
   categories?: PulseCategory[];
 };
 
+const AUTHOR_IMAGE_FALLBACK = 'https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg';
+
 const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], categories = [] }) => {
   const pathname = usePathname();
   const detectedLocale = pathname?.split('/')[1];
@@ -162,7 +164,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
               >
                 {filteredData.map((post, index) => {
                   const imageSrc = normalizeAssetUrl(post.image) || placeholderImage;
-                  const authorImageSrc = normalizeAssetUrl(post.authorImage);
+                  const authorImageSrc = normalizeAssetUrl(post.authorImage) || AUTHOR_IMAGE_FALLBACK;
 
                   return (
                     <a
@@ -190,13 +192,17 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                         <h3 className="blog-card__title">{post.title}</h3>
 
                         <div className="blog-card__author">
-                          {authorImageSrc && (
-                            <Image
+                          {post.author && (
+                            <img
                               src={authorImageSrc}
                               alt={post.author ?? ''}
                               className="blog-card__avatar"
-                              width={32}
-                              height={32}
+                              loading="lazy"
+                              onError={(event) => {
+                                const target = event.currentTarget;
+                                target.onerror = null;
+                                target.src = AUTHOR_IMAGE_FALLBACK;
+                              }}
                             />
                           )}
                           <span className="blog-card__author-name">{post.author}</span>

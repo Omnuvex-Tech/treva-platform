@@ -12,6 +12,8 @@ import "./pulse.css";
 import { ReadMoreOverlay } from "../ReadMoreOverlay";
 import { ButtonText } from '@/app/components/ButtonText';
 
+const AUTHOR_IMAGE_FALLBACK = 'https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg';
+
 type PulseProps = {
   locale: string;
   articles: Article[];
@@ -103,19 +105,23 @@ function ArticleMeta({ category, date }: Pick<Article, "category" | "date">) {
 function AuthorBlock({ author, authorImage }: Pick<Article, "author" | "authorImage">) {
   if (!author) return null;
 
+  const authorImageSrc = toAbsUrl(authorImage || "") || AUTHOR_IMAGE_FALLBACK;
+
   return (
     <div className="news_author-wrap hide-landscape">
-      {authorImage && (
-        <div className="news_author-headshot">
-          <Image
-            src={toAbsUrl(authorImage)}
-            alt={author}
-            className="fullwidth-img"
-            width={48}
-            height={48}
-          />
-        </div>
-      )}
+      <div className="news_author-headshot">
+        <img
+          src={authorImageSrc}
+          alt={author}
+          className="fullwidth-img"
+          loading="lazy"
+          onError={(event) => {
+            const target = event.currentTarget;
+            target.onerror = null;
+            target.src = AUTHOR_IMAGE_FALLBACK;
+          }}
+        />
+      </div>
       <div>{author}</div>
     </div>
   );
