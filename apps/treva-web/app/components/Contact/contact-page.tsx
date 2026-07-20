@@ -454,7 +454,7 @@ export function ContactPage({ locale }: ContactPageProps) {
         strategy="afterInteractive"
         onLoad={() => window.dispatchEvent(new Event('gsap-ready'))}
       />
-      <div className="page-wrapper">
+      <div className="page-wrapper" data-locale={locale}>
 
           <Header locale={locale} variant="solid" />
 

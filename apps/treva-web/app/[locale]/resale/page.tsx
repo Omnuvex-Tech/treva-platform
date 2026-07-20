@@ -166,7 +166,7 @@ export default function ResalePage() {
   };
 
   return (
-    <div className="re-page-wrapper">
+    <div className="re-page-wrapper" data-locale={locale}>
       <Navbar variant="solid" />
       <main className="re-main-wrapper">
         <PageContainer>

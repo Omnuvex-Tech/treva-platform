@@ -28,6 +28,8 @@ interface Props {
   getImageUrl: (url: string) => string;
 }
 
+const AUTOPLAY_DELAY = 5000;
+
 export default function ProjectHero({
   title,
   desktopDescription,
@@ -40,9 +42,11 @@ export default function ProjectHero({
 }: Props) {
   const validImages = images?.filter((img) => img.url) || [];
   const [activeIndex, setActiveIndex] = useState(0);
+  const [animationTick, setAnimationTick] = useState(0);
 
   const handleSlideChange = (swiper: SwiperClass) => {
     setActiveIndex(swiper.realIndex);
+    setAnimationTick((prev) => prev + 1);
   };
 
   return (
@@ -53,7 +57,7 @@ export default function ProjectHero({
           modules={[Autoplay, EffectFade, Navigation]}
           effect="fade"
           fadeEffect={{ crossFade: true }}
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
+          autoplay={{ delay: AUTOPLAY_DELAY, disableOnInteraction: false }}
           loop={validImages.length > 1}
           navigation={{
             prevEl: ".vision-hero__prev",
@@ -148,10 +152,19 @@ export default function ProjectHero({
           <div className="vision-hero__slider-controls">
             <div className="vision-hero__bottom-timeline">
               {validImages.map((_, idx) => (
-                <span
-                  key={idx}
-                  className={`vision-hero__segment ${idx === activeIndex ? "vision-hero__segment--active" : ""}`}
-                />
+                <span key={idx} className="vision-hero__segment">
+                  <span
+                    key={idx === activeIndex ? `${idx}-${animationTick}` : `${idx}-static`}
+                    className={`vision-hero__segment-fill ${
+                      idx < activeIndex
+                        ? "vision-hero__segment-fill--complete"
+                        : idx === activeIndex
+                          ? "vision-hero__segment-fill--active"
+                          : ""
+                    }`}
+                    style={idx === activeIndex ? { animationDuration: `${AUTOPLAY_DELAY}ms` } : undefined}
+                  />
+                </span>
               ))}
             </div>
 

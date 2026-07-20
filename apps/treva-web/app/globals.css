@@ -12,6 +12,36 @@ body {
     position: relative;
 }
 
+:root {
+    --font-az-safe: var(--font-inter), "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+[data-locale="az"] {
+    --font-family: var(--font-az-safe);
+    --font-stack: var(--font-az-safe);
+    --font-sans: var(--font-az-safe);
+    --font-main: var(--font-az-safe);
+    --treva-font-oak: var(--font-az-safe);
+}
+
+[data-locale="az"] h1,
+[data-locale="az"] h2,
+[data-locale="az"] h3,
+[data-locale="az"] h4,
+[data-locale="az"] h5,
+[data-locale="az"] h6,
+[data-locale="az"] p,
+[data-locale="az"] a,
+[data-locale="az"] button,
+[data-locale="az"] label,
+[data-locale="az"] li,
+[data-locale="az"] input,
+[data-locale="az"] textarea,
+[data-locale="az"] select,
+[data-locale="az"] span {
+    font-family: var(--font-az-safe) !important;
+}
+
 #treva-navbar-layer {
     position: fixed;
     inset: 0;

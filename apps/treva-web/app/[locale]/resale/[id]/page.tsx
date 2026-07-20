@@ -298,7 +298,7 @@ export default function ResaleDetailPage() {
   };
 
   return (
-    <div className="pdet-page-wrapper">
+    <div className="pdet-page-wrapper" data-locale={locale}>
       {!isGalleryOpen && <Navbar variant="solid" />}
       <main className="pdet-main-wrapper">
         <PageContainer>

@@ -189,8 +189,12 @@ const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021"
 
 export function toAbsUrl(path: string): string {
     if (!path) return "";
-    if (path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")) return path;
-    return `${ABS_API}${path}`;
+    const absoluteUrl =
+        path.startsWith("http") || path.startsWith("blob:") || path.startsWith("data:")
+            ? path
+            : `${ABS_API}${path}`;
+
+    return encodeURI(absoluteUrl);
 }
 
 export function formatDate(iso: string): string {

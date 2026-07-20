@@ -631,7 +631,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
         strategy="afterInteractive"
         onLoad={() => window.dispatchEvent(new Event('gsap-ready'))}
       />
-      <div className="page-wrapper">
+      <div className="page-wrapper" data-locale={locale}>
           <Navbar locale={locale} variant="solid" />
           
           <main className="main-wrapper">

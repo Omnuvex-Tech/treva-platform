@@ -12,6 +12,8 @@ import { BlockRenderer } from "./BlockRenderer";
 import { toAbsUrl } from "@/lib/pulse-api";
 import "./pulse-article.css";
 
+const AUTHOR_IMAGE_FALLBACK = "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg";
+
 type PulseArticleDetailProps = {
   locale: string;
   article: Article;
@@ -269,7 +271,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                           {item.author && (
                             <div className="news_author-wrap">
                               <div className="news_author-headshot">
-                                <img src={toAbsUrl(item.authorImage || "") || "https://cdn.prod.website-files.com/plugins/Basic/assets/placeholder.60f9b1840c.svg"} loading="lazy" alt={item.author} className="fullwidth-img" />
+                                <img src={toAbsUrl(item.authorImage || "") || AUTHOR_IMAGE_FALLBACK} loading="lazy" alt={item.author} className="fullwidth-img" />
                               </div>
                               <div>{item.author}</div>
                             </div>
@@ -308,8 +310,9 @@ const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; sl
 
 const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article, sidebarArticles = [], relatedArticles = [] }) => {
   useEffect(() => { window.scrollTo(0, 0); }, []);
+  const articleAuthorImage = toAbsUrl(article.authorImage || "") || AUTHOR_IMAGE_FALLBACK;
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
       <ArticleBanner />
       <style jsx global>{`
@@ -347,7 +350,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                             className="article_specs-author w-inline-block"
                           >
                             <div className="article_author-avatar">
-          <img src={toAbsUrl(article.authorImage || "")} loading="lazy" alt={article.author} className="fullwidth-img" />
+                              <img src={articleAuthorImage} loading="lazy" alt={article.author} className="fullwidth-img" />
                             </div>
                             <div className="article_author-content">
                               <div className="text-color-blue400">{article.author}</div>

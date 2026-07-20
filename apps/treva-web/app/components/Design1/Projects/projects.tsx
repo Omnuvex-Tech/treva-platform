@@ -166,7 +166,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
 
   return (
     <>
-      <div className="page-wrapper" ref={containerRef}>
+      <div className="page-wrapper" data-locale={locale} ref={containerRef}>
         <Navbar locale={locale} variant="solid" />
         <main className="main-wrapper">
           <section id="projects" className="section_projects">

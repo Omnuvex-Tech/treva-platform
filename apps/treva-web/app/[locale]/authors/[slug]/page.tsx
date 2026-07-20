@@ -63,7 +63,7 @@ export default async function AuthorPage({ params }: Props) {
   ];
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
 
       <main className="main-wrapper" style={{ paddingTop: "calc(var(--treva-nav-height, 64px) + 64px)" }}>

@@ -16,7 +16,7 @@ interface PrivacyPolicyProps {
 
 const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ locale }) => {
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
       
       <main className="main-wrapper">

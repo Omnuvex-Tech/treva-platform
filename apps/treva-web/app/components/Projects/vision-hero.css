@@ -193,10 +193,37 @@
   height: 3px;
   background: rgba(255, 255, 255, 0.35);
   border-radius: 2px;
+  position: relative;
+  overflow: hidden;
 }
 
-.vision-hero__segment--active {
+.vision-hero__segment-fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
   background-color: #ffffff;
+  border-radius: 2px;
+}
+
+.vision-hero__segment-fill--complete {
+  background-color: #ffffff;
+  width: 100%;
+}
+
+.vision-hero__segment-fill--active {
+  animation-name: vision-hero-progress-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes vision-hero-progress-fill {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
 /* ==========================================================================
