@@ -212,6 +212,17 @@ export function formatDate(iso: string): string {
     return `${day}.${month}.${year}`;
 }
 
+function resolveArticleDate(api: ApiArticle): string {
+    const candidate = api.date || api.createdAt || api.updatedAt;
+    const parsed = candidate ? new Date(candidate) : null;
+
+    if (!parsed || Number.isNaN(parsed.getTime())) {
+        return "";
+    }
+
+    return formatDate(candidate);
+}
+
 export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Article {
     const searchParts = [api.title, api.category, api.excerpt]
         .filter(Boolean)
@@ -226,7 +237,7 @@ export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Art
         slug: api.slug,
         title: getLocalized(api.title, locale),
         category: getLocalized(api.category, locale),
-        date: formatDate(api.date),
+        date: resolveArticleDate(api),
         image: api.coverImage,
         coverImage: api.coverImage,
         author: api.author?.name,
