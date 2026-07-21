@@ -5,6 +5,7 @@ import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
 import Link from "next/link";
 import { getAuthorBySlug, apiArticleToArticle, toAbsUrl } from "@/lib/pulse-api";
 import { notFound } from "next/navigation";
+import { FaLinkedin } from "react-icons/fa6";
 import "@/app/components/Pulse/pulse.css";
 
 type Props = {
@@ -40,7 +41,7 @@ export default async function AuthorPage({ params }: Props) {
 
   let apiAuthor;
   try {
-    apiAuthor = await getAuthorBySlug(slug);
+    apiAuthor = await getAuthorBySlug(slug, locale);
   } catch {
     notFound();
   }
@@ -49,6 +50,10 @@ export default async function AuthorPage({ params }: Props) {
   const authorName = apiAuthor.name;
   const authorTitle = apiAuthor.title || "Ekspert / Müəllif";
   const authorImage = apiAuthor.avatar || "/assets/webflow-placeholder.svg";
+  const authorLinkedin = apiAuthor.linkedin;
+  const authorDescription =
+    apiAuthor.description ||
+    "TREVA real estate komandasının peşəkar üzvü. Daşınmaz əmlak bazarı üzrə ən son xəbərlər, təhlillər və məsləhətlər.";
 
   const keywords = [
     authorName,
@@ -80,8 +85,19 @@ export default async function AuthorPage({ params }: Props) {
                   <h1 className="heading-style-h2-medium" style={{ margin: 0 }}>{authorName}</h1>
                   <p className="text-color-blue400" style={{ margin: "0.5rem 0 0 0", fontSize: "1.1rem" }}>{authorTitle}</p>
                   <p style={{ color: "rgba(23, 25, 28, 0.6)", marginTop: "0.5rem" }}>
-                    TREVA real estate komandasının peşəkar üzvü. Daşınmaz əmlak bazarı üzrə ən son xəbərlər, təhlillər və məsləhətlər.
+                    {authorDescription}
                   </p>
+                  {authorLinkedin && (
+                    <a
+                      href={authorLinkedin}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="pulse-social-icon-link"
+                      aria-label={`${authorName} LinkedIn profili`}
+                    >
+                      <FaLinkedin size={22} aria-hidden="true" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

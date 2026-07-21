@@ -22,15 +22,17 @@ export function getLocalized(value: LocalizedString | undefined | null, locale: 
 
 export interface ApiAuthor {
     id: string;
-    name: string;
+    name: LocalizedString;
     slug: string;
-    title?: string;
+    title?: LocalizedString;
+    linkedin?: string;
     avatar?: string;
+    description?: LocalizedString;
 }
 
 export interface ApiKeyword {
     id: string;
-    name: string;
+    name: LocalizedString;
     slug: string;
 }
 
@@ -165,16 +167,23 @@ export async function getPulseCategories(): Promise<PulseCategory[]> {
     return (await parseJsonResponse<PulseCategory[]>(res)) ?? [];
 }
 
-export async function getAuthors(): Promise<ApiAuthor[]> {
+export async function getAuthors(locale: string = "az"): Promise<ApiAuthor[]> {
     const res = await fetch(`${API}/pulse/authors`, {
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Failed to fetch authors");
-    return (await parseJsonResponse<ApiAuthor[]>(res)) ?? [];
+    const authors = (await parseJsonResponse<ApiAuthor[]>(res)) ?? [];
+    return authors.map((author) => ({
+        ...author,
+        name: getLocalized(author.name, locale),
+        title: getLocalized(author.title, locale),
+        description: getLocalized(author.description, locale),
+    }));
 }
 
 export async function getAuthorBySlug(
     slug: string,
+    locale: string = "az",
 ): Promise<ApiAuthor & { articles: ApiArticle[] }> {
     const res = await fetch(`${API}/pulse/authors/slug/${slug}`, {
         next: { revalidate: 60 },
@@ -182,7 +191,13 @@ export async function getAuthorBySlug(
     if (!res.ok) throw new Error("Author not found");
     const author = await parseJsonResponse<ApiAuthor & { articles: ApiArticle[] }>(res);
     if (!author) throw new Error("Author not found");
-    return author;
+    return {
+        ...author,
+        name: getLocalized(author.name, locale),
+        title: getLocalized(author.title, locale),
+        description: getLocalized(author.description, locale),
+        articles: author.articles,
+    };
 }
 
 const ABS_API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
@@ -245,9 +260,19 @@ export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Art
         authorTitle: api.author?.title,
         authorId: api.authorId,
         authorObj: api.author
-            ? { id: api.author.id, name: api.author.name, slug: api.author.slug, title: api.author.title, avatar: api.author.avatar }
+            ? {
+                id: api.author.id,
+                name: getLocalized(api.author.name, locale),
+                slug: api.author.slug,
+                title: getLocalized(api.author.title, locale),
+                linkedin: api.author.linkedin,
+                avatar: api.author.avatar,
+            }
             : undefined,
-        keywords: api.keywords,
+        keywords: api.keywords?.map((keyword) => ({
+            ...keyword,
+            name: getLocalized(keyword.name, locale),
+        })),
         blocks: api.blocks,
         excerpt: getLocalized(api.excerpt, locale),
         featured: api.featured,

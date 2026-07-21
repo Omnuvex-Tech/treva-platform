@@ -27,7 +27,7 @@ export default async function AboutUsRoute({
     notFound();
   }
 
-  const authors = await getAuthors().catch(() => []);
+  const authors = await getAuthors(locale).catch(() => []);
 
   return (
     <>

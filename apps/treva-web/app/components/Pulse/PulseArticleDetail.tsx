@@ -7,6 +7,7 @@ import React, { useEffect, useState, FormEvent } from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import { FaLinkedin } from "react-icons/fa6";
 import { Article } from "@/lib/pulse.types";
 import { BlockRenderer } from "./BlockRenderer";
 import { toAbsUrl } from "@/lib/pulse-api";
@@ -357,6 +358,17 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                               <div className="text-size-small">{article.authorTitle || "Ekspert"}</div>
                             </div>
                           </a>
+                          {article.authorObj?.linkedin && (
+                            <a
+                              href={article.authorObj.linkedin}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="pulse-author-social-link"
+                              aria-label={`${article.author} LinkedIn profili`}
+                            >
+                              <FaLinkedin size={22} aria-hidden="true" />
+                            </a>
+                          )}
                         </div>
                       )}
 

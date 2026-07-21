@@ -52,6 +52,31 @@
   white-space: nowrap;
 }
 
+.pulse-author-social-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.875rem;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.125rem;
+  border: 1px solid rgba(23, 25, 28, 0.12);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #5b6170;
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.pulse-author-social-link:hover {
+  color: #3f4552;
+  border-color: rgba(23, 25, 28, 0.22);
+  background: #fafafa;
+}
+
+.pulse-author-social-link svg {
+  display: block;
+}
+
 .article_content-main {
   flex: 1;
   min-width: 0;

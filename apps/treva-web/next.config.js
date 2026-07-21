@@ -10,6 +10,7 @@ const nextConfig = {
         remotePatterns: [
             { protocol: "http", hostname: "localhost" },
             { protocol: "https", hostname: "images.unsplash.com" },
+            { protocol: "https", hostname: "cdn.prod.website-files.com" },
             {
                 protocol: cmsOrigin.protocol.replace(":", ""),
                 hostname: cmsOrigin.hostname,
