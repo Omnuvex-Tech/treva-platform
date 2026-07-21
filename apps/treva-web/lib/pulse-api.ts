@@ -20,7 +20,7 @@ export function getLocalized(value: LocalizedString | undefined | null, locale: 
     return value[locale as keyof typeof value] || value.az || Object.values(value)[0] || "";
 }
 
-export interface ApiAuthor {
+interface ApiAuthorPayload {
     id: string;
     name: LocalizedString;
     slug: string;
@@ -28,6 +28,16 @@ export interface ApiAuthor {
     linkedin?: string;
     avatar?: string;
     description?: LocalizedString;
+}
+
+export interface ApiAuthor {
+    id: string;
+    name: string;
+    slug: string;
+    title?: string;
+    linkedin?: string;
+    avatar?: string;
+    description?: string;
 }
 
 export interface ApiKeyword {
@@ -45,7 +55,7 @@ export interface ApiArticle {
     coverImage?: string;
     excerpt?: LocalizedString;
     authorId?: string;
-    author?: ApiAuthor;
+    author?: ApiAuthorPayload;
     keywords?: ApiKeyword[];
     blocks: ArticleBlock[];
     metaTitle?: LocalizedString;
@@ -172,7 +182,7 @@ export async function getAuthors(locale: string = "az"): Promise<ApiAuthor[]> {
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Failed to fetch authors");
-    const authors = (await parseJsonResponse<ApiAuthor[]>(res)) ?? [];
+    const authors = (await parseJsonResponse<ApiAuthorPayload[]>(res)) ?? [];
     return authors.map((author) => ({
         ...author,
         name: getLocalized(author.name, locale),
@@ -189,7 +199,7 @@ export async function getAuthorBySlug(
         next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error("Author not found");
-    const author = await parseJsonResponse<ApiAuthor & { articles: ApiArticle[] }>(res);
+    const author = await parseJsonResponse<ApiAuthorPayload & { articles: ApiArticle[] }>(res);
     if (!author) throw new Error("Author not found");
     return {
         ...author,
@@ -255,9 +265,9 @@ export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Art
         date: resolveArticleDate(api),
         image: api.coverImage,
         coverImage: api.coverImage,
-        author: api.author?.name,
+        author: api.author ? getLocalized(api.author.name, locale) : undefined,
         authorImage: api.author?.avatar,
-        authorTitle: api.author?.title,
+        authorTitle: api.author ? getLocalized(api.author.title, locale) : undefined,
         authorId: api.authorId,
         authorObj: api.author
             ? {
