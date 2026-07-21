@@ -79,16 +79,16 @@ function SliderEmptyState() {
 }
 
 const ArticleHero: React.FC<{ article: Article }> = ({ article }) => (
-  <>
-    <div className="article_intro-wrap">
-      <div className="news_specs-wrap">
-        <div className="news_category-label">
-          <div>{article.category}</div>
+    <>
+        <div className="article_intro-wrap">
+            <div className="news_specs-wrap">
+                <div className="news_category-label">
+                    <div>{String(article.category || "")}</div>
+                </div>
+                <div>{String(article.date || "")}</div>
+            </div>
+            <h1 className="heading-style-h2-medium">{String(article.title || "")}</h1>
         </div>
-        <div>{article.date}</div>
-      </div>
-      <h1 className="heading-style-h2-medium">{article.title}</h1>
-    </div>
 
     <div className="article_cover-wrap img-reveal">
       {article.image ? (
@@ -160,14 +160,14 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
                   )}
                 </div>
                 <div className="article_sidebar-content">
-                  <h4 className="no-animate">{item.title}</h4>
-                  <div className="news_specs-wrap">
-                    <div className="news_category-label">
-                      <div>{item.category}</div>
-                    </div>
-                    <div>{item.date}</div>
-                  </div>
-                </div>
+                            <h4 className="no-animate">{String(item.title || "")}</h4>
+                            <div className="news_specs-wrap">
+                                <div className="news_category-label">
+                                    <div>{String(item.category || "")}</div>
+                                </div>
+                                <div>{String(item.date || "")}</div>
+                            </div>
+                        </div>
               </a>
             </div>
           ))}
@@ -260,23 +260,23 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                           </div>
                         </div>
                         <div className="news-header_middle-content-wrap">
-                          <div className="news_middle-content">
-                            <div className="news_specs-wrap">
-                              <div className="news_category-label">
-                                <div>{item.category}</div>
-                              </div>
-                              <div>{item.date}</div>
+                            <div className="news_middle-content">
+                                <div className="news_specs-wrap">
+                                    <div className="news_category-label">
+                                        <div>{String(item.category || "")}</div>
+                                    </div>
+                                    <div>{String(item.date || "")}</div>
+                                </div>
+                                <h2 className="f-articles_title no-animate">{String(item.title || "")}</h2>
                             </div>
-                            <h2 className="f-articles_title no-animate">{item.title}</h2>
-                          </div>
-                          {item.author && (
-                            <div className="news_author-wrap">
-                              <div className="news_author-headshot">
-                                <img src={toAbsUrl(item.authorImage || "") || AUTHOR_IMAGE_FALLBACK} loading="lazy" alt={item.author} className="fullwidth-img" />
-                              </div>
-                              <div>{item.author}</div>
-                            </div>
-                          )}
+                            {item.author && (
+                                <div className="news_author-wrap">
+                                    <div className="news_author-headshot">
+                                        <img src={toAbsUrl(item.authorImage || "") || AUTHOR_IMAGE_FALLBACK} loading="lazy" alt={String(item.author || "")} className="fullwidth-img" />
+                                    </div>
+                                    <div>{String(item.author || "")}</div>
+                                </div>
+                            )}
                         </div>
                       </a>
                     </div>
@@ -301,7 +301,7 @@ const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; sl
       <div className="article-keywords-list">
         {keywords.map((kw) => (
           <span key={kw.id} className="article-keyword-tag">
-            #{kw.name}
+            #{String(kw.name || "")}
           </span>
         ))}
       </div>

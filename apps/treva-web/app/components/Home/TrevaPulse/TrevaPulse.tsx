@@ -137,10 +137,10 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                       type="button"
                       key={cat.id}
                       className={`pulse__filter-btn ${activeFilter === cat.name ? 'pulse__filter-btn--active' : ''}`}
-                      onClick={() => setActiveFilter(cat.name)}
+                      onClick={() => setActiveFilter(String(cat.name || ""))}
                       suppressHydrationWarning
                     >
-                      {cat.name}
+                      {String(cat.name || "")}
                     </button>
                   ))}
                 </div>
@@ -177,7 +177,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                         <div className="blog-card__img-wrapper">
                           <Image
                             src={imageSrc}
-                            alt={post.title}
+                            alt={String(post.title || "")}
                             className="blog-card__img"
                             fill
                             sizes="(max-width: 768px) 90vw, (max-width: 1024px) 45vw, 30vw"
@@ -185,17 +185,17 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                         </div>
 
                         <div className="blog-card__meta">
-                          <span className="blog-card__category">{post.category}</span>
-                          <span className="blog-card__date">{post.date}</span>
+                          <span className="blog-card__category">{String(post.category || "")}</span>
+                          <span className="blog-card__date">{String(post.date || "")}</span>
                         </div>
 
-                        <h3 className="blog-card__title">{post.title}</h3>
+                        <h3 className="blog-card__title">{String(post.title || "")}</h3>
 
                         <div className="blog-card__author">
                           {post.author && (
                             <img
                               src={authorImageSrc}
-                              alt={post.author ?? ''}
+                              alt={String(post.author ?? '')}
                               className="blog-card__avatar"
                               loading="lazy"
                               onError={(event) => {
@@ -205,7 +205,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
                               }}
                             />
                           )}
-                          <span className="blog-card__author-name">{post.author}</span>
+                          <span className="blog-card__author-name">{String(post.author || "")}</span>
                         </div>
                       </div>
                     </a>

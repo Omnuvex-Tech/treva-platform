@@ -14,10 +14,17 @@ export type ArticleBlock =
 
 export type LocalizedString = string | { az?: string; en?: string; ru?: string };
 
-export function getLocalized(value: LocalizedString | undefined | null, locale: string = "az"): string {
+export function getLocalized(value: any, locale: string = "az"): string {
     if (!value) return "";
     if (typeof value === "string") return value;
-    return value[locale as keyof typeof value] || value.az || Object.values(value)[0] || "";
+    if (typeof value === "object" && value !== null) {
+        // Ensure we handle objects safely
+        const val = value[locale as keyof typeof value] || value.az;
+        if (typeof val === "string") return val;
+        const firstValue = Object.values(value).find(v => typeof v === "string");
+        if (firstValue) return firstValue as string;
+    }
+    return "";
 }
 
 interface ApiAuthorPayload {
@@ -237,9 +244,10 @@ export function formatDate(iso: string): string {
     return `${day}.${month}.${year}`;
 }
 
-function resolveArticleDate(api: ApiArticle): string {
+function resolveArticleDate(api: any): string {
     const candidate = api.date || api.createdAt || api.updatedAt;
-    const parsed = candidate ? new Date(candidate) : null;
+    if (!candidate || typeof candidate !== "string") return "";
+    const parsed = new Date(candidate);
 
     if (!parsed || Number.isNaN(parsed.getTime())) {
         return "";
@@ -248,8 +256,11 @@ function resolveArticleDate(api: ApiArticle): string {
     return formatDate(candidate);
 }
 
-export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Article {
-    const searchParts = [api.title, api.category, api.excerpt]
+export function apiArticleToArticle(api: any, locale: string = "az"): Article {
+    // Defensively process the input, ensure all fields are safe
+    const safeApi = api || {};
+    
+    const searchParts = [safeApi.title, safeApi.category, safeApi.excerpt]
         .filter(Boolean)
         .flatMap(v => {
             if (typeof v === "string") return [v];
@@ -258,40 +269,40 @@ export function apiArticleToArticle(api: ApiArticle, locale: string = "az"): Art
         });
 
     return {
-        id: api.id,
-        slug: api.slug,
-        title: getLocalized(api.title, locale),
-        category: getLocalized(api.category, locale),
-        date: resolveArticleDate(api),
-        image: api.coverImage,
-        coverImage: api.coverImage,
-        author: api.author ? getLocalized(api.author.name, locale) : undefined,
-        authorImage: api.author?.avatar,
-        authorTitle: api.author ? getLocalized(api.author.title, locale) : undefined,
-        authorId: api.authorId,
-        authorObj: api.author
+        id: safeApi.id,
+        slug: safeApi.slug,
+        title: getLocalized(safeApi.title, locale),
+        category: getLocalized(safeApi.category, locale),
+        date: resolveArticleDate(safeApi),
+        image: safeApi.coverImage,
+        coverImage: safeApi.coverImage,
+        author: safeApi.author ? getLocalized(safeApi.author.name, locale) : undefined,
+        authorImage: safeApi.author?.avatar,
+        authorTitle: safeApi.author ? getLocalized(safeApi.author.title, locale) : undefined,
+        authorId: safeApi.authorId,
+        authorObj: safeApi.author
             ? {
-                id: api.author.id,
-                name: getLocalized(api.author.name, locale),
-                slug: api.author.slug,
-                title: getLocalized(api.author.title, locale),
-                linkedin: api.author.linkedin,
-                avatar: api.author.avatar,
+                id: safeApi.author.id,
+                name: getLocalized(safeApi.author.name, locale),
+                slug: safeApi.author.slug,
+                title: getLocalized(safeApi.author.title, locale),
+                linkedin: safeApi.author.linkedin,
+                avatar: safeApi.author.avatar,
             }
             : undefined,
-        keywords: api.keywords?.map((keyword) => ({
+        keywords: safeApi.keywords?.map((keyword: any) => ({
             ...keyword,
             name: getLocalized(keyword.name, locale),
         })),
-        blocks: api.blocks,
-        excerpt: getLocalized(api.excerpt, locale),
-        featured: api.featured,
-        published: api.published,
-        headerPositions: api.headerPositions ?? undefined,
-        headerOrder: api.headerOrder ?? undefined,
-        selectedArticles: api.selectedArticles?.map(a => apiArticleToArticle(a, locale)),
-        metaTitle: getLocalized(api.metaTitle, locale),
-        metaDescription: getLocalized(api.metaDescription, locale),
+        blocks: safeApi.blocks,
+        excerpt: getLocalized(safeApi.excerpt, locale),
+        featured: safeApi.featured,
+        published: safeApi.published,
+        headerPositions: safeApi.headerPositions ?? undefined,
+        headerOrder: safeApi.headerOrder ?? undefined,
+        selectedArticles: safeApi.selectedArticles?.map((a: any) => apiArticleToArticle(a, locale)),
+        metaTitle: getLocalized(safeApi.metaTitle, locale),
+        metaDescription: getLocalized(safeApi.metaDescription, locale),
         _searchable: searchParts.join(' ').toLowerCase(),
     };
 }

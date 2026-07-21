@@ -79,13 +79,13 @@ export default async function AuthorPage({ params }: Props) {
             <div className="container-large">
               <div style={{ display: "flex", alignItems: "center", gap: "2rem", flexWrap: "wrap" }}>
                 <div style={{ width: "120px", height: "120px", borderRadius: "50%", overflow: "hidden", border: "1px solid rgba(0,0,0,0.1)" }}>
-                  <img src={authorImage} alt={authorName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={authorImage} alt={String(authorName || "")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div>
-                  <h1 className="heading-style-h2-medium" style={{ margin: 0 }}>{authorName}</h1>
-                  <p className="text-color-blue400" style={{ margin: "0.5rem 0 0 0", fontSize: "1.1rem" }}>{authorTitle}</p>
+                  <h1 className="heading-style-h2-medium" style={{ margin: 0 }}>{String(authorName || "")}</h1>
+                  <p className="text-color-blue400" style={{ margin: "0.5rem 0 0 0", fontSize: "1.1rem" }}>{String(authorTitle || "")}</p>
                   <p style={{ color: "rgba(23, 25, 28, 0.6)", marginTop: "0.5rem" }}>
-                    {authorDescription}
+                    {String(authorDescription || "")}
                   </p>
                   {authorLinkedin && (
                     <a
@@ -93,7 +93,7 @@ export default async function AuthorPage({ params }: Props) {
                       target="_blank"
                       rel="noreferrer"
                       className="pulse-social-icon-link"
-                      aria-label={`${authorName} LinkedIn profili`}
+                      aria-label={`${String(authorName || "")} LinkedIn profili`}
                     >
                       <FaLinkedin size={22} aria-hidden="true" />
                     </a>
@@ -117,21 +117,21 @@ export default async function AuthorPage({ params }: Props) {
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_middle-link w-inline-block">
                           <div className="news_middle-img-wrap">
                               <div className="news_middle-img-holder">
-                              {article.image ? <img src={toAbsUrl(article.image)} loading="lazy" alt={article.title} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
+                              {article.image ? <img src={toAbsUrl(article.image)} loading="lazy" alt={String(article.title || "")} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
                             </div>
                           </div>
 
                           <div className="news-header_middle-content-wrap">
                             <div className="news_middle-content">
-                              <div className="news_specs-wrap">
-                                <div className="news_category-label">
-                                  <div>{article.category}</div>
+                                <div className="news_specs-wrap">
+                                    <div className="news_category-label">
+                                        <div>{String(article.category || "")}</div>
+                                    </div>
+                                    <div>{String(article.date || "")}</div>
                                 </div>
-                                <div>{article.date}</div>
-                              </div>
-                              <h2 className="news_middle-title no-animate">{article.title}</h2>
+                                <h2 className="news_middle-title no-animate">{String(article.title || "")}</h2>
                             </div>
-                          </div>
+                        </div>
                         </Link>
                       </div>
                     ))}

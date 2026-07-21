@@ -92,27 +92,28 @@ function PulseKeywordsSection() {
 }
 
 function ArticleMeta({ category, date }: Pick<Article, "category" | "date">) {
-  return (
-    <div className="news_specs-wrap">
-      <div className="news_category-label">
-        <div>{category}</div>
-      </div>
-      <div>{date}</div>
-    </div>
-  );
+    return (
+        <div className="news_specs-wrap">
+            <div className="news_category-label">
+                <div>{String(category || "")}</div>
+            </div>
+            <div>{String(date || "")}</div>
+        </div>
+    );
 }
 
 function AuthorBlock({ author, authorImage }: Pick<Article, "author" | "authorImage">) {
   if (!author) return null;
 
   const authorImageSrc = toAbsUrl(authorImage || "") || AUTHOR_IMAGE_FALLBACK;
+  const authorName = String(author || "");
 
   return (
     <div className="news_author-wrap hide-landscape">
       <div className="news_author-headshot">
         <img
           src={authorImageSrc}
-          alt={author}
+          alt={authorName}
           className="fullwidth-img"
           loading="lazy"
           onError={(event) => {
@@ -122,7 +123,7 @@ function AuthorBlock({ author, authorImage }: Pick<Article, "author" | "authorIm
           }}
         />
       </div>
-      <div>{author}</div>
+      <div>{authorName}</div>
     </div>
   );
 }
@@ -181,7 +182,7 @@ function NewsCard({
         <div className={isWeek ? "news_week-content-wrap" : variant === "left" ? "news_leftcol-content" : "news-header_middle-content-wrap"}>
           <div className="news_middle-content">
             <ArticleMeta category={article.category} date={article.date} />
-            <h2 className={titleClass}>{article.title}</h2>
+            <h2 className={titleClass}>{String(article.title || "")}</h2>
           </div>
           {variant !== "left" && !isWeek && <AuthorBlock author={article.author} authorImage={article.authorImage} />}
         </div>
@@ -261,7 +262,7 @@ function PulseHeaderSection({
                           <div className="news-header_middle-content-wrap">
                             <div className="news_middle-content">
                               <ArticleMeta category={centerArticle.category} date={centerArticle.date} />
-                              <h2 className="news-header_middle-title no-animate">{centerArticle.title}</h2>
+                              <h2 className="news-header_middle-title no-animate">{String(centerArticle.title || "")}</h2>
                             </div>
                           </div>
                         </Link>
@@ -278,7 +279,7 @@ function PulseHeaderSection({
                       <div key={article.slug} role="listitem" className="news_rightcol-item w-dyn-item">
                         <Link href={`/${locale}/pulse/${article.slug}`} className="news_rightcol-link w-inline-block">
                           <div className="news_rightcol-link-content">
-                            <h2 className="news_rightcol-title no-animate">{article.title}</h2>
+                            <h2 className="news_rightcol-title no-animate">{String(article.title || "")}</h2>
                             <ArticleMeta category={article.category} date={article.date} />
                           </div>
                         </Link>
@@ -434,7 +435,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                                 letterSpacing: "0.05em",
                               }}
                             >
-                              {category.name}
+                              {String(category.name || "")}
                             </button>
                           );
                         })}
