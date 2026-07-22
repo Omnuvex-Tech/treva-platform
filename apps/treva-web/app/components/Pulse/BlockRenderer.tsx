@@ -3,10 +3,11 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
 import type { ArticleBlock } from "@/lib/pulse-api";
-import { toAbsUrl } from "@/lib/pulse-api";
+import { toAbsUrl, getLocalized } from "@/lib/pulse-api";
 
 type BlockRendererProps = {
     blocks: ArticleBlock[];
+    locale: string;
 };
 
 function GalleryCarousel({ images }: { images: { url: string; alt: string }[] }) {
@@ -73,7 +74,7 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
     );
 }
 
-export function BlockRenderer({ blocks }: BlockRendererProps) {
+export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
     return (
         <>
             {blocks.map((block, index) => {
@@ -84,7 +85,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                         const className = `heading-style-h${block.level}`;
                         return (
                             <Tag key={index} className={className} style={{ marginTop, marginBottom: "1rem" }}>
-                                <strong>{block.text}</strong>
+                                <strong>{getLocalized(block.text as any, locale)}</strong>
                             </Tag>
                         );
                     }
@@ -94,7 +95,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                             <p
                                 key={index}
                                 style={{ marginBottom: "1rem", lineHeight: 1.7 }}
-                                dangerouslySetInnerHTML={{ __html: block.text }}
+                                dangerouslySetInnerHTML={{ __html: getLocalized(block.text as any, locale) }}
                             />
                         );
 
@@ -107,7 +108,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                             >
                                 <div>
                                     <img
-                                        alt={block.alt}
+                                        alt={getLocalized(block.alt as any, locale)}
                                         src={toAbsUrl(block.url)}
                                         loading="lazy"
                                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -115,7 +116,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                 </div>
                                 {block.caption && (
                                     <figcaption style={{ fontSize: "0.875rem", color: "#888", marginTop: "0.5rem" }}>
-                                        {block.caption}
+                                        {getLocalized(block.caption as any, locale)}
                                     </figcaption>
                                 )}
                             </figure>
@@ -129,7 +130,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                 listStyleType: block.ordered ? "decimal" : "disc"
                             }}>
                                 {block.items.map((item, itemIdx) => (
-                                    <li key={itemIdx} dangerouslySetInnerHTML={{ __html: item }} />
+                                    <li key={itemIdx} dangerouslySetInnerHTML={{ __html: getLocalized(item as any, locale) }} />
                                 ))}
                             </ListTag>
                         );
@@ -138,9 +139,9 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                         return (
                             <div key={index} style={{ marginTop: "2rem", marginBottom: "1rem" }}>
                                 <h2 className="heading-style-h2" style={{ marginBottom: "0.5rem" }}>
-                                    <strong>{block.question}</strong>
+                                    <strong>{getLocalized(block.question as any, locale)}</strong>
                                 </h2>
-                                <p style={{ lineHeight: 1.7 }}>{block.answer}</p>
+                                <p style={{ lineHeight: 1.7 }}>{getLocalized(block.answer as any, locale)}</p>
                             </div>
                         );
 
@@ -156,10 +157,10 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                                     color: "#555",
                                 }}
                             >
-                                <p>{block.text}</p>
+                                <p>{getLocalized(block.text as any, locale)}</p>
                                 {block.author && (
                                     <cite style={{ display: "block", marginTop: "0.5rem", fontStyle: "normal", fontSize: "0.875rem", color: "#888" }}>
-                                        — {block.author}
+                                        — {getLocalized(block.author as any, locale)}
                                     </cite>
                                 )}
                             </blockquote>
@@ -178,7 +179,15 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
                         )
 
                     case "gallery": {
-                        return <GalleryCarousel key={index} images={block.images} />;
+                        return (
+                            <GalleryCarousel
+                                key={index}
+                                images={block.images.map((img) => ({
+                                    url: img.url,
+                                    alt: getLocalized(img.alt as any, locale),
+                                }))}
+                            />
+                        );
                     }
 
                     default:

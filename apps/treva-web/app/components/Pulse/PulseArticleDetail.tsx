@@ -377,7 +377,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                           <div>
                             <div className="article_richtext no-animate w-richtext">
                               {article.blocks && article.blocks.length > 0 ? (
-                                <BlockRenderer blocks={article.blocks} />
+                                <BlockRenderer blocks={article.blocks} locale={locale} />
                               ) : (
                                 article.content
                               )}

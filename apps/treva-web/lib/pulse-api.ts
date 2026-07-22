@@ -3,14 +3,14 @@ import { Article } from "./pulse.types";
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
 
 export type ArticleBlock =
-    | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
-    | { type: "paragraph"; text: string }
-    | { type: "image"; url: string; alt: string; caption?: string }
-    | { type: "list"; items: string[]; ordered?: boolean }
-    | { type: "faq"; question: string; answer: string }
-    | { type: "quote"; text: string; author?: string }
+    | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: LocalizedString }
+    | { type: "paragraph"; text: LocalizedString }
+    | { type: "image"; url: string; alt: LocalizedString; caption?: LocalizedString }
+    | { type: "list"; items: LocalizedString[]; ordered?: boolean }
+    | { type: "faq"; question: LocalizedString; answer: LocalizedString }
+    | { type: "quote"; text: LocalizedString; author?: LocalizedString }
     | { type: "video"; url: string }
-    | { type: "gallery"; images: { url: string; alt: string }[] };
+    | { type: "gallery"; images: { url: string; alt: LocalizedString }[] };
 
 export type LocalizedString = string | { az?: string; en?: string; ru?: string };
 
