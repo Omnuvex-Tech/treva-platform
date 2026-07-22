@@ -49,7 +49,9 @@ export default async function AuthorPage({ params }: Props) {
   const authorArticles = apiAuthor.articles.map(a => apiArticleToArticle(a, locale));
   const authorName = apiAuthor.name;
   const authorTitle = apiAuthor.title || "Ekspert / Müəllif";
-  const authorImage = apiAuthor.avatar || "/assets/webflow-placeholder.svg";
+  const authorImage = apiAuthor.avatar
+    ? toAbsUrl(apiAuthor.avatar)
+    : "/assets/webflow-placeholder.svg";
   const authorLinkedin = apiAuthor.linkedin;
   const authorDescription =
     apiAuthor.description ||
