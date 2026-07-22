@@ -4,12 +4,18 @@ import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
 import "./project-details.css";
 
+interface LocalizedString {
+  az?: string;
+  en?: string;
+  ru?: string;
+}
+
 interface FeatureSection {
   id: string;
-  titleItalic: string;
-  titleRest: string;
-  subtitle: string;
-  items: string[];
+  titleItalic: LocalizedString;
+  titleRest: LocalizedString;
+  subtitle: LocalizedString;
+  items: LocalizedString[];
   dark: boolean;
   image: string;
   imageLeft: boolean;
@@ -22,7 +28,14 @@ interface Props {
   titleBold: string;
   sections: FeatureSection[];
   brochureFile?: string;
+  locale: string;
   getImageUrl: (url: string) => string;
+}
+
+function loc(obj: LocalizedString | undefined | null, locale: string, fallback = ""): string {
+  if (!obj) return fallback;
+  if (typeof obj === "string") return obj || fallback;
+  return (obj as any)[locale] || obj.az || obj.en || obj.ru || fallback;
 }
 
 export default function ProjectFeatures({
@@ -32,6 +45,7 @@ export default function ProjectFeatures({
   titleBold,
   sections,
   brochureFile,
+  locale,
   getImageUrl,
 }: Props) {
   const handleBrochureDownload = () => {
@@ -89,18 +103,18 @@ export default function ProjectFeatures({
               >
                 <div className="pd-card-header">
                   <h3 className="pd-card-title">
-                    {sec.titleItalic && <em>{sec.titleItalic}</em>}
-                    {sec.titleRest}
+                    {loc(sec.titleItalic, locale) && <em>{loc(sec.titleItalic, locale)}</em>}
+                    {loc(sec.titleRest, locale)}
                   </h3>
                   <span className="pd-card-num">.{sec.id}</span>
                 </div>
-                {sec.subtitle && (
-                  <p className="pd-card-subtitle">{sec.subtitle}</p>
+                {loc(sec.subtitle, locale) && (
+                  <p className="pd-card-subtitle">{loc(sec.subtitle, locale)}</p>
                 )}
                 {sec.items.length > 0 && (
                   <ul className="pd-card-list">
                     {sec.items.map((item, i) => (
-                      <li key={i}>{item}</li>
+                      <li key={i}>{loc(item, locale)}</li>
                     ))}
                   </ul>
                 )}
@@ -111,7 +125,7 @@ export default function ProjectFeatures({
               <div key={sec.id + "-img"} className="pd-image-cell">
                 <img
                   src={getImageUrl(sec.image)}
-                  alt={`${sec.titleItalic} ${sec.titleRest}`}
+                  alt={`${loc(sec.titleItalic, locale)} ${loc(sec.titleRest, locale)}`.trim()}
                 />
               </div>
             ) : null;

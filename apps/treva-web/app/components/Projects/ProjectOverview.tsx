@@ -9,9 +9,15 @@ interface OverviewImage {
   label: string;
 }
 
+interface LocalizedString {
+  az?: string;
+  en?: string;
+  ru?: string;
+}
+
 interface DataRow {
-  key: string;
-  value: string;
+  key: LocalizedString;
+  value: LocalizedString;
 }
 
 interface Props {
@@ -28,7 +34,14 @@ interface Props {
     small: OverviewImage;
   };
   dataRows: DataRow[];
+  locale: string;
   getImageUrl: (url: string) => string;
+}
+
+function loc(obj: LocalizedString | undefined | null, locale: string, fallback = ""): string {
+  if (!obj) return fallback;
+  if (typeof obj === "string") return obj || fallback;
+  return (obj as any)[locale] || obj.az || obj.en || obj.ru || fallback;
 }
 
 export default function ProjectOverview({
@@ -41,6 +54,7 @@ export default function ProjectOverview({
   description,
   images,
   dataRows,
+  locale,
   getImageUrl,
 }: Props): React.ReactElement {
   return (
@@ -131,8 +145,8 @@ export default function ProjectOverview({
             {dataRows.map((row, idx) => (
               <React.Fragment key={idx}>
                 <div className="po-data-row">
-                  <span className="po-data-key">{row.key}</span>
-                  <span className="po-data-val">{row.value}</span>
+                  <span className="po-data-key">{loc(row.key, locale)}</span>
+                  <span className="po-data-val">{loc(row.value, locale)}</span>
                 </div>
                 {idx < dataRows.length - 1 && (
                   <hr className="po-data-line" />

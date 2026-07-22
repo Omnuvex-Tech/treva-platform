@@ -10,16 +10,16 @@ export interface HeroImage {
 }
 
 export interface OverviewDataRow {
-  key: string;
-  value: string;
+  key: LocalizedString;
+  value: LocalizedString;
 }
 
 export interface FeatureSection {
   id: string;
-  titleItalic: string;
-  titleRest: string;
-  subtitle: string;
-  items: string[];
+  titleItalic: LocalizedString;
+  titleRest: LocalizedString;
+  subtitle: LocalizedString;
+  items: LocalizedString[];
   dark: boolean;
   image: string;
   imageLeft: boolean;

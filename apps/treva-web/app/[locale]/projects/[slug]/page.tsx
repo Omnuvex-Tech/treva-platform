@@ -156,6 +156,7 @@ export default function ProjectDetailPage() {
           },
         }}
         dataRows={detail.overviewDataRows || []}
+        locale={locale}
         getImageUrl={getImageUrl}
       />
 
@@ -166,6 +167,7 @@ export default function ProjectDetailPage() {
         titleBold={loc(detail.featuresTitleBold, locale, "Details")}
         sections={detail.featuresSections || []}
         brochureFile={detail.brochureFile}
+        locale={locale}
         getImageUrl={getImageUrl}
       />
 
