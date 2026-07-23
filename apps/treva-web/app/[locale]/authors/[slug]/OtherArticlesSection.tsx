@@ -38,7 +38,14 @@ const OtherArticlesSection: React.FC<Props> = ({ locale, articles, categories })
     <div className="other-articles">
       <h2 className="other-articles__title">Digər məqalələr</h2>
 
-      <div className="other-articles__filters">
+     <div className="other-articles__filters">
+        <button
+          type="button"
+          className={`other-articles__filter-btn ${activeCategory === null ? "is-active" : ""}`}
+          onClick={() => setActiveCategory(null)}
+        >
+          Hamısı
+        </button>
         {categories.map((cat) => (
           <button
             key={cat.id}

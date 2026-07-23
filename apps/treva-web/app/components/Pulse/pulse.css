@@ -1351,6 +1351,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  position: sticky;
+  top: calc(var(--treva-nav-height, 64px) + 24px);
+  align-self: start;
+  height: max-content;
 }
 
 .author-page_avatar {
