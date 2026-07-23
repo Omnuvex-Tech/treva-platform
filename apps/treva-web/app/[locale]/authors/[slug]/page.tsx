@@ -2,16 +2,27 @@ import React from "react";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import OtherArticlesSection from "./OtherArticlesSection";
 import Link from "next/link";
-import { getAuthorBySlug, apiArticleToArticle, toAbsUrl } from "@/lib/pulse-api";
+import {
+  getAuthorBySlug,
+  apiArticleToArticle,
+  toAbsUrl,
+  getArticles,
+  getPulseCategories,
+  getLocalized,
+} from "@/lib/pulse-api";
 import { notFound } from "next/navigation";
-import { FaLinkedin } from "react-icons/fa6";
+import { FaLinkedin, FaArrowRightLong } from "react-icons/fa6";
 import "@/app/components/Pulse/pulse.css";
 
 type Props = {
   params: Promise<{
     locale: string;
     slug: string;
+  }>;
+  searchParams: Promise<{
+    category?: string;
   }>;
 };
 
@@ -36,8 +47,9 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function AuthorPage({ params }: Props) {
+export default async function AuthorPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
+  const { category: activeCategory } = await searchParams;
 
   let apiAuthor;
   try {
@@ -68,83 +80,113 @@ export default async function AuthorPage({ params }: Props) {
     "Müəllif məqalələri",
     "Treva Pulse"
   ];
+  let allCategories: { id: string; name: string; slug: string }[] = [];
+  let otherArticles: ReturnType<typeof apiArticleToArticle>[] = [];
 
+  try {
+    const [apiArticlesRes, categoriesRes] = await Promise.all([
+      getArticles({ limit: 100 }),
+      getPulseCategories(),
+    ]);
+
+    allCategories = categoriesRes.map((cat) => ({
+      id: cat.id,
+      name: getLocalized(cat.name, locale),
+      slug: cat.slug,
+    }));
+
+    otherArticles = apiArticlesRes.data
+      .map((a) => apiArticleToArticle(a, locale))
+      .filter((a) => !authorArticles.some((aa) => aa.slug === a.slug));
+  } catch {
+    otherArticles = [];
+  }
   return (
     <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
 
-      <main className="main-wrapper" style={{ paddingTop: "calc(var(--treva-nav-height, 64px) + 64px)" }}>
-        
-        {/* Author Bio Banner */}
-        <section className="section_author-banner" style={{ borderBottom: "1px solid rgba(23, 25, 28, 0.1)", paddingBottom: "3rem" }}>
-          <div className="global-padding">
-            <div className="container-large">
-              <div style={{ display: "flex", alignItems: "center", gap: "2rem", flexWrap: "wrap" }}>
-                <div style={{ width: "120px", height: "120px", borderRadius: "50%", overflow: "hidden", border: "1px solid rgba(0,0,0,0.1)" }}>
-                  <img src={authorImage} alt={String(authorName || "")} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      <main className="main-wrapper">
+
+        <section className="global-padding">
+          <div className="container-large">
+            <div className="author-page_wrap">
+
+              {/* Left column — author info */}
+              <div className="author-page_left-col">
+                <div className="author-page_avatar">
+                  <img src={authorImage} alt={String(authorName || "")} />
                 </div>
-                <div>
-                  <h1 className="heading-style-h2-medium" style={{ margin: 0 }}>{String(authorName || "")}</h1>
-                  <p className="text-color-blue400" style={{ margin: "0.5rem 0 0 0", fontSize: "1.1rem" }}>{String(authorTitle || "")}</p>
-                  <p style={{ color: "rgba(23, 25, 28, 0.6)", marginTop: "0.5rem" }}>
-                    {String(authorDescription || "")}
-                  </p>
-                  {authorLinkedin && (
-                    <a
-                      href={authorLinkedin}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="pulse-social-icon-link"
-                      aria-label={`${String(authorName || "")} LinkedIn profili`}
+                <h1 className="author-page_name">{String(authorName || "")}</h1>
+                <p className="author-page_title">{String(authorTitle || "")}</p>
+                <p className="author-page_desc">{String(authorDescription || "")}</p>
+                {authorLinkedin && (
+                  <a
+                    href={authorLinkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="pulse-social-icon-link"
+                    aria-label={`${String(authorName || "")} LinkedIn profili`}
+                  >
+                    <FaLinkedin size={22} aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+
+              {/* Right column — latest articles */}
+              <div className="author-page_right-col">
+                <h2 className="author-page_articles-title">Son məqalələr</h2>
+                <div className="author-page_articles-list">
+                  {authorArticles.map((article) => (
+                    <Link
+                      key={article.slug}
+                      href={`/${locale}/pulse/${article.slug}`}
+                      className="author-page_article-item"
                     >
-                      <FaLinkedin size={22} aria-hidden="true" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Author's Articles */}
-        <section className="section_news author-articles-section" style={{ paddingTop: "3rem" }}>
-          <div className="global-padding">
-            <div className="container-large">
-              <h2 className="heading-style-h3-small" style={{ marginBottom: "2rem" }}>Müəllifin bütün məqalələri</h2>
-              <div className="news_middle-wrap">
-                <div className="w-dyn-list">
-                  <div role="list" className="news_middle-list w-dyn-items author-articles-grid" style={{ borderRight: "1px solid rgba(23, 25, 28, 0.1)" }}>
-                    {authorArticles.map((article) => (
-                      <div key={article.slug} role="listitem" className="news_header-item w-dyn-item">
-                        <Link href={`/${locale}/pulse/${article.slug}`} className="news_middle-link w-inline-block">
-                          <div className="news_middle-img-wrap">
-                              <div className="news_middle-img-holder">
-                              {article.image ? <img src={toAbsUrl(article.image)} loading="lazy" alt={String(article.title || "")} className="fullwidth-img" /> : <div className="fullwidth-img" style={{ background: "#f1f5f9" }} />}
-                            </div>
-                          </div>
-
-                          <div className="news-header_middle-content-wrap">
-                            <div className="news_middle-content">
-                                <div className="news_specs-wrap">
-                                    <div className="news_category-label">
-                                        <div>{String(article.category || "")}</div>
-                                    </div>
-                                    <div>{String(article.date || "")}</div>
-                                </div>
-                                <h2 className="news_middle-title no-animate">{String(article.title || "")}</h2>
-                            </div>
+                      <div className="author-page_article-img">
+                        {article.image ? (
+                          <img src={toAbsUrl(article.image)} loading="lazy" alt={String(article.title || "")} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", background: "#f1f5f9" }} />
+                        )}
+                        <div className="author-page_img-overlay">
+                          <div className="author-page_img-btn">Məqaləni oxu</div>
                         </div>
-                        </Link>
                       </div>
-                    ))}
-                  </div>
+
+                      <div className="author-page_article-content">
+                        <h3 className="author-page_article-title">{String(article.title || "")}</h3>
+                        {article.excerpt && (
+                          <p className="author-page_article-excerpt">{String(article.excerpt)}</p>
+                        )}
+                        <span className="author-page_article-cta">
+                          Məqaləni oxu <FaArrowRightLong size={14} aria-hidden="true" />
+                        </span>
+                      </div>
+
+                      <div className="author-page_article-meta">
+                        <div className="news_category-label">
+                          <div>{String(article.category || "")}</div>
+                        </div>
+                        <span className="author-page_article-date">{String(article.date || "")}</span>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
+
             </div>
           </div>
         </section>
 
-        {/* SEO Keywords Section */}
+        <section className="global-padding">
+          <div className="container-large">
+            <OtherArticlesSection
+              locale={locale}
+              articles={otherArticles}
+              categories={allCategories}
+            />
+          </div>
+        </section>
         <section className="section_keywords author-keywords-section">
           <div className="global-padding">
             <div className="container-large">
