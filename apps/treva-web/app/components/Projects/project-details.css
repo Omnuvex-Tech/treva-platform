@@ -1,5 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap");
 @import url('https://fonts.cdnfonts.com/css/oak-sans');
+
+/* ─── PAGE CONTAINER CUSTOM PADDING ─────────── */
+.page-container.pde-page-container {
+  padding-left: 36px !important;
+  padding-right: 36px !important;
+}
+
+@media (max-width: 768px) {
+  .page-container.pde-page-container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
+
 /* ─── WRAPPER ─────────────────────────────── */
 .pd-wrapper {
   background: #ffffff;

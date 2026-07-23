@@ -59,7 +59,7 @@ export default function ProjectOverview({
 }: Props): React.ReactElement {
   return (
     <section className="po-section">
-      <PageContainer>
+      <PageContainer className="pde-page-container">
         {/* Header */}
         <div className="po-header">
           <div className="po-title-col">

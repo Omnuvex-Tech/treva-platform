@@ -1,5 +1,18 @@
 /* unit-layout.css */
 
+/* ─── PAGE CONTAINER CUSTOM PADDING ─────────── */
+.page-container.pde-page-container {
+  padding-left: 36px !important;
+  padding-right: 36px !important;
+}
+
+@media (max-width: 768px) {
+  .page-container.pde-page-container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
+
 .layouts-section {
     --color-bg: #ffffff;
     --color-card-bg: #f4f0ea;

@@ -46,7 +46,7 @@ export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllH
 
   return (
     <main className="layouts-section">
-      <PageContainer>
+      <PageContainer className="pde-page-container">
         <header className="layouts-header">
           <h1 className="layouts-header__title">
             {t.titleThin} <span>{t.titleBold}</span>

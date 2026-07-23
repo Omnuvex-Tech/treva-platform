@@ -29,8 +29,23 @@
 }
 
 /* ──────────────────────────────────────────────────────────
+   PAGE CONTAINER CUSTOM PADDING
+   ────────────────────────────────────────────────────────── */
+.page-container.pde-page-container {
+  padding-left: 36px !important;
+  padding-right: 36px !important;
+}
+
+@media (max-width: 768px) {
+  .page-container.pde-page-container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
    MAIN SECTION
-────────────────────────────────────────────────────────── */
+   ────────────────────────────────────────────────────────── */
 .po-section {
   font-family: var(--font-family);
   color: var(--color-secondary);
@@ -147,9 +162,9 @@
   gap: 10px;
 }
 
-.po-card-large  { flex: 0 0 50%; }
-.po-card-medium { flex: 0 0 25%; }
-.po-card-small  { flex: 0 0 25%; }
+.po-card-large  { flex: 2; }
+.po-card-medium { flex: 1; }
+.po-card-small  { flex: 1; }
 
 .po-image-label {
   font-size: 14px;

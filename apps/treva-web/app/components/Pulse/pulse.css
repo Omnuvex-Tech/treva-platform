@@ -135,7 +135,7 @@
   font-family: 'Helveticanowdisplay', Arial, sans-serif;
   font-size: 1.5rem;
   font-weight: 400;
-  color: #17191c;
+  color: #3f4249;
   margin-top: 0px;
   margin-bottom: 1.5rem;
   text-transform: uppercase;
@@ -193,7 +193,7 @@
   font-size: 1.35rem !important;
   line-height: 1.3;
   font-weight: 400;
-  color: #17191c;
+  color: #3f4249;
 }
 
 /* SAĞ SÜTUN (FİLTƏRLƏR VƏ AXTARIŞ) */
@@ -283,7 +283,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #17191c;
+  color: #3f4249;
   transition: background-color 0.2s ease;
 }
 
@@ -461,7 +461,7 @@
   text-transform: none;
   font-weight: 400;
   line-height: 1.3;
-  color: #17191c;
+  color: #3f4249;
   margin: 0;
 }
 
@@ -495,7 +495,7 @@
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  color: #17191c;
+  color: #3f4249;
 }
 
 .section_news .news_week-col {
@@ -849,7 +849,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #17191c;
+  color: #3f4249;
   margin: 0;
 }
 
@@ -871,7 +871,7 @@
 }
 
 .keyword_tag:hover {
-  background-color: #17191c;
+  background-color: #3f4249;
   color: #ffffff;
 }
 
@@ -983,9 +983,9 @@
 .news-header_right-cta-holder .button,
 .is-view-more {
   display: inline-flex;
-  background-color: #17191c !important;
+  background-color: #3f4249 !important;
   color: #ffffff !important;
-  border: 1px solid #17191c !important;
+  border: 1px solid #3f4249 !important;
   padding: 5px 5px !important;
   border-radius: 100px !important;
   width: 100%;
@@ -1005,7 +1005,7 @@
 .news-header_right-cta-holder .button:hover,
 .is-view-more:hover {
   background-color: transparent !important;
-  color: #17191c !important;
+  color: #3f4249 !important;
 }
 
 .callbackContainer .roleButton {

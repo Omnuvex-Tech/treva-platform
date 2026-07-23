@@ -412,7 +412,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                             padding: "3px 11px", borderRadius: 20, fontSize: 11, fontWeight: 400,
                             border: "none", cursor: "pointer",
                             background: selectedSlugs.length === 0 && !searchQuery ? "#4C525E" : "#ededed",
-                            color: selectedSlugs.length === 0 && !searchQuery ? "#fff" : "#17191c",
+                            color: selectedSlugs.length === 0 && !searchQuery ? "#fff" : "#3f4249",
                             textTransform: "uppercase",
                             letterSpacing: "0.05em",
                           }}
@@ -430,7 +430,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                                 padding: "3px 11px", borderRadius: 20, fontSize: 11, fontWeight: 400,
                                 border: "none", cursor: "pointer",
                                 background: isActive ? "#4C525E" : "#ededed",
-                                color: isActive ? "#fff" : "#17191c",
+                                color: isActive ? "#fff" : "#3f4249",
                                 textTransform: "uppercase",
                                 letterSpacing: "0.05em",
                               }}

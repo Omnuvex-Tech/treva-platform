@@ -56,7 +56,7 @@ export default function ProjectFeatures({
 
   return (
     <section className="pd-wrapper">
-      <PageContainer>
+      <PageContainer className="pde-page-container">
         {/* HEADER */}
         <div className="pd-header">
           <div className="pd-header-left">
