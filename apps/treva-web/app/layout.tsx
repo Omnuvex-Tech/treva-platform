@@ -48,7 +48,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="az">
-            <head />
+            <head>
+                <script src="https://salesagent.treva.realestate/webchat/widget.js"
+                    data-title="TREVA Assistant"
+                    data-accent="#4b5563"
+                    defer></script>
+            </head>
             <body className={inter.variable} suppressHydrationWarning>
                 <QueryProvider>
                     <NotifyProvider>
