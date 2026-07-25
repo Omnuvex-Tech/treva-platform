@@ -45,7 +45,10 @@ const heroDictionary = {
     ),
     subtitle: "Doğru investisiya seçimləri və fərdi həyat tərzi həlləri təqdim edən platforma.",
     location: "Layihələr",
-    dealOptions: ["Off-Plan", "Resale"],
+    dealOptions: [
+      "Off-Plan",
+      // "Resale",
+    ],
   },
   en: {
     title: (
@@ -57,7 +60,10 @@ const heroDictionary = {
     ),
     subtitle: "Curated real estate investments and tailored lifestyle solutions.",
     location: "Projects",
-    dealOptions: ["Off-Plan", "Resale"],
+    dealOptions: [
+      "Off-Plan",
+      // "Resale",
+    ],
   },
   ru: {
     title: (
@@ -69,7 +75,10 @@ const heroDictionary = {
     ),
     subtitle: "Надёжная платформа для правильных инвестиций и индивидуальных решений для жизни.",
     location: "Проекты",
-    dealOptions: ["Off-Plan", "Resale"],
+    dealOptions: [
+      "Off-Plan",
+      // "Resale",
+    ],
   },
 } as const;
 

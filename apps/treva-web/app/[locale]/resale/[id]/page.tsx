@@ -1,3 +1,4 @@
+/*
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -605,4 +606,11 @@ export default function ResaleDetailPage() {
       <HomeFooter />
     </div>
   );
+}
+*/
+
+import { notFound } from "next/navigation";
+
+export default function ResaleDetailPage() {
+  notFound();
 }

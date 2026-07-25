@@ -7,26 +7,24 @@ import { objectTypesApi, type ObjectType } from "../../api/object-types";
 import { currenciesApi, type Currency } from "../../api/currencies";
 import { locationOptionsApi, type LocationOption } from "../../api/location-options";
 import { FormDropdown, FormAddButton, FormTabSwitcher } from "@repo/ui";
-import { HouseForm } from "./HouseForm";
+import { HouseForm as UnitLayoutInlineForm } from "./HouseForm";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { useFormDraft } from "../../hooks/useFormDraft";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
+import { PlanUploadCard } from "../../components/PlanUploadCard";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
 
-type TabKey = "info" | "property" | "houses";
-type PropertySubTab = "properties" | "payments" | "options" | "stock";
+type TabKey = "basic" | "commercial" | "location" | "properties" | "payments" | "options" | "stock" | "unitLayouts";
 
 const TABS: { key: TabKey; label: string }[] = [
-    { key: "info", label: "Object Info" },
-    { key: "property", label: "Property" },
-    { key: "houses", label: "Houses" },
-];
-
-const PROPERTY_SUB_TABS: { key: PropertySubTab; label: string }[] = [
-    { key: "properties", label: "Properties" },
+    { key: "basic", label: "Basic Info" },
+    { key: "commercial", label: "Commercial" },
+    { key: "location", label: "Location" },
+    { key: "properties", label: "General Plans" },
+    { key: "unitLayouts", label: "Unit Layouts" },
     { key: "payments", label: "Payment Methods" },
     { key: "options", label: "Options" },
     { key: "stock", label: "Stock" },
@@ -36,6 +34,25 @@ const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
 
 const DRAFT_KEY = "treva-object-create-draft";
+
+function getDefaultPlanName(fileName: string) {
+    return fileName.replace(/\.[^/.]+$/, "").trim();
+}
+
+function normalizePrimaryTab(tab?: string): TabKey {
+    switch (tab) {
+        case "commercial":
+        case "location":
+        case "properties":
+        case "payments":
+        case "options":
+        case "stock":
+        case "unitLayouts":
+            return tab;
+        default:
+            return "basic";
+    }
+}
 
 function SectionBlock({
     title,
@@ -69,11 +86,11 @@ const defaultFormData = {
     region: "",
     area: "",
     city: "",
+    locationTitle: "",
+    locationUrl: "",
     locationGoogleMapsUrl: "",
     developerBrand: "",
     website: "",
-    banks: "",
-    infrastructure: "",
     salesDepartment: "",
     fedLaw214: false,
     image: "",
@@ -87,26 +104,27 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
     const [showHouseForm, setShowHouseForm] = useState(false);
     const [docUploading, setDocUploading] = useState(false);
-    const docInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const coverImageInputRef = useRef<HTMLInputElement>(null);
     const [imageUploading, setImageUploading] = useState(false);
     const [coverImageUploading, setCoverImageUploading] = useState(false);
     const [imageDrag, setImageDrag] = useState(false);
     const [coverImageDrag, setCoverImageDrag] = useState(false);
+    const [showPlanUpload, setShowPlanUpload] = useState(false);
+    const [pendingPlanName, setPendingPlanName] = useState("");
+    const [pendingPlanFile, setPendingPlanFile] = useState<File | null>(null);
 
     const { state: draftState, setState: setDraftState, clearDraft } = useFormDraft({
         key: DRAFT_KEY,
         initialState: {
-            activeTab: "info" as TabKey,
+            activeTab: "basic" as TabKey,
             activeHouseTab: "Active" as "Active" | "Archive",
             formData: defaultFormData,
         },
     });
 
-    const activeTab = draftState.activeTab;
-    const setActiveTab = (tab: TabKey) => setDraftState((prev) => ({ ...prev, activeTab: tab }));
-    const [activePropertySubTab, setActivePropertySubTab] = useState<PropertySubTab>("properties");
+    const activeTab = normalizePrimaryTab(draftState.activeTab);
+    const setActiveTab = (tab: TabKey) => setDraftState((prev) => ({ ...prev, activeTab: normalizePrimaryTab(tab) }));
     const activeHouseTab = draftState.activeHouseTab;
     const setActiveHouseTab = (tab: "Active" | "Archive") => setDraftState((prev) => ({ ...prev, activeHouseTab: tab }));
     const formData = draftState.formData;
@@ -201,8 +219,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         if (!formData.city.trim()) newErrors.city = "City is required";
         if (!formData.developerBrand.trim()) newErrors.developerBrand = "Developer brand is required";
         if (!formData.website.trim()) newErrors.website = "Website is required";
-        if (!formData.banks.trim()) newErrors.banks = "Banks is required";
-        if (!formData.infrastructure.trim()) newErrors.infrastructure = "Infrastructure is required";
         if (!formData.salesDepartment.trim()) newErrors.salesDepartment = "Sales department is required";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -237,10 +253,10 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 area: formData.area,
                 city: formData.city,
                 locationGoogleMapsUrl: formData.locationGoogleMapsUrl || undefined,
+                locationTitle: formData.locationTitle || undefined,
+                locationUrl: formData.locationUrl || undefined,
                 developerBrand: formData.developerBrand,
                 website: formData.website,
-                banks: formData.banks,
-                infrastructure: formData.infrastructure,
                 salesDepartment: formData.salesDepartment,
                 fedLaw214: formData.fedLaw214,
                 image: formData.image || undefined,
@@ -252,7 +268,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             const slug = response?.data?.slug;
             if (slug) {
                 setCreatedSlug(slug);
-                setActiveTab("property");
+                setActiveTab("properties");
                 showSuccess({ title: "Object created" });
                 clearDraft();
             }
@@ -344,23 +360,34 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         if (file) handleCoverImageUpload(file);
     };
 
-    const handleDocUpload = async (files: FileList | File[]) => {
-        const arr = Array.from(files);
-        if (arr.length === 0) return;
+    const resetPlanUpload = () => {
+        setShowPlanUpload(false);
+        setPendingPlanName("");
+        setPendingPlanFile(null);
+    };
+
+    const handleDocFileChange = (file?: File | null) => {
+        if (!file) return;
+        setPendingPlanFile(file);
+    };
+
+    const handleDocUpload = async () => {
+        if (!pendingPlanFile) return;
         setDocUploading(true);
         try {
-            const newDocs: CategoryDocument[] = [];
-            for (const file of arr) {
-                const res = await unitLayoutsApi.uploadFile(file);
-                const docType = file.type === "application/pdf" ? "pdf" : "image";
-                newDocs.push({ type: docType, url: res.data.url });
-            }
-            updateDocsMutation.mutate([...documents, ...newDocs]);
+            const res = await unitLayoutsApi.uploadFile(pendingPlanFile);
+            const docType = pendingPlanFile.type === "application/pdf" ? "pdf" : "image";
+            const nextDoc: CategoryDocument = {
+                type: docType,
+                url: res.data.url,
+                name: pendingPlanName.trim() || getDefaultPlanName(pendingPlanFile.name),
+            };
+            updateDocsMutation.mutate([...documents, nextDoc]);
+            resetPlanUpload();
         } catch {
             // silent
         } finally {
             setDocUploading(false);
-            if (docInputRef.current) docInputRef.current.value = "";
         }
     };
 
@@ -389,8 +416,8 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 })}
             </div>
 
-            {/* Tab: Object Info */}
-            {activeTab === "info" && (
+            {/* Tab: Basic Info */}
+            {activeTab === "basic" && (
                 <form onSubmit={handleSubmit} className="max-w-5xl">
                     <div className="space-y-5">
                         <SectionBlock title="Identity" description="Core object information and listing basics.">
@@ -509,63 +536,80 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                             {errors.currency && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.currency}</p>}
                                         </div>
                                     </div>
+                                    <div className="grid gap-4 lg:grid-cols-3">
+                                        <div>
+                                            <FormDropdown
+                                                label="City *"
+                                                value={formData.city}
+                                                options={toLocationDropdownOptions("city", formData.city)}
+                                                placeholder="Select city"
+                                                onChange={(id) => {
+                                                    updateFormData("city", id);
+                                                    updateFormData("region", "");
+                                                    clearError("city");
+                                                    clearError("region");
+                                                }}
+                                                onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                                createLabel="Create city"
+                                            />
+                                            {errors.city && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.city}</p>}
+                                        </div>
+                                        <div>
+                                            <FormDropdown
+                                                label="Region *"
+                                                value={formData.region}
+                                                options={toLocationDropdownOptions("region", formData.region, formData.city)}
+                                                placeholder={formData.city ? "Select region" : "Select city first"}
+                                                onChange={(id) => { updateFormData("region", id); clearError("region"); }}
+                                                onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                                createLabel="Create region"
+                                            />
+                                            {errors.region && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.region}</p>}
+                                        </div>
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
+                                            <input
+                                                className={inputClass}
+                                                value={formData.area}
+                                                onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }}
+                                                placeholder="2500 m²"
+                                            />
+                                            {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </SectionBlock>
+                    </div>
 
-                        <SectionBlock title="Location" description="Region, city and area details for the object.">
-                            <div className="grid gap-5 lg:grid-cols-3">
-                                <div>
-                                    <FormDropdown
-                                        label="City *"
-                                        value={formData.city}
-                                        options={toLocationDropdownOptions("city", formData.city)}
-                                        placeholder="Select city"
-                                        onChange={(id) => {
-                                            updateFormData("city", id);
-                                            updateFormData("region", "");
-                                            clearError("city");
-                                            clearError("region");
-                                        }}
-                                        onCreateClick={() => navigate("/dashboard/resale/location-options")}
-                                        createLabel="Create city"
-                                    />
-                                    {errors.city && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.city}</p>}
-                                </div>
-                                <div>
-                                    <FormDropdown
-                                        label="Region *"
-                                        value={formData.region}
-                                        options={toLocationDropdownOptions("region", formData.region, formData.city)}
-                                        placeholder={formData.city ? "Select region" : "Select city first"}
-                                        onChange={(id) => { updateFormData("region", id); clearError("region"); }}
-                                        onCreateClick={() => navigate("/dashboard/resale/location-options")}
-                                        createLabel="Create region"
-                                    />
-                                    {errors.region && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.region}</p>}
-                                </div>
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
-                                    <input
-                                        className={inputClass}
-                                        value={formData.area}
-                                        onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }}
-                                        placeholder="2500 m²"
-                                    />
-                                    {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
-                                </div>
-                                <div className="lg:col-span-3">
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location URL</label>
-                                    <input
-                                        className={inputClass}
-                                        value={formData.locationGoogleMapsUrl}
-                                        onChange={(e) => updateFormData("locationGoogleMapsUrl", e.target.value)}
-                                        placeholder="https://www.google.com/maps/embed?pb=..."
-                                    />
-                                </div>
-                            </div>
-                        </SectionBlock>
+                    <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
+                        <button
+                            type="submit"
+                            disabled={createMutation.isPending}
+                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {createMutation.isPending ? "Creating..." : "Create Object"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate("/dashboard/offplan/objects")}
+                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
 
+                    {createMutation.isError && (
+                        <div className="mt-4 rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
+                            {(createMutation.error as Error)?.message || "Failed to create object"}
+                        </div>
+                    )}
+                </form>
+            )}
+
+            {activeTab === "commercial" && (
+                <form onSubmit={handleSubmit} className="max-w-5xl">
+                    <div className="space-y-5">
                         <SectionBlock title="Commercial" description="Developer, sales and infrastructure details shown for the project.">
                             <div className="grid gap-5 lg:grid-cols-2">
                                 <div>
@@ -588,17 +632,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                     />
                                     {errors.website && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.website}</p>}
                                 </div>
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Banks *</label>
-                                    <input
-                                        className={inputClass}
-                                        value={formData.banks}
-                                        onChange={(e) => { updateFormData("banks", e.target.value); clearError("banks"); }}
-                                        placeholder="Kapital Bank, PASHA Bank"
-                                    />
-                                    {errors.banks && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.banks}</p>}
-                                </div>
-                                <div>
+                                <div className="lg:col-span-3">
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Sales Department *</label>
                                     <input
                                         className={inputClass}
@@ -607,16 +641,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         placeholder="sales@example.com"
                                     />
                                     {errors.salesDepartment && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.salesDepartment}</p>}
-                                </div>
-                                <div className="lg:col-span-2">
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Infrastructure *</label>
-                                    <input
-                                        className={inputClass}
-                                        value={formData.infrastructure}
-                                        onChange={(e) => { updateFormData("infrastructure", e.target.value); clearError("infrastructure"); }}
-                                        placeholder="Swimming pool, Gym, Parking"
-                                    />
-                                    {errors.infrastructure && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.infrastructure}</p>}
                                 </div>
                             </div>
                         </SectionBlock>
@@ -646,7 +670,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         </div>
                     </div>
 
-                    {/* Submit Bar */}
                     <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
                         <button
                             type="submit"
@@ -672,8 +695,69 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 </form>
             )}
 
-            {/* Tab: Property */}
-            {activeTab === "property" && (
+            {activeTab === "location" && (
+                <form onSubmit={handleSubmit} className="max-w-5xl">
+                    <div className="space-y-5">
+                        <SectionBlock title="Location" description="Map labels, address copy and embed links for the object.">
+                            <div className="grid gap-5 lg:grid-cols-3">
+                                <div className="lg:col-span-3">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location Title</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.locationTitle}
+                                        onChange={(e) => updateFormData("locationTitle", e.target.value)}
+                                        placeholder="Baku city, Murtuza Mukhtarov str, house 31"
+                                    />
+                                </div>
+                                <div className="lg:col-span-3">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location URL</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.locationUrl}
+                                        onChange={(e) => updateFormData("locationUrl", e.target.value)}
+                                        placeholder="https://maps.google.com/..."
+                                    />
+                                </div>
+                                <div className="lg:col-span-3">
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Location Embed URL</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.locationGoogleMapsUrl}
+                                        onChange={(e) => updateFormData("locationGoogleMapsUrl", e.target.value)}
+                                        placeholder="https://www.google.com/maps/embed?pb=..."
+                                    />
+                                </div>
+                            </div>
+                        </SectionBlock>
+                    </div>
+
+                    <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
+                        <button
+                            type="submit"
+                            disabled={createMutation.isPending}
+                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {createMutation.isPending ? "Creating..." : "Create Object"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate("/dashboard/offplan/objects")}
+                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
+                    {createMutation.isError && (
+                        <div className="mt-4 rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
+                            {(createMutation.error as Error)?.message || "Failed to create object"}
+                        </div>
+                    )}
+                </form>
+            )}
+
+            {/* Tab: Properties */}
+            {activeTab === "properties" && (
                 <div className="max-w-5xl space-y-5">
                     {!createdSlug ? (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -681,34 +765,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                 <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
                                     <img src="/images/inv-dashboard/inv-offplan/options.svg" alt="" className="w-8 h-8 opacity-50" />
                                 </div>
-                                <p className="text-sm font-medium text-[#667085]">Property section is ready</p>
-                                <p className="text-xs text-[#999] mt-1">You can review the tabs now. Save the object when you are ready to start adding plans and property data.</p>
+                                <p className="text-sm font-medium text-[#667085]">General Plans section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">Save the object when you are ready to start adding plans and property data.</p>
                             </div>
                         </div>
                     ) : (
-                        <>
-                    {/* Sub-tabs */}
-                    <div className="rounded-[24px] border border-[#ECEEF2] bg-white p-1.5">
-                        <div className="flex gap-1">
-                            {PROPERTY_SUB_TABS.map((tab) => (
-                                <button
-                                    key={tab.key}
-                                    type="button"
-                                    onClick={() => setActivePropertySubTab(tab.key)}
-                                    className={`flex-1 rounded-2xl px-3 py-2 text-[13px] font-medium transition-all cursor-pointer ${
-                                        activePropertySubTab === tab.key
-                                            ? "bg-[#4E525D] text-white shadow-sm"
-                                            : "text-[#667085] hover:bg-[#F8F9FB]"
-                                    }`}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Sub-tab: Properties */}
-                    {activePropertySubTab === "properties" && (
                         <div className="space-y-5">
                             {/* General Plans */}
                             <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -718,8 +779,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         <p className="mt-1 text-xs leading-5 text-[#808191]">Upload master plans and documents</p>
                                     </div>
                                 </div>
-                                <input ref={docInputRef} type="file" accept=".pdf,image/jpeg,image/png,image/webp" multiple className="hidden"
-                                    onChange={(e) => { if (e.target.files && e.target.files.length > 0) handleDocUpload(e.target.files); }} />
                                 {documents.length > 0 ? (
                                     <div>
                                         <div className="space-y-2 mb-4">
@@ -731,7 +790,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                                 {doc.type === "pdf" ? "PDF" : "IMG"}
                                                             </span>
                                                         </div>
-                                                        <span className="text-sm text-[#1A1A1A] truncate">{doc.url.split("/").pop() || `Plan ${idx + 1}`}</span>
+                                                        <span className="text-sm text-[#1A1A1A] truncate">{doc.name || doc.url.split("/").pop() || `Plan ${idx + 1}`}</span>
                                                     </div>
                                                     <button type="button" onClick={() => handleRemoveDoc(idx)}
                                                         className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50 cursor-pointer">
@@ -742,33 +801,78 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 </div>
                                             ))}
                                         </div>
+                                        {showPlanUpload ? (
+                                            <div className="mb-4">
+                                                <PlanUploadCard
+                                                    planName={pendingPlanName}
+                                                    onPlanNameChange={setPendingPlanName}
+                                                    selectedFileName={pendingPlanFile?.name}
+                                                    uploading={docUploading}
+                                                    onFileSelect={handleDocFileChange}
+                                                    onUpload={handleDocUpload}
+                                                    onCancel={resetPlanUpload}
+                                                />
+                                            </div>
+                                        ) : null}
                                         <FormAddButton icon={<span className="text-sm font-light">+</span>}
                                             className="!bg-white !border !border-[#CBD5E1] !text-[#1A1C1E] hover:!bg-gray-50"
-                                            onClick={() => docInputRef.current?.click()} disabled={docUploading}>
-                                            {docUploading ? "Uploading..." : "Add master plan"}
+                                            onClick={() => setShowPlanUpload(true)} disabled={docUploading}>
+                                            Add master plan
                                         </FormAddButton>
                                     </div>
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center text-center py-8">
-                                        <div className="w-10 h-10 rounded-full bg-[#EBEBEB] flex items-center justify-center mb-3">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#718096" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                                            </svg>
+                                    <div className="space-y-4 pt-0 pb-8">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EBEBEB]">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#718096" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm font-medium text-[#718096]">No plans uploaded yet</p>
                                         </div>
-                                        <p className="text-sm font-medium text-[#718096] mb-4">No plans uploaded yet</p>
-                                        <FormAddButton icon={<span className="text-sm font-light">+</span>}
-                                            className="!bg-white !border !border-[#CBD5E1] !text-[#1A1C1E] hover:!bg-gray-50"
-                                            onClick={() => docInputRef.current?.click()} disabled={docUploading}>
-                                            {docUploading ? "Uploading..." : "Add master plan"}
-                                        </FormAddButton>
+                                        <div className="w-full max-w-[620px] space-y-3">
+                                            {showPlanUpload ? (
+                                                <PlanUploadCard
+                                                    planName={pendingPlanName}
+                                                    onPlanNameChange={setPendingPlanName}
+                                                    selectedFileName={pendingPlanFile?.name}
+                                                    uploading={docUploading}
+                                                    onFileSelect={handleDocFileChange}
+                                                    onUpload={handleDocUpload}
+                                                    onCancel={resetPlanUpload}
+                                                />
+                                            ) : null}
+                                            {!showPlanUpload ? (
+                                                <div>
+                                                    <FormAddButton icon={<span className="text-sm font-light">+</span>}
+                                                        className="!bg-white !border !border-[#CBD5E1] !text-[#1A1C1E] hover:!bg-gray-50"
+                                                        onClick={() => setShowPlanUpload(true)} disabled={docUploading}>
+                                                        Add master plan
+                                                    </FormAddButton>
+                                                </div>
+                                            ) : null}
+                                        </div>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
+                </div>
+            )}
 
-                    {/* Sub-tab: Payment Methods */}
-                    {activePropertySubTab === "payments" && (
+            {activeTab === "payments" && (
+                <div className="max-w-5xl space-y-5">
+                    {!createdSlug ? (
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
+                                    <img src="/images/inv-dashboard/inv-offplan/payment.svg" alt="" className="w-8 h-8 opacity-50" />
+                                </div>
+                                <p className="text-sm font-medium text-[#667085]">Payment Methods section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">Save the object to continue with payment method setup.</p>
+                            </div>
+                        </div>
+                    ) : (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="flex flex-col items-center justify-center text-center">
                                 <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
@@ -779,9 +883,22 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             </div>
                         </div>
                     )}
+                </div>
+            )}
 
-                    {/* Sub-tab: Options */}
-                    {activePropertySubTab === "options" && (
+            {activeTab === "options" && (
+                <div className="max-w-5xl space-y-5">
+                    {!createdSlug ? (
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
+                                    <img src="/images/inv-dashboard/inv-offplan/options.svg" alt="" className="w-8 h-8 opacity-50" />
+                                </div>
+                                <p className="text-sm font-medium text-[#667085]">Options section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">Save the object to continue with option management.</p>
+                            </div>
+                        </div>
+                    ) : (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="flex flex-col items-center justify-center text-center">
                                 <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
@@ -792,9 +909,22 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             </div>
                         </div>
                     )}
+                </div>
+            )}
 
-                    {/* Sub-tab: Stock */}
-                    {activePropertySubTab === "stock" && (
+            {activeTab === "stock" && (
+                <div className="max-w-5xl space-y-5">
+                    {!createdSlug ? (
+                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                            <div className="flex flex-col items-center justify-center text-center">
+                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
+                                    <img src="/images/inv-dashboard/inv-offplan/stock.svg" alt="" className="w-8 h-8 opacity-50" />
+                                </div>
+                                <p className="text-sm font-medium text-[#667085]">Stock section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">Save the object to continue with stock management.</p>
+                            </div>
+                        </div>
+                    ) : (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="flex flex-col items-center justify-center text-center">
                                 <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
@@ -805,13 +935,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             </div>
                         </div>
                     )}
-                        </>
-                    )}
                 </div>
             )}
 
-            {/* Tab: Houses */}
-            {activeTab === "houses" && (
+            {/* Tab: Unit Layouts */}
+            {activeTab === "unitLayouts" && (
                 <div className="max-w-5xl space-y-5">
                     {!createdSlug ? (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -819,15 +947,15 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                 <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
                                     <img src="/images/inv-dashboard/inv-offplan/stock.svg" alt="" className="w-8 h-8 opacity-50" />
                                 </div>
-                                <p className="text-sm font-medium text-[#667085]">Houses section is ready</p>
-                                <p className="text-xs text-[#999] mt-1">You can switch here before saving. Add houses after the object is created.</p>
+                                <p className="text-sm font-medium text-[#667085]">Unit layouts section is ready</p>
+                                <p className="text-xs text-[#999] mt-1">You can switch here before saving. Add unit layouts after the object is created.</p>
                             </div>
                         </div>
                     ) : (
                         <>
                     <div className="flex items-center justify-between">
                         <FormTabSwitcher
-                            tabs={[{ id: "Active", label: "Active houses" }, { id: "Archive", label: "Archive" }]}
+                            tabs={[{ id: "Active", label: "Active unit layouts" }, { id: "Archive", label: "Archive" }]}
                             activeTab={activeHouseTab}
                             onChange={(id) => setActiveHouseTab(id as "Active" | "Archive")}
                             size="md"
@@ -836,13 +964,13 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             icon={<span className="text-base font-light mr-0.5">+</span>}
                             onClick={() => setShowHouseForm(true)}
                         >
-                            Add House
+                                Add Unit Layout
                         </FormAddButton>
                     </div>
 
                     {showHouseForm && (
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                            <HouseForm
+                                <UnitLayoutInlineForm
                                 embedded
                                 inline
                                 categorySlug={createdSlug || undefined}
@@ -857,7 +985,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                     <div className="flex flex-wrap gap-4">
                         {filteredHouses.length === 0 ? (
                             <div className="w-full py-12 text-center text-[#999] text-sm">
-                                {activeHouseTab === "Active" ? "No active houses yet. Click 'Add House' to create one." : "No archived houses"}
+                                    {activeHouseTab === "Active" ? "No active unit layouts yet. Click 'Add Unit Layout' to create one." : "No archived unit layouts"}
                             </div>
                         ) : (
                             filteredHouses.map((house) => {

@@ -84,6 +84,16 @@ export class UpdateCategoryDto {
   @IsString()
   city?: string;
 
+  @ApiPropertyOptional({ example: 'Baku city, Murtuza Mukhtarov str, house 31' })
+  @IsOptional()
+  @IsString()
+  locationTitle?: string;
+
+  @ApiPropertyOptional({ example: 'https://maps.google.com/...' })
+  @IsOptional()
+  @IsString()
+  locationUrl?: string;
+
   @ApiPropertyOptional({ example: 'https://www.google.com/maps/embed?pb=...' })
   @IsOptional()
   @IsString()
@@ -98,16 +108,6 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsString()
   website?: string;
-
-  @ApiPropertyOptional({ example: 'Sberbank' })
-  @IsOptional()
-  @IsString()
-  banks?: string;
-
-  @ApiPropertyOptional({ example: 'Pool, Gym' })
-  @IsOptional()
-  @IsString()
-  infrastructure?: string;
 
   @ApiPropertyOptional({ example: '+7 999 123 4567' })
   @IsOptional()

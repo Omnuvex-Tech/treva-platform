@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     unitLayoutsApi,
+    UNIT_LAYOUT_STATUS_OPTIONS,
     CreateUnitLayoutData,
     UploadResponse,
     Document,
@@ -10,8 +11,6 @@ import {
 } from "../../api/unit-layouts";
 import { categoriesApi, Category } from "../../api/categories";
 import { roomOptionsApi, RoomOption } from "../../api/room-options";
-import { viewOptionsApi, ViewOption } from "../../api/view-options";
-import { statusOptionsApi, StatusOption } from "../../api/status-options";
 import { FileUpload } from "../../components/FileUpload";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -55,7 +54,6 @@ const validateBasicTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.categoryId) errors.push({ field: "Category", message: "Basic Info / Category is required" });
     if (!form.floor && form.floor !== 0) errors.push({ field: "Floor", message: "Basic Info / Floor is required" });
     if (!form.number && form.number !== 0) errors.push({ field: "Number", message: "Basic Info / Number is required" });
-    // if (!form.viewOptionId) errors.push({ field: "View", message: "Basic Info / View Option is required" }); // Optional if required
     return { valid: errors.length === 0, errors };
 };
 
@@ -128,7 +126,7 @@ export function UnitLayoutForm() {
         slug: "",
         categoryId: "",
         roomOptionId: undefined,
-        statusOptionId: undefined,
+            status: "available",
         floor: undefined as unknown as number,
         number: undefined as unknown as number,
         totalArea: undefined as unknown as number,
@@ -137,7 +135,6 @@ export function UnitLayoutForm() {
         prices: {},
         completionYear: undefined as unknown as number,
         numberOfFloors: { start: undefined as unknown as number, end: undefined as unknown as number },
-        viewOptionId: undefined,
         similarApartmentIds: [],
         mainImage: undefined,
         gallery: [],
@@ -167,16 +164,6 @@ export function UnitLayoutForm() {
         queryFn: () => roomOptionsApi.getAll(),
     });
 
-    const { data: viewOptionsResponse } = useQuery({
-        queryKey: ["view-options"],
-        queryFn: () => viewOptionsApi.getAll(),
-    });
-
-    const { data: statusOptionsResponse } = useQuery({
-        queryKey: ["status-options"],
-        queryFn: () => statusOptionsApi.getAll(),
-    });
-
     const { data: currenciesResponse } = useQuery({
         queryKey: ["currencies"],
         queryFn: () => import("../../api/currencies").then(m => m.currenciesApi.getAll()),
@@ -186,23 +173,17 @@ export function UnitLayoutForm() {
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [roomOptionOpen, setRoomOptionOpen] = useState(false);
-    const [viewOptionOpen, setViewOptionOpen] = useState(false);
-    const [statusOpen, setStatusOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
     const [currentTabError, setCurrentTabError] = useState<ValidationError[]>([]);
     const [similarRecommendation, setSimilarRecommendation] = useState(false);
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
     const roomOptionRef = useRef<HTMLDivElement>(null);
-    const viewOptionRef = useRef<HTMLDivElement>(null);
-    const statusRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setCategoryOpen(false);
             if (roomOptionRef.current && !roomOptionRef.current.contains(e.target as Node)) setRoomOptionOpen(false);
-            if (viewOptionRef.current && !viewOptionRef.current.contains(e.target as Node)) setViewOptionOpen(false);
-            if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -216,7 +197,7 @@ export function UnitLayoutForm() {
                 name: d.name,
                 slug: d.slug,
                 categoryId: d.categoryId,
-                statusOptionId: d.statusOptionId ?? undefined,
+                status: d.status ?? "available",
                 floor: d.floor ?? 1,
                 number: d.number ?? 0,
                 totalArea: d.totalArea ?? 0,
@@ -225,7 +206,6 @@ export function UnitLayoutForm() {
                 prices: d.prices || {},
                 completionYear: d.completionYear ?? 2030,
                 numberOfFloors: d.numberOfFloors || { start: 1, end: 1 },
-                viewOptionId: d.viewOptionId ?? undefined,
                 similarApartmentIds: d.similarApartmentIds || [],
                 mainImage: d.mainImage ?? undefined,
                 gallery: Array.isArray(d.gallery) ? d.gallery : [],
@@ -445,12 +425,6 @@ export function UnitLayoutForm() {
     const roomOptions = Array.isArray(roomOptionsResponse?.data)
         ? (roomOptionsResponse.data as RoomOption[])
         : [];
-    const viewOptions = Array.isArray(viewOptionsResponse?.data)
-        ? (viewOptionsResponse.data as ViewOption[])
-        : [];
-    const statusOptions = Array.isArray(statusOptionsResponse?.data)
-        ? (statusOptionsResponse.data as StatusOption[])
-        : [];
     const mutationError =
         createMutation.error || updateMutation.error;
     const mutationErrorMessage = (() => {
@@ -588,59 +562,22 @@ export function UnitLayoutForm() {
                                             )}
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                            Status
-                                        </label>
-                                        <div ref={statusRef} className="relative">
-                                            <button
-                                                type="button"
-                                                onClick={() => setStatusOpen((p) => !p)}
-                                                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
+                                        <div>
+                                            <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                                Status
+                                            </label>
+                                            <select
+                                                value={form.status || "available"}
+                                                onChange={(e) => updateField("status", e.target.value as CreateUnitLayoutData["status"])}
+                                                className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm text-[#1A1A1A] outline-none focus:bg-white focus:border-gray-400"
                                             >
-                                                <span className={form.statusOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
-                                                    {statusOptions.find((s) => s.id === form.statusOptionId)?.value || "Select status (optional)"}
-                                                </span>
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${statusOpen ? "rotate-180" : ""}`}>
-                                                    <path d="M6 9l6 6 6-6" />
-                                                </svg>
-                                            </button>
-                                            {statusOpen && (
-                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => { updateField("statusOptionId", undefined); setStatusOpen(false); }}
-                                                        className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                            !form.statusOptionId
-                                                                ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
-                                                                : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
-                                                        }`}
-                                                    >
-                                                        â€” None
-                                                    </button>
-                                                    {statusOptions.map((opt) => (
-                                                        <button
-                                                            key={opt.id}
-                                                            type="button"
-                                                            onClick={() => { updateField("statusOptionId", opt.id); setStatusOpen(false); }}
-                                                            className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                                form.statusOptionId === opt.id
-                                                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
-                                                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
-                                                            }`}
-                                                        >
-                                                            {opt.value}
-                                                        </button>
-                                                    ))}
-                                                    {statusOptions.length === 0 && (
-                                                        <div className="px-4 py-3 text-sm text-[#999]">
-                                                            No status options yet. Add them in Status Options.
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
+                                                {UNIT_LAYOUT_STATUS_OPTIONS.map((option) => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
-                                    </div>
                                 </div>
                                 <div>
                                     <label className="mb-1 block text-xs font-medium text-[#4E525D]">
@@ -730,59 +667,6 @@ export function UnitLayoutForm() {
                                             min={1}
                                             required
                                         />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                            View Option
-                                        </label>
-                                        <div ref={viewOptionRef} className="relative">
-                                            <button
-                                                type="button"
-                                                onClick={() => setViewOptionOpen((p) => !p)}
-                                                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
-                                            >
-                                                <span className={form.viewOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
-                                                    {viewOptions.find((v) => v.id === form.viewOptionId)?.title || "Select view option (optional)"}
-                                                </span>
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${viewOptionOpen ? "rotate-180" : ""}`}>
-                                                    <path d="M6 9l6 6 6-6" />
-                                                </svg>
-                                            </button>
-                                            {viewOptionOpen && (
-                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => { updateField("viewOptionId", undefined); setViewOptionOpen(false); }}
-                                                        className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                            !form.viewOptionId
-                                                                ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
-                                                                : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
-                                                        }`}
-                                                    >
-                                                        â€” None
-                                                    </button>
-                                                    {viewOptions.map((opt) => (
-                                                        <button
-                                                            key={opt.id}
-                                                            type="button"
-                                                            onClick={() => { updateField("viewOptionId", opt.id); setViewOptionOpen(false); }}
-                                                            className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                                form.viewOptionId === opt.id
-                                                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
-                                                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
-                                                            }`}
-                                                        >
-                                                            {opt.title}
-                                                        </button>
-                                                    ))}
-                                                    {viewOptions.length === 0 && (
-                                                        <div className="px-4 py-3 text-sm text-[#999]">
-                                                            No view options yet. Add them in View Options.
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
                             </div>

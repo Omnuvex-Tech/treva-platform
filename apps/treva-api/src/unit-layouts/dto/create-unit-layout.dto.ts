@@ -96,10 +96,35 @@ export class CreateUnitLayoutDto {
   @IsNotEmpty()
   slug: string;
 
-  @ApiPropertyOptional({ example: 'clq1234567890' })
+  @ApiPropertyOptional({ example: 'Sea Breeze Residence' })
   @IsOptional()
   @IsString()
-  statusOptionId?: string;
+  seoTitle?: string;
+
+  @ApiPropertyOptional({ example: 'Premium off-plan unit layout with sea-facing facade.' })
+  @IsOptional()
+  @IsString()
+  seoDescription?: string;
+
+  @ApiPropertyOptional({ example: 'sea breeze, penthouse, off-plan' })
+  @IsOptional()
+  @IsString()
+  seoKeywords?: string;
+
+  @ApiPropertyOptional({ example: 'https://example.com/projects/sea-breeze-residence' })
+  @IsOptional()
+  @IsString()
+  canonicalUrl?: string;
+
+  @ApiPropertyOptional({ example: '/uploads/images/seo-cover.png' })
+  @IsOptional()
+  @IsString()
+  seoImage?: string;
+
+  @ApiPropertyOptional({ example: 'available', enum: ['available', 'reserved', 'sold'] })
+  @IsOptional()
+  @IsEnum(['available', 'reserved', 'sold'])
+  status?: 'available' | 'reserved' | 'sold';
 
   @ApiPropertyOptional({ example: false })
   @IsOptional()
@@ -157,11 +182,6 @@ export class CreateUnitLayoutDto {
   @Type(() => NumberOfFloorsDto)
   numberOfFloors: NumberOfFloorsDto;
 
-  @ApiProperty({ example: 'clq1234567890abcdefg', required: false })
-  @IsString()
-  @IsOptional()
-  viewOptionId?: string;
-
   @ApiProperty({ example: ['id1', 'id2'] })
   @IsArray()
   @IsString({ each: true })
@@ -173,6 +193,13 @@ export class CreateUnitLayoutDto {
   @ValidateNested()
   @Type(() => MainImageDto)
   mainImage?: MainImageDto;
+
+  @ApiPropertyOptional({ type: MainImageDto })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => MainImageDto)
+  coverImage?: MainImageDto;
 
   @ApiProperty({ type: [GalleryImageDto] })
   @IsArray()
@@ -233,51 +260,6 @@ export class CreateUnitLayoutDto {
   @IsObject()
   endOfSales?: Record<string, number>;
 
-  @ApiPropertyOptional({ example: 'Main Office' })
-  @IsOptional()
-  @IsString()
-  salesOffice?: string;
-
-  @ApiPropertyOptional({ example: '123 Main Street, Building 5' })
-  @IsOptional()
-  @IsString()
-  contractAddress?: string;
-
-  @ApiPropertyOptional({ example: 'Neftchilar Avenue' })
-  @IsOptional()
-  @IsString()
-  street?: string;
-
-  @ApiPropertyOptional({ example: '42' })
-  @IsOptional()
-  @IsString()
-  houseNumber?: string;
-
-  @ApiPropertyOptional({ example: '2026-12-31' })
-  @IsOptional()
-  @IsString()
-  deadlineForCommissioning?: string;
-
-  @ApiPropertyOptional({ example: '123456789' })
-  @IsOptional()
-  @IsString()
-  landCadastralNumber?: string;
-
-  @ApiPropertyOptional({ example: 'Yes' })
-  @IsOptional()
-  @IsString()
-  showroomAvailability?: string;
-
-  @ApiPropertyOptional({ example: 'Renovated' })
-  @IsOptional()
-  @IsString()
-  renovation?: string;
-
-  @ApiPropertyOptional({ example: 'Brick' })
-  @IsOptional()
-  @IsString()
-  wallMaterial?: string;
-
   @ApiPropertyOptional({ example: '<p>Beautiful apartment</p>' })
   @IsOptional()
   @IsString()
@@ -309,4 +291,9 @@ export class CreateUnitLayoutDto {
   @IsOptional()
   @IsString()
   locationUrl?: string;
+
+  @ApiPropertyOptional({ example: 'https://www.google.com/maps/embed?pb=...' })
+  @IsOptional()
+  @IsString()
+  locationGoogleMapsUrl?: string;
 }

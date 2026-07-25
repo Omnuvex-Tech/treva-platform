@@ -152,10 +152,6 @@ export class UpdateApartmentDto {
   @IsOptional()
   extract?: boolean;
 
-  @ApiPropertyOptional({ example: true })
-  @IsOptional()
-  parking?: boolean;
-
   @ApiPropertyOptional({ example: 8 })
   @IsOptional()
   @IsNumber()
@@ -167,10 +163,6 @@ export class UpdateApartmentDto {
   @IsIn(['furnished', 'unfurnished'])
   furnishing?: string;
 
-  @ApiPropertyOptional({ example: true })
-  @IsOptional()
-  elevator?: boolean;
-
   @ApiPropertyOptional({ example: 2.8 })
   @IsOptional()
   @IsNumber()
@@ -181,12 +173,6 @@ export class UpdateApartmentDto {
   @IsArray()
   @IsString({ each: true })
   heatingTypeIds?: string[];
-
-  @ApiPropertyOptional({ example: ['view-option-id'] })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  viewOptionIds?: string[];
 
   @ApiPropertyOptional({ example: 'apartment-type-id' })
   @IsOptional()

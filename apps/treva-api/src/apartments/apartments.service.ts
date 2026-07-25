@@ -44,28 +44,22 @@ export class ApartmentsService {
     };
   }
 
-  private async attachOptionRelations<T extends { heatingTypeIds: string[]; viewOptionIds: string[] }>(
+  private async attachOptionRelations<T extends { heatingTypeIds: string[] }>(
     apartments: T[],
   ) {
     const heatingTypeIds = [...new Set(apartments.flatMap((apartment) => apartment.heatingTypeIds || []))];
-    const viewOptionIds = [...new Set(apartments.flatMap((apartment) => apartment.viewOptionIds || []))];
 
-    const [heatingTypes, viewOptions] = await Promise.all([
+    const heatingTypes = await (
       heatingTypeIds.length > 0
         ? this.prisma.heatingTypeOption.findMany({ where: { id: { in: heatingTypeIds } } })
-        : Promise.resolve([]),
-      viewOptionIds.length > 0
-        ? this.prisma.viewOption.findMany({ where: { id: { in: viewOptionIds } } })
-        : Promise.resolve([]),
-    ]);
+        : Promise.resolve([])
+    );
 
     const heatingTypeMap = new Map(heatingTypes.map((item) => [item.id, item]));
-    const viewOptionMap = new Map(viewOptions.map((item) => [item.id, item]));
 
     return apartments.map((apartment) => ({
       ...apartment,
       heatingTypes: (apartment.heatingTypeIds || []).map((id) => heatingTypeMap.get(id)).filter(isDefined),
-      viewOptions: (apartment.viewOptionIds || []).map((id) => viewOptionMap.get(id)).filter(isDefined),
     }));
   }
 
@@ -155,10 +149,9 @@ export class ApartmentsService {
     maxGrossArea?: number;
     floor?: number;
     currency?: string;
-    viewOptionIds?: string;
     status?: string;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, viewOptionIds, status } = query;
+    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, status } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
@@ -189,10 +182,6 @@ export class ApartmentsService {
     if (floor) {
       where.floorFrom = { lte: floor };
       where.floorTo = { gte: floor };
-    }
-    if (viewOptionIds) {
-      const ids = viewOptionIds.split(',').filter(Boolean);
-      if (ids.length > 0) where.viewOptionIds = { hasSome: ids };
     }
     if (status) where.status = status;
 

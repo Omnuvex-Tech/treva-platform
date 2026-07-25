@@ -11,6 +11,7 @@ export interface CategoryMetrics {
 export interface CategoryDocument {
     type: string;
     url: string;
+    name?: string;
 }
 
 export interface Category {
@@ -32,11 +33,11 @@ export interface Category {
     region?: string;
     area?: string;
     city?: string;
+    locationTitle?: string;
+    locationUrl?: string;
     locationGoogleMapsUrl?: string;
     developerBrand?: string;
     website?: string;
-    banks?: string;
-    infrastructure?: string;
     salesDepartment?: string;
     documents?: CategoryDocument[];
     fedLaw214: boolean;
@@ -63,11 +64,11 @@ export interface CreateCategoryData {
     region?: string;
     area?: string;
     city?: string;
+    locationTitle?: string;
+    locationUrl?: string;
     locationGoogleMapsUrl?: string;
     developerBrand?: string;
     website?: string;
-    banks?: string;
-    infrastructure?: string;
     salesDepartment?: string;
     fedLaw214?: boolean;
 }
@@ -89,11 +90,11 @@ export interface UpdateCategoryData {
     region?: string;
     area?: string;
     city?: string;
+    locationTitle?: string;
+    locationUrl?: string;
     locationGoogleMapsUrl?: string;
     developerBrand?: string;
     website?: string;
-    banks?: string;
-    infrastructure?: string;
     salesDepartment?: string;
     documents?: CategoryDocument[];
     fedLaw214?: boolean;

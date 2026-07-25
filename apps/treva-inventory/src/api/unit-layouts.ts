@@ -33,13 +33,25 @@ export interface Category {
     slug: string;
 }
 
+export type UnitLayoutStatus = "available" | "reserved" | "sold";
+
+export const UNIT_LAYOUT_STATUS_OPTIONS: Array<{ id: UnitLayoutStatus; label: string }> = [
+    { id: "available", label: "Available" },
+    { id: "reserved", label: "Reserved" },
+    { id: "sold", label: "Sold" },
+];
+
 export interface UnitLayout {
     id: string;
     title: string;
     name: string;
     slug: string;
-    statusOptionId?: string;
-    statusOption?: { id: string; value: string };
+    seoTitle?: string;
+    seoDescription?: string;
+    seoKeywords?: string;
+    canonicalUrl?: string;
+    seoImage?: string;
+    status: UnitLayoutStatus;
     archived?: boolean;
     floor: number;
     number?: number;
@@ -49,9 +61,9 @@ export interface UnitLayout {
     prices: Record<string, number>;
     completionYear: number;
     numberOfFloors: NumberOfFloors;
-    viewOptionId?: string;
     similarApartmentIds: string[];
     mainImage?: MainImage;
+    coverImage?: MainImage;
     gallery: GalleryImage[];
     documents: Document[];
     location?: Location;
@@ -59,13 +71,13 @@ export interface UnitLayout {
     category: Category;
     roomOptionId?: string;
     roomOption?: { id: string; name: string; title: string; type: string };
-    viewOption?: { id: string; name: string; title: string };
     ownerId?: string;
     owner?: { id: string; firstName: string; lastName: string; phoneNumber: string };
     heatingTypeIds?: string[];
     attributeIds?: string[];
     locationTitle?: string;
     locationUrl?: string;
+    locationGoogleMapsUrl?: string;
     lcd?: string;
     typeOfBuilding?: string;
     defaultPropertyType?: string;
@@ -74,15 +86,6 @@ export interface UnitLayout {
     completionOfConstruction?: { month: number; year: number };
     startOfSales?: { month: number; year: number };
     endOfSales?: { month: number; year: number };
-    salesOffice?: string;
-    contractAddress?: string;
-    street?: string;
-    houseNumber?: string;
-    deadlineForCommissioning?: string;
-    landCadastralNumber?: string;
-    showroomAvailability?: string;
-    renovation?: string;
-    wallMaterial?: string;
     description?: string;
     createdAt: string;
     updatedAt: string;
@@ -111,7 +114,12 @@ export interface CreateUnitLayoutData {
     title: string;
     name: string;
     slug: string;
-    statusOptionId?: string;
+    seoTitle?: string;
+    seoDescription?: string;
+    seoKeywords?: string;
+    canonicalUrl?: string;
+    seoImage?: string;
+    status?: UnitLayoutStatus;
     archived?: boolean;
     categoryId: string;
     floor: number;
@@ -122,9 +130,9 @@ export interface CreateUnitLayoutData {
     prices: Record<string, number>;
     completionYear: number;
     numberOfFloors: NumberOfFloors;
-    viewOptionId?: string;
     similarApartmentIds: string[];
     mainImage?: MainImage;
+    coverImage?: MainImage;
     gallery?: GalleryImage[];
     documents?: Document[];
     location?: Location;
@@ -134,6 +142,7 @@ export interface CreateUnitLayoutData {
     attributeIds?: string[];
     locationTitle?: string;
     locationUrl?: string;
+    locationGoogleMapsUrl?: string;
     lcd?: string;
     typeOfBuilding?: string;
     defaultPropertyType?: string;
@@ -142,15 +151,6 @@ export interface CreateUnitLayoutData {
     completionOfConstruction?: { month: number; year: number };
     startOfSales?: { month: number; year: number };
     endOfSales?: { month: number; year: number };
-    salesOffice?: string;
-    contractAddress?: string;
-    street?: string;
-    houseNumber?: string;
-    deadlineForCommissioning?: string;
-    landCadastralNumber?: string;
-    showroomAvailability?: string;
-    renovation?: string;
-    wallMaterial?: string;
     description?: string;
 }
 
@@ -159,7 +159,7 @@ export interface UnitLayoutFilters {
     limit?: number;
     categoryId?: string;
     categorySlug?: string;
-    statusOptionId?: string;
+    status?: UnitLayoutStatus;
     archived?: boolean;
     search?: string;
     minPrice?: number;
@@ -167,7 +167,6 @@ export interface UnitLayoutFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    viewOptionId?: string;
     roomOptionId?: string;
 }
 
@@ -190,13 +189,20 @@ const sanitizeUnitLayoutData = (
 ): Partial<CreateUnitLayoutData> => {
     const locationTitle = cleanString(data.location?.title) || cleanString(data.locationTitle);
     const locationType = cleanString(data.location?.type);
-    const mainImageUrl = cleanString(data.mainImage?.url);
+        const mainImageUrl = cleanString(data.mainImage?.url);
+        const coverImageUrl = cleanString(data.coverImage?.url);
 
     return {
         ...data,
         title: data.title?.trim(),
         name: data.name?.trim(),
         slug: data.slug?.trim(),
+        seoTitle: cleanString(data.seoTitle),
+        seoDescription: cleanString(data.seoDescription),
+        seoKeywords: cleanString(data.seoKeywords),
+        canonicalUrl: cleanString(data.canonicalUrl),
+        seoImage: cleanString(data.seoImage),
+            status: data.status || "available",
         number: data.number,
         balconyArea: data.balconyArea,
         similarApartmentIds: data.similarApartmentIds?.filter(Boolean),
@@ -205,12 +211,19 @@ const sanitizeUnitLayoutData = (
         attributeIds: data.attributeIds?.filter(Boolean) || [],
         locationTitle: cleanString(data.locationTitle) || cleanString(data.location?.title),
         locationUrl: cleanString(data.locationUrl) || cleanString(data.location?.url),
+        locationGoogleMapsUrl: cleanString(data.locationGoogleMapsUrl),
         mainImage: mainImageUrl
             ? {
                   url: mainImageUrl,
                   alt: cleanString(data.mainImage?.alt),
               }
             : undefined,
+            coverImage: coverImageUrl
+                ? {
+                      url: coverImageUrl,
+                      alt: cleanString(data.coverImage?.alt),
+                  }
+                : undefined,
         gallery: data.gallery
             ?.map((image) => ({
                 url: cleanString(image.url) || "",

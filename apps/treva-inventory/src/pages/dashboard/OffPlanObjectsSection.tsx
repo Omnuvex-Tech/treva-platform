@@ -3,14 +3,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { categoriesApi, type Category } from "../../api/categories";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
-import { FormAddButton } from "@repo/ui";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
-import { FormTabSwitcher } from "@repo/ui";
 
 const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}.${d.getFullYear()}`;
+};
+
+const getObjectLocation = (category: Category) => {
+    return [category.city, category.region, category.area]
+        .map((item) => item?.trim())
+        .filter(Boolean)
+        .join(" · ");
 };
 
 export function OffPlanObjectsSection() {
@@ -55,8 +60,6 @@ export function OffPlanObjectsSection() {
                 website: cat.website,
                 fedLaw214: cat.fedLaw214,
                 image: cat.image,
-                banks: cat.banks,
-                infrastructure: cat.infrastructure,
                 salesDepartment: cat.salesDepartment,
             });
         },
@@ -97,37 +100,44 @@ export function OffPlanObjectsSection() {
 
     return (
         <main
-            className="flex-1 p-8 overflow-y-auto font-sans antialiased"
+            className="flex-1 overflow-y-auto p-8 font-sans antialiased selection:bg-[#4A4E5A]/10"
             style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
         >
-            {/* Action Bar */}
-            <div className="w-full flex items-center justify-between mb-6">
-                {/* Toggle Segment Control */}
-                <FormTabSwitcher
-                    tabs={[
-                        { id: "Active", label: "Active" },
-                        { id: "Archive", label: "Archive" },
-                    ]}
-                    activeTab={activeTab}
-                    onChange={(id) => setActiveTab(id as "Active" | "Archive")}
-                    size="sm"
-                />
+            <div className="mb-8 flex w-full items-center justify-between gap-3">
+                <div className="flex h-[46px] items-center rounded-full border border-[#E2E8F0] bg-white p-1 shadow-sm">
+                    {(["Active", "Archive"] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            type="button"
+                            onClick={() => setActiveTab(tab)}
+                            className={`flex h-[40px] min-w-[92px] items-center justify-center rounded-[24px] px-4 text-[14px] font-medium leading-[20px] transition-all cursor-pointer ${
+                                activeTab === tab
+                                    ? "border border-white bg-[#EBEBEB] text-[#4E525D]"
+                                    : "border border-transparent bg-transparent text-[#718096] hover:bg-[#F1F5F9]"
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
 
-                {/* Add Object Button */}
-                <FormAddButton
-                    onClick={() => { localStorage.removeItem("treva-object-create-draft"); navigate("/dashboard/offplan/objects/create"); }}
-                    icon={<img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />}
-                    className="w-[124px]"
+                <button
+                    type="button"
+                    onClick={() => {
+                        localStorage.removeItem("treva-object-create-draft");
+                        navigate("/dashboard/offplan/objects/create");
+                    }}
+                    className="flex h-[44px] w-[124px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#4E525D] px-3.5 py-2 text-[13px] font-medium leading-[20px] text-white transition-colors hover:bg-[#3D404A] cursor-pointer"
                 >
-                    Add Object
-                </FormAddButton>
+                    <img src="/images/inv-resale/plus.svg" alt="" className="h-4 w-4" />
+                    <span>Add Object</span>
+                </button>
             </div>
 
-            {/* Card Grid */}
             {isLoading ? (
                 <LoadingSpinner label="Loading objects" className="min-h-[320px]" />
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-[#666666]">
+                <div className="flex h-64 flex-col items-center justify-center text-[#666666]">
                     <svg
                         width="48"
                         height="48"
@@ -143,9 +153,7 @@ export function OffPlanObjectsSection() {
                         <circle cx="9" cy="9" r="2" />
                         <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                     </svg>
-                    <p className="text-[16px] font-medium mb-1">
-                        No objects found
-                    </p>
+                    <p className="mb-1 text-[16px] font-medium">No objects found</p>
                     <p className="text-[14px] text-[#999]">
                         {activeTab === "Active"
                             ? "Create your first project object"
@@ -153,34 +161,37 @@ export function OffPlanObjectsSection() {
                     </p>
                 </div>
             ) : (
-                <div className="flex flex-wrap gap-5 w-full">
+                <div className="flex w-full flex-wrap gap-5">
                     {filtered.map((cat) => (
-                        <div
-                            key={cat.id}
-                            className="bg-[#FFFFFF] border border-[#EBEBEB] rounded-[32px] pt-[8px] pr-[8px] pb-[12px] pl-[8px] flex flex-col gap-[12px] w-[265px] h-[398px] shrink-0"
-                        >
-                            {/* Image Container */}
+                        <div key={cat.id} className="group flex w-[280px] shrink-0 flex-col gap-3 rounded-[28px] border border-[#EBEBEB] bg-white p-2 pb-3 transition-shadow hover:shadow-md">
                             <div className="relative w-full h-[200px] rounded-[32px] overflow-hidden bg-[#F3F4F6] shrink-0">
                                 {cat.image ? (
                                     <img
                                         src={cat.image}
                                         alt={cat.title}
-                                        className="w-full h-full object-cover"
+                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                                         loading="lazy"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-[#999] text-sm">
+                                    <div className="flex h-full w-full items-center justify-center text-sm text-[#999]">
                                         No Image
                                     </div>
                                 )}
 
-                                {/* Status Badge */}
-                                <div className="absolute top-2.5 right-2.5">
+                                {cat.objectType ? (
+                                    <div className="absolute left-3 top-3">
+                                        <span className="inline-flex items-center rounded-full bg-[#EBEBEB] px-2 py-1 text-[12px] font-medium text-[#666666]">
+                                            {cat.objectType}
+                                        </span>
+                                    </div>
+                                ) : null}
+
+                                <div className="absolute right-3 top-3">
                                     <span
-                                        className={`inline-flex items-center justify-center w-[51px] h-[26px] rounded-full gap-[4px] py-[18px] px-[31px] text-[14px] font-medium leading-[18px] tracking-[0px] ${
+                                        className={`inline-flex items-center rounded-full px-2 py-1 text-[12px] font-medium ${
                                             (cat.status || "active") === "active"
-                                                ? "bg-[#D7F3E3] text-[#2D9A5B]"
-                                                : "bg-[#F3F4F6] text-[#999]"
+                                                ? "bg-[#2D9A5B] text-white"
+                                                : "bg-[#F4F5F6] text-[#718096]"
                                         }`}
                                     >
                                         {(cat.status || "active") === "active" ? "Active" : "Archive"}
@@ -188,78 +199,81 @@ export function OffPlanObjectsSection() {
                                 </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1 flex flex-col justify-between">
-                                <div className="px-0.5">
-                                    {/* Title */}
-                                    <h3 className="text-[16px] font-semibold text-[#1A1A1A] leading-[20px] tracking-[0px] mb-1 line-clamp-1">
+                            <div className="flex flex-1 flex-col justify-between px-1.5">
+                                <div>
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}
+                                        className="mb-4 line-clamp-1 text-left text-[16px] font-semibold leading-[20px] text-[#1A1A1A] cursor-pointer"
+                                    >
                                         {cat.title}
-                                    </h3>
+                                    </button>
 
-                                    {/* Date & Edit Icon */}
-                                    <div className="flex items-center gap-2 pb-4 mb-4 border-b border-[#EBEBEB]">
-                                        <span className="text-[14px] font-medium text-[#4E525D] leading-[20px] tracking-[0px]">
-                                            {formatDate(cat.createdAt)}
+                                    <div className="mb-3 flex items-center gap-1">
+                                        <img src="/images/inv-resale/location.svg" alt="" className="h-[14px] w-[14px]" />
+                                        <span className="line-clamp-1 text-[14px] font-medium leading-[20px] text-[#4E525D]">
+                                            {getObjectLocation(cat) || cat.locationTitle || "-"}
                                         </span>
-                                        <button
-                                            onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}
-                                            className="transition-colors cursor-pointer flex items-center justify-center"
-                                            aria-label="Edit Date"
-                                        >
-                                            <img src="/images/inv-dashboard/inv-offplan/edit.svg" alt="edit" className="w-4 h-4" />
-                                        </button>
                                     </div>
 
-                                    {/* Metrics Grid */}
-                                    <div className="grid grid-cols-4 gap-0 text-center mb-4">
+                                    <div className="mb-5 flex flex-wrap items-center gap-y-2 text-[13px] font-medium leading-[20px] text-[#4E525D]">
+                                        <span>{cat.developerBrand?.trim() || "Developer -"}</span>
+                                        <span className="mx-3 text-[#D1D5DB]">|</span>
+                                        <span>{cat.currency || "Currency -"}</span>
+                                        <span className="mx-3 text-[#D1D5DB]">|</span>
+                                        <span>{formatDate(cat.createdAt)}</span>
+                                    </div>
+
+                                    <div className="mb-3 rounded-[20px] bg-[#F4F5F6] px-3 py-2.5">
+                                        <div className="grid grid-cols-4 gap-2 text-center">
                                         <div>
-                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Houses</span>
-                                            <span className="block text-[14px] font-semibold text-[#1A1A1A] leading-[20px] tracking-[0px]">
+                                                <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Unit Layouts</span>
+                                            <span className="block text-[14px] font-semibold leading-[20px] text-[#1A1A1A]">
                                                 {(cat.metrics?.houses ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Properties</span>
-                                            <span className="block text-[14px] font-semibold text-[#00C274] leading-[20px] tracking-[0px]">
+                                            <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Properties</span>
+                                            <span className="block text-[14px] font-semibold leading-[20px] text-[#00C274]">
                                                 {(cat.metrics?.properties ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Reserved</span>
-                                            <span className="block text-[14px] font-semibold text-[#FFBB00] leading-[20px] tracking-[0px]">
+                                            <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Reserved</span>
+                                            <span className="block text-[14px] font-semibold leading-[20px] text-[#C98A00]">
                                                 {(cat.metrics?.reserved ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="block text-[12px] font-normal text-[#4E525D] leading-[18px] tracking-[0px] mb-1">Sold</span>
-                                            <span className="block text-[14px] font-semibold text-[#4E525D] leading-[20px] tracking-[0px]">
+                                            <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Sold</span>
+                                            <span className="block text-[14px] font-semibold leading-[20px] text-[#C3362B]">
                                                 {(cat.metrics?.sold ?? 0).toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
+                                </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex items-center justify-between gap-2">
-                                    {/* Delete Button */}
+                                <div className="mt-auto flex items-center gap-2">
                                     <button
+                                        type="button"
                                         onClick={() => deleteMut.mutate(cat.id)}
                                         aria-label="Delete"
                                         title="Delete"
-                                        className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#C3362B] transition-colors hover:bg-[#FCEDEA] cursor-pointer"
+                                        className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9] cursor-pointer"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
                                         </svg>
                                     </button>
 
-                                    {/* Copy Button */}
                                     <button
+                                        type="button"
                                         onClick={() => copyMut.mutate(cat)}
                                         disabled={copyMut.isPending}
                                         aria-label="Copy"
                                         title="Copy"
-                                        className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer disabled:opacity-50"
+                                        className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer disabled:opacity-50"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
                                             <rect x="9" y="9" width="10" height="10" rx="2" />
@@ -267,13 +281,13 @@ export function OffPlanObjectsSection() {
                                         </svg>
                                     </button>
 
-                                    {/* Archive/Restore Button */}
                                     <button
+                                        type="button"
                                         onClick={() => statusMut.mutate({ id: cat.id, status: (cat.status || "active") === "active" ? "archive" : "active" })}
                                         disabled={statusMut.isPending}
                                         aria-label={(cat.status || "active") === "active" ? "Archive" : "Restore"}
                                         title={(cat.status || "active") === "active" ? "Move to Archive" : "Restore"}
-                                        className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer disabled:opacity-50"
+                                        className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer disabled:opacity-50"
                                     >
                                         {(cat.status || "active") === "active" ? (
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
@@ -286,12 +300,12 @@ export function OffPlanObjectsSection() {
                                         )}
                                     </button>
 
-                                    {/* Edit Button */}
                                     <button
+                                        type="button"
                                         onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}
-                                        className="flex-1 h-[32px] bg-[#EBEBEB] rounded-[24px] flex items-center justify-center text-[14px] font-medium leading-[20px] text-[#4E525D] hover:bg-[#E0E0E0] transition-colors cursor-pointer"
+                                        className="flex h-10 flex-1 items-center justify-center rounded-[14px] bg-[#4E525D] px-4 text-[14px] font-medium leading-[20px] text-white transition-colors hover:bg-[#3A3D46] cursor-pointer"
                                     >
-                                        Edit
+                                        Edit Object
                                     </button>
                                 </div>
                             </div>

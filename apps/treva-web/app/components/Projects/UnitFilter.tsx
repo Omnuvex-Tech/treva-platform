@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useRoomOptions } from '@/hooks/use-room-options';
-import { useViewOptions } from '@/hooks/use-view-options';
 import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -29,7 +28,6 @@ export default function UnitLayout() {
       from: 'min',
       to: 'max',
       floor: 'Mərtəbə',
-      view: 'Mənzərə',
       status: 'Status',
       rooms: 'Otaq sayı',
       noRooms: 'Otaq yoxdur',
@@ -58,7 +56,6 @@ export default function UnitLayout() {
       from: 'from',
       to: 'to',
       floor: 'Floor',
-      view: 'View',
       status: 'Status',
       rooms: 'Number of rooms',
       noRooms: 'No rooms',
@@ -87,7 +84,6 @@ export default function UnitLayout() {
       from: 'от',
       to: 'до',
       floor: 'Этаж',
-      view: 'Вид',
       status: 'Статус',
       rooms: 'Количество комнат',
       noRooms: 'Нет комнат',
@@ -114,17 +110,14 @@ export default function UnitLayout() {
 
   const [currency, setCurrency] = useState(searchParams.get('currency') || 'USD');
   const [floor, setFloor] = useState(searchParams.get('floor') || '');
-  const [selectedView, setSelectedView] = useState(searchParams.get('view') || '');
   const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
   const [selectedRooms, setSelectedRooms] = useState<string>(searchParams.get('rooms') || '');
 
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [floorOpen, setFloorOpen] = useState(false);
-  const [viewOpen, setViewOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
   const floorRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
   const [priceMin, setPriceMin] = useState<number | ''>(Number(searchParams.get('priceMin')) || 0);
@@ -144,9 +137,6 @@ export default function UnitLayout() {
 
   const { data: roomOptionsData } = useRoomOptions('off-plan');
   const roomOptions = roomOptionsData || [];
-
-  const { data: viewOptionsData } = useViewOptions();
-  const viewOptions = viewOptionsData || [];
 
   const { data: statusOptionsData } = useStatusOptions();
   const statusOptions = statusOptionsData || [];
@@ -178,7 +168,6 @@ export default function UnitLayout() {
     const handleClickOutside = (e: MouseEvent) => {
       if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
       if (floorRef.current && !floorRef.current.contains(e.target as Node)) setFloorOpen(false);
-      if (viewRef.current && !viewRef.current.contains(e.target as Node)) setViewOpen(false);
       if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -190,7 +179,6 @@ export default function UnitLayout() {
     if (categorySlug) sp.set('category', categorySlug);
     if (currency && currency !== 'USD') sp.set('currency', currency);
     if (floor) sp.set('floor', floor);
-    if (selectedView) sp.set('view', selectedView);
     if (selectedStatus) sp.set('status', selectedStatus);
     if (selectedRooms) sp.set('rooms', selectedRooms);
     if (typeof priceMin === 'number' && priceMin > 0) sp.set('priceMin', String(priceMin));
@@ -200,7 +188,7 @@ export default function UnitLayout() {
     if (page > 1) sp.set('page', String(page));
     const qs = sp.toString();
     router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
-  }, [currency, floor, selectedView, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, categorySlug, router]);
+  }, [currency, floor, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, categorySlug, router]);
 
   const debouncedPriceMin = useDebounce(priceMin, 1000);
   const debouncedPriceMax = useDebounce(priceMax, 1000);
@@ -212,7 +200,6 @@ export default function UnitLayout() {
     limit,
     ...(categorySlug && { categorySlug }),
     ...(floor && { floor: parseInt(floor) }),
-    ...(selectedView && { viewOptionId: selectedView }),
     ...(selectedStatus && { statusOptionId: selectedStatus }),
     ...(selectedRooms && { roomOptionId: selectedRooms }),
     ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
@@ -220,7 +207,7 @@ export default function UnitLayout() {
     currency,
     ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
     ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
-  }), [page, limit, categorySlug, floor, selectedView, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
+  }), [page, limit, categorySlug, floor, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
@@ -280,7 +267,6 @@ export default function UnitLayout() {
 
   const handleReset = () => {
     setFloor('');
-    setSelectedView('');
     setSelectedStatus('');
     setSelectedRooms('');
     setPriceMin(0);
@@ -549,31 +535,8 @@ export default function UnitLayout() {
             </div>
           </div>
 
-          {/* View & Status Wrapper */}
+          {/* Status Wrapper */}
           <div className="mobile-flex-row filter-group--view-status">
-            <div className="filter-group filter-group--view">
-              <label className="filter-label">{t.view}</label>
-              <div className="custom-select" ref={viewRef}>
-                <button type="button" className="custom-select__trigger" aria-expanded={viewOpen} onClick={() => setViewOpen((p) => !p)}>
-                  <span>{viewOptions.find(v => v.id === selectedView)?.title || viewOptions.find(v => v.id === selectedView)?.value || t.all}</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-                {viewOpen && (
-                  <div className="custom-select__dropdown">
-                    <button type="button" className={`custom-select__option ${!selectedView ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(''); setPage(1); setViewOpen(false); }}>
-                      {t.all}
-                    </button>
-                    {viewOptions.map((opt) => (
-                      <button key={opt.id} type="button" className={`custom-select__option ${selectedView === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedView(opt.id); setPage(1); setViewOpen(false); }}>
-                        {opt.value || opt.title || opt.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
             <div className="filter-group filter-group--status">
               <label className="filter-label">{t.status}</label>
               <div className="custom-select" ref={statusRef}>

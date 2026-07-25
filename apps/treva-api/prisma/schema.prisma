@@ -32,11 +32,11 @@ model Category {
   region          String?
   area            String?
   city            String?
+  locationTitle         String?
+  locationUrl           String?
   locationGoogleMapsUrl String?
   developerBrand  String?
   website         String?
-  banks           String?
-  infrastructure  String?
   salesDepartment String?
   coverImage      String?
   documents       Json       @default("[]")
@@ -62,6 +62,11 @@ model UnitLayout {
   title                       String
   name                        String
   slug                        String      @unique
+  seoTitle                    String?
+  seoDescription              String?
+  seoKeywords                 String?
+  canonicalUrl                String?
+  seoImage                    String?
   floor                       Int
   number                      Int?
   totalArea                   Float
@@ -72,6 +77,7 @@ model UnitLayout {
   numberOfFloors              Json
   similarApartmentIds         String[]
   mainImage                   Json?
+  coverImage                  Json?
   gallery                     Json[]
   documents                   Json[]
   location                    Json?
@@ -79,8 +85,7 @@ model UnitLayout {
   category                    Category    @relation(fields: [categoryId], references: [id])
   roomOptionId                String?
   roomOption                  RoomOption? @relation(fields: [roomOptionId], references: [id])
-  viewOptionId                String?
-  viewOption                  ViewOption? @relation(fields: [viewOptionId], references: [id])
+  status                      String       @default("available")
   statusOptionId              String?
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
   lcd                         String?
@@ -91,15 +96,6 @@ model UnitLayout {
   completionOfConstruction    Json?
   startOfSales                Json?
   endOfSales                  Json?
-  salesOffice                 String?
-  contractAddress             String?
-  street                      String?
-  houseNumber                 String?
-  deadlineForCommissioning    DateTime?
-  landCadastralNumber         String?
-  showroomAvailability        String?
-  renovation                  String?
-  wallMaterial                String?
   description                 String?
   ownerId                     String?
   owner                       Owner?      @relation(fields: [ownerId], references: [id])
@@ -107,6 +103,7 @@ model UnitLayout {
   attributeIds                String[]    @default([])
   locationTitle               String?
   locationUrl                 String?
+  locationGoogleMapsUrl       String?
   archived                    Boolean     @default(false)
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
@@ -123,16 +120,6 @@ model RoomOption {
   unitLayouts UnitLayout[]
 
   @@unique([name, type])
-}
-
-model ViewOption {
-  id        String       @id @default(cuid())
-  name      String       @unique
-  title     String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  unitLayouts UnitLayout[]
 }
 
 model Currency {
@@ -177,20 +164,6 @@ model PropertyTypeOption {
 }
 
 model ConstructionStageOption {
-  id        String   @id @default(cuid())
-  value     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model SalesOfficeOption {
-  id        String   @id @default(cuid())
-  value     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model HouseMaterialOption {
   id        String   @id @default(cuid())
   value     String   @unique
   createdAt DateTime @default(now())
@@ -271,15 +244,12 @@ model Apartment {
   renovation      String?
   mortgage        Boolean?
   extract         Boolean?
-  parking         Boolean?
   buildingAge     Int?
   furnishing      String?
-  elevator        Boolean?
   ceilingHeight   Float?
   kitchenSize     Float?
   wallMaterial    String?
   heatingTypeIds  String[]      @default([])
-  viewOptionIds   String[]      @default([])
   attributeIds    String[]
   requestIds      String[]
   status          String        @default("active")

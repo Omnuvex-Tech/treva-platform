@@ -39,7 +39,6 @@ export interface UnitLayout {
     prices: Record<string, number>;
     completionYear: number;
     numberOfFloors: UnitLayoutNumberOfFloors;
-    view?: string;
     statusOptionId?: string;
     statusOption?: { id: string; value: string; order: number };
     similarApartmentIds: string[];
@@ -77,7 +76,6 @@ export interface UnitLayoutFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    viewOptionId?: string;
     rooms?: string;
     roomOptionId?: string;
 }

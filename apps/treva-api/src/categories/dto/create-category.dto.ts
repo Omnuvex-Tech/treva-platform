@@ -12,6 +12,11 @@ export class CategoryDocumentDto {
   @IsString()
   @IsNotEmpty()
   url: string;
+
+  @ApiPropertyOptional({ example: 'Master Plan A' })
+  @IsOptional()
+  @IsString()
+  name?: string;
 }
 
 export class CreateCategoryDto {
@@ -90,6 +95,16 @@ export class CreateCategoryDto {
   @IsString()
   city?: string;
 
+  @ApiPropertyOptional({ example: 'Baku city, Murtuza Mukhtarov str, house 31' })
+  @IsOptional()
+  @IsString()
+  locationTitle?: string;
+
+  @ApiPropertyOptional({ example: 'https://maps.google.com/...' })
+  @IsOptional()
+  @IsString()
+  locationUrl?: string;
+
   @ApiPropertyOptional({ example: 'https://www.google.com/maps/embed?pb=...' })
   @IsOptional()
   @IsString()
@@ -104,16 +119,6 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsString()
   website?: string;
-
-  @ApiPropertyOptional({ example: 'Sberbank' })
-  @IsOptional()
-  @IsString()
-  banks?: string;
-
-  @ApiPropertyOptional({ example: 'Pool, Gym' })
-  @IsOptional()
-  @IsString()
-  infrastructure?: string;
 
   @ApiPropertyOptional({ example: '+7 999 123 4567' })
   @IsOptional()

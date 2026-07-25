@@ -7,8 +7,6 @@ import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
 import { currenciesApi, Currency } from "../../api/currencies";
 import { locationOptionsApi, type LocationOption } from "../../api/location-options";
-import { viewOptionsApi, type ViewOption } from "../../api/view-options";
-import { heatingTypeOptionsApi, type HeatingTypeOption } from "../../api/heating-type-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -29,6 +27,26 @@ const TABS: { key: TabKey; label: string }[] = [
 const SUPPORTED_IMAGE_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_UPLOAD_ACCEPT = SUPPORTED_IMAGE_UPLOAD_TYPES.join(",");
 const MAX_RESALE_FLOOR = 999;
+const RESALE_STATUS_OPTIONS = [
+    {
+        id: "active" as const,
+        label: "Active",
+        activeClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        idleClass: "border-[#E7E9EE] bg-white text-[#666666] hover:border-emerald-200 hover:bg-emerald-50/60 hover:text-emerald-700",
+    },
+    {
+        id: "reserved" as const,
+        label: "Reserved",
+        activeClass: "border-amber-200 bg-amber-50 text-amber-700",
+        idleClass: "border-[#E7E9EE] bg-white text-[#666666] hover:border-amber-200 hover:bg-amber-50/60 hover:text-amber-700",
+    },
+    {
+        id: "sold" as const,
+        label: "Sold",
+        activeClass: "border-rose-200 bg-rose-50 text-rose-700",
+        idleClass: "border-[#E7E9EE] bg-white text-[#666666] hover:border-rose-200 hover:bg-rose-50/60 hover:text-rose-700",
+    },
+] as const;
 
 function slugify(text: string): string {
     return text
@@ -194,6 +212,72 @@ function CustomSelect({
     );
 }
 
+function BinarySwitchField({
+    label,
+    value,
+    leftOption,
+    rightOption,
+    onChange,
+}: {
+    label: string;
+    value?: string;
+    leftOption: {
+        id: string;
+        label: string;
+    };
+    rightOption: {
+        id: string;
+        label: string;
+    };
+    onChange: (value: string) => void;
+}) {
+    const isRightSelected = value === rightOption.id;
+    return (
+        <div className="inline-flex w-fit max-w-full self-start flex-col">
+            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">{label}</label>
+            <div className="inline-flex w-fit max-w-full min-h-[52px] items-center gap-3 rounded-[20px] border border-[#ECEEF2] bg-[#F8F9FB] px-4 py-2">
+                <button
+                    type="button"
+                    onClick={() => onChange(leftOption.id)}
+                    className={`text-left text-sm leading-5 transition-colors ${
+                        !isRightSelected ? "font-semibold text-[#1A1A1A]" : "font-medium text-[#9AA1AF]"
+                    }`}
+                >
+                    {leftOption.label}
+                </button>
+                <button
+                    type="button"
+                    role="switch"
+                    aria-checked={isRightSelected}
+                    onClick={() => onChange(isRightSelected ? leftOption.id : rightOption.id)}
+                    className={`relative h-7 w-12 flex-shrink-0 rounded-full border transition-all ${
+                        isRightSelected
+                            ? "border-[#7E8797] bg-[#7E8797]"
+                            : "border-[#D9DEE7] bg-white"
+                    }`}
+                >
+                    <span
+                        className={`absolute top-0.5 h-5.5 w-5.5 rounded-full shadow-[0_1px_2px_rgba(16,24,40,0.16)] transition-all ${
+                            isRightSelected
+                                ? "left-[24px] bg-white"
+                                : "left-0.5 bg-[#7E8797]"
+                        }`}
+                    />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onChange(rightOption.id)}
+                    className={`text-right text-sm leading-5 transition-colors ${
+                        isRightSelected ? "font-semibold text-[#1A1A1A]" : "font-medium text-[#9AA1AF]"
+                    }`}
+                >
+                    {rightOption.label}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {}) {
     const { id } = useParams();
     const isEdit = Boolean(id);
@@ -204,6 +288,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     const [activeTab, setActiveTab] = useState<TabKey>("basic");
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const [seoTitleManuallyEdited, setSeoTitleManuallyEdited] = useState(false);
+    const [draggedGalleryIndex, setDraggedGalleryIndex] = useState<number | null>(null);
+    const [dragOverGalleryIndex, setDragOverGalleryIndex] = useState<number | null>(null);
 
     const { data: types } = useQuery({
         queryKey: ["apartment-types"],
@@ -228,16 +314,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     const { data: locationOptions } = useQuery({
         queryKey: ["location-options"],
         queryFn: () => locationOptionsApi.getAll(),
-    });
-
-    const { data: viewOptionsRes } = useQuery({
-        queryKey: ["view-options"],
-        queryFn: () => viewOptionsApi.getAll(),
-    });
-
-    const { data: heatingTypeOptionsRes } = useQuery({
-        queryKey: ["heating-type-options"],
-        queryFn: () => heatingTypeOptionsApi.getAll(),
     });
 
     const { data: existing } = useQuery({
@@ -276,13 +352,9 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         renovation: undefined,
         mortgage: undefined,
         extract: undefined,
-        parking: undefined,
         buildingAge: undefined as unknown as number,
         furnishing: undefined,
-        elevator: undefined,
         ceilingHeight: undefined as unknown as number,
-        heatingTypeIds: [],
-        viewOptionIds: [],
         apartmentTypeId: "",
         ownerId: "",
         attributeIds: [],
@@ -324,13 +396,9 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 renovation: d.renovation || undefined,
                 mortgage: d.mortgage ?? undefined,
                 extract: d.extract ?? undefined,
-                parking: d.parking ?? undefined,
                 buildingAge: d.buildingAge ?? undefined,
                 furnishing: d.furnishing || undefined,
-                elevator: d.elevator ?? undefined,
                 ceilingHeight: d.ceilingHeight ?? undefined,
-                heatingTypeIds: d.heatingTypeIds || (d.heatingTypes || []).map((item) => item.id),
-                viewOptionIds: d.viewOptionIds || (d.viewOptions || []).map((item) => item.id),
                 apartmentTypeId: d.apartmentTypeId || "",
                 ownerId: d.ownerId || "",
                 attributeIds: d.attributeIds || [],
@@ -461,6 +529,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
             locationUrl: normalizeOptionalText(form.locationUrl),
             locationGoogleMapsUrl: normalizeOptionalText(form.locationGoogleMapsUrl),
             ownerId: normalizeOptionalText(form.ownerId),
+            heatingTypeIds: [],
             prices: (form.prices || []).map((p: any) => ({
                 currencyId: p.currencyId,
                 priceTotal: p.priceTotal,
@@ -578,6 +647,52 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         }));
     };
 
+    const reorderGalleryItem = (fromIndex: number, toIndex: number) => {
+        if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return;
+        setForm((f) => {
+            const gallery = [...(f.gallery || [])];
+            const [movedItem] = gallery.splice(fromIndex, 1);
+            if (!movedItem) return f;
+            gallery.splice(toIndex, 0, movedItem);
+            return { ...f, gallery };
+        });
+    };
+
+    const handleGalleryItemDragStart = (e: React.DragEvent, index: number) => {
+        e.stopPropagation();
+        e.dataTransfer.setData("text/plain", index.toString());
+        e.dataTransfer.effectAllowed = "move";
+        setDraggedGalleryIndex(index);
+    };
+
+    const handleGalleryItemDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = "move";
+        if (dragOverGalleryIndex !== index) {
+            setDragOverGalleryIndex(index);
+        }
+    };
+
+    const handleGalleryItemDrop = (e: React.DragEvent, targetIndex: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const sourceIndexStr = e.dataTransfer.getData("text/plain");
+        const sourceIndex = sourceIndexStr !== "" ? parseInt(sourceIndexStr, 10) : draggedGalleryIndex;
+
+        if (sourceIndex !== null && !isNaN(sourceIndex) && sourceIndex !== targetIndex) {
+            reorderGalleryItem(sourceIndex, targetIndex);
+        }
+        setDraggedGalleryIndex(null);
+        setDragOverGalleryIndex(null);
+    };
+
+    const handleGalleryItemDragEnd = (e: React.DragEvent) => {
+        e.stopPropagation();
+        setDraggedGalleryIndex(null);
+        setDragOverGalleryIndex(null);
+    };
+
     const onMainDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
     const onMainDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setMainDrag(true); };
     const onMainDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setMainDrag(false); };
@@ -623,8 +738,6 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     };
 
     const locationOptionItems = Array.isArray(locationOptions?.data) ? locationOptions.data : [];
-    const viewOptionItems = Array.isArray(viewOptionsRes?.data) ? viewOptionsRes.data : [];
-    const heatingTypeItems = Array.isArray(heatingTypeOptionsRes?.data) ? heatingTypeOptionsRes.data : [];
     const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string, cityTitle?: string) => {
         const mapped = locationOptionItems
             .filter((item: LocationOption) => {
@@ -756,14 +869,11 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                 placeholder="Sea Breeze"
                                             />
                                         </div>
-                                        <CustomSelect
+                                        <BinarySwitchField
                                             label="Offer Type"
                                             value={form.purpose || "sale"}
-                                            options={[
-                                                { id: "sale", label: "For Sale" },
-                                                { id: "rent", label: "For Rent" },
-                                            ]}
-                                            placeholder="Select offer type"
+                                            leftOption={{ id: "sale", label: "For Sale" }}
+                                            rightOption={{ id: "rent", label: "For Rent" }}
                                             onChange={(id) => updateField("purpose", id as "sale" | "rent")}
                                         />
                                     </div>
@@ -828,17 +938,26 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
 
                         <SectionBlock title="Layout" description="Physical structure and apartment placement details.">
                             <div className="grid gap-4 lg:grid-cols-2">
-                                <CustomSelect
-                                    label="Status"
-                                    value={form.status || "active"}
-                                    options={[
-                                        { id: "active", label: "Active" },
-                                        { id: "reserved", label: "Reserved" },
-                                        { id: "sold", label: "Sold" },
-                                    ]}
-                                    placeholder="Select status"
-                                    onChange={(id) => updateField("status", id as "active" | "reserved" | "sold")}
-                                />
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Status</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {RESALE_STATUS_OPTIONS.map((option) => {
+                                            const isSelected = (form.status || "active") === option.id;
+                                            return (
+                                                <button
+                                                    key={option.id}
+                                                    type="button"
+                                                    onClick={() => updateField("status", option.id)}
+                                                    className={`h-11 rounded-2xl border px-3 text-sm font-semibold transition-colors ${
+                                                        isSelected ? option.activeClass : option.idleClass
+                                                    }`}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                                 <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Room Count</label>
                                     <input
@@ -897,99 +1016,39 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     />
                                 </div>
                                 <div>
-                                    <CustomSelect
+                                    <BinarySwitchField
                                         label="Renovation"
-                                        value={form.renovation || ""}
-                                        options={[
-                                            { id: "renovated", label: "Renovated" },
-                                            { id: "non-renovated", label: "Non-renovated" },
-                                        ]}
-                                        placeholder="Select renovation"
+                                        value={form.renovation}
+                                        leftOption={{ id: "renovated", label: "Renovated" }}
+                                        rightOption={{ id: "non-renovated", label: "Unrenovated" }}
                                         onChange={(id) => updateField("renovation", id as ApartmentRenovation)}
                                     />
                                 </div>
                                 <div>
-                                    <CustomSelect
+                                    <BinarySwitchField
                                         label="Furnishing"
-                                        value={form.furnishing || ""}
-                                        options={[
-                                            { id: "furnished", label: "Furnished" },
-                                            { id: "unfurnished", label: "Unfurnished" },
-                                        ]}
-                                        placeholder="Select furnishing"
+                                        value={form.furnishing}
+                                        leftOption={{ id: "furnished", label: "Furnished" }}
+                                        rightOption={{ id: "unfurnished", label: "Unfurnished" }}
                                         onChange={(id) => updateField("furnishing", id as ApartmentFurnishing)}
                                     />
                                 </div>
                                 <div>
-                                    <CustomSelect
+                                    <BinarySwitchField
                                         label="Mortgage"
-                                        value={form.mortgage === undefined ? "" : String(form.mortgage)}
-                                        options={[
-                                            { id: "true", label: "Yes" },
-                                            { id: "false", label: "No" },
-                                        ]}
-                                        placeholder="Select mortgage"
-                                        onChange={(id) => updateField("mortgage", id === "" ? undefined : id === "true")}
+                                        value={form.mortgage === undefined ? undefined : String(form.mortgage)}
+                                        leftOption={{ id: "true", label: "Yes" }}
+                                        rightOption={{ id: "false", label: "No" }}
+                                        onChange={(id) => updateField("mortgage", id === "true")}
                                     />
                                 </div>
                                 <div>
-                                    <CustomSelect
+                                    <BinarySwitchField
                                         label="Extract"
-                                        value={form.extract === undefined ? "" : String(form.extract)}
-                                        options={[
-                                            { id: "true", label: "Yes" },
-                                            { id: "false", label: "No" },
-                                        ]}
-                                        placeholder="Select extract"
-                                        onChange={(id) => updateField("extract", id === "" ? undefined : id === "true")}
-                                    />
-                                </div>
-                                <div>
-                                    <CustomSelect
-                                        label="Parking"
-                                        value={form.parking === undefined ? "" : String(form.parking)}
-                                        options={[
-                                            { id: "true", label: "Yes" },
-                                            { id: "false", label: "No" },
-                                        ]}
-                                        placeholder="Select parking"
-                                        onChange={(id) => updateField("parking", id === "" ? undefined : id === "true")}
-                                    />
-                                </div>
-                                <div>
-                                    <CustomSelect
-                                        label="Elevator"
-                                        value={form.elevator === undefined ? "" : String(form.elevator)}
-                                        options={[
-                                            { id: "true", label: "Yes" },
-                                            { id: "false", label: "No" },
-                                        ]}
-                                        placeholder="Select elevator"
-                                        onChange={(id) => updateField("elevator", id === "" ? undefined : id === "true")}
-                                    />
-                                </div>
-                                <div>
-                                    <CustomSelect
-                                        label="Heating Type"
-                                        value={form.heatingTypeIds || []}
-                                        options={toSimpleOptions<HeatingTypeOption>(heatingTypeItems)}
-                                        placeholder="Select heating type"
-                                        onChange={(value) => updateField("heatingTypeIds", value as string[])}
-                                        multiSelect
-                                        noOptionsLabel="Create Heating Type"
-                                        onNoOptionsClick={() => navigate("/dashboard/resale/heating-type-options")}
-                                    />
-                                </div>
-                                <div>
-                                    <CustomSelect
-                                        label="View"
-                                        value={form.viewOptionIds || []}
-                                        options={toSimpleOptions<ViewOption>(viewOptionItems)}
-                                        placeholder="Select view"
-                                        onChange={(value) => updateField("viewOptionIds", value as string[])}
-                                        multiSelect
-                                        noOptionsLabel="Create View"
-                                        onNoOptionsClick={() => navigate("/dashboard/resale/view-options")}
+                                        value={form.extract === undefined ? undefined : String(form.extract)}
+                                        leftOption={{ id: "true", label: "Yes" }}
+                                        rightOption={{ id: "false", label: "No" }}
+                                        onChange={(id) => updateField("extract", id === "true")}
                                     />
                                 </div>
                             </div>
@@ -1233,30 +1292,110 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                         if (galleryInputRef.current) galleryInputRef.current.value = "";
                                     }}
                                 />
-                                {form.gallery && form.gallery.length > 0 && (
-                                    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
-                                        {form.gallery.map((item: any, idx: number) => (
-                                            <div key={idx} className="group relative overflow-hidden rounded-[20px] border border-[#ECEEF2] bg-[#F8F9FB] p-2">
-                                                <img
-                                                    src={item.url || item}
-                                                    alt={`Gallery ${idx + 1}`}
-                                                    className="h-28 w-full rounded-[16px] object-cover"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    aria-label={`Remove gallery image ${idx + 1}`}
-                                                    onClick={() => removeGalleryItem(idx)}
-                                                    className="absolute right-3 top-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-white backdrop-blur-sm opacity-0 transition-opacity hover:opacity-85 group-hover:opacity-100"
-                                                >
-                                                    <IoClose size={18} />
-                                                </button>
-                                                <div className="absolute bottom-3 left-3 rounded-full bg-[#1A1A1A]/75 px-2 py-0.5 text-[10px] font-medium text-white">
-                                                    {idx + 1}
-                                                </div>
-                                            </div>
-                                        ))}
+                                {form.gallery && form.gallery.length > 0 && (() => {
+                                    const galleryList = form.gallery;
+                                    return (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between text-xs text-[#808191]">
+                                            <span>Drag images to reorder gallery display sequence</span>
+                                            <span>{galleryList.length} photos</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+                                            {galleryList.map((item: any, idx: number) => {
+                                                const isDragging = draggedGalleryIndex === idx;
+                                                const isDragOver = dragOverGalleryIndex === idx && !isDragging;
+                                                return (
+                                                    <div
+                                                        key={idx}
+                                                        draggable
+                                                        onDragStart={(e) => handleGalleryItemDragStart(e, idx)}
+                                                        onDragOver={(e) => handleGalleryItemDragOver(e, idx)}
+                                                        onDragLeave={(e) => {
+                                                            e.stopPropagation();
+                                                            if (dragOverGalleryIndex === idx) setDragOverGalleryIndex(null);
+                                                        }}
+                                                        onDrop={(e) => handleGalleryItemDrop(e, idx)}
+                                                        onDragEnd={handleGalleryItemDragEnd}
+                                                        className={`group relative overflow-hidden rounded-[20px] border p-2 transition-all cursor-grab active:cursor-grabbing ${
+                                                            isDragging
+                                                                ? "opacity-30 border-blue-400 scale-[0.97] bg-blue-50/20"
+                                                                : isDragOver
+                                                                    ? "border-blue-500 bg-blue-50/50 ring-2 ring-blue-400/40"
+                                                                    : "border-[#ECEEF2] bg-[#F8F9FB] hover:border-[#D8DCE5]"
+                                                        }`}
+                                                    >
+                                                        <img
+                                                            src={item.url || item}
+                                                            alt={`Gallery ${idx + 1}`}
+                                                            className="h-28 w-full rounded-[16px] object-cover pointer-events-none"
+                                                        />
+                                                        <div className="absolute left-3 top-3 flex h-6 w-6 cursor-grab items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-white backdrop-blur-sm opacity-70 transition-opacity group-hover:opacity-100">
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                                                <circle cx="8" cy="4" r="2" />
+                                                                <circle cx="8" cy="12" r="2" />
+                                                                <circle cx="8" cy="20" r="2" />
+                                                                <circle cx="16" cy="4" r="2" />
+                                                                <circle cx="16" cy="12" r="2" />
+                                                                <circle cx="16" cy="20" r="2" />
+                                                            </svg>
+                                                        </div>
+                                                        <div className="absolute right-3 top-3 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                                            {idx > 0 && (
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={`Move image ${idx + 1} left`}
+                                                                    title="Move left"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        reorderGalleryItem(idx, idx - 1);
+                                                                    }}
+                                                                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-white backdrop-blur-sm transition-colors hover:bg-black"
+                                                                >
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                                        <path d="M15 18l-6-6 6-6" />
+                                                                    </svg>
+                                                                </button>
+                                                            )}
+                                                            {idx < galleryList.length - 1 && (
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={`Move image ${idx + 1} right`}
+                                                                    title="Move right"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        reorderGalleryItem(idx, idx + 1);
+                                                                    }}
+                                                                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-white backdrop-blur-sm transition-colors hover:bg-black"
+                                                                >
+                                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                                        <path d="M9 18l6-6-6-6" />
+                                                                    </svg>
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                aria-label={`Remove gallery image ${idx + 1}`}
+                                                                title="Remove image"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    removeGalleryItem(idx);
+                                                                }}
+                                                                className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(220,38,38,0.85)] text-white backdrop-blur-sm transition-colors hover:bg-red-600"
+                                                            >
+                                                                <IoClose size={16} />
+                                                            </button>
+                                                        </div>
+                                                        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-[#1A1A1A]/75 px-2 py-0.5 text-[10px] font-medium text-white">
+                                                            <span>#{idx + 1}</span>
+                                                            {idx === 0 && <span className="rounded bg-blue-500/80 px-1 text-[9px] uppercase">Cover</span>}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                )}
+                                    );
+                                })()}
                             </SectionBlock>
                         </div>
                     </div>

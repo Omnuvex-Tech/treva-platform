@@ -41,7 +41,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiQuery({ name: 'categorySlug', required: false })
-  @ApiQuery({ name: 'statusOptionId', required: false })
+    @ApiQuery({ name: 'status', required: false, enum: ['available', 'reserved', 'sold'] })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false, type: Number })
   @ApiQuery({ name: 'maxPrice', required: false, type: Number })
@@ -49,7 +49,6 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'minArea', required: false, type: Number })
   @ApiQuery({ name: 'maxArea', required: false, type: Number })
   @ApiQuery({ name: 'floor', required: false, type: Number })
-  @ApiQuery({ name: 'viewOptionId', required: false })
   @ApiQuery({ name: 'roomOptionId', required: false })
   @ApiQuery({ name: 'archived', required: false, type: Boolean })
   async findAll(
@@ -57,7 +56,7 @@ export class UnitLayoutsController {
     @Query('limit') limit?: string,
     @Query('categoryId') categoryId?: string,
     @Query('categorySlug') categorySlug?: string,
-    @Query('statusOptionId') statusOptionId?: string,
+      @Query('status') status?: 'available' | 'reserved' | 'sold',
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
@@ -65,7 +64,6 @@ export class UnitLayoutsController {
     @Query('minArea') minArea?: string,
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
-    @Query('viewOptionId') viewOptionId?: string,
     @Query('roomOptionId') roomOptionId?: string,
     @Query('archived') archived?: string,
   ) {
@@ -74,7 +72,7 @@ export class UnitLayoutsController {
       limit: limit ? parseInt(limit, 10) : undefined,
       categoryId,
       categorySlug,
-      statusOptionId,
+        status,
       search,
       minPrice: minPrice ? parseFloat(minPrice) : undefined,
       maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
@@ -82,7 +80,6 @@ export class UnitLayoutsController {
       minArea: minArea ? parseFloat(minArea) : undefined,
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor, 10) : undefined,
-      viewOptionId,
       roomOptionId,
       archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
     });

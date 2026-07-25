@@ -34,15 +34,11 @@ export interface Apartment {
     renovation: ApartmentRenovation | null;
     mortgage: boolean | null;
     extract: boolean | null;
-    parking: boolean | null;
     buildingAge: number | null;
     furnishing: ApartmentFurnishing | null;
-    elevator: boolean | null;
     ceilingHeight: number | null;
     heatingTypeIds: string[];
     heatingTypes: { id: string; name: string; title: string }[];
-    viewOptionIds: string[];
-    viewOptions: { id: string; name: string; title: string }[];
     attributeIds: string[];
     requestIds: string[];
     status?: "active" | "reserved" | "sold";
@@ -97,13 +93,10 @@ export interface CreateApartmentData {
     renovation?: ApartmentRenovation;
     mortgage?: boolean;
     extract?: boolean;
-    parking?: boolean;
     buildingAge?: number;
     furnishing?: ApartmentFurnishing;
-    elevator?: boolean;
     ceilingHeight?: number;
     heatingTypeIds?: string[];
-    viewOptionIds?: string[];
     apartmentTypeId: string;
     ownerId?: string;
     attributeIds?: string[];
@@ -143,13 +136,10 @@ export interface UpdateApartmentData {
     renovation?: ApartmentRenovation;
     mortgage?: boolean;
     extract?: boolean;
-    parking?: boolean;
     buildingAge?: number;
     furnishing?: ApartmentFurnishing;
-    elevator?: boolean;
     ceilingHeight?: number;
     heatingTypeIds?: string[];
-    viewOptionIds?: string[];
     apartmentTypeId?: string;
     ownerId?: string;
     attributeIds?: string[];
@@ -174,7 +164,6 @@ export interface ApartmentFilters {
     maxGrossArea?: number;
     floor?: number;
     currency?: string;
-    viewOptionIds?: string;
     status?: "active" | "reserved" | "sold";
 }
 

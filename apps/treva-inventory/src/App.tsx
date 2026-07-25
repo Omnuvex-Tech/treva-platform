@@ -3,8 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
-import { CategoryCreate } from "./pages/categories/CategoryCreate";
-import { CategoryEdit } from "./pages/categories/CategoryEdit";
 import { UnitLayoutForm } from "./pages/unit-layouts/UnitLayoutForm";
 import { ApartmentForm } from "./pages/resale/ApartmentForm";
 import { ApartmentTypeForm } from "./pages/resale/ApartmentTypeForm";
@@ -195,7 +193,7 @@ function App() {
                             path="/dashboard/resale/view-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/resale" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -203,7 +201,7 @@ function App() {
                             path="/dashboard/resale/heating-type-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/resale" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -219,7 +217,7 @@ function App() {
                             path="/dashboard/offplan/categories"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan/objects" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -267,15 +265,7 @@ function App() {
                             path="/dashboard/offplan/view-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/dashboard/offplan/status-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -307,7 +297,7 @@ function App() {
                             path="/dashboard/offplan/heating-type-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -331,7 +321,7 @@ function App() {
                             path="/dashboard/offplan/sales-office-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -339,23 +329,7 @@ function App() {
                             path="/dashboard/resale/sales-office-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/dashboard/offplan/property-type-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Dashboard />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/dashboard/resale/property-type-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/resale" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -363,7 +337,7 @@ function App() {
                             path="/dashboard/offplan/house-material-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -371,7 +345,7 @@ function App() {
                             path="/dashboard/resale/house-material-options"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/resale" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -379,7 +353,7 @@ function App() {
                             path="/categories"
                             element={
                                 <ProtectedRoute>
-                                    <Navigate to="/dashboard/offplan/categories" replace />
+                                    <Navigate to="/dashboard/offplan/objects" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -387,7 +361,7 @@ function App() {
                             path="/categories/new"
                             element={
                                 <ProtectedRoute>
-                                    <CategoryCreate />
+                                    <Navigate to="/dashboard/offplan/objects/create" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -395,7 +369,7 @@ function App() {
                             path="/categories/:id/edit"
                             element={
                                 <ProtectedRoute>
-                                    <CategoryEdit />
+                                    <Navigate to="/dashboard/offplan/objects" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -443,7 +417,7 @@ function App() {
                             path="/view-options"
                             element={
                                 <ProtectedRoute>
-                                    <Navigate to="/dashboard/offplan/view-options" replace />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -452,14 +426,6 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <Navigate to="/dashboard/offplan/currencies" replace />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/status-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Navigate to="/dashboard/offplan/status-options" replace />
                                 </ProtectedRoute>
                             }
                         />

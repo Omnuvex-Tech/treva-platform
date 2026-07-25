@@ -13,8 +13,6 @@ const sharedItems = [
 const offPlanItems = [
     { path: "/categories", label: "Categories", icon: "📁" },
     { path: "/unit-layouts", label: "Unit Layouts", icon: "🏢" },
-    { path: "/view-options", label: "View Options", icon: "🖼️" },
-    { path: "/status-options", label: "Status Options", icon: "🏷️" },
 ];
 
 const resaleItems = [
