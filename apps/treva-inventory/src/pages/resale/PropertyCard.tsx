@@ -4,16 +4,17 @@ import type { Apartment } from "../../api/apartments";
 interface PropertyCardProps {
     apartment: Apartment;
     onDuplicate?: (apartment: Apartment) => void;
+    onArchive?: (apartment: Apartment) => void;
+    archiveDisabled?: boolean;
     onDelete?: (apartment: Apartment) => void;
 }
 
 const formatPrice = (p: number) =>
     p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
-export function PropertyCard({ apartment: apt, onDuplicate, onDelete }: PropertyCardProps) {
+export function PropertyCard({ apartment: apt, onDuplicate, onArchive, archiveDisabled, onDelete }: PropertyCardProps) {
     const navigate = useNavigate();
 
-    const status = apt.status || "active";
     const primaryPrice = apt.prices?.[0];
     const price = primaryPrice?.priceTotal ?? apt.priceTotal ?? 0;
     const currencyCode = primaryPrice?.currency?.value || apt.currency?.value || "";
@@ -41,28 +42,70 @@ export function PropertyCard({ apartment: apt, onDuplicate, onDelete }: Property
                     </div>
                 )}
 
-                {/* View count badge - top left */}
-                <div className="absolute top-3 left-3 bg-[#EBEBEB] px-2 py-1 rounded-full flex items-center gap-1">
-                    <img src="/images/inv-resale/eye.svg" alt="" className="w-[13px] h-[13px]" />
-                    <span className="text-[12px] font-medium text-[#666666]">0</span>
-                </div>
+                {onArchive ? (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onArchive(apt);
+                        }}
+                        disabled={archiveDisabled}
+                        aria-label={apt.archived ? "Restore" : "Archive"}
+                        title={apt.archived ? "Restore" : "Archive"}
+                        className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
+                    >
+                        {apt.archived ? (
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                className="h-4 w-4"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" />
+                            </svg>
+                        ) : (
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                className="h-4 w-4"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            </svg>
+                        )}
+                    </button>
+                ) : null}
 
-                {/* Status badge - top right */}
-                <div className="absolute top-3 right-3">
-                    {status === "active" ? (
-                        <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#2D9A5B] text-white">
-                            Active
-                        </span>
-                    ) : status === "reserved" ? (
-                        <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#FDF4E0] text-[#967B38]">
-                            Reserved
-                        </span>
-                    ) : (
-                        <span className="text-[12px] font-medium px-2 py-1 rounded-full bg-[#FDECEC] text-[#C3362B]">
-                            Sold
-                        </span>
-                    )}
-                </div>
+                {onDelete ? (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(apt);
+                        }}
+                        aria-label="Delete"
+                        title="Delete"
+                        className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            className="h-4 w-4"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.75h4.5A1.5 1.5 0 0 1 15.75 5.25V7.5h-7.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l.675 10.125A1.5 1.5 0 0 0 8.922 19.5h6.156a1.5 1.5 0 0 0 1.497-1.875L17.25 7.5" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 10.5v5.25M13.5 10.5v5.25" />
+                        </svg>
+                    </button>
+                ) : null}
             </div>
 
             {/* Content */}
@@ -124,48 +167,9 @@ export function PropertyCard({ apartment: apt, onDuplicate, onDelete }: Property
                             <button
                                 type="button"
                                 onClick={() => onDuplicate(apt)}
-                                aria-label="Duplicate"
-                                title="Duplicate"
-                                className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0]"
+                                className="flex h-10 flex-1 items-center justify-center rounded-[14px] border border-[#E2E8F0] px-4 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-gray-50"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
-                                    className="h-4 w-4"
-                                >
-                                    <rect x="9" y="9" width="10" height="10" rx="2" />
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"
-                                    />
-                                </svg>
-                            </button>
-                        ) : null}
-                        {onDelete ? (
-                            <button
-                                type="button"
-                                onClick={() => onDelete(apt)}
-                                aria-label="Delete"
-                                title="Delete"
-                                className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
-                                    className="h-4 w-4"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.75h4.5A1.5 1.5 0 0 1 15.75 5.25V7.5h-7.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l.675 10.125A1.5 1.5 0 0 0 8.922 19.5h6.156a1.5 1.5 0 0 0 1.497-1.875L17.25 7.5" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 10.5v5.25M13.5 10.5v5.25" />
-                                </svg>
+                                Copy
                             </button>
                         ) : null}
 
@@ -174,7 +178,7 @@ export function PropertyCard({ apartment: apt, onDuplicate, onDelete }: Property
                             onClick={handleOpenListing}
                             className="flex h-10 flex-1 items-center justify-center rounded-[14px] bg-[#4E525D] px-4 text-[14px] font-medium leading-[20px] text-white transition-colors hover:bg-[#3A3D46] cursor-pointer"
                         >
-                            Open Listing
+                            Edit
                         </button>
                     </div>
                 </div>

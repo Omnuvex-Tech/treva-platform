@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     apartmentsApi,
     type Apartment,
@@ -15,13 +15,17 @@ import { getApiErrorMessage } from "../../utils/apiError";
 import { IoClose } from "react-icons/io5";
 
 export function ResaleApartmentsCardSection() {
+    const location = useLocation();
     const navigate = useNavigate();
     const qc = useQueryClient();
     const { showError, showSuccess } = useMessageCenter();
+    const initialTab = new URLSearchParams(location.search).get("tab") === "archive" ? "Archive" : "Active";
+    const [activeTab, setActiveTab] = useState<"Active" | "Archive">(initialTab);
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [filters, setFilters] = useState<ApartmentFilters>({
         page: 1,
         limit: 12,
+        archived: initialTab === "Archive",
     });
     const [filterOpen, setFilterOpen] = useState(false);
     const filterPanelRef = useRef<HTMLDivElement>(null);
@@ -64,6 +68,21 @@ export function ResaleApartmentsCardSection() {
         onError: (error) => {
             showError({
                 title: "Apartment could not be duplicated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const archiveMut = useMutation({
+        mutationFn: ({ id, archived }: { id: string; archived: boolean }) =>
+            apartmentsApi.update(id, { archived }),
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ["apartments"] });
+            showSuccess({ title: variables.archived ? "Listing archived" : "Listing restored" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Listing status could not be updated",
                 description: getApiErrorMessage(error, "Please try again."),
             });
         },
@@ -131,6 +150,16 @@ export function ResaleApartmentsCardSection() {
     };
 
     useEffect(() => {
+        const tabFromUrl = new URLSearchParams(location.search).get("tab") === "archive" ? "Archive" : "Active";
+        setActiveTab(tabFromUrl);
+        setFilters((prev) => ({
+            ...prev,
+            page: 1,
+            archived: tabFromUrl === "Archive",
+        }));
+    }, [location.search]);
+
+    useEffect(() => {
         if (!filterOpen) return;
 
         const handleOutsideClick = (event: MouseEvent) => {
@@ -151,7 +180,33 @@ export function ResaleApartmentsCardSection() {
             style={{ background: "var(--background-primary-50, #FFFFFF80)" }}
         >
             {/* Action Bar */}
-            <div className="relative mb-8 flex w-full items-center justify-end gap-3">
+            <div className="relative mb-8 flex w-full items-center justify-between gap-3">
+                <div className="flex h-[46px] items-center rounded-full border border-[#E2E8F0] bg-white p-1 shadow-sm">
+                    {(["Active", "Archive"] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            type="button"
+                            onClick={() => {
+                                setActiveTab(tab);
+                                navigate(`/dashboard/resale/apartments?tab=${tab === "Archive" ? "archive" : "active"}`);
+                                setFilters((prev) => ({
+                                    ...prev,
+                                    page: 1,
+                                    archived: tab === "Archive",
+                                }));
+                            }}
+                            className={`flex h-[40px] min-w-[92px] items-center justify-center rounded-[24px] px-4 text-[14px] font-medium leading-[20px] transition-all cursor-pointer ${
+                                activeTab === tab
+                                    ? "border border-white bg-[#EBEBEB] text-[#4E525D]"
+                                    : "border border-transparent bg-transparent text-[#718096] hover:bg-[#F1F5F9]"
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="flex items-center gap-3">
                 {/* Filter Pill Button */}
                 <button
                     type="button"
@@ -196,12 +251,13 @@ export function ResaleApartmentsCardSection() {
 
                 {/* Global Blueprint Action Button */}
                 <button
-                    onClick={() => navigate("/dashboard/resale/apartments/create")}
+                    onClick={() => navigate(`/dashboard/resale/apartments/create?tab=${activeTab === "Archive" ? "archive" : "active"}`)}
                     className="flex items-center justify-center gap-2 w-[124px] h-[44px] bg-[#4E525D] border border-white rounded-[16px] py-2 px-3.5 text-[13px] font-medium leading-[20px] tracking-[0px] text-white hover:bg-[#3D404A] transition-colors cursor-pointer"
                 >
                     <img src="/images/inv-resale/plus.svg" alt="" className="w-4 h-4" />
                     <span>Add Listing</span>
                 </button>
+                </div>
 
                 {filterOpen ? (
                     <div
@@ -346,7 +402,9 @@ export function ResaleApartmentsCardSection() {
                         No apartments found
                     </p>
                     <p className="text-[14px] text-[#999]">
-                        Try adjusting your search or filters
+                        {activeTab === "Active"
+                            ? "Try adjusting your search or filters"
+                            : "No archived listings"}
                     </p>
                 </div>
             ) : (
@@ -357,6 +415,8 @@ export function ResaleApartmentsCardSection() {
                                 key={apt.id}
                                 apartment={apt}
                                 onDuplicate={(apartment) => duplicateMut.mutate(apartment)}
+                                onArchive={(apartment) => archiveMut.mutate({ id: apartment.id, archived: !apartment.archived })}
+                                archiveDisabled={archiveMut.isPending}
                                 onDelete={(apartment) => {
                                     if (window.confirm(`Delete "${apartment.title}"?`)) {
                                         deleteMut.mutate(apartment.id);
@@ -452,15 +512,35 @@ export function ResaleApartmentsCardSection() {
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <RowActions
-                                                        onEdit={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
-                                                        onDuplicate={() => duplicateMut.mutate(apt)}
-                                                        onDelete={() => {
-                                                            if (window.confirm(`Delete "${apt.title}"?`)) {
-                                                                deleteMut.mutate(apt.id);
-                                                            }
-                                                        }}
-                                                    />
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => archiveMut.mutate({ id: apt.id, archived: !apt.archived })}
+                                                            disabled={archiveMut.isPending}
+                                                            aria-label={apt.archived ? "Restore" : "Archive"}
+                                                            title={apt.archived ? "Restore" : "Archive"}
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#4E525D] transition-colors hover:bg-gray-100 disabled:opacity-50"
+                                                        >
+                                                            {apt.archived ? (
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" />
+                                                                </svg>
+                                                            ) : (
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                                                </svg>
+                                                            )}
+                                                        </button>
+                                                        <RowActions
+                                                            onEdit={() => navigate(`/dashboard/resale/apartments/${apt.id}`)}
+                                                            onDuplicate={() => duplicateMut.mutate(apt)}
+                                                            onDelete={() => {
+                                                                if (window.confirm(`Delete "${apt.title}"?`)) {
+                                                                    deleteMut.mutate(apt.id);
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );

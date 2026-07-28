@@ -33,6 +33,7 @@ export class CategoriesService {
       title: category.title,
       name: category.name,
       slug: category.slug,
+      objectType: category.objectType,
       image: category.image,
       coverImage: category.coverImage,
       status: category.status,
@@ -41,7 +42,6 @@ export class CategoriesService {
       propertiesCount: category.propertiesCount,
       reservedCount: category.reservedCount,
       soldCount: category.soldCount,
-      objectType: category.objectType,
       propertyName: category.propertyName,
       currency: category.currency,
       region: category.region,
@@ -81,6 +81,7 @@ export class CategoriesService {
       title: category.title,
       name: category.name,
       slug: category.slug,
+      objectType: category.objectType,
       image: category.image,
       coverImage: category.coverImage,
       status: category.status,
@@ -89,7 +90,6 @@ export class CategoriesService {
       propertiesCount: category.propertiesCount,
       reservedCount: category.reservedCount,
       soldCount: category.soldCount,
-      objectType: category.objectType,
       propertyName: category.propertyName,
       currency: category.currency,
       region: category.region,
@@ -129,6 +129,7 @@ export class CategoriesService {
       title: category.title,
       name: category.name,
       slug: category.slug,
+      objectType: category.objectType,
       image: category.image,
       coverImage: category.coverImage,
       status: category.status,
@@ -137,7 +138,6 @@ export class CategoriesService {
       propertiesCount: category.propertiesCount,
       reservedCount: category.reservedCount,
       soldCount: category.soldCount,
-      objectType: category.objectType,
       propertyName: category.propertyName,
       currency: category.currency,
       region: category.region,
@@ -198,6 +198,10 @@ export class CategoriesService {
     }
 
     await this.prisma.unitLayout.deleteMany({
+      where: { categoryId: id },
+    });
+
+    await this.prisma.house.deleteMany({
       where: { categoryId: id },
     });
 

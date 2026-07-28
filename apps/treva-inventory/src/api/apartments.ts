@@ -42,6 +42,7 @@ export interface Apartment {
     attributeIds: string[];
     requestIds: string[];
     status?: "active" | "reserved" | "sold";
+    archived: boolean;
     apartmentTypeId: string;
     apartmentType: { id: string; title: string } | null;
     ownerId: string | null;
@@ -102,6 +103,7 @@ export interface CreateApartmentData {
     attributeIds?: string[];
     requestIds?: string[];
     status?: "active" | "reserved" | "sold";
+    archived?: boolean;
     currencyId?: string;
     prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
@@ -145,6 +147,7 @@ export interface UpdateApartmentData {
     attributeIds?: string[];
     requestIds?: string[];
     status?: "active" | "reserved" | "sold";
+    archived?: boolean;
     currencyId?: string;
     prices?: { currencyId: string; priceTotal: number; priceByArea: number }[];
 }
@@ -165,6 +168,7 @@ export interface ApartmentFilters {
     floor?: number;
     currency?: string;
     status?: "active" | "reserved" | "sold";
+    archived?: boolean;
 }
 
 export interface UploadResponse {

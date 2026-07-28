@@ -20,13 +20,13 @@ model Category {
   title           String
   name            String
   slug            String   @unique
+  objectType      String?
   image           String?
   status          String   @default("active")
   housesCount     Int      @default(0)
   propertiesCount Int      @default(0)
   reservedCount   Int      @default(0)
   soldCount       Int      @default(0)
-  objectType      String   @default("Resident Complex")
   propertyName    String?
   currency        String   @default("Rubels")
   region          String?
@@ -45,16 +45,65 @@ model Category {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  houses      House[]
   unitLayouts UnitLayout[]
 }
 
-model ObjectType {
-  id        String   @id @default(cuid())
-  name      String
-  title     String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model House {
+  id                          String      @id @default(cuid())
+  title                       String
+  name                        String
+  slug                        String      @unique
+  seoTitle                    String?
+  seoDescription              String?
+  seoKeywords                 String?
+  canonicalUrl                String?
+  seoImage                    String?
+  floor                       Int
+  number                      Int?
+  totalArea                   Float
+  internalArea                Float
+  balconyArea                 Float?
+  prices                      Json        @default("{}")
+  completionYear              Int
+  numberOfFloors              Json
+  similarApartmentIds         String[]
+  mainImage                   Json?
+  coverImage                  Json?
+  gallery                     Json[]
+  documents                   Json[]
+  location                    Json?
+  categoryId                  String
+  category                    Category    @relation(fields: [categoryId], references: [id])
+  roomOptionId                String?
+  roomOption                  RoomOption? @relation(fields: [roomOptionId], references: [id])
+  status                      String      @default("available")
+  statusOptionId              String?
+  statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
+  typeOfBuilding              String?
+  constructionStage           String?
+  description                 String?
+  ownerId                     String?
+  owner                       Owner?      @relation(fields: [ownerId], references: [id])
+  heatingTypeIds              String[]    @default([])
+  attributeIds                String[]    @default([])
+  locationTitle               String?
+  locationUrl                 String?
+  locationGoogleMapsUrl       String?
+  street                      String?
+  houseNumber                 String?
+  deadlineForCommissioning    String?
+  salesOffice                 String?
+  landCadastralNumber         String?
+  contractAddress             String?
+  secondContractAddress       String?
+  showroomAvailability        String?
+  secondShowroomAvailability  String?
+  archived                    Boolean     @default(false)
+  createdAt                   DateTime    @default(now())
+  updatedAt                   DateTime    @updatedAt
+
+  unitLayouts                 UnitLayout[]
 }
 
 model UnitLayout {
@@ -80,30 +129,20 @@ model UnitLayout {
   coverImage                  Json?
   gallery                     Json[]
   documents                   Json[]
-  location                    Json?
   categoryId                  String
   category                    Category    @relation(fields: [categoryId], references: [id])
+  houseId                     String?
+  house                       House?      @relation(fields: [houseId], references: [id], onDelete: SetNull)
   roomOptionId                String?
   roomOption                  RoomOption? @relation(fields: [roomOptionId], references: [id])
   status                      String       @default("available")
   statusOptionId              String?
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
-  lcd                         String?
   typeOfBuilding              String?
-  defaultPropertyType         String?
   constructionStage           String?
-  startOfConstruction         Json?
-  completionOfConstruction    Json?
-  startOfSales                Json?
-  endOfSales                  Json?
   description                 String?
-  ownerId                     String?
-  owner                       Owner?      @relation(fields: [ownerId], references: [id])
   heatingTypeIds              String[]    @default([])
   attributeIds                String[]    @default([])
-  locationTitle               String?
-  locationUrl                 String?
-  locationGoogleMapsUrl       String?
   archived                    Boolean     @default(false)
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
@@ -117,6 +156,7 @@ model RoomOption {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  houses      House[]
   unitLayouts UnitLayout[]
 
   @@unique([name, type])
@@ -139,6 +179,7 @@ model StatusOption {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  houses      House[]
   unitLayouts UnitLayout[]
 }
 
@@ -192,6 +233,7 @@ model Owner {
   updatedAt   DateTime @updatedAt
 
   apartments  Apartment[]
+  houses      House[]
   unitLayouts UnitLayout[]
 }
 
@@ -253,6 +295,7 @@ model Apartment {
   attributeIds    String[]
   requestIds      String[]
   status          String        @default("active")
+  archived        Boolean       @default(false)
   apartmentTypeId String
   apartmentType   ApartmentType  @relation(fields: [apartmentTypeId], references: [id])
   ownerId         String?

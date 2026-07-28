@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsArray, ValidateNested, IsIn, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, ValidateNested, IsIn, Min, Max, IsBoolean } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ApartmentPriceInput, MAX_RESALE_FLOOR } from './create-apartment.dto';
@@ -198,6 +198,11 @@ export class UpdateApartmentDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  archived?: boolean;
 
   @ApiPropertyOptional({ type: [ApartmentPriceInput] })
   @IsOptional()

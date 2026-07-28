@@ -19,6 +19,7 @@ export interface Category {
     title: string;
     name: string;
     slug: string;
+    objectType?: string;
     image?: string;
     coverImage?: string;
     status?: string;
@@ -27,7 +28,6 @@ export interface Category {
     propertiesCount: number;
     reservedCount: number;
     soldCount: number;
-    objectType: string;
     propertyName?: string;
     currency: string;
     region?: string;
@@ -51,6 +51,7 @@ export interface CreateCategoryData {
     name: string;
     slug: string;
     type?: string;
+    objectType?: string;
     image?: string;
     coverImage?: string;
     status?: string;
@@ -58,7 +59,6 @@ export interface CreateCategoryData {
     propertiesCount?: number;
     reservedCount?: number;
     soldCount?: number;
-    objectType?: string;
     propertyName?: string;
     currency?: string;
     region?: string;
@@ -70,6 +70,7 @@ export interface CreateCategoryData {
     developerBrand?: string;
     website?: string;
     salesDepartment?: string;
+    documents?: CategoryDocument[];
     fedLaw214?: boolean;
 }
 
@@ -77,6 +78,7 @@ export interface UpdateCategoryData {
     title?: string;
     name?: string;
     slug?: string;
+    objectType?: string;
     image?: string;
     coverImage?: string;
     status?: string;
@@ -84,7 +86,6 @@ export interface UpdateCategoryData {
     propertiesCount?: number;
     reservedCount?: number;
     soldCount?: number;
-    objectType?: string;
     propertyName?: string;
     currency?: string;
     region?: string;

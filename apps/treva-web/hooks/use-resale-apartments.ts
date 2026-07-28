@@ -10,13 +10,11 @@ export function useResaleApartments(filters?: ResaleFilters) {
         queryKey: ["resale-apartments", filters],
         queryFn: async () => {
             const params = new URLSearchParams();
-            if (filters) {
-                Object.entries(filters).forEach(([key, value]) => {
-                    if (value !== undefined && value !== "" && value !== null) {
-                        params.append(key, String(value));
-                    }
-                });
-            }
+            Object.entries({ archived: false, ...(filters || {}) }).forEach(([key, value]) => {
+                if (value !== undefined && value !== "" && value !== null) {
+                    params.append(key, String(value));
+                }
+            });
             const response = await api.get<ResaleApartmentListResponse>(
                 `${endpoints.resale.apartments.list}?${params.toString()}`
             );
@@ -69,9 +67,10 @@ export function useResaleApartmentRange(currency?: string) {
     return useQuery({
         queryKey: ["resale-apartment-range", currency],
         queryFn: async () => {
-            const params = currency ? `?currency=${currency}` : '';
+            const params = new URLSearchParams({ archived: "false" });
+            if (currency) params.set("currency", currency);
             const response = await api.get<{ maxPrice: number; minPrice: number; maxTotalArea: number; minTotalArea: number }>(
-                `${endpoints.resale.apartments.list}/range${params}`
+                `${endpoints.resale.apartments.list}/range?${params.toString()}`
             );
             return response.data;
         },
@@ -95,7 +94,7 @@ export function useResaleFloors() {
         queryKey: ["resale-floors"],
         queryFn: async () => {
             const response = await api.get<number[]>(
-                endpoints.resale.apartments.floors
+                `${endpoints.resale.apartments.floors}?archived=false`
             );
             return response.data;
         },
@@ -108,7 +107,7 @@ export function useResaleRooms() {
         queryKey: ["resale-rooms"],
         queryFn: async () => {
             const response = await api.get<number[]>(
-                endpoints.resale.apartments.rooms
+                `${endpoints.resale.apartments.rooms}?archived=false`
             );
             return response.data;
         },

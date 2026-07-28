@@ -1,0 +1,2 @@
+ALTER TABLE "Apartment"
+ADD COLUMN "archived" BOOLEAN NOT NULL DEFAULT false;

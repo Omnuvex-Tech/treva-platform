@@ -41,6 +41,7 @@ export class ApartmentsService {
       locationUrl: normalizeOptionalString(dto.locationUrl),
       locationGoogleMapsUrl: normalizeOptionalString(dto.locationGoogleMapsUrl),
       ownerId: normalizeOptionalString(dto.ownerId),
+      archived: dto.archived,
     };
   }
 
@@ -122,7 +123,7 @@ export class ApartmentsService {
               },
             }
           : {}),
-      },
+      } as any,
       include: APARTMENT_INCLUDE,
     });
 
@@ -150,8 +151,9 @@ export class ApartmentsService {
     floor?: number;
     currency?: string;
     status?: string;
+    archived?: boolean;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, status } = query;
+    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, status, archived } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
@@ -184,6 +186,7 @@ export class ApartmentsService {
       where.floorTo = { gte: floor };
     }
     if (status) where.status = status;
+    if (archived !== undefined) where.archived = archived;
 
     const [data, total] = await Promise.all([
       this.prisma.apartment.findMany({
@@ -237,6 +240,7 @@ export class ApartmentsService {
       include: APARTMENT_INCLUDE,
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
+    if ((apartment as any).archived) throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
     const [apartmentWithOptions] = await this.attachOptionRelations([{ ...apartment, attributes }]);
     return apartmentWithOptions;
@@ -273,7 +277,7 @@ export class ApartmentsService {
 
     const updated = await this.prisma.apartment.update({
       where: { id },
-      data: apartmentData,
+      data: apartmentData as any,
       include: APARTMENT_INCLUDE,
     });
 
@@ -287,20 +291,27 @@ export class ApartmentsService {
     return this.prisma.apartment.delete({ where: { id } });
   }
 
-  async getRange(currency?: string) {
+  async getRange(currency?: string, archived = false) {
     const priceWhere: any = {};
     if (currency) {
       const resolvedId = await this.resolveCurrencyId(currency);
       if (resolvedId) priceWhere.currencyId = resolvedId;
     }
 
+    const apartmentRelationFilter: any = { apartment: { is: { archived } } };
+    const apartmentWhere: any = { archived };
+
     const result = await this.prisma.apartmentPrice.aggregate({
-      where: Object.keys(priceWhere).length > 0 ? priceWhere : undefined,
+      where: {
+        ...(Object.keys(priceWhere).length > 0 ? priceWhere : {}),
+        ...apartmentRelationFilter,
+      } as any,
       _max: { priceTotal: true },
       _min: { priceTotal: true },
     });
 
     const areaResult = await this.prisma.apartment.aggregate({
+      where: apartmentWhere,
       _max: { area: true },
       _min: { area: true },
     });
@@ -313,8 +324,10 @@ export class ApartmentsService {
     };
   }
 
-  async getFloors(): Promise<number[]> {
+  async getFloors(archived = false): Promise<number[]> {
+    const apartmentWhere: any = { archived };
     const apartments = await this.prisma.apartment.findMany({
+      where: apartmentWhere,
       select: { floorFrom: true, floorTo: true },
       orderBy: [{ floorFrom: 'asc' }, { floorTo: 'asc' }],
     });
@@ -340,8 +353,10 @@ export class ApartmentsService {
     return [...floors].sort((a, b) => a - b);
   }
 
-  async getRoomCounts(): Promise<number[]> {
+  async getRoomCounts(archived = false): Promise<number[]> {
+    const apartmentWhere: any = { archived };
     const apartments = await this.prisma.apartment.findMany({
+      where: apartmentWhere,
       select: { roomCount: true },
       orderBy: { roomCount: 'asc' },
     });

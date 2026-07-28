@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsIn, Min, Max } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsIn, Min, Max, IsBoolean } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type, Transform } from 'class-transformer';
 
@@ -218,6 +218,11 @@ export class CreateApartmentDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  archived?: boolean;
 
   @ApiPropertyOptional({ type: [ApartmentPriceInput] })
   @IsOptional()

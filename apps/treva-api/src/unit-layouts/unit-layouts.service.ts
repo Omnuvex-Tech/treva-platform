@@ -7,6 +7,20 @@ import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
 export class UnitLayoutsService {
   constructor(private prisma: PrismaService) {}
 
+  private async syncCategoryMetrics(categoryId: string) {
+    const [housesCount, propertiesCount, reservedCount, soldCount] = await Promise.all([
+      this.prisma.house.count({ where: { categoryId, archived: false } }),
+      this.prisma.unitLayout.count({ where: { categoryId, archived: false } }),
+      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'reserved' } }),
+      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'sold' } }),
+    ]);
+
+    await this.prisma.category.update({
+      where: { id: categoryId },
+      data: { housesCount, propertiesCount, reservedCount, soldCount },
+    });
+  }
+
   async create(createDto: CreateUnitLayoutDto) {
     const existingSlug = await this.prisma.unitLayout.findUnique({
       where: { slug: createDto.slug },
@@ -16,7 +30,7 @@ export class UnitLayoutsService {
       throw new ConflictException('Unit layout with this slug already exists');
     }
 
-    return this.prisma.unitLayout.create({
+    const layout = await this.prisma.unitLayout.create({
       data: {
         title: createDto.title,
         name: createDto.name,
@@ -42,25 +56,18 @@ export class UnitLayoutsService {
           coverImage: createDto.coverImage as any,
         gallery: createDto.gallery as any[] || [],
         documents: createDto.documents as any[] || [],
-        location: createDto.location as any,
-        lcd: createDto.lcd,
+        houseId: createDto.houseId,
         typeOfBuilding: createDto.typeOfBuilding,
-        defaultPropertyType: createDto.defaultPropertyType,
         constructionStage: createDto.constructionStage,
-        startOfConstruction: createDto.startOfConstruction as any,
-        completionOfConstruction: createDto.completionOfConstruction as any,
-        startOfSales: createDto.startOfSales as any,
-        endOfSales: createDto.endOfSales as any,
         description: createDto.description,
-        ownerId: createDto.ownerId,
         heatingTypeIds: createDto.heatingTypeIds || [],
         attributeIds: createDto.attributeIds || [],
-        locationTitle: createDto.locationTitle,
-        locationUrl: createDto.locationUrl,
-        locationGoogleMapsUrl: createDto.locationGoogleMapsUrl,
       },
-      include: { category: true, owner: true },
+      include: { category: true, house: true, roomOption: true },
     });
+
+    await this.syncCategoryMetrics(createDto.categoryId);
+    return layout;
   }
 
   async findAll(query: {
@@ -77,6 +84,8 @@ export class UnitLayoutsService {
     maxArea?: number;
     floor?: number;
     roomOptionId?: string;
+    houseId?: string;
+    houseSlug?: string;
     archived?: boolean;
   }) {
     const page = query.page || 1;
@@ -96,6 +105,19 @@ export class UnitLayoutsService {
       });
       if (category) {
         where.categoryId = category.id;
+      }
+    }
+
+    if (query.houseId) {
+      where.houseId = query.houseId;
+    }
+
+    if (query.houseSlug) {
+      const house = await this.prisma.house.findUnique({
+        where: { slug: query.houseSlug },
+      });
+      if (house) {
+        where.houseId = house.id;
       }
     }
 
@@ -180,8 +202,8 @@ export class UnitLayoutsService {
         orderBy: { createdAt: 'desc' },
         include: {
           category: true,
+          house: true,
           roomOption: true,
-          owner: true,
         },
       }),
       this.prisma.unitLayout.count({ where }),
@@ -201,7 +223,7 @@ export class UnitLayoutsService {
   async findOne(id: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { id },
-      include: { category: true, roomOption: true, owner: true },
+      include: { category: true, roomOption: true, house: true },
     });
 
     if (!unitLayout) {
@@ -212,7 +234,7 @@ export class UnitLayoutsService {
     if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
       similarApartments = await this.prisma.unitLayout.findMany({
         where: { id: { in: unitLayout.similarApartmentIds } },
-            include: { category: true },
+      include: { category: true, house: true },
       });
     }
 
@@ -222,7 +244,7 @@ export class UnitLayoutsService {
   async findBySlug(slug: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { slug },
-      include: { category: true, roomOption: true, owner: true },
+      include: { category: true, roomOption: true, house: true },
     });
 
     if (!unitLayout) {
@@ -233,7 +255,7 @@ export class UnitLayoutsService {
     if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
       similarApartments = await this.prisma.unitLayout.findMany({
         where: { id: { in: unitLayout.similarApartmentIds } },
-            include: { category: true },
+      include: { category: true, house: true },
       });
     }
 
@@ -270,6 +292,7 @@ export class UnitLayoutsService {
     if (updateDto.status !== undefined) data.status = updateDto.status;
     if (updateDto.archived !== undefined) data.archived = updateDto.archived;
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
+    if (updateDto.houseId !== undefined) data.houseId = updateDto.houseId;
     if (updateDto.roomOptionId !== undefined) data.roomOptionId = updateDto.roomOptionId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
@@ -284,28 +307,24 @@ export class UnitLayoutsService {
         if (updateDto.coverImage !== undefined) data.coverImage = updateDto.coverImage;
     if (updateDto.gallery !== undefined) data.gallery = updateDto.gallery;
     if (updateDto.documents !== undefined) data.documents = updateDto.documents;
-    if (updateDto.location !== undefined) data.location = updateDto.location;
-    if (updateDto.lcd !== undefined) data.lcd = updateDto.lcd;
     if (updateDto.typeOfBuilding !== undefined) data.typeOfBuilding = updateDto.typeOfBuilding;
-    if (updateDto.defaultPropertyType !== undefined) data.defaultPropertyType = updateDto.defaultPropertyType;
     if (updateDto.constructionStage !== undefined) data.constructionStage = updateDto.constructionStage;
-    if (updateDto.startOfConstruction !== undefined) data.startOfConstruction = updateDto.startOfConstruction;
-    if (updateDto.completionOfConstruction !== undefined) data.completionOfConstruction = updateDto.completionOfConstruction;
-    if (updateDto.startOfSales !== undefined) data.startOfSales = updateDto.startOfSales;
-    if (updateDto.endOfSales !== undefined) data.endOfSales = updateDto.endOfSales;
     if (updateDto.description !== undefined) data.description = updateDto.description;
-    if (updateDto.ownerId !== undefined) data.ownerId = updateDto.ownerId;
     if (updateDto.heatingTypeIds !== undefined) data.heatingTypeIds = updateDto.heatingTypeIds;
     if (updateDto.attributeIds !== undefined) data.attributeIds = updateDto.attributeIds;
-    if (updateDto.locationTitle !== undefined) data.locationTitle = updateDto.locationTitle;
-    if (updateDto.locationUrl !== undefined) data.locationUrl = updateDto.locationUrl;
-    if (updateDto.locationGoogleMapsUrl !== undefined) data.locationGoogleMapsUrl = updateDto.locationGoogleMapsUrl;
 
-    return this.prisma.unitLayout.update({
+    const layout = await this.prisma.unitLayout.update({
       where: { id },
       data,
-      include: { category: true, roomOption: true, owner: true },
+      include: { category: true, roomOption: true, house: true },
     });
+
+    await this.syncCategoryMetrics(layout.categoryId);
+    if (existing.categoryId !== layout.categoryId) {
+      await this.syncCategoryMetrics(existing.categoryId);
+    }
+
+    return layout;
   }
 
   async remove(id: string) {
@@ -317,9 +336,12 @@ export class UnitLayoutsService {
       throw new NotFoundException('Unit layout not found');
     }
 
-    return this.prisma.unitLayout.delete({
+    const result = await this.prisma.unitLayout.delete({
       where: { id },
     });
+
+    await this.syncCategoryMetrics(existing.categoryId);
+    return result;
   }
 
   async count() {

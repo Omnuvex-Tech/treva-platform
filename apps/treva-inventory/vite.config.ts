@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     preview: {
-      allowedHosts: ["inventory.pre.treva.realestate"],
+      allowedHosts: ["inventory.pre.treva.realestate", "inventory.treva.realestate"],
     },
   };
 });

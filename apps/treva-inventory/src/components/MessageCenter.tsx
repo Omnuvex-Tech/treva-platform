@@ -55,9 +55,9 @@ function MessageViewport({
                     role="status"
                     aria-live="polite"
                 >
-                    <div className="flex items-start gap-3 px-4 py-4">
+                    <div className="flex items-center gap-3 px-4 py-4">
                         <div
-                            className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
                                 message.variant === "success"
                                     ? "bg-emerald-50 text-emerald-600"
                                     : "bg-rose-50 text-rose-600"

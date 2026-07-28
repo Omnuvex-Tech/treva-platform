@@ -13,27 +13,10 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-export class LocationDto {
-  @ApiProperty({ example: 'Sea Breeze Resort' })
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @ApiProperty({ example: 'https://seabreeze.az' })
-  @IsString()
-  @IsNotEmpty()
-  url: string;
-
-  @ApiProperty({ example: 'apartment' })
-  @IsString()
-  @IsNotEmpty()
-  type: string;
-}
-
-export class NumberOfFloorsDto {
   @ApiProperty({ example: 3 })
   @IsNumber()
   @Min(1)
+  @Max(999)
   @Max(999)
   start: number;
 
@@ -135,6 +118,11 @@ export class CreateUnitLayoutDto {
   @IsNotEmpty()
   categoryId: string;
 
+  @ApiPropertyOptional({ example: 'clx1234567890' })
+  @IsOptional()
+  @IsString()
+  houseId?: string;
+
   @ApiPropertyOptional({ example: 'cuid...' })
   @IsOptional()
   @IsString()
@@ -213,62 +201,20 @@ export class CreateUnitLayoutDto {
   @Type(() => DocumentDto)
   documents: DocumentDto[];
 
-  @ApiPropertyOptional({ type: LocationDto })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => LocationDto)
-  location?: LocationDto;
-
-  @ApiPropertyOptional({ example: 'LCD-1' })
-  @IsOptional()
-  @IsString()
-  lcd?: string;
-
   @ApiPropertyOptional({ example: 'Residential' })
   @IsOptional()
   @IsString()
   typeOfBuilding?: string;
-
-  @ApiPropertyOptional({ example: 'Apartment' })
-  @IsOptional()
-  @IsString()
-  defaultPropertyType?: string;
 
   @ApiPropertyOptional({ example: 'Under construction' })
   @IsOptional()
   @IsString()
   constructionStage?: string;
 
-  @ApiPropertyOptional({ example: { month: 1, year: 2024 } })
-  @IsOptional()
-  @IsObject()
-  startOfConstruction?: Record<string, number>;
-
-  @ApiPropertyOptional({ example: { month: 12, year: 2026 } })
-  @IsOptional()
-  @IsObject()
-  completionOfConstruction?: Record<string, number>;
-
-  @ApiPropertyOptional({ example: { month: 3, year: 2024 } })
-  @IsOptional()
-  @IsObject()
-  startOfSales?: Record<string, number>;
-
-  @ApiPropertyOptional({ example: { month: 6, year: 2027 } })
-  @IsOptional()
-  @IsObject()
-  endOfSales?: Record<string, number>;
-
   @ApiPropertyOptional({ example: '<p>Beautiful apartment</p>' })
   @IsOptional()
   @IsString()
   description?: string;
-
-  @ApiPropertyOptional({ example: 'clx1234567890' })
-  @IsOptional()
-  @IsString()
-  ownerId?: string;
 
   @ApiPropertyOptional({ example: ['id1', 'id2'] })
   @IsOptional()
@@ -281,19 +227,4 @@ export class CreateUnitLayoutDto {
   @IsArray()
   @IsString({ each: true })
   attributeIds?: string[];
-
-  @ApiPropertyOptional({ example: 'Seafront Boulevard' })
-  @IsOptional()
-  @IsString()
-  locationTitle?: string;
-
-  @ApiPropertyOptional({ example: 'https://maps.example.com/...' })
-  @IsOptional()
-  @IsString()
-  locationUrl?: string;
-
-  @ApiPropertyOptional({ example: 'https://www.google.com/maps/embed?pb=...' })
-  @IsOptional()
-  @IsString()
-  locationGoogleMapsUrl?: string;
 }

@@ -35,6 +35,11 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   slug: string;
 
+  @ApiPropertyOptional({ example: 'Residential' })
+  @IsOptional()
+  @IsString()
+  objectType?: string;
+
   @ApiPropertyOptional({ example: 0 })
   @IsOptional()
   @IsNumber()
@@ -64,11 +69,6 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsNumber()
   soldCount?: number;
-
-  @ApiPropertyOptional({ example: 'Resident Complex' })
-  @IsOptional()
-  @IsString()
-  objectType?: string;
 
   @ApiPropertyOptional({ example: 'Panorama' })
   @IsOptional()

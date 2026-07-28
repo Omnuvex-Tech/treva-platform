@@ -1,0 +1,2 @@
+-- This migration is kept as a no-op so local history matches the database.
+-- The actual House table JSONB array change now runs after House creation.

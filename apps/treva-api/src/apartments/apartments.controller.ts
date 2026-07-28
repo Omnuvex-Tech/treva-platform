@@ -39,6 +39,7 @@ export class ApartmentsController {
   @ApiQuery({ name: 'floor', required: false })
   @ApiQuery({ name: 'currency', required: false })
   @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'archived', required: false, type: Boolean })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -59,6 +60,7 @@ export class ApartmentsController {
     @Query('floor') floor?: string,
     @Query('currency') currency?: string,
     @Query('status') status?: string,
+    @Query('archived') archived?: string,
   ) {
     return this.service.findAll({
       page: page ? parseInt(page) : 1,
@@ -80,25 +82,36 @@ export class ApartmentsController {
       floor: floor ? parseInt(floor) : undefined,
       currency,
       status,
+      archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
     });
   }
 
   @Get('range')
   @ApiOperation({ summary: 'Get price and area range from apartments' })
-  async getRange(@Query('currency') currency?: string) {
-    return this.service.getRange(currency);
+  async getRange(
+    @Query('currency') currency?: string,
+    @Query('archived') archived?: string,
+  ) {
+    return this.service.getRange(
+      currency,
+      archived === 'true' ? true : archived === 'false' ? false : false,
+    );
   }
 
   @Get('floors')
   @ApiOperation({ summary: 'Get available floor numbers' })
-  async getFloors() {
-    return this.service.getFloors();
+  async getFloors(@Query('archived') archived?: string) {
+    return this.service.getFloors(
+      archived === 'true' ? true : archived === 'false' ? false : false,
+    );
   }
 
   @Get('rooms')
   @ApiOperation({ summary: 'Get available room counts' })
-  async getRoomCounts() {
-    return this.service.getRoomCounts();
+  async getRoomCounts(@Query('archived') archived?: string) {
+    return this.service.getRoomCounts(
+      archived === 'true' ? true : archived === 'false' ? false : false,
+    );
   }
 
   @Get('slug/:slug')

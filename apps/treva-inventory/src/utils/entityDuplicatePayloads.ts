@@ -1,4 +1,5 @@
 import type { Apartment, CreateApartmentData } from "../api/apartments";
+import type { CreateHouseData, House } from "../api/houses";
 import type { CreateUnitLayoutData, UnitLayout } from "../api/unit-layouts";
 import {
     createDuplicateToken,
@@ -50,6 +51,7 @@ export function buildApartmentDuplicatePayload(
         attributeIds: apartment.attributeIds || [],
         requestIds: [],
         status: apartment.status,
+        archived: false,
         currencyId: apartment.currencyId || undefined,
         prices: apartment.prices?.map((price) => ({
             currencyId: price.currencyId,
@@ -70,6 +72,7 @@ export function buildUnitLayoutDuplicatePayload(
         slug: duplicateSlug(layout.slug, token),
         status: layout.status,
         categoryId: layout.categoryId,
+        houseId: layout.houseId,
         floor: layout.floor,
         number: layout.number ?? 1,
         totalArea: layout.totalArea,
@@ -82,8 +85,55 @@ export function buildUnitLayoutDuplicatePayload(
         mainImage: layout.mainImage,
         gallery: layout.gallery || [],
         documents: layout.documents || [],
-        location: layout.location || { title: layout.title, url: "", type: "apartment" },
         roomOptionId: layout.roomOptionId,
+    };
+}
+
+export function buildHouseDuplicatePayload(
+    house: House
+): CreateHouseData {
+    const token = createDuplicateToken();
+
+    return {
+        title: duplicateText(house.title, token),
+        name: duplicateText(house.name, token),
+        slug: duplicateSlug(house.slug, token),
+        status: house.status,
+        archived: false,
+        categoryId: house.categoryId,
+        floor: house.floor,
+        number: house.number ?? 1,
+        totalArea: house.totalArea,
+        internalArea: house.internalArea,
+        balconyArea: house.balconyArea ?? 0,
+        prices: house.prices || {},
+        completionYear: house.completionYear,
+        numberOfFloors: house.numberOfFloors,
+        similarApartmentIds: house.similarApartmentIds || [],
+        mainImage: house.mainImage,
+        coverImage: house.coverImage,
+        gallery: house.gallery || [],
+        documents: house.documents || [],
+        location: house.location,
+        roomOptionId: house.roomOptionId,
+        ownerId: house.ownerId,
+        heatingTypeIds: house.heatingTypeIds || [],
+        attributeIds: house.attributeIds || [],
+        locationTitle: house.locationTitle,
+        locationUrl: house.locationUrl,
+        locationGoogleMapsUrl: house.locationGoogleMapsUrl,
+        typeOfBuilding: house.typeOfBuilding,
+        constructionStage: house.constructionStage,
+        description: house.description,
+        street: house.street,
+        houseNumber: house.houseNumber,
+        deadlineForCommissioning: house.deadlineForCommissioning,
+        salesOffice: house.salesOffice,
+        landCadastralNumber: house.landCadastralNumber,
+        contractAddress: house.contractAddress,
+        secondContractAddress: house.secondContractAddress,
+        showroomAvailability: house.showroomAvailability,
+        secondShowroomAvailability: house.secondShowroomAvailability,
     };
 }
 

@@ -72,6 +72,7 @@ export interface ResaleApartment {
     attributeIds: string[];
     attributes?: ResaleAttribute[];
     requestIds: string[];
+    archived?: boolean;
     apartmentTypeId: string;
     apartmentType?: ResaleApartmentType;
     ownerId?: string;
@@ -109,4 +110,5 @@ export interface ResaleFilters {
     floor?: number;
     currency?: string;
     status?: string;
+    archived?: boolean;
 }

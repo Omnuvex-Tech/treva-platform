@@ -1,0 +1,2 @@
+ALTER TABLE "House"
+DROP COLUMN "lcd";

@@ -1,11 +1,5 @@
 import apiClient from "./client";
 
-export interface Location {
-    title: string;
-    url?: string;
-    type: string;
-}
-
 export interface NumberOfFloors {
     start: number;
     end: number;
@@ -66,26 +60,16 @@ export interface UnitLayout {
     coverImage?: MainImage;
     gallery: GalleryImage[];
     documents: Document[];
-    location?: Location;
     categoryId: string;
     category: Category;
+    houseId?: string;
+    house?: { id: string; title: string; name: string; slug: string };
     roomOptionId?: string;
     roomOption?: { id: string; name: string; title: string; type: string };
-    ownerId?: string;
-    owner?: { id: string; firstName: string; lastName: string; phoneNumber: string };
     heatingTypeIds?: string[];
     attributeIds?: string[];
-    locationTitle?: string;
-    locationUrl?: string;
-    locationGoogleMapsUrl?: string;
-    lcd?: string;
     typeOfBuilding?: string;
-    defaultPropertyType?: string;
     constructionStage?: string;
-    startOfConstruction?: { month: number; year: number };
-    completionOfConstruction?: { month: number; year: number };
-    startOfSales?: { month: number; year: number };
-    endOfSales?: { month: number; year: number };
     description?: string;
     createdAt: string;
     updatedAt: string;
@@ -122,6 +106,7 @@ export interface CreateUnitLayoutData {
     status?: UnitLayoutStatus;
     archived?: boolean;
     categoryId: string;
+    houseId?: string;
     floor: number;
     number: number;
     totalArea: number;
@@ -135,22 +120,11 @@ export interface CreateUnitLayoutData {
     coverImage?: MainImage;
     gallery?: GalleryImage[];
     documents?: Document[];
-    location?: Location;
     roomOptionId?: string;
-    ownerId?: string;
     heatingTypeIds?: string[];
     attributeIds?: string[];
-    locationTitle?: string;
-    locationUrl?: string;
-    locationGoogleMapsUrl?: string;
-    lcd?: string;
     typeOfBuilding?: string;
-    defaultPropertyType?: string;
     constructionStage?: string;
-    startOfConstruction?: { month: number; year: number };
-    completionOfConstruction?: { month: number; year: number };
-    startOfSales?: { month: number; year: number };
-    endOfSales?: { month: number; year: number };
     description?: string;
 }
 
@@ -159,6 +133,8 @@ export interface UnitLayoutFilters {
     limit?: number;
     categoryId?: string;
     categorySlug?: string;
+    houseId?: string;
+    houseSlug?: string;
     status?: UnitLayoutStatus;
     archived?: boolean;
     search?: string;
@@ -187,10 +163,8 @@ const cleanString = (value: string | undefined) => {
 const sanitizeUnitLayoutData = (
     data: Partial<CreateUnitLayoutData>
 ): Partial<CreateUnitLayoutData> => {
-    const locationTitle = cleanString(data.location?.title) || cleanString(data.locationTitle);
-    const locationType = cleanString(data.location?.type);
-        const mainImageUrl = cleanString(data.mainImage?.url);
-        const coverImageUrl = cleanString(data.coverImage?.url);
+    const mainImageUrl = cleanString(data.mainImage?.url);
+    const coverImageUrl = cleanString(data.coverImage?.url);
 
     return {
         ...data,
@@ -206,12 +180,8 @@ const sanitizeUnitLayoutData = (
         number: data.number,
         balconyArea: data.balconyArea,
         similarApartmentIds: data.similarApartmentIds?.filter(Boolean),
-        ownerId: cleanString(data.ownerId),
         heatingTypeIds: data.heatingTypeIds?.filter(Boolean) || [],
         attributeIds: data.attributeIds?.filter(Boolean) || [],
-        locationTitle: cleanString(data.locationTitle) || cleanString(data.location?.title),
-        locationUrl: cleanString(data.locationUrl) || cleanString(data.location?.url),
-        locationGoogleMapsUrl: cleanString(data.locationGoogleMapsUrl),
         mainImage: mainImageUrl
             ? {
                   url: mainImageUrl,
@@ -236,14 +206,6 @@ const sanitizeUnitLayoutData = (
                 url: cleanString(document.url) || "",
             }))
             .filter((document) => document.type && document.url),
-        location:
-            locationTitle && locationType
-                ? {
-                      title: locationTitle,
-                      type: locationType,
-                      url: cleanString(data.location?.url) || cleanString(data.locationUrl),
-                  }
-                : undefined,
     };
 };
 

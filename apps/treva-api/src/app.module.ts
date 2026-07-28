@@ -19,13 +19,13 @@ import { ApartmentsModule } from './apartments/apartments.module';
 import { OwnersModule } from './owners/owners.module';
 import { AttributesModule } from './attributes/attributes.module';
 import { RequestsModule } from './requests/requests.module';
-import { ObjectTypesModule } from './object-types/object-types.module';
 import { LcdOptionsModule } from './lcd-options/lcd-options.module';
 import { TypeOfBuildingOptionsModule } from './type-of-building-options/type-of-building-options.module';
 import { PropertyTypeOptionsModule } from './property-type-options/property-type-options.module';
 import { ConstructionStageOptionsModule } from './construction-stage-options/construction-stage-options.module';
 import { LocationOptionsModule } from './location-options/location-options.module';
 import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-options.module';
+import { HousesModule } from './houses/houses.module';
 
 @Module({
   imports: [
@@ -47,6 +47,7 @@ import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-op
     PrismaModule,
     AuthModule,
     CategoriesModule,
+    HousesModule,
     UnitLayoutsModule,
     UploadModule,
     RoomOptionsModule,
@@ -57,7 +58,6 @@ import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-op
     OwnersModule,
     AttributesModule,
     RequestsModule,
-    ObjectTypesModule,
     LcdOptionsModule,
     TypeOfBuildingOptionsModule,
     PropertyTypeOptionsModule,

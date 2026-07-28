@@ -5,7 +5,7 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { getApiErrorMessage } from "../../utils/apiError";
-import { HouseForm as UnitLayoutInlineForm } from "./HouseForm";
+import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 
 const statusBadgeMap: Record<string, string> = {
     available: "bg-emerald-50 text-emerald-700",
@@ -209,11 +209,36 @@ export function UnitLayoutsSection() {
                                             <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">No Image</div>
                                         )}
 
-                                        <div className="absolute left-2 top-2">
-                                            <span className={`inline-flex items-center rounded-full px-2 py-1 text-[11px] font-medium ${statusBadgeMap[layout.status || ""] || "bg-[#F4F5F6] text-[#718096]"}`}>
-                                                {statusLabelMap[layout.status || ""] || "Status"}
-                                            </span>
-                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => archiveMut.mutate({ id: layout.id, archived: !layout.archived })}
+                                            disabled={archiveMut.isPending}
+                                            aria-label={layout.archived ? "Restore" : "Archive"}
+                                            title={layout.archived ? "Restore" : "Archive"}
+                                            className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
+                                        >
+                                            {layout.archived ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                                </svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                                </svg>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => deleteMut.mutate(layout.id)}
+                                            aria-label="Delete"
+                                            title="Delete"
+                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                            </svg>
+                                        </button>
                                     </div>
 
                                     <div className="px-1 pb-1">
@@ -236,39 +261,21 @@ export function UnitLayoutsSection() {
                                     <div className="flex gap-1 px-1 pb-1">
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                setEditingHouseId(layout.id);
-                                                setShowHouseForm(true);
-                                            }}
-                                            className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => archiveMut.mutate({ id: layout.id, archived: !layout.archived })}
-                                            disabled={archiveMut.isPending}
-                                            className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
-                                        >
-                                            {layout.archived ? "Restore" : "Archive"}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => deleteMut.mutate(layout.id)}
-                                            className="flex-1 rounded-lg border border-[#FECACA] py-1.5 text-[12px] font-medium text-[#C3362B] transition-colors hover:bg-red-50 cursor-pointer"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-
-                                    <div className="flex gap-1 px-1">
-                                        <button
-                                            type="button"
                                             onClick={() => duplicateMut.mutate(layout)}
                                             disabled={duplicateMut.isPending}
                                             className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
                                         >
-                                            Duplicate
+                                            Copy
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingHouseId(layout.id);
+                                                setShowHouseForm(true);
+                                            }}
+                                            className="flex-1 rounded-lg bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46] cursor-pointer"
+                                        >
+                                            Edit
                                         </button>
                                     </div>
                                 </div>

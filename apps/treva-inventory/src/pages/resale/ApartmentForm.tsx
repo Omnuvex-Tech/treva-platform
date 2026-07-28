@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { apartmentsApi, CreateApartmentData, type ApartmentFurnishing, type ApartmentRenovation, UploadResponse } from "../../api/apartments";
 import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
@@ -281,9 +281,11 @@ function BinarySwitchField({
 export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {}) {
     const { id } = useParams();
     const isEdit = Boolean(id);
+    const location = useLocation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { showError, showSuccess } = useMessageCenter();
+    const createTab = new URLSearchParams(location.search).get("tab") === "archive" ? "archive" : "active";
 
     const [activeTab, setActiveTab] = useState<TabKey>("basic");
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -360,6 +362,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         attributeIds: [],
         requestIds: [],
         status: "active" as "active" | "reserved" | "sold",
+        archived: createTab === "archive",
         prices: [],
     });
 
@@ -404,12 +407,18 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 attributeIds: d.attributeIds || [],
                 requestIds: d.requestIds || [],
                 status: d.status || "active",
+                archived: !!d.archived,
                 prices: (d.prices || []).map((p: any) => ({ currencyId: p.currencyId, priceTotal: p.priceTotal, priceByArea: p.priceByArea })),
             });
             setSlugManuallyEdited(Boolean(d.slug));
             setSeoTitleManuallyEdited(Boolean(d.seoTitle));
         }
     }, [existing?.data]);
+
+    useEffect(() => {
+        if (isEdit) return;
+        setForm((prev) => ({ ...prev, archived: createTab === "archive" }));
+    }, [createTab, isEdit]);
 
     const handleSlugFromTitle = (title: string) => {
         const nextSlug = slugify(title);
@@ -429,7 +438,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["apartments"] });
             showSuccess({ title: "Apartment created" });
-            navigate("/dashboard/resale/apartments");
+            navigate(`/dashboard/resale/apartments?tab=${createTab}`);
         },
         onError: (error) => {
             showError({
@@ -445,7 +454,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
             queryClient.invalidateQueries({ queryKey: ["apartments"] });
             queryClient.invalidateQueries({ queryKey: ["apartment", id] });
             showSuccess({ title: "Apartment updated" });
-            navigate("/dashboard/resale/apartments");
+            navigate(`/dashboard/resale/apartments?tab=${form.archived ? "archive" : "active"}`);
         },
         onError: (error) => {
             showError({
@@ -514,6 +523,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         }
         const submitData = {
             ...form,
+            archived: isEdit ? !!form.archived : createTab === "archive",
             name: normalizeOptionalText(form.name),
             description: normalizeOptionalText(form.description),
             seoTitle: normalizeOptionalText(form.seoTitle),

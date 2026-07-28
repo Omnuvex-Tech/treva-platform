@@ -2,17 +2,20 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi, type CategoryDocument } from "../../api/categories";
+import { housesApi, type House } from "../../api/houses";
 import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
-import { objectTypesApi, type ObjectType } from "../../api/object-types";
 import { currenciesApi, type Currency } from "../../api/currencies";
 import { locationOptionsApi, type LocationOption } from "../../api/location-options";
 import { FormDropdown, FormAddButton, FormTabSwitcher } from "@repo/ui";
-import { HouseForm as UnitLayoutInlineForm } from "./HouseForm";
+import { HouseForm } from "./HouseForm";
+import { HouseInformationCard } from "./HouseInformationCard";
+import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { useFormDraft } from "../../hooks/useFormDraft";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { PlanUploadCard } from "../../components/PlanUploadCard";
+import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
@@ -24,14 +27,22 @@ const TABS: { key: TabKey; label: string }[] = [
     { key: "commercial", label: "Commercial" },
     { key: "location", label: "Location" },
     { key: "properties", label: "General Plans" },
-    { key: "unitLayouts", label: "Unit Layouts" },
-    { key: "payments", label: "Payment Methods" },
-    { key: "options", label: "Options" },
-    { key: "stock", label: "Stock" },
 ];
 
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
+
+function formatPriceValue(value: number) {
+    return value.toLocaleString();
+}
+
+function formatPricePreview(prices: Record<string, number> | undefined) {
+    if (!prices || Object.keys(prices).length === 0) return "No price";
+
+    const [currency, amount] = Object.entries(prices)[0] || [];
+    if (!currency || amount === undefined) return "No price";
+    return `${currency} ${formatPriceValue(Number(amount))}`;
+}
 
 const DRAFT_KEY = "treva-object-create-draft";
 
@@ -44,10 +55,6 @@ function normalizePrimaryTab(tab?: string): TabKey {
         case "commercial":
         case "location":
         case "properties":
-        case "payments":
-        case "options":
-        case "stock":
-        case "unitLayouts":
             return tab;
         default:
             return "basic";
@@ -103,6 +110,8 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const { showError, showSuccess } = useMessageCenter();
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
     const [showHouseForm, setShowHouseForm] = useState(false);
+    const [editingHouseId, setEditingHouseId] = useState<string | null>(null);
+    const [previewHouseId, setPreviewHouseId] = useState<string | null>(null);
     const [docUploading, setDocUploading] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const coverImageInputRef = useRef<HTMLInputElement>(null);
@@ -113,6 +122,14 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [showPlanUpload, setShowPlanUpload] = useState(false);
     const [pendingPlanName, setPendingPlanName] = useState("");
     const [pendingPlanFile, setPendingPlanFile] = useState<File | null>(null);
+    const [draftDocuments, setDraftDocuments] = useState<CategoryDocument[]>([]);
+    const [showUnitLayoutList, setShowUnitLayoutList] = useState(false);
+    const [showUnitLayoutForm, setShowUnitLayoutForm] = useState(false);
+    const [editingUnitLayoutId, setEditingUnitLayoutId] = useState<string | null>(null);
+    const [activeUnitLayoutTab, setActiveUnitLayoutTab] = useState<"Active" | "Archive">("Active");
+    const [selectedManagementCard, setSelectedManagementCard] = useState<"properties" | "payments" | "options" | "stock" | null>(null);
+    const [selectedPostPlanCard, setSelectedPostPlanCard] = useState<"grid" | "property-layouts" | "floor-plans" | "facades" | null>("grid");
+    const [showPostPlanCards, setShowPostPlanCards] = useState(false);
 
     const { state: draftState, setState: setDraftState, clearDraft } = useFormDraft({
         key: DRAFT_KEY,
@@ -141,13 +158,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     });
 
     const categories = Array.isArray(categoriesResponse?.data) ? categoriesResponse.data : [];
-
-    const { data: objectTypesResponse } = useQuery({
-        queryKey: ["object-types"],
-        queryFn: () => objectTypesApi.getAll(),
-    });
-
-    const objectTypes: ObjectType[] = Array.isArray(objectTypesResponse?.data) ? objectTypesResponse.data : [];
 
     const { data: currenciesResponse } = useQuery({
         queryKey: ["currencies"],
@@ -194,33 +204,53 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const category = useMemo(() => categoryRes?.data, [categoryRes]);
     const documents: CategoryDocument[] = category?.documents || [];
+    const generalPlanDocuments = createdSlug ? (documents.length > 0 ? documents : draftDocuments) : draftDocuments;
 
-    const { data: layoutsRes } = useQuery({
-        queryKey: ["unit-layouts", createdSlug],
-        queryFn: () => unitLayoutsApi.getAll({ categorySlug: createdSlug! }),
+    const { data: housesRes } = useQuery({
+        queryKey: ["houses", createdSlug],
+        queryFn: () => housesApi.getAll({ categorySlug: createdSlug! }),
         enabled: !!createdSlug,
     });
 
-    const allHouses: UnitLayout[] = layoutsRes?.data?.data || [];
+    const allHouses: House[] = housesRes?.data?.data || [];
     const filteredHouses = activeHouseTab === "Active"
         ? allHouses.filter((h) => !h.archived)
         : allHouses.filter((h) => h.archived);
+    const previewHouse = allHouses.find((house) => house.id === previewHouseId) || null;
+
+    const { data: unitLayoutsRes } = useQuery({
+        queryKey: ["unit-layouts", createdSlug, previewHouseId],
+        queryFn: () => unitLayoutsApi.getAll({ categorySlug: createdSlug!, houseId: previewHouseId!, limit: 100 }),
+        enabled: !!createdSlug && !!previewHouseId,
+    });
+
+    const allUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
+    const filteredUnitLayouts = activeUnitLayoutTab === "Active"
+        ? allUnitLayouts.filter((layout) => !layout.archived)
+        : allUnitLayouts.filter((layout) => !!layout.archived);
+
+    useEffect(() => {
+        setShowUnitLayoutList(false);
+        setShowUnitLayoutForm(false);
+        setEditingUnitLayoutId(null);
+        setActiveUnitLayoutTab("Active");
+    }, [previewHouseId]);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const optionalText = (value: string | undefined) => {
+        const trimmed = value?.trim();
+        return trimmed ? trimmed : undefined;
+    };
 
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
-        if (!formData.objectType) newErrors.objectType = "Object type is required";
         if (!(formData.name || "").trim()) newErrors.name = "Name is required";
         if (!(formData.title || "").trim()) newErrors.title = "Title is required";
-        if (!formData.currency) newErrors.currency = "Currency is required";
-        if (!formData.region.trim()) newErrors.region = "Region is required";
-        if (!formData.area.trim()) newErrors.area = "Area is required";
-        if (!formData.city.trim()) newErrors.city = "City is required";
-        if (!formData.developerBrand.trim()) newErrors.developerBrand = "Developer brand is required";
-        if (!formData.website.trim()) newErrors.website = "Website is required";
-        if (!formData.salesDepartment.trim()) newErrors.salesDepartment = "Sales department is required";
         setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) {
+            showError({ title: "Missing required fields", description: "Name and Title are required." });
+            return false;
+        }
         return Object.keys(newErrors).length === 0;
     };
 
@@ -234,9 +264,51 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         }
     };
 
+    const validateStep = (tab: "basic" | "commercial") => {
+        const newErrors: Record<string, string> = {};
+
+        if (tab === "basic") {
+            if (!(formData.name || "").trim()) newErrors.name = "Name is required";
+            if (!(formData.title || "").trim()) newErrors.title = "Title is required";
+        }
+
+        setErrors((prev) => ({ ...prev, ...newErrors }));
+        if (Object.keys(newErrors).length > 0) {
+            showError({ title: "Missing required fields", description: "Name and Title are required." });
+        }
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleTabChange = (nextTab: TabKey) => {
+        if (nextTab === "basic") {
+            setActiveTab(nextTab);
+            return;
+        }
+
+        if (!validateStep("basic")) return;
+        setActiveTab(nextTab);
+    };
+
+    const handleBasicNext = () => {
+        if (!validateStep("basic")) return;
+        setActiveTab("commercial");
+    };
+
+    const handleCommercialNext = () => {
+        if (!validateStep("commercial")) return;
+        setActiveTab("location");
+    };
+
+    const handleLocationNext = () => {
+        if (!validate()) return;
+        setActiveTab("properties");
+        setSelectedManagementCard(null);
+        setSelectedPostPlanCard("grid");
+        setShowPostPlanCards(false);
+    };
+
     const createMutation = useMutation({
         mutationFn: () => {
-            const selectedType = objectTypes.find((t) => t.id === formData.objectType);
             const slugSource = formData.title || formData.name;
             const finalSlug = formData.slug || `${slugSource
                 ? slugSource.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
@@ -246,18 +318,19 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 name: formData.name || "untitled",
                 slug: finalSlug,
                 type: "object",
-                objectType: selectedType?.title || formData.objectType,
+                objectType: formData.objectType?.trim() || undefined,
                 propertyName: formData.name || formData.title,
-                currency: formData.currency,
-                region: formData.region,
-                area: formData.area,
-                city: formData.city,
-                locationGoogleMapsUrl: formData.locationGoogleMapsUrl || undefined,
-                locationTitle: formData.locationTitle || undefined,
-                locationUrl: formData.locationUrl || undefined,
-                developerBrand: formData.developerBrand,
-                website: formData.website,
-                salesDepartment: formData.salesDepartment,
+                currency: optionalText(formData.currency) || undefined,
+                region: optionalText(formData.region) || undefined,
+                area: optionalText(formData.area) || undefined,
+                city: optionalText(formData.city) || undefined,
+                locationGoogleMapsUrl: optionalText(formData.locationGoogleMapsUrl) || undefined,
+                locationTitle: optionalText(formData.locationTitle) || undefined,
+                locationUrl: optionalText(formData.locationUrl) || undefined,
+                developerBrand: optionalText(formData.developerBrand) || undefined,
+                website: optionalText(formData.website) || undefined,
+                salesDepartment: optionalText(formData.salesDepartment) || undefined,
+                documents: draftDocuments,
                 fedLaw214: formData.fedLaw214,
                 image: formData.image || undefined,
                 coverImage: formData.coverImage || undefined,
@@ -269,7 +342,10 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             if (slug) {
                 setCreatedSlug(slug);
                 setActiveTab("properties");
-                showSuccess({ title: "Object created" });
+                setSelectedManagementCard(null);
+                setSelectedPostPlanCard("grid");
+                setShowPostPlanCards(true);
+                showSuccess({ title: "Object saved" });
                 clearDraft();
             }
         },
@@ -280,9 +356,67 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const archiveHouseMutation = useMutation({
         mutationFn: ({ id, archived }: { id: string; archived: boolean }) =>
-            unitLayoutsApi.update(id, { archived }),
+            housesApi.update(id, { archived }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug] });
+            queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+        },
+    });
+
+    const deleteHouseMutation = useMutation({
+        mutationFn: (houseId: string) => housesApi.delete(houseId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+        },
+    });
+
+    const duplicateHouseMutation = useMutation({
+        mutationFn: (house: House) => housesApi.create(buildHouseDuplicatePayload(house)),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+        },
+    });
+
+    const deleteUnitLayoutMutation = useMutation({
+        mutationFn: (id: string) => unitLayoutsApi.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug, previewHouseId] });
+            queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+            showSuccess({ title: "Unit layout deleted" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be deleted",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const archiveUnitLayoutMutation = useMutation({
+        mutationFn: ({ id, archived }: { id: string; archived: boolean }) => unitLayoutsApi.update(id, { archived }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug, previewHouseId] });
+            showSuccess({ title: "Unit layout updated" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be updated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const duplicateUnitLayoutMutation = useMutation({
+        mutationFn: (layout: UnitLayout) => unitLayoutsApi.create(buildUnitLayoutDuplicatePayload(layout)),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug, previewHouseId] });
+            queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+            showSuccess({ title: "Unit layout duplicated" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit layout could not be duplicated",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
         },
     });
 
@@ -295,12 +429,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             queryClient.invalidateQueries({ queryKey: ["category", createdSlug] });
         },
     });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) return;
-        createMutation.mutate();
-    };
 
     const handleImageUpload = async (file: File) => {
         const items = [file];
@@ -382,7 +510,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 url: res.data.url,
                 name: pendingPlanName.trim() || getDefaultPlanName(pendingPlanFile.name),
             };
-            updateDocsMutation.mutate([...documents, nextDoc]);
+            if (createdSlug) {
+                updateDocsMutation.mutate([...documents, nextDoc]);
+            } else {
+                setDraftDocuments((current) => [...current, nextDoc]);
+            }
             resetPlanUpload();
         } catch {
             // silent
@@ -392,8 +524,188 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     };
 
     const handleRemoveDoc = (index: number) => {
-        updateDocsMutation.mutate(documents.filter((_, i) => i !== index));
+        if (createdSlug) {
+            updateDocsMutation.mutate(documents.filter((_, i) => i !== index));
+            return;
+        }
+        setDraftDocuments((current) => current.filter((_, i) => i !== index));
     };
+
+    const managementCards = [
+        { key: "properties" as const, label: "Properties", icon: "/images/inv-dashboard/inv-offplan/properties.svg" },
+        { key: "payments" as const, label: "Payment methods", icon: "/images/inv-dashboard/inv-offplan/payment.svg" },
+        { key: "options" as const, label: "Options", icon: "/images/inv-dashboard/inv-offplan/options.svg" },
+        { key: "stock" as const, label: "Stock", icon: "/images/inv-dashboard/inv-offplan/stock.svg" },
+    ];
+
+    const postPlanCards = [
+        { key: "grid" as const, label: "Grid", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
+        { key: "property-layouts" as const, label: "Property layouts", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
+        { key: "floor-plans" as const, label: "Floor plans", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
+        { key: "facades" as const, label: "Facades", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
+    ];
+
+    const unitLayoutsPanel = !createdSlug ? null : (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <FormTabSwitcher
+                    tabs={[{ id: "Active", label: "Active houses" }, { id: "Archive", label: "Archive" }]}
+                    activeTab={activeHouseTab}
+                    onChange={(id) => setActiveHouseTab(id as "Active" | "Archive")}
+                    size="md"
+                />
+                <FormAddButton
+                    icon={<span className="mr-0.5 text-base font-light">+</span>}
+                    onClick={() => {
+                        setPreviewHouseId(null);
+                        setEditingHouseId(null);
+                        setShowHouseForm(true);
+                    }}
+                >
+                    Add House
+                </FormAddButton>
+            </div>
+
+            {(showHouseForm || editingHouseId) && (
+                <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                    <HouseForm
+                        embedded
+                        inline
+                        categorySlug={createdSlug}
+                        houseId={editingHouseId ?? undefined}
+                        key={editingHouseId ?? "new-house"}
+                        onSuccess={() => {
+                            const editedHouseId = editingHouseId;
+                            setShowHouseForm(false);
+                            setPreviewHouseId(editedHouseId ?? null);
+                            setEditingHouseId(null);
+                            queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+                        }}
+                        onCancel={() => {
+                            setShowHouseForm(false);
+                            setPreviewHouseId(editingHouseId ?? previewHouseId);
+                            setEditingHouseId(null);
+                        }}
+                    />
+                </div>
+            )}
+
+            <div className="space-y-3">
+                <div>
+                    <h4 className="text-sm font-semibold text-[#1A1A1A]">House List</h4>
+                    <p className="mt-1 text-xs text-[#808191]">Only the house list is shown here.</p>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                    {filteredHouses.length === 0 ? (
+                        <div className="w-full rounded-[24px] border border-[#E9ECF2] bg-white px-6 py-12 text-center text-sm text-[#999]">
+                            {activeHouseTab === "Active" ? "No active houses yet. Click 'Add House' to create one." : "No archived houses"}
+                        </div>
+                    ) : (
+                        filteredHouses.map((house) => {
+                            const imageUrl = house.mainImage?.url || house.gallery?.[0]?.url;
+
+                            return (
+                                <div
+                                    key={house.id}
+                                    className="group w-[240px] shrink-0 rounded-[16px] border border-[#EBEBEB] bg-white p-2 text-left transition-colors hover:border-[#D6DAE3]"
+                                >
+                                    <div
+                                        className="relative h-[186px] w-full cursor-pointer overflow-hidden rounded-[12px] bg-[#F3F4F6]"
+                                        onClick={() => {
+                                            setPreviewHouseId(house.id);
+                                            setShowHouseForm(false);
+                                            setEditingHouseId(null);
+                                            setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+                                        }}
+                                    >
+                                        {imageUrl ? (
+                                            <img
+                                                src={imageUrl}
+                                                alt={house.title}
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                loading="lazy"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">No Image</div>
+                                        )}
+
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                archiveHouseMutation.mutate({ id: house.id, archived: !house.archived });
+                                            }}
+                                            disabled={archiveHouseMutation.isPending}
+                                            aria-label={house.archived ? "Restore" : "Archive"}
+                                            title={house.archived ? "Restore" : "Archive"}
+                                            className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
+                                        >
+                                            {house.archived ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                                </svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                                </svg>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                deleteHouseMutation.mutate(house.id);
+                                            }}
+                                            aria-label="Delete"
+                                            title="Delete"
+                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div className="px-1 py-3">
+                                        <p className="truncate text-sm font-semibold text-[#1A1A1A]">{house.title}</p>
+                                    </div>
+
+                                    <div className="flex gap-1 px-1 pb-1">
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setPreviewHouseId(null);
+                                                duplicateHouseMutation.mutate(house);
+                                            }}
+                                            disabled={duplicateHouseMutation.isPending}
+                                            className="flex-1 cursor-pointer rounded-xl border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                        >
+                                            Copy
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setPreviewHouseId(house.id);
+                                                setShowHouseForm(false);
+                                                setEditingHouseId(null);
+                                            }}
+                                            className="flex-1 cursor-pointer rounded-xl bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
+                                        >
+                                            View
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 
     const formContent = (
         <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
@@ -403,7 +715,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                         <button
                             key={tab.key}
                             type="button"
-                            onClick={() => setActiveTab(tab.key)}
+                            onClick={() => handleTabChange(tab.key)}
                             className={`relative cursor-pointer rounded-2xl px-4 py-2.5 text-sm font-medium transition-colors ${
                                 activeTab === tab.key
                                     ? "bg-[#4E525D] text-white shadow-sm"
@@ -418,7 +730,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
             {/* Tab: Basic Info */}
             {activeTab === "basic" && (
-                <form onSubmit={handleSubmit} className="max-w-5xl">
+                <form onSubmit={(e) => { e.preventDefault(); handleBasicNext(); }} className="max-w-5xl">
                     <div className="space-y-5">
                         <SectionBlock title="Identity" description="Core object information and listing basics.">
                             <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
@@ -497,7 +809,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 onChange={(e) => { updateFormData("name", e.target.value); clearError("name"); }}
                                                 placeholder="Sea Breeze"
                                             />
-                                            {errors.name && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.name}</p>}
                                         </div>
                                         <div>
                                             <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Title *</label>
@@ -507,25 +818,21 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 onChange={(e) => { updateFormData("title", e.target.value); clearError("title"); }}
                                                 placeholder="Sea Breeze Residence"
                                             />
-                                            {errors.title && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.title}</p>}
                                         </div>
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Object Type</label>
+                                        <input
+                                            className={inputClass}
+                                            value={formData.objectType}
+                                            onChange={(e) => updateFormData("objectType", e.target.value)}
+                                            placeholder="Residential"
+                                        />
                                     </div>
                                     <div className="grid gap-4 lg:grid-cols-2">
                                         <div>
                                             <FormDropdown
-                                                label="Type *"
-                                                value={formData.objectType}
-                                                options={objectTypes.map((t) => ({ id: t.id, label: t.title }))}
-                                                placeholder="Select type"
-                                                onChange={(id) => { updateFormData("objectType", id); clearError("objectType"); }}
-                                                onCreateClick={() => navigate("/dashboard/offplan/object-types")}
-                                                createLabel="Create object type"
-                                            />
-                                            {errors.objectType && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.objectType}</p>}
-                                        </div>
-                                        <div>
-                                            <FormDropdown
-                                                label="Currency *"
+                                                label="Currency"
                                                 value={formData.currency}
                                                 options={currencies.map((c) => ({ id: c.value, label: c.title }))}
                                                 placeholder="Select currency"
@@ -533,13 +840,21 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 onCreateClick={() => navigate("/dashboard/offplan/currencies")}
                                                 createLabel="Create currency"
                                             />
-                                            {errors.currency && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.currency}</p>}
+                                        </div>
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area</label>
+                                            <input
+                                                className={inputClass}
+                                                value={formData.area}
+                                                onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }}
+                                                placeholder="2500 m²"
+                                            />
                                         </div>
                                     </div>
-                                    <div className="grid gap-4 lg:grid-cols-3">
+                                    <div className="grid gap-4 lg:grid-cols-2">
                                         <div>
                                             <FormDropdown
-                                                label="City *"
+                                                label="City"
                                                 value={formData.city}
                                                 options={toLocationDropdownOptions("city", formData.city)}
                                                 placeholder="Select city"
@@ -552,29 +867,17 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 onCreateClick={() => navigate("/dashboard/resale/location-options")}
                                                 createLabel="Create city"
                                             />
-                                            {errors.city && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.city}</p>}
                                         </div>
                                         <div>
                                             <FormDropdown
-                                                label="Region *"
+                                                label="Region"
                                                 value={formData.region}
                                                 options={toLocationDropdownOptions("region", formData.region, formData.city)}
-                                                placeholder={formData.city ? "Select region" : "Select city first"}
+                                                placeholder="Select region"
                                                 onChange={(id) => { updateFormData("region", id); clearError("region"); }}
                                                 onCreateClick={() => navigate("/dashboard/resale/location-options")}
                                                 createLabel="Create region"
                                             />
-                                            {errors.region && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.region}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area *</label>
-                                            <input
-                                                className={inputClass}
-                                                value={formData.area}
-                                                onChange={(e) => { updateFormData("area", e.target.value); clearError("area"); }}
-                                                placeholder="2500 m²"
-                                            />
-                                            {errors.area && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.area}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -584,63 +887,55 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
                     <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
                         <button
-                            type="submit"
-                            disabled={createMutation.isPending}
-                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {createMutation.isPending ? "Creating..." : "Create Object"}
-                        </button>
-                        <button
                             type="button"
                             onClick={() => navigate("/dashboard/offplan/objects")}
                             className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
                         >
                             Cancel
                         </button>
+                        <button
+                            type="submit"
+                            disabled={createMutation.isPending}
+                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Next
+                        </button>
                     </div>
 
-                    {createMutation.isError && (
-                        <div className="mt-4 rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
-                            {(createMutation.error as Error)?.message || "Failed to create object"}
-                        </div>
-                    )}
                 </form>
             )}
 
             {activeTab === "commercial" && (
-                <form onSubmit={handleSubmit} className="max-w-5xl">
+                <form onSubmit={(e) => { e.preventDefault(); handleCommercialNext(); }} className="max-w-5xl">
                     <div className="space-y-5">
                         <SectionBlock title="Commercial" description="Developer, sales and infrastructure details shown for the project.">
                             <div className="grid gap-5 lg:grid-cols-2">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Developer Brand *</label>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Developer Brand</label>
                                     <input
                                         className={inputClass}
                                         value={formData.developerBrand}
                                         onChange={(e) => { updateFormData("developerBrand", e.target.value); clearError("developerBrand"); }}
                                         placeholder="ABC Development"
                                     />
-                                    {errors.developerBrand && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.developerBrand}</p>}
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Website *</label>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Website</label>
                                     <input
                                         className={inputClass}
                                         value={formData.website}
                                         onChange={(e) => { updateFormData("website", e.target.value); clearError("website"); }}
                                         placeholder="https://example.com"
                                     />
-                                    {errors.website && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.website}</p>}
                                 </div>
                                 <div className="lg:col-span-3">
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Sales Department *</label>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Sales Department</label>
                                     <input
                                         className={inputClass}
                                         value={formData.salesDepartment}
                                         onChange={(e) => { updateFormData("salesDepartment", e.target.value); clearError("salesDepartment"); }}
                                         placeholder="sales@example.com"
                                     />
-                                    {errors.salesDepartment && <p className="mt-1 text-[12px] text-[#C3362B]">{errors.salesDepartment}</p>}
                                 </div>
                             </div>
                         </SectionBlock>
@@ -672,31 +967,26 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
                     <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
                         <button
+                            type="button"
+                            onClick={() => setActiveTab("basic")}
+                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                        >
+                            Back
+                        </button>
+                        <button
                             type="submit"
                             disabled={createMutation.isPending}
                             className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            {createMutation.isPending ? "Creating..." : "Create Object"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => navigate("/dashboard/offplan/objects")}
-                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
-                        >
-                            Cancel
+                            Next
                         </button>
                     </div>
 
-                    {createMutation.isError && (
-                        <div className="mt-4 rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
-                            {(createMutation.error as Error)?.message || "Failed to create object"}
-                        </div>
-                    )}
                 </form>
             )}
 
             {activeTab === "location" && (
-                <form onSubmit={handleSubmit} className="max-w-5xl">
+                <form onSubmit={(e) => { e.preventDefault(); handleLocationNext(); }} className="max-w-5xl">
                     <div className="space-y-5">
                         <SectionBlock title="Location" description="Map labels, address copy and embed links for the object.">
                             <div className="grid gap-5 lg:grid-cols-3">
@@ -733,43 +1023,27 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
                     <div className="mt-6 flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
                         <button
-                            type="submit"
-                            disabled={createMutation.isPending}
-                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {createMutation.isPending ? "Creating..." : "Create Object"}
-                        </button>
-                        <button
                             type="button"
-                            onClick={() => navigate("/dashboard/offplan/objects")}
+                            onClick={() => setActiveTab("commercial")}
                             className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
                         >
-                            Cancel
+                            Back
+                        </button>
+                        <button
+                            type="submit"
+                            className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Next
                         </button>
                     </div>
 
-                    {createMutation.isError && (
-                        <div className="mt-4 rounded-xl bg-red-50 p-3 text-center text-sm text-[#C3362B]">
-                            {(createMutation.error as Error)?.message || "Failed to create object"}
-                        </div>
-                    )}
                 </form>
             )}
 
             {/* Tab: Properties */}
             {activeTab === "properties" && (
                 <div className="max-w-5xl space-y-5">
-                    {!createdSlug ? (
-                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                            <div className="flex flex-col items-center justify-center text-center">
-                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
-                                    <img src="/images/inv-dashboard/inv-offplan/options.svg" alt="" className="w-8 h-8 opacity-50" />
-                                </div>
-                                <p className="text-sm font-medium text-[#667085]">General Plans section is ready</p>
-                                <p className="text-xs text-[#999] mt-1">Save the object when you are ready to start adding plans and property data.</p>
-                            </div>
-                        </div>
-                    ) : (
+                    {!showPostPlanCards ? (
                         <div className="space-y-5">
                             {/* General Plans */}
                             <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -779,10 +1053,10 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         <p className="mt-1 text-xs leading-5 text-[#808191]">Upload master plans and documents</p>
                                     </div>
                                 </div>
-                                {documents.length > 0 ? (
+                                {generalPlanDocuments.length > 0 ? (
                                     <div>
                                         <div className="space-y-2 mb-4">
-                                            {documents.map((doc, idx) => (
+                                            {generalPlanDocuments.map((doc, idx) => (
                                                 <div key={idx} className="flex items-center justify-between rounded-xl border border-[#ECEEF2] px-3 py-2.5 group">
                                                     <div className="flex items-center gap-2.5 min-w-0">
                                                         <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 rounded-lg" style={{ background: doc.type === "pdf" ? "#FEE2E2" : "#DBEAFE" }}>
@@ -855,6 +1129,317 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                     </div>
                                 )}
                             </div>
+                            <div className="flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab("location")}
+                                    className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                                >
+                                    Back
+                                </button>
+                                {createdSlug ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowPostPlanCards(true);
+                                            setSelectedManagementCard(null);
+                                            setSelectedPostPlanCard("grid");
+                                        }}
+                                        className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
+                                    >
+                                        Next
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => createMutation.mutate()}
+                                        disabled={createMutation.isPending}
+                                        className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        {createMutation.isPending ? "Saving..." : "Save"}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-5">
+                            {!previewHouse ? (
+                                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                    {managementCards.map((card) => {
+                                        const isActive = selectedManagementCard === card.key;
+                                        return (
+                                            <button
+                                                key={card.key}
+                                                type="button"
+                                                onClick={() => {
+                                                if (card.key !== "properties") return;
+                                                setSelectedManagementCard("properties");
+                                                setSelectedPostPlanCard("grid");
+                                                }}
+                                                className={`flex min-h-[120px] flex-col items-center justify-center rounded-[20px] border bg-[#F3F3F3] px-5 py-6 text-center transition-colors ${
+                                                    isActive ? "border-[#4E525D] bg-white" : "border-[#E4E4E4]"
+                                                }`}
+                                            >
+                                                <img src={card.icon} alt="" className="mb-4 h-12 w-12 object-contain" />
+                                                <span className="text-sm font-medium text-[#4E525D]">{card.label}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : null}
+
+                            {selectedManagementCard === "properties" ? (
+                                previewHouse ? (
+                                    showUnitLayoutList ? (
+                                        <div className="space-y-5">
+                                            <div className="flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowUnitLayoutList(false);
+                                                        setShowUnitLayoutForm(false);
+                                                        setEditingUnitLayoutId(null);
+                                                    }}
+                                                    className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                                                >
+                                                    Back
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-6 rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                                                <div className="flex items-center justify-between">
+                                                    <FormTabSwitcher
+                                                        tabs={[{ id: "Active", label: "Active unit layouts" }, { id: "Archive", label: "Archive" }]}
+                                                        activeTab={activeUnitLayoutTab}
+                                                        onChange={(id) => setActiveUnitLayoutTab(id as "Active" | "Archive")}
+                                                        size="md"
+                                                    />
+                                                    <FormAddButton
+                                                        icon={<span className="mr-0.5 text-base font-light">+</span>}
+                                                        onClick={() => {
+                                                            setEditingUnitLayoutId(null);
+                                                            setShowUnitLayoutForm(true);
+                                                        }}
+                                                    >
+                                                        Add Unit Layout
+                                                    </FormAddButton>
+                                                </div>
+
+                                                {(showUnitLayoutForm || editingUnitLayoutId) ? (
+                                                    <div className="rounded-[24px] border border-[#E9ECF2] bg-white p-5">
+                                                        <UnitLayoutInlineForm
+                                                            embedded
+                                                            inline
+                                                            categorySlug={createdSlug}
+                                                            parentHouseId={previewHouse.id}
+                                                            houseId={editingUnitLayoutId ?? undefined}
+                                                            key={editingUnitLayoutId ?? `new-${previewHouse.id}`}
+                                                            onSuccess={() => {
+                                                                setShowUnitLayoutForm(false);
+                                                                setEditingUnitLayoutId(null);
+                                                                queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug, previewHouseId] });
+                                                                queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ) : null}
+
+                                                {filteredUnitLayouts.length === 0 ? (
+                                                    <div className="rounded-[24px] border border-[#E9ECF2] bg-white px-6 py-12 text-center text-sm text-[#999]">
+                                                        {activeUnitLayoutTab === "Active"
+                                                            ? "No active unit layouts yet. Click 'Add Unit Layout' to create one."
+                                                            : "No archived unit layouts"}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-wrap gap-4">
+                                                        {filteredUnitLayouts.map((layout) => {
+                                                            const imageUrl = layout.mainImage?.url || layout.gallery?.[0]?.url;
+                                                            return (
+                                                                <div
+                                                                    key={layout.id}
+                                                                    className="group w-[312px] shrink-0 rounded-[20px] border border-[#EBEBEB] bg-white p-3 text-left transition-colors hover:border-[#D6DAE3]"
+                                                                >
+                                                                    <div
+                                                                        className="relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-[16px] bg-[#F8F9FB]"
+                                                                        onClick={() => {
+                                                                            setEditingUnitLayoutId(layout.id);
+                                                                            setShowUnitLayoutForm(true);
+                                                                            setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+                                                                        }}
+                                                                    >
+                                                                        {imageUrl ? (
+                                                                            <img
+                                                                                src={imageUrl}
+                                                                                alt={layout.title}
+                                                                                className="h-full w-full p-3 object-contain transition-transform duration-500 group-hover:scale-105"
+                                                                                loading="lazy"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">No Image</div>
+                                                                        )}
+
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(event) => {
+                                                                                event.stopPropagation();
+                                                                                archiveUnitLayoutMutation.mutate({ id: layout.id, archived: !layout.archived });
+                                                                            }}
+                                                                            disabled={archiveUnitLayoutMutation.isPending}
+                                                                            aria-label={layout.archived ? "Restore" : "Archive"}
+                                                                            title={layout.archived ? "Restore" : "Archive"}
+                                                                            className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
+                                                                        >
+                                                                            {layout.archived ? (
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                                                                </svg>
+                                                                            ) : (
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                                                                                </svg>
+                                                                            )}
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(event) => {
+                                                                                event.stopPropagation();
+                                                                                deleteUnitLayoutMutation.mutate(layout.id);
+                                                                            }}
+                                                                            aria-label="Delete"
+                                                                            title="Delete"
+                                                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                                                        >
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <div className="flex items-center justify-between gap-3 px-1 py-3">
+                                                                        <p className="truncate text-base font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices)}</p>
+                                                                        <p className="shrink-0 text-sm text-[#666666]">{layout.totalArea} m²</p>
+                                                                    </div>
+
+                                                                    <div className="flex gap-1 px-1 pb-1">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => duplicateUnitLayoutMutation.mutate(layout)}
+                                                                            disabled={duplicateUnitLayoutMutation.isPending}
+                                                                            className="flex-1 cursor-pointer rounded-xl border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                                                        >
+                                                                            Copy
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setEditingUnitLayoutId(layout.id);
+                                                                                setShowUnitLayoutForm(true);
+                                                                            }}
+                                                                            className="flex-1 cursor-pointer rounded-xl bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
+                                                                        >
+                                                                            Edit
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (showHouseForm || editingHouseId) ? (
+                                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                                            <HouseForm
+                                                embedded
+                                                inline
+                                                categorySlug={createdSlug}
+                                                houseId={editingHouseId ?? undefined}
+                                                key={editingHouseId ?? "preview-house"}
+                                                onSuccess={() => {
+                                                    const editedHouseId = editingHouseId;
+                                                    setShowHouseForm(false);
+                                                    setPreviewHouseId(editedHouseId ?? previewHouseId);
+                                                    setEditingHouseId(null);
+                                                    queryClient.invalidateQueries({ queryKey: ["houses", createdSlug] });
+                                                }}
+                                                onCancel={() => {
+                                                    setShowHouseForm(false);
+                                                    setEditingHouseId(null);
+                                                }}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-5">
+                                            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                                {postPlanCards.map((card) => {
+                                                    const isActive = card.key === selectedPostPlanCard;
+                                                    return (
+                                                        <div
+                                                            key={card.key}
+                                                            className={`rounded-[20px] border bg-white p-4 transition-colors ${
+                                                                isActive ? "border-[#4E525D]" : "border-[#E5E7EB]"
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-start justify-between gap-3">
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-[#1A1A1A]">{card.label}</p>
+                                                                    <p className="mt-1 text-sm text-[#808191]">Filling 0%</p>
+                                                                </div>
+                                                                <img src={card.icon} alt="" className="h-10 w-10 object-contain opacity-70" />
+                                                            </div>
+
+                                                            <div className="mt-5">
+                                                                {card.key === "grid" ? (
+                                                                    <div className="grid grid-cols-2 gap-2">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setSelectedPostPlanCard("grid");
+                                                                                setShowUnitLayoutList(true);
+                                                                                setShowUnitLayoutForm(false);
+                                                                                setEditingUnitLayoutId(null);
+                                                                            }}
+                                                                            className="rounded-full bg-[#EFEFF1] px-4 py-2 text-sm font-medium text-[#666]"
+                                                                        >
+                                                                            Edit
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="rounded-full bg-[#4E525D] px-4 py-2 text-sm font-medium text-white"
+                                                                        >
+                                                                            Upload File
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setSelectedPostPlanCard(card.key)}
+                                                                        className="w-full rounded-full bg-[#EFEFF1] px-4 py-2 text-sm font-medium text-[#666]"
+                                                                    >
+                                                                        Fill
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            <HouseInformationCard
+                                                house={previewHouse}
+                                                onCancel={() => setPreviewHouseId(null)}
+                                                onEdit={() => {
+                                                    setEditingHouseId(previewHouse.id);
+                                                    setShowHouseForm(true);
+                                                }}
+                                            />
+                                        </div>
+                                    )
+                                ) : (
+                                    unitLayoutsPanel
+                                )
+                            ) : null}
                         </div>
                     )}
                 </div>
@@ -938,90 +1523,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 </div>
             )}
 
-            {/* Tab: Unit Layouts */}
-            {activeTab === "unitLayouts" && (
-                <div className="max-w-5xl space-y-5">
-                    {!createdSlug ? (
-                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-10 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                            <div className="flex flex-col items-center justify-center text-center">
-                                <div className="w-14 h-14 rounded-full bg-[#F0F1F3] flex items-center justify-center mb-4">
-                                    <img src="/images/inv-dashboard/inv-offplan/stock.svg" alt="" className="w-8 h-8 opacity-50" />
-                                </div>
-                                <p className="text-sm font-medium text-[#667085]">Unit layouts section is ready</p>
-                                <p className="text-xs text-[#999] mt-1">You can switch here before saving. Add unit layouts after the object is created.</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                    <div className="flex items-center justify-between">
-                        <FormTabSwitcher
-                            tabs={[{ id: "Active", label: "Active unit layouts" }, { id: "Archive", label: "Archive" }]}
-                            activeTab={activeHouseTab}
-                            onChange={(id) => setActiveHouseTab(id as "Active" | "Archive")}
-                            size="md"
-                        />
-                        <FormAddButton
-                            icon={<span className="text-base font-light mr-0.5">+</span>}
-                            onClick={() => setShowHouseForm(true)}
-                        >
-                                Add Unit Layout
-                        </FormAddButton>
-                    </div>
-
-                    {showHouseForm && (
-                        <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                                <UnitLayoutInlineForm
-                                embedded
-                                inline
-                                categorySlug={createdSlug || undefined}
-                                onSuccess={() => {
-                                    setShowHouseForm(false);
-                                    queryClient.invalidateQueries({ queryKey: ["unit-layouts", createdSlug] });
-                                }}
-                            />
-                        </div>
-                    )}
-
-                    <div className="flex flex-wrap gap-4">
-                        {filteredHouses.length === 0 ? (
-                            <div className="w-full py-12 text-center text-[#999] text-sm">
-                                    {activeHouseTab === "Active" ? "No active unit layouts yet. Click 'Add Unit Layout' to create one." : "No archived unit layouts"}
-                            </div>
-                        ) : (
-                            filteredHouses.map((house) => {
-                                const imageUrl = house.mainImage?.url || house.gallery?.[0]?.url;
-                                return (
-                                    <div key={house.id} className="bg-white border border-[#EBEBEB] rounded-[16px] p-2 flex flex-col gap-2 w-[220px] shrink-0">
-                                        <div className="relative w-full h-[140px] rounded-[12px] overflow-hidden bg-[#F3F4F6]">
-                                            {imageUrl ? (
-                                                <img src={imageUrl} alt={house.title} className="w-full h-full object-cover" loading="lazy" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-[#999] text-xs">No Image</div>
-                                            )}
-                                        </div>
-                                        <div className="px-1 pb-1">
-                                            <p className="text-sm font-semibold text-[#1A1A1A] truncate">{house.title}</p>
-                                            <p className="text-xs text-[#999]">{house.totalArea} m² · {house.roomOption?.title || `${house.number || 0} rooms`}</p>
-                                        </div>
-                                        <div className="px-1 pb-1">
-                                            <button
-                                                type="button"
-                                                onClick={() => archiveHouseMutation.mutate({ id: house.id, archived: !house.archived })}
-                                                disabled={archiveHouseMutation.isPending}
-                                                className="w-full rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
-                                            >
-                                                {house.archived ? "Restore" : "Archive"}
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
-                        </>
-                    )}
-                </div>
-            )}
         </div>
     );
 

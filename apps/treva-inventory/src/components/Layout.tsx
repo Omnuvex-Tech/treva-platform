@@ -43,9 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <div className="flex h-screen bg-gray-900 text-white">
-            <aside className="w-64 border-r border-white/10 bg-gray-900 p-4">
-                <div className="mb-6 text-lg font-bold tracking-tight">
+        <div className="flex h-screen bg-[#F8F9FB] text-[#1A1A1A]">
+            <aside className="w-64 border-r border-[#E7E9EE] bg-white p-4">
+                <div className="mb-6 text-lg font-bold tracking-tight text-[#1A1A1A]">
                     Treva Inventory
                 </div>
                 <nav className="flex flex-col gap-1">
@@ -55,23 +55,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             to={item.path}
                             className={`rounded-lg px-3 py-2 text-sm transition-colors ${
                                 location.pathname === item.path
-                                    ? "bg-white/10 text-white"
-                                    : "text-white/85 hover:bg-white/5 hover:text-white"
+                                    ? "bg-[#EBEBEB] text-[#4E525D]"
+                                    : "text-[#666666] hover:bg-[#F4F5F6] hover:text-[#1A1A1A]"
                             }`}
                         >
                             <span className="mr-2">{item.icon}</span>
                             {item.label}
                         </Link>
                     ))}
-                    <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-white/40">Shared</div>
+                    <div className="mt-3 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-[#999999]">Shared</div>
                     {sharedItems.map((item) => (
                         <Link
                             key={item.path}
                             to={item.path}
                             className={`rounded-lg px-3 py-2 text-sm transition-colors ${
                                 location.pathname === item.path
-                                    ? "bg-white/10 text-white"
-                                    : "text-white/85 hover:bg-white/5 hover:text-white"
+                                    ? "bg-[#EBEBEB] text-[#4E525D]"
+                                    : "text-[#666666] hover:bg-[#F4F5F6] hover:text-[#1A1A1A]"
                             }`}
                         >
                             <span className="mr-2">{item.icon}</span>
@@ -81,10 +81,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <button
                         type="button"
                         onClick={() => setOffPlanOpen((v) => !v)}
-                        className="mt-3 mb-1 flex items-center justify-between px-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40"
+                        className="mt-3 mb-1 flex items-center justify-between px-3 text-left text-xs font-semibold uppercase tracking-wider text-[#999999]"
                     >
                         <span>Off-Plan</span>
-                        <span className="text-white/35">{offPlanOpen ? "▾" : "▸"}</span>
+                        <span className="text-[#B0B0B0]">{offPlanOpen ? "▾" : "▸"}</span>
                     </button>
                     {offPlanOpen &&
                         offPlanItems.map((item) => (
@@ -93,8 +93,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                                 to={item.path}
                                 className={`rounded-lg px-3 py-2 text-sm transition-colors ${
                                     location.pathname.startsWith(item.path)
-                                        ? "bg-white/10 text-white"
-                                        : "text-white/85 hover:bg-white/5 hover:text-white"
+                                        ? "bg-[#EBEBEB] text-[#4E525D]"
+                                        : "text-[#666666] hover:bg-[#F4F5F6] hover:text-[#1A1A1A]"
                                 }`}
                             >
                                 <span className="mr-2">{item.icon}</span>
@@ -105,10 +105,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <button
                         type="button"
                         onClick={() => setResaleOpen((v) => !v)}
-                        className="mt-3 mb-1 flex items-center justify-between px-3 text-left text-xs font-semibold uppercase tracking-wider text-white/40"
+                        className="mt-3 mb-1 flex items-center justify-between px-3 text-left text-xs font-semibold uppercase tracking-wider text-[#999999]"
                     >
                         <span>Resale</span>
-                        <span className="text-white/35">{resaleOpen ? "▾" : "▸"}</span>
+                        <span className="text-[#B0B0B0]">{resaleOpen ? "▾" : "▸"}</span>
                     </button>
                     {resaleOpen &&
                         resaleItems.map((item) => (
@@ -117,8 +117,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                                 to={item.path}
                                 className={`rounded-lg px-3 py-2 text-sm transition-colors ${
                                     location.pathname.startsWith(item.path)
-                                        ? "bg-white/10 text-white"
-                                        : "text-white/85 hover:bg-white/5 hover:text-white"
+                                        ? "bg-[#EBEBEB] text-[#4E525D]"
+                                        : "text-[#666666] hover:bg-[#F4F5F6] hover:text-[#1A1A1A]"
                                 }`}
                             >
                                 <span className="mr-2">{item.icon}</span>
@@ -126,35 +126,35 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             </Link>
                         ))}
                 </nav>
-                <div className="mt-auto border-t border-white/10 pt-4">
+                <div className="mt-auto border-t border-[#E7E9EE] pt-4">
                     <button
                         onClick={handleLogout}
-                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-white/85 hover:bg-white/5 hover:text-white"
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-[#666666] transition-colors hover:bg-[#F4F5F6] hover:text-[#1A1A1A]"
                     >
                         Logout
                     </button>
                 </div>
             </aside>
-            <main className="flex min-w-0 flex-1 flex-col bg-gray-900">
-                <header className="flex items-center justify-between border-b border-white/10 bg-white/5 px-5 py-3 backdrop-blur">
+            <main className="flex min-w-0 flex-1 flex-col bg-[#F8F9FB]">
+                <header className="flex items-center justify-between border-b border-[#E7E9EE] bg-white px-5 py-3">
                     <div>
-                        <div className="text-sm font-semibold">
+                        <div className="text-sm font-semibold text-[#1A1A1A]">
                             {[...navItems, ...sharedItems, ...offPlanItems, ...resaleItems].find(
                                 (i) => location.pathname === i.path || (i.path !== "/" && location.pathname.startsWith(i.path))
                             )?.label ?? "Dashboard"}
                         </div>
-                        <div className="mt-0.5 text-xs text-white/60">
+                        <div className="mt-0.5 text-xs text-[#808191]">
                             Inventory management admin panel
                         </div>
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5"
+                        className="rounded-md border border-[#E7E9EE] px-3 py-1.5 text-xs text-[#666666] transition-colors hover:bg-[#F4F5F6] hover:text-[#1A1A1A]"
                     >
                         Logout
                     </button>
                 </header>
-                <section className="flex-1 overflow-auto bg-gray-900 p-5">{children}</section>
+                <section className="flex-1 overflow-auto bg-[#F8F9FB] p-5">{children}</section>
             </main>
         </div>
     );

@@ -19,6 +19,11 @@ export class UpdateCategoryDto {
   @IsString()
   slug?: string;
 
+  @ApiPropertyOptional({ example: 'Residential' })
+  @IsOptional()
+  @IsString()
+  objectType?: string;
+
   @ApiPropertyOptional({ example: 'active', enum: ['active', 'archive'] })
   @IsOptional()
   @IsString()
@@ -53,11 +58,6 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsNumber()
   soldCount?: number;
-
-  @ApiPropertyOptional({ example: 'Resident Complex' })
-  @IsOptional()
-  @IsString()
-  objectType?: string;
 
   @ApiPropertyOptional({ example: 'Panorama' })
   @IsOptional()

@@ -16,21 +16,11 @@ import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { IoClose } from "react-icons/io5";
 
-type Tab = "basic" | "area" | "location" | "documents" | "gallery" | "similar";
-
-type ApiError = {
-    response?: {
-        data?: {
-            message?: string | string[];
-        };
-    };
-    message?: string;
-};
+type Tab = "basic" | "area" | "documents" | "gallery" | "similar";
 
 const tabs: { key: Tab; label: string }[] = [
     { key: "basic", label: "Basic Info" },
     { key: "area", label: "Area & Pricing" },
-    { key: "location", label: "Location & Building" },
     { key: "documents", label: "Documents" },
     { key: "gallery", label: "Gallery" },
     { key: "similar", label: "Similar Apartments" },
@@ -54,6 +44,9 @@ const validateBasicTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.categoryId) errors.push({ field: "Category", message: "Basic Info / Category is required" });
     if (!form.floor && form.floor !== 0) errors.push({ field: "Floor", message: "Basic Info / Floor is required" });
     if (!form.number && form.number !== 0) errors.push({ field: "Number", message: "Basic Info / Number is required" });
+    if (!form.completionYear && form.completionYear !== 0) errors.push({ field: "Completion Year", message: "Basic Info / Completion Year is required" });
+    if (!form.numberOfFloors?.start && form.numberOfFloors?.start !== 0) errors.push({ field: "Floors From", message: "Basic Info / Floors From is required" });
+    if (!form.numberOfFloors?.end && form.numberOfFloors?.end !== 0) errors.push({ field: "Floors To", message: "Basic Info / Floors To is required" });
     return { valid: errors.length === 0, errors };
 };
 
@@ -63,17 +56,6 @@ const validateAreaTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.internalArea && form.internalArea !== 0) errors.push({ field: "Internal Area", message: "Area & Pricing / Internal Area is required" });
     if (!form.balconyArea && form.balconyArea !== 0) errors.push({ field: "Balcony Area", message: "Area & Pricing / Balcony Area is required" });
     if (!form.prices || Object.keys(form.prices).length === 0) errors.push({ field: "Prices", message: "Area & Pricing / At least one price is required" });
-    return { valid: errors.length === 0, errors };
-};
-
-const validateLocationTab = (form: CreateUnitLayoutData): TabValidation => {
-    const errors: ValidationError[] = [];
-    if (!form.location?.title?.trim()) errors.push({ field: "Location Title", message: "Location & Building / Location Title is required" });
-    if (!form.location?.url?.trim()) errors.push({ field: "Location URL", message: "Location & Building / Location URL is required" });
-    if (!form.location?.type?.trim()) errors.push({ field: "Location Type", message: "Location & Building / Location Type is required" });
-    if (!form.completionYear && form.completionYear !== 0) errors.push({ field: "Completion Year", message: "Location & Building / Completion Year is required" });
-    if (!form.numberOfFloors?.start && form.numberOfFloors?.start !== 0) errors.push({ field: "Floors From", message: "Location & Building / Floors From is required" });
-    if (!form.numberOfFloors?.end && form.numberOfFloors?.end !== 0) errors.push({ field: "Floors To", message: "Location & Building / Floors To is required" });
     return { valid: errors.length === 0, errors };
 };
 
@@ -102,7 +84,6 @@ const validateTab = (tab: Tab, form: CreateUnitLayoutData): TabValidation => {
     switch (tab) {
         case "basic": return validateBasicTab(form);
         case "area": return validateAreaTab(form);
-        case "location": return validateLocationTab(form);
         case "documents": return validateDocumentsTab(form);
         case "gallery": return validateGalleryTab(form);
         case "similar": return validateSimilarTab(form);
@@ -110,7 +91,7 @@ const validateTab = (tab: Tab, form: CreateUnitLayoutData): TabValidation => {
     }
 };
 
-const tabOrder: Tab[] = ["basic", "area", "location", "documents", "gallery", "similar"];
+const tabOrder: Tab[] = ["basic", "area", "documents", "gallery", "similar"];
 
 export function UnitLayoutForm() {
     const { id } = useParams<{ id: string }>();
@@ -139,7 +120,6 @@ export function UnitLayoutForm() {
         mainImage: undefined,
         gallery: [],
         documents: [],
-        location: { title: "", url: "", type: "" },
     });
 
     const { data: existing, isLoading: loadingExisting } = useQuery({
@@ -173,8 +153,6 @@ export function UnitLayoutForm() {
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [roomOptionOpen, setRoomOptionOpen] = useState(false);
-    const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
-    const [currentTabError, setCurrentTabError] = useState<ValidationError[]>([]);
     const [similarRecommendation, setSimilarRecommendation] = useState(false);
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const categoryRef = useRef<HTMLDivElement>(null);
@@ -210,7 +188,6 @@ export function UnitLayoutForm() {
                 mainImage: d.mainImage ?? undefined,
                 gallery: Array.isArray(d.gallery) ? d.gallery : [],
                 documents: Array.isArray(d.documents) ? d.documents : [],
-                location: d.location || { title: "", url: "", type: "apartment" },
                 roomOptionId: d.roomOptionId ?? undefined,
             });
         }
@@ -259,20 +236,20 @@ export function UnitLayoutForm() {
         }
 
         if (allErrors.length > 0) {
-            setValidationErrors(allErrors);
             const firstInvalidTab = tabOrder.find((tab) => !validateTab(tab, form).valid);
             if (firstInvalidTab) {
+                const firstTabErrors = validateTab(firstInvalidTab, form).errors;
                 setActiveTab(firstInvalidTab);
-                setCurrentTabError(validateTab(firstInvalidTab, form).errors);
+                showError({
+                    title: "Please fill required fields",
+                    description: firstTabErrors[0]?.message || "Please review the required fields.",
+                });
             }
             return;
         }
 
         const hasSimilar = form.similarApartmentIds && form.similarApartmentIds.length > 0;
         setSimilarRecommendation(!hasSimilar);
-
-        setValidationErrors([]);
-        setCurrentTabError([]);
 
         if (isEdit) {
             updateMutation.mutate(form);
@@ -288,14 +265,14 @@ export function UnitLayoutForm() {
         if (targetIndex > currentIndex) {
             const result = validateTab(activeTab, form);
             if (!result.valid) {
-                setCurrentTabError(result.errors);
-                setValidationErrors(result.errors);
+                showError({
+                    title: "Please fill required fields",
+                    description: result.errors[0]?.message || "Please review the required fields.",
+                });
                 return;
             }
         }
 
-        setCurrentTabError([]);
-        setValidationErrors([]);
         setActiveTab(tab);
     };
 
@@ -318,22 +295,6 @@ export function UnitLayoutForm() {
         value: CreateUnitLayoutData[K]
     ) => {
         setForm((prev) => ({ ...prev, [key]: value }));
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes(String(key).toLowerCase())));
-        }
-    };
-
-    const updateLocation = (
-        key: keyof NonNullable<CreateUnitLayoutData["location"]>,
-        value: string
-    ) => {
-        setForm((prev) => ({
-            ...prev,
-            location: { ...prev.location!, [key]: value },
-        }));
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes(String(key).toLowerCase())));
-        }
     };
 
     const updateFloors = (key: "start" | "end", value: number | undefined) => {
@@ -341,9 +302,6 @@ export function UnitLayoutForm() {
             ...prev,
             numberOfFloors: { ...prev.numberOfFloors, [key]: value },
         }));
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes(key)));
-        }
     };
 
     const handleMainImageUpload = (result: UploadResponse) => {
@@ -351,9 +309,6 @@ export function UnitLayoutForm() {
             ...prev,
             mainImage: { url: result.url, alt: result.alt },
         }));
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("main")));
-        }
     };
 
     const handleGalleryUpload = (result: UploadResponse) => {
@@ -361,9 +316,6 @@ export function UnitLayoutForm() {
             ...prev,
             gallery: [...(prev.gallery || []), { url: result.url, alt: result.alt }],
         }));
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("gallery")));
-        }
     };
 
     const removeGalleryImage = (index: number) => {
@@ -381,9 +333,6 @@ export function UnitLayoutForm() {
                 { type: "pdf", url: result.url },
             ],
         }));
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("document")));
-        }
     };
 
     const removeDocument = (index: number) => {
@@ -405,9 +354,6 @@ export function UnitLayoutForm() {
             };
         });
         setSimilarRecommendation(false);
-        if (currentTabError.length > 0) {
-            setCurrentTabError((prev) => prev.filter((e) => !e.field.toLowerCase().includes("similar")));
-        }
     };
 
     const removeSimilarApartment = (layoutId: string) => {
@@ -425,14 +371,6 @@ export function UnitLayoutForm() {
     const roomOptions = Array.isArray(roomOptionsResponse?.data)
         ? (roomOptionsResponse.data as RoomOption[])
         : [];
-    const mutationError =
-        createMutation.error || updateMutation.error;
-    const mutationErrorMessage = (() => {
-        const apiError = mutationError as ApiError | null;
-        const message = apiError?.response?.data?.message;
-        if (Array.isArray(message)) return message.join(", ");
-        return message || apiError?.message || "An error occurred";
-    })();
     const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
     if (isEdit && loadingExisting) {
@@ -456,9 +394,7 @@ export function UnitLayoutForm() {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4 flex gap-1 border-b border-gray-200">
                         {tabs.map((tab) => {
-                            const tabResult = validateTab(tab.key, form);
                             const isActive = activeTab === tab.key;
-                            const hasError = !tabResult.valid;
                             return (
                                 <button
                                     key={tab.key}
@@ -471,12 +407,6 @@ export function UnitLayoutForm() {
                                     }`}
                                 >
                                     {tab.label}
-                                    {hasError && !isActive && (
-                                        <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff6767] opacity-75"></span>
-                                            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff6767]"></span>
-                                        </span>
-                                    )}
                                 </button>
                             );
                         })}
@@ -668,6 +598,66 @@ export function UnitLayoutForm() {
                                             required
                                         />
                                     </div>
+                                    <div>
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                            Completion Year
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={form.completionYear || ""}
+                                            onChange={(e) =>
+                                                updateField(
+                                                    "completionYear",
+                                                    e.target.value ? parseInt(e.target.value) : 0
+                                                )
+                                            }
+                                            placeholder="2026"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
+                                            min={2020}
+                                            max={2100}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                            Floors From
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={form.numberOfFloors.start ?? ""}
+                                            onChange={(e) =>
+                                                updateFloors(
+                                                    "start",
+                                                    e.target.value ? parseInt(e.target.value) : 0
+                                                )
+                                            }
+                                            placeholder="1"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
+                                            min={1}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                            Floors To
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={form.numberOfFloors.end ?? ""}
+                                            onChange={(e) =>
+                                                updateFloors(
+                                                    "end",
+                                                    e.target.value ? parseInt(e.target.value) : 0
+                                                )
+                                            }
+                                            placeholder="15"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
+                                            min={1}
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -808,116 +798,6 @@ export function UnitLayoutForm() {
                                             </div>
                                         </>
                                     )}
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === "location" && (
-                            <div className="flex flex-col gap-4">
-                                <div>
-                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                        Location Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={form.location?.title || ""}
-                                        onChange={(e) =>
-                                            updateLocation("title", e.target.value)
-                                        }
-                                        placeholder="Sea Breeze Resort, Nardaran District"
-                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                        Location URL
-                                    </label>
-                                        <input
-                                            type="text"
-                                            value={form.location?.url || ""}
-                                            onChange={(e) =>
-                                                updateLocation("url", e.target.value)
-                                            }
-                                            placeholder="https://maps.google.com/..."
-                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                            required
-                                        />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                        Location Type
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={form.location?.type || ""}
-                                        onChange={(e) =>
-                                            updateLocation("type", e.target.value)
-                                        }
-                                        placeholder="For example: Apartment"
-                                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                        Completion Year
-                                    </label>
-                                        <input
-                                            type="number"
-                                            value={form.completionYear || ""}
-                                            onChange={(e) =>
-                                                updateField(
-                                                    "completionYear",
-                                                    e.target.value ? parseInt(e.target.value) : 0
-                                            )
-                                        }
-                                            placeholder="2026"
-                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                            min={2020}
-                                            max={2100}
-                                            required
-                                        />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                            Floors From
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={form.numberOfFloors.start ?? ""}
-                                            onChange={(e) =>
-                                                updateFloors(
-                                                    "start",
-                                                    e.target.value ? parseInt(e.target.value) : 0
-                                                )
-                                            }
-                                            placeholder="1"
-                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                            min={1}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                            Floors To
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={form.numberOfFloors.end ?? ""}
-                                            onChange={(e) =>
-                                                updateFloors(
-                                                    "end",
-                                                    e.target.value ? parseInt(e.target.value) : 0
-                                                )
-                                            }
-                                            placeholder="15"
-                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                            min={1}
-                                            required
-                                        />
-                                    </div>
                                 </div>
                             </div>
                         )}
@@ -1163,37 +1043,6 @@ export function UnitLayoutForm() {
                             </div>
                         )}
                     </div>
-
-                    {currentTabError.length > 0 && (
-                        <div className="mt-4 overflow-hidden rounded-xl border border-red-200 bg-red-50">
-                            <div className="flex items-center gap-2 border-b border-red-100 bg-red-50 px-4 py-2.5">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C3362B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="8" x2="12" y2="12"/>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                                </svg>
-                                <span className="text-sm font-medium text-[#C3362B]">
-                                    Please fill in all required fields
-                                </span>
-                            </div>
-                            <div className="px-4 py-3">
-                                <ul className="flex flex-col gap-1.5">
-                                    {currentTabError.map((err, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm text-[#C3362B]">
-                                            <span className="mt-1.5 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#C3362B]" />
-                                            {err.message}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {mutationError && (
-                        <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-center text-sm text-[#C3362B]">
-                            {mutationErrorMessage}
-                        </div>
-                    )}
 
                     {similarRecommendation && (
                         <div className="mt-4 overflow-hidden rounded-xl border border-yellow-200 bg-yellow-50">
