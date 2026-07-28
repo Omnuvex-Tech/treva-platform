@@ -234,7 +234,6 @@ model Owner {
 
   apartments  Apartment[]
   houses      House[]
-  unitLayouts UnitLayout[]
 }
 
 model Attribute {
