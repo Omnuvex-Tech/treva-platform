@@ -230,26 +230,6 @@ export class CreateHouseDto {
   @IsString()
   constructionStage?: string;
 
-  @ApiPropertyOptional({ example: { month: 1, year: 2024 } })
-  @IsOptional()
-  @IsObject()
-  startOfConstruction?: Record<string, number>;
-
-  @ApiPropertyOptional({ example: { month: 12, year: 2026 } })
-  @IsOptional()
-  @IsObject()
-  completionOfConstruction?: Record<string, number>;
-
-  @ApiPropertyOptional({ example: { month: 3, year: 2024 } })
-  @IsOptional()
-  @IsObject()
-  startOfSales?: Record<string, number>;
-
-  @ApiPropertyOptional({ example: { month: 6, year: 2027 } })
-  @IsOptional()
-  @IsObject()
-  endOfSales?: Record<string, number>;
-
   @ApiPropertyOptional({ example: '<p>House description</p>' })
   @IsOptional()
   @IsString()

@@ -13,10 +13,10 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
+export class NumberOfFloorsDto {
   @ApiProperty({ example: 3 })
   @IsNumber()
   @Min(1)
-  @Max(999)
   @Max(999)
   start: number;
 
