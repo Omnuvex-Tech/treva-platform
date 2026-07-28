@@ -136,7 +136,7 @@ export function HouseForm({
     const [isTagModalOpen, setIsTagModalOpen] = useState(false);
     const [tagDraft, setTagDraft] = useState<{ text: string; color: string; icon: HouseTagIcon }>({
         text: "",
-        color: TAG_COLOR_OPTIONS[0],
+        color: TAG_COLOR_OPTIONS[0] ?? "#06B6D4",
         icon: "star",
     });
 
@@ -240,7 +240,7 @@ export function HouseForm({
     const resetTagDraft = () => {
         setTagDraft({
             text: "",
-            color: TAG_COLOR_OPTIONS[0],
+            color: TAG_COLOR_OPTIONS[0] ?? "#06B6D4",
             icon: "star",
         });
     };

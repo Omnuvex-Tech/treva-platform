@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "node ../../scripts/run-with-env.cjs .env.development nest start --watch",
-    "build": "node ../../scripts/run-with-env.cjs .env.production nest build",
+    "build": "npm run prisma:generate && node ../../scripts/run-with-env.cjs .env.production nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node ../../scripts/run-with-env.cjs .env.production nest start",
     "start:dev": "node ../../scripts/run-with-env.cjs .env.development nest start --watch",

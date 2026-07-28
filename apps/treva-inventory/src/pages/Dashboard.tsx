@@ -391,7 +391,7 @@ export function Dashboard() {
         });
 
         const dataCoverage = [
-            { label: "Owners", value: offplanOwners.length, hint: `${unitLayouts.filter((h) => h.ownerId).length} linked to unit layouts` },
+            { label: "Owners", value: offplanOwners.length, hint: "off-plan owners list" },
             { label: "Attributes", value: offplanAttributes.length, hint: `${unitLayouts.reduce((sum, h) => sum + (h.attributeIds?.length || 0), 0)} assigned` },
             { label: "Room Options", value: offplanRoomOptions.length, hint: "offplan-specific options" },
             { label: "Currencies", value: offplanCurrencies.length, hint: `${housesWithPrice} unit layouts carry price data` },

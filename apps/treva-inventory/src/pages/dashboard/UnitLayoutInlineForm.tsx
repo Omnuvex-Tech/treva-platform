@@ -424,7 +424,7 @@ export function HouseForm({
             const firstInvalid = TABS.find((t) => allErrors[t.key]);
             if (firstInvalid) {
                 setActiveTab(firstInvalid.key);
-                showValidationToast(allErrors[firstInvalid.key]);
+                showValidationToast(allErrors[firstInvalid.key] ?? []);
             }
             return;
         }

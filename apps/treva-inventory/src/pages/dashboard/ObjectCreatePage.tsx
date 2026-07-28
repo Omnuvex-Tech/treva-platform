@@ -113,6 +113,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [editingHouseId, setEditingHouseId] = useState<string | null>(null);
     const [previewHouseId, setPreviewHouseId] = useState<string | null>(null);
     const [docUploading, setDocUploading] = useState(false);
+    const houseFormRef = useRef<HTMLDivElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const coverImageInputRef = useRef<HTMLInputElement>(null);
     const [imageUploading, setImageUploading] = useState(false);
@@ -567,11 +568,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             </div>
 
             {(showHouseForm || editingHouseId) && (
-                <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                <div ref={houseFormRef} className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                     <HouseForm
                         embedded
                         inline
-                        categorySlug={createdSlug}
+                        categorySlug={createdSlug || undefined}
                         houseId={editingHouseId ?? undefined}
                         key={editingHouseId ?? "new-house"}
                         onSuccess={() => {
@@ -1226,11 +1227,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 </div>
 
                                                 {(showUnitLayoutForm || editingUnitLayoutId) ? (
-                                                    <div className="rounded-[24px] border border-[#E9ECF2] bg-white p-5">
+                                                    <div ref={houseFormRef} className="rounded-[24px] border border-[#E9ECF2] bg-white p-5">
                                                         <UnitLayoutInlineForm
                                                             embedded
                                                             inline
-                                                            categorySlug={createdSlug}
+                                                            categorySlug={createdSlug || undefined}
                                                             parentHouseId={previewHouse.id}
                                                             houseId={editingUnitLayoutId ?? undefined}
                                                             key={editingUnitLayoutId ?? `new-${previewHouse.id}`}
@@ -1353,7 +1354,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                             <HouseForm
                                                 embedded
                                                 inline
-                                                categorySlug={createdSlug}
+                                                categorySlug={createdSlug || undefined}
                                                 houseId={editingHouseId ?? undefined}
                                                 key={editingHouseId ?? "preview-house"}
                                                 onSuccess={() => {
