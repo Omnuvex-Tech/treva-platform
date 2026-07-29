@@ -42,7 +42,6 @@ const validateBasicTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.name?.trim()) errors.push({ field: "Name", message: "Basic Info / Name is required" });
     if (!form.slug?.trim()) errors.push({ field: "Slug", message: "Basic Info / Slug is required" });
     if (!form.categoryId) errors.push({ field: "Category", message: "Basic Info / Category is required" });
-    if (!form.floor && form.floor !== 0) errors.push({ field: "Floor", message: "Basic Info / Floor is required" });
     if (!form.number && form.number !== 0) errors.push({ field: "Number", message: "Basic Info / Number is required" });
     if (!form.completionYear && form.completionYear !== 0) errors.push({ field: "Completion Year", message: "Basic Info / Completion Year is required" });
     if (!form.numberOfFloors?.start && form.numberOfFloors?.start !== 0) errors.push({ field: "Floors From", message: "Basic Info / Floors From is required" });
@@ -253,10 +252,18 @@ export function UnitLayoutForm() {
         const hasSimilar = form.similarApartmentIds && form.similarApartmentIds.length > 0;
         setSimilarRecommendation(!hasSimilar);
 
+        const submitForm: CreateUnitLayoutData = {
+            ...form,
+            floor:
+                (form.floor ?? undefined) ??
+                (form.numberOfFloors?.start ?? undefined) ??
+                1,
+        };
+
         if (isEdit) {
-            updateMutation.mutate(form);
+            updateMutation.mutate(submitForm);
         } else {
-            createMutation.mutate(form);
+            createMutation.mutate(submitForm);
         }
     };
 
