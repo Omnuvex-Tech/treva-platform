@@ -26,9 +26,6 @@ export const endpoints = {
         categories: "/categories",
     },
 
-    roomOptions: {
-        list: "/room-options",
-    },
 
     unitTypeOptions: {
         list: "/unit-type-options",

@@ -69,8 +69,6 @@ export interface House {
     location?: Location;
     categoryId: string;
     category: Category;
-    roomOptionId?: string;
-    roomOption?: { id: string; name: string; title: string; type: string };
     ownerId?: string;
     owner?: { id: string; firstName: string; lastName: string; phoneNumber: string };
     _count?: { unitLayouts: number };
@@ -144,7 +142,6 @@ export interface CreateHouseData {
     gallery?: GalleryImage[];
     documents?: Document[];
     location?: Location;
-    roomOptionId?: string;
     ownerId?: string;
     heatingTypeIds?: string[];
     attributeIds?: string[];
@@ -182,7 +179,6 @@ export interface HouseFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    roomOptionId?: string;
 }
 
 export interface UploadResponse {

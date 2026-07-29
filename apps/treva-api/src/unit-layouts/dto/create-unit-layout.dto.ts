@@ -134,11 +134,12 @@ export class CreateUnitLayoutDto {
   @Max(999)
   floor: number;
 
-  @ApiProperty({ example: 1 })
+  @ApiPropertyOptional({ example: 1 })
+  @IsOptional()
   @IsNumber()
   @Min(1)
   @Max(999)
-  number: number;
+  number?: number;
 
   @ApiPropertyOptional({ example: 'A' })
   @IsOptional()

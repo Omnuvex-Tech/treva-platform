@@ -180,6 +180,10 @@ export default function ApartmentCard() {
     return statusValue ? statusValue.charAt(0).toUpperCase() + statusValue.slice(1) : '';
   };
 
+  const brochureDoc = layout?.documents?.find(
+    (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
+  );
+
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
   const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
 
@@ -319,6 +323,11 @@ export default function ApartmentCard() {
               {/* Left Side: Blueprint Image Section */}
               <div className="apt-image-section">
                 <div className="apt-blueprint-box">
+                  {layout.statusOption?.value ? (
+                    <div className={`apt-status-left apt-badge ${statusClass(layout.statusOption.value)}`}>
+                      <span className="apt-badge__text">{formatStatus(layout.statusOption.value)}</span>
+                    </div>
+                  ) : null}
                   {layout.mainImage ? (
                     <img
                       src={getAssetUrl(layout.mainImage.url)}
@@ -341,14 +350,11 @@ export default function ApartmentCard() {
                   </h1>
 
                   <div className="apt-badge-row">
-                    <span className={`apt-badge ${statusClass(layout.statusOption?.value || '')}`}>
-                      <span className="apt-badge__text">{formatStatus(layout.statusOption?.value || '')}</span>
-                    </span>
-                    {layout.documents && layout.documents.length > 0 && layout.documents[0] && (
-                      <a href={getAssetUrl(layout.documents[0].url)} target="_blank" rel="noopener noreferrer" className="apt-badge badge-btn">
-                        <span className="apt-badge__text">PDF</span>
+                    {brochureDoc ? (
+                      <a href={getAssetUrl(brochureDoc.url)} className="apt-badge badge-btn" download>
+                        <span className="apt-badge__text">Brochure</span>
                       </a>
-                    )}
+                    ) : null}
                     <div className="apt-share-container" ref={shareRef}>
                       <button type="button" className="apt-share-btn" aria-label={t.share} onClick={() => setShareOpen((prev) => !prev)} aria-haspopup="listbox" aria-expanded={shareOpen}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

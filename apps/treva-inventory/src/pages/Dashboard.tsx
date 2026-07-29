@@ -8,13 +8,9 @@ import { ownersApi, type Owner } from "../api/owners";
 import { attributesApi, type Attribute } from "../api/attributes";
 import { requestsApi, type Request } from "../api/requests";
 import { locationOptionsApi, type LocationOption } from "../api/location-options";
-import { roomOptionsApi, type RoomOption } from "../api/room-options";
-import { currenciesApi, type Currency } from "../api/currencies";
 import { unitTypeOptionsApi, type UnitTypeOption } from "../api/unit-type-options";
 import { UnitLayoutsSection } from "./dashboard/UnitLayoutsSection";
-import { RoomOptionsSection } from "./dashboard/RoomOptionsSection";
 import { UnitTypeOptionsSection } from "./dashboard/UnitTypeOptionsSection";
-import { CurrenciesSection } from "./dashboard/CurrenciesSection";
 import { LocationOptionsSection } from "./dashboard/LocationOptionsSection";
 import { ResaleApartmentsCardSection } from "./dashboard/ResaleApartmentsCardSection";
 import { ApartmentForm } from "./resale/ApartmentForm";
@@ -30,18 +26,16 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 
 type MenuKey = "offplan" | "resale"
     | "unitLayouts"
-    | "roomOptions" | "unitTypes" | "currencies"
+    | "unitTypes"
     | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests" | "locationOptions"
     | "objects"
-    | "offplanLocationOptions" | "offplanOwners" | "offplanAttributes";
+    | "offplanLocationOptions" | "offplanAttributes";
 
 const pageNames: Record<MenuKey, string> = {
     offplan: "Off-plan",
     resale: "Resale",
     unitLayouts: "Unit Layouts",
-    roomOptions: "Room Options",
     unitTypes: "Unit Types",
-    currencies: "Currencies",
     apartments: "Apartments",
     apartmentTypes: "Apartment Types",
     owners: "Owners",
@@ -50,7 +44,6 @@ const pageNames: Record<MenuKey, string> = {
     locationOptions: "Location Options",
     objects: "Objects",
     offplanLocationOptions: "Location Options",
-    offplanOwners: "Owners",
     offplanAttributes: "Attributes",
 };
 
@@ -58,9 +51,7 @@ const pageSubtitles: Record<MenuKey, string> = {
     offplan: "Pre-construction project pipeline",
     resale: "Secondary market listings",
     unitLayouts: "Manage off-plan unit layouts",
-    roomOptions: "Manage room options",
     unitTypes: "Manage unit types",
-    currencies: "Manage currencies",
     apartments: "Manage resale apartments",
     apartmentTypes: "Manage apartment types",
     owners: "Manage apartment owners",
@@ -69,7 +60,6 @@ const pageSubtitles: Record<MenuKey, string> = {
     locationOptions: "Manage city and region options",
     objects: "Manage off-plan project objects",
     offplanLocationOptions: "Manage city and region options",
-    offplanOwners: "Manage property owners",
     offplanAttributes: "Manage property attributes",
 };
 
@@ -84,12 +74,10 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
             { key: "resale", label: "Dashboard", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
             { key: "apartments", label: "Listings", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg> },
             { key: "apartmentTypes", label: "Listing Types", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg> },
-            { key: "roomOptions", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
             { key: "attributes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg> },
             { key: "owners", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
             { key: "locationOptions", label: "Locations", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" /><circle cx="12" cy="11" r="2.5" /></svg> },
             { key: "requests", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg> },
-            { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
         ],
     },
     {
@@ -102,15 +90,13 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
             { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
             { key: "unitTypes", label: "Unit Types", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
             { key: "locationOptions", label: "Locations", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" /><circle cx="12" cy="11" r="2.5" /></svg> },
-            { key: "owners", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
             { key: "attributes", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg> },
-            { key: "currencies", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg> },
         ],
     },
 ];
 
 const getParentSection = (key: MenuKey): SectionKey | null => {
-        if (key === "offplan" || key === "unitLayouts" || key === "unitTypes" || key === "objects" || key === "offplanLocationOptions" || key === "offplanOwners" || key === "offplanAttributes") return "offplan";
+        if (key === "offplan" || key === "unitLayouts" || key === "unitTypes" || key === "objects" || key === "offplanLocationOptions" || key === "offplanAttributes") return "offplan";
     return "resale";
 };
 
@@ -130,9 +116,6 @@ function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
     if (key === "unitLayouts") return "/dashboard/offplan/unit-layouts";
     if (key === "unitTypes") return "/dashboard/offplan/unit-type-options";
 
-    if (key === "roomOptions") return `/dashboard/${parent}/room-options`;
-    if (key === "currencies") return `/dashboard/${parent}/currencies`;
-
     return "/";
 }
 
@@ -140,13 +123,11 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
     const routeMatchers: Array<[MenuKey, (value: string) => boolean]> = [
         ["apartments", (value) => value === "/dashboard/resale/apartments" || value.startsWith("/dashboard/resale/apartments/")],
         ["apartmentTypes", (value) => value === "/dashboard/resale/apartment-types"],
-        ["roomOptions", (value) => value === "/dashboard/resale/room-options"],
         ["unitTypes", (value) => value === "/dashboard/offplan/unit-type-options"],
         ["attributes", (value) => value === "/dashboard/resale/attributes" || value === "/dashboard/offplan/attributes"],
-        ["owners", (value) => value === "/dashboard/resale/owners" || value === "/dashboard/offplan/owners"],
+        ["owners", (value) => value === "/dashboard/resale/owners"],
         ["locationOptions", (value) => value === "/dashboard/resale/location-options" || value === "/dashboard/offplan/location-options"],
         ["requests", (value) => value === "/dashboard/resale/requests"],
-        ["currencies", (value) => value === "/dashboard/resale/currencies" || value === "/dashboard/offplan/currencies"],
         ["objects", (value) => value === "/dashboard/offplan/objects" || /^\/dashboard\/offplan\/objects\/[^/]+\/edit$/.test(value) || value === "/dashboard/offplan/objects/create"],
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["resale", (value) => value === "/dashboard/resale"],
@@ -232,10 +213,8 @@ export function Dashboard() {
     const [unitStats, setUnitStats] = useState<UnitLayoutStats | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [unitLayouts, setUnitLayouts] = useState<UnitLayout[]>([]);
-    const [offplanOwners, setOffplanOwners] = useState<Owner[]>([]);
     const [offplanAttributes, setOffplanAttributes] = useState<Attribute[]>([]);
     const [offplanUnitTypes, setOffplanUnitTypes] = useState<UnitTypeOption[]>([]);
-    const [offplanCurrencies, setOffplanCurrencies] = useState<Currency[]>([]);
     const [apartments, setApartments] = useState<Apartment[]>([]);
     const [archivedApartments, setArchivedApartments] = useState<Apartment[]>([]);
     const [apartmentTypes, setApartmentTypes] = useState<ApartmentType[]>([]);
@@ -243,8 +222,6 @@ export function Dashboard() {
     const [attributes, setAttributes] = useState<Attribute[]>([]);
     const [requests, setRequests] = useState<Request[]>([]);
     const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
-    const [resaleRoomOptions, setResaleRoomOptions] = useState<RoomOption[]>([]);
-    const [resaleCurrencies, setResaleCurrencies] = useState<Currency[]>([]);
     const [resaleListingsTotal, setResaleListingsTotal] = useState(0);
     const [loading, setLoading] = useState(false);
 
@@ -255,26 +232,20 @@ export function Dashboard() {
                 unitLayoutsApi.getStats(),
                 categoriesApi.getAll("object"),
                 unitLayoutsApi.getAll({ limit: 500 }),
-                ownersApi.getAll(),
                 attributesApi.getAll(),
                 unitTypeOptionsApi.getAll(),
-                currenciesApi.getAll(),
-            ]).then(([statsRes, catsRes, layoutsRes, ownersRes, attributesRes, unitTypesRes, currenciesRes]) => {
+            ]).then(([statsRes, catsRes, layoutsRes, attributesRes, unitTypesRes]) => {
                 setUnitStats(statsRes.data);
                 setCategories(catsRes.data);
                 setUnitLayouts(layoutsRes.data.data);
-                setOffplanOwners(ownersRes.data);
                 setOffplanAttributes(attributesRes.data);
                 setOffplanUnitTypes(unitTypesRes.data);
-                setOffplanCurrencies(currenciesRes.data);
             }).catch(() => {
                 setUnitStats(null);
                 setCategories([]);
                 setUnitLayouts([]);
-                setOffplanOwners([]);
                 setOffplanAttributes([]);
                 setOffplanUnitTypes([]);
-                setOffplanCurrencies([]);
             }).finally(() => setLoading(false));
         } else if (activeMenu === "resale") {
             setLoading(true);
@@ -286,9 +257,7 @@ export function Dashboard() {
                 attributesApi.getAll(),
                 requestsApi.getAll(),
                 locationOptionsApi.getAll(),
-                roomOptionsApi.getAll("resale"),
-                currenciesApi.getAll(),
-            ]).then(([activeAptsRes, archivedAptsRes, typesRes, ownersRes, attributesRes, requestsRes, locationsRes, roomOptionsRes, currenciesRes]) => {
+            ]).then(([activeAptsRes, archivedAptsRes, typesRes, ownersRes, attributesRes, requestsRes, locationsRes]) => {
                 setApartments(activeAptsRes.data.data);
                 setArchivedApartments(archivedAptsRes.data.data);
                 setResaleListingsTotal(activeAptsRes.data.pagination.total + archivedAptsRes.data.pagination.total);
@@ -297,8 +266,6 @@ export function Dashboard() {
                 setAttributes(attributesRes.data);
                 setRequests(requestsRes.data);
                 setLocationOptions(locationsRes.data);
-                setResaleRoomOptions(roomOptionsRes.data);
-                setResaleCurrencies(currenciesRes.data);
             }).catch(() => {
                 setApartments([]);
                 setArchivedApartments([]);
@@ -308,8 +275,6 @@ export function Dashboard() {
                 setAttributes([]);
                 setRequests([]);
                 setLocationOptions([]);
-                setResaleRoomOptions([]);
-                setResaleCurrencies([]);
             }).finally(() => setLoading(false));
         }
     }, [activeMenu]);
@@ -397,10 +362,8 @@ export function Dashboard() {
         });
 
         const dataCoverage = [
-            { label: "Owners", value: offplanOwners.length, hint: "off-plan owners list" },
             { label: "Attributes", value: offplanAttributes.length, hint: `${unitLayouts.reduce((sum, h) => sum + (h.attributeIds?.length || 0), 0)} assigned` },
             { label: "Unit Types", value: offplanUnitTypes.length, hint: "offplan unit types" },
-            { label: "Currencies", value: offplanCurrencies.length, hint: `${housesWithPrice} unit layouts carry price data` },
             { label: "Objects", value: totalObjects, hint: `${activeObjects} active, ${archivedObjects} archived` },
         ];
 
@@ -420,7 +383,7 @@ export function Dashboard() {
             donutSegments, typeDistribution,
             dataCoverage, topCards,
         };
-    }, [unitLayouts, unitStats, categories, offplanOwners, offplanAttributes, offplanUnitTypes, offplanCurrencies]);
+    }, [unitLayouts, unitStats, categories, offplanAttributes, offplanUnitTypes]);
 
     const resaleDashboard = useMemo(() => {
         const allApartments = [...apartments, ...archivedApartments];
@@ -556,8 +519,6 @@ export function Dashboard() {
             { label: "Requests", value: requests.length, hint: `${linkedRequestCount} attached to listings` },
             { label: "Regions", value: locationOptions.filter((option) => option.type === "region").length, hint: `${usedRegionCount} already used` },
             { label: "Cities", value: locationOptions.filter((option) => option.type === "city").length, hint: `${usedCityCount} already used` },
-            { label: "Room Options", value: resaleRoomOptions.length, hint: "resale-specific options" },
-            { label: "Currencies", value: resaleCurrencies.length, hint: `${pricedListings.length} listings carry price data` },
         ];
 
         return {
@@ -586,9 +547,7 @@ export function Dashboard() {
         locationOptions,
         owners,
         requests,
-        resaleCurrencies,
         resaleListingsTotal,
-        resaleRoomOptions,
     ]);
 
     return (
@@ -1158,9 +1117,7 @@ export function Dashboard() {
                 {/* Management Content Sections */}
                 {activeMenu === "objects" && (isCreatingObject ? <ObjectCreatePage embedded /> : objectId ? <ObjectEditPage embedded key={objectId} /> : <OffPlanObjectsSection />)}
                 {activeMenu === "unitLayouts" && <UnitLayoutsSection />}
-                {activeMenu === "roomOptions" && <RoomOptionsSection />}
                 {activeMenu === "unitTypes" && <UnitTypeOptionsSection />}
-                {activeMenu === "currencies" && <CurrenciesSection />}
                 {activeMenu === "apartments" && (apartmentId || isCreatingApartment ? <ApartmentForm embedded /> : <ResaleApartmentsCardSection />)}
                 {activeMenu === "apartmentTypes" && <ApartmentTypesSection />}
                 {activeMenu === "owners" && <OwnersSection />}

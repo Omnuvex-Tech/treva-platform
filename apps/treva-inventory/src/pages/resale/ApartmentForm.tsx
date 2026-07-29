@@ -1,15 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { apartmentsApi, CreateApartmentData, type ApartmentFurnishing, type ApartmentRenovation, UploadResponse } from "../../api/apartments";
 import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
-import { currenciesApi, Currency } from "../../api/currencies";
+import { currenciesApi } from "../../api/currencies";
 import { locationOptionsApi, type LocationOption } from "../../api/location-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { IoClose } from "react-icons/io5";
 import { FormKeywordInput } from "@repo/ui";
 
@@ -102,6 +103,8 @@ function CustomSelect({
     onChange,
     noOptionsLabel,
     onNoOptionsClick,
+    createLabel,
+    onCreateClick,
     multiSelect = false,
 }: {
     label: string;
@@ -111,6 +114,8 @@ function CustomSelect({
     onChange: (value: string | string[]) => void;
     noOptionsLabel?: string;
     onNoOptionsClick?: () => void;
+    createLabel?: string;
+    onCreateClick?: () => void;
     multiSelect?: boolean;
 }) {
     const [open, setOpen] = useState(false);
@@ -190,6 +195,18 @@ function CustomSelect({
                             ) : null}
                         </button>
                     ))}
+                    {onCreateClick ? (
+                        <button
+                            type="button"
+                            className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 hover:text-[#1A1A1A]"
+                            onClick={() => {
+                                setOpen(false);
+                                onCreateClick();
+                            }}
+                        >
+                            {createLabel || "Create"}
+                        </button>
+                    ) : null}
                     {options.length === 0 && (
                         onNoOptionsClick ? (
                             <button
@@ -288,6 +305,14 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
     const createTab = new URLSearchParams(location.search).get("tab") === "archive" ? "archive" : "active";
 
     const [activeTab, setActiveTab] = useState<TabKey>("basic");
+    const [isApartmentTypeModalOpen, setIsApartmentTypeModalOpen] = useState(false);
+    const [apartmentTypeDraft, setApartmentTypeDraft] = useState({ name: "", title: "" });
+    const [isOwnerModalOpen, setIsOwnerModalOpen] = useState(false);
+    const [ownerDraft, setOwnerDraft] = useState({ firstName: "", lastName: "", phoneNumber: "", profession: "" });
+    const [isCityModalOpen, setIsCityModalOpen] = useState(false);
+    const [cityDraft, setCityDraft] = useState({ name: "", title: "" });
+    const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+    const [regionDraft, setRegionDraft] = useState({ name: "", title: "" });
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const [seoTitleManuallyEdited, setSeoTitleManuallyEdited] = useState(false);
     const [draggedGalleryIndex, setDraggedGalleryIndex] = useState<number | null>(null);
@@ -323,6 +348,79 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         queryFn: () => apartmentsApi.getById(id!),
         enabled: isEdit,
     });
+
+    const createApartmentTypeMutation = useMutation({
+        mutationFn: (payload: { name: string; title: string }) => apartmentTypesApi.create(payload),
+        onSuccess: (res) => {
+            queryClient.invalidateQueries({ queryKey: ["apartment-types"] });
+            const created = res?.data;
+            if (created?.id) updateField("apartmentTypeId", created.id);
+            setIsApartmentTypeModalOpen(false);
+            setApartmentTypeDraft({ name: "", title: "" });
+            showSuccess({ title: "Listing type created" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Listing type could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const createOwnerMutation = useMutation({
+        mutationFn: (payload: { firstName: string; lastName: string; phoneNumber: string; profession?: string }) =>
+            ownersApi.create(payload),
+        onSuccess: (res) => {
+            queryClient.invalidateQueries({ queryKey: ["owners"] });
+            const created = res?.data;
+            if (created?.id) updateField("ownerId", created.id);
+            setIsOwnerModalOpen(false);
+            setOwnerDraft({ firstName: "", lastName: "", phoneNumber: "", profession: "" });
+            showSuccess({ title: "Owner created" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Owner could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const createLocationOptionMutation = useMutation({
+        mutationFn: (payload: { type: "region" | "city"; name: string; title: string; cityId?: string }) =>
+            locationOptionsApi.create(payload),
+        onSuccess: (res, vars) => {
+            queryClient.invalidateQueries({ queryKey: ["location-options"] });
+            const created = res?.data;
+            if (vars.type === "city") {
+                updateField("city", created?.title || vars.title);
+                updateField("region", "");
+                setIsCityModalOpen(false);
+                setCityDraft({ name: "", title: "" });
+                showSuccess({ title: "City created" });
+            } else {
+                updateField("region", created?.title || vars.title);
+                setIsRegionModalOpen(false);
+                setRegionDraft({ name: "", title: "" });
+                showSuccess({ title: "Region created" });
+            }
+        },
+        onError: (error) => {
+            showError({
+                title: "Location option could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const priceCurrencies = useMemo(() => {
+        const list = Array.isArray(currencies?.data) ? currencies.data : [];
+        return STATIC_CURRENCIES.map((sc) => ({
+            value: sc.value,
+            label: sc.label,
+            id: list.find((item) => item.value === sc.value)?.id,
+        }));
+    }, [currencies?.data]);
 
     const [form, setForm] = useState<CreateApartmentData>({
         name: "",
@@ -776,8 +874,70 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         }));
     };
 
+    const buildNameFromTitle = (title: string) =>
+        title
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")
+            .replace(/-+/g, "-")
+            .replace(/(^-|-$)/g, "");
+
+    const handleCreateListingType = () => {
+        const title = apartmentTypeDraft.title.trim();
+        const name = (apartmentTypeDraft.name.trim() || buildNameFromTitle(title)).trim();
+        if (!title || !name) {
+            showError({ title: "Please fill required fields", description: !title ? "Title is required" : "Name is required" });
+            return;
+        }
+        createApartmentTypeMutation.mutate({ name, title });
+    };
+
+    const handleCreateOwner = () => {
+        const firstName = ownerDraft.firstName.trim();
+        const lastName = ownerDraft.lastName.trim();
+        const phoneNumber = ownerDraft.phoneNumber.trim();
+        const profession = ownerDraft.profession.trim();
+        if (!firstName || !lastName || !phoneNumber) {
+            showError({ title: "Please fill required fields", description: "First name, last name and phone are required" });
+            return;
+        }
+        createOwnerMutation.mutate({ firstName, lastName, phoneNumber, profession: profession || undefined });
+    };
+
+    const handleCreateCity = () => {
+        const title = cityDraft.title.trim();
+        const name = (cityDraft.name.trim() || buildNameFromTitle(title)).trim();
+        if (!title || !name) {
+            showError({ title: "Please fill required fields", description: !title ? "Title is required" : "Name is required" });
+            return;
+        }
+        createLocationOptionMutation.mutate({ type: "city", name, title });
+    };
+
+    const handleCreateRegion = () => {
+        const selectedCityTitle = String(form.city || "").trim();
+        if (!selectedCityTitle) {
+            showError({ title: "City is required", description: "Select city first to create region" });
+            return;
+        }
+        const cityId = locationOptionItems.find((item) => item.type === "city" && item.title === selectedCityTitle)?.id;
+        if (!cityId) {
+            showError({ title: "City is not configured", description: "Selected city is not found in location options" });
+            return;
+        }
+        const title = regionDraft.title.trim();
+        const name = (regionDraft.name.trim() || buildNameFromTitle(title)).trim();
+        if (!title || !name) {
+            showError({ title: "Please fill required fields", description: !title ? "Title is required" : "Name is required" });
+            return;
+        }
+        createLocationOptionMutation.mutate({ type: "region", name, title, cityId });
+    };
+
     // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const formContent = (
+        <>
         <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
             <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
                 {TABS.map((tab) => {
@@ -906,8 +1066,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                             options={types?.data?.map((t: ApartmentType) => ({ id: t.id, label: t.title })) || []}
                                             placeholder="Select type"
                                             onChange={(id) => updateField("apartmentTypeId", id)}
-                                            noOptionsLabel="Create Listing Type"
-                                            onNoOptionsClick={() => navigate("/dashboard/resale/apartment-types")}
+                                            createLabel="Create Listing Type"
+                                            onCreateClick={() => setIsApartmentTypeModalOpen(true)}
                                         />
                                         <CustomSelect
                                             label="Owner"
@@ -915,8 +1075,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                             options={owners?.data?.map((o: Owner) => ({ id: o.id, label: `${o.firstName} ${o.lastName}` })) || []}
                                             placeholder="Select owner (optional)"
                                             onChange={(id) => updateField("ownerId", id)}
-                                            noOptionsLabel="Create Owner"
-                                            onNoOptionsClick={() => navigate("/dashboard/resale/owners")}
+                                            createLabel="Create Owner"
+                                            onCreateClick={() => setIsOwnerModalOpen(true)}
                                         />
                                     </div>
                                     <div className="grid gap-4 lg:grid-cols-2">
@@ -926,8 +1086,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                             options={toLocationDropdownOptions("region", form.region, form.city)}
                                             placeholder={form.city ? "Select region" : "Select city first"}
                                             onChange={(id) => updateField("region", id)}
-                                            noOptionsLabel="Create Region"
-                                            onNoOptionsClick={() => navigate("/dashboard/resale/location-options")}
+                                            createLabel="Create Region"
+                                            onCreateClick={() => setIsRegionModalOpen(true)}
                                         />
                                         <CustomSelect
                                             label="City"
@@ -938,8 +1098,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                 updateField("city", id);
                                                 updateField("region", "");
                                             }}
-                                            noOptionsLabel="Create City"
-                                            onNoOptionsClick={() => navigate("/dashboard/resale/location-options")}
+                                            createLabel="Create City"
+                                            onCreateClick={() => setIsCityModalOpen(true)}
                                         />
                                     </div>
                                 </div>
@@ -1143,15 +1303,15 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                             </div>
                         </SectionBlock>
 
-                        {currencies?.data && currencies.data.length > 0 && (
+                        {priceCurrencies.length > 0 && (
                             <SectionBlock title="Prices by Currency" description="Each currency now lives in its own cleaner pricing card.">
                                 <div className="space-y-3">
-                                    {currencies.data.map((cur: Currency) => {
-                                        const existingPrice = form.prices?.find((p: any) => p.currencyId === cur.id);
+                                    {priceCurrencies.map((cur) => {
+                                        const existingPrice = cur.id ? form.prices?.find((p: any) => p.currencyId === cur.id) : undefined;
                                         return (
-                                            <div key={cur.id} className="rounded-[22px] border border-[#ECEEF2] bg-[#F8F9FB] p-4">
+                                            <div key={cur.value} className="rounded-[22px] border border-[#ECEEF2] bg-[#F8F9FB] p-4">
                                                 <div className="mb-3 flex items-center justify-between gap-3">
-                                                    <div className="text-sm font-semibold text-[#1A1A1A]">{cur.title || cur.name}</div>
+                                                    <div className="text-sm font-semibold text-[#1A1A1A]">{cur.label}</div>
                                                     <div className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-[#808191]">
                                                         {cur.value}
                                                     </div>
@@ -1164,6 +1324,10 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                             type="number"
                                                             value={existingPrice?.priceTotal ?? ""}
                                                             onChange={(e) => {
+                                                                if (!cur.id) {
+                                                                    showError(`Currency ${cur.value} is not configured`);
+                                                                    return;
+                                                                }
                                                                 const raw = e.target.value;
                                                                 const prices = [...(form.prices || [])];
                                                                 const idx = prices.findIndex((p: any) => p.currencyId === cur.id);
@@ -1190,6 +1354,10 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                             type="number"
                                                             value={existingPrice?.priceByArea ?? ""}
                                                             onChange={(e) => {
+                                                                if (!cur.id) {
+                                                                    showError(`Currency ${cur.value} is not configured`);
+                                                                    return;
+                                                                }
                                                                 const raw = e.target.value;
                                                                 const prices = [...(form.prices || [])];
                                                                 const idx = prices.findIndex((p: any) => p.currencyId === cur.id);
@@ -1589,6 +1757,280 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 </div>
             </form>
         </div>
+        {isApartmentTypeModalOpen ? (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                    <div className="mb-5 flex items-center justify-between">
+                        <h4 className="text-xl font-medium text-[#1A1A1A]">Create listing type</h4>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsApartmentTypeModalOpen(false);
+                                setApartmentTypeDraft({ name: "", title: "" });
+                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                            disabled={createApartmentTypeMutation.isPending}
+                        >
+                            <IoClose className="h-5 w-5" />
+                        </button>
+                    </div>
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={apartmentTypeDraft.name}
+                                    onChange={(e) => setApartmentTypeDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                    placeholder="studio"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={apartmentTypeDraft.title}
+                                    onChange={(e) => setApartmentTypeDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                    placeholder="Studio"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsApartmentTypeModalOpen(false);
+                                setApartmentTypeDraft({ name: "", title: "" });
+                            }}
+                            className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                            disabled={createApartmentTypeMutation.isPending}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleCreateListingType}
+                            className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                            disabled={createApartmentTypeMutation.isPending}
+                        >
+                            {createApartmentTypeMutation.isPending ? "Creating..." : "Add"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : null}
+        {isOwnerModalOpen ? (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                <div className="w-full max-w-[460px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                    <div className="mb-5 flex items-center justify-between">
+                        <h4 className="text-xl font-medium text-[#1A1A1A]">Create owner</h4>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsOwnerModalOpen(false);
+                                setOwnerDraft({ firstName: "", lastName: "", phoneNumber: "", profession: "" });
+                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                            disabled={createOwnerMutation.isPending}
+                        >
+                            <IoClose className="h-5 w-5" />
+                        </button>
+                    </div>
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">First name</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={ownerDraft.firstName}
+                                    onChange={(e) => setOwnerDraft((prev) => ({ ...prev, firstName: e.target.value }))}
+                                    placeholder="John"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Last name</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={ownerDraft.lastName}
+                                    onChange={(e) => setOwnerDraft((prev) => ({ ...prev, lastName: e.target.value }))}
+                                    placeholder="Doe"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Phone number</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={ownerDraft.phoneNumber}
+                                    onChange={(e) => setOwnerDraft((prev) => ({ ...prev, phoneNumber: e.target.value }))}
+                                    placeholder="+994..."
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Profession (optional)</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={ownerDraft.profession}
+                                    onChange={(e) => setOwnerDraft((prev) => ({ ...prev, profession: e.target.value }))}
+                                    placeholder="Engineer"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsOwnerModalOpen(false);
+                                setOwnerDraft({ firstName: "", lastName: "", phoneNumber: "", profession: "" });
+                            }}
+                            className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                            disabled={createOwnerMutation.isPending}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleCreateOwner}
+                            className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                            disabled={createOwnerMutation.isPending}
+                        >
+                            {createOwnerMutation.isPending ? "Creating..." : "Add"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : null}
+        {isCityModalOpen ? (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                    <div className="mb-5 flex items-center justify-between">
+                        <h4 className="text-xl font-medium text-[#1A1A1A]">Create city</h4>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsCityModalOpen(false);
+                                setCityDraft({ name: "", title: "" });
+                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                            disabled={createLocationOptionMutation.isPending}
+                        >
+                            <IoClose className="h-5 w-5" />
+                        </button>
+                    </div>
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={cityDraft.name}
+                                    onChange={(e) => setCityDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                    placeholder="baku"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={cityDraft.title}
+                                    onChange={(e) => setCityDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                    placeholder="Baku"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsCityModalOpen(false);
+                                setCityDraft({ name: "", title: "" });
+                            }}
+                            className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                            disabled={createLocationOptionMutation.isPending}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleCreateCity}
+                            className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                            disabled={createLocationOptionMutation.isPending}
+                        >
+                            {createLocationOptionMutation.isPending ? "Creating..." : "Add"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : null}
+        {isRegionModalOpen ? (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                    <div className="mb-5 flex items-center justify-between">
+                        <h4 className="text-xl font-medium text-[#1A1A1A]">Create region</h4>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsRegionModalOpen(false);
+                                setRegionDraft({ name: "", title: "" });
+                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                            disabled={createLocationOptionMutation.isPending}
+                        >
+                            <IoClose className="h-5 w-5" />
+                        </button>
+                    </div>
+                    <div className="space-y-5">
+                        <div className="text-xs text-[#808191]">City: {form.city || "-"}</div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={regionDraft.name}
+                                    onChange={(e) => setRegionDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                    placeholder="nasimi"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                <input
+                                    className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                    value={regionDraft.title}
+                                    onChange={(e) => setRegionDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                    placeholder="Nasimi"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsRegionModalOpen(false);
+                                setRegionDraft({ name: "", title: "" });
+                            }}
+                            className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                            disabled={createLocationOptionMutation.isPending}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleCreateRegion}
+                            className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                            disabled={createLocationOptionMutation.isPending}
+                        >
+                            {createLocationOptionMutation.isPending ? "Creating..." : "Add"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : null}
+        </>
     );
 
     if (embedded) {

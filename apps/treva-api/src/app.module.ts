@@ -11,7 +11,6 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { UnitLayoutsModule } from './unit-layouts/unit-layouts.module';
 import { UploadModule } from './upload/upload.module';
-import { RoomOptionsModule } from './room-options/room-options.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { StatusOptionsModule } from './status-options/status-options.module';
 import { ApartmentTypesModule } from './apartment-types/apartment-types.module';
@@ -51,7 +50,6 @@ import { UnitTypeOptionsModule } from './unit-type-options/unit-type-options.mod
     HousesModule,
     UnitLayoutsModule,
     UploadModule,
-    RoomOptionsModule,
     CurrenciesModule,
     StatusOptionsModule,
     ApartmentTypesModule,

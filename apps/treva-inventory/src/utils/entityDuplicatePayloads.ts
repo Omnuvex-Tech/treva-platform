@@ -116,7 +116,6 @@ export function buildHouseDuplicatePayload(
         gallery: house.gallery || [],
         documents: house.documents || [],
         location: house.location,
-        roomOptionId: house.roomOptionId,
         ownerId: house.ownerId,
         heatingTypeIds: house.heatingTypeIds || [],
         attributeIds: house.attributeIds || [],

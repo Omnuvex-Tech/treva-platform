@@ -14,6 +14,7 @@ import { unitTypeOptionsApi, UnitTypeOption } from "../../api/unit-type-options"
 import { FileUpload } from "../../components/FileUpload";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { IoClose } from "react-icons/io5";
 
 type Tab = "basic" | "area" | "documents" | "gallery" | "similar";
@@ -42,10 +43,8 @@ const validateBasicTab = (form: CreateUnitLayoutData): TabValidation => {
     if (!form.name?.trim()) errors.push({ field: "Name", message: "Basic Info / Name is required" });
     if (!form.slug?.trim()) errors.push({ field: "Slug", message: "Basic Info / Slug is required" });
     if (!form.categoryId) errors.push({ field: "Category", message: "Basic Info / Category is required" });
-    if (!form.number && form.number !== 0) errors.push({ field: "Number", message: "Basic Info / Number is required" });
     if (!form.completionYear && form.completionYear !== 0) errors.push({ field: "Completion Year", message: "Basic Info / Completion Year is required" });
     if (!form.numberOfFloors?.start && form.numberOfFloors?.start !== 0) errors.push({ field: "Floors From", message: "Basic Info / Floors From is required" });
-    if (!form.numberOfFloors?.end && form.numberOfFloors?.end !== 0) errors.push({ field: "Floors To", message: "Basic Info / Floors To is required" });
     return { valid: errors.length === 0, errors };
 };
 
@@ -146,11 +145,7 @@ export function UnitLayoutForm() {
         queryFn: () => unitTypeOptionsApi.getAll(),
     });
 
-    const { data: currenciesResponse } = useQuery({
-        queryKey: ["currencies"],
-        queryFn: () => import("../../api/currencies").then(m => m.currenciesApi.getAll()),
-    });
-    const currencies = Array.isArray(currenciesResponse?.data) ? currenciesResponse.data : [];
+    const currencies = STATIC_CURRENCIES;
 
     const [similarSearch, setSimilarSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
@@ -293,6 +288,10 @@ export function UnitLayoutForm() {
                 (form.floor ?? undefined) ??
                 (form.numberOfFloors?.start ?? undefined) ??
                 1,
+            numberOfFloors: {
+                start: form.numberOfFloors?.start,
+                end: form.numberOfFloors?.end ?? form.numberOfFloors?.start,
+            },
         };
 
         if (isEdit) {
@@ -798,9 +797,9 @@ export function UnitLayoutForm() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     {currencies.map((curr) => (
-                                        <div key={curr.id}>
+                                        <div key={curr.value}>
                                             <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                                Price ({curr.title || curr.name || curr.value})
+                                                Price ({curr.label})
                                             </label>
                                             <input
                                                 type="number"
@@ -820,52 +819,6 @@ export function UnitLayoutForm() {
                                             />
                                         </div>
                                     ))}
-                                    {currencies.length === 0 && (
-                                        <>
-                                            <div>
-                                                <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                                    Price (USD)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    value={form.prices?.["USD"] || ""}
-                                                    onChange={(e) =>
-                                                        updateField(
-                                                            "prices",
-                                                            {
-                                                                ...form.prices,
-                                                                USD: e.target.value ? parseFloat(e.target.value) : 0,
-                                                            }
-                                                        )
-                                                    }
-                                                    placeholder="120,000"
-                                                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                                    min={0}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                                    Price (AZN)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    value={form.prices?.["AZN"] || ""}
-                                                    onChange={(e) =>
-                                                        updateField(
-                                                            "prices",
-                                                            {
-                                                                ...form.prices,
-                                                                AZN: e.target.value ? parseFloat(e.target.value) : 0,
-                                                            }
-                                                        )
-                                                    }
-                                                    placeholder="204,000"
-                                                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
-                                                    min={0}
-                                                />
-                                            </div>
-                                        </>
-                                    )}
                                 </div>
                             </div>
                         )}

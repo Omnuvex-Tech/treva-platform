@@ -138,8 +138,6 @@ export class CreateHouseDto {
   @ApiPropertyOptional({ example: 'cuid...' })
   @IsOptional()
   @IsString()
-  roomOptionId?: string;
-
   @ApiProperty({ example: 5 })
   @IsNumber()
   @Min(1)

@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { categoriesApi, type CategoryDocument } from "../../api/categories";
 import { housesApi, type House } from "../../api/houses";
 import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
-import { currenciesApi, type Currency } from "../../api/currencies";
 import { locationOptionsApi, type LocationOption } from "../../api/location-options";
 import { FormDropdown, FormAddButton, FormTabSwitcher } from "@repo/ui";
 import { HouseForm } from "./HouseForm";
@@ -16,6 +15,8 @@ import { useFormDraft } from "../../hooks/useFormDraft";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { PlanUploadCard } from "../../components/PlanUploadCard";
 import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
+import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
+import { IoClose } from "react-icons/io5";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
@@ -109,6 +110,10 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const queryClient = useQueryClient();
     const { showError, showSuccess } = useMessageCenter();
     const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+    const [isCityModalOpen, setIsCityModalOpen] = useState(false);
+    const [cityDraft, setCityDraft] = useState({ name: "", title: "" });
+    const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+    const [regionDraft, setRegionDraft] = useState({ name: "", title: "" });
     const [showHouseForm, setShowHouseForm] = useState(false);
     const [editingHouseId, setEditingHouseId] = useState<string | null>(null);
     const [previewHouseId, setPreviewHouseId] = useState<string | null>(null);
@@ -131,6 +136,15 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [selectedManagementCard, setSelectedManagementCard] = useState<"properties" | "payments" | "options" | "stock" | null>(null);
     const [selectedPostPlanCard, setSelectedPostPlanCard] = useState<"grid" | "property-layouts" | "floor-plans" | "facades" | null>("grid");
     const [showPostPlanCards, setShowPostPlanCards] = useState(false);
+
+    const buildNameFromTitle = (title: string) =>
+        title
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")
+            .replace(/-+/g, "-")
+            .replace(/(^-|-$)/g, "");
 
     const { state: draftState, setState: setDraftState, clearDraft } = useFormDraft({
         key: DRAFT_KEY,
@@ -160,13 +174,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
     const categories = Array.isArray(categoriesResponse?.data) ? categoriesResponse.data : [];
 
-    const { data: currenciesResponse } = useQuery({
-        queryKey: ["currencies"],
-        queryFn: () => currenciesApi.getAll(),
-    });
-
-    const currencies: Currency[] = Array.isArray(currenciesResponse?.data) ? currenciesResponse.data : [];
-
     const { data: locationOptionsResponse } = useQuery({
         queryKey: ["location-options"],
         queryFn: () => locationOptionsApi.getAll(),
@@ -195,6 +202,63 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         }
 
         return mapped;
+    };
+
+    const createLocationOptionMutation = useMutation({
+        mutationFn: (payload: { type: "region" | "city"; name: string; title: string; cityId?: string }) =>
+            locationOptionsApi.create(payload),
+        onSuccess: (res, vars) => {
+            queryClient.invalidateQueries({ queryKey: ["location-options"] });
+            const created = res?.data;
+            if (vars.type === "city") {
+                updateFormData("city", created?.title || vars.title);
+                updateFormData("region", "");
+                setIsCityModalOpen(false);
+                setCityDraft({ name: "", title: "" });
+                showSuccess({ title: "City created" });
+            } else {
+                updateFormData("region", created?.title || vars.title);
+                setIsRegionModalOpen(false);
+                setRegionDraft({ name: "", title: "" });
+                showSuccess({ title: "Region created" });
+            }
+        },
+        onError: (error) => {
+            showError({
+                title: "Location option could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const handleCreateCity = () => {
+        const title = cityDraft.title.trim();
+        const name = (cityDraft.name.trim() || buildNameFromTitle(title)).trim();
+        if (!title || !name) {
+            showError({ title: "Please fill required fields", description: !title ? "Title is required" : "Name is required" });
+            return;
+        }
+        createLocationOptionMutation.mutate({ type: "city", name, title });
+    };
+
+    const handleCreateRegion = () => {
+        const selectedCityTitle = String(formData.city || "").trim();
+        if (!selectedCityTitle) {
+            showError({ title: "City is required", description: "Select city first to create region" });
+            return;
+        }
+        const cityId = locationOptionItems.find((item) => item.type === "city" && item.title === selectedCityTitle)?.id;
+        if (!cityId) {
+            showError({ title: "City is not configured", description: "Selected city is not found in location options" });
+            return;
+        }
+        const title = regionDraft.title.trim();
+        const name = (regionDraft.name.trim() || buildNameFromTitle(title)).trim();
+        if (!title || !name) {
+            showError({ title: "Please fill required fields", description: !title ? "Title is required" : "Name is required" });
+            return;
+        }
+        createLocationOptionMutation.mutate({ type: "region", name, title, cityId });
     };
 
     const { data: categoryRes } = useQuery({
@@ -835,11 +899,9 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                             <FormDropdown
                                                 label="Currency"
                                                 value={formData.currency}
-                                                options={currencies.map((c) => ({ id: c.value, label: c.title }))}
+                                                options={STATIC_CURRENCIES.map((c) => ({ id: c.value, label: c.label }))}
                                                 placeholder="Select currency"
                                                 onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
-                                                onCreateClick={() => navigate("/dashboard/offplan/currencies")}
-                                                createLabel="Create currency"
                                             />
                                         </div>
                                         <div>
@@ -865,7 +927,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                     clearError("city");
                                                     clearError("region");
                                                 }}
-                                                onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                                onCreateClick={() => setIsCityModalOpen(true)}
                                                 createLabel="Create city"
                                             />
                                         </div>
@@ -876,7 +938,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                 options={toLocationDropdownOptions("region", formData.region, formData.city)}
                                                 placeholder="Select region"
                                                 onChange={(id) => { updateFormData("region", id); clearError("region"); }}
-                                                onCreateClick={() => navigate("/dashboard/resale/location-options")}
+                                                onCreateClick={() => setIsRegionModalOpen(true)}
                                                 createLabel="Create region"
                                             />
                                         </div>
@@ -1530,6 +1592,133 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     return (
         <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
             {formContent}
+            {isCityModalOpen ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                    <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                        <div className="mb-5 flex items-center justify-between">
+                            <h4 className="text-xl font-medium text-[#1A1A1A]">Create city</h4>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsCityModalOpen(false);
+                                    setCityDraft({ name: "", title: "" });
+                                }}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                                disabled={createLocationOptionMutation.isPending}
+                            >
+                                <IoClose className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="space-y-5">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                    <input
+                                        className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                        value={cityDraft.name}
+                                        onChange={(e) => setCityDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                        placeholder="baku"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                    <input
+                                        className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                        value={cityDraft.title}
+                                        onChange={(e) => setCityDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                        placeholder="Baku"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsCityModalOpen(false);
+                                    setCityDraft({ name: "", title: "" });
+                                }}
+                                className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                                disabled={createLocationOptionMutation.isPending}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCreateCity}
+                                className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                                disabled={createLocationOptionMutation.isPending}
+                            >
+                                {createLocationOptionMutation.isPending ? "Creating..." : "Add"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+            {isRegionModalOpen ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                    <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                        <div className="mb-5 flex items-center justify-between">
+                            <h4 className="text-xl font-medium text-[#1A1A1A]">Create region</h4>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsRegionModalOpen(false);
+                                    setRegionDraft({ name: "", title: "" });
+                                }}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                                disabled={createLocationOptionMutation.isPending}
+                            >
+                                <IoClose className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="space-y-5">
+                            <div className="text-xs text-[#808191]">City: {formData.city || "-"}</div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                    <input
+                                        className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                        value={regionDraft.name}
+                                        onChange={(e) => setRegionDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                        placeholder="nasimi"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                    <input
+                                        className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                        value={regionDraft.title}
+                                        onChange={(e) => setRegionDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                        placeholder="Nasimi"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsRegionModalOpen(false);
+                                    setRegionDraft({ name: "", title: "" });
+                                }}
+                                className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                                disabled={createLocationOptionMutation.isPending}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCreateRegion}
+                                className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                                disabled={createLocationOptionMutation.isPending}
+                            >
+                                {createLocationOptionMutation.isPending ? "Creating..." : "Add"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </main>
     );
 }

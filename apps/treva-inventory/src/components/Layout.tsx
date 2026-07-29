@@ -6,8 +6,6 @@ const navItems = [
 ];
 
 const sharedItems = [
-    { path: "/room-options", label: "Room Options", icon: "🛏️" },
-    { path: "/currencies", label: "Currencies", icon: "💰" },
 ];
 
 const offPlanItems = [

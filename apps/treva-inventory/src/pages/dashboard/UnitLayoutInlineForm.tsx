@@ -4,10 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type CreateUnitLayoutData, type UnitLayoutStatus } from "../../api/unit-layouts";
 import { unitTypeOptionsApi, type UnitTypeOption } from "../../api/unit-type-options";
 import { attributesApi, type Attribute } from "../../api/attributes";
-import { currenciesApi, type Currency } from "../../api/currencies";
 import { categoriesApi, type Category } from "../../api/categories";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { FormDropdown, FormKeywordInput } from "@repo/ui";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { IoClose } from "react-icons/io5";
@@ -147,6 +147,8 @@ export function HouseForm({
     const [seoTitleManuallyEdited, setSeoTitleManuallyEdited] = useState(false);
     const [draggedGalleryIndex, setDraggedGalleryIndex] = useState<number | null>(null);
     const [dragOverGalleryIndex, setDragOverGalleryIndex] = useState<number | null>(null);
+    const [brochureUploading, setBrochureUploading] = useState(false);
+    const brochureFileRef = useRef<HTMLInputElement>(null);
 
     const { data: unitTypesRes } = useQuery({
         queryKey: ["unit-type-options"],
@@ -156,11 +158,6 @@ export function HouseForm({
     const { data: attributesRes } = useQuery({
         queryKey: ["attributes"],
         queryFn: () => attributesApi.getAll(),
-    });
-
-    const { data: currenciesRes } = useQuery({
-        queryKey: ["currencies"],
-        queryFn: () => currenciesApi.getAll(),
     });
 
     const { data: categoriesRes } = useQuery({
@@ -196,9 +193,31 @@ export function HouseForm({
     const existingHouseData = useMemo(() => responseData<any>(existingHouse), [existingHouse]);
     const unitTypes = useMemo(() => responseArray<UnitTypeOption>(unitTypesRes), [unitTypesRes]);
     const attributes = useMemo(() => responseArray<Attribute>(attributesRes), [attributesRes]);
-    const currencies = useMemo(() => responseArray<Currency>(currenciesRes), [currenciesRes]);
+    const currencies = useMemo(
+        () => STATIC_CURRENCIES.map((c) => ({ id: c.value, name: c.label, title: c.label, value: c.value })),
+        [],
+    );
     const categoryId = category?.id || selectedCategoryId || "";
     const shouldSelectCategory = !categorySlugProp && !urlSlug;
+
+    const existingDocuments = useMemo(() => {
+        const docs = (existingHouseData as any)?.documents;
+        return Array.isArray(docs) ? docs : [];
+    }, [existingHouseData]);
+
+    const brochureDoc = useMemo(() => {
+        return existingDocuments.find((doc: any) => doc?.type === "brochure") || null;
+    }, [existingDocuments]);
+
+    const brochureFileName = useMemo(() => {
+        const url = brochureDoc?.url;
+        if (!url) return "";
+        try {
+            return String(url).split("/").pop() || "";
+        } catch {
+            return "";
+        }
+    }, [brochureDoc?.url]);
 
     const findOptionId = <T extends { id: string; value?: string; name?: string; title?: string }>(
         options: T[] | undefined,
@@ -285,7 +304,7 @@ export function HouseForm({
             const rawPrices = house.pricesByCurrency || house.priceByCurrency || house.prices || {};
             const pricesArray = rawPrices && typeof rawPrices === "object"
                 ? Object.entries(rawPrices).map(([currencyValue, priceTotal]) => {
-                    const cur = currencies.find((c: Currency) => [c.id, c.value, c.name].includes(String(currencyValue)));
+                    const cur = currencies.find((c) => [c.id, c.value, c.name].includes(String(currencyValue)));
                     const total = Number(priceTotal) || 0;
                     return {
                         currencyId: cur?.id || String(currencyValue),
@@ -308,7 +327,6 @@ export function HouseForm({
                     unitTypes,
                     firstValue(
                         (house as any).unitTypeOptionId,
-                        house.roomOptionId,
                         house.apartmentTypeId,
                         (house as any).unitTypeOption?.id,
                         (house as any).unitTypeOption?.name,
@@ -413,9 +431,9 @@ export function HouseForm({
                 if (!form.unitTypeOptionId) errors.push("Unit type is required");
                 if (!form.floorFrom || form.floorFrom < 1) errors.push("Floor From is required");
                 if (form.floorFrom && form.floorFrom > 999) errors.push("Floor From must be â‰¤ 999");
-                if (!form.floorTo || form.floorTo < 1) errors.push("Floor To is required");
+                if (form.floorTo && form.floorTo < 1) errors.push("Floor To must be â‰¥ 1");
                 if (form.floorTo && form.floorTo > 999) errors.push("Floor To must be â‰¤ 999");
-                if (!form.roomCount || form.roomCount < 1) errors.push("Room Count is required");
+                if (form.roomCount && form.roomCount < 1) errors.push("Room Count must be â‰¥ 1");
                 if (form.roomCount && form.roomCount > 999) errors.push("Room Count must be â‰¤ 999");
                 break;
             case "area":
@@ -460,6 +478,61 @@ export function HouseForm({
         });
     };
 
+    const handleBrochureFileUpload = async (file: File) => {
+        if (!isEditMode || !houseId) {
+            showError({
+                title: "Please save unit layout first",
+                description: "Brochure can be uploaded after the unit layout is created.",
+            });
+            return;
+        }
+
+        setBrochureUploading(true);
+        try {
+            const uploadRes = await unitLayoutsApi.uploadFile(file);
+            const url = uploadRes?.data?.url;
+            if (!url) throw new Error("Upload response is missing url");
+
+            const nextDocuments = [
+                ...existingDocuments.filter((doc: any) => doc?.type !== "brochure"),
+                { type: "brochure", url },
+            ];
+
+            await unitLayoutsApi.update(houseId, { documents: nextDocuments });
+            queryClient.invalidateQueries({ queryKey: ["unit-layout", houseId] });
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
+            showSuccess({ title: "Brochure saved" });
+        } catch (error) {
+            showError({
+                title: "Brochure could not be saved",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        } finally {
+            setBrochureUploading(false);
+        }
+    };
+
+    const removeBrochure = async () => {
+        if (!isEditMode || !houseId) return;
+        const nextDocuments = existingDocuments.filter((doc: any) => doc?.type !== "brochure");
+        setBrochureUploading(true);
+        try {
+            await unitLayoutsApi.update(houseId, { documents: nextDocuments });
+            queryClient.invalidateQueries({ queryKey: ["unit-layout", houseId] });
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
+            queryClient.invalidateQueries({ queryKey: ["unit-layouts", slug] });
+            showSuccess({ title: "Brochure removed" });
+        } catch (error) {
+            showError({
+                title: "Brochure could not be removed",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        } finally {
+            setBrochureUploading(false);
+        }
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const allErrors: Record<string, string[]> = {};
@@ -478,7 +551,7 @@ export function HouseForm({
 
         const pricesRecord: Record<string, number> = {};
         for (const p of form.prices) {
-            const cur = currencies.find((c: Currency) => c.id === p.currencyId || c.value === p.currencyId || c.name === p.currencyId);
+            const cur = currencies.find((c) => c.id === p.currencyId || c.value === p.currencyId || c.name === p.currencyId);
             pricesRecord[cur?.value || p.currencyId] = p.priceTotal;
         }
 
@@ -494,7 +567,7 @@ export function HouseForm({
             categoryId,
             houseId: parentHouseId || existingHouseData?.houseId || undefined,
             floor: form.floorFrom,
-            number: form.roomCount,
+            number: form.roomCount || undefined,
             entrance: normalizeOptionalText(form.entrance),
             totalArea: form.totalArea,
             internalArea: form.internalArea || form.totalArea,
@@ -958,6 +1031,66 @@ export function HouseForm({
                                 </div>
                             </SectionBlock>
 
+                            <SectionBlock title="Brochure" description="Upload a brochure PDF and save it immediately to this unit layout.">
+                                <div className="space-y-3">
+                                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 py-3">
+                                        <div className="min-w-0">
+                                            <div className="truncate text-sm font-medium text-[#1A1A1A]">
+                                                {brochureFileName || "No brochure uploaded"}
+                                            </div>
+                                            {brochureDoc?.url ? (
+                                                <a
+                                                    href={brochureDoc.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="text-xs text-[#4E525D] hover:underline"
+                                                >
+                                                    Open brochure
+                                                </a>
+                                            ) : (
+                                                <div className="text-xs text-[#999]">PDF only</div>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {brochureDoc?.url ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={removeBrochure}
+                                                    disabled={brochureUploading}
+                                                    className="rounded-full border border-[#C9CDD5] bg-white px-4 py-2 text-xs font-semibold text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                                                >
+                                                    Remove
+                                                </button>
+                                            ) : null}
+                                            <button
+                                                type="button"
+                                                onClick={() => brochureFileRef.current?.click()}
+                                                disabled={brochureUploading || !isEditMode}
+                                                className="rounded-full bg-[#4E525D] px-4 py-2 text-xs font-semibold text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                                            >
+                                                {brochureUploading ? "Uploading..." : brochureDoc?.url ? "Replace" : "Upload"}
+                                            </button>
+                                            <input
+                                                ref={brochureFileRef}
+                                                type="file"
+                                                accept=".pdf"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleBrochureFileUpload(file);
+                                                    if (brochureFileRef.current) brochureFileRef.current.value = "";
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    {!isEditMode ? (
+                                        <div className="text-xs text-[#999]">
+                                            Create the unit layout first to enable brochure upload.
+                                        </div>
+                                    ) : null}
+                                </div>
+                            </SectionBlock>
+
                             <SectionBlock title="Attributes" description="Choose the unit layout features shown with the listing.">
                                 <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 py-2">
                                     {attributes.map((attr: Attribute) => {
@@ -1040,7 +1173,7 @@ export function HouseForm({
                                 {currencies.length > 0 ? (
                                     <div className="space-y-3">
                                         <label className="block text-sm font-semibold text-[#1A1A1A]">Prices by Currency</label>
-                                        {currencies.map((cur: Currency) => {
+                                        {currencies.map((cur) => {
                                             const existingPrice = form.prices?.find((p: any) => p.currencyId === cur.id);
                                             return (
                                                 <div key={cur.id} className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">

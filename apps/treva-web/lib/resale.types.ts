@@ -62,7 +62,7 @@ export interface ResaleApartment {
     roomCount: number;
     area: number;
     floorFrom: number;
-    floorTo: number;
+    floorTo?: number | null;
     locationTitle?: string;
     locationUrl?: string;
     locationGoogleMapsUrl?: string;

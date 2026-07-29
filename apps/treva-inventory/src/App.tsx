@@ -166,18 +166,10 @@ function App() {
                             }
                         />
                         <Route
-                            path="/dashboard/resale/room-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Dashboard />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
                             path="/dashboard/resale/currencies"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/resale" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -273,7 +265,7 @@ function App() {
                             path="/dashboard/offplan/currencies"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -297,7 +289,7 @@ function App() {
                             path="/dashboard/offplan/owners"
                             element={
                                 <ProtectedRoute>
-                                    <Dashboard />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -390,26 +382,10 @@ function App() {
                             }
                         />
                         <Route
-                            path="/room-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Navigate to="/dashboard/resale/room-options" replace />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
                             path="/unit-type-options"
                             element={
                                 <ProtectedRoute>
                                     <Navigate to="/dashboard/offplan/unit-type-options" replace />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/resale/room-options"
-                            element={
-                                <ProtectedRoute>
-                                    <Navigate to="/dashboard/resale/room-options" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -425,7 +401,7 @@ function App() {
                             path="/currencies"
                             element={
                                 <ProtectedRoute>
-                                    <Navigate to="/dashboard/offplan/currencies" replace />
+                                    <Navigate to="/dashboard/offplan" replace />
                                 </ProtectedRoute>
                             }
                         />
@@ -537,7 +513,7 @@ function App() {
                             path="/resale/currencies"
                             element={
                                 <ProtectedRoute>
-                                    <Navigate to="/dashboard/resale/currencies" replace />
+                                    <Navigate to="/dashboard/resale" replace />
                                 </ProtectedRoute>
                             }
                         />

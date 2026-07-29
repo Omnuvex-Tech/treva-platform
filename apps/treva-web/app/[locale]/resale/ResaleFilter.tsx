@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useResaleApartmentRange, useResaleCurrencies, useResaleLocationOptions, useResaleRooms, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
-import { useRoomOptions } from '@/hooks/use-room-options';
 import { useDebounce } from '@/hooks/use-debounce';
 import type { ResaleLocationOption } from '@/lib/resale.types';
 import './unit-filter.css';
@@ -187,7 +186,6 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const { data: apartmentTypesData } = useResaleApartmentTypes();
   const { data: locationOptionsData } = useResaleLocationOptions();
   const { data: currenciesData } = useResaleCurrencies();
-  const { data: roomOptionsData } = useRoomOptions('resale');
   const { data: roomCountsData } = useResaleRooms();
 
   const apartmentTypes = [...(apartmentTypesData || [])].sort((a: any, b: any) => {
@@ -196,17 +194,9 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const locationOptions = locationOptionsData || [];
   const cities = locationOptions.filter((option) => option.type === 'city');
   const currencies = currenciesData || [];
-  const roomOptions = roomOptionsData || [];
   const roomButtons = roomCountsData?.length
     ? roomCountsData.map((roomCount) => ({ value: String(roomCount), label: String(roomCount) }))
-    : roomOptions
-        .map((room: any) => {
-          const rawValue = room.value ?? room.name ?? room.title;
-          const match = String(rawValue ?? '').match(/\d+/);
-          const value = match?.[0] ?? '';
-          return value ? { value, label: String(rawValue) } : null;
-        })
-        .filter((room): room is { value: string; label: string } => Boolean(room));
+    : [];
 
   const resaleStatusOptions = [
     { id: 'active', value: t.active },

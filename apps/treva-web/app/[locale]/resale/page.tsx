@@ -111,6 +111,13 @@ export default function ResalePage() {
     setSavedItems(getSaved().filter(p => p.type === 'resale').map(p => p.id));
   }, []);
 
+  const formatFloorLabel = (floorFrom: number | null | undefined, floorTo: number | null | undefined) => {
+    const from = floorFrom ?? 0;
+    const to = floorTo ?? null;
+    if (!to || to === from) return String(from);
+    return `${from}/${to}`;
+  };
+
   const toggleSave = (apt: ResaleApartment) => {
     if (savedItems.includes(apt.id)) {
       removeSaved(apt.id);
@@ -126,7 +133,7 @@ export default function ResalePage() {
         currency: apt.prices?.[0]?.currency?.value ?? 'AZN',
         rooms: String(apt.roomCount ?? ''),
         area: String(apt.area ?? ''),
-        floor: `${apt.floorFrom}/${apt.floorTo}`,
+        floor: formatFloorLabel(apt.floorFrom, apt.floorTo),
         location: apt.locationTitle || '',
         title: apt.title || '',
         apartmentTypeSlug: apt.apartmentType?.slug,
@@ -244,7 +251,7 @@ export default function ResalePage() {
                           <div className="re-tags-row">
                             <span className="re-tag">{apt.roomCount}-{t.room}</span>
                             <span className="re-tag">{apt.area} m²</span>
-                            <span className="re-tag">{apt.floorFrom}/{apt.floorTo} {t.floor}</span>
+                            <span className="re-tag">{formatFloorLabel(apt.floorFrom, apt.floorTo)} {t.floor}</span>
                           </div>
 
                           <p className="re-address">{apt.locationTitle || '—'}</p>

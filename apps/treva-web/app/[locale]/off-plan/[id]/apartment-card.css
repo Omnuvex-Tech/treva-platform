@@ -88,6 +88,7 @@
   width: 100%;
   display: flex;
   box-sizing: border-box;
+  position: relative;
 }
 
 .apt-plan-img {
@@ -177,6 +178,25 @@
 
 .badge-btn:hover {
   background-color: #555961;
+}
+
+.apt-status-left {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+}
+
+.apt-badge.badge-available {
+  background-color: #2e7d32;
+}
+
+.apt-badge.badge-sold {
+  background-color: #c62828;
+}
+
+.apt-badge.badge-reserved {
+  background-color: #ef6c00;
 }
 
 /* Share Button & Dropdown (matches resale) */
@@ -273,14 +293,14 @@
   display: flex;
   flex-direction: column;
   margin: auto 0;
-  padding: 20px 0;
+  padding: 28px 0;
 }
 
 .apt-spec-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 13px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--line-gray);
 }
 

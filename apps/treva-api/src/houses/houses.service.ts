@@ -43,7 +43,6 @@ export class HousesService {
         status: createDto.status || 'available',
         archived: createDto.archived ?? false,
         categoryId: createDto.categoryId,
-        roomOptionId: createDto.roomOptionId,
         floor: createDto.floor,
         number: createDto.number,
         totalArea: createDto.totalArea,
@@ -77,7 +76,7 @@ export class HousesService {
         showroomAvailability: createDto.showroomAvailability,
         secondShowroomAvailability: createDto.secondShowroomAvailability,
       },
-      include: { category: true, owner: true, roomOption: true },
+      include: { category: true, owner: true },
     });
 
     await this.syncCategoryMetrics(createDto.categoryId);
@@ -128,7 +127,6 @@ export class HousesService {
         orderBy: { createdAt: 'desc' },
         include: {
           category: true,
-          roomOption: true,
           owner: true,
           _count: { select: { unitLayouts: true } },
         },
@@ -152,7 +150,6 @@ export class HousesService {
       where: { id },
       include: {
         category: true,
-        roomOption: true,
         owner: true,
         unitLayouts: true,
       },
@@ -170,7 +167,6 @@ export class HousesService {
       where: { slug },
       include: {
         category: true,
-        roomOption: true,
         owner: true,
         unitLayouts: true,
       },
@@ -213,7 +209,6 @@ export class HousesService {
     if (updateDto.status !== undefined) data.status = updateDto.status;
     if (updateDto.archived !== undefined) data.archived = updateDto.archived;
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
-    if (updateDto.roomOptionId !== undefined) data.roomOptionId = updateDto.roomOptionId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
@@ -250,7 +245,7 @@ export class HousesService {
     const house = await this.prisma.house.update({
       where: { id },
       data,
-      include: { category: true, roomOption: true, owner: true },
+      include: { category: true, owner: true },
     });
 
     await this.syncCategoryMetrics(house.categoryId);

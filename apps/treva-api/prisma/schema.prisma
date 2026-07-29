@@ -75,8 +75,6 @@ model House {
   location                    Json?
   categoryId                  String
   category                    Category    @relation(fields: [categoryId], references: [id])
-  roomOptionId                String?
-  roomOption                  RoomOption? @relation(fields: [roomOptionId], references: [id])
   status                      String      @default("available")
   statusOptionId              String?
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
@@ -147,18 +145,6 @@ model UnitLayout {
   archived                    Boolean     @default(false)
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
-}
-
-model RoomOption {
-  id        String   @id @default(cuid())
-  name      String
-  title     String
-  type      String   @default("off-plan") // "resale" | "off-plan"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  houses      House[]
-  @@unique([name, type])
 }
 
 model UnitTypeOption {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { trevaApi as api } from "@/lib/api";
+import { STATIC_CURRENCIES } from "@/config/currencies";
 
 export interface Currency {
     id: string;
@@ -13,9 +13,6 @@ export interface Currency {
 export function useCurrencies() {
     return useQuery({
         queryKey: ["currencies"],
-        queryFn: async () => {
-            const response = await api.get<Currency[]>("/currencies");
-            return response.data;
-        },
+        queryFn: async () => STATIC_CURRENCIES as Currency[],
     });
 }

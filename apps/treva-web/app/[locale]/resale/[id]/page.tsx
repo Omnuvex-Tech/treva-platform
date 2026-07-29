@@ -150,6 +150,12 @@ export default function ResaleDetailPage() {
 
   const toggleSaveProp = () => {
     if (!apartment) return;
+    const formatFloorLabel = (floorFrom: number | null | undefined, floorTo: number | null | undefined) => {
+      const from = floorFrom ?? 0;
+      const to = floorTo ?? null;
+      if (!to || to === from) return String(from);
+      return `${from}/${to}`;
+    };
     if (isSavedProp(apartment.id)) {
       removeSaved(apartment.id);
       setIsSaved(false);
@@ -164,7 +170,7 @@ export default function ResaleDetailPage() {
         currency: apartment.prices?.[0]?.currency?.value ?? 'AZN',
         rooms: String(apartment.roomCount ?? ''),
         area: String(apartment.area ?? ''),
-        floor: `${apartment.floorFrom}/${apartment.floorTo}`,
+        floor: formatFloorLabel(apartment.floorFrom, apartment.floorTo),
         location: apartment.locationTitle || '',
         title: apartment.title || '',
         apartmentTypeSlug: apartment.apartmentType?.slug,
@@ -220,7 +226,14 @@ export default function ResaleDetailPage() {
     return 'AZN';
   };
 
-  const title = `${apartment.roomCount}-ROOM FLAT, ${apartment.area} M², ${apartment.floorFrom}/${apartment.floorTo} FLOOR`;
+  const floorLabel = (() => {
+    const from = apartment.floorFrom ?? 0;
+    const to = apartment.floorTo ?? null;
+    if (!to || to === from) return String(from);
+    return `${from}/${to}`;
+  })();
+
+  const title = `${apartment.roomCount}-ROOM FLAT, ${apartment.area} M², ${floorLabel} FLOOR`;
   const galleryDictionary = {
     az: {
       viewAll: 'Bütün',
