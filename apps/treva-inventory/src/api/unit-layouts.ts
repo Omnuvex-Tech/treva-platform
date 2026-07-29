@@ -118,7 +118,7 @@ export interface CreateUnitLayoutData {
     houseId?: string;
     unitTypeOptionId?: string;
     floor: number;
-    number: number;
+    number?: number;
     entrance?: string;
     totalArea: number;
     internalArea: number;

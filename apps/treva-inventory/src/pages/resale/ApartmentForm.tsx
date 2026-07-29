@@ -1325,7 +1325,10 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                             value={existingPrice?.priceTotal ?? ""}
                                                             onChange={(e) => {
                                                                 if (!cur.id) {
-                                                                    showError(`Currency ${cur.value} is not configured`);
+                                                                    showError({
+                                                                        title: "Currency is not configured",
+                                                                        description: `Currency ${cur.value} is not configured`,
+                                                                    });
                                                                     return;
                                                                 }
                                                                 const raw = e.target.value;
@@ -1355,7 +1358,10 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                             value={existingPrice?.priceByArea ?? ""}
                                                             onChange={(e) => {
                                                                 if (!cur.id) {
-                                                                    showError(`Currency ${cur.value} is not configured`);
+                                                                    showError({
+                                                                        title: "Currency is not configured",
+                                                                        description: `Currency ${cur.value} is not configured`,
+                                                                    });
                                                                     return;
                                                                 }
                                                                 const raw = e.target.value;

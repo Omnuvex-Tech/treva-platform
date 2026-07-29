@@ -304,7 +304,8 @@ export function HouseForm({
             const rawPrices = house.pricesByCurrency || house.priceByCurrency || house.prices || {};
             const pricesArray = rawPrices && typeof rawPrices === "object"
                 ? Object.entries(rawPrices).map(([currencyValue, priceTotal]) => {
-                    const cur = currencies.find((c) => [c.id, c.value, c.name].includes(String(currencyValue)));
+                    const currencyKey = String(currencyValue);
+                    const cur = currencies.find((c) => c.id === currencyKey || c.value === currencyKey || c.name === currencyKey);
                     const total = Number(priceTotal) || 0;
                     return {
                         currencyId: cur?.id || String(currencyValue),
@@ -555,20 +556,21 @@ export function HouseForm({
             pricesRecord[cur?.value || p.currencyId] = p.priceTotal;
         }
 
+        const seoTitle = normalizeOptionalText(form.seoTitle);
+        const seoDescription = normalizeOptionalText(form.seoDescription);
+        const seoKeywords = normalizeOptionalText(form.seoKeywords);
+        const canonicalUrl = normalizeOptionalText(form.canonicalUrl);
+        const seoImage = normalizeOptionalText(form.seoImage);
+        const entrance = normalizeOptionalText(form.entrance);
+        const houseIdValue = parentHouseId || existingHouseData?.houseId || undefined;
+        const descriptionValue = normalizeOptionalText(form.description);
+
         const submitData: CreateUnitLayoutData = {
-                title: form.title,
-                name: form.name,
+            title: form.title,
+            name: form.name,
             slug: normalizeOptionalText(form.slug) || "",
-            seoTitle: normalizeOptionalText(form.seoTitle),
-            seoDescription: normalizeOptionalText(form.seoDescription),
-            seoKeywords: normalizeOptionalText(form.seoKeywords),
-            canonicalUrl: normalizeOptionalText(form.canonicalUrl),
-            seoImage: normalizeOptionalText(form.seoImage),
             categoryId,
-            houseId: parentHouseId || existingHouseData?.houseId || undefined,
             floor: form.floorFrom,
-            number: form.roomCount || undefined,
-            entrance: normalizeOptionalText(form.entrance),
             totalArea: form.totalArea,
             internalArea: form.internalArea || form.totalArea,
             balconyArea: form.balconyArea || 0,
@@ -578,13 +580,20 @@ export function HouseForm({
             similarApartmentIds: form.attributeIds,
             attributeIds: form.attributeIds,
             heatingTypeIds: [],
-            mainImage: form.image ? { url: form.image } : undefined,
-                coverImage: form.coverImage ? { url: form.coverImage } : undefined,
+            ...(form.image ? { mainImage: { url: form.image } } : {}),
+            ...(form.coverImage ? { coverImage: { url: form.coverImage } } : {}),
             gallery: form.gallery,
-            documents: [],
             status: (form.status || "available") as UnitLayoutStatus,
-            unitTypeOptionId: form.unitTypeOptionId || undefined,
-            description: form.description || undefined,
+            ...(seoTitle ? { seoTitle } : {}),
+            ...(seoDescription ? { seoDescription } : {}),
+            ...(seoKeywords ? { seoKeywords } : {}),
+            ...(canonicalUrl ? { canonicalUrl } : {}),
+            ...(seoImage ? { seoImage } : {}),
+            ...(houseIdValue ? { houseId: houseIdValue } : {}),
+            ...(entrance ? { entrance } : {}),
+            ...(form.roomCount ? { number: form.roomCount } : {}),
+            ...(form.unitTypeOptionId ? { unitTypeOptionId: form.unitTypeOptionId } : {}),
+            ...(descriptionValue ? { description: descriptionValue } : {}),
         };
 
         createMutation.mutate(submitData);

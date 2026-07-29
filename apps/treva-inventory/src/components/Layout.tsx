@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const navItems = [
+type NavItem = { path: string; label: string; icon: string };
+
+const navItems: NavItem[] = [
     { path: "/", label: "Dashboard", icon: "📊" },
 ];
 
-const sharedItems = [
-];
+const sharedItems: NavItem[] = [];
 
-const offPlanItems = [
+const offPlanItems: NavItem[] = [
     { path: "/categories", label: "Categories", icon: "📁" },
     { path: "/unit-layouts", label: "Unit Layouts", icon: "🏢" },
 ];
 
-const resaleItems = [
+const resaleItems: NavItem[] = [
     { path: "/resale/apartments", label: "Apartments", icon: "🏠" },
     { path: "/resale/apartment-types", label: "Apartment Types", icon: "📑" },
     { path: "/resale/owners", label: "Owners", icon: "👤" },
