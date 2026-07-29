@@ -50,6 +50,8 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'maxArea', required: false, type: Number })
   @ApiQuery({ name: 'floor', required: false, type: Number })
   @ApiQuery({ name: 'unitTypeOptionId', required: false })
+  @ApiQuery({ name: 'rooms', required: false })
+  @ApiQuery({ name: 'statusOptionId', required: false })
   @ApiQuery({ name: 'houseId', required: false })
   @ApiQuery({ name: 'houseSlug', required: false })
   @ApiQuery({ name: 'archived', required: false, type: Boolean })
@@ -59,6 +61,7 @@ export class UnitLayoutsController {
     @Query('categoryId') categoryId?: string,
     @Query('categorySlug') categorySlug?: string,
       @Query('status') status?: 'available' | 'reserved' | 'sold',
+    @Query('statusOptionId') statusOptionId?: string,
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
@@ -67,6 +70,7 @@ export class UnitLayoutsController {
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
     @Query('unitTypeOptionId') unitTypeOptionId?: string,
+    @Query('rooms') rooms?: string,
     @Query('houseId') houseId?: string,
     @Query('houseSlug') houseSlug?: string,
     @Query('archived') archived?: string,
@@ -76,7 +80,8 @@ export class UnitLayoutsController {
       limit: limit ? parseInt(limit, 10) : undefined,
       categoryId,
       categorySlug,
-        status,
+      status,
+      statusOptionId,
       search,
       minPrice: minPrice ? parseFloat(minPrice) : undefined,
       maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
@@ -85,6 +90,7 @@ export class UnitLayoutsController {
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor, 10) : undefined,
       unitTypeOptionId,
+      rooms,
       houseId,
       houseSlug,
       archived: archived === 'true' ? true : archived === 'false' ? false : undefined,

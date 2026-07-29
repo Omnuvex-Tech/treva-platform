@@ -522,7 +522,7 @@
   /* Spesifikasiya siyahısı */
   .apt-specs-list {
     margin: 0;
-    padding: 12px 0;
+    padding: 28px 0;
     width: 100%;
     flex-grow: 1;
     display: flex;
@@ -531,8 +531,8 @@
   }
 
   .apt-spec-item {
-    height: 42px;
-    padding: 0;
+    height: auto;
+    padding: 16px 0;
     border-bottom-color: #b8b4ab;
   }
 

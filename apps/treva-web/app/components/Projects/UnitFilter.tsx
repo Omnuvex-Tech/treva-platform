@@ -4,13 +4,20 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
-import { useUnitTypeOptions } from '@/hooks/use-unit-type-options';
 import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
+
+const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string }> = [
+  { id: '1', label: '1' },
+  { id: '2', label: '2' },
+  { id: '3', label: '3' },
+  { id: '4', label: '4' },
+  { id: '4plus', label: '4+' },
+];
 
 export default function UnitLayout() {
   const params = useParams();
@@ -135,9 +142,6 @@ export default function UnitLayout() {
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const limit = 12;
 
-  const { data: unitTypesData } = useUnitTypeOptions();
-  const roomOptions = unitTypesData || [];
-
   const { data: statusOptionsData } = useStatusOptions();
   const statusOptions = statusOptionsData || [];
 
@@ -201,7 +205,7 @@ export default function UnitLayout() {
     ...(categorySlug && { categorySlug }),
     ...(floor && { floor: parseInt(floor) }),
     ...(selectedStatus && { statusOptionId: selectedStatus }),
-    ...(selectedRooms && { unitTypeOptionId: selectedRooms }),
+    ...(selectedRooms && { rooms: selectedRooms }),
     ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
     ...(typeof debouncedPriceMax === 'number' && debouncedPriceMax < totalPriceMax && { maxPrice: debouncedPriceMax }),
     currency,
@@ -566,20 +570,16 @@ export default function UnitLayout() {
           <div className="filter-group filter-group--rooms">
             <label className="filter-label">{t.rooms}</label>
             <div className="rooms-group">
-              {roomOptions.length === 0 ? (
-                <span style={{ fontSize: 13, color: '#9ca3af' }}>{t.noRooms}</span>
-              ) : (
-                roomOptions.map((room) => (
-                  <button
-                    key={room.id}
-                    type="button"
-                    className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
-                    onClick={() => { setSelectedRooms(selectedRooms === room.id ? '' : room.id); setPage(1); }}
-                  >
-                    <span className="room-btn__text">{room.title}</span>
-                  </button>
-                ))
-              )}
+              {ROOM_COUNT_OPTIONS.map((room) => (
+                <button
+                  key={room.id}
+                  type="button"
+                  className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
+                  onClick={() => { setSelectedRooms(selectedRooms === room.id ? '' : room.id); setPage(1); }}
+                >
+                  <span className="room-btn__text">{room.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 

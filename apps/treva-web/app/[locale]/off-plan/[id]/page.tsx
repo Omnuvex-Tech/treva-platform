@@ -90,7 +90,7 @@ export default function ApartmentCard() {
       outOf: 'out of',
       showMore: 'Show more',
       checkOutApartment: 'Check out this apartment',
-      available: 'Available',
+      available: 'Active',
       sold: 'Sold',
       reserved: 'Reserved',
       floorSuffix: 'floor',
@@ -323,11 +323,6 @@ export default function ApartmentCard() {
               {/* Left Side: Blueprint Image Section */}
               <div className="apt-image-section">
                 <div className="apt-blueprint-box">
-                  {layout.statusOption?.value ? (
-                    <div className={`apt-status-left apt-badge ${statusClass(layout.statusOption.value)}`}>
-                      <span className="apt-badge__text">{formatStatus(layout.statusOption.value)}</span>
-                    </div>
-                  ) : null}
                   {layout.mainImage ? (
                     <img
                       src={getAssetUrl(layout.mainImage.url)}
@@ -350,9 +345,14 @@ export default function ApartmentCard() {
                   </h1>
 
                   <div className="apt-badge-row">
+                    {layout.statusOption?.value ? (
+                      <div className={`apt-badge ${statusClass(layout.statusOption.value)}`}>
+                        <span className="apt-badge__text">{formatStatus(layout.statusOption.value)}</span>
+                      </div>
+                    ) : null}
                     {brochureDoc ? (
                       <a href={getAssetUrl(brochureDoc.url)} className="apt-badge badge-btn" download>
-                        <span className="apt-badge__text">Brochure</span>
+                        <span className="apt-badge__text">PDF</span>
                       </a>
                     ) : null}
                     <div className="apt-share-container" ref={shareRef}>
@@ -517,7 +517,11 @@ export default function ApartmentCard() {
                 </div>
                 <div className="panorama-row">
                   <span className="panorama-label">{t.numberOfFloors}</span>
-                  <span className="panorama-value">{layout.numberOfFloors?.start} - {layout.numberOfFloors?.end} {t.floorsRange}</span>
+                  <span className="panorama-value">
+                    {layout.numberOfFloors?.start && layout.numberOfFloors?.end && layout.numberOfFloors.end !== layout.numberOfFloors.start
+                      ? `${layout.numberOfFloors.start} - ${layout.numberOfFloors.end}`
+                      : `${layout.numberOfFloors?.start ?? layout.numberOfFloors?.end ?? ''}`}
+                  </span>
                 </div>
               </div>
             </section>

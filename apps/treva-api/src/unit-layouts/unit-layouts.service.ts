@@ -77,6 +77,7 @@ export class UnitLayoutsService {
     categoryId?: string;
     categorySlug?: string;
       status?: 'available' | 'reserved' | 'sold';
+    statusOptionId?: string;
     search?: string;
     minPrice?: number;
     maxPrice?: number;
@@ -85,6 +86,7 @@ export class UnitLayoutsService {
     maxArea?: number;
     floor?: number;
     unitTypeOptionId?: string;
+    rooms?: string;
     houseId?: string;
     houseSlug?: string;
     archived?: boolean;
@@ -122,7 +124,9 @@ export class UnitLayoutsService {
       }
     }
 
-    if (query.status) {
+    if (query.statusOptionId) {
+      where.statusOptionId = query.statusOptionId;
+    } else if (query.status) {
       where.status = query.status;
     }
 
@@ -193,6 +197,18 @@ export class UnitLayoutsService {
 
     if (query.unitTypeOptionId) {
       where.unitTypeOptionId = query.unitTypeOptionId;
+    }
+
+    if (query.rooms) {
+      const raw = String(query.rooms).trim().toLowerCase();
+      if (raw === '4plus' || raw === '4+' || raw === '4 ') {
+        where.number = { gte: 4 };
+      } else {
+        const parsed = parseInt(raw, 10);
+        if (Number.isFinite(parsed)) {
+          where.number = parsed;
+        }
+      }
     }
 
     const [data, total] = await Promise.all([
