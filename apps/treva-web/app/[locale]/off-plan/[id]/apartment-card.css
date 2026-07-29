@@ -70,7 +70,7 @@
   display: flex;
   width: 100%;
   box-sizing: border-box;
-  padding: 55px 0;
+  padding: 55px 24px;
   align-items: center;
   justify-content: space-around;
   border-radius: 5px;
@@ -147,7 +147,7 @@
 }
 
 .apt-badge {
-  background-color: var(--slate-gray);
+  background-color: #4E525D;
   color: #ffffff;
   height: 42px;
   padding: 0 19px;
@@ -387,15 +387,12 @@
   left: 0;
   width: 100%;
   padding: 0;
-  background: #ffffff;
-  border: 1px solid #E7E9EE;
-  border-radius: 6px;
-  box-shadow: none;
+  background: #4E525D;
+  border-radius: 12px;
+  box-shadow: var(--treva-shadow);
   overflow: hidden;
   z-index: 99;
-  min-width: 100%;
-  max-height: min(320px, 60vh);
-  overflow-y: auto;
+  min-width: 90px;
 }
 
 .apt-currency-option {
@@ -407,7 +404,7 @@
   padding: 12px 18px;
   border: none;
   background: transparent;
-  color: #3F4249;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 400;
   line-height: 1;
@@ -418,11 +415,11 @@
 }
 
 .apt-currency-option:hover {
-  background: #f4f1eb;
+  background: #555961;
 }
 
 .apt-currency-option--active {
-  background: #ebe5db;
+  background: #3F4249;
 }
 
 .apt-badge--status {
@@ -447,7 +444,7 @@
    ========================================================================== */
 @media (min-width: 769px) {
   .apt-main-card {
-    padding: 28px 0;
+    padding: 24px;
     gap: clamp(20px, 2.6vw, 48px);
     display: flex;
     /* align-items: stretch sağ və sol div-lərin hündürlüyünü kilidləyir. 

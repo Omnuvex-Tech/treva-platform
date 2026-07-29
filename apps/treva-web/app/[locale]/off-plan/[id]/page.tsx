@@ -272,7 +272,7 @@ export default function ApartmentCard() {
       <div className="page-wrapper">
         <Navbar locale={locale} variant="solid" />
         <main className="main-wrapper">
-          <PageContainer>
+          <PageContainer className="off-plan-page-container">
             <div />
           </PageContainer>
         </main>
@@ -290,7 +290,7 @@ export default function ApartmentCard() {
       <div className="page-wrapper">
         <Navbar locale={locale} variant="solid" />
         <main className="main-wrapper">
-          <PageContainer>
+          <PageContainer className="off-plan-page-container">
             <div className="loading-state" style={{ padding: '64px 0', textAlign: 'center' }}>
               <p style={{ color: '#6d717a' }}>{t.apartmentNotFound}</p>
               <Link href={`/${locale}/off-plan`} style={{ color: '#3F4249', marginTop: 16, display: 'inline-block' }}>
@@ -309,7 +309,7 @@ export default function ApartmentCard() {
     <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
       <main className="main-wrapper">
-        <PageContainer>
+        <PageContainer className="off-plan-page-container">
           <div className="apt-wrapper">
             {/* Breadcrumbs */}
             <nav className="apt-breadcrumbs">
