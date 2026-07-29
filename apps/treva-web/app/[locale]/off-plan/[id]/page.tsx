@@ -183,6 +183,7 @@ export default function ApartmentCard() {
   const brochureDoc = layout?.documents?.find(
     (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
   );
+  const statusValue = layout?.statusOption?.value || (layout as any)?.status || '';
 
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
   const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
@@ -345,9 +346,9 @@ export default function ApartmentCard() {
                   </h1>
 
                   <div className="apt-badge-row">
-                    {layout.statusOption?.value ? (
-                      <div className={`apt-badge ${statusClass(layout.statusOption.value)}`}>
-                        <span className="apt-badge__text">{formatStatus(layout.statusOption.value)}</span>
+                    {statusValue ? (
+                      <div className={`apt-badge ${statusClass(statusValue)}`}>
+                        <span className="apt-badge__text">{formatStatus(statusValue)}</span>
                       </div>
                     ) : null}
                     {brochureDoc ? (

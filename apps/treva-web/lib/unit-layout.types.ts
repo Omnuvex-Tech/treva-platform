@@ -31,6 +31,7 @@ export interface UnitLayout {
     title: string;
     name: string;
     slug: string;
+    status?: string;
     floor: number;
     number?: number;
     entrance?: string;

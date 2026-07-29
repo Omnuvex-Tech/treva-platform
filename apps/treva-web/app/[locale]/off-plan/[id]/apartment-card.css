@@ -333,30 +333,30 @@
 }
 
 .apt-currency-select {
-  background-color: var(--slate-gray);
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #3f4249;
   height: 42px;
   padding: 0 18px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 14px;
   cursor: pointer;
   text-transform: none;
-  border: none;
+  border: 1px solid #ccc;
   appearance: none;
   -webkit-appearance: none;
   line-height: 1;
-  transition: background-color 0.2s;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
   white-space: nowrap;
 }
 
 .apt-currency-select:hover {
-  background-color: #555961;
+  border-color: #999;
 }
 
 .apt-currency-select[aria-expanded="true"] svg {
@@ -367,9 +367,10 @@
   display: block;
   flex: 0 0 auto;
   transition: transform 0.2s ease;
-  width: 20px;
-  height: 20px;
-  stroke-width: 2;
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+  color: #3f4249;
 }
 
 .apt-price {
@@ -386,39 +387,42 @@
   left: 0;
   width: 100%;
   padding: 0;
-  background: #3f4249;
-  border-radius: 12px;
-  box-shadow: var(--treva-shadow);
+  background: #ffffff;
+  border: 1px solid rgba(63, 66, 73, 0.1);
+  border-radius: 6px;
+  box-shadow: none;
   overflow: hidden;
   z-index: 99;
-  min-width: 90px;
+  min-width: 100%;
+  max-height: min(320px, 60vh);
+  overflow-y: auto;
 }
 
 .apt-currency-option {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
-  min-height: 42px;
-  padding: 18px 20px;
+  min-height: 44px;
+  padding: 12px 18px;
   border: none;
   background: transparent;
-  color: #ffffff;
+  color: #3F4249;
   font-size: 13px;
   font-weight: 400;
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
 .apt-currency-option:hover {
-  background: #2f3134;
+  background: #f4f1eb;
 }
 
 .apt-currency-option--active {
-  background: #2f3134;
+  background: #ebe5db;
 }
 
 .apt-wrapper,
