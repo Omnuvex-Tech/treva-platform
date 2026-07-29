@@ -108,6 +108,8 @@ export class UnitLayoutsService {
       });
       if (category) {
         where.categoryId = category.id;
+      } else {
+        where.categoryId = '__missing__';
       }
     }
 

@@ -8,10 +8,10 @@ import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
+import { trevaApi as api } from "@/lib/api";
+import { endpoints } from "@/config/endpoints";
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
-
-const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
 
 const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string }> = [
   { id: '1', label: '1' },
@@ -149,7 +149,7 @@ export default function UnitLayout() {
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const limit = 12;
 
-  const [categories, setCategories] = useState<Array<{ slug: string; title: { az?: string; en?: string; ru?: string } }>>([]);
+  const [categories, setCategories] = useState<Array<{ slug: string; title: string }>>([]);
 
   const { data: statusOptionsData } = useStatusOptions();
   const statusOptions = statusOptionsData || [];
@@ -205,20 +205,19 @@ export default function UnitLayout() {
   }, [selectedCategorySlug, currency, floor, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, router]);
 
   useEffect(() => {
-    fetch(`${CMS_API}/layihelerimiz/categories/visible`)
-      .then((res) => res.json())
-      .then((raw) => {
-        const data = Array.isArray(raw) ? raw : raw.value || [];
+    api.get(`${endpoints.offPlan.categories}?type=object`)
+      .then((res) => {
+        const raw = (res as any)?.data?.data ?? (res as any)?.data ?? [];
+        const data = Array.isArray(raw) ? raw : [];
         const next = data
-          .map((cat: any) => {
-            const rawTitle = cat.title;
-            const titleObj = (rawTitle && typeof rawTitle === 'object') ? rawTitle : { az: rawTitle, en: rawTitle, ru: rawTitle };
-            return { slug: String(cat.slug || ''), title: titleObj };
-          })
+          .map((cat: any) => ({
+            slug: String(cat?.slug || ''),
+            title: String(cat?.title || cat?.name || cat?.slug || ''),
+          }))
           .filter((item: any) => item.slug);
         setCategories(next);
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const debouncedPriceMin = useDebounce(priceMin, 1000);
@@ -336,7 +335,7 @@ export default function UnitLayout() {
             <label className="filter-label">{t.project}</label>
             <div className="custom-select" ref={categoryRef}>
               <button type="button" className="custom-select__trigger" aria-expanded={categoryOpen} onClick={() => setCategoryOpen((p) => !p)}>
-                <span>{selectedCategorySlug ? (categories.find((c) => c.slug === selectedCategorySlug)?.title?.[locale] || selectedCategorySlug) : t.all}</span>
+                <span>{selectedCategorySlug ? (categories.find((c) => c.slug === selectedCategorySlug)?.title || selectedCategorySlug) : t.all}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
@@ -353,7 +352,7 @@ export default function UnitLayout() {
                       className={`custom-select__option ${selectedCategorySlug === cat.slug ? 'custom-select__option--active' : ''}`}
                       onClick={() => { setSelectedCategorySlug(cat.slug); setPage(1); setCategoryOpen(false); }}
                     >
-                      {cat.title?.[locale] || cat.slug}
+                      {cat.title || cat.slug}
                     </button>
                   ))}
                 </div>
