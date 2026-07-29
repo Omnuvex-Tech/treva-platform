@@ -347,7 +347,7 @@ export default function ApartmentCard() {
 
                   <div className="apt-badge-row">
                     {statusValue ? (
-                      <div className={`apt-badge ${statusClass(statusValue)}`}>
+                      <div className="apt-badge apt-badge--status">
                         <span className="apt-badge__text">{formatStatus(statusValue)}</span>
                       </div>
                     ) : null}
