@@ -100,6 +100,8 @@ export function UnitLayoutForm() {
     const { showError, showSuccess } = useMessageCenter();
 
     const [activeTab, setActiveTab] = useState<Tab>("basic");
+    const [isUnitTypeModalOpen, setIsUnitTypeModalOpen] = useState(false);
+    const [unitTypeDraft, setUnitTypeDraft] = useState({ name: "", title: "" });
     const [form, setForm] = useState<CreateUnitLayoutData>({
         title: "",
         name: "",
@@ -224,6 +226,39 @@ export function UnitLayoutForm() {
             });
         },
     });
+
+    const createUnitTypeMutation = useMutation({
+        mutationFn: (payload: { name: string; title: string }) => unitTypeOptionsApi.create(payload),
+        onSuccess: (res) => {
+            queryClient.invalidateQueries({ queryKey: ["unit-type-options"] });
+            const created = res?.data;
+            if (created?.id) {
+                setForm((prev) => ({ ...prev, unitTypeOptionId: created.id }));
+            }
+            setIsUnitTypeModalOpen(false);
+            setUnitTypeDraft({ name: "", title: "" });
+            showSuccess({ title: "Unit type created" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit type could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
+    const handleCreateUnitType = () => {
+        const name = unitTypeDraft.name.trim();
+        const title = unitTypeDraft.title.trim();
+        if (!name || !title) {
+            showError({
+                title: "Please fill required fields",
+                description: !name ? "Name is required" : "Title is required",
+            });
+            return;
+        }
+        createUnitTypeMutation.mutate({ name, title });
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -572,8 +607,8 @@ export function UnitLayoutForm() {
                                                         type="button"
                                                         className="flex w-full items-center border-t border-gray-200 px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         onClick={() => {
-                                                            navigate("/dashboard/offplan/unit-type-options");
                                                             setRoomOptionOpen(false);
+                                                            setIsUnitTypeModalOpen(true);
                                                         }}
                                                     >
                                                         Create unit type
@@ -1113,6 +1148,71 @@ export function UnitLayoutForm() {
                         </button>
                     </div>
                 </form>
+                {isUnitTypeModalOpen ? (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                        <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                            <div className="mb-5 flex items-center justify-between">
+                                <h4 className="text-xl font-medium text-[#1A1A1A]">Create unit type</h4>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsUnitTypeModalOpen(false);
+                                        setUnitTypeDraft({ name: "", title: "" });
+                                    }}
+                                    className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                                    disabled={createUnitTypeMutation.isPending}
+                                >
+                                    <IoClose className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-5">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                        <input
+                                            className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                            value={unitTypeDraft.name}
+                                            onChange={(e) => setUnitTypeDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                            placeholder="2-room"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                        <input
+                                            className="w-full h-10 rounded-xl border border-gray-200 bg-[#F4F5F6] px-3 text-sm outline-none focus:border-gray-400 focus:bg-white"
+                                            value={unitTypeDraft.title}
+                                            onChange={(e) => setUnitTypeDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                            placeholder="2 rooms"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsUnitTypeModalOpen(false);
+                                        setUnitTypeDraft({ name: "", title: "" });
+                                    }}
+                                    className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                                    disabled={createUnitTypeMutation.isPending}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleCreateUnitType}
+                                    className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                                    disabled={createUnitTypeMutation.isPending}
+                                >
+                                    {createUnitTypeMutation.isPending ? "Creating..." : "Add"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
             </div>
         </div>
         </div>

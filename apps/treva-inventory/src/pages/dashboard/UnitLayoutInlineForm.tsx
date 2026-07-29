@@ -141,6 +141,8 @@ export function HouseForm({
     const isEditMode = !!houseId;
 
     const [activeTab, setActiveTab] = useState<TabKey>("basic");
+    const [isUnitTypeModalOpen, setIsUnitTypeModalOpen] = useState(false);
+    const [unitTypeDraft, setUnitTypeDraft] = useState({ name: "", title: "" });
     const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
     const [seoTitleManuallyEdited, setSeoTitleManuallyEdited] = useState(false);
     const [draggedGalleryIndex, setDraggedGalleryIndex] = useState<number | null>(null);
@@ -381,6 +383,26 @@ export function HouseForm({
         },
     });
 
+    const createUnitTypeMutation = useMutation({
+        mutationFn: (payload: { name: string; title: string }) => unitTypeOptionsApi.create(payload),
+        onSuccess: (res) => {
+            queryClient.invalidateQueries({ queryKey: ["unit-type-options"] });
+            const created = res?.data;
+            if (created?.id) {
+                updateField("unitTypeOptionId", created.id);
+            }
+            setIsUnitTypeModalOpen(false);
+            setUnitTypeDraft({ name: "", title: "" });
+            showSuccess({ title: "Unit type created" });
+        },
+        onError: (error) => {
+            showError({
+                title: "Unit type could not be created",
+                description: getApiErrorMessage(error, "Please try again."),
+            });
+        },
+    });
+
     const validateTab = (tab: TabKey): string[] => {
         const errors: string[] = [];
         switch (tab) {
@@ -415,6 +437,19 @@ export function HouseForm({
                 break;
         }
         return errors;
+    };
+
+    const handleCreateUnitType = () => {
+        const name = unitTypeDraft.name.trim();
+        const title = unitTypeDraft.title.trim();
+        if (!name || !title) {
+            showError({
+                title: "Please fill required fields",
+                description: !name ? "Name is required" : "Title is required",
+            });
+            return;
+        }
+        createUnitTypeMutation.mutate({ name, title });
     };
 
     const showValidationToast = (errors: string[]) => {
@@ -844,8 +879,8 @@ export function HouseForm({
                                                     options={dropdownOptions(unitTypes, form.unitTypeOptionId || "", (t) => ({ id: t.id, label: t.title }))}
                                                     placeholder="Select unit type"
                                                     onChange={(id) => updateField("unitTypeOptionId", id)}
-                                                    onCreateClick={() => navigate("/dashboard/offplan/unit-type-options")}
                                                     createLabel="Create unit type"
+                                                    onCreateClick={() => setIsUnitTypeModalOpen(true)}
                                                 />
                                                 <div>
                                                     <label className="mb-1 block text-xs text-[#4E525D]">Entrance (optional)</label>
@@ -1403,6 +1438,71 @@ export function HouseForm({
                     </button>
                 </div>
             </form>
+            {isUnitTypeModalOpen ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#10182833] px-4">
+                    <div className="w-full max-w-[420px] rounded-[24px] bg-white p-6 shadow-[0_24px_48px_rgba(16,24,40,0.18)]">
+                        <div className="mb-5 flex items-center justify-between">
+                            <h4 className="text-xl font-medium text-[#1A1A1A]">Create unit type</h4>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsUnitTypeModalOpen(false);
+                                    setUnitTypeDraft({ name: "", title: "" });
+                                }}
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[#666]"
+                                disabled={createUnitTypeMutation.isPending}
+                            >
+                                <IoClose className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-5">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                    <input
+                                        className={inputClass}
+                                        value={unitTypeDraft.name}
+                                        onChange={(e) => setUnitTypeDraft((prev) => ({ ...prev, name: e.target.value }))}
+                                        placeholder="2-room"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                    <input
+                                        className={inputClass}
+                                        value={unitTypeDraft.title}
+                                        onChange={(e) => setUnitTypeDraft((prev) => ({ ...prev, title: e.target.value }))}
+                                        placeholder="2 rooms"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsUnitTypeModalOpen(false);
+                                    setUnitTypeDraft({ name: "", title: "" });
+                                }}
+                                className="rounded-full border border-[#C9CDD5] bg-white px-5 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] disabled:opacity-50"
+                                disabled={createUnitTypeMutation.isPending}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleCreateUnitType}
+                                className="rounded-full bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+                                disabled={createUnitTypeMutation.isPending}
+                            >
+                                {createUnitTypeMutation.isPending ? "Creating..." : "Add"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 
