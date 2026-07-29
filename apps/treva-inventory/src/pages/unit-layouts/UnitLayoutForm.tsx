@@ -10,7 +10,7 @@ import {
     GalleryImage,
 } from "../../api/unit-layouts";
 import { categoriesApi, Category } from "../../api/categories";
-import { roomOptionsApi, RoomOption } from "../../api/room-options";
+import { unitTypeOptionsApi, UnitTypeOption } from "../../api/unit-type-options";
 import { FileUpload } from "../../components/FileUpload";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -106,10 +106,11 @@ export function UnitLayoutForm() {
         name: "",
         slug: "",
         categoryId: "",
-        roomOptionId: undefined,
+        unitTypeOptionId: undefined,
             status: "available",
         floor: undefined as unknown as number,
         number: undefined as unknown as number,
+        entrance: "",
         totalArea: undefined as unknown as number,
         internalArea: undefined as unknown as number,
         balconyArea: undefined as unknown as number,
@@ -139,9 +140,9 @@ export function UnitLayoutForm() {
         enabled: activeTab === "similar",
     });
 
-    const { data: roomOptionsResponse } = useQuery({
-        queryKey: ["room-options"],
-        queryFn: () => roomOptionsApi.getAll(),
+    const { data: unitTypesResponse } = useQuery({
+        queryKey: ["unit-type-options"],
+        queryFn: () => unitTypeOptionsApi.getAll(),
     });
 
     const { data: currenciesResponse } = useQuery({
@@ -178,6 +179,7 @@ export function UnitLayoutForm() {
                 status: d.status ?? "available",
                 floor: d.floor ?? 1,
                 number: d.number ?? 0,
+                entrance: d.entrance ?? "",
                 totalArea: d.totalArea ?? 0,
                 internalArea: d.internalArea ?? 0,
                 balconyArea: d.balconyArea ?? 0,
@@ -188,7 +190,7 @@ export function UnitLayoutForm() {
                 mainImage: d.mainImage ?? undefined,
                 gallery: Array.isArray(d.gallery) ? d.gallery : [],
                 documents: Array.isArray(d.documents) ? d.documents : [],
-                roomOptionId: d.roomOptionId ?? undefined,
+                unitTypeOptionId: d.unitTypeOptionId ?? undefined,
             });
         }
     }, [existing]);
@@ -368,8 +370,8 @@ export function UnitLayoutForm() {
     const categories = Array.isArray(categoriesResponse?.data)
         ? (categoriesResponse.data as Category[])
         : [];
-    const roomOptions = Array.isArray(roomOptionsResponse?.data)
-        ? (roomOptionsResponse.data as RoomOption[])
+    const unitTypes = Array.isArray(unitTypesResponse?.data)
+        ? (unitTypesResponse.data as UnitTypeOption[])
         : [];
     const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
@@ -509,57 +511,81 @@ export function UnitLayoutForm() {
                                             </select>
                                         </div>
                                 </div>
-                                <div>
-                                    <label className="mb-1 block text-xs font-medium text-[#4E525D]">
-                                        Room Option
-                                    </label>
-                                    <div ref={roomOptionRef} className="relative">
-                                        <button
-                                            type="button"
-                                            onClick={() => setRoomOptionOpen((p) => !p)}
-                                            className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
-                                        >
-                                            <span className={form.roomOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
-                                                {roomOptions.find((r) => r.id === form.roomOptionId)?.title || "Select room option (optional)"}
-                                            </span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${roomOptionOpen ? "rotate-180" : ""}`}>
-                                                <path d="M6 9l6 6 6-6" />
-                                            </svg>
-                                        </button>
-                                        {roomOptionOpen && (
-                                            <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { updateField("roomOptionId", undefined); setRoomOptionOpen(false); }}
-                                                    className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                        !form.roomOptionId
-                                                            ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
-                                                            : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
-                                                    }`}
-                                                >
-                                                    â€” None
-                                                </button>
-                                                {roomOptions.map((opt) => (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                            Unit type
+                                        </label>
+                                        <div ref={roomOptionRef} className="relative">
+                                            <button
+                                                type="button"
+                                                onClick={() => setRoomOptionOpen((p) => !p)}
+                                                className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-[#F4F5F6] px-4 h-10 text-sm text-[#1A1A1A] focus:border-gray-400 focus:outline-none"
+                                            >
+                                                <span className={form.unitTypeOptionId ? "text-[#1A1A1A]" : "text-[#999]"}>
+                                                    {unitTypes.find((t) => t.id === form.unitTypeOptionId)?.title || "Select unit type (optional)"}
+                                                </span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${roomOptionOpen ? "rotate-180" : ""}`}>
+                                                    <path d="M6 9l6 6 6-6" />
+                                                </svg>
+                                            </button>
+                                            {roomOptionOpen && (
+                                                <div className="absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                                                     <button
-                                                        key={opt.id}
                                                         type="button"
-                                                        onClick={() => { updateField("roomOptionId", opt.id); setRoomOptionOpen(false); }}
+                                                        onClick={() => { updateField("unitTypeOptionId", undefined); setRoomOptionOpen(false); }}
                                                         className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
-                                                            form.roomOptionId === opt.id
+                                                            !form.unitTypeOptionId
                                                                 ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
                                                                 : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
                                                         }`}
                                                     >
-                                                        {opt.title}
+                                                        â€” None
                                                     </button>
-                                                ))}
-                                                {roomOptions.length === 0 && (
-                                                    <div className="px-4 py-3 text-sm text-[#999]">
-                                                        No room options yet. Add them in Room Options.
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
+                                                    {unitTypes.map((opt) => (
+                                                        <button
+                                                            key={opt.id}
+                                                            type="button"
+                                                            onClick={() => { updateField("unitTypeOptionId", opt.id); setRoomOptionOpen(false); }}
+                                                            className={`flex w-full items-center px-4 py-2.5 text-left text-sm transition-colors ${
+                                                                form.unitTypeOptionId === opt.id
+                                                                    ? "bg-[#4E525D]/10 text-[#1A1A1A] font-medium"
+                                                                    : "text-[#666666] hover:bg-gray-50 hover:text-[#1A1A1A]"
+                                                            }`}
+                                                        >
+                                                            {opt.title}
+                                                        </button>
+                                                    ))}
+                                                    {unitTypes.length === 0 && (
+                                                        <div className="px-4 py-3 text-sm text-[#999]">
+                                                        No unit types yet. Add them in Unit Types.
+                                                        </div>
+                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        className="flex w-full items-center border-t border-gray-200 px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 hover:text-[#1A1A1A]"
+                                                        onClick={() => {
+                                                            navigate("/dashboard/offplan/unit-type-options");
+                                                            setRoomOptionOpen(false);
+                                                        }}
+                                                    >
+                                                        Create unit type
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                            Entrance (optional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={form.entrance ?? ""}
+                                            onChange={(e) => updateField("entrance", e.target.value)}
+                                            placeholder="A"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
+                                        />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">

@@ -75,6 +75,7 @@ export function buildUnitLayoutDuplicatePayload(
         houseId: layout.houseId,
         floor: layout.floor,
         number: layout.number ?? 1,
+        entrance: layout.entrance,
         totalArea: layout.totalArea,
         internalArea: layout.internalArea,
         balconyArea: layout.balconyArea ?? 0,
@@ -85,7 +86,7 @@ export function buildUnitLayoutDuplicatePayload(
         mainImage: layout.mainImage,
         gallery: layout.gallery || [],
         documents: layout.documents || [],
-        roomOptionId: layout.roomOptionId,
+        unitTypeOptionId: layout.unitTypeOptionId,
     };
 }
 

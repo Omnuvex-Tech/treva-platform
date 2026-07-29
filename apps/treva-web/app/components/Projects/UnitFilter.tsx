@@ -4,7 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
-import { useRoomOptions } from '@/hooks/use-room-options';
+import { useUnitTypeOptions } from '@/hooks/use-unit-type-options';
 import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -135,8 +135,8 @@ export default function UnitLayout() {
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const limit = 12;
 
-  const { data: roomOptionsData } = useRoomOptions('off-plan');
-  const roomOptions = roomOptionsData || [];
+  const { data: unitTypesData } = useUnitTypeOptions();
+  const roomOptions = unitTypesData || [];
 
   const { data: statusOptionsData } = useStatusOptions();
   const statusOptions = statusOptionsData || [];
@@ -201,7 +201,7 @@ export default function UnitLayout() {
     ...(categorySlug && { categorySlug }),
     ...(floor && { floor: parseInt(floor) }),
     ...(selectedStatus && { statusOptionId: selectedStatus }),
-    ...(selectedRooms && { roomOptionId: selectedRooms }),
+    ...(selectedRooms && { unitTypeOptionId: selectedRooms }),
     ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
     ...(typeof debouncedPriceMax === 'number' && debouncedPriceMax < totalPriceMax && { maxPrice: debouncedPriceMax }),
     currency,
@@ -576,7 +576,7 @@ export default function UnitLayout() {
                     className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
                     onClick={() => { setSelectedRooms(selectedRooms === room.id ? '' : room.id); setPage(1); }}
                   >
-                    <span className="room-btn__text">{room.value}</span>
+                    <span className="room-btn__text">{room.title}</span>
                   </button>
                 ))
               )}

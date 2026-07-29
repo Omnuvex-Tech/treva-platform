@@ -126,7 +126,7 @@ export class CreateUnitLayoutDto {
   @ApiPropertyOptional({ example: 'cuid...' })
   @IsOptional()
   @IsString()
-  roomOptionId?: string;
+  unitTypeOptionId?: string;
 
   @ApiProperty({ example: 5 })
   @IsNumber()
@@ -139,6 +139,11 @@ export class CreateUnitLayoutDto {
   @Min(1)
   @Max(999)
   number: number;
+
+  @ApiPropertyOptional({ example: 'A' })
+  @IsOptional()
+  @IsString()
+  entrance?: string;
 
   @ApiProperty({ example: 50.5 })
   @IsNumber()

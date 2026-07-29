@@ -30,6 +30,10 @@ export const endpoints = {
         list: "/room-options",
     },
 
+    unitTypeOptions: {
+        list: "/unit-type-options",
+    },
+
     statusOptions: {
         list: "/status-options",
     },

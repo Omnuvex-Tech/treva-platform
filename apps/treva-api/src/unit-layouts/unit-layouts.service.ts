@@ -42,9 +42,10 @@ export class UnitLayoutsService {
         seoImage: createDto.seoImage,
           status: createDto.status || 'available',
         categoryId: createDto.categoryId,
-        roomOptionId: createDto.roomOptionId,
+        unitTypeOptionId: createDto.unitTypeOptionId,
         floor: createDto.floor,
         number: createDto.number,
+        entrance: createDto.entrance,
         totalArea: createDto.totalArea,
         internalArea: createDto.internalArea,
         balconyArea: createDto.balconyArea,
@@ -63,7 +64,7 @@ export class UnitLayoutsService {
         heatingTypeIds: createDto.heatingTypeIds || [],
         attributeIds: createDto.attributeIds || [],
       },
-      include: { category: true, house: true, roomOption: true },
+      include: { category: true, house: true, unitTypeOption: true },
     });
 
     await this.syncCategoryMetrics(createDto.categoryId);
@@ -83,7 +84,7 @@ export class UnitLayoutsService {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    roomOptionId?: string;
+    unitTypeOptionId?: string;
     houseId?: string;
     houseSlug?: string;
     archived?: boolean;
@@ -190,8 +191,8 @@ export class UnitLayoutsService {
       where.floor = query.floor;
     }
 
-    if (query.roomOptionId) {
-      where.roomOptionId = query.roomOptionId;
+    if (query.unitTypeOptionId) {
+      where.unitTypeOptionId = query.unitTypeOptionId;
     }
 
     const [data, total] = await Promise.all([
@@ -203,7 +204,7 @@ export class UnitLayoutsService {
         include: {
           category: true,
           house: true,
-          roomOption: true,
+          unitTypeOption: true,
         },
       }),
       this.prisma.unitLayout.count({ where }),
@@ -223,7 +224,7 @@ export class UnitLayoutsService {
   async findOne(id: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { id },
-      include: { category: true, roomOption: true, house: true },
+      include: { category: true, unitTypeOption: true, house: true },
     });
 
     if (!unitLayout) {
@@ -244,7 +245,7 @@ export class UnitLayoutsService {
   async findBySlug(slug: string) {
     const unitLayout = await this.prisma.unitLayout.findUnique({
       where: { slug },
-      include: { category: true, roomOption: true, house: true },
+      include: { category: true, unitTypeOption: true, house: true },
     });
 
     if (!unitLayout) {
@@ -293,9 +294,10 @@ export class UnitLayoutsService {
     if (updateDto.archived !== undefined) data.archived = updateDto.archived;
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
     if (updateDto.houseId !== undefined) data.houseId = updateDto.houseId;
-    if (updateDto.roomOptionId !== undefined) data.roomOptionId = updateDto.roomOptionId;
+    if (updateDto.unitTypeOptionId !== undefined) data.unitTypeOptionId = updateDto.unitTypeOptionId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
+    if (updateDto.entrance !== undefined) data.entrance = updateDto.entrance;
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
     if (updateDto.internalArea !== undefined) data.internalArea = updateDto.internalArea;
     if (updateDto.balconyArea !== undefined) data.balconyArea = updateDto.balconyArea;
@@ -316,7 +318,7 @@ export class UnitLayoutsService {
     const layout = await this.prisma.unitLayout.update({
       where: { id },
       data,
-      include: { category: true, roomOption: true, house: true },
+      include: { category: true, unitTypeOption: true, house: true },
     });
 
     await this.syncCategoryMetrics(layout.categoryId);

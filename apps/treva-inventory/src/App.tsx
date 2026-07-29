@@ -262,7 +262,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/dashboard/offplan/room-options"
+                            path="/dashboard/offplan/unit-type-options"
                             element={
                                 <ProtectedRoute>
                                     <Dashboard />
@@ -393,7 +393,15 @@ function App() {
                             path="/room-options"
                             element={
                                 <ProtectedRoute>
-                                    <Navigate to="/dashboard/offplan/room-options" replace />
+                                    <Navigate to="/dashboard/resale/room-options" replace />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/unit-type-options"
+                            element={
+                                <ProtectedRoute>
+                                    <Navigate to="/dashboard/offplan/unit-type-options" replace />
                                 </ProtectedRoute>
                             }
                         />

@@ -244,7 +244,7 @@ export function UnitLayoutsSection() {
                                     <div className="px-1 pb-1">
                                         <p className="truncate text-sm font-semibold text-[#1A1A1A]">{layout.title}</p>
                                         <p className="text-xs text-[#999]">
-                                            {layout.totalArea} m² · {layout.roomOption?.title || `${layout.number || 0} rooms`}
+                                            {layout.totalArea} m² · {layout.unitTypeOption?.title || `${layout.number || 0} rooms`}
                                         </p>
                                         <p className="mt-1 truncate text-xs text-[#718096]">
                                             {layout.category?.title || "No object"} · Floor {layout.floor}

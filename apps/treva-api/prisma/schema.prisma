@@ -118,6 +118,7 @@ model UnitLayout {
   seoImage                    String?
   floor                       Int
   number                      Int?
+  entrance                    String?
   totalArea                   Float
   internalArea                Float
   balconyArea                 Float?
@@ -133,8 +134,8 @@ model UnitLayout {
   category                    Category    @relation(fields: [categoryId], references: [id])
   houseId                     String?
   house                       House?      @relation(fields: [houseId], references: [id], onDelete: SetNull)
-  roomOptionId                String?
-  roomOption                  RoomOption? @relation(fields: [roomOptionId], references: [id])
+  unitTypeOptionId            String?
+  unitTypeOption              UnitTypeOption? @relation(fields: [unitTypeOptionId], references: [id])
   status                      String       @default("available")
   statusOptionId              String?
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
@@ -157,9 +158,18 @@ model RoomOption {
   updatedAt DateTime @updatedAt
 
   houses      House[]
-  unitLayouts UnitLayout[]
-
   @@unique([name, type])
+}
+
+model UnitTypeOption {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  title     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unitLayouts UnitLayout[]
 }
 
 model Currency {

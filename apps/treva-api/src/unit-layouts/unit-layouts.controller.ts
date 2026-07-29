@@ -49,7 +49,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'minArea', required: false, type: Number })
   @ApiQuery({ name: 'maxArea', required: false, type: Number })
   @ApiQuery({ name: 'floor', required: false, type: Number })
-  @ApiQuery({ name: 'roomOptionId', required: false })
+  @ApiQuery({ name: 'unitTypeOptionId', required: false })
   @ApiQuery({ name: 'houseId', required: false })
   @ApiQuery({ name: 'houseSlug', required: false })
   @ApiQuery({ name: 'archived', required: false, type: Boolean })
@@ -66,7 +66,7 @@ export class UnitLayoutsController {
     @Query('minArea') minArea?: string,
     @Query('maxArea') maxArea?: string,
     @Query('floor') floor?: string,
-    @Query('roomOptionId') roomOptionId?: string,
+    @Query('unitTypeOptionId') unitTypeOptionId?: string,
     @Query('houseId') houseId?: string,
     @Query('houseSlug') houseSlug?: string,
     @Query('archived') archived?: string,
@@ -84,7 +84,7 @@ export class UnitLayoutsController {
       minArea: minArea ? parseFloat(minArea) : undefined,
       maxArea: maxArea ? parseFloat(maxArea) : undefined,
       floor: floor ? parseInt(floor, 10) : undefined,
-      roomOptionId,
+      unitTypeOptionId,
       houseId,
       houseSlug,
       archived: archived === 'true' ? true : archived === 'false' ? false : undefined,

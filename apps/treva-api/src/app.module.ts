@@ -26,6 +26,7 @@ import { ConstructionStageOptionsModule } from './construction-stage-options/con
 import { LocationOptionsModule } from './location-options/location-options.module';
 import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-options.module';
 import { HousesModule } from './houses/houses.module';
+import { UnitTypeOptionsModule } from './unit-type-options/unit-type-options.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { HousesModule } from './houses/houses.module';
     ConstructionStageOptionsModule,
     LocationOptionsModule,
     HeatingTypeOptionsModule,
+    UnitTypeOptionsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -27,6 +27,14 @@ export interface Category {
     slug: string;
 }
 
+export interface UnitTypeOption {
+    id: string;
+    name: string;
+    title: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export type UnitLayoutStatus = "available" | "reserved" | "sold";
 
 export const UNIT_LAYOUT_STATUS_OPTIONS: Array<{ id: UnitLayoutStatus; label: string }> = [
@@ -49,6 +57,7 @@ export interface UnitLayout {
     archived?: boolean;
     floor: number;
     number?: number;
+    entrance?: string;
     totalArea: number;
     internalArea: number;
     balconyArea?: number;
@@ -64,8 +73,8 @@ export interface UnitLayout {
     category: Category;
     houseId?: string;
     house?: { id: string; title: string; name: string; slug: string };
-    roomOptionId?: string;
-    roomOption?: { id: string; name: string; title: string; type: string };
+    unitTypeOptionId?: string;
+    unitTypeOption?: UnitTypeOption;
     heatingTypeIds?: string[];
     attributeIds?: string[];
     typeOfBuilding?: string;
@@ -107,8 +116,10 @@ export interface CreateUnitLayoutData {
     archived?: boolean;
     categoryId: string;
     houseId?: string;
+    unitTypeOptionId?: string;
     floor: number;
     number: number;
+    entrance?: string;
     totalArea: number;
     internalArea: number;
     balconyArea: number;
@@ -120,7 +131,6 @@ export interface CreateUnitLayoutData {
     coverImage?: MainImage;
     gallery?: GalleryImage[];
     documents?: Document[];
-    roomOptionId?: string;
     heatingTypeIds?: string[];
     attributeIds?: string[];
     typeOfBuilding?: string;
@@ -143,7 +153,7 @@ export interface UnitLayoutFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
-    roomOptionId?: string;
+    unitTypeOptionId?: string;
 }
 
 export interface UploadResponse {
@@ -176,6 +186,7 @@ const sanitizeUnitLayoutData = (
         seoKeywords: cleanString(data.seoKeywords),
         canonicalUrl: cleanString(data.canonicalUrl),
         seoImage: cleanString(data.seoImage),
+        entrance: cleanString(data.entrance),
             status: data.status || "available",
         number: data.number,
         balconyArea: data.balconyArea,

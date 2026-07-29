@@ -100,17 +100,28 @@ export function FormDropdown({
                             ) : null}
                         </button>
                     ))}
-                    {options.length === 0 && ((onNoOptionsClick && noOptionsLabel) || onCreateClick) && (
+                    {options.length === 0 && onNoOptionsClick && noOptionsLabel && (
                         <button
                             type="button"
                             className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 hover:text-[#1A1A1A] cursor-pointer"
                             onClick={() => {
-                                if (onNoOptionsClick) onNoOptionsClick();
-                                else if (onCreateClick) onCreateClick();
+                                onNoOptionsClick();
                                 setOpen(false);
                             }}
                         >
-                            {noOptionsLabel || createLabel || "Create"}
+                            {noOptionsLabel}
+                        </button>
+                    )}
+                    {onCreateClick && (
+                        <button
+                            type="button"
+                            className="w-full border-t border-[#EEF1F5] px-4 py-2.5 text-left text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 hover:text-[#1A1A1A] cursor-pointer"
+                            onClick={() => {
+                                onCreateClick();
+                                setOpen(false);
+                            }}
+                        >
+                            {createLabel || "Create"}
                         </button>
                     )}
                     {options.length === 0 && !noOptionsLabel && !onCreateClick && (

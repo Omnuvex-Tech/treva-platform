@@ -9,7 +9,7 @@ export function RoomOptionsSection() {
     type RoomOptionForm = {
         name: string;
         title: string;
-        type: "" | "resale" | "off-plan";
+        type: "" | "resale";
     };
 
     const { showError } = useMessageCenter();
@@ -28,19 +28,19 @@ export function RoomOptionsSection() {
         confirmAndDelete,
         duplicateItem,
     } = useEntityCrud({
-        queryKey: ["room-options"],
-        queryFn: () => roomOptionsApi.getAll(),
+        queryKey: ["room-options", "resale"],
+        queryFn: () => roomOptionsApi.getAll("resale"),
         getItems: (data) => (Array.isArray(data?.data) ? data.data : []),
         createEmptyForm: (): RoomOptionForm => ({ name: "", title: "", type: "" }),
         mapItemToForm: (item: RoomOption): RoomOptionForm => ({
             name: item.name,
             title: item.title,
-            type: (item.type as "resale" | "off-plan") || "",
+            type: (item.type as "resale") || "",
         }),
         buildPayload: (nextForm: RoomOptionForm) => ({
             name: nextForm.name,
             title: nextForm.title,
-            type: nextForm.type as "resale" | "off-plan",
+            type: nextForm.type as "resale",
         }),
         createFn: (payload) => roomOptionsApi.create(payload),
         updateFn: (itemId, payload) => roomOptionsApi.update(itemId, payload),
@@ -53,7 +53,7 @@ export function RoomOptionsSection() {
             return {
                 name: duplicateText(item.name, token),
                 title: duplicateText(item.title, token),
-                type: (item.type as "resale" | "off-plan") || "",
+                type: (item.type as "resale") || "",
             };
         },
     });
@@ -92,7 +92,6 @@ export function RoomOptionsSection() {
                                 value={form.type}
                                 options={[
                                     { id: "resale", label: "Resale" },
-                                    { id: "off-plan", label: "Off-Plan" },
                                 ]}
                                 placeholder="Select type"
                                 onChange={(id) => setForm((prev) => ({ ...prev, type: id as RoomOptionForm["type"] }))}

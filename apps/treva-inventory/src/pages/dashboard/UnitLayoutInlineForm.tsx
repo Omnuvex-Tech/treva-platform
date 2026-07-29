@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type CreateUnitLayoutData, type UnitLayoutStatus } from "../../api/unit-layouts";
-import { roomOptionsApi, type RoomOption } from "../../api/room-options";
+import { unitTypeOptionsApi, type UnitTypeOption } from "../../api/unit-type-options";
 import { attributesApi, type Attribute } from "../../api/attributes";
 import { currenciesApi, type Currency } from "../../api/currencies";
 import { categoriesApi, type Category } from "../../api/categories";
@@ -146,9 +146,9 @@ export function HouseForm({
     const [draggedGalleryIndex, setDraggedGalleryIndex] = useState<number | null>(null);
     const [dragOverGalleryIndex, setDragOverGalleryIndex] = useState<number | null>(null);
 
-    const { data: roomOptionsRes } = useQuery({
-        queryKey: ["room-options"],
-        queryFn: () => roomOptionsApi.getAll(),
+    const { data: unitTypesRes } = useQuery({
+        queryKey: ["unit-type-options"],
+        queryFn: () => unitTypeOptionsApi.getAll(),
     });
 
     const { data: attributesRes } = useQuery({
@@ -192,7 +192,7 @@ export function HouseForm({
 
     const category = useMemo(() => responseData<any>(categoryRes), [categoryRes]);
     const existingHouseData = useMemo(() => responseData<any>(existingHouse), [existingHouse]);
-    const roomOptions = useMemo(() => responseArray<RoomOption>(roomOptionsRes), [roomOptionsRes]);
+    const unitTypes = useMemo(() => responseArray<UnitTypeOption>(unitTypesRes), [unitTypesRes]);
     const attributes = useMemo(() => responseArray<Attribute>(attributesRes), [attributesRes]);
     const currencies = useMemo(() => responseArray<Currency>(currenciesRes), [currenciesRes]);
     const categoryId = category?.id || selectedCategoryId || "";
@@ -257,7 +257,7 @@ export function HouseForm({
             seoKeywords: "",
             canonicalUrl: "",
             seoImage: "",
-            apartmentTypeId: "",
+            unitTypeOptionId: "",
             status: "available" as UnitLayoutStatus,
             floorFrom: undefined as unknown as number,
             floorTo: undefined as unknown as number,
@@ -270,6 +270,7 @@ export function HouseForm({
             image: "",
             coverImage: "",
             gallery: [] as { url: string; alt?: string }[],
+            entrance: "",
             description: "",
         });
 
@@ -301,7 +302,17 @@ export function HouseForm({
                 seoKeywords: house.seoKeywords || "",
                 canonicalUrl: house.canonicalUrl || "",
                 seoImage: house.seoImage || "",
-                apartmentTypeId: findOptionId(roomOptions, firstValue(house.roomOptionId, house.apartmentTypeId, house.houseNameId, house.roomOption?.id, house.roomOption?.title, house.roomOption?.value, house.apartmentType?.id, house.apartmentType?.value)),
+                unitTypeOptionId: findOptionId(
+                    unitTypes,
+                    firstValue(
+                        (house as any).unitTypeOptionId,
+                        house.roomOptionId,
+                        house.apartmentTypeId,
+                        (house as any).unitTypeOption?.id,
+                        (house as any).unitTypeOption?.name,
+                        (house as any).unitTypeOption?.title,
+                    ),
+                ),
                 status: (((firstValue(house.status, house.statusId) as string) || "available") as UnitLayoutStatus),
                 floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
                 floorTo: toNumberOrUndefined(house.floorTo, house.numberOfFloors?.end, house.floor),
@@ -314,12 +325,13 @@ export function HouseForm({
                 image: house.image || house.mainImage?.url || "",
                     coverImage: house.coverImage?.url || "",
                 gallery: (house.gallery || []).map((g: any) => ({ url: g.url, alt: g.alt })),
+                entrance: house.entrance || "",
                 description: house.description || "",
             });
             setSlugManuallyEdited(Boolean(house.slug));
             setSeoTitleManuallyEdited(Boolean(house.seoTitle));
         }
-    }, [existingHouseData, isEditMode, currencies, roomOptions]);
+    }, [existingHouseData, isEditMode, currencies, unitTypes]);
 
     useEffect(() => {
         if (!selectedCategoryId && existingHouseData?.category?.id) {
@@ -376,7 +388,7 @@ export function HouseForm({
                 if (!categoryId) errors.push("Object is required");
                 if (!form.name?.trim()) errors.push("Name is required");
                 if (!form.title?.trim()) errors.push("Title is required");
-                if (!form.apartmentTypeId) errors.push("Type is required");
+                if (!form.unitTypeOptionId) errors.push("Unit type is required");
                 if (!form.floorFrom || form.floorFrom < 1) errors.push("Floor From is required");
                 if (form.floorFrom && form.floorFrom > 999) errors.push("Floor From must be â‰¤ 999");
                 if (!form.floorTo || form.floorTo < 1) errors.push("Floor To is required");
@@ -448,6 +460,7 @@ export function HouseForm({
             houseId: parentHouseId || existingHouseData?.houseId || undefined,
             floor: form.floorFrom,
             number: form.roomCount,
+            entrance: normalizeOptionalText(form.entrance),
             totalArea: form.totalArea,
             internalArea: form.internalArea || form.totalArea,
             balconyArea: form.balconyArea || 0,
@@ -462,7 +475,7 @@ export function HouseForm({
             gallery: form.gallery,
             documents: [],
             status: (form.status || "available") as UnitLayoutStatus,
-            roomOptionId: form.apartmentTypeId || undefined,
+            unitTypeOptionId: form.unitTypeOptionId || undefined,
             description: form.description || undefined,
         };
 
@@ -826,12 +839,24 @@ export function HouseForm({
                                             </div>
                                             <div className="grid gap-4 lg:grid-cols-2">
                                                 <FormDropdown
-                                                    label="Room option *"
-                                                    value={form.apartmentTypeId || ""}
-                                                    options={dropdownOptions(roomOptions, form.apartmentTypeId || "", (t) => ({ id: t.id, label: t.title }))}
-                                                    placeholder="Select room option"
-                                                    onChange={(id) => updateField("apartmentTypeId", id)}
+                                                    label="Unit type *"
+                                                    value={form.unitTypeOptionId || ""}
+                                                    options={dropdownOptions(unitTypes, form.unitTypeOptionId || "", (t) => ({ id: t.id, label: t.title }))}
+                                                    placeholder="Select unit type"
+                                                    onChange={(id) => updateField("unitTypeOptionId", id)}
+                                                    onCreateClick={() => navigate("/dashboard/offplan/unit-type-options")}
+                                                    createLabel="Create unit type"
                                                 />
+                                                <div>
+                                                    <label className="mb-1 block text-xs text-[#4E525D]">Entrance (optional)</label>
+                                                    <input
+                                                        className={inputClass}
+                                                        type="text"
+                                                        value={form.entrance ?? ""}
+                                                        onChange={(e) => updateField("entrance", e.target.value)}
+                                                        placeholder="A"
+                                                    />
+                                                </div>
                                             </div>
                                             <div>
                                                 <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Status</label>

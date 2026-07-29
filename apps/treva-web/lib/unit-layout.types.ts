@@ -33,6 +33,7 @@ export interface UnitLayout {
     slug: string;
     floor: number;
     number?: number;
+    entrance?: string;
     totalArea: number;
     internalArea: number;
     balconyArea?: number;
@@ -77,5 +78,5 @@ export interface UnitLayoutFilters {
     maxArea?: number;
     floor?: number;
     rooms?: string;
-    roomOptionId?: string;
+    unitTypeOptionId?: string;
 }
