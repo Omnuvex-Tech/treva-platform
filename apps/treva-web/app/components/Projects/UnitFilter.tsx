@@ -11,6 +11,8 @@ import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
 
+const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
+
 const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string }> = [
   { id: '1', label: '1' },
   { id: '2', label: '2' },
@@ -24,12 +26,13 @@ export default function UnitLayout() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
-  const categorySlug = searchParams.get('category') || '';
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState(searchParams.get('category') || '');
 
   const dictionary = {
     az: {
       titleThin: 'Mənzil',
       titleBold: 'planları',
+      project: 'Layihə',
       price: 'Qiymət',
       area: 'Sahə (m²)',
       from: 'min',
@@ -58,6 +61,7 @@ export default function UnitLayout() {
     en: {
       titleThin: 'Unit',
       titleBold: 'layouts',
+      project: 'Projects',
       price: 'Price',
       area: 'Area (m²)',
       from: 'from',
@@ -86,6 +90,7 @@ export default function UnitLayout() {
     ru: {
       titleThin: 'План',
       titleBold: 'ировки',
+      project: 'Проекты',
       price: 'Цена',
       area: 'Площадь (м²)',
       from: 'от',
@@ -120,9 +125,11 @@ export default function UnitLayout() {
   const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
   const [selectedRooms, setSelectedRooms] = useState<string>(searchParams.get('rooms') || '');
 
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [floorOpen, setFloorOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement>(null);
   const currencyRef = useRef<HTMLDivElement>(null);
   const floorRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
@@ -141,6 +148,8 @@ export default function UnitLayout() {
 
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const limit = 12;
+
+  const [categories, setCategories] = useState<Array<{ slug: string; title: { az?: string; en?: string; ru?: string } }>>([]);
 
   const { data: statusOptionsData } = useStatusOptions();
   const statusOptions = statusOptionsData || [];
@@ -170,6 +179,7 @@ export default function UnitLayout() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setCategoryOpen(false);
       if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) setCurrencyOpen(false);
       if (floorRef.current && !floorRef.current.contains(e.target as Node)) setFloorOpen(false);
       if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false);
@@ -180,7 +190,7 @@ export default function UnitLayout() {
 
   useEffect(() => {
     const sp = new URLSearchParams();
-    if (categorySlug) sp.set('category', categorySlug);
+    if (selectedCategorySlug) sp.set('category', selectedCategorySlug);
     if (currency && currency !== 'USD') sp.set('currency', currency);
     if (floor) sp.set('floor', floor);
     if (selectedStatus) sp.set('status', selectedStatus);
@@ -192,7 +202,24 @@ export default function UnitLayout() {
     if (page > 1) sp.set('page', String(page));
     const qs = sp.toString();
     router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
-  }, [currency, floor, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, categorySlug, router]);
+  }, [selectedCategorySlug, currency, floor, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, router]);
+
+  useEffect(() => {
+    fetch(`${CMS_API}/layihelerimiz/categories/visible`)
+      .then((res) => res.json())
+      .then((raw) => {
+        const data = Array.isArray(raw) ? raw : raw.value || [];
+        const next = data
+          .map((cat: any) => {
+            const rawTitle = cat.title;
+            const titleObj = (rawTitle && typeof rawTitle === 'object') ? rawTitle : { az: rawTitle, en: rawTitle, ru: rawTitle };
+            return { slug: String(cat.slug || ''), title: titleObj };
+          })
+          .filter((item: any) => item.slug);
+        setCategories(next);
+      })
+      .catch(() => { });
+  }, []);
 
   const debouncedPriceMin = useDebounce(priceMin, 1000);
   const debouncedPriceMax = useDebounce(priceMax, 1000);
@@ -202,7 +229,7 @@ export default function UnitLayout() {
   const filters = useMemo(() => ({
     page,
     limit,
-    ...(categorySlug && { categorySlug }),
+    ...(selectedCategorySlug && { categorySlug: selectedCategorySlug }),
     ...(floor && { floor: parseInt(floor) }),
     ...(selectedStatus && { statusOptionId: selectedStatus }),
     ...(selectedRooms && { rooms: selectedRooms }),
@@ -211,7 +238,7 @@ export default function UnitLayout() {
     currency,
     ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
     ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
-  }), [page, limit, categorySlug, floor, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
+  }), [page, limit, selectedCategorySlug, floor, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
@@ -273,6 +300,7 @@ export default function UnitLayout() {
     setFloor('');
     setSelectedStatus('');
     setSelectedRooms('');
+    setSelectedCategorySlug('');
     setPriceMin(0);
     setPriceMinInput(0);
     setPriceMax(totalPriceMax);
@@ -303,6 +331,35 @@ export default function UnitLayout() {
 
         {/* FILTERS CONTAINER */}
         <div className="filters-grid">
+
+          <div className="filter-group filter-group--project">
+            <label className="filter-label">{t.project}</label>
+            <div className="custom-select" ref={categoryRef}>
+              <button type="button" className="custom-select__trigger" aria-expanded={categoryOpen} onClick={() => setCategoryOpen((p) => !p)}>
+                <span>{selectedCategorySlug ? (categories.find((c) => c.slug === selectedCategorySlug)?.title?.[locale] || selectedCategorySlug) : t.all}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              {categoryOpen && (
+                <div className="custom-select__dropdown">
+                  <button type="button" className={`custom-select__option ${!selectedCategorySlug ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedCategorySlug(''); setPage(1); setCategoryOpen(false); }}>
+                    {t.all}
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.slug}
+                      type="button"
+                      className={`custom-select__option ${selectedCategorySlug === cat.slug ? 'custom-select__option--active' : ''}`}
+                      onClick={() => { setSelectedCategorySlug(cat.slug); setPage(1); setCategoryOpen(false); }}
+                    >
+                      {cat.title?.[locale] || cat.slug}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
           
           {/* Price Filter */}
           <div className="filter-group filter-group--price">
