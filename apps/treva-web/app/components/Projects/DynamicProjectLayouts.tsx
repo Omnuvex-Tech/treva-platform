@@ -37,12 +37,16 @@ export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
 
   useEffect(() => {
     const fetchLayouts = async () => {
+      if (!categorySlug) {
+        setLayouts([]);
+        return;
+      }
       try {
         const trevaApiUrl =
           process.env.NEXT_PUBLIC_TREVA_API_URL ||
           "http://localhost:10011/api/v1";
         const res = await fetch(
-          `${trevaApiUrl}/unit-layouts?categorySlug=${categorySlug}&limit=10`
+          `${trevaApiUrl}/unit-layouts?categorySlug=${encodeURIComponent(categorySlug)}&limit=3`
         );
         if (!res.ok) return;
         const rawData = await res.json();
@@ -51,10 +55,8 @@ export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
 
         if (items && items.length > 0) {
           const apiUrl = trevaApiUrl.replace(/\/api\/v1\/?$/, "");
-          const shuffled = [...items].sort(() => Math.random() - 0.5);
-          const picked = shuffled.slice(0, 3);
           setLayouts(
-            picked.map((item) => ({
+            items.slice(0, 3).map((item) => ({
               title: item.title,
               code: item.name || item.title,
               floor: `${item.floor} floor`,
