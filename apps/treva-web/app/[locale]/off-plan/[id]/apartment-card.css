@@ -72,7 +72,7 @@
   display: flex;
   width: 100%;
   box-sizing: border-box;
-  padding: clamp(24px, 4vw, 56px);
+  padding: clamp(18px, 2.6vw, 32px) clamp(24px, 4vw, 56px);
   align-items: center;
   justify-content: space-around;
   border-radius: 5px;
@@ -446,7 +446,7 @@
    ========================================================================== */
 @media (min-width: 769px) {
   .apt-main-card {
-    padding: clamp(24px, 3vw, 56px);
+    padding: clamp(18px, 2vw, 28px) clamp(24px, 3vw, 56px);
     gap: clamp(20px, 2.6vw, 48px);
     display: flex;
     /* align-items: stretch sağ və sol div-lərin hündürlüyünü kilidləyir. 
@@ -576,7 +576,7 @@
 
   .apt-main-card {
     flex-direction: column;
-    padding: 24px;
+    padding: 18px 24px;
     gap: 24px;
   }
 
