@@ -17,6 +17,7 @@ interface ApiUnitLayout {
   unitTypeOption?: { id: string; name: string; title: string } | null;
   prices: Record<string, number>;
   mainImage?: { url: string } | null;
+  coverImage?: { url: string } | null;
 }
 
 interface ApiCategory {
@@ -132,7 +133,7 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
           setLayouts(
             items.slice(0, 3).map((item) => ({
               title: item.title,
-              code: item.name || item.title,
+              code: item.title || item.name,
               floor: formatFloorRange(item),
               number: formatRooms(item.number),
               unitType: item.unitTypeOption?.title || "",
@@ -143,10 +144,10 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
                 ? `₼${item.prices.AZN.toLocaleString()}`
                 : "",
               slug: item.slug,
-              image: item.mainImage?.url
-                ? item.mainImage.url.startsWith("http")
-                  ? item.mainImage.url
-                  : `${apiUrl}${item.mainImage.url}`
+              image: (item.coverImage || item.mainImage)?.url
+                ? (item.coverImage || item.mainImage)!.url.startsWith("http")
+                  ? (item.coverImage || item.mainImage)!.url
+                  : `${apiUrl}${(item.coverImage || item.mainImage)!.url}`
                 : undefined,
             }))
           );

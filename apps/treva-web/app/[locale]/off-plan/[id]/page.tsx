@@ -564,7 +564,7 @@ export default function ApartmentCard() {
                         <Link key={item.id} href={`/${locale}/off-plan/${item.slug}`} className="layout-card">
                           <div className="layout-card__header">
                             <div className="layout-card__title-block">
-                              <span className="layout-card__code">{item.name || item.title}</span>
+                              <span className="layout-card__code">{item.title || item.name}</span>
                               <span className="layout-card__floor">{formatFloorRange(item)} {t.floorSuffix}</span>
                             </div>
                             <div className="layout-card__number-block">
@@ -574,10 +574,10 @@ export default function ApartmentCard() {
                           </div>
 
                           <div className="layout-card__visual">
-                            {item.mainImage ? (
+                            {item.coverImage || item.mainImage ? (
                               <img
-                                src={getAssetUrl(item.mainImage.url)}
-                                alt={item.mainImage.alt || item.title}
+                                src={getAssetUrl((item.coverImage || item.mainImage)!.url)}
+                                alt={(item.coverImage || item.mainImage)!.alt || item.title}
                                 className="layout-card__blueprint"
                               />
                             ) : (

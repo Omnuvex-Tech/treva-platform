@@ -54,6 +54,7 @@ export interface UnitLayout {
     similarApartmentIds: string[];
     similarApartments?: UnitLayout[];
     mainImage?: UnitLayoutImage;
+    coverImage?: UnitLayoutImage;
     gallery: UnitLayoutImage[];
     documents: UnitLayoutDocument[];
     location?: UnitLayoutLocation;

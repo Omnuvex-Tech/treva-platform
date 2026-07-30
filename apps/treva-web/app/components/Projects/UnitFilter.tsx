@@ -329,7 +329,7 @@ export default function UnitLayout() {
   };
 
   const getCardCode = (layout: UnitLayout) => {
-    return layout.name || layout.title;
+    return layout.title || layout.name;
   };
 
   return (
@@ -730,8 +730,12 @@ export default function UnitLayout() {
                       </div>
 
                       <div className="layout-card__visual">
-                        {layout.mainImage ? (
-                          <img src={getAssetUrl(layout.mainImage.url)} alt={layout.mainImage.alt || layout.title} className="layout-card__blueprint" />
+                        {layout.coverImage || layout.mainImage ? (
+                          <img
+                            src={getAssetUrl((layout.coverImage || layout.mainImage)!.url)}
+                            alt={(layout.coverImage || layout.mainImage)!.alt || layout.title}
+                            className="layout-card__blueprint"
+                          />
                         ) : (
                           <div className="layout-card__blueprint layout-card__blueprint--placeholder">
                             <span>{t.noImage}</span>
