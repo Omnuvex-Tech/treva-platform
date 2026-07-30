@@ -335,7 +335,7 @@
 }
 
 .apt-currency-select {
-  background-color: #4E525D;
+  background-color: var(--treva-pill-bg);
   color: #ffffff;
   height: 42px;
   padding: 0 18px;
@@ -389,7 +389,7 @@
   left: 0;
   width: 100%;
   padding: 0;
-  background: #4E525D;
+  background: var(--treva-pill-bg);
   border-radius: 12px;
   box-shadow: var(--treva-shadow);
   overflow: hidden;
@@ -421,7 +421,7 @@
 }
 
 .apt-currency-option--active {
-  background: #3F4249;
+  background: var(--treva-pill-bg);
 }
 
 .apt-badge--status {
