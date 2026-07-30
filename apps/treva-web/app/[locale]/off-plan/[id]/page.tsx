@@ -432,12 +432,6 @@ export default function ApartmentCard() {
                     <span className="apt-label">{t.internalArea}</span>
                     <span className="apt-value">{layout.internalArea} m²</span>
                   </div>
-                  {realEstateTypeValue ? (
-                    <div className="apt-spec-item">
-                      <span className="apt-label">{t.realEstateType}</span>
-                      <span className="apt-value">{realEstateTypeValue}</span>
-                    </div>
-                  ) : null}
                   {layout.balconyArea && (
                     <div className="apt-spec-item">
                       <span className="apt-label">{t.balcony}</span>
@@ -533,12 +527,12 @@ export default function ApartmentCard() {
                     <span className="panorama-value">{layout.location.title}</span>
                   </div>
                 )}
-                {layout.location && (
+                {realEstateTypeValue ? (
                   <div className="panorama-row">
                     <span className="panorama-label">{t.realEstateType}</span>
-                    <span className="panorama-value">{layout.location.type}</span>
+                    <span className="panorama-value">{realEstateTypeValue}</span>
                   </div>
-                )}
+                ) : null}
                 <div className="panorama-row">
                   <span className="panorama-label">{t.completionYear}</span>
                   <span className="panorama-value">{layout.completionYear}</span>
