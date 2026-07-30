@@ -29,32 +29,47 @@ interface LayoutItem {
 
 interface Props {
   categorySlug: string;
+  fallbackCategorySlug?: string;
   locale: string;
 }
 
-export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
+export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySlug, locale }: Props) {
   const [layouts, setLayouts] = useState<LayoutItem[]>([]);
+  const [activeCategorySlug, setActiveCategorySlug] = useState<string>(categorySlug);
 
   useEffect(() => {
     const fetchLayouts = async () => {
       if (!categorySlug) {
         setLayouts([]);
+        setActiveCategorySlug(categorySlug);
         return;
       }
       try {
         const trevaApiUrl =
           process.env.NEXT_PUBLIC_TREVA_API_URL ||
           "http://localhost:10011/api/v1";
-        const res = await fetch(
-          `${trevaApiUrl}/unit-layouts?categorySlug=${encodeURIComponent(categorySlug)}&limit=3`
-        );
-        if (!res.ok) return;
-        const rawData = await res.json();
-        const items: ApiUnitLayout[] =
-          rawData.data || rawData.items || rawData;
+        const fetchForSlug = async (slug: string) => {
+          const res = await fetch(
+            `${trevaApiUrl}/unit-layouts?categorySlug=${encodeURIComponent(slug)}&limit=3`
+          );
+          if (!res.ok) return [];
+          const rawData = await res.json();
+          const data = rawData?.data ?? rawData?.items ?? rawData;
+          if (Array.isArray(data)) return data as ApiUnitLayout[];
+          if (Array.isArray(data?.data)) return data.data as ApiUnitLayout[];
+          return [];
+        };
+
+        let items = await fetchForSlug(categorySlug);
+        let usedSlug = categorySlug;
+        if (items.length === 0 && fallbackCategorySlug && fallbackCategorySlug !== categorySlug) {
+          items = await fetchForSlug(fallbackCategorySlug);
+          usedSlug = fallbackCategorySlug;
+        }
 
         if (items && items.length > 0) {
           const apiUrl = trevaApiUrl.replace(/\/api\/v1\/?$/, "");
+          setActiveCategorySlug(usedSlug);
           setLayouts(
             items.slice(0, 3).map((item) => ({
               title: item.title,
@@ -74,23 +89,27 @@ export default function DynamicProjectLayouts({ categorySlug, locale }: Props) {
                 : undefined,
             }))
           );
+        } else {
+          setLayouts([]);
+          setActiveCategorySlug(usedSlug);
         }
       } catch {
-        // No layouts available
+        setLayouts([]);
+        setActiveCategorySlug(categorySlug);
       }
     };
 
     fetchLayouts();
-  }, [categorySlug]);
+  }, [categorySlug, fallbackCategorySlug]);
 
   if (layouts.length === 0) return null;
 
   return (
     <ProjectLayouts
       layouts={layouts}
-      categorySlug={categorySlug}
+      categorySlug={activeCategorySlug}
       locale={locale}
-      viewAllHref={`/${locale}/off-plan?category=${categorySlug}`}
+      viewAllHref={`/${locale}/off-plan?category=${activeCategorySlug}`}
     />
   );
 }

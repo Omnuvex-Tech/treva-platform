@@ -183,7 +183,7 @@ export default function ProjectDetailPage() {
         getImageUrl={getImageUrl}
       />
 
-      <DynamicProjectLayouts categorySlug={detail.categorySlug || slug} locale={locale} />
+      <DynamicProjectLayouts categorySlug={detail.categorySlug} fallbackCategorySlug={slug} locale={locale} />
 
       <CallbackForm allowedRoles={['Client']} />
 
