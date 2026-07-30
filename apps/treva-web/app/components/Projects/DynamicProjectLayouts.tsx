@@ -17,6 +17,14 @@ interface ApiUnitLayout {
   mainImage?: { url: string } | null;
 }
 
+interface ApiCategory {
+  id: string;
+  slug: string;
+  name?: string | null;
+  title?: string | null;
+  propertyName?: string | null;
+}
+
 interface LayoutItem {
   title: string;
   code: string;
@@ -39,15 +47,19 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
 
   useEffect(() => {
     const fetchLayouts = async () => {
-      if (!categorySlug) {
+      const slugs = [categorySlug, fallbackCategorySlug].filter(Boolean) as string[];
+      const uniqueSlugs = Array.from(new Set(slugs.map((s) => String(s).trim()).filter(Boolean)));
+      if (uniqueSlugs.length === 0) {
         setLayouts([]);
-        setActiveCategorySlug(categorySlug);
+        setActiveCategorySlug(categorySlug || "");
         return;
       }
+
       try {
         const trevaApiUrl =
           process.env.NEXT_PUBLIC_TREVA_API_URL ||
           "http://localhost:10011/api/v1";
+
         const fetchForSlug = async (slug: string) => {
           const res = await fetch(
             `${trevaApiUrl}/unit-layouts?categorySlug=${encodeURIComponent(slug)}&limit=3`
@@ -60,11 +72,39 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
           return [];
         };
 
-        let items = await fetchForSlug(categorySlug);
-        let usedSlug = categorySlug;
-        if (items.length === 0 && fallbackCategorySlug && fallbackCategorySlug !== categorySlug) {
-          items = await fetchForSlug(fallbackCategorySlug);
-          usedSlug = fallbackCategorySlug;
+        const resolveCategorySlug = async (slug: string) => {
+          const res = await fetch(`${trevaApiUrl}/categories?type=object`);
+          if (!res.ok) return null;
+          const raw = await res.json();
+          const data = raw?.data ?? raw?.items ?? raw;
+          const items = Array.isArray(data) ? (data as ApiCategory[]) : Array.isArray(data?.data) ? (data.data as ApiCategory[]) : [];
+          const match = items.find((cat) => {
+            const catSlug = String(cat?.slug || "");
+            const prop = String(cat?.propertyName || "");
+            const name = String(cat?.name || "");
+            if (catSlug === slug) return true;
+            if (prop && prop === slug) return true;
+            if (name && name === slug) return true;
+            if (catSlug && slug && catSlug.startsWith(`${slug}-`)) return true;
+            return false;
+          });
+          return match?.slug ? String(match.slug) : null;
+        };
+
+        let items: ApiUnitLayout[] = [];
+        let usedSlug = uniqueSlugs[0];
+
+        for (const candidate of uniqueSlugs) {
+          usedSlug = candidate;
+          items = await fetchForSlug(candidate);
+          if (items.length > 0) break;
+
+          const resolved = await resolveCategorySlug(candidate);
+          if (resolved && resolved !== candidate) {
+            usedSlug = resolved;
+            items = await fetchForSlug(resolved);
+            if (items.length > 0) break;
+          }
         }
 
         if (items && items.length > 0) {
@@ -95,7 +135,7 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
         }
       } catch {
         setLayouts([]);
-        setActiveCategorySlug(categorySlug);
+        setActiveCategorySlug(categorySlug || "");
       }
     };
 
