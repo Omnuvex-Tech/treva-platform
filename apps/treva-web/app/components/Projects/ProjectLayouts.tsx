@@ -10,6 +10,8 @@ interface LayoutItem {
   code: string;
   floor: string;
   number: string;
+  unitType?: string;
+  area?: number;
   price: string;
   slug: string;
   image?: string;
@@ -81,6 +83,11 @@ export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllH
 
               <div className="layout-card__footer">
                 <h2 className="layout-card__name">{layout.title}</h2>
+                <div className="layout-card__meta">
+                  {layout.unitType ? <span>{layout.unitType}</span> : null}
+                  {layout.unitType ? <span className="layout-card__meta-sep">•</span> : null}
+                  {typeof layout.area === "number" ? <span>{layout.area} m²</span> : null}
+                </div>
                 <span className="layout-card__price">{layout.price}</span>
               </div>
             </Link>

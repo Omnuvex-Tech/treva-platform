@@ -295,6 +295,13 @@ export default function UnitLayout() {
 
   const formatFloor = (floorValue: string | number) => `${floorValue} ${t.floorSuffix}`;
 
+  const formatRooms = (rooms?: number) => {
+    if (!rooms || rooms <= 0) return '';
+    if (locale === 'ru') return `${rooms} комн.`;
+    if (locale === 'en') return `${rooms} ${rooms === 1 ? 'room' : 'rooms'}`;
+    return `${rooms} otaqlı`;
+  };
+
   const handleReset = () => {
     setFloor('');
     setSelectedStatus('');
@@ -708,7 +715,7 @@ export default function UnitLayout() {
                           <span className="layout-card__floor">{formatFloor(layout.floor)}</span>
                         </div>
                         <div className="layout-card__number-block">
-                          <span className="layout-card__number">N° {layout.number || layout.id.slice(-2)}</span>
+                          <span className="layout-card__number">{formatRooms(layout.number)}</span>
                           <span className="layout-card__status">{formatStatus(layout.statusOption?.value || '')}</span>
                         </div>
                       </div>
@@ -724,7 +731,12 @@ export default function UnitLayout() {
                       </div>
 
                       <div className="layout-card__footer">
-                        <h2 className="layout-card__name">{layout.title}, {layout.totalArea} m²</h2>
+                        <h2 className="layout-card__name">{layout.title}</h2>
+                        <div className="layout-card__meta">
+                          {layout.unitTypeOption?.title ? <span>{layout.unitTypeOption.title}</span> : null}
+                          {layout.unitTypeOption?.title ? <span className="layout-card__meta-sep">•</span> : null}
+                          <span>{layout.totalArea} m²</span>
+                        </div>
                         <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
                       </div>
                     </div>

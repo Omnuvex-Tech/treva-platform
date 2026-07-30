@@ -26,6 +26,12 @@ export interface UnitLayoutCategory {
     slug: string;
 }
 
+export interface UnitLayoutUnitTypeOption {
+    id: string;
+    name: string;
+    title: string;
+}
+
 export interface UnitLayout {
     id: string;
     title: string;
@@ -43,6 +49,8 @@ export interface UnitLayout {
     numberOfFloors: UnitLayoutNumberOfFloors;
     statusOptionId?: string;
     statusOption?: { id: string; value: string; order: number };
+    unitTypeOptionId?: string;
+    unitTypeOption?: UnitLayoutUnitTypeOption | null;
     similarApartmentIds: string[];
     similarApartments?: UnitLayout[];
     mainImage?: UnitLayoutImage;

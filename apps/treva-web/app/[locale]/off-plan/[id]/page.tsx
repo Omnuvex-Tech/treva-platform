@@ -180,6 +180,13 @@ export default function ApartmentCard() {
     return statusValue ? statusValue.charAt(0).toUpperCase() + statusValue.slice(1) : '';
   };
 
+  const formatRooms = (rooms?: number | null) => {
+    if (!rooms || rooms <= 0) return '';
+    if (locale === 'ru') return `${rooms} комн.`;
+    if (locale === 'en') return `${rooms} ${rooms === 1 ? 'room' : 'rooms'}`;
+    return `${rooms} otaqlı`;
+  };
+
   const brochureDoc = layout?.documents?.find(
     (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
   );
@@ -551,7 +558,7 @@ export default function ApartmentCard() {
                               <span className="layout-card__floor">{item.floor} {t.floorSuffix}</span>
                             </div>
                             <div className="layout-card__number-block">
-                              <span className="layout-card__number">N° {item.number || item.id.slice(-2)}</span>
+                              <span className="layout-card__number">{formatRooms(item.number)}</span>
                               <span className="layout-card__status">{formatStatus(item.statusOption?.value || "")}</span>
                             </div>
                           </div>
@@ -571,9 +578,12 @@ export default function ApartmentCard() {
                           </div>
 
                           <div className="layout-card__footer">
-                            <h3 className="layout-card__name">
-                              {item.title}, {item.totalArea} m²
-                            </h3>
+                            <h3 className="layout-card__name">{item.title}</h3>
+                            <div className="layout-card__meta">
+                              {item.unitTypeOption?.title ? <span>{item.unitTypeOption.title}</span> : null}
+                              {item.unitTypeOption?.title ? <span className="layout-card__meta-sep">•</span> : null}
+                              <span>{item.totalArea} m²</span>
+                            </div>
                             {typeof item.prices?.[currency] === "number" && item.prices[currency] > 0 && (
                               <span className="layout-card__price">
                                 {currency} {formatNumber(item.prices[currency])}

@@ -198,3 +198,17 @@ body {
 .layout-card-wrapper:hover .layout-card__visual > img {
     transform: scale(1.05);
 }
+
+.layout-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 400;
+    color: #6d717a;
+}
+
+.layout-card__meta-sep {
+    opacity: 0.65;
+}

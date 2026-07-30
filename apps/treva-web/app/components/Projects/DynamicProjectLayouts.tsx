@@ -13,6 +13,7 @@ interface ApiUnitLayout {
   totalArea: number;
   internalArea: number;
   balconyArea?: number;
+  unitTypeOption?: { id: string; name: string; title: string } | null;
   prices: Record<string, number>;
   mainImage?: { url: string } | null;
 }
@@ -30,6 +31,8 @@ interface LayoutItem {
   code: string;
   floor: string;
   number: string;
+  unitType?: string;
+  area?: number;
   price: string;
   slug: string;
   image?: string;
@@ -110,12 +113,20 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
         if (items && items.length > 0) {
           const apiUrl = trevaApiUrl.replace(/\/api\/v1\/?$/, "");
           setActiveCategorySlug(usedSlug);
+          const formatRooms = (rooms?: number) => {
+            if (!rooms || rooms <= 0) return "";
+            if (locale === "ru") return `${rooms} комн.`;
+            if (locale === "en") return `${rooms} ${rooms === 1 ? "room" : "rooms"}`;
+            return `${rooms} otaqlı`;
+          };
           setLayouts(
             items.slice(0, 3).map((item) => ({
               title: item.title,
               code: item.name || item.title,
               floor: `${item.floor} floor`,
-              number: item.number ? `N° ${item.number}` : "",
+              number: formatRooms(item.number),
+              unitType: item.unitTypeOption?.title || "",
+              area: item.totalArea,
               price: item.prices?.USD
                 ? `$${item.prices.USD.toLocaleString()}`
                 : item.prices?.AZN
