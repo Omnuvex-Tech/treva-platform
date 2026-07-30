@@ -359,7 +359,7 @@ export default function ApartmentCard() {
               <div className="apt-details-section">
                 <div className="apt-header">
                   <h1 className="apt-title">
-                    {layout.title}
+                    {layout.unitTypeOption?.title ? `${layout.unitTypeOption.title} ${layout.title}` : layout.title}
                   </h1>
 
                   <div className="apt-badge-row">
