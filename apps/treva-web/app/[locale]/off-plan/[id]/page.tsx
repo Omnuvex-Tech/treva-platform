@@ -201,6 +201,10 @@ export default function ApartmentCard() {
     (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
   );
   const statusValue = layout?.statusOption?.value || (layout as any)?.status || '';
+  const realEstateTypeValue =
+    typeof (layout as any)?.realEstateType === 'string'
+      ? String((layout as any).realEstateType).trim()
+      : '';
 
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
   const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
@@ -428,6 +432,12 @@ export default function ApartmentCard() {
                     <span className="apt-label">{t.internalArea}</span>
                     <span className="apt-value">{layout.internalArea} m²</span>
                   </div>
+                  {realEstateTypeValue ? (
+                    <div className="apt-spec-item">
+                      <span className="apt-label">{t.realEstateType}</span>
+                      <span className="apt-value">{realEstateTypeValue}</span>
+                    </div>
+                  ) : null}
                   {layout.balconyArea && (
                     <div className="apt-spec-item">
                       <span className="apt-label">{t.balcony}</span>
