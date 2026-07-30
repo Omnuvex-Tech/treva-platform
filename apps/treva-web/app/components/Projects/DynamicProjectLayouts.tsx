@@ -92,7 +92,7 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
         };
 
         let items: ApiUnitLayout[] = [];
-        let usedSlug = uniqueSlugs[0];
+        let usedSlug: string = uniqueSlugs[0] || "";
 
         for (const candidate of uniqueSlugs) {
           usedSlug = candidate;
