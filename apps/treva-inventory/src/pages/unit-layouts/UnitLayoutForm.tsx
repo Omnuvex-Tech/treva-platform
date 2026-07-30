@@ -107,6 +107,7 @@ export function UnitLayoutForm() {
         slug: "",
         categoryId: "",
         unitTypeOptionId: undefined,
+        realEstateType: "",
             status: "available",
         floor: undefined as unknown as number,
         number: undefined as unknown as number,
@@ -176,6 +177,7 @@ export function UnitLayoutForm() {
                 floor: d.floor ?? 1,
                 number: d.number ?? 0,
                 entrance: d.entrance ?? "",
+                realEstateType: d.realEstateType ?? "",
                 totalArea: d.totalArea ?? 0,
                 internalArea: d.internalArea ?? 0,
                 balconyArea: d.balconyArea ?? 0,
@@ -625,6 +627,18 @@ export function UnitLayoutForm() {
                                             value={form.entrance ?? ""}
                                             onChange={(e) => updateField("entrance", e.target.value)}
                                             placeholder="A"
+                                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-xs font-medium text-[#4E525D]">
+                                            Real estate type (optional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={form.realEstateType ?? ""}
+                                            onChange={(e) => updateField("realEstateType", e.target.value)}
+                                            placeholder="apartment"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                         />
                                     </div>

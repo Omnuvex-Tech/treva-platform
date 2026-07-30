@@ -51,6 +51,7 @@ export interface UnitLayout {
     statusOption?: { id: string; value: string; order: number };
     unitTypeOptionId?: string;
     unitTypeOption?: UnitLayoutUnitTypeOption | null;
+    realEstateType?: string | null;
     similarApartmentIds: string[];
     similarApartments?: UnitLayout[];
     mainImage?: UnitLayoutImage;

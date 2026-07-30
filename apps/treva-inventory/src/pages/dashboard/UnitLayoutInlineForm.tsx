@@ -279,6 +279,7 @@ export function HouseForm({
             canonicalUrl: "",
             seoImage: "",
             unitTypeOptionId: "",
+            realEstateType: "",
             status: "available" as UnitLayoutStatus,
             floorFrom: undefined as unknown as number,
             floorTo: undefined as unknown as number,
@@ -334,6 +335,7 @@ export function HouseForm({
                         (house as any).unitTypeOption?.title,
                     ),
                 ),
+                realEstateType: house.realEstateType || "",
                 status: (((firstValue(house.status, house.statusId) as string) || "available") as UnitLayoutStatus),
                 floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
                 floorTo: toNumberOrUndefined(house.floorTo, house.numberOfFloors?.end, house.floor),
@@ -562,6 +564,7 @@ export function HouseForm({
         const canonicalUrl = normalizeOptionalText(form.canonicalUrl);
         const seoImage = normalizeOptionalText(form.seoImage);
         const entrance = normalizeOptionalText(form.entrance);
+        const realEstateType = normalizeOptionalText(form.realEstateType);
         const houseIdValue = parentHouseId || existingHouseData?.houseId || undefined;
         const descriptionValue = normalizeOptionalText(form.description);
 
@@ -591,6 +594,7 @@ export function HouseForm({
             ...(seoImage ? { seoImage } : {}),
             ...(houseIdValue ? { houseId: houseIdValue } : {}),
             ...(entrance ? { entrance } : {}),
+            ...(realEstateType ? { realEstateType } : {}),
             ...(form.roomCount ? { number: form.roomCount } : {}),
             ...(form.unitTypeOptionId ? { unitTypeOptionId: form.unitTypeOptionId } : {}),
             ...(descriptionValue ? { description: descriptionValue } : {}),
@@ -974,6 +978,16 @@ export function HouseForm({
                                                         placeholder="A"
                                                     />
                                                 </div>
+                                            </div>
+                                            <div>
+                                                <label className="mb-1 block text-xs text-[#4E525D]">Real estate type (optional)</label>
+                                                <input
+                                                    className={inputClass}
+                                                    type="text"
+                                                    value={form.realEstateType ?? ""}
+                                                    onChange={(e) => updateField("realEstateType", e.target.value)}
+                                                    placeholder="apartment"
+                                                />
                                             </div>
                                             <div>
                                                 <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Status</label>

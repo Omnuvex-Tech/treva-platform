@@ -43,6 +43,7 @@ export class UnitLayoutsService {
           status: createDto.status || 'available',
         categoryId: createDto.categoryId,
         unitTypeOptionId: createDto.unitTypeOptionId,
+        realEstateType: createDto.realEstateType,
         floor: createDto.floor,
         number: createDto.number,
         entrance: createDto.entrance,
@@ -313,6 +314,7 @@ export class UnitLayoutsService {
     if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
     if (updateDto.houseId !== undefined) data.houseId = updateDto.houseId;
     if (updateDto.unitTypeOptionId !== undefined) data.unitTypeOptionId = updateDto.unitTypeOptionId;
+    if (updateDto.realEstateType !== undefined) data.realEstateType = updateDto.realEstateType;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
     if (updateDto.entrance !== undefined) data.entrance = updateDto.entrance;

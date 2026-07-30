@@ -75,6 +75,7 @@ export interface UnitLayout {
     house?: { id: string; title: string; name: string; slug: string };
     unitTypeOptionId?: string;
     unitTypeOption?: UnitTypeOption;
+    realEstateType?: string;
     heatingTypeIds?: string[];
     attributeIds?: string[];
     typeOfBuilding?: string;
@@ -117,6 +118,7 @@ export interface CreateUnitLayoutData {
     categoryId: string;
     houseId?: string;
     unitTypeOptionId?: string;
+    realEstateType?: string;
     floor: number;
     number?: number;
     entrance?: string;

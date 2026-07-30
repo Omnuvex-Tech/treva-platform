@@ -128,6 +128,11 @@ export class CreateUnitLayoutDto {
   @IsString()
   unitTypeOptionId?: string;
 
+  @ApiPropertyOptional({ example: 'apartment' })
+  @IsOptional()
+  @IsString()
+  realEstateType?: string;
+
   @ApiProperty({ example: 5 })
   @IsNumber()
   @Min(1)

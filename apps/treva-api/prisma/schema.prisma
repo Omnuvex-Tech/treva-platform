@@ -134,6 +134,7 @@ model UnitLayout {
   house                       House?      @relation(fields: [houseId], references: [id], onDelete: SetNull)
   unitTypeOptionId            String?
   unitTypeOption              UnitTypeOption? @relation(fields: [unitTypeOptionId], references: [id])
+  realEstateType              String?
   status                      String       @default("available")
   statusOptionId              String?
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])

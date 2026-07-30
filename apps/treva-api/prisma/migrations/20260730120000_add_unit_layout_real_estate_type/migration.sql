@@ -1,0 +1,2 @@
+ALTER TABLE "UnitLayout" ADD COLUMN IF NOT EXISTS "realEstateType" TEXT;
+
