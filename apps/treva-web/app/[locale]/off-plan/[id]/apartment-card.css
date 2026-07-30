@@ -5,6 +5,7 @@
   --line-gray: #e1ded7;
   --text-gray: #7a7e85;
   --treva-pill-bg: #3f4249;
+  --treva-pill-bg-hover: #555961;
 }
 
 .apt-wrapper {
@@ -179,7 +180,7 @@
 }
 
 .badge-btn:hover {
-  background-color: #555961;
+  background-color: var(--treva-pill-bg-hover);
 }
 
 .apt-status-left {
@@ -218,14 +219,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0.8;
-  transition: opacity 0.18s ease, background-color 0.18s ease;
+  opacity: 1;
+  transition: background-color 0.18s ease;
   line-height: 1;
 }
 
 .apt-share-btn:hover {
-  opacity: 1;
-  background-color: #3F4249;
+  background-color: var(--treva-pill-bg-hover);
 }
 
 .apt-share-btn svg {
@@ -358,7 +358,7 @@
 }
 
 .apt-currency-select:hover {
-  background-color: #555961;
+  background-color: var(--treva-pill-bg-hover);
 }
 
 .apt-currency-select[aria-expanded="true"] svg {
