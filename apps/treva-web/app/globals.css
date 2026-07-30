@@ -203,10 +203,10 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.2;
-    font-weight: 400;
-    color: #6d717a;
+    font-weight: 500;
+    color: #3f4249;
 }
 
 .layout-card__meta-sep {

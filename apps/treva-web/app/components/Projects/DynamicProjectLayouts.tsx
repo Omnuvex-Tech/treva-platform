@@ -9,6 +9,7 @@ interface ApiUnitLayout {
   name: string;
   slug: string;
   floor: number;
+  numberOfFloors?: { start: number; end: number } | null;
   number?: number;
   totalArea: number;
   internalArea: number;
@@ -119,11 +120,20 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
             if (locale === "en") return `${rooms} ${rooms === 1 ? "room" : "rooms"}`;
             return `${rooms} otaqlı`;
           };
+          const floorSuffix = locale === "ru" ? "этаж" : locale === "en" ? "floor" : "mərtəbə";
+          const formatFloorRange = (item: ApiUnitLayout) => {
+            const start = item.numberOfFloors?.start;
+            const end = item.numberOfFloors?.end;
+            if (typeof start === "number" && typeof end === "number") {
+              return start !== end ? `${start}-${end} ${floorSuffix}` : `${start} ${floorSuffix}`;
+            }
+            return `${item.floor} ${floorSuffix}`;
+          };
           setLayouts(
             items.slice(0, 3).map((item) => ({
               title: item.title,
               code: item.name || item.title,
-              floor: `${item.floor} floor`,
+              floor: formatFloorRange(item),
               number: formatRooms(item.number),
               unitType: item.unitTypeOption?.title || "",
               area: item.totalArea,

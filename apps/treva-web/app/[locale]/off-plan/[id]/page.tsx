@@ -187,6 +187,16 @@ export default function ApartmentCard() {
     return `${rooms} otaqlı`;
   };
 
+  const formatFloorRange = (item: any) => {
+    const start = item?.numberOfFloors?.start;
+    const end = item?.numberOfFloors?.end;
+    if (typeof start === 'number' && typeof end === 'number') {
+      return start !== end ? `${start}-${end}` : `${start}`;
+    }
+    const floor = item?.floor;
+    return typeof floor === 'number' ? `${floor}` : '';
+  };
+
   const brochureDoc = layout?.documents?.find(
     (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
   );
@@ -555,7 +565,7 @@ export default function ApartmentCard() {
                           <div className="layout-card__header">
                             <div className="layout-card__title-block">
                               <span className="layout-card__code">{item.name || item.title}</span>
-                              <span className="layout-card__floor">{item.floor} {t.floorSuffix}</span>
+                              <span className="layout-card__floor">{formatFloorRange(item)} {t.floorSuffix}</span>
                             </div>
                             <div className="layout-card__number-block">
                               <span className="layout-card__number">{formatRooms(item.number)}</span>
@@ -578,7 +588,6 @@ export default function ApartmentCard() {
                           </div>
 
                           <div className="layout-card__footer">
-                            <h3 className="layout-card__name">{item.title}</h3>
                             <div className="layout-card__meta">
                               {item.unitTypeOption?.title ? <span>{item.unitTypeOption.title}</span> : null}
                               {item.unitTypeOption?.title ? <span className="layout-card__meta-sep">•</span> : null}

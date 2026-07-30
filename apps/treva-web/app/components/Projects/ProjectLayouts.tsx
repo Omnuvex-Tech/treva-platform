@@ -82,7 +82,6 @@ export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllH
               </div>
 
               <div className="layout-card__footer">
-                <h2 className="layout-card__name">{layout.title}</h2>
                 <div className="layout-card__meta">
                   {layout.unitType ? <span>{layout.unitType}</span> : null}
                   {layout.unitType ? <span className="layout-card__meta-sep">•</span> : null}

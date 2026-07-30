@@ -294,6 +294,15 @@ export default function UnitLayout() {
   };
 
   const formatFloor = (floorValue: string | number) => `${floorValue} ${t.floorSuffix}`;
+  const formatFloorRange = (layout: UnitLayout) => {
+    const start = (layout as any)?.numberOfFloors?.start;
+    const end = (layout as any)?.numberOfFloors?.end;
+    if (typeof start === 'number' && typeof end === 'number') {
+      const label = start !== end ? `${start}-${end}` : `${start}`;
+      return `${label} ${t.floorSuffix}`;
+    }
+    return `${layout.floor} ${t.floorSuffix}`;
+  };
 
   const formatRooms = (rooms?: number) => {
     if (!rooms || rooms <= 0) return '';
@@ -712,7 +721,7 @@ export default function UnitLayout() {
                       <div className="layout-card__header">
                         <div className="layout-card__title-block">
                           <span className="layout-card__code">{getCardCode(layout)}</span>
-                          <span className="layout-card__floor">{formatFloor(layout.floor)}</span>
+                          <span className="layout-card__floor">{formatFloorRange(layout)}</span>
                         </div>
                         <div className="layout-card__number-block">
                           <span className="layout-card__number">{formatRooms(layout.number)}</span>
@@ -731,7 +740,6 @@ export default function UnitLayout() {
                       </div>
 
                       <div className="layout-card__footer">
-                        <h2 className="layout-card__name">{layout.title}</h2>
                         <div className="layout-card__meta">
                           {layout.unitTypeOption?.title ? <span>{layout.unitTypeOption.title}</span> : null}
                           {layout.unitTypeOption?.title ? <span className="layout-card__meta-sep">•</span> : null}
