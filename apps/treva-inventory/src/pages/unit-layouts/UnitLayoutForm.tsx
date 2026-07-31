@@ -58,11 +58,7 @@ const validateAreaTab = (form: CreateUnitLayoutData): TabValidation => {
 };
 
 const validateDocumentsTab = (form: CreateUnitLayoutData): TabValidation => {
-    const errors: ValidationError[] = [];
-    if (!form.documents || form.documents.length === 0) {
-        errors.push({ field: "Documents", message: "Documents / At least one PDF document is required" });
-    }
-    return { valid: errors.length === 0, errors };
+    return { valid: true, errors: [] };
 };
 
 const validateGalleryTab = (form: CreateUnitLayoutData): TabValidation => {

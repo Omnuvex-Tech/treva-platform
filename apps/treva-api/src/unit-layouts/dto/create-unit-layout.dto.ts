@@ -206,11 +206,12 @@ export class CreateUnitLayoutDto {
   @Type(() => GalleryImageDto)
   gallery: GalleryImageDto[];
 
-  @ApiProperty({ type: [DocumentDto] })
+  @ApiPropertyOptional({ type: [DocumentDto] })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DocumentDto)
-  documents: DocumentDto[];
+  documents?: DocumentDto[];
 
   @ApiPropertyOptional({ example: 'Residential' })
   @IsOptional()
