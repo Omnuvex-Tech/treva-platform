@@ -152,6 +152,7 @@ export default function ApartmentCard() {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [baseFrame, setBaseFrame] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
   const viewerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const dragRef = useRef<{ active: boolean; startX: number; startY: number; baseX: number; baseY: number; pointerId: number | null }>({
@@ -335,6 +336,20 @@ export default function ApartmentCard() {
     setPan({ x: 0, y: 0 });
   }, [galleryOpen, galleryIndex]);
 
+  const computeBaseFrame = () => {
+    const viewer = viewerRef.current;
+    const img = imgRef.current;
+    if (!viewer || !img) return;
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    if (!natW || !natH) return;
+    const viewerRect = viewer.getBoundingClientRect();
+    const containScale = Math.min(1, Math.min(viewerRect.width / natW, viewerRect.height / natH));
+    const w = Math.max(1, natW * containScale);
+    const h = Math.max(1, natH * containScale);
+    setBaseFrame({ w, h });
+  };
+
   useEffect(() => {
     if (!galleryOpen) return;
     const prevOverflow = document.body.style.overflow;
@@ -349,36 +364,18 @@ export default function ApartmentCard() {
   }, [galleryOpen]);
 
   const canPanAtZoom = (z: number) => {
-    const viewer = viewerRef.current;
-    const img = imgRef.current;
-    if (!viewer || !img) return false;
-    const natW = img.naturalWidth;
-    const natH = img.naturalHeight;
-    if (!natW || !natH) return false;
-    const viewerRect = viewer.getBoundingClientRect();
-    const containScale = Math.min(1, Math.min(viewerRect.width / natW, viewerRect.height / natH));
-    const baseW = natW * containScale;
-    const baseH = natH * containScale;
-    const scaledW = baseW * Math.max(1, z);
-    const scaledH = baseH * Math.max(1, z);
-    return scaledW > viewerRect.width + 1 || scaledH > viewerRect.height + 1;
+    if (!baseFrame.w || !baseFrame.h) return false;
+    return z > 1;
   };
 
   const clampPan = (nextZoom: number, nextPan: { x: number; y: number }) => {
-    const viewer = viewerRef.current;
-    const img = imgRef.current;
-    if (!viewer || !img) return nextPan;
-    const viewerRect = viewer.getBoundingClientRect();
-    const natW = img.naturalWidth;
-    const natH = img.naturalHeight;
-    if (!natW || !natH) return nextPan;
-    const containScale = Math.min(1, Math.min(viewerRect.width / natW, viewerRect.height / natH));
-    const baseW = natW * containScale;
-    const baseH = natH * containScale;
+    const baseW = baseFrame.w;
+    const baseH = baseFrame.h;
+    if (!baseW || !baseH) return nextPan;
     const scaledW = baseW * Math.max(1, nextZoom);
     const scaledH = baseH * Math.max(1, nextZoom);
-    const maxX = Math.max(0, (scaledW - viewerRect.width) / 2);
-    const maxY = Math.max(0, (scaledH - viewerRect.height) / 2);
+    const maxX = Math.max(0, (scaledW - baseW) / 2);
+    const maxY = Math.max(0, (scaledH - baseH) / 2);
     const x = Math.min(maxX, Math.max(-maxX, nextPan.x));
     const y = Math.min(maxY, Math.max(-maxY, nextPan.y));
     return { x, y };
@@ -482,6 +479,14 @@ export default function ApartmentCard() {
       setZoomSafe(1);
     }
   };
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    computeBaseFrame();
+    const onResize = () => computeBaseFrame();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [galleryOpen, galleryIndex, galleryItems.length]);
 
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
   const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
@@ -840,15 +845,25 @@ export default function ApartmentCard() {
                     onClick={(e) => e.stopPropagation()}
                     role="presentation"
                   >
-                    <div className="apt-lightbox__pan" style={{ transform: `translate3d(${pan.x}px, ${pan.y}px, 0)` }}>
-                      <img
-                        ref={imgRef}
-                        className="apt-lightbox__image"
-                        style={{ transform: `scale(${zoom})` }}
-                        src={getAssetUrl(galleryItems[galleryIndex]?.url)}
-                        alt={galleryItems[galleryIndex]?.alt || layout.title}
-                        draggable={false}
-                      />
+                    <div
+                      className="apt-lightbox__frame"
+                      style={{
+                        width: baseFrame.w ? `${Math.round(baseFrame.w)}px` : undefined,
+                        height: baseFrame.h ? `${Math.round(baseFrame.h)}px` : undefined,
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      role="presentation"
+                    >
+                      <div className="apt-lightbox__pan" style={{ transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})` }}>
+                        <img
+                          ref={imgRef}
+                          className="apt-lightbox__image"
+                          onLoad={computeBaseFrame}
+                          src={getAssetUrl(galleryItems[galleryIndex]?.url)}
+                          alt={galleryItems[galleryIndex]?.alt || layout.title}
+                          draggable={false}
+                        />
+                      </div>
                     </div>
                   </div>
 
