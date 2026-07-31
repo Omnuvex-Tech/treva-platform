@@ -147,6 +147,18 @@ export default function ApartmentCard() {
   const similarLimit = 6;
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const dragRef = useRef<{ active: boolean; startX: number; startY: number; baseX: number; baseY: number; pointerId: number | null }>({
+    active: false,
+    startX: 0,
+    startY: 0,
+    baseX: 0,
+    baseY: 0,
+    pointerId: null,
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -254,10 +266,105 @@ export default function ApartmentCard() {
       if (e.key === 'Escape') closeGallery();
       if (e.key === 'ArrowLeft') goPrev();
       if (e.key === 'ArrowRight') goNext();
+      if (e.key === '+' || e.key === '=') setZoom((prev) => Math.min(4, Math.round((prev + 0.25) * 100) / 100));
+      if (e.key === '-' || e.key === '_') setZoom((prev) => Math.max(1, Math.round((prev - 0.25) * 100) / 100));
+      if (e.key === '0') { setZoom(1); setPan({ x: 0, y: 0 }); }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [galleryOpen, galleryItems.length]);
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  }, [galleryOpen, galleryIndex]);
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevPaddingRight = document.body.style.paddingRight;
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`;
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.paddingRight = prevPaddingRight;
+    };
+  }, [galleryOpen]);
+
+  const clampPan = (nextZoom: number, nextPan: { x: number; y: number }) => {
+    const viewer = viewerRef.current;
+    const img = imgRef.current;
+    if (!viewer || !img) return nextPan;
+    const viewerRect = viewer.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+    const baseW = imgRect.width / Math.max(1, zoom);
+    const baseH = imgRect.height / Math.max(1, zoom);
+    const scaledW = baseW * nextZoom;
+    const scaledH = baseH * nextZoom;
+    const maxX = Math.max(0, (scaledW - viewerRect.width) / 2);
+    const maxY = Math.max(0, (scaledH - viewerRect.height) / 2);
+    const x = Math.min(maxX, Math.max(-maxX, nextPan.x));
+    const y = Math.min(maxY, Math.max(-maxY, nextPan.y));
+    return { x, y };
+  };
+
+  const setZoomSafe = (nextZoom: number) => {
+    const z = Math.max(1, Math.min(4, nextZoom));
+    setZoom(z);
+    if (z <= 1) {
+      setPan({ x: 0, y: 0 });
+      return;
+    }
+    setPan((prev) => clampPan(z, prev));
+  };
+
+  const onWheelZoom = (e: React.WheelEvent) => {
+    if (!galleryOpen) return;
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.2 : -0.2;
+    setZoom((prev) => {
+      const next = Math.max(1, Math.min(4, Math.round((prev + delta) * 100) / 100));
+      if (next <= 1) setPan({ x: 0, y: 0 });
+      else setPan((p) => clampPan(next, p));
+      return next;
+    });
+  };
+
+  const onPointerDownPan = (e: React.PointerEvent) => {
+    if (zoom <= 1) return;
+    dragRef.current.active = true;
+    dragRef.current.pointerId = e.pointerId;
+    dragRef.current.startX = e.clientX;
+    dragRef.current.startY = e.clientY;
+    dragRef.current.baseX = pan.x;
+    dragRef.current.baseY = pan.y;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMovePan = (e: React.PointerEvent) => {
+    if (!dragRef.current.active) return;
+    if (dragRef.current.pointerId !== e.pointerId) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+    const nextPan = { x: dragRef.current.baseX + dx, y: dragRef.current.baseY + dy };
+    setPan(clampPan(zoom, nextPan));
+  };
+
+  const onPointerUpPan = (e: React.PointerEvent) => {
+    if (dragRef.current.pointerId !== e.pointerId) return;
+    dragRef.current.active = false;
+    dragRef.current.pointerId = null;
+  };
+
+  const onDoubleClickZoom = () => {
+    if (zoom <= 1) {
+      setZoomSafe(2);
+    } else {
+      setZoomSafe(1);
+    }
+  };
 
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
   const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
@@ -581,11 +688,28 @@ export default function ApartmentCard() {
                     </button>
                   ) : null}
 
-                  <img
-                    className="apt-lightbox__image"
-                    src={getAssetUrl(galleryItems[galleryIndex]?.url)}
-                    alt={galleryItems[galleryIndex]?.alt || layout.title}
-                  />
+                  <div
+                    className={`apt-lightbox__viewer ${zoom > 1 ? 'apt-lightbox__viewer--zoomed' : ''}`}
+                    ref={viewerRef}
+                    onWheel={onWheelZoom}
+                    onPointerDown={onPointerDownPan}
+                    onPointerMove={onPointerMovePan}
+                    onPointerUp={onPointerUpPan}
+                    onPointerCancel={onPointerUpPan}
+                    onDoubleClick={onDoubleClickZoom}
+                    role="presentation"
+                  >
+                    <div className="apt-lightbox__pan" style={{ transform: `translate3d(${pan.x}px, ${pan.y}px, 0)` }}>
+                      <img
+                        ref={imgRef}
+                        className="apt-lightbox__image"
+                        style={{ transform: `scale(${zoom})` }}
+                        src={getAssetUrl(galleryItems[galleryIndex]?.url)}
+                        alt={galleryItems[galleryIndex]?.alt || layout.title}
+                        draggable={false}
+                      />
+                    </div>
+                  </div>
 
                   {galleryItems.length > 1 ? (
                     <button type="button" className="apt-lightbox__nav apt-lightbox__nav--next" onClick={goNext} aria-label="Next image">
