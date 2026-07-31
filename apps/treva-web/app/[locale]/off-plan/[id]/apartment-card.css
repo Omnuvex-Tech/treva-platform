@@ -208,6 +208,19 @@
 .apt-lightbox__close svg,
 .apt-lightbox__nav svg {
   display: block;
+  pointer-events: none;
+}
+
+.apt-lightbox__close svg {
+  transform: translate(0, 0);
+}
+
+.apt-lightbox__nav--prev svg {
+  transform: translate(-0.5px, 0);
+}
+
+.apt-lightbox__nav--next svg {
+  transform: translate(0.5px, 0);
 }
 
 .apt-lightbox__image {
