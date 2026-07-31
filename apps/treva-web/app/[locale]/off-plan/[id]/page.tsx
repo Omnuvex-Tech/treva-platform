@@ -43,6 +43,7 @@ export default function ApartmentCard() {
       consultation: 'Konsultasiya alın',
       complexInfo: 'Yaşayış kompleksi haqqında daha çox',
       location: 'Məkan',
+      contractAddress: 'Müqaviləyə görə ünvan',
       realEstateType: 'Əmlak növü',
       completionYear: 'Təhvil ili',
       numberOfFloors: 'Mərtəbə sayı',
@@ -78,6 +79,7 @@ export default function ApartmentCard() {
       consultation: 'Get a Consultation',
       complexInfo: 'More About the Residential Complex',
       location: 'Location',
+      contractAddress: 'Address of the house according to the contract',
       realEstateType: 'Real Estate Type',
       completionYear: 'Year of Completion',
       numberOfFloors: 'Number of Floors',
@@ -113,6 +115,7 @@ export default function ApartmentCard() {
       consultation: 'Получить консультацию',
       complexInfo: 'Подробнее о жилом комплексе',
       location: 'Локация',
+      contractAddress: 'Адрес дома по договору',
       realEstateType: 'Тип недвижимости',
       completionYear: 'Год сдачи',
       numberOfFloors: 'Количество этажей',
@@ -219,13 +222,19 @@ export default function ApartmentCard() {
     typeof (layout as any)?.realEstateType === 'string'
       ? String((layout as any).realEstateType).trim()
       : '';
+  const contractAddressValue =
+    typeof (layout as any)?.house?.contractAddress === 'string'
+      ? String((layout as any).house.contractAddress).trim()
+      : '';
   const locationTitleValue =
     String(
-      (layout as any)?.house?.location?.title ??
-        (layout as any)?.house?.locationTitle ??
-        (layout as any)?.location?.title ??
-        ''
+      contractAddressValue ||
+        (layout as any)?.house?.location?.title ??
+          (layout as any)?.house?.locationTitle ??
+          (layout as any)?.location?.title ??
+          ''
     ).trim();
+  const locationLabel = contractAddressValue ? t.contractAddress : t.location;
 
   const galleryItems = (() => {
     const items: Array<{ url: string; alt?: string }> = [];
@@ -793,7 +802,7 @@ export default function ApartmentCard() {
               <div className="panorama-info-table">
                 {locationTitleValue ? (
                   <div className="panorama-row">
-                    <span className="panorama-label">{t.location}</span>
+                    <span className="panorama-label">{locationLabel}</span>
                     <span className="panorama-value">{locationTitleValue}</span>
                   </div>
                 ) : null}

@@ -39,6 +39,7 @@ export interface UnitLayoutHouse {
     slug: string;
     location?: UnitLayoutLocation | null;
     locationTitle?: string | null;
+    contractAddress?: string | null;
 }
 
 export interface UnitLayout {
