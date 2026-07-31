@@ -356,8 +356,11 @@ export default function ApartmentCard() {
     const natH = img.naturalHeight;
     if (!natW || !natH) return false;
     const viewerRect = viewer.getBoundingClientRect();
-    const scaledW = natW * Math.max(1, z);
-    const scaledH = natH * Math.max(1, z);
+    const containScale = Math.min(1, Math.min(viewerRect.width / natW, viewerRect.height / natH));
+    const baseW = natW * containScale;
+    const baseH = natH * containScale;
+    const scaledW = baseW * Math.max(1, z);
+    const scaledH = baseH * Math.max(1, z);
     return scaledW > viewerRect.width + 1 || scaledH > viewerRect.height + 1;
   };
 
@@ -369,8 +372,11 @@ export default function ApartmentCard() {
     const natW = img.naturalWidth;
     const natH = img.naturalHeight;
     if (!natW || !natH) return nextPan;
-    const scaledW = natW * Math.max(1, nextZoom);
-    const scaledH = natH * Math.max(1, nextZoom);
+    const containScale = Math.min(1, Math.min(viewerRect.width / natW, viewerRect.height / natH));
+    const baseW = natW * containScale;
+    const baseH = natH * containScale;
+    const scaledW = baseW * Math.max(1, nextZoom);
+    const scaledH = baseH * Math.max(1, nextZoom);
     const maxX = Math.max(0, (scaledW - viewerRect.width) / 2);
     const maxY = Math.max(0, (scaledH - viewerRect.height) / 2);
     const x = Math.min(maxX, Math.max(-maxX, nextPan.x));
