@@ -339,9 +339,12 @@ export default function ApartmentCard() {
     const img = imgRef.current;
     if (!viewer || !img) return nextPan;
     const viewerRect = viewer.getBoundingClientRect();
-    const imgRect = img.getBoundingClientRect();
-    const baseW = imgRect.width / Math.max(1, zoom);
-    const baseH = imgRect.height / Math.max(1, zoom);
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    if (!natW || !natH) return nextPan;
+    const containScale = Math.min(viewerRect.width / natW, viewerRect.height / natH);
+    const baseW = natW * containScale;
+    const baseH = natH * containScale;
     const scaledW = baseW * nextZoom;
     const scaledH = baseH * nextZoom;
     const maxX = Math.max(0, (scaledW - viewerRect.width) / 2);
