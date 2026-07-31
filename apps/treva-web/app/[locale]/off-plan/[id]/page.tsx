@@ -217,6 +217,7 @@ export default function ApartmentCard() {
   const brochureDoc = layout?.documents?.find(
     (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
   );
+  const brochureUrl = brochureDoc?.url ? getAssetUrl(brochureDoc.url) : '';
   const statusValue = layout?.statusOption?.value || (layout as any)?.status || '';
   const realEstateTypeValue =
     typeof (layout as any)?.realEstateType === 'string'
@@ -265,6 +266,30 @@ export default function ApartmentCard() {
   };
 
   const closeGallery = () => setGalleryOpen(false);
+
+  const downloadAsset = async (url: string, filename: string) => {
+    const safeName = filename?.trim() || 'file';
+    try {
+      const res = await fetch(url, { method: 'GET' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = safeName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = safeName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  };
 
   const goPrev = () => {
     if (galleryItems.length <= 1) return;
@@ -567,7 +592,20 @@ export default function ApartmentCard() {
                       </div>
                     ) : null}
                     {brochureDoc ? (
-                      <a href={getAssetUrl(brochureDoc.url)} className="apt-badge badge-btn" download>
+                      <a
+                        href={brochureUrl}
+                        className="apt-badge badge-btn"
+                        download
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!brochureUrl) return;
+                          const href = brochureUrl;
+                          const rawUrl = String(brochureDoc?.url || '');
+                          const nameFromUrl = ((((rawUrl.split('?')[0] ?? '').split('#')[0] ?? '').split('/').pop() ?? '') || '');
+                          const filename = nameFromUrl || `${layout.slug || 'brochure'}.pdf`;
+                          downloadAsset(href, filename);
+                        }}
+                      >
                         <span className="apt-badge__text">PDF</span>
                       </a>
                     ) : null}
