@@ -219,6 +219,13 @@ export default function ApartmentCard() {
     typeof (layout as any)?.realEstateType === 'string'
       ? String((layout as any).realEstateType).trim()
       : '';
+  const locationTitleValue =
+    String(
+      (layout as any)?.house?.location?.title ??
+        (layout as any)?.house?.locationTitle ??
+        (layout as any)?.location?.title ??
+        ''
+    ).trim();
 
   const galleryItems = (() => {
     const items: Array<{ url: string; alt?: string }> = [];
@@ -784,12 +791,12 @@ export default function ApartmentCard() {
               </div>
 
               <div className="panorama-info-table">
-                {layout.location && (
+                {locationTitleValue ? (
                   <div className="panorama-row">
                     <span className="panorama-label">{t.location}</span>
-                    <span className="panorama-value">{layout.location.title}</span>
+                    <span className="panorama-value">{locationTitleValue}</span>
                   </div>
-                )}
+                ) : null}
                 {realEstateTypeValue ? (
                   <div className="panorama-row">
                     <span className="panorama-label">{t.realEstateType}</span>

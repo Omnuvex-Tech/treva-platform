@@ -32,6 +32,15 @@ export interface UnitLayoutUnitTypeOption {
     title: string;
 }
 
+export interface UnitLayoutHouse {
+    id: string;
+    title: string;
+    name: string;
+    slug: string;
+    location?: UnitLayoutLocation | null;
+    locationTitle?: string | null;
+}
+
 export interface UnitLayout {
     id: string;
     title: string;
@@ -52,6 +61,8 @@ export interface UnitLayout {
     unitTypeOptionId?: string;
     unitTypeOption?: UnitLayoutUnitTypeOption | null;
     realEstateType?: string | null;
+    houseId?: string | null;
+    house?: UnitLayoutHouse | null;
     similarApartmentIds: string[];
     similarApartments?: UnitLayout[];
     mainImage?: UnitLayoutImage;
