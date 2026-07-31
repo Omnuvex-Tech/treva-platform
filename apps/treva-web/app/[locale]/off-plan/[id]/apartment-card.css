@@ -228,8 +228,8 @@
   height: calc(100vh - 220px);
   overflow: hidden;
   display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   touch-action: none;
 }
 
@@ -244,8 +244,8 @@
 .apt-lightbox__pan {
   will-change: transform;
   display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
 }
@@ -254,7 +254,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: left center;
+  object-position: center center;
   background: transparent;
   transform-origin: center center;
   will-change: transform;
