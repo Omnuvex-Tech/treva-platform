@@ -59,6 +59,10 @@ export class HousesService {
         location: createDto.location as any,
         typeOfBuilding: createDto.typeOfBuilding,
         constructionStage: createDto.constructionStage,
+        startOfConstruction: createDto.startOfConstruction as any,
+        completionOfConstruction: createDto.completionOfConstruction as any,
+        startOfSales: createDto.startOfSales as any,
+        endOfSales: createDto.endOfSales as any,
         description: createDto.description,
         ownerId: createDto.ownerId,
         heatingTypeIds: createDto.heatingTypeIds || [],
@@ -225,6 +229,10 @@ export class HousesService {
     if (updateDto.location !== undefined) data.location = updateDto.location;
     if (updateDto.typeOfBuilding !== undefined) data.typeOfBuilding = updateDto.typeOfBuilding;
     if (updateDto.constructionStage !== undefined) data.constructionStage = updateDto.constructionStage;
+    if (updateDto.startOfConstruction !== undefined) data.startOfConstruction = updateDto.startOfConstruction;
+    if (updateDto.completionOfConstruction !== undefined) data.completionOfConstruction = updateDto.completionOfConstruction;
+    if (updateDto.startOfSales !== undefined) data.startOfSales = updateDto.startOfSales;
+    if (updateDto.endOfSales !== undefined) data.endOfSales = updateDto.endOfSales;
     if (updateDto.description !== undefined) data.description = updateDto.description;
     if (updateDto.ownerId !== undefined) data.ownerId = updateDto.ownerId;
     if (updateDto.heatingTypeIds !== undefined) data.heatingTypeIds = updateDto.heatingTypeIds;

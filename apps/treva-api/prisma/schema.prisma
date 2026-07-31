@@ -80,6 +80,10 @@ model House {
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
   typeOfBuilding              String?
   constructionStage           String?
+  startOfConstruction          Json?
+  completionOfConstruction     Json?
+  startOfSales                 Json?
+  endOfSales                   Json?
   description                 String?
   ownerId                     String?
   owner                       Owner?      @relation(fields: [ownerId], references: [id])

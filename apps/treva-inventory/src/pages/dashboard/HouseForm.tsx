@@ -161,9 +161,7 @@ export function HouseForm({
         salesOffice: "",
         landCadastralNumber: "",
         contractAddress: "",
-        secondContractAddress: "",
         showroomAvailability: "",
-        secondShowroomAvailability: "",
     });
 
     const activeCategorySlug = categorySlugProp || urlSlug || "";
@@ -230,9 +228,7 @@ export function HouseForm({
             salesOffice: existingHouse.salesOffice || "",
             landCadastralNumber: existingHouse.landCadastralNumber || "",
             contractAddress: existingHouse.contractAddress || "",
-            secondContractAddress: existingHouse.secondContractAddress || "",
             showroomAvailability: existingHouse.showroomAvailability || "",
-            secondShowroomAvailability: existingHouse.secondShowroomAvailability || "",
         });
         setSlugManuallyEdited(Boolean(existingHouse.slug));
     }, [existingHouse, isEditMode]);
@@ -389,9 +385,7 @@ export function HouseForm({
             salesOffice: form.salesOffice.trim() || undefined,
             landCadastralNumber: form.landCadastralNumber.trim() || undefined,
             contractAddress: form.contractAddress.trim() || undefined,
-            secondContractAddress: form.secondContractAddress.trim() || undefined,
             showroomAvailability: form.showroomAvailability.trim() || undefined,
-            secondShowroomAvailability: form.secondShowroomAvailability.trim() || undefined,
         });
     };
 
@@ -559,15 +553,6 @@ export function HouseForm({
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">Showroom availability in the house</label>
                     <input className={inputClass} value={form.showroomAvailability} onChange={(e) => updateField("showroomAvailability", e.target.value)} />
-                </div>
-
-                <div>
-                    <label className="mb-1 block text-xs text-[#4E525D]">Address of the house according to the contract</label>
-                    <input className={inputClass} value={form.secondContractAddress} onChange={(e) => updateField("secondContractAddress", e.target.value)} />
-                </div>
-                <div>
-                    <label className="mb-1 block text-xs text-[#4E525D]">Showroom availability in the house</label>
-                    <input className={inputClass} value={form.secondShowroomAvailability} onChange={(e) => updateField("secondShowroomAvailability", e.target.value)} />
                 </div>
             </div>
 
