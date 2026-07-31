@@ -150,14 +150,6 @@ export function HouseForm({
         typeOfBuilding: "",
         constructionStage: "",
         deadlineForCommissioning: "",
-        startOfConstructionMonth: "",
-        startOfConstructionYear: "",
-        completionOfConstructionMonth: "",
-        completionOfConstructionYear: "",
-        startOfSalesMonth: "",
-        startOfSalesYear: "",
-        endOfSalesMonth: "",
-        endOfSalesYear: "",
         salesOffice: "",
         landCadastralNumber: "",
         contractAddress: "",
@@ -217,14 +209,6 @@ export function HouseForm({
             typeOfBuilding: existingHouse.typeOfBuilding || "",
             constructionStage: existingHouse.constructionStage || "",
             deadlineForCommissioning: existingHouse.deadlineForCommissioning || "",
-            startOfConstructionMonth: existingHouse.startOfConstruction?.month?.toString() || "",
-            startOfConstructionYear: existingHouse.startOfConstruction?.year?.toString() || "",
-            completionOfConstructionMonth: existingHouse.completionOfConstruction?.month?.toString() || "",
-            completionOfConstructionYear: existingHouse.completionOfConstruction?.year?.toString() || "",
-            startOfSalesMonth: existingHouse.startOfSales?.month?.toString() || "",
-            startOfSalesYear: existingHouse.startOfSales?.year?.toString() || "",
-            endOfSalesMonth: existingHouse.endOfSales?.month?.toString() || "",
-            endOfSalesYear: existingHouse.endOfSales?.year?.toString() || "",
             salesOffice: existingHouse.salesOffice || "",
             landCadastralNumber: existingHouse.landCadastralNumber || "",
             contractAddress: existingHouse.contractAddress || "",
@@ -335,7 +319,13 @@ export function HouseForm({
         }
 
         const parsedHouseNumber = Number.parseInt(form.houseNumber, 10);
-        const completionYear = Number.parseInt(form.completionOfConstructionYear, 10) || Number.parseInt(form.endOfSalesYear, 10) || 2030;
+        const completionYearFromDate = form.deadlineForCommissioning
+            ? Number.parseInt(form.deadlineForCommissioning.slice(0, 4), 10)
+            : NaN;
+        const completionYear =
+            (Number.isFinite(completionYearFromDate) ? completionYearFromDate : undefined) ??
+            (existingHouse as any)?.completionYear ??
+            2030;
 
         mutation.mutate({
             categoryId,
@@ -366,22 +356,6 @@ export function HouseForm({
             typeOfBuilding: form.typeOfBuilding,
             constructionStage: form.constructionStage || undefined,
             deadlineForCommissioning: form.deadlineForCommissioning || undefined,
-            startOfConstruction:
-                form.startOfConstructionMonth && form.startOfConstructionYear
-                    ? { month: Number(form.startOfConstructionMonth), year: Number(form.startOfConstructionYear) }
-                    : undefined,
-            completionOfConstruction:
-                form.completionOfConstructionMonth && form.completionOfConstructionYear
-                    ? { month: Number(form.completionOfConstructionMonth), year: Number(form.completionOfConstructionYear) }
-                    : undefined,
-            startOfSales:
-                form.startOfSalesMonth && form.startOfSalesYear
-                    ? { month: Number(form.startOfSalesMonth), year: Number(form.startOfSalesYear) }
-                    : undefined,
-            endOfSales:
-                form.endOfSalesMonth && form.endOfSalesYear
-                    ? { month: Number(form.endOfSalesMonth), year: Number(form.endOfSalesYear) }
-                    : undefined,
             salesOffice: form.salesOffice.trim() || undefined,
             landCadastralNumber: form.landCadastralNumber.trim() || undefined,
             contractAddress: form.contractAddress.trim() || undefined,
@@ -505,36 +479,6 @@ export function HouseForm({
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">The deadline for commissioning</label>
                     <input type="date" className={inputClass} value={form.deadlineForCommissioning} onChange={(e) => updateField("deadlineForCommissioning", e.target.value)} />
-                </div>
-
-                <div>
-                    <label className="mb-1 block text-xs text-[#4E525D]">Start of construction</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        <FormDropdown label="Month" value={form.startOfConstructionMonth} options={monthOptions} onChange={(id) => updateField("startOfConstructionMonth", id)} placeholder="Month" />
-                        <FormDropdown label="Year" value={form.startOfConstructionYear} options={yearOptions} onChange={(id) => updateField("startOfConstructionYear", id)} placeholder="Year" />
-                    </div>
-                </div>
-                <div>
-                    <label className="mb-1 block text-xs text-[#4E525D]">Completion of construction</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        <FormDropdown label="Month" value={form.completionOfConstructionMonth} options={monthOptions} onChange={(id) => updateField("completionOfConstructionMonth", id)} placeholder="Month" />
-                        <FormDropdown label="Year" value={form.completionOfConstructionYear} options={yearOptions} onChange={(id) => updateField("completionOfConstructionYear", id)} placeholder="Year" />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="mb-1 block text-xs text-[#4E525D]">Start of sales</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        <FormDropdown label="Month" value={form.startOfSalesMonth} options={monthOptions} onChange={(id) => updateField("startOfSalesMonth", id)} placeholder="Month" />
-                        <FormDropdown label="Year" value={form.startOfSalesYear} options={yearOptions} onChange={(id) => updateField("startOfSalesYear", id)} placeholder="Year" />
-                    </div>
-                </div>
-                <div>
-                    <label className="mb-1 block text-xs text-[#4E525D]">End of sales</label>
-                    <div className="grid grid-cols-2 gap-2">
-                        <FormDropdown label="Month" value={form.endOfSalesMonth} options={monthOptions} onChange={(id) => updateField("endOfSalesMonth", id)} placeholder="Month" />
-                        <FormDropdown label="Year" value={form.endOfSalesYear} options={yearOptions} onChange={(id) => updateField("endOfSalesYear", id)} placeholder="Year" />
-                    </div>
                 </div>
 
                 <div>

@@ -88,10 +88,6 @@ export interface House {
     secondShowroomAvailability?: string;
     typeOfBuilding?: string;
     constructionStage?: string;
-    startOfConstruction?: { month: number; year: number };
-    completionOfConstruction?: { month: number; year: number };
-    startOfSales?: { month: number; year: number };
-    endOfSales?: { month: number; year: number };
     description?: string;
     createdAt: string;
     updatedAt: string;
@@ -159,10 +155,6 @@ export interface CreateHouseData {
     secondShowroomAvailability?: string;
     typeOfBuilding?: string;
     constructionStage?: string;
-    startOfConstruction?: { month: number; year: number };
-    completionOfConstruction?: { month: number; year: number };
-    startOfSales?: { month: number; year: number };
-    endOfSales?: { month: number; year: number };
     description?: string;
 }
 

@@ -80,20 +80,6 @@ export class HouseDocumentDto {
   url: string;
 }
 
-export class HouseMonthYearDto {
-  @ApiProperty({ example: 1 })
-  @IsNumber()
-  @Min(1)
-  @Max(12)
-  month: number;
-
-  @ApiProperty({ example: 2026 })
-  @IsNumber()
-  @Min(1900)
-  @Max(2100)
-  year: number;
-}
-
 export class CreateHouseDto {
   @ApiProperty({ example: 'Block A' })
   @IsString()
@@ -238,34 +224,6 @@ export class CreateHouseDto {
   @IsOptional()
   @IsString()
   constructionStage?: string;
-
-  @ApiPropertyOptional({ example: { month: 1, year: 2026 } })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => HouseMonthYearDto)
-  startOfConstruction?: HouseMonthYearDto;
-
-  @ApiPropertyOptional({ example: { month: 12, year: 2028 } })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => HouseMonthYearDto)
-  completionOfConstruction?: HouseMonthYearDto;
-
-  @ApiPropertyOptional({ example: { month: 3, year: 2026 } })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => HouseMonthYearDto)
-  startOfSales?: HouseMonthYearDto;
-
-  @ApiPropertyOptional({ example: { month: 6, year: 2027 } })
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => HouseMonthYearDto)
-  endOfSales?: HouseMonthYearDto;
 
   @ApiPropertyOptional({ example: '<p>House description</p>' })
   @IsOptional()
