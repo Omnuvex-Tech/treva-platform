@@ -229,10 +229,10 @@ export default function ApartmentCard() {
   const locationTitleValue =
     String(
       contractAddressValue ||
-        (layout as any)?.house?.location?.title ??
+        ((layout as any)?.house?.location?.title ??
           (layout as any)?.house?.locationTitle ??
           (layout as any)?.location?.title ??
-          ''
+          '')
     ).trim();
   const locationLabel = contractAddressValue ? t.contractAddress : t.location;
 
