@@ -145,6 +145,8 @@ export default function ApartmentCard() {
   const [shareCopied, setShareCopied] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
   const similarLimit = 6;
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -205,6 +207,57 @@ export default function ApartmentCard() {
     typeof (layout as any)?.realEstateType === 'string'
       ? String((layout as any).realEstateType).trim()
       : '';
+
+  const galleryItems = (() => {
+    const items: Array<{ url: string; alt?: string }> = [];
+    const mainUrl = layout?.mainImage?.url ? String(layout.mainImage.url).trim() : '';
+    if (mainUrl) items.push({ url: mainUrl, alt: layout?.mainImage?.alt || layout?.title });
+
+    const gallery = Array.isArray(layout?.gallery) ? layout!.gallery : [];
+    for (const img of gallery) {
+      const url = img?.url ? String(img.url).trim() : '';
+      if (!url) continue;
+      if (mainUrl && url === mainUrl) continue;
+      items.push({ url, alt: img?.alt || layout?.title });
+    }
+
+    const seen = new Set<string>();
+    return items.filter((it) => {
+      if (seen.has(it.url)) return false;
+      seen.add(it.url);
+      return true;
+    });
+  })();
+
+  const openGallery = (index: number) => {
+    if (galleryItems.length === 0) return;
+    const safeIndex = Math.max(0, Math.min(index, galleryItems.length - 1));
+    setGalleryIndex(safeIndex);
+    setGalleryOpen(true);
+  };
+
+  const closeGallery = () => setGalleryOpen(false);
+
+  const goPrev = () => {
+    if (galleryItems.length <= 1) return;
+    setGalleryIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
+  };
+
+  const goNext = () => {
+    if (galleryItems.length <= 1) return;
+    setGalleryIndex((prev) => (prev + 1) % galleryItems.length);
+  };
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeGallery();
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [galleryOpen, galleryItems.length]);
 
   const shareUrl = typeof window !== 'undefined' && layout ? `${window.location.origin}/${locale}/off-plan/${layout.slug}` : '';
   const shareText = layout ? `${t.checkOutApartment}: ${layout.title}` : '';
@@ -345,17 +398,35 @@ export default function ApartmentCard() {
               {/* Left Side: Blueprint Image Section */}
               <div className="apt-image-section">
                 <div className="apt-blueprint-box">
-                  {layout.mainImage ? (
-                    <img
-                      src={getAssetUrl(layout.mainImage.url)}
-                      alt={layout.mainImage.alt || layout.title}
-                      className="apt-plan-img"
-                    />
-                  ) : (
-                    <div className="apt-plan-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f2eb', color: '#6d717a' }}>
-                      {t.noImage}
-                    </div>
-                  )}
+                  <button
+                    type="button"
+                    className="apt-blueprint-trigger"
+                    onClick={() => openGallery(0)}
+                    disabled={galleryItems.length === 0}
+                    aria-label="Open gallery"
+                  >
+                    {layout.mainImage ? (
+                      <img
+                        src={getAssetUrl(layout.mainImage.url)}
+                        alt={layout.mainImage.alt || layout.title}
+                        className="apt-plan-img"
+                      />
+                    ) : (
+                      <div className="apt-plan-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f2eb', color: '#6d717a' }}>
+                        {t.noImage}
+                      </div>
+                    )}
+                    {galleryItems.length > 0 ? (
+                      <span className="apt-blueprint-overlay" aria-hidden="true">
+                        <span className="apt-blueprint-icon" aria-hidden="true">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="7" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                          </svg>
+                        </span>
+                      </span>
+                    ) : null}
+                  </button>
                 </div>
               </div>
 
@@ -490,6 +561,58 @@ export default function ApartmentCard() {
 
               </div>
             </div>
+
+            {galleryOpen && galleryItems.length > 0 ? (
+              <div className="apt-lightbox" role="dialog" aria-modal="true">
+                <button type="button" className="apt-lightbox__backdrop" onClick={closeGallery} aria-label="Close gallery" />
+                <div className="apt-lightbox__panel">
+                  <button type="button" className="apt-lightbox__close" onClick={closeGallery} aria-label="Close gallery">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+
+                  {galleryItems.length > 1 ? (
+                    <button type="button" className="apt-lightbox__nav apt-lightbox__nav--prev" onClick={goPrev} aria-label="Previous image">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                    </button>
+                  ) : null}
+
+                  <img
+                    className="apt-lightbox__image"
+                    src={getAssetUrl(galleryItems[galleryIndex]?.url)}
+                    alt={galleryItems[galleryIndex]?.alt || layout.title}
+                  />
+
+                  {galleryItems.length > 1 ? (
+                    <button type="button" className="apt-lightbox__nav apt-lightbox__nav--next" onClick={goNext} aria-label="Next image">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </button>
+                  ) : null}
+
+                  {galleryItems.length > 1 ? (
+                    <div className="apt-lightbox__thumbs">
+                      {galleryItems.map((img, idx) => (
+                        <button
+                          key={`${img.url}-${idx}`}
+                          type="button"
+                          className={`apt-lightbox__thumb ${idx === galleryIndex ? 'apt-lightbox__thumb--active' : ''}`}
+                          onClick={() => setGalleryIndex(idx)}
+                          aria-label={`Open image ${idx + 1}`}
+                        >
+                          <img src={getAssetUrl(img.url)} alt={img.alt || layout.title} />
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
 
             <section className="panorama-section" aria-label={t.apartmentDetails}>
               <div className="panorama-banner">
