@@ -162,6 +162,20 @@ export default function ApartmentCard() {
     baseY: 0,
     pointerId: null,
   });
+  const pointerMapRef = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef<{
+    active: boolean;
+    startDist: number;
+    startZoom: number;
+    startPan: { x: number; y: number };
+    startCenter: { x: number; y: number };
+  }>({
+    active: false,
+    startDist: 0,
+    startZoom: 1,
+    startPan: { x: 0, y: 0 },
+    startCenter: { x: 0, y: 0 },
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -377,6 +391,26 @@ export default function ApartmentCard() {
   };
 
   const onPointerDownPan = (e: React.PointerEvent) => {
+    pointerMapRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+
+    if (pointerMapRef.current.size >= 2) {
+      const points = Array.from(pointerMapRef.current.values());
+      const p1 = points[0]!;
+      const p2 = points[1]!;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      pinchRef.current.active = true;
+      pinchRef.current.startDist = dist;
+      pinchRef.current.startZoom = zoom;
+      pinchRef.current.startPan = { ...pan };
+      pinchRef.current.startCenter = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      dragRef.current.active = false;
+      dragRef.current.pointerId = null;
+      return;
+    }
+
     if (zoom <= 1) return;
     dragRef.current.active = true;
     dragRef.current.pointerId = e.pointerId;
@@ -384,10 +418,29 @@ export default function ApartmentCard() {
     dragRef.current.startY = e.clientY;
     dragRef.current.baseX = pan.x;
     dragRef.current.baseY = pan.y;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const onPointerMovePan = (e: React.PointerEvent) => {
+    if (!pointerMapRef.current.has(e.pointerId)) return;
+    pointerMapRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pinchRef.current.active && pointerMapRef.current.size >= 2) {
+      const points = Array.from(pointerMapRef.current.values());
+      const p1 = points[0]!;
+      const p2 = points[1]!;
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const ratio = dist / Math.max(1, pinchRef.current.startDist);
+      const nextZoom = Math.max(1, Math.min(4, Math.round((pinchRef.current.startZoom * ratio) * 100) / 100));
+      const center = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      const deltaCenter = { x: center.x - pinchRef.current.startCenter.x, y: center.y - pinchRef.current.startCenter.y };
+      const nextPan = { x: pinchRef.current.startPan.x + deltaCenter.x, y: pinchRef.current.startPan.y + deltaCenter.y };
+      setZoom(nextZoom);
+      setPan(nextZoom <= 1 ? { x: 0, y: 0 } : clampPan(nextZoom, nextPan));
+      return;
+    }
+
     if (!dragRef.current.active) return;
     if (dragRef.current.pointerId !== e.pointerId) return;
     const dx = e.clientX - dragRef.current.startX;
@@ -397,6 +450,10 @@ export default function ApartmentCard() {
   };
 
   const onPointerUpPan = (e: React.PointerEvent) => {
+    pointerMapRef.current.delete(e.pointerId);
+    if (pointerMapRef.current.size < 2) {
+      pinchRef.current.active = false;
+    }
     if (dragRef.current.pointerId !== e.pointerId) return;
     dragRef.current.active = false;
     dragRef.current.pointerId = null;
