@@ -348,6 +348,19 @@ export default function ApartmentCard() {
     };
   }, [galleryOpen]);
 
+  const canPanAtZoom = (z: number) => {
+    const viewer = viewerRef.current;
+    const img = imgRef.current;
+    if (!viewer || !img) return false;
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    if (!natW || !natH) return false;
+    const viewerRect = viewer.getBoundingClientRect();
+    const scaledW = natW * Math.max(1, z);
+    const scaledH = natH * Math.max(1, z);
+    return scaledW > viewerRect.width + 1 || scaledH > viewerRect.height + 1;
+  };
+
   const clampPan = (nextZoom: number, nextPan: { x: number; y: number }) => {
     const viewer = viewerRef.current;
     const img = imgRef.current;
@@ -356,11 +369,8 @@ export default function ApartmentCard() {
     const natW = img.naturalWidth;
     const natH = img.naturalHeight;
     if (!natW || !natH) return nextPan;
-    const containScale = Math.min(1, Math.min(viewerRect.width / natW, viewerRect.height / natH));
-    const baseW = natW * containScale;
-    const baseH = natH * containScale;
-    const scaledW = baseW * nextZoom;
-    const scaledH = baseH * nextZoom;
+    const scaledW = natW * Math.max(1, nextZoom);
+    const scaledH = natH * Math.max(1, nextZoom);
     const maxX = Math.max(0, (scaledW - viewerRect.width) / 2);
     const maxY = Math.max(0, (scaledH - viewerRect.height) / 2);
     const x = Math.min(maxX, Math.max(-maxX, nextPan.x));
@@ -411,7 +421,7 @@ export default function ApartmentCard() {
       return;
     }
 
-    if (zoom <= 1) return;
+    if (!canPanAtZoom(zoom)) return;
     dragRef.current.active = true;
     dragRef.current.pointerId = e.pointerId;
     dragRef.current.startX = e.clientX;
@@ -437,7 +447,7 @@ export default function ApartmentCard() {
       const deltaCenter = { x: center.x - pinchRef.current.startCenter.x, y: center.y - pinchRef.current.startCenter.y };
       const nextPan = { x: pinchRef.current.startPan.x + deltaCenter.x, y: pinchRef.current.startPan.y + deltaCenter.y };
       setZoom(nextZoom);
-      setPan(nextZoom <= 1 ? { x: 0, y: 0 } : clampPan(nextZoom, nextPan));
+      setPan(canPanAtZoom(nextZoom) ? clampPan(nextZoom, nextPan) : { x: 0, y: 0 });
       return;
     }
 
