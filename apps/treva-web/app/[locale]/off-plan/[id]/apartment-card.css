@@ -224,8 +224,8 @@
 }
 
 .apt-lightbox__viewer {
-  width: min(1100px, calc(100vw - 140px));
-  height: calc(100vh - 220px);
+  width: min(1240px, calc(100vw - 120px));
+  height: calc(100vh - 190px);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -274,8 +274,8 @@
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  height: 46px;
-  width: 46px;
+  height: 40px;
+  width: 40px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
@@ -288,11 +288,11 @@
 }
 
 .apt-lightbox__nav--prev {
-  left: 22px;
+  left: 18px;
 }
 
 .apt-lightbox__nav--next {
-  right: 22px;
+  right: 18px;
 }
 
 .apt-lightbox__thumbs {
@@ -328,9 +328,40 @@
 
 .apt-lightbox__thumb img {
   width: 100%;
-  height: 54px;
+  height: 48px;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 768px) {
+  .apt-lightbox__panel {
+    padding: 60px 18px 110px;
+  }
+
+  .apt-lightbox__viewer {
+    width: calc(100vw - 72px);
+    height: calc(100vh - 176px);
+  }
+
+  .apt-lightbox__nav {
+    height: 36px;
+    width: 36px;
+  }
+
+  .apt-lightbox__nav--prev {
+    left: 12px;
+  }
+
+  .apt-lightbox__nav--next {
+    right: 12px;
+  }
+
+  .apt-lightbox__close {
+    top: 16px;
+    right: 16px;
+    height: 40px;
+    width: 40px;
+  }
 }
 
 /* Details Section */
