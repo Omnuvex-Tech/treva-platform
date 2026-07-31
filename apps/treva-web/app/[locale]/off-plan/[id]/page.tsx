@@ -672,8 +672,13 @@ export default function ApartmentCard() {
             {galleryOpen && galleryItems.length > 0 ? (
               <div className="apt-lightbox" role="dialog" aria-modal="true">
                 <button type="button" className="apt-lightbox__backdrop" onClick={closeGallery} aria-label="Close gallery" />
-                <div className="apt-lightbox__panel">
-                  <button type="button" className="apt-lightbox__close" onClick={closeGallery} aria-label="Close gallery">
+                <div className="apt-lightbox__panel" onClick={closeGallery}>
+                  <button
+                    type="button"
+                    className="apt-lightbox__close"
+                    onClick={(e) => { e.stopPropagation(); closeGallery(); }}
+                    aria-label="Close gallery"
+                  >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <line x1="18" y1="6" x2="6" y2="18" />
                       <line x1="6" y1="6" x2="18" y2="18" />
@@ -681,7 +686,12 @@ export default function ApartmentCard() {
                   </button>
 
                   {galleryItems.length > 1 ? (
-                    <button type="button" className="apt-lightbox__nav apt-lightbox__nav--prev" onClick={goPrev} aria-label="Previous image">
+                    <button
+                      type="button"
+                      className="apt-lightbox__nav apt-lightbox__nav--prev"
+                      onClick={(e) => { e.stopPropagation(); goPrev(); }}
+                      aria-label="Previous image"
+                    >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6" />
                       </svg>
@@ -697,6 +707,7 @@ export default function ApartmentCard() {
                     onPointerUp={onPointerUpPan}
                     onPointerCancel={onPointerUpPan}
                     onDoubleClick={onDoubleClickZoom}
+                    onClick={(e) => e.stopPropagation()}
                     role="presentation"
                   >
                     <div className="apt-lightbox__pan" style={{ transform: `translate3d(${pan.x}px, ${pan.y}px, 0)` }}>
@@ -712,7 +723,12 @@ export default function ApartmentCard() {
                   </div>
 
                   {galleryItems.length > 1 ? (
-                    <button type="button" className="apt-lightbox__nav apt-lightbox__nav--next" onClick={goNext} aria-label="Next image">
+                    <button
+                      type="button"
+                      className="apt-lightbox__nav apt-lightbox__nav--next"
+                      onClick={(e) => { e.stopPropagation(); goNext(); }}
+                      aria-label="Next image"
+                    >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="9 18 15 12 9 6" />
                       </svg>
@@ -720,13 +736,13 @@ export default function ApartmentCard() {
                   ) : null}
 
                   {galleryItems.length > 1 ? (
-                    <div className="apt-lightbox__thumbs">
+                    <div className="apt-lightbox__thumbs" onClick={(e) => e.stopPropagation()}>
                       {galleryItems.map((img, idx) => (
                         <button
                           key={`${img.url}-${idx}`}
                           type="button"
                           className={`apt-lightbox__thumb ${idx === galleryIndex ? 'apt-lightbox__thumb--active' : ''}`}
-                          onClick={() => setGalleryIndex(idx)}
+                          onClick={(e) => { e.stopPropagation(); setGalleryIndex(idx); }}
                           aria-label={`Open image ${idx + 1}`}
                         >
                           <img src={getAssetUrl(img.url)} alt={img.alt || layout.title} />
