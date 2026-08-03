@@ -26,6 +26,7 @@ import { LocationOptionsModule } from './location-options/location-options.modul
 import { HeatingTypeOptionsModule } from './heating-type-options/heating-type-options.module';
 import { HousesModule } from './houses/houses.module';
 import { UnitTypeOptionsModule } from './unit-type-options/unit-type-options.module';
+import { ProfitbaseModule } from './profitbase/profitbase.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { UnitTypeOptionsModule } from './unit-type-options/unit-type-options.mod
     LocationOptionsModule,
     HeatingTypeOptionsModule,
     UnitTypeOptionsModule,
+    ProfitbaseModule,
   ],
   controllers: [AppController],
   providers: [

@@ -44,6 +44,7 @@ model Category {
   documents       Json       @default("[]")
   fedLaw214       Boolean  @default(false)
   type            String   @default("object") // "category" | "object"
+  externalId      String?  @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -63,6 +64,8 @@ model House {
   seoImage                    String?
   floor                       Int
   number                      Int?
+  unitCode                    String?
+  rooms                       Int?
   totalArea                   Float
   internalArea                Float
   balconyArea                 Float?
@@ -100,6 +103,7 @@ model House {
   showroomAvailability        String?
   secondShowroomAvailability  String?
   archived                    Boolean     @default(false)
+  externalId                  String?     @unique
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 
@@ -118,6 +122,8 @@ model UnitLayout {
   seoImage                    String?
   floor                       Int
   number                      Int?
+  unitCode                    String?
+  rooms                       Int?
   entrance                    String?
   totalArea                   Float
   internalArea                Float
@@ -146,6 +152,7 @@ model UnitLayout {
   heatingTypeIds              String[]    @default([])
   attributeIds                String[]    @default([])
   archived                    Boolean     @default(false)
+  externalId                  String?     @unique
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 }

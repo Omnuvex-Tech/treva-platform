@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayoutStats, type UnitLayout } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
+import { profitbaseApi } from "../api/profitbase";
+import { useMessageCenter } from "../components/MessageCenter";
+import { getApiErrorMessage } from "../utils/apiError";
 import { apartmentsApi, type Apartment } from "../api/apartments";
 import { apartmentTypesApi, type ApartmentType } from "../api/apartment-types";
 import { ownersApi, type Owner } from "../api/owners";
@@ -224,29 +227,52 @@ export function Dashboard() {
     const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
     const [resaleListingsTotal, setResaleListingsTotal] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [syncingProfitbase, setSyncingProfitbase] = useState(false);
+    const { showSuccess, showError } = useMessageCenter();
+
+    const loadOffplanDashboardData = useCallback(() => {
+        setLoading(true);
+        return Promise.all([
+            unitLayoutsApi.getStats(),
+            categoriesApi.getAll("object"),
+            unitLayoutsApi.getAll({ limit: 10000 }),
+            attributesApi.getAll(),
+            unitTypeOptionsApi.getAll(),
+        ]).then(([statsRes, catsRes, layoutsRes, attributesRes, unitTypesRes]) => {
+            setUnitStats(statsRes.data);
+            setCategories(catsRes.data);
+            setUnitLayouts(layoutsRes.data.data);
+            setOffplanAttributes(attributesRes.data);
+            setOffplanUnitTypes(unitTypesRes.data);
+        }).catch(() => {
+            setUnitStats(null);
+            setCategories([]);
+            setUnitLayouts([]);
+            setOffplanAttributes([]);
+            setOffplanUnitTypes([]);
+        }).finally(() => setLoading(false));
+    }, []);
+
+    const handleProfitbaseTransfer = async () => {
+        setSyncingProfitbase(true);
+        try {
+            const res = await profitbaseApi.sync();
+            const { categories: catSummary, houses, unitLayouts: layoutSummary } = res.data;
+            showSuccess({
+                title: "Profitbase transfer complete",
+                description: `Objects: +${catSummary.created} / ${catSummary.updated} updated · Houses: +${houses.created} / ${houses.updated} updated · Unit layouts: +${layoutSummary.created} / ${layoutSummary.updated} updated`,
+            });
+            if (activeMenu === "offplan") await loadOffplanDashboardData();
+        } catch (error) {
+            showError({ title: "Profitbase transfer failed", description: getApiErrorMessage(error, "Please try again.") });
+        } finally {
+            setSyncingProfitbase(false);
+        }
+    };
 
     useEffect(() => {
         if (activeMenu === "offplan") {
-            setLoading(true);
-            Promise.all([
-                unitLayoutsApi.getStats(),
-                categoriesApi.getAll("object"),
-                unitLayoutsApi.getAll({ limit: 500 }),
-                attributesApi.getAll(),
-                unitTypeOptionsApi.getAll(),
-            ]).then(([statsRes, catsRes, layoutsRes, attributesRes, unitTypesRes]) => {
-                setUnitStats(statsRes.data);
-                setCategories(catsRes.data);
-                setUnitLayouts(layoutsRes.data.data);
-                setOffplanAttributes(attributesRes.data);
-                setOffplanUnitTypes(unitTypesRes.data);
-            }).catch(() => {
-                setUnitStats(null);
-                setCategories([]);
-                setUnitLayouts([]);
-                setOffplanAttributes([]);
-                setOffplanUnitTypes([]);
-            }).finally(() => setLoading(false));
+            loadOffplanDashboardData();
         } else if (activeMenu === "resale") {
             setLoading(true);
             Promise.all([
@@ -682,6 +708,16 @@ export function Dashboard() {
                         <LoadingSpinner label="Loading overview" className="min-h-[256px]" />
                     ) : (
                     <>
+                    <div className="flex items-center justify-end">
+                        <button
+                            type="button"
+                            onClick={handleProfitbaseTransfer}
+                            disabled={syncingProfitbase}
+                            className="flex h-[44px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#4E525D] px-4 py-2 text-[13px] font-medium leading-[20px] text-white transition-colors hover:bg-[#3D404A] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                            <span>{syncingProfitbase ? "Transferring…" : "Transfer"}</span>
+                        </button>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {offplanDashboard.topCards.map((card) => (
                             <div key={card.label} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
