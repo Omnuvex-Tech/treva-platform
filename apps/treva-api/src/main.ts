@@ -15,6 +15,17 @@ function parseCsv(value?: string) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // TEMP DEBUG - remove after diagnosing production issue
+  app.use((req: any, res: any, next: () => void) => {
+    const start = Date.now();
+    console.log(`[DEBUG] --> ${req.method} ${req.originalUrl}`);
+    res.on('finish', () => {
+      console.log(`[DEBUG] <-- ${req.method} ${req.originalUrl} ${res.statusCode} (${Date.now() - start}ms)`);
+    });
+    next();
+  });
+
   const configService = app.get(ConfigService);
   const corsOrigins = parseCsv(configService.get<string>('CORS_ORIGINS'));
   const apiPrefix = configService.get<string>('API_PREFIX');
