@@ -62,16 +62,6 @@ export default function RootLayout({
                 {/* End Google Tag Manager */}
             </head>
             <body className={inter.variable} suppressHydrationWarning>
-                {/* Google Tag Manager (noscript) */}
-                <noscript>
-                    <iframe
-                        src="https://www.googletagmanager.com/ns.html?id=GTM-KR9HGHTS"
-                        height="0"
-                        width="0"
-                        style={{ display: "none", visibility: "hidden" }}
-                    />
-                </noscript>
-                {/* End Google Tag Manager (noscript) */}
                 <QueryProvider>
                     <NotifyProvider>
                         <div id="treva-navbar-layer" />
