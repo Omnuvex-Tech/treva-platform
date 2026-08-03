@@ -100,9 +100,11 @@ const defaultFormData = {
     developerBrand: "",
     website: "",
     salesDepartment: "",
+    phoneNumber: "",
     fedLaw214: false,
     image: "",
     coverImage: "",
+    bannerImage: "",
 };
 
 export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = {}) {
@@ -121,10 +123,13 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const houseFormRef = useRef<HTMLDivElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const coverImageInputRef = useRef<HTMLInputElement>(null);
+    const bannerImageInputRef = useRef<HTMLInputElement>(null);
     const [imageUploading, setImageUploading] = useState(false);
     const [coverImageUploading, setCoverImageUploading] = useState(false);
+    const [bannerImageUploading, setBannerImageUploading] = useState(false);
     const [imageDrag, setImageDrag] = useState(false);
     const [coverImageDrag, setCoverImageDrag] = useState(false);
+    const [bannerImageDrag, setBannerImageDrag] = useState(false);
     const [showPlanUpload, setShowPlanUpload] = useState(false);
     const [pendingPlanName, setPendingPlanName] = useState("");
     const [pendingPlanFile, setPendingPlanFile] = useState<File | null>(null);
@@ -395,10 +400,12 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                 developerBrand: optionalText(formData.developerBrand) || undefined,
                 website: optionalText(formData.website) || undefined,
                 salesDepartment: optionalText(formData.salesDepartment) || undefined,
+                phoneNumber: optionalText(formData.phoneNumber) || undefined,
                 documents: draftDocuments,
                 fedLaw214: formData.fedLaw214,
                 image: formData.image || undefined,
                 coverImage: formData.coverImage || undefined,
+                bannerImage: formData.bannerImage || undefined,
             });
         },
         onSuccess: (response) => {
@@ -551,6 +558,35 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         setCoverImageDrag(false);
         const file = e.dataTransfer.files?.[0];
         if (file) handleCoverImageUpload(file);
+    };
+
+    const handleBannerImageUpload = async (file: File) => {
+        const items = [file];
+        const hasUnsupported = items.some((f) => !SUPPORTED_IMAGE_TYPES.includes(f.type as typeof SUPPORTED_IMAGE_TYPES[number]));
+        if (hasUnsupported) {
+            showError({ title: "Unsupported file type", description: "Please upload JPG, PNG, WebP, or GIF images." });
+            return;
+        }
+        setBannerImageUploading(true);
+        try {
+            const res = await unitLayoutsApi.uploadFile(file);
+            updateFormData("bannerImage", res.data.url);
+        } catch (error) {
+            showError({ title: "Upload failed", description: getApiErrorMessage(error, "Please try again.") });
+        } finally {
+            setBannerImageUploading(false);
+        }
+    };
+
+    const onBannerImageDragOver = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); };
+    const onBannerImageDragEnter = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setBannerImageDrag(true); };
+    const onBannerImageDragLeave = (e: React.DragEvent) => { e.preventDefault(); e.stopPropagation(); setBannerImageDrag(false); };
+    const onBannerImageDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setBannerImageDrag(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleBannerImageUpload(file);
     };
 
     const resetPlanUpload = () => {
@@ -991,13 +1027,54 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                         placeholder="https://example.com"
                                     />
                                 </div>
-                                <div className="lg:col-span-3">
+                                <div>
                                     <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Sales Department</label>
                                     <input
                                         className={inputClass}
                                         value={formData.salesDepartment}
                                         onChange={(e) => { updateFormData("salesDepartment", e.target.value); clearError("salesDepartment"); }}
                                         placeholder="sales@example.com"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Phone Number</label>
+                                    <input
+                                        className={inputClass}
+                                        value={formData.phoneNumber}
+                                        onChange={(e) => { updateFormData("phoneNumber", e.target.value); clearError("phoneNumber"); }}
+                                        placeholder="+994 50 123 45 67"
+                                    />
+                                </div>
+                                <div className="lg:col-span-2 border-t border-[#EEF1F5] pt-4">
+                                    <ImageAssetCard
+                                        label="Banner Image"
+                                        description="Wide banner visual shown for the project on the Commercial section."
+                                        alt="Banner"
+                                        imageUrl={formData.bannerImage || null}
+                                        widthClass="w-[220px]"
+                                        previewClassName="h-[110px] w-[220px] rounded-[16px] border border-[#E5E7EC] bg-white p-1.5 shadow-[0_8px_20px_rgba(17,24,39,0.06)]"
+                                        emptyPreviewClassName={`flex h-[110px] w-[220px] items-center justify-center rounded-[16px] border-2 border-dashed bg-white ${bannerImageDrag ? "border-blue-400 bg-blue-50" : bannerImageUploading ? "pointer-events-none border-gray-200 bg-[#F4F5F6] opacity-50" : "border-gray-200 hover:border-gray-400"}`}
+                                        placeholderTitle="Upload banner"
+                                        placeholderHint="Landscape image"
+                                        isDragging={bannerImageDrag}
+                                        uploading={bannerImageUploading}
+                                        onOpen={() => bannerImageInputRef.current?.click()}
+                                        onRemove={() => updateFormData("bannerImage", "")}
+                                        onDragOver={onBannerImageDragOver}
+                                        onDragEnter={onBannerImageDragEnter}
+                                        onDragLeave={onBannerImageDragLeave}
+                                        onDrop={onBannerImageDrop}
+                                    />
+                                    <input
+                                        ref={bannerImageInputRef}
+                                        type="file"
+                                        accept={IMAGE_ACCEPT}
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleBannerImageUpload(file);
+                                            if (bannerImageInputRef.current) bannerImageInputRef.current.value = "";
+                                        }}
                                     />
                                 </div>
                             </div>

@@ -38,7 +38,9 @@ model Category {
   developerBrand  String?
   website         String?
   salesDepartment String?
+  phoneNumber     String?
   coverImage      String?
+  bannerImage     String?
   documents       Json       @default("[]")
   fedLaw214       Boolean  @default(false)
   type            String   @default("object") // "category" | "object"

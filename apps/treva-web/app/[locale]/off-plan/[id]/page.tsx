@@ -229,6 +229,10 @@ export default function ApartmentCard() {
     return typeof floor === 'number' ? `${floor}` : '';
   };
 
+  const panoramaBannerUrl = layout?.category?.bannerImage ? getAssetUrl(layout.category.bannerImage) : '';
+  const panoramaPhone = layout?.category?.phoneNumber?.trim() || '+994502772662';
+  const panoramaEmail = layout?.category?.salesDepartment?.trim() || '';
+
   const brochureDoc = layout?.documents?.find(
     (doc) => String(doc?.type || '').trim().toLowerCase() === 'brochure' && doc?.url
   );
@@ -927,27 +931,24 @@ export default function ApartmentCard() {
             ) : null}
 
             <section className="panorama-section" aria-label={t.apartmentDetails}>
-              <div className="panorama-banner">
+              <div
+                className="panorama-banner"
+                style={panoramaBannerUrl ? { backgroundImage: `url(${panoramaBannerUrl})` } : undefined}
+              >
                 <div className="panorama-overlay" />
                 <div className="panorama-content">
                   <h2 className="panorama-title">{layout.category?.title || t.moreDetails}</h2>
                   <div className="panorama-button-group">
-                    <a href="tel:+994502772662" className="panorama-btn">
+                    <a href={`tel:${panoramaPhone}`} className="panorama-btn">
                       <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
                       <span>{t.consultation}</span>
                     </a>
-                    <a href="tel:+994502772662" className="panorama-btn">
+                    <a href={panoramaEmail ? `mailto:${panoramaEmail}` : `tel:${panoramaPhone}`} className="panorama-btn">
                       <svg className="panorama-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
-                        <line x1="9" y1="22" x2="9" y2="16" />
-                        <line x1="15" y1="22" x2="15" y2="16" />
-                        <line x1="9" y1="16" x2="15" y2="16" />
-                        <path d="M9 6h.01" />
-                        <path d="M15 6h.01" />
-                        <path d="M9 10h.01" />
-                        <path d="M15 10h.01" />
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22 6 12 13 2 6" />
                       </svg>
                       <span>{t.complexInfo}</span>
                     </a>

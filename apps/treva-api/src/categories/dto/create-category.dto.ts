@@ -55,6 +55,11 @@ export class CreateCategoryDto {
   @IsString()
   coverImage?: string;
 
+  @ApiPropertyOptional({ example: '/uploads/images/banner-example.webp' })
+  @IsOptional()
+  @IsString()
+  bannerImage?: string;
+
   @ApiPropertyOptional({ example: 0 })
   @IsOptional()
   @IsNumber()
@@ -124,6 +129,11 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsString()
   salesDepartment?: string;
+
+  @ApiPropertyOptional({ example: '+994 50 123 45 67' })
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
 
   @ApiPropertyOptional({ example: false })
   @IsOptional()

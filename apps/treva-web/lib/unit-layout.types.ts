@@ -24,6 +24,9 @@ export interface UnitLayoutCategory {
     title: string;
     name: string;
     slug: string;
+    bannerImage?: string;
+    phoneNumber?: string;
+    salesDepartment?: string;
 }
 
 export interface UnitLayoutUnitTypeOption {

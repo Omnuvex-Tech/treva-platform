@@ -22,6 +22,7 @@ export interface Category {
     objectType?: string;
     image?: string;
     coverImage?: string;
+    bannerImage?: string;
     status?: string;
     type?: string;
     housesCount: number;
@@ -39,6 +40,7 @@ export interface Category {
     developerBrand?: string;
     website?: string;
     salesDepartment?: string;
+    phoneNumber?: string;
     documents?: CategoryDocument[];
     fedLaw214: boolean;
     createdAt: string;
@@ -54,6 +56,7 @@ export interface CreateCategoryData {
     objectType?: string;
     image?: string;
     coverImage?: string;
+    bannerImage?: string;
     status?: string;
     housesCount?: number;
     propertiesCount?: number;
@@ -70,6 +73,7 @@ export interface CreateCategoryData {
     developerBrand?: string;
     website?: string;
     salesDepartment?: string;
+    phoneNumber?: string;
     documents?: CategoryDocument[];
     fedLaw214?: boolean;
 }
@@ -81,6 +85,7 @@ export interface UpdateCategoryData {
     objectType?: string;
     image?: string;
     coverImage?: string;
+    bannerImage?: string;
     status?: string;
     housesCount?: number;
     propertiesCount?: number;
@@ -97,6 +102,7 @@ export interface UpdateCategoryData {
     developerBrand?: string;
     website?: string;
     salesDepartment?: string;
+    phoneNumber?: string;
     documents?: CategoryDocument[];
     fedLaw214?: boolean;
 }
