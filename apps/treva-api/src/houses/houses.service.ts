@@ -91,6 +91,7 @@ export class HousesService {
     status?: 'available' | 'reserved' | 'sold';
     search?: string;
     archived?: boolean;
+    summary?: boolean;
   }) {
     const page = query.page || 1;
     const limit = query.limit || 12;
@@ -120,17 +121,36 @@ export class HousesService {
     }
 
     const [data, total] = await Promise.all([
-      this.prisma.house.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          category: true,
-          owner: true,
-          _count: { select: { unitLayouts: true } },
-        },
-      }),
+      query.summary
+        ? this.prisma.house.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              title: true,
+              name: true,
+              slug: true,
+              status: true,
+              mainImage: true,
+              prices: true,
+              categoryId: true,
+              category: { select: { id: true, title: true, name: true, slug: true } },
+              _count: { select: { unitLayouts: true } },
+            },
+          })
+        : this.prisma.house.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+            include: {
+              category: true,
+              owner: true,
+              _count: { select: { unitLayouts: true } },
+            },
+          }),
       this.prisma.house.count({ where }),
     ]);
 

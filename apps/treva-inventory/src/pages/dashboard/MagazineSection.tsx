@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { housesApi, type House } from "../../api/houses";
+import { housesApi, type HouseSummary } from "../../api/houses";
 import { unitLayoutsApi, UNIT_LAYOUT_STATUS_OPTIONS, type UnitLayout } from "../../api/unit-layouts";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
@@ -95,10 +95,10 @@ export function MagazineSection() {
     }, [gridFilterOpen]);
 
     const { data: housesResponse, isLoading: housesLoading } = useQuery({
-        queryKey: ["houses", "magazine", debouncedSearch],
-        queryFn: () => housesApi.getAll({ search: debouncedSearch || undefined, limit: 50, archived: false }),
+        queryKey: ["houses", "magazine-summary", debouncedSearch],
+        queryFn: () => housesApi.getAllSummary({ search: debouncedSearch || undefined, limit: 50, archived: false }),
     });
-    const houses: House[] = housesResponse?.data?.data || [];
+    const houses: HouseSummary[] = housesResponse?.data?.data || [];
 
     useEffect(() => {
         if (!selectedHouseId && houses[0]) {

@@ -44,6 +44,7 @@ export class HousesController {
   @ApiQuery({ name: 'status', required: false, enum: ['available', 'reserved', 'sold'] })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'archived', required: false, type: Boolean })
+  @ApiQuery({ name: 'summary', required: false, type: Boolean })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -52,6 +53,7 @@ export class HousesController {
     @Query('status') status?: 'available' | 'reserved' | 'sold',
     @Query('search') search?: string,
     @Query('archived') archived?: string,
+    @Query('summary') summary?: string,
   ) {
     return this.housesService.findAll({
       page: page ? parseInt(page, 10) : undefined,
@@ -61,6 +63,7 @@ export class HousesController {
       status,
       search,
       archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
+      summary: summary === 'true',
     });
   }
 

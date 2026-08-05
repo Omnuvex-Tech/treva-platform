@@ -171,6 +171,25 @@ export interface HouseFilters {
     minArea?: number;
     maxArea?: number;
     floor?: number;
+    summary?: boolean;
+}
+
+export interface HouseSummary {
+    id: string;
+    title: string;
+    name: string;
+    slug: string;
+    status: HouseStatus;
+    mainImage?: MainImage;
+    prices: Record<string, number>;
+    categoryId: string;
+    category: Category;
+    _count?: { unitLayouts: number };
+}
+
+export interface HouseSummaryListResponse {
+    data: HouseSummary[];
+    pagination: Pagination;
 }
 
 export interface UploadResponse {
@@ -261,6 +280,21 @@ export const housesApi = {
             });
         }
         return apiClient.get<HouseListResponse>(
+            `/houses?${params.toString()}`
+        );
+    },
+
+    getAllSummary: (filters?: Omit<HouseFilters, "summary">) => {
+        const params = new URLSearchParams();
+        if (filters) {
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== undefined && value !== "" && value !== null) {
+                    params.append(key, String(value));
+                }
+            });
+        }
+        params.append("summary", "true");
+        return apiClient.get<HouseSummaryListResponse>(
             `/houses?${params.toString()}`
         );
     },
