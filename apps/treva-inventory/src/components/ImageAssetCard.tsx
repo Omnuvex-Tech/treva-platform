@@ -1,5 +1,6 @@
-import type { DragEvent } from "react";
-import { IoClose } from "react-icons/io5";
+import { useState, type DragEvent } from "react";
+import { IoClose, IoEyeOutline } from "react-icons/io5";
+import { ImageLightbox } from "./ImageLightbox";
 
 interface ImageAssetCardProps {
     label: string;
@@ -40,10 +41,12 @@ export function ImageAssetCard({
     onDragLeave,
     onDrop,
 }: ImageAssetCardProps) {
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+
     return (
         <div className="rounded-[22px] border border-[#ECEEF2] bg-white p-3">
             <div className="flex items-start gap-4">
-                <div className={`relative ${widthClass}`}>
+                <div className={`group relative ${widthClass}`}>
                     <button
                         type="button"
                         onClick={onOpen}
@@ -70,6 +73,20 @@ export function ImageAssetCard({
                         )}
                     </button>
 
+                    {imageUrl ? (
+                        <button
+                            type="button"
+                            aria-label={`View ${label}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxOpen(true);
+                            }}
+                            className="absolute bottom-3 left-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:opacity-85"
+                        >
+                            <IoEyeOutline size={14} className="block shrink-0" />
+                        </button>
+                    ) : null}
+
                     {imageUrl && onRemove ? (
                         <button
                             type="button"
@@ -89,6 +106,10 @@ export function ImageAssetCard({
                     <p className="mt-1 text-xs leading-5 text-[#808191]">{description}</p>
                 </div>
             </div>
+
+            {lightboxOpen && imageUrl ? (
+                <ImageLightbox src={imageUrl} alt={alt} onClose={() => setLightboxOpen(false)} />
+            ) : null}
         </div>
     );
 }

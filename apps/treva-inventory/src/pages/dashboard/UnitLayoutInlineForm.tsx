@@ -10,7 +10,8 @@ import { getApiErrorMessage } from "../../utils/apiError";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { FormDropdown, FormKeywordInput } from "@repo/ui";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
-import { IoClose } from "react-icons/io5";
+import { ImageLightbox } from "../../components/ImageLightbox";
+import { IoClose, IoEyeOutline } from "react-icons/io5";
 
 type TabKey = "basic" | "area" | "gallery" | "description" | "seo";
 
@@ -613,6 +614,7 @@ export function HouseForm({
     const [coverDrag, setCoverDrag] = useState(false);
     const [seoDrag, setSeoDrag] = useState(false);
     const [galleryDrag, setGalleryDrag] = useState(false);
+    const [viewingGalleryImage, setViewingGalleryImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const coverInputRef = useRef<HTMLInputElement>(null);
     const seoInputRef = useRef<HTMLInputElement>(null);
@@ -1408,6 +1410,18 @@ export function HouseForm({
                                                                 <span>#{idx + 1}</span>
                                                                 {idx === 0 && <span className="rounded bg-blue-500/80 px-1 text-[9px] uppercase">Cover</span>}
                                                             </div>
+                                                            <button
+                                                                type="button"
+                                                                aria-label={`View gallery image ${idx + 1}`}
+                                                                title="View image"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setViewingGalleryImage(item.url || item);
+                                                                }}
+                                                                className="absolute bottom-3 right-3 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-[rgba(17,24,39,0.72)] text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:opacity-85"
+                                                            >
+                                                                <IoEyeOutline size={14} />
+                                                            </button>
                                                         </div>
                                                     );
                                                 })}
@@ -1418,6 +1432,10 @@ export function HouseForm({
                                 </SectionBlock>
                     </div>
                 )}
+
+                {viewingGalleryImage ? (
+                    <ImageLightbox src={viewingGalleryImage} alt="Gallery image" onClose={() => setViewingGalleryImage(null)} />
+                ) : null}
 
                 {/* â”€â”€â”€ Tab: Description â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === "description" && (

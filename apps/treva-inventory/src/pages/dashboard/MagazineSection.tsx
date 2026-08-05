@@ -6,7 +6,8 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { UnitLayoutsSection, FilterSelect } from "./UnitLayoutsSection";
 import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
-import { IoClose } from "react-icons/io5";
+import { ImageLightbox } from "../../components/ImageLightbox";
+import { IoClose, IoEyeOutline } from "react-icons/io5";
 
 const statusTextMap: Record<string, string> = {
     available: "text-[#2D9A5B]",
@@ -59,6 +60,7 @@ export function MagazineSection() {
     const [selectedGridLayout, setSelectedGridLayout] = useState<UnitLayout | null>(null);
     const [gridPanelOpen, setGridPanelOpen] = useState(false);
     const [editingGridLayoutId, setEditingGridLayoutId] = useState<string | null>(null);
+    const [viewingFloorPlan, setViewingFloorPlan] = useState<string | null>(null);
 
     const openGridPanel = (layout: UnitLayout) => {
         const wasOpen = !!selectedGridLayout;
@@ -389,13 +391,25 @@ export function MagazineSection() {
                             <p className="mb-2 text-xs text-[#999]">
                                 Floor plan{selectedGridLayout.unitCode ? ` · ${selectedGridLayout.unitCode}` : ""}
                             </p>
-                            <div className="mb-4 flex h-[160px] w-full items-center justify-center overflow-hidden rounded-2xl bg-[#F8F9FA]">
+                            <div className="group relative mb-4 flex h-[160px] w-full items-center justify-center overflow-hidden rounded-2xl bg-[#F8F9FA]">
                                 {selectedGridLayout.mainImage?.url || selectedGridLayout.gallery?.[0]?.url ? (
-                                    <img
-                                        src={selectedGridLayout.mainImage?.url || selectedGridLayout.gallery?.[0]?.url}
-                                        alt={selectedGridLayout.title}
-                                        className="h-full w-full object-contain"
-                                    />
+                                    <>
+                                        <img
+                                            src={selectedGridLayout.mainImage?.url || selectedGridLayout.gallery?.[0]?.url}
+                                            alt={selectedGridLayout.title}
+                                            className="h-full w-full object-contain"
+                                        />
+                                        <button
+                                            type="button"
+                                            aria-label="View floor plan"
+                                            onClick={() => setViewingFloorPlan(selectedGridLayout.mainImage?.url || selectedGridLayout.gallery?.[0]?.url || null)}
+                                            className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/30 group-hover:opacity-100 cursor-pointer"
+                                        >
+                                            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#1A1A1A]">
+                                                <IoEyeOutline size={18} />
+                                            </span>
+                                        </button>
+                                    </>
                                 ) : (
                                     <span className="text-xs text-[#999]">No floor plan</span>
                                 )}
@@ -448,6 +462,10 @@ export function MagazineSection() {
                     ) : (
                         <UnitLayoutsSection houseId={selectedHouseId ?? undefined} embedded minimal />
                     )}
+
+                    {viewingFloorPlan ? (
+                        <ImageLightbox src={viewingFloorPlan} alt="Floor plan" onClose={() => setViewingFloorPlan(null)} />
+                    ) : null}
                 </div>
             ) : (
             <>

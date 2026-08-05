@@ -35,6 +35,15 @@ select option {
   color: #1a1a1a;
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes message-toast-in {
   from {
     opacity: 0;
