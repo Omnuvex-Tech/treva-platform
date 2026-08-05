@@ -8,8 +8,6 @@ import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
-import { trevaApi as api } from "@/lib/api";
-import { endpoints } from "@/config/endpoints";
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import './unit-filter.css';
 
@@ -20,6 +18,17 @@ const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string }> = [
   { id: '4', label: '4' },
   { id: '4plus', label: '4+' },
 ];
+
+const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
+
+type CategoryTitle = { az?: string; en?: string; ru?: string } | string;
+
+function getCatTitle(title: CategoryTitle | undefined, loc: string): string {
+  if (!title) return '';
+  if (typeof title === 'string') return title;
+  const t = title as Record<string, string | undefined>;
+  return t[loc] || t.az || t.en || t.ru || '';
+}
 
 export default function UnitLayout() {
   const params = useParams();
@@ -205,22 +214,27 @@ export default function UnitLayout() {
   }, [selectedCategorySlug, currency, floor, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, router]);
 
   useEffect(() => {
-    api.get(`${endpoints.offPlan.categories}?type=object`)
-      .then((res) => {
-        const raw = (res as any)?.data?.data ?? (res as any)?.data ?? [];
-        const data = Array.isArray(raw) ? raw : [];
+    // Source the project list from the CMS (same as the homepage hero) so every
+    // project shows up here, with a proper localized title and a clean slug
+    // (e.g. "marina-village" instead of Profitbase's "sabah-towers-57259").
+    // Projects that don't have a matching listing yet simply return an empty
+    // result set from the API rather than being filtered out of the dropdown.
+    fetch(`${CMS_API}/layihelerimiz/categories/visible`)
+      .then((res) => res.json())
+      .then((raw) => {
+        const data = Array.isArray(raw) ? raw : raw.value || [];
         const next = data
-          .map((cat: any) => ({
-            // Prefer the clean `name` (e.g. "sabah-towers") over `slug`, which
-            // Profitbase sync suffixes with an external id (e.g. "sabah-towers-57259").
-            slug: String(cat?.name || cat?.slug || ''),
-            title: String(cat?.title || cat?.name || cat?.slug || ''),
-          }))
+          .map((cat: any) => {
+            const rawTitle = cat.title;
+            const titleObj = (rawTitle && typeof rawTitle === 'object') ? rawTitle : { az: rawTitle, en: rawTitle, ru: rawTitle };
+            const slug = String(cat?.slug || '');
+            return { slug, title: getCatTitle(titleObj, locale) || slug };
+          })
           .filter((item: any) => item.slug);
         setCategories(next);
       })
       .catch(() => {});
-  }, []);
+  }, [locale]);
 
   const debouncedPriceMin = useDebounce(priceMin, 1000);
   const debouncedPriceMax = useDebounce(priceMax, 1000);
