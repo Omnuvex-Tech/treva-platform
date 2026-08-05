@@ -40,9 +40,11 @@ export function UnitLayoutsSection() {
     const [showHouseForm, setShowHouseForm] = useState(false);
     const [editingHouseId, setEditingHouseId] = useState<string | null>(null);
 
+    const effectiveFilters: UnitLayoutFilters = { ...filters, archived: activeTab === "Archive" };
+
     const { data: response, isLoading } = useQuery({
-        queryKey: ["unit-layouts", filters],
-        queryFn: () => unitLayoutsApi.getAll(filters),
+        queryKey: ["unit-layouts", effectiveFilters],
+        queryFn: () => unitLayoutsApi.getAll(effectiveFilters),
     });
 
     const deleteMut = useMutation({
@@ -95,12 +97,13 @@ export function UnitLayoutsSection() {
     }, [search]);
 
     const handlePageChange = (page: number) => setFilters((prev) => ({ ...prev, page }));
+    const handleTabChange = (tab: "Active" | "Archive") => {
+        setActiveTab(tab);
+        setFilters((prev) => ({ ...prev, page: 1 }));
+    };
 
     const layouts = Array.isArray(response?.data?.data) ? response.data.data : [];
     const pagination = response?.data?.pagination;
-    const filteredLayouts = layouts.filter((layout) =>
-        activeTab === "Active" ? !layout.archived : !!layout.archived
-    );
 
     return (
         <main className="flex-1 overflow-y-auto p-8 font-sans antialiased selection:bg-[#4A4E5A]/10" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
@@ -111,7 +114,7 @@ export function UnitLayoutsSection() {
                             <button
                                 key={tab}
                                 type="button"
-                                onClick={() => setActiveTab(tab)}
+                                onClick={() => handleTabChange(tab)}
                                 className={`flex h-[40px] min-w-[108px] items-center justify-center rounded-[24px] px-4 text-[14px] font-medium leading-[20px] transition-all cursor-pointer ${
                                     activeTab === tab
                                         ? "border border-white bg-[#EBEBEB] text-[#4E525D]"
@@ -168,7 +171,7 @@ export function UnitLayoutsSection() {
 
             {isLoading ? (
                 <LoadingSpinner label="Loading unit layouts" className="min-h-[320px]" />
-            ) : filteredLayouts.length === 0 ? (
+            ) : layouts.length === 0 ? (
                 <div className="flex h-64 flex-col items-center justify-center text-[#666666]">
                     <svg
                         width="48"
@@ -193,7 +196,7 @@ export function UnitLayoutsSection() {
             ) : (
                 <>
                     <div className="flex w-full flex-wrap gap-5">
-                        {filteredLayouts.map((layout) => {
+                        {layouts.map((layout) => {
                             const imageUrl = layout.mainImage?.url || layout.gallery?.[0]?.url;
                             const openEdit = () => {
                                 setEditingHouseId(layout.id);
