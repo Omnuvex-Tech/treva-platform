@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { unitLayoutsApi, type UnitLayout, type UnitLayoutFilters } from "../../api/unit-layouts";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { Pagination } from "../../components/Pagination";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { getApiErrorMessage } from "../../utils/apiError";
@@ -300,23 +301,12 @@ export function UnitLayoutsSection() {
                         })}
                     </div>
 
-                    {pagination && pagination.totalPages > 1 ? (
-                        <div className="mt-6 flex items-center justify-center gap-2">
-                            {Array.from({ length: pagination.totalPages }, (_, index) => index + 1).map((page) => (
-                                <button
-                                    key={page}
-                                    type="button"
-                                    onClick={() => handlePageChange(page)}
-                                    className={`rounded-lg px-3 py-1.5 text-sm ${
-                                        page === (filters.page || 1)
-                                            ? "bg-[#4E525D] text-white"
-                                            : "text-[#666666] hover:bg-gray-100"
-                                    }`}
-                                >
-                                    {page}
-                                </button>
-                            ))}
-                        </div>
+                    {pagination ? (
+                        <Pagination
+                            page={filters.page || 1}
+                            totalPages={pagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     ) : null}
                 </>
             )}
