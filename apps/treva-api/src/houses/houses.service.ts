@@ -101,10 +101,24 @@ export class HousesService {
     if (query.categoryId) where.categoryId = query.categoryId;
 
     if (query.categorySlug) {
-      const category = await this.prisma.category.findUnique({
+      let category = await this.prisma.category.findUnique({
         where: { slug: query.categorySlug },
       });
-      if (category) where.categoryId = category.id;
+      if (!category) {
+        // Profitbase-synced categories have slugs like `${slug}-${externalId}`.
+        // Callers (e.g. the homepage hero, bookmarked links) may only know the
+        // clean slug, so fall back to a prefix/name match before giving up.
+        category = await this.prisma.category.findFirst({
+          where: {
+            OR: [
+              { slug: { startsWith: `${query.categorySlug}-` } },
+              { name: query.categorySlug },
+              { propertyName: query.categorySlug },
+            ],
+          },
+        });
+      }
+      where.categoryId = category ? category.id : '__missing__';
     }
 
     if (query.status) where.status = query.status;
