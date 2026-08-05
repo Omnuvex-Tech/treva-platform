@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { housesApi, type House } from "../../api/houses";
 import { unitLayoutsApi, UNIT_LAYOUT_STATUS_OPTIONS, type UnitLayout } from "../../api/unit-layouts";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { UnitLayoutsSection, FilterSelect } from "./UnitLayoutsSection";
+import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 import { IoClose } from "react-icons/io5";
 
 const statusTextMap: Record<string, string> = {
@@ -43,6 +44,7 @@ const FILL_CARDS = [
 ];
 
 export function MagazineSection() {
+    const qc = useQueryClient();
     const { showError } = useMessageCenter();
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -56,6 +58,7 @@ export function MagazineSection() {
     const gridFilterPanelRef = useRef<HTMLDivElement>(null);
     const [selectedGridLayout, setSelectedGridLayout] = useState<UnitLayout | null>(null);
     const [gridPanelOpen, setGridPanelOpen] = useState(false);
+    const [editingGridLayoutId, setEditingGridLayoutId] = useState<string | null>(null);
 
     const openGridPanel = (layout: UnitLayout) => {
         const wasOpen = !!selectedGridLayout;
@@ -106,6 +109,7 @@ export function MagazineSection() {
     useEffect(() => {
         setSelectedGridLayout(null);
         setGridPanelOpen(false);
+        setEditingGridLayoutId(null);
     }, [selectedHouseId]);
 
     const { data: gridResponse, isLoading: gridLoading } = useQuery({
@@ -161,6 +165,7 @@ export function MagazineSection() {
                                 setGridViewTab("Grid");
                                 setSelectedGridLayout(null);
                                 setGridPanelOpen(false);
+                                setEditingGridLayoutId(null);
                             }}
                             className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
                             aria-label="Back"
@@ -184,6 +189,36 @@ export function MagazineSection() {
                     </div>
 
                     {gridViewTab === "Grid" ? (
+                    editingGridLayoutId ? (
+                    <div>
+                        <div className="mb-4 flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setEditingGridLayoutId(null)}
+                                className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
+                                aria-label="Back to grid"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="15 18 9 12 15 6" />
+                                </svg>
+                            </button>
+                            <p className="text-sm font-medium text-[#1A1A1A]">Edit unit layout</p>
+                        </div>
+                        <UnitLayoutInlineForm
+                            embedded
+                            inline
+                            houseId={editingGridLayoutId}
+                            parentHouseId={selectedHouseId ?? undefined}
+                            key={editingGridLayoutId}
+                            onSuccess={() => {
+                                setEditingGridLayoutId(null);
+                                setSelectedGridLayout(null);
+                                setGridPanelOpen(false);
+                                qc.invalidateQueries({ queryKey: ["unit-layouts", "magazine-grid", selectedHouseId] });
+                            }}
+                        />
+                    </div>
+                    ) : (
                     <div className="flex items-stretch overflow-hidden">
                     <div className={`min-w-0 flex-1 transition-[padding] duration-300 ease-out ${selectedGridLayout ? "pr-5" : ""}`}>
                     <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
@@ -368,7 +403,7 @@ export function MagazineSection() {
 
                             <button
                                 type="button"
-                                onClick={notifyComingSoon}
+                                onClick={() => setEditingGridLayoutId(selectedGridLayout.id)}
                                 className="mb-4 w-full rounded-2xl border border-[#4E525D] px-4 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] cursor-pointer"
                             >
                                 Select unit
@@ -409,6 +444,7 @@ export function MagazineSection() {
                         </div>
                     ) : null}
                     </div>
+                    )
                     ) : (
                         <UnitLayoutsSection houseId={selectedHouseId ?? undefined} embedded minimal />
                     )}
