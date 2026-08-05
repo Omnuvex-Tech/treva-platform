@@ -173,8 +173,18 @@ export default function UnitLayout() {
   const totalPriceMax = rangeData?.maxPrice || 1500000;
   const totalAreaMax = rangeData?.maxTotalArea || 10000;
 
+  // Hydrating the price/area sliders from the fetched range (below) briefly makes
+  // `priceMax`/`areaMax` differ from their debounced counterparts, which used to
+  // make `isDebouncing` (and therefore the loading spinner) flip on again for a
+  // second right after the initial list had already loaded. This ref lets the
+  // spinner logic tell "range just loaded" apart from "user is dragging a slider".
+  const isHydratingRangeRef = useRef(false);
+  const rangeHydratedRef = useRef(false);
+
   useEffect(() => {
-    if (rangeData) {
+    if (rangeData && !rangeHydratedRef.current) {
+      rangeHydratedRef.current = true;
+      isHydratingRangeRef.current = true;
       setPriceMax(rangeData.maxPrice);
       setPriceMaxInput(rangeData.maxPrice);
       setAreaMax(rangeData.maxTotalArea);
@@ -257,7 +267,15 @@ export default function UnitLayout() {
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
-  const isDebouncing = priceMin !== debouncedPriceMin || priceMax !== debouncedPriceMax || areaMin !== debouncedAreaMin || areaMax !== debouncedAreaMax;
+  useEffect(() => {
+    if (isHydratingRangeRef.current && priceMax === debouncedPriceMax && areaMax === debouncedAreaMax) {
+      isHydratingRangeRef.current = false;
+    }
+  }, [debouncedPriceMax, debouncedAreaMax, priceMax, areaMax]);
+
+  const isDebouncing =
+    !isHydratingRangeRef.current &&
+    (priceMin !== debouncedPriceMin || priceMax !== debouncedPriceMax || areaMin !== debouncedAreaMin || areaMax !== debouncedAreaMax);
   const showSpinner = isLoading || isFetching || isDebouncing;
 
   const pageLayouts = response?.data || [];
