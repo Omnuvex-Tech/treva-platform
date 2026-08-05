@@ -8,6 +8,7 @@ import { housesApi, type CreateHouseData } from "../../api/houses";
 import { categoriesApi, type Category } from "../../api/categories";
 import { typeOfBuildingOptionsApi, type TypeOfBuildingOption } from "../../api/type-of-building-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
+import { DatePickerField } from "../../components/DatePickerField";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 
@@ -437,21 +438,13 @@ export function HouseForm({
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                        <label className="mb-1 block text-xs text-[#4E525D]">House name <span className="text-[#F31100]">*</span></label>
+                        <label className="mb-1 block text-xs text-[#4E525D]">House name *</label>
                         <input
                             className={inputClass}
                             value={form.name}
                             onChange={(e) => updateField("name", e.target.value)}
                             placeholder="Enter house name"
                         />
-                    </div>
-                    <div>
-                        <label className="mb-1 block text-xs text-[#4E525D]">Street</label>
-                        <input className={inputClass} value={form.street} onChange={(e) => updateField("street", e.target.value)} />
-                    </div>
-                    <div>
-                        <label className="mb-1 block text-xs text-[#4E525D]">House number</label>
-                        <input className={inputClass} value={form.houseNumber} onChange={(e) => updateField("houseNumber", e.target.value)} />
                     </div>
                     <div>
                         <FormDropdown
@@ -462,6 +455,14 @@ export function HouseForm({
                             onChange={(id) => updateField("typeOfBuilding", id)}
                             placeholder="Select type"
                         />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-xs text-[#4E525D]">Street</label>
+                        <input className={inputClass} value={form.street} onChange={(e) => updateField("street", e.target.value)} placeholder="e.g. Main street" />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-xs text-[#4E525D]">House number</label>
+                        <input className={inputClass} value={form.houseNumber} onChange={(e) => updateField("houseNumber", e.target.value)} placeholder="e.g. 12A" />
                     </div>
                 </div>
             </div>
@@ -478,25 +479,29 @@ export function HouseForm({
                 </div>
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">The deadline for commissioning</label>
-                    <input type="date" className={inputClass} value={form.deadlineForCommissioning} onChange={(e) => updateField("deadlineForCommissioning", e.target.value)} />
+                    <DatePickerField
+                        value={form.deadlineForCommissioning}
+                        onChange={(value) => updateField("deadlineForCommissioning", value)}
+                        placeholder="Select deadline"
+                    />
                 </div>
 
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">Sales office</label>
-                    <input className={inputClass} value={form.salesOffice} onChange={(e) => updateField("salesOffice", e.target.value)} />
+                    <input className={inputClass} value={form.salesOffice} onChange={(e) => updateField("salesOffice", e.target.value)} placeholder="e.g. Sales office A" />
                 </div>
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">Land cadastral number</label>
-                    <input className={inputClass} value={form.landCadastralNumber} onChange={(e) => updateField("landCadastralNumber", e.target.value)} />
+                    <input className={inputClass} value={form.landCadastralNumber} onChange={(e) => updateField("landCadastralNumber", e.target.value)} placeholder="e.g. AA-12345" />
                 </div>
 
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">Address of the house according to the contract</label>
-                    <input className={inputClass} value={form.contractAddress} onChange={(e) => updateField("contractAddress", e.target.value)} />
+                    <input className={inputClass} value={form.contractAddress} onChange={(e) => updateField("contractAddress", e.target.value)} placeholder="Address according to contract" />
                 </div>
                 <div>
                     <label className="mb-1 block text-xs text-[#4E525D]">Showroom availability in the house</label>
-                    <input className={inputClass} value={form.showroomAvailability} onChange={(e) => updateField("showroomAvailability", e.target.value)} />
+                    <input className={inputClass} value={form.showroomAvailability} onChange={(e) => updateField("showroomAvailability", e.target.value)} placeholder="e.g. Available" />
                 </div>
             </div>
 

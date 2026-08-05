@@ -45,7 +45,7 @@ export function FormDropdown({
         <div ref={ref} className="relative">
             <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">
                 {label}
-                {required && <span style={{ color: "#F31100" }}>*</span>}
+                {required && <span>*</span>}
             </label>
             <button
                 type="button"

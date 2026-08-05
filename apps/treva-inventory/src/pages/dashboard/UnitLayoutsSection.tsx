@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { unitLayoutsApi, type UnitLayout, type UnitLayoutFilters } from "../../api/unit-layouts";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
@@ -87,6 +87,13 @@ export function UnitLayoutsSection() {
         },
     });
 
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setFilters((prev) => ({ ...prev, search: search.trim() || undefined, page: 1 }));
+        }, 400);
+        return () => clearTimeout(timeout);
+    }, [search]);
+
     const handlePageChange = (page: number) => setFilters((prev) => ({ ...prev, page }));
 
     const layouts = Array.isArray(response?.data?.data) ? response.data.data : [];
@@ -124,21 +131,9 @@ export function UnitLayoutsSection() {
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    setFilters((prev) => ({ ...prev, search: search.trim() || undefined, page: 1 }));
-                                }
-                            }}
                             placeholder="Search unit layouts"
                             className="h-10 w-[240px] border-0 bg-transparent text-sm text-[#1A1A1A] outline-none placeholder:text-[#999]"
                         />
-                        <button
-                            type="button"
-                            onClick={() => setFilters((prev) => ({ ...prev, search: search.trim() || undefined, page: 1 }))}
-                            className="rounded-[12px] bg-[#EBEBEB] px-3 py-1.5 text-[13px] font-medium text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer"
-                        >
-                            Search
-                        </button>
                     </div>
                 </div>
 
@@ -197,25 +192,42 @@ export function UnitLayoutsSection() {
                 </div>
             ) : (
                 <>
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex w-full flex-wrap gap-5">
                         {filteredLayouts.map((layout) => {
                             const imageUrl = layout.mainImage?.url || layout.gallery?.[0]?.url;
+                            const openEdit = () => {
+                                setEditingHouseId(layout.id);
+                                setShowHouseForm(true);
+                            };
                             return (
-                                <div key={layout.id} className="flex w-[220px] shrink-0 flex-col gap-2 rounded-[16px] border border-[#EBEBEB] bg-white p-2">
-                                    <div className="relative h-[140px] w-full overflow-hidden rounded-[12px] bg-[#F3F4F6]">
+                                <div key={layout.id} className="group flex w-[280px] shrink-0 flex-col gap-3 rounded-[28px] border border-[#EBEBEB] bg-white p-2 pb-3 transition-shadow hover:shadow-md">
+                                    <div
+                                        className="relative h-[200px] w-full shrink-0 cursor-pointer overflow-hidden rounded-[24px] bg-[#F8F9FA]"
+                                        onClick={openEdit}
+                                    >
                                         {imageUrl ? (
-                                            <img src={imageUrl} alt={layout.title} className="h-full w-full object-cover" loading="lazy" />
+                                            <img
+                                                src={imageUrl}
+                                                alt={layout.title}
+                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                                                loading="lazy"
+                                            />
                                         ) : (
-                                            <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">No Image</div>
+                                            <div className="flex h-full w-full items-center justify-center bg-gray-100 text-sm text-[#999]">
+                                                No Image
+                                            </div>
                                         )}
 
                                         <button
                                             type="button"
-                                            onClick={() => archiveMut.mutate({ id: layout.id, archived: !layout.archived })}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                archiveMut.mutate({ id: layout.id, archived: !layout.archived });
+                                            }}
                                             disabled={archiveMut.isPending}
                                             aria-label={layout.archived ? "Restore" : "Archive"}
                                             title={layout.archived ? "Restore" : "Archive"}
-                                            className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
+                                            className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                         >
                                             {layout.archived ? (
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
@@ -230,10 +242,13 @@ export function UnitLayoutsSection() {
 
                                         <button
                                             type="button"
-                                            onClick={() => deleteMut.mutate(layout.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteMut.mutate(layout.id);
+                                            }}
                                             aria-label="Delete"
                                             title="Delete"
-                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                            className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
@@ -241,42 +256,41 @@ export function UnitLayoutsSection() {
                                         </button>
                                     </div>
 
-                                    <div className="px-1 pb-1">
-                                        <p className="truncate text-sm font-semibold text-[#1A1A1A]">{layout.title}</p>
-                                        <p className="text-xs text-[#999]">
-                                            {layout.totalArea} m² · {layout.unitTypeOption?.title || `${layout.number || 0} rooms`}
-                                        </p>
-                                        <p className="mt-1 truncate text-xs text-[#718096]">
-                                            {layout.category?.title || "No object"} · Floor {layout.floor}
-                                        </p>
-                                    </div>
+                                    <div className="flex flex-1 flex-col justify-between px-1.5 pb-1">
+                                        <div>
+                                            <p className="truncate text-sm font-semibold text-[#1A1A1A]">{layout.title}</p>
+                                            <p className="text-xs text-[#999]">
+                                                {layout.totalArea} m² · {layout.unitTypeOption?.title || `${layout.number || 0} rooms`}
+                                            </p>
+                                            <p className="mt-1 truncate text-xs text-[#718096]">
+                                                {layout.category?.title || "No object"} · Floor {layout.floor}
+                                            </p>
 
-                                    <div className="rounded-[12px] bg-[#F4F5F6] px-3 py-2">
-                                        <p className="text-[11px] font-medium text-[#808191]">Price</p>
-                                        <p className="truncate text-sm font-semibold text-[#1A1A1A]">
-                                            {formatPricePreview(layout.prices)}
-                                        </p>
-                                    </div>
+                                            <div className="mt-3 rounded-[12px] bg-[#F4F5F6] px-3 py-2">
+                                                <p className="text-[11px] font-medium text-[#808191]">Price</p>
+                                                <p className="truncate text-sm font-semibold text-[#1A1A1A]">
+                                                    {formatPricePreview(layout.prices)}
+                                                </p>
+                                            </div>
+                                        </div>
 
-                                    <div className="flex gap-1 px-1 pb-1">
-                                        <button
-                                            type="button"
-                                            onClick={() => duplicateMut.mutate(layout)}
-                                            disabled={duplicateMut.isPending}
-                                            className="flex-1 rounded-lg border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
-                                        >
-                                            Copy
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setEditingHouseId(layout.id);
-                                                setShowHouseForm(true);
-                                            }}
-                                            className="flex-1 rounded-lg bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46] cursor-pointer"
-                                        >
-                                            Edit
-                                        </button>
+                                        <div className="mt-3 flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => duplicateMut.mutate(layout)}
+                                                disabled={duplicateMut.isPending}
+                                                className="flex h-10 flex-1 items-center justify-center rounded-[14px] border border-[#E2E8F0] px-4 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
+                                            >
+                                                Copy
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={openEdit}
+                                                className="flex h-10 flex-1 items-center justify-center rounded-[14px] bg-[#4E525D] px-4 text-[14px] font-medium leading-[20px] text-white transition-colors hover:bg-[#3A3D46] cursor-pointer"
+                                            >
+                                                Edit
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             );

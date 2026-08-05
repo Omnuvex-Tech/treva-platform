@@ -288,7 +288,7 @@ export function HouseForm({
             totalArea: undefined as unknown as number,
             internalArea: undefined as unknown as number,
             balconyArea: undefined as unknown as number,
-            prices: [] as { currencyId: string; priceTotal: number; priceByArea: number }[],
+            prices: [] as { currencyId: string; priceTotal?: number; priceByArea?: number }[],
             image: "",
             coverImage: "",
             gallery: [] as { url: string; alt?: string }[],
@@ -554,6 +554,7 @@ export function HouseForm({
 
         const pricesRecord: Record<string, number> = {};
         for (const p of form.prices) {
+            if (!p.priceTotal) continue;
             const cur = currencies.find((c) => c.id === p.currencyId || c.value === p.currencyId || c.name === p.currencyId);
             pricesRecord[cur?.value || p.currencyId] = p.priceTotal;
         }
@@ -850,7 +851,7 @@ export function HouseForm({
                 })}
             </div>
 
-                <form onSubmit={handleSubmit} className="max-w-5xl">
+                <form onSubmit={handleSubmit}>
                 {/* â”€â”€â”€ Tab: Basic Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                     {activeTab === "basic" && (
                         <div className="space-y-5">
@@ -859,7 +860,7 @@ export function HouseForm({
                                         <div className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
                                             <div className="space-y-4">
                                                 <ImageAssetCard
-                                                    label="Main Image"
+                                                    label="Main Image *"
                                                     description="Primary thumbnail used in cards and quick unit layout views."
                                                     alt="Main"
                                                     imageUrl={form.image || null}
@@ -937,7 +938,7 @@ export function HouseForm({
                                             ) : null}
                                             <div className="grid gap-4 lg:grid-cols-2">
                                                 <div>
-                                                    <label className="mb-1 block text-xs text-[#4E525D]">Unit layout name <span className="text-[#F31100]">*</span></label>
+                                                    <label className="mb-1 block text-xs text-[#4E525D]">Unit layout name *</label>
                                                     <input
                                                         className={inputClass}
                                                         value={form.name || ""}
@@ -946,7 +947,7 @@ export function HouseForm({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="mb-1 block text-xs text-[#4E525D]">Title <span className="text-[#F31100]">*</span></label>
+                                                    <label className="mb-1 block text-xs text-[#4E525D]">Title *</label>
                                                     <input
                                                         className={inputClass}
                                                         value={form.title || ""}
@@ -1016,7 +1017,7 @@ export function HouseForm({
                             <SectionBlock title="Specification" description="Physical, ownership and construction details for this layout.">
                                 <div className="grid gap-4 lg:grid-cols-3">
                                     <div>
-                                        <label className="mb-1 block text-xs text-[#4E525D]">Floor From</label>
+                                        <label className="mb-1 block text-xs text-[#4E525D]">Floor From *</label>
                                         <input
                                             className={inputClass}
                                             type="number"
@@ -1156,7 +1157,7 @@ export function HouseForm({
                             <SectionBlock title="Area & Pricing" description="Surface area and price matrix for each available currency.">
                                 <div className="grid gap-4 lg:grid-cols-3">
                                     <div>
-                                        <label className="mb-1 block text-xs text-[#4E525D]">Total Area (m²)</label>
+                                        <label className="mb-1 block text-xs text-[#4E525D]">Total Area (m²) *</label>
                                         <input
                                             className={inputClass}
                                             type="number"
@@ -1203,7 +1204,7 @@ export function HouseForm({
                                                     <div className="mb-3 text-xs font-medium text-[#666666]">{cur.title || cur.name} ({cur.value})</div>
                                                     <div className="grid gap-3 lg:grid-cols-2">
                                                         <div>
-                                                            <label className="mb-1 block text-xs text-[#4E525D]">Price Total</label>
+                                                            <label className="mb-1 block text-xs text-[#4E525D]">Price Total *</label>
                                                             <input
                                                                 className={inputClass}
                                                                 type="number"
@@ -1217,9 +1218,9 @@ export function HouseForm({
                                                                     } else {
                                                                         const val = parseFloat(raw) || 0;
                                                                         if (idx >= 0) {
-                                                                            prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea ?? 0 };
+                                                                            prices[idx] = { currencyId: cur.id, priceTotal: val, priceByArea: prices[idx]?.priceByArea };
                                                                         } else {
-                                                                            prices.push({ currencyId: cur.id, priceTotal: val, priceByArea: 0 });
+                                                                            prices.push({ currencyId: cur.id, priceTotal: val });
                                                                         }
                                                                     }
                                                                     updateField("prices", prices);
@@ -1229,7 +1230,7 @@ export function HouseForm({
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label className="mb-1 block text-xs text-[#4E525D]">Price per m²</label>
+                                                            <label className="mb-1 block text-xs text-[#4E525D]">Price per m² *</label>
                                                             <input
                                                                 className={inputClass}
                                                                 type="number"
@@ -1243,9 +1244,9 @@ export function HouseForm({
                                                                     } else {
                                                                         const val = parseFloat(raw) || 0;
                                                                         if (idx >= 0) {
-                                                                            prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal ?? 0, priceByArea: val };
+                                                                            prices[idx] = { currencyId: cur.id, priceTotal: prices[idx]?.priceTotal, priceByArea: val };
                                                                         } else {
-                                                                            prices.push({ currencyId: cur.id, priceTotal: 0, priceByArea: val });
+                                                                            prices.push({ currencyId: cur.id, priceByArea: val });
                                                                         }
                                                                     }
                                                                     updateField("prices", prices);
@@ -1512,7 +1513,7 @@ export function HouseForm({
                                     <div className="space-y-4">
                                         <div className="grid gap-4 lg:grid-cols-2">
                                             <div>
-                                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Slug <span className="text-[#F31100]">*</span></label>
+                                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Slug *</label>
                                                 <input
                                                     className={inputClass}
                                                     value={form.slug || ""}
@@ -1615,7 +1616,7 @@ export function HouseForm({
                         <div className="space-y-5">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Name</label>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Name *</label>
                                     <input
                                         className={inputClass}
                                         value={unitTypeDraft.name}
@@ -1624,7 +1625,7 @@ export function HouseForm({
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Title</label>
+                                    <label className="mb-1.5 block text-xs text-[#4E525D]">Title *</label>
                                     <input
                                         className={inputClass}
                                         value={unitTypeDraft.title}

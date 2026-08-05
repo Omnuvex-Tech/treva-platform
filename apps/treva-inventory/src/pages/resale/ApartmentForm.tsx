@@ -958,7 +958,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 })}
             </div>
 
-            <form onSubmit={handleSubmit} className="max-w-5xl">
+            <form onSubmit={handleSubmit}>
                 {activeTab === "basic" && (
                     <div className="space-y-5">
                         <SectionBlock title="Identity" description="Core listing information and ownership details.">

@@ -691,7 +691,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     ];
 
     const unitLayoutsPanel = (
-        <div className="max-w-5xl space-y-6">
+        <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <FormTabSwitcher
                     tabs={[{ id: "Active", label: "Active houses" }, { id: "Archive", label: "Archive" }]}
@@ -826,7 +826,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 duplicateHouseMutation.mutate(house);
                                             }}
                                             disabled={duplicateHouseMutation.isPending}
-                                            className="flex-1 cursor-pointer rounded-xl border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                            className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
                                         >
                                             Copy
                                         </button>
@@ -839,7 +839,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 setEditingHouseId(null);
                                                 setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
                                             }}
-                                            className="flex-1 cursor-pointer rounded-xl bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
+                                            className="flex-1 cursor-pointer rounded-full bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
                                         >
                                             View
                                         </button>
@@ -889,7 +889,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             </div>
 
             {activeTab === "basic" && (
-                <form onSubmit={(e) => { e.preventDefault(); handleBasicNext(); }} className="max-w-5xl">
+                <form onSubmit={(e) => { e.preventDefault(); handleBasicNext(); }}>
                     <div className="space-y-5">
                         <SectionBlock title="Identity" description="Core object information and listing basics.">
                             <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
@@ -1064,7 +1064,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             )}
 
             {activeTab === "commercial" && (
-                <form onSubmit={(e) => { e.preventDefault(); handleCommercialNext(); }} className="max-w-5xl">
+                <form onSubmit={(e) => { e.preventDefault(); handleCommercialNext(); }}>
                     <div className="space-y-5">
                         <SectionBlock title="Commercial" description="Developer, sales and infrastructure details shown for the project.">
                             <div className="grid gap-5 lg:grid-cols-2">
@@ -1185,7 +1185,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             )}
 
             {activeTab === "location" && (
-                <form onSubmit={(e) => { e.preventDefault(); handleLocationNext(); }} className="max-w-5xl">
+                <form onSubmit={(e) => { e.preventDefault(); handleLocationNext(); }}>
                     <div className="space-y-5">
                         <SectionBlock title="Location" description="Map labels, address copy and embed links for the object.">
                             <div className="grid gap-5 lg:grid-cols-3">
@@ -1241,7 +1241,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             )}
 
             {activeTab === "properties" && (
-                <div className="max-w-5xl space-y-5">
+                <div className="space-y-5">
                     {!showPostPlanCards ? (
                     <div className="space-y-5">
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -1393,20 +1393,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             previewHouse ? (
                                 showUnitLayoutList ? (
                                     <div className="space-y-5">
-                                        <div className="flex gap-3 rounded-[24px] border border-[#ECEEF2] bg-white p-4">
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setShowUnitLayoutList(false);
-                                                    setShowUnitLayoutForm(false);
-                                                    setEditingUnitLayoutId(null);
-                                                }}
-                                                className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
-                                            >
-                                                Back
-                                            </button>
-                                        </div>
-
                                         <div className="space-y-6 rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                                             <div className="flex items-center justify-between">
                                                 <FormTabSwitcher
@@ -1415,16 +1401,29 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                     onChange={(id) => setActiveUnitLayoutTab(id as "Active" | "Archive")}
                                                     size="md"
                                                 />
-                                                <FormAddButton
-                                                    icon={<span className="mr-0.5 text-base font-light">+</span>}
-                                                    onClick={() => {
-                                                        setEditingUnitLayoutId(null);
-                                                        setShowUnitLayoutForm(true);
-                                                        setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
-                                                    }}
-                                                >
-                                                    Add Unit Layout
-                                                </FormAddButton>
+                                                <div className="flex items-center gap-3">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setShowUnitLayoutList(false);
+                                                            setShowUnitLayoutForm(false);
+                                                            setEditingUnitLayoutId(null);
+                                                        }}
+                                                        className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm text-[#666666] transition-colors hover:bg-gray-50"
+                                                    >
+                                                        Back
+                                                    </button>
+                                                    <FormAddButton
+                                                        icon={<span className="mr-0.5 text-base font-light">+</span>}
+                                                        onClick={() => {
+                                                            setEditingUnitLayoutId(null);
+                                                            setShowUnitLayoutForm(true);
+                                                            setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+                                                        }}
+                                                    >
+                                                        Add Unit Layout
+                                                    </FormAddButton>
+                                                </div>
                                             </div>
 
                                             {(showUnitLayoutForm || editingUnitLayoutId) ? (
@@ -1528,7 +1527,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                         type="button"
                                                                         onClick={() => duplicateUnitLayoutMutation.mutate(layout)}
                                                                         disabled={duplicateUnitLayoutMutation.isPending}
-                                                                        className="flex-1 cursor-pointer rounded-xl border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                                                        className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
                                                                     >
                                                                         Copy
                                                                     </button>
@@ -1539,7 +1538,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                             setShowUnitLayoutForm(true);
                                                                             setTimeout(() => houseFormRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
                                                                         }}
-                                                                        className="flex-1 cursor-pointer rounded-xl bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
+                                                                        className="flex-1 cursor-pointer rounded-full bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
                                                                     >
                                                                         Edit
                                                                     </button>

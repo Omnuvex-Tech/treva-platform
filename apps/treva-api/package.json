@@ -26,7 +26,9 @@
     "db:deploy": "npm run prisma:deploy && npm run prisma:generate",
     "db:reset": "node ../../scripts/run-with-env.cjs .env.development prisma migrate reset --force && npm run prisma:seed",
     "prisma:seed": "node ../../scripts/run-with-env.cjs .env.development ts-node prisma/seed.ts",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "backfill:currencies:dev": "node ../../scripts/run-with-env.cjs .env.development ts-node scripts/backfill-unit-layout-currencies.ts",
+    "backfill:currencies:prod": "node ../../scripts/run-with-env.cjs .env.production ts-node scripts/backfill-unit-layout-currencies.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

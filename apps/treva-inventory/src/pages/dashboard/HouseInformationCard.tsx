@@ -1,9 +1,20 @@
+import { useState } from "react";
 import type { House } from "../../api/houses";
 
 function displayValue(value?: string | number | null) {
     if (value === null || value === undefined) return "Not specified";
     const stringValue = String(value).trim();
     return stringValue ? stringValue : "Not specified";
+}
+
+function getFileNameFromUrl(url: string, fallback: string) {
+    try {
+        const path = new URL(url, window.location.origin).pathname;
+        const name = path.split("/").pop();
+        return name && name.includes(".") ? name : fallback;
+    } catch {
+        return fallback;
+    }
 }
 
 export function HouseInformationCard({
@@ -17,6 +28,28 @@ export function HouseInformationCard({
 }) {
     const imageUrl = house.mainImage?.url || house.gallery?.[0]?.url || "";
     const address = [house.street, house.houseNumber].filter(Boolean).join(", ");
+    const [downloading, setDownloading] = useState(false);
+
+    const handleDownloadImage = async () => {
+        if (!imageUrl || downloading) return;
+        setDownloading(true);
+        try {
+            const res = await fetch(imageUrl);
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = getFileNameFromUrl(imageUrl, `${house.name || house.title || "house"}.jpg`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(blobUrl);
+        } catch {
+            window.open(imageUrl, "_blank", "noreferrer");
+        } finally {
+            setDownloading(false);
+        }
+    };
     const aboveGroundFloors =
         house.numberOfFloors?.end || house.numberOfFloors?.start || 0;
 
@@ -59,9 +92,9 @@ export function HouseInformationCard({
             </div>
 
             <div className="overflow-hidden rounded-[22px] border border-[#E9ECF2] bg-[#FBFBFC]">
-                <div className="grid lg:grid-cols-[190px_minmax(0,1fr)]">
+                <div className="grid lg:grid-cols-[240px_minmax(0,1fr)]">
                     <div className="border-b border-[#E9ECF2] p-4 lg:border-b-0 lg:border-r">
-                        <div className="mx-auto h-[140px] w-[140px] overflow-hidden rounded-[18px] bg-white">
+                        <div className="aspect-square w-full overflow-hidden rounded-[18px] bg-white">
                             {imageUrl ? (
                                 <img src={imageUrl} alt={house.title} className="h-full w-full object-cover" />
                             ) : (
@@ -75,19 +108,19 @@ export function HouseInformationCard({
                             Preview in the CRM widget and Smart Catalog. The image is expected to update.
                         </p>
 
-                        <a
-                            href={imageUrl || "#"}
-                            target="_blank"
-                            rel="noreferrer"
+                        <button
+                            type="button"
+                            onClick={handleDownloadImage}
+                            disabled={!imageUrl || downloading}
                             className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#BFC4CF] px-4 py-2 text-sm font-medium text-[#4E525D] transition-colors ${
                                 imageUrl ? "hover:bg-[#F8F9FB]" : "pointer-events-none opacity-50"
-                            }`}
+                            } ${downloading ? "pointer-events-none opacity-70" : ""}`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" />
                             </svg>
-                            Download image
-                        </a>
+                            {downloading ? "Downloading..." : "Download image"}
+                        </button>
                     </div>
 
                     <div className="grid md:grid-cols-2">
