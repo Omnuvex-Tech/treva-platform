@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { housesApi, type House } from "../../api/houses";
 import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
-import { getApiErrorMessage } from "../../utils/apiError";
-import { buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
-import { FormTabSwitcher, FormAddButton } from "@repo/ui";
-import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 
 const statusTextMap: Record<string, string> = {
     available: "text-[#2D9A5B]",
@@ -28,13 +24,6 @@ function formatPrice(prices: Record<string, number> | undefined) {
     return currency === "USD" ? `$${Number(amount).toLocaleString()}` : `${currency} ${Number(amount).toLocaleString()}`;
 }
 
-function formatPricePreview(prices: Record<string, number> | undefined) {
-    if (!prices || Object.keys(prices).length === 0) return "No price";
-    const [currency, amount] = Object.entries(prices)[0] || [];
-    if (!currency || amount === undefined) return "No price";
-    return `${currency} ${Number(amount).toLocaleString()}`;
-}
-
 const GRID_LEGEND = {
     available: { label: "Available", dot: "bg-emerald-400", cell: "bg-emerald-100" },
     reserved: { label: "Reserved", dot: "bg-amber-400", cell: "bg-amber-100" },
@@ -52,14 +41,10 @@ const FILL_CARDS = [
 ];
 
 export function MagazineSection() {
-    const qc = useQueryClient();
-    const { showError, showSuccess } = useMessageCenter();
+    const { showError } = useMessageCenter();
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [selectedHouseId, setSelectedHouseId] = useState<string | null>(null);
-    const [activeUnitTab, setActiveUnitTab] = useState<"Active" | "Archive">("Active");
-    const [showUnitForm, setShowUnitForm] = useState(false);
-    const [editingUnitId, setEditingUnitId] = useState<string | null>(null);
     const [selectedPostPlanCard, setSelectedPostPlanCard] = useState<"grid" | "property-layouts" | "floor-plans" | "facades" | null>(null);
     const [showGridView, setShowGridView] = useState(false);
 
@@ -81,13 +66,6 @@ export function MagazineSection() {
     }, [houses, selectedHouseId]);
 
     const selectedHouse = houses.find((h) => h.id === selectedHouseId) || null;
-
-    const { data: unitLayoutsResponse, isLoading: unitsLoading } = useQuery({
-        queryKey: ["unit-layouts", "magazine", selectedHouseId, activeUnitTab],
-        queryFn: () => unitLayoutsApi.getAll({ houseId: selectedHouseId!, archived: activeUnitTab === "Archive", limit: 100 }),
-        enabled: !!selectedHouseId,
-    });
-    const unitLayouts: UnitLayout[] = unitLayoutsResponse?.data?.data || [];
 
     const { data: gridResponse, isLoading: gridLoading } = useQuery({
         queryKey: ["unit-layouts", "magazine-grid", selectedHouseId],
@@ -114,35 +92,6 @@ export function MagazineSection() {
         return { floor, units };
     });
     const gridMaxColumns = Math.max(1, ...gridByFloor.map((row) => row.units.length));
-
-    const invalidateUnitLayouts = () => qc.invalidateQueries({ queryKey: ["unit-layouts", "magazine"] });
-
-    const duplicateMut = useMutation({
-        mutationFn: (layout: UnitLayout) => unitLayoutsApi.create(buildUnitLayoutDuplicatePayload(layout)),
-        onSuccess: () => {
-            invalidateUnitLayouts();
-            showSuccess({ title: "Unit layout duplicated" });
-        },
-        onError: (error) => showError({ title: "Could not duplicate unit layout", description: getApiErrorMessage(error, "Please try again.") }),
-    });
-
-    const archiveMut = useMutation({
-        mutationFn: ({ id, archived }: { id: string; archived: boolean }) => unitLayoutsApi.update(id, { archived }),
-        onSuccess: () => {
-            invalidateUnitLayouts();
-            showSuccess({ title: "Unit layout updated" });
-        },
-        onError: (error) => showError({ title: "Could not update unit layout", description: getApiErrorMessage(error, "Please try again.") }),
-    });
-
-    const deleteMut = useMutation({
-        mutationFn: (id: string) => unitLayoutsApi.delete(id),
-        onSuccess: () => {
-            invalidateUnitLayouts();
-            showSuccess({ title: "Unit layout deleted" });
-        },
-        onError: (error) => showError({ title: "Could not delete unit layout", description: getApiErrorMessage(error, "Please try again.") }),
-    });
 
     const notifyComingSoon = () =>
         showError({ title: "Coming soon", description: "This part of Magazine isn't wired up yet." });
@@ -343,7 +292,10 @@ export function MagazineSection() {
                             <div className="flex items-center gap-2">
                                 <button
                                     type="button"
-                                    onClick={() => setShowGridView(false)}
+                                    onClick={() => {
+                                        setShowGridView(false);
+                                        setSelectedPostPlanCard(null);
+                                    }}
                                     className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
                                     aria-label="Back"
                                 >
@@ -419,135 +371,7 @@ export function MagazineSection() {
                             </div>
                         )}
                     </div>
-                    ) : (
-                    <div className="space-y-6 rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="flex items-center justify-between">
-                            <FormTabSwitcher
-                                tabs={[{ id: "Active", label: "Active unit layouts" }, { id: "Archive", label: "Archive" }]}
-                                activeTab={activeUnitTab}
-                                onChange={(id) => setActiveUnitTab(id as "Active" | "Archive")}
-                                size="md"
-                            />
-                            <FormAddButton
-                                icon={<span className="mr-0.5 text-base font-light">+</span>}
-                                onClick={() => {
-                                    setEditingUnitId(null);
-                                    setShowUnitForm(true);
-                                }}
-                            >
-                                Add Unit Layout
-                            </FormAddButton>
-                        </div>
-
-                        {(showUnitForm || editingUnitId) ? (
-                            <div className="rounded-[24px] border border-[#E9ECF2] bg-white p-5">
-                                <UnitLayoutInlineForm
-                                    embedded
-                                    inline
-                                    categorySlug={selectedHouse.category?.slug}
-                                    parentHouseId={selectedHouse.id}
-                                    houseId={editingUnitId ?? undefined}
-                                    key={editingUnitId ?? `new-${selectedHouse.id}`}
-                                    onSuccess={() => {
-                                        setShowUnitForm(false);
-                                        setEditingUnitId(null);
-                                        invalidateUnitLayouts();
-                                    }}
-                                />
-                            </div>
-                        ) : null}
-
-                        {unitsLoading ? (
-                            <LoadingSpinner label="Loading unit layouts" className="min-h-[160px]" />
-                        ) : unitLayouts.length === 0 ? (
-                            <div className="rounded-[24px] border border-[#E9ECF2] bg-white px-6 py-12 text-center text-sm text-[#999]">
-                                {activeUnitTab === "Active" ? "No active unit layouts yet. Click 'Add Unit Layout' to create one." : "No archived unit layouts"}
-                            </div>
-                        ) : (
-                            <div className="flex flex-wrap gap-4">
-                                {unitLayouts.map((layout) => {
-                                    const imageUrl = layout.mainImage?.url || layout.gallery?.[0]?.url;
-                                    const openEdit = () => {
-                                        setEditingUnitId(layout.id);
-                                        setShowUnitForm(true);
-                                    };
-                                    return (
-                                        <div key={layout.id} className="group flex w-[240px] shrink-0 flex-col gap-2 rounded-[16px] border border-[#EBEBEB] bg-white p-2">
-                                            <div className="relative h-[140px] w-full overflow-hidden rounded-[12px] bg-[#F3F4F6]">
-                                                {imageUrl ? (
-                                                    <img src={imageUrl} alt={layout.title} className="h-full w-full object-cover" loading="lazy" />
-                                                ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-xs text-[#999]">No Image</div>
-                                                )}
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => archiveMut.mutate({ id: layout.id, archived: !layout.archived })}
-                                                    disabled={archiveMut.isPending}
-                                                    aria-label={layout.archived ? "Restore" : "Archive"}
-                                                    title={layout.archived ? "Restore" : "Archive"}
-                                                    className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
-                                                >
-                                                    {layout.archived ? (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                                        </svg>
-                                                    ) : (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                                        </svg>
-                                                    )}
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => deleteMut.mutate(layout.id)}
-                                                    aria-label="Delete"
-                                                    title="Delete"
-                                                    className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-
-                                            <div className="px-1 pb-1">
-                                                <p className="truncate text-sm font-semibold text-[#1A1A1A]">{layout.title}</p>
-                                                <p className="text-xs text-[#999]">
-                                                    {layout.totalArea} m² · {layout.unitTypeOption?.title || `${layout.number || 0} rooms`}
-                                                </p>
-                                            </div>
-
-                                            <div className="rounded-[12px] bg-[#F4F5F6] px-3 py-2">
-                                                <p className="text-[11px] font-medium text-[#808191]">Price</p>
-                                                <p className="truncate text-sm font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices)}</p>
-                                            </div>
-
-                                            <div className="flex gap-1 px-1 pb-1">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => duplicateMut.mutate(layout)}
-                                                    disabled={duplicateMut.isPending}
-                                                    className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
-                                                >
-                                                    Copy
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={openEdit}
-                                                    className="flex-1 cursor-pointer rounded-full bg-[#4E525D] py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#3A3D46]"
-                                                >
-                                                    Edit
-                                                </button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                    )}
+                    ) : null}
                 </>
             ) : null}
         </main>
