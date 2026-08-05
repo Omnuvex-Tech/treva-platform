@@ -206,6 +206,14 @@ function App() {
                             }
                         />
                         <Route
+                            path="/dashboard/magazine"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
                             path="/dashboard/offplan/categories"
                             element={
                                 <ProtectedRoute>

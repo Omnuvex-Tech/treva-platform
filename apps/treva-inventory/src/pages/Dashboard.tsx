@@ -24,10 +24,11 @@ import { RequestsSection } from "./dashboard/RequestsSection";
 import { OffPlanObjectsSection } from "./dashboard/OffPlanObjectsSection";
 import { ObjectEditPage } from "./dashboard/ObjectEditPage";
 import { ObjectCreatePage } from "./dashboard/ObjectCreatePage";
+import { MagazineSection } from "./dashboard/MagazineSection";
 
 import { LoadingSpinner } from "../components/LoadingSpinner";
 
-type MenuKey = "offplan" | "resale"
+type MenuKey = "offplan" | "resale" | "magazine"
     | "unitLayouts"
     | "unitTypes"
     | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests" | "locationOptions"
@@ -37,6 +38,7 @@ type MenuKey = "offplan" | "resale"
 const pageNames: Record<MenuKey, string> = {
     offplan: "Off-plan",
     resale: "Resale",
+    magazine: "Magazine",
     unitLayouts: "Unit Layouts",
     unitTypes: "Unit Types",
     apartments: "Apartments",
@@ -53,6 +55,7 @@ const pageNames: Record<MenuKey, string> = {
 const pageSubtitles: Record<MenuKey, string> = {
     offplan: "Pre-construction project pipeline",
     resale: "Secondary market listings",
+    magazine: "Per-property data catalog",
     unitLayouts: "Manage off-plan unit layouts",
     unitTypes: "Manage unit types",
     apartments: "Manage resale apartments",
@@ -90,6 +93,7 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
         children: [
             { key: "offplan", label: "Dashboard", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg> },
             { key: "objects", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg> },
+            { key: "magazine", label: "Magazine", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /><line x1="8" y1="7" x2="15" y2="7" /><line x1="8" y1="11" x2="15" y2="11" /></svg> },
             { key: "unitLayouts", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="2" /><line x1="15" y1="22" x2="15" y2="2" /></svg> },
             { key: "unitTypes", label: "Unit Types", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg> },
             { key: "locationOptions", label: "Locations", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" /><circle cx="12" cy="11" r="2.5" /></svg> },
@@ -99,13 +103,14 @@ const accordionConfig: { key: SectionKey; label: string; icon: React.ReactNode; 
 ];
 
 const getParentSection = (key: MenuKey): SectionKey | null => {
-        if (key === "offplan" || key === "unitLayouts" || key === "unitTypes" || key === "objects" || key === "offplanLocationOptions" || key === "offplanAttributes") return "offplan";
+        if (key === "offplan" || key === "unitLayouts" || key === "unitTypes" || key === "objects" || key === "offplanLocationOptions" || key === "offplanAttributes" || key === "magazine") return "offplan";
     return "resale";
 };
 
 function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
     if (key === "resale") return "/dashboard/resale";
     if (key === "offplan") return "/dashboard/offplan";
+    if (key === "magazine") return "/dashboard/magazine";
 
     if (key === "apartments") return "/dashboard/resale/apartments";
     if (key === "apartmentTypes") return "/dashboard/resale/apartment-types";
@@ -135,6 +140,7 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["unitLayouts", (value) => value === "/dashboard/offplan/unit-layouts"],
         ["resale", (value) => value === "/dashboard/resale"],
         ["offplan", (value) => value === "/dashboard/offplan"],
+        ["magazine", (value) => value === "/dashboard/magazine"],
     ];
 
     return routeMatchers.find(([, matches]) => matches(path))?.[0] ?? null;
@@ -1160,6 +1166,7 @@ export function Dashboard() {
                 {activeMenu === "locationOptions" && <LocationOptionsSection />}
                 {activeMenu === "attributes" && <AttributesSection />}
                 {activeMenu === "requests" && <RequestsSection />}
+                {activeMenu === "magazine" && <MagazineSection />}
             </div>
         </div>
     );

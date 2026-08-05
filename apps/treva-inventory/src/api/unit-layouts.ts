@@ -57,6 +57,8 @@ export interface UnitLayout {
     archived?: boolean;
     floor: number;
     number?: number;
+    unitCode?: string;
+    rooms?: number;
     entrance?: string;
     totalArea: number;
     internalArea: number;
