@@ -10,7 +10,7 @@ import { getApiErrorMessage } from "../../utils/apiError";
 import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 import { IoClose } from "react-icons/io5";
 
-function FilterSelect({
+export function FilterSelect({
     label,
     value,
     options,
@@ -132,7 +132,8 @@ function formatPricePreview(prices: Record<string, number> | undefined) {
     return `${currency} ${formatPriceValue(Number(amount))}`;
 }
 
-export function UnitLayoutsSection() {
+export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: string; embedded?: boolean; minimal?: boolean } = {}) {
+    const Wrapper = embedded ? "div" : "main";
     const qc = useQueryClient();
     const { showError, showSuccess } = useMessageCenter();
     const [filters, setFilters] = useState<UnitLayoutFilters>({ page: 1, limit: 12 });
@@ -149,6 +150,7 @@ export function UnitLayoutsSection() {
     const effectiveFilters: UnitLayoutFilters = {
         ...filters,
         archived: activeTab === "Archive",
+        houseId: houseId || undefined,
         categorySlug: appliedFilters.categorySlug || undefined,
         status: (appliedFilters.status || undefined) as UnitLayoutFilters["status"],
     };
@@ -253,7 +255,10 @@ export function UnitLayoutsSection() {
     const pagination = response?.data?.pagination;
 
     return (
-        <main className="flex-1 overflow-y-auto p-8 font-sans antialiased selection:bg-[#4A4E5A]/10" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
+        <Wrapper
+            className={`font-sans antialiased selection:bg-[#4A4E5A]/10 ${embedded ? "" : "flex-1 overflow-y-auto p-8"}`}
+            style={embedded ? undefined : { background: "var(--background-primary-50, #FFFFFF80)" }}
+        >
             <div className="relative mb-8 flex w-full flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                     <div className="flex h-[46px] items-center rounded-full border border-[#E2E8F0] bg-white p-1 shadow-sm">
@@ -292,7 +297,7 @@ export function UnitLayoutsSection() {
                         <button
                             type="button"
                             onClick={() => setFilterOpen((prev) => !prev)}
-                            className="flex h-[44px] w-[85px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#EBEBEB] px-3.5 py-2 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer"
+                            className="flex h-[44px] w-auto min-w-[85px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#EBEBEB] px-4 py-2 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer"
                         >
                             <img src="/images/inv-resale/filter.svg" alt="" className="h-4 w-4" />
                             <span>Filter</span>
@@ -306,12 +311,12 @@ export function UnitLayoutsSection() {
                         {filterOpen ? (
                             <div
                                 ref={filterPanelRef}
-                                className="absolute left-0 top-full z-20 mt-2 w-[380px] max-w-[90vw] rounded-[28px] border border-[#E7E9EE] bg-white p-5 shadow-[0_20px_50px_rgba(17,24,39,0.12)]"
+                                className="absolute right-0 top-full z-20 mt-2 w-[380px] max-w-[90vw] rounded-[28px] border border-[#E7E9EE] bg-white p-5 shadow-[0_20px_50px_rgba(17,24,39,0.12)]"
                             >
                                 <div className="mb-4 flex items-center justify-between">
                                     <div>
                                         <h4 className="text-[16px] font-semibold text-[#1A1A1A]">Filter Unit Layouts</h4>
-                                        <p className="mt-1 text-[13px] text-[#808191]">Narrow down by object and status</p>
+                                        <p className="mt-1 text-[13px] text-[#808191]">{houseId ? "Narrow down by status" : "Narrow down by object and status"}</p>
                                     </div>
                                     <button
                                         type="button"
@@ -323,13 +328,15 @@ export function UnitLayoutsSection() {
                                 </div>
 
                                 <div className="grid gap-4">
-                                    <FilterSelect
-                                        label="Object"
-                                        value={draftFilters.categorySlug}
-                                        options={categoryOptions}
-                                        placeholder="All objects"
-                                        onChange={(value) => setDraftFilters((prev) => ({ ...prev, categorySlug: value }))}
-                                    />
+                                    {!houseId ? (
+                                        <FilterSelect
+                                            label="Object"
+                                            value={draftFilters.categorySlug}
+                                            options={categoryOptions}
+                                            placeholder="All objects"
+                                            onChange={(value) => setDraftFilters((prev) => ({ ...prev, categorySlug: value }))}
+                                        />
+                                    ) : null}
                                     <FilterSelect
                                         label="Status"
                                         value={draftFilters.status}
@@ -359,6 +366,8 @@ export function UnitLayoutsSection() {
                         ) : null}
                     </div>
 
+                    {!minimal ? (
+                    <>
                     <div className="flex h-[46px] items-center rounded-full border border-[#E2E8F0] bg-white p-1 shadow-sm">
                         <button
                             type="button"
@@ -397,6 +406,8 @@ export function UnitLayoutsSection() {
                         <img src="/images/inv-resale/plus.svg" alt="" className="h-4 w-4" />
                         <span>Add Unit Layout</span>
                     </button>
+                    </>
+                    ) : null}
                 </div>
             </div>
 
@@ -406,6 +417,7 @@ export function UnitLayoutsSection() {
                         embedded
                         inline
                         houseId={editingHouseId ?? undefined}
+                        parentHouseId={houseId}
                         key={editingHouseId ?? "new"}
                         onSuccess={() => {
                             setShowHouseForm(false);
@@ -687,6 +699,6 @@ export function UnitLayoutsSection() {
                     ) : null}
                 </>
             )}
-        </main>
+        </Wrapper>
     );
 }

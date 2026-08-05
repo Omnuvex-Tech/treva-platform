@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { housesApi, type House } from "../../api/houses";
-import { unitLayoutsApi, type UnitLayout } from "../../api/unit-layouts";
+import { unitLayoutsApi, UNIT_LAYOUT_STATUS_OPTIONS, type UnitLayout } from "../../api/unit-layouts";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
+import { UnitLayoutsSection, FilterSelect } from "./UnitLayoutsSection";
+import { IoClose } from "react-icons/io5";
 
 const statusTextMap: Record<string, string> = {
     available: "text-[#2D9A5B]",
@@ -47,11 +49,27 @@ export function MagazineSection() {
     const [selectedHouseId, setSelectedHouseId] = useState<string | null>(null);
     const [selectedPostPlanCard, setSelectedPostPlanCard] = useState<"grid" | "property-layouts" | "floor-plans" | "facades" | null>(null);
     const [showGridView, setShowGridView] = useState(false);
+    const [gridViewTab, setGridViewTab] = useState<"Grid" | "Layouts">("Grid");
+    const [gridFilterOpen, setGridFilterOpen] = useState(false);
+    const [gridAppliedStatus, setGridAppliedStatus] = useState("");
+    const [gridDraftStatus, setGridDraftStatus] = useState("");
+    const gridFilterPanelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const timeout = setTimeout(() => setDebouncedSearch(search.trim()), 400);
         return () => clearTimeout(timeout);
     }, [search]);
+
+    useEffect(() => {
+        if (!gridFilterOpen) return;
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (gridFilterPanelRef.current && !gridFilterPanelRef.current.contains(event.target as Node)) {
+                setGridFilterOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => document.removeEventListener("mousedown", handleOutsideClick);
+    }, [gridFilterOpen]);
 
     const { data: housesResponse, isLoading: housesLoading } = useQuery({
         queryKey: ["houses", "magazine", debouncedSearch],
@@ -96,13 +114,176 @@ export function MagazineSection() {
     const notifyComingSoon = () =>
         showError({ title: "Coming soon", description: "This part of Magazine isn't wired up yet." });
 
+    const applyGridFilter = () => {
+        setGridAppliedStatus(gridDraftStatus);
+        setGridFilterOpen(false);
+    };
+
+    const clearGridFilter = () => {
+        setGridDraftStatus("");
+        setGridAppliedStatus("");
+        setGridFilterOpen(false);
+    };
+
     return (
         <main className="flex-1 overflow-y-auto p-8 font-sans antialiased selection:bg-[#4A4E5A]/10" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
-            <div className="mb-3 flex items-center justify-between">
+            {showGridView && selectedHouse ? (
+                <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowGridView(false);
+                                    setSelectedPostPlanCard(null);
+                                    setGridViewTab("Grid");
+                                }}
+                                className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
+                                aria-label="Back"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="15 18 9 12 15 6" />
+                                </svg>
+                            </button>
+                            {(["Grid", "Layouts"] as const).map((tab) => (
+                                <button
+                                    key={tab}
+                                    type="button"
+                                    onClick={() => setGridViewTab(tab)}
+                                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                                        gridViewTab === tab ? "bg-[#EFEFF1] text-[#1A1A1A]" : "text-[#808191] hover:bg-gray-50"
+                                    }`}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+                        {gridViewTab === "Grid" ? (
+                            <div ref={gridFilterPanelRef} className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setGridDraftStatus(gridAppliedStatus);
+                                        setGridFilterOpen((prev) => !prev);
+                                    }}
+                                    className="flex h-[44px] w-auto min-w-[85px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#EBEBEB] px-4 py-2 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer"
+                                >
+                                    <img src="/images/inv-resale/filter.svg" alt="" className="h-4 w-4" />
+                                    <span>Filter</span>
+                                    {gridAppliedStatus ? (
+                                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#4E525D] px-1 text-[11px] font-semibold text-white">
+                                            1
+                                        </span>
+                                    ) : null}
+                                </button>
+
+                                {gridFilterOpen ? (
+                                    <div className="absolute right-0 top-full z-20 mt-2 w-[380px] max-w-[90vw] rounded-[28px] border border-[#E7E9EE] bg-white p-5 shadow-[0_20px_50px_rgba(17,24,39,0.12)]">
+                                        <div className="mb-4 flex items-center justify-between">
+                                            <div>
+                                                <h4 className="text-[16px] font-semibold text-[#1A1A1A]">Filter Grid</h4>
+                                                <p className="mt-1 text-[13px] text-[#808191]">Narrow down by status</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setGridFilterOpen(false)}
+                                                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4F5F6] text-[#4E525D] transition-colors hover:bg-[#E9ECF2]"
+                                            >
+                                                <IoClose size={18} />
+                                            </button>
+                                        </div>
+
+                                        <div className="grid gap-4">
+                                            <FilterSelect
+                                                label="Status"
+                                                value={gridDraftStatus}
+                                                options={UNIT_LAYOUT_STATUS_OPTIONS}
+                                                placeholder="All statuses"
+                                                onChange={setGridDraftStatus}
+                                            />
+                                        </div>
+
+                                        <div className="mt-5 flex items-center justify-end gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={clearGridFilter}
+                                                className="rounded-2xl border border-[#E7E9EE] px-4 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB]"
+                                            >
+                                                Clear
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={applyGridFilter}
+                                                className="rounded-2xl bg-[#4E525D] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3D404A]"
+                                            >
+                                                Apply Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : null}
+                            </div>
+                        ) : null}
+                    </div>
+
+                    {gridViewTab === "Grid" ? (
+                    <>
+                    <div className="mb-5 flex flex-wrap items-center gap-4">
+                        {GRID_LEGEND_ORDER.map((key) => (
+                            <span key={key} className="flex items-center gap-1.5 text-xs font-medium text-[#4E525D]">
+                                <span className={`h-2.5 w-2.5 rounded-full ${GRID_LEGEND[key].dot}`} />
+                                {GRID_LEGEND[key].label} {gridLegendCounts[key]}
+                            </span>
+                        ))}
+                    </div>
+
+                    {gridLoading ? (
+                        <LoadingSpinner label="Loading grid" className="min-h-[240px]" />
+                    ) : gridByFloor.length === 0 ? (
+                        <div className="rounded-[24px] border border-[#E9ECF2] bg-white px-6 py-12 text-center text-sm text-[#999]">
+                            No unit layouts yet for this property.
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <div className="inline-block min-w-full">
+                                <div className="flex">
+                                    <div className="w-10 flex-shrink-0" />
+                                    {Array.from({ length: gridMaxColumns }, (_, i) => i + 1).map((col) => (
+                                        <div key={col} className="flex w-9 flex-shrink-0 items-center justify-center text-xs text-[#999]">
+                                            {col}
+                                        </div>
+                                    ))}
+                                </div>
+                                {gridByFloor.map(({ floor, units }) => (
+                                    <div key={floor} className="flex items-center">
+                                        <div className="flex w-10 flex-shrink-0 items-center justify-center text-xs text-[#999]">{floor}</div>
+                                        {Array.from({ length: gridMaxColumns }, (_, i) => units[i]).map((layout, i) => (
+                                            <div key={layout?.id ?? `empty-${floor}-${i}`} className="flex w-9 flex-shrink-0 items-center justify-center p-0.5">
+                                                {layout ? (
+                                                    <div
+                                                        title={`${layout.unitCode || layout.title} · ${GRID_LEGEND[gridCellStatus(layout)].label}`}
+                                                        className={`h-7 w-7 rounded-md ${
+                                                            gridAppliedStatus && gridCellStatus(layout) !== gridAppliedStatus
+                                                                ? "border border-[#C8CDD8] bg-transparent"
+                                                                : GRID_LEGEND[gridCellStatus(layout)].cell
+                                                        }`}
+                                                    />
+                                                ) : null}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    </>
+                    ) : (
+                        <UnitLayoutsSection houseId={selectedHouseId ?? undefined} embedded minimal />
+                    )}
+                </div>
+            ) : (
+            <>
+            <div className="mb-3">
                 <h3 className="text-sm font-medium text-[#808191]">Selected Property</h3>
-                <button type="button" onClick={notifyComingSoon} className="text-sm font-medium text-[#4E525D] transition-colors hover:opacity-80 cursor-pointer">
-                    + Create new
-                </button>
             </div>
 
             {selectedHouse ? (
@@ -195,37 +376,6 @@ export function MagazineSection() {
 
             {selectedHouse ? (
                 <>
-                    <div className="mb-8 grid gap-4 md:grid-cols-2">
-                        <div className="rounded-[24px] border border-[#E9ECF2] bg-white p-5">
-                            <p className="text-xs text-[#999]">Current Version</p>
-                            <div className="mt-2 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[15px] font-semibold text-[#1A1A1A]">Version No.6</span>
-                                    <span className="rounded-full bg-[#E7F6ED] px-2.5 py-1 text-xs font-medium text-[#2D9A5B]">Published</span>
-                                </div>
-                                <button type="button" onClick={notifyComingSoon} className="text-sm font-medium text-[#4E525D] transition-colors hover:opacity-80 cursor-pointer">
-                                    History
-                                </button>
-                            </div>
-                            <p className="mt-1 text-xs text-[#999]">
-                                {new Date(selectedHouse.updatedAt).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}
-                            </p>
-                        </div>
-
-                        <div className="rounded-[24px] border border-[#E9ECF2] bg-white p-5">
-                            <p className="text-xs text-[#999]">Data Rules</p>
-                            <div className="mt-2 flex items-center justify-between gap-3">
-                                <div>
-                                    <span className="text-[15px] font-semibold text-[#1A1A1A]">Auto-update on next load</span>
-                                    <p className="mt-1 text-xs text-[#999]">Rules apply on next data import</p>
-                                </div>
-                                <button type="button" onClick={notifyComingSoon} className="flex-shrink-0 text-sm font-medium text-blue-600 transition-colors hover:opacity-80 cursor-pointer">
-                                    Configure
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         {FILL_CARDS.map((card) => {
                             const isActive = card.key === selectedPostPlanCard;
@@ -285,95 +435,10 @@ export function MagazineSection() {
                             );
                         })}
                     </div>
-
-                    {showGridView ? (
-                    <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                        <div className="mb-4 flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowGridView(false);
-                                        setSelectedPostPlanCard(null);
-                                    }}
-                                    className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
-                                    aria-label="Back"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="15 18 9 12 15 6" />
-                                    </svg>
-                                </button>
-                                {(["Grid", "Grid+", "Properties", "Layouts"] as const).map((tab, index) => (
-                                    <button
-                                        key={tab}
-                                        type="button"
-                                        onClick={index === 0 ? undefined : notifyComingSoon}
-                                        className={`rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
-                                            index === 0 ? "bg-[#EFEFF1] text-[#1A1A1A]" : "text-[#808191] hover:bg-gray-50"
-                                        }`}
-                                    >
-                                        {tab}
-                                    </button>
-                                ))}
-                            </div>
-                            <button
-                                type="button"
-                                onClick={notifyComingSoon}
-                                className="flex items-center gap-2 rounded-full border border-[#E2E8F0] px-4 py-2 text-sm font-medium text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer"
-                            >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
-                                Filter
-                            </button>
-                        </div>
-
-                        <div className="mb-5 flex flex-wrap items-center gap-4">
-                            {GRID_LEGEND_ORDER.map((key) => (
-                                <span key={key} className="flex items-center gap-1.5 text-xs font-medium text-[#4E525D]">
-                                    <span className={`h-2.5 w-2.5 rounded-full ${GRID_LEGEND[key].dot}`} />
-                                    {GRID_LEGEND[key].label} {gridLegendCounts[key]}
-                                </span>
-                            ))}
-                        </div>
-
-                        {gridLoading ? (
-                            <LoadingSpinner label="Loading grid" className="min-h-[240px]" />
-                        ) : gridByFloor.length === 0 ? (
-                            <div className="rounded-[24px] border border-[#E9ECF2] bg-white px-6 py-12 text-center text-sm text-[#999]">
-                                No unit layouts yet for this property.
-                            </div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <div className="inline-block min-w-full">
-                                    <div className="flex">
-                                        <div className="w-10 flex-shrink-0" />
-                                        {Array.from({ length: gridMaxColumns }, (_, i) => i + 1).map((col) => (
-                                            <div key={col} className="flex w-9 flex-shrink-0 items-center justify-center text-xs text-[#999]">
-                                                {col}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {gridByFloor.map(({ floor, units }) => (
-                                        <div key={floor} className="flex items-center">
-                                            <div className="flex w-10 flex-shrink-0 items-center justify-center text-xs text-[#999]">{floor}</div>
-                                            {Array.from({ length: gridMaxColumns }, (_, i) => units[i]).map((layout, i) => (
-                                                <div key={layout?.id ?? `empty-${floor}-${i}`} className="flex w-9 flex-shrink-0 items-center justify-center p-0.5">
-                                                    {layout ? (
-                                                        <div
-                                                            title={`${layout.unitCode || layout.title} · ${GRID_LEGEND[gridCellStatus(layout)].label}`}
-                                                            className={`h-7 w-7 rounded-md ${GRID_LEGEND[gridCellStatus(layout)].cell}`}
-                                                        />
-                                                    ) : null}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    ) : null}
                 </>
             ) : null}
+            </>
+            )}
         </main>
     );
 }
