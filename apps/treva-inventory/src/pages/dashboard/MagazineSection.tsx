@@ -54,6 +54,24 @@ export function MagazineSection() {
     const [gridAppliedStatus, setGridAppliedStatus] = useState("");
     const [gridDraftStatus, setGridDraftStatus] = useState("");
     const gridFilterPanelRef = useRef<HTMLDivElement>(null);
+    const [selectedGridLayout, setSelectedGridLayout] = useState<UnitLayout | null>(null);
+    const [gridPanelOpen, setGridPanelOpen] = useState(false);
+
+    const openGridPanel = (layout: UnitLayout) => {
+        const wasOpen = !!selectedGridLayout;
+        setSelectedGridLayout(layout);
+        if (wasOpen) {
+            setGridPanelOpen(true);
+        } else {
+            setGridPanelOpen(false);
+            requestAnimationFrame(() => requestAnimationFrame(() => setGridPanelOpen(true)));
+        }
+    };
+
+    const closeGridPanel = () => {
+        setGridPanelOpen(false);
+        setTimeout(() => setSelectedGridLayout(null), 300);
+    };
 
     useEffect(() => {
         const timeout = setTimeout(() => setDebouncedSearch(search.trim()), 400);
@@ -84,6 +102,11 @@ export function MagazineSection() {
     }, [houses, selectedHouseId]);
 
     const selectedHouse = houses.find((h) => h.id === selectedHouseId) || null;
+
+    useEffect(() => {
+        setSelectedGridLayout(null);
+        setGridPanelOpen(false);
+    }, [selectedHouseId]);
 
     const { data: gridResponse, isLoading: gridLoading } = useQuery({
         queryKey: ["unit-layouts", "magazine-grid", selectedHouseId],
@@ -129,111 +152,113 @@ export function MagazineSection() {
         <main className="flex-1 overflow-y-auto p-8 font-sans antialiased selection:bg-[#4A4E5A]/10" style={{ background: "var(--background-primary-50, #FFFFFF80)" }}>
             {showGridView && selectedHouse ? (
                 <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
+                    <div className="mb-4 flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowGridView(false);
+                                setSelectedPostPlanCard(null);
+                                setGridViewTab("Grid");
+                                setSelectedGridLayout(null);
+                                setGridPanelOpen(false);
+                            }}
+                            className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
+                            aria-label="Back"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                        </button>
+                        {(["Grid", "Layouts"] as const).map((tab) => (
                             <button
+                                key={tab}
                                 type="button"
-                                onClick={() => {
-                                    setShowGridView(false);
-                                    setSelectedPostPlanCard(null);
-                                    setGridViewTab("Grid");
-                                }}
-                                className="flex h-9 w-9 items-center justify-center rounded-full text-[#4E525D] transition-colors hover:bg-[#F4F5F6] cursor-pointer"
-                                aria-label="Back"
+                                onClick={() => setGridViewTab(tab)}
+                                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                                    gridViewTab === tab ? "bg-[#EFEFF1] text-[#1A1A1A]" : "text-[#808191] hover:bg-gray-50"
+                                }`}
                             >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="15 18 9 12 15 6" />
-                                </svg>
+                                {tab}
                             </button>
-                            {(["Grid", "Layouts"] as const).map((tab) => (
-                                <button
-                                    key={tab}
-                                    type="button"
-                                    onClick={() => setGridViewTab(tab)}
-                                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
-                                        gridViewTab === tab ? "bg-[#EFEFF1] text-[#1A1A1A]" : "text-[#808191] hover:bg-gray-50"
-                                    }`}
-                                >
-                                    {tab}
-                                </button>
-                            ))}
-                        </div>
-                        {gridViewTab === "Grid" ? (
-                            <div ref={gridFilterPanelRef} className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setGridDraftStatus(gridAppliedStatus);
-                                        setGridFilterOpen((prev) => !prev);
-                                    }}
-                                    className="flex h-[44px] w-auto min-w-[85px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#EBEBEB] px-4 py-2 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer"
-                                >
-                                    <img src="/images/inv-resale/filter.svg" alt="" className="h-4 w-4" />
-                                    <span>Filter</span>
-                                    {gridAppliedStatus ? (
-                                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#4E525D] px-1 text-[11px] font-semibold text-white">
-                                            1
-                                        </span>
-                                    ) : null}
-                                </button>
-
-                                {gridFilterOpen ? (
-                                    <div className="absolute right-0 top-full z-20 mt-2 w-[380px] max-w-[90vw] rounded-[28px] border border-[#E7E9EE] bg-white p-5 shadow-[0_20px_50px_rgba(17,24,39,0.12)]">
-                                        <div className="mb-4 flex items-center justify-between">
-                                            <div>
-                                                <h4 className="text-[16px] font-semibold text-[#1A1A1A]">Filter Grid</h4>
-                                                <p className="mt-1 text-[13px] text-[#808191]">Narrow down by status</p>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => setGridFilterOpen(false)}
-                                                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4F5F6] text-[#4E525D] transition-colors hover:bg-[#E9ECF2]"
-                                            >
-                                                <IoClose size={18} />
-                                            </button>
-                                        </div>
-
-                                        <div className="grid gap-4">
-                                            <FilterSelect
-                                                label="Status"
-                                                value={gridDraftStatus}
-                                                options={UNIT_LAYOUT_STATUS_OPTIONS}
-                                                placeholder="All statuses"
-                                                onChange={setGridDraftStatus}
-                                            />
-                                        </div>
-
-                                        <div className="mt-5 flex items-center justify-end gap-3">
-                                            <button
-                                                type="button"
-                                                onClick={clearGridFilter}
-                                                className="rounded-2xl border border-[#E7E9EE] px-4 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB]"
-                                            >
-                                                Clear
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={applyGridFilter}
-                                                className="rounded-2xl bg-[#4E525D] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3D404A]"
-                                            >
-                                                Apply Filters
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : null}
-                            </div>
-                        ) : null}
+                        ))}
                     </div>
 
                     {gridViewTab === "Grid" ? (
-                    <>
-                    <div className="mb-5 flex flex-wrap items-center gap-4">
-                        {GRID_LEGEND_ORDER.map((key) => (
-                            <span key={key} className="flex items-center gap-1.5 text-xs font-medium text-[#4E525D]">
-                                <span className={`h-2.5 w-2.5 rounded-full ${GRID_LEGEND[key].dot}`} />
-                                {GRID_LEGEND[key].label} {gridLegendCounts[key]}
-                            </span>
-                        ))}
+                    <div className="flex items-stretch overflow-hidden">
+                    <div className={`min-w-0 flex-1 transition-[padding] duration-300 ease-out ${selectedGridLayout ? "pr-5" : ""}`}>
+                    <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex flex-wrap items-center gap-4">
+                            {GRID_LEGEND_ORDER.map((key) => (
+                                <span key={key} className="flex items-center gap-1.5 text-xs font-medium text-[#4E525D]">
+                                    <span className={`h-2.5 w-2.5 rounded-full ${GRID_LEGEND[key].dot}`} />
+                                    {GRID_LEGEND[key].label} {gridLegendCounts[key]}
+                                </span>
+                            ))}
+                        </div>
+
+                        <div ref={gridFilterPanelRef} className="relative">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setGridDraftStatus(gridAppliedStatus);
+                                    setGridFilterOpen((prev) => !prev);
+                                }}
+                                className="flex h-[44px] w-auto min-w-[85px] items-center justify-center gap-2 rounded-[16px] border border-white bg-[#EBEBEB] px-4 py-2 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] cursor-pointer"
+                            >
+                                <img src="/images/inv-resale/filter.svg" alt="" className="h-4 w-4" />
+                                <span>Filter</span>
+                                {gridAppliedStatus ? (
+                                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#4E525D] px-1 text-[11px] font-semibold text-white">
+                                        1
+                                    </span>
+                                ) : null}
+                            </button>
+
+                            {gridFilterOpen ? (
+                                <div className="absolute right-0 top-full z-20 mt-2 w-[380px] max-w-[90vw] rounded-[28px] border border-[#E7E9EE] bg-white p-5 shadow-[0_20px_50px_rgba(17,24,39,0.12)]">
+                                    <div className="mb-4 flex items-center justify-between">
+                                        <div>
+                                            <h4 className="text-[16px] font-semibold text-[#1A1A1A]">Filter Grid</h4>
+                                            <p className="mt-1 text-[13px] text-[#808191]">Narrow down by status</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setGridFilterOpen(false)}
+                                            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4F5F6] text-[#4E525D] transition-colors hover:bg-[#E9ECF2]"
+                                        >
+                                            <IoClose size={18} />
+                                        </button>
+                                    </div>
+
+                                    <div className="grid gap-4">
+                                        <FilterSelect
+                                            label="Status"
+                                            value={gridDraftStatus}
+                                            options={UNIT_LAYOUT_STATUS_OPTIONS}
+                                            placeholder="All statuses"
+                                            onChange={setGridDraftStatus}
+                                        />
+                                    </div>
+
+                                    <div className="mt-5 flex items-center justify-end gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={clearGridFilter}
+                                            className="rounded-2xl border border-[#E7E9EE] px-4 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB]"
+                                        >
+                                            Clear
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={applyGridFilter}
+                                            className="rounded-2xl bg-[#4E525D] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#3D404A]"
+                                        >
+                                            Apply Filters
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
                     </div>
 
                     {gridLoading ? (
@@ -259,12 +284,18 @@ export function MagazineSection() {
                                         {Array.from({ length: gridMaxColumns }, (_, i) => units[i]).map((layout, i) => (
                                             <div key={layout?.id ?? `empty-${floor}-${i}`} className="flex w-9 flex-shrink-0 items-center justify-center p-0.5">
                                                 {layout ? (
-                                                    <div
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openGridPanel(layout)}
                                                         title={`${layout.unitCode || layout.title} · ${GRID_LEGEND[gridCellStatus(layout)].label}`}
-                                                        className={`h-7 w-7 rounded-md ${
+                                                        className={`relative h-7 w-7 rounded-md transition-all cursor-pointer ${
                                                             gridAppliedStatus && gridCellStatus(layout) !== gridAppliedStatus
                                                                 ? "border border-[#C8CDD8] bg-transparent"
                                                                 : GRID_LEGEND[gridCellStatus(layout)].cell
+                                                        } ${
+                                                            gridPanelOpen && selectedGridLayout?.id === layout.id
+                                                                ? "z-10 ring-2 ring-[#4E525D] ring-offset-1"
+                                                                : ""
                                                         }`}
                                                     />
                                                 ) : null}
@@ -275,7 +306,109 @@ export function MagazineSection() {
                             </div>
                         </div>
                     )}
-                    </>
+                    </div>
+
+                    {selectedGridLayout ? (
+                        <div
+                            className={`w-[300px] flex-shrink-0 self-stretch border-l border-[#E9ECF2] bg-white pl-5 transition-all duration-300 ease-out ${
+                                gridPanelOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+                            }`}
+                        >
+                            <div className="mb-4 flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-xs text-[#999]">Residential unit</p>
+                                    <p className="mt-1 text-[15px] font-semibold text-[#1A1A1A]">
+                                        №{selectedGridLayout.unitCode || selectedGridLayout.number || selectedGridLayout.title}
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={closeGridPanel}
+                                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#F4F5F6] text-[#4E525D] transition-colors hover:bg-[#E9ECF2] cursor-pointer"
+                                    aria-label="Close"
+                                >
+                                    <IoClose size={16} />
+                                </button>
+                            </div>
+
+                            <div className="mb-4 grid grid-cols-3 gap-2 rounded-2xl bg-[#F8F9FB] p-3">
+                                <div>
+                                    <p className="text-[11px] text-[#999]">Area</p>
+                                    <p className="mt-0.5 text-sm font-semibold text-[#1A1A1A]">{selectedGridLayout.totalArea} m²</p>
+                                </div>
+                                <div>
+                                    <p className="text-[11px] text-[#999]">Floor</p>
+                                    <p className="mt-0.5 text-sm font-semibold text-[#1A1A1A]">
+                                        {selectedGridLayout.floor}
+                                        {selectedGridLayout.numberOfFloors?.end ? ` / ${selectedGridLayout.numberOfFloors.end}` : ""}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-[11px] text-[#999]">Status</p>
+                                    <p className={`mt-0.5 text-sm font-semibold ${statusTextMap[selectedGridLayout.status] || "text-[#1A1A1A]"}`}>
+                                        {GRID_LEGEND[gridCellStatus(selectedGridLayout)].label}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="mb-2 text-xs text-[#999]">
+                                Floor plan{selectedGridLayout.unitCode ? ` · ${selectedGridLayout.unitCode}` : ""}
+                            </p>
+                            <div className="mb-4 flex h-[160px] w-full items-center justify-center overflow-hidden rounded-2xl bg-[#F8F9FA]">
+                                {selectedGridLayout.mainImage?.url || selectedGridLayout.gallery?.[0]?.url ? (
+                                    <img
+                                        src={selectedGridLayout.mainImage?.url || selectedGridLayout.gallery?.[0]?.url}
+                                        alt={selectedGridLayout.title}
+                                        className="h-full w-full object-contain"
+                                    />
+                                ) : (
+                                    <span className="text-xs text-[#999]">No floor plan</span>
+                                )}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={notifyComingSoon}
+                                className="mb-4 w-full rounded-2xl border border-[#4E525D] px-4 py-2.5 text-sm font-medium text-[#4E525D] transition-colors hover:bg-[#F8F9FB] cursor-pointer"
+                            >
+                                Select unit
+                            </button>
+
+                            <div className="mb-4 border-t border-[#F1F2F4] pt-4">
+                                <p className="text-xs text-[#999]">Price according to the price list</p>
+                                <p className="mt-1 text-lg font-semibold text-[#1A1A1A]">
+                                    {formatPrice(selectedGridLayout.prices) || "No price"}
+                                </p>
+                                {selectedGridLayout.prices && Object.keys(selectedGridLayout.prices).length > 0 && selectedGridLayout.totalArea ? (
+                                    <p className="mt-0.5 text-xs text-[#999]">
+                                        {Math.round((Object.values(selectedGridLayout.prices)[0] || 0) / selectedGridLayout.totalArea).toLocaleString()}{" "}
+                                        {Object.keys(selectedGridLayout.prices)[0]} / m²
+                                    </p>
+                                ) : null}
+                            </div>
+
+                            <div className="border-t border-[#F1F2F4] pt-4">
+                                <p className="mb-3 text-sm font-semibold text-[#1A1A1A]">Property details</p>
+                                <div className="space-y-2.5 text-sm">
+                                    {[
+                                        ["Apartment number", selectedGridLayout.unitCode || String(selectedGridLayout.number || "—")],
+                                        ["Sub-Type", selectedGridLayout.unitTypeOption?.title || "—"],
+                                        ["Building entrance", selectedGridLayout.entrance || "—"],
+                                        ["Floor", String(selectedGridLayout.floor)],
+                                        ["Name of building", selectedGridLayout.house?.title || selectedHouse?.title || "—"],
+                                        ["Complex", selectedHouse?.category?.title || "—"],
+                                        ["Total area, m²", String(selectedGridLayout.totalArea)],
+                                    ].map(([label, value]) => (
+                                        <div key={label} className="flex items-center justify-between gap-3">
+                                            <span className="text-[#999]">{label}</span>
+                                            <span className="truncate text-right font-medium text-[#1A1A1A]">{value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+                    </div>
                     ) : (
                         <UnitLayoutsSection houseId={selectedHouseId ?? undefined} embedded minimal />
                     )}
