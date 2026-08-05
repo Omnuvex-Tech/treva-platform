@@ -211,7 +211,9 @@ export default function UnitLayout() {
         const data = Array.isArray(raw) ? raw : [];
         const next = data
           .map((cat: any) => ({
-            slug: String(cat?.slug || ''),
+            // Prefer the clean `name` (e.g. "sabah-towers") over `slug`, which
+            // Profitbase sync suffixes with an external id (e.g. "sabah-towers-57259").
+            slug: String(cat?.name || cat?.slug || ''),
             title: String(cat?.title || cat?.name || cat?.slug || ''),
           }))
           .filter((item: any) => item.slug);
