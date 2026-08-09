@@ -6,5 +6,5 @@ type Props = {
 
 export default async function VillaSienaPage({ params }: Props) {
   const { locale } = await params;
-  redirect(`/${locale}/projects/villa-siena?design=2`);
+  redirect(`/${locale}/projects/villa-siena`);
 }

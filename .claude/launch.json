@@ -6,6 +6,12 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run", "dev", "--workspace=apps/treva-inventory"],
             "port": 10030
+        },
+        {
+            "name": "treva-web",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev", "--workspace=apps/treva-web"],
+            "port": 10010
         }
     ]
 }

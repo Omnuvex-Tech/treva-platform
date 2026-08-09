@@ -873,7 +873,7 @@ export default function ApartmentCard() {
                     onPointerUp={onPointerUpPan}
                     onPointerCancel={onPointerUpPan}
                     onDoubleClick={onDoubleClickZoom}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); closeGallery(); }}
                     role="presentation"
                   >
                     <div
