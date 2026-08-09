@@ -1,0 +1,131 @@
+.notfound_section {
+  position: relative;
+  min-height: calc(100dvh - var(--treva-nav-height, 64px) - 32px - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--_color---white, #fff);
+}
+
+.notfound_glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(64rem, 92vw);
+  height: min(64rem, 92vw);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(76, 82, 94, 0.07) 0%, rgba(76, 82, 94, 0) 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.notfound_content {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.notfound_code {
+  margin: 0;
+  font-size: clamp(5.5rem, 16vw, 10rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--_color---blue-400, #3f4249);
+}
+
+.notfound_title {
+  margin: 1.5rem 0 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--_color---blue-400, #3f4249);
+}
+
+.notfound_description {
+  margin: 1.25rem 0 0;
+  max-width: 32rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--_color---blue-100, #4c525e);
+}
+
+.notfound_actions {
+  margin-top: 2.5rem;
+  margin-left: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.notfound_actions .button {
+  background-color: var(--treva-pill-bg, #3f4249);
+  border-color: var(--treva-pill-bg, #3f4249);
+  color: #fff;
+}
+
+.notfound_actions .button:hover {
+  background-color: var(--treva-pill-bg, #3f4249);
+  border-color: var(--treva-pill-bg, #3f4249);
+  color: #fff;
+}
+
+.notfound_actions .button[data-wf--button--variant="ghost"] {
+  background-color: transparent;
+  color: var(--treva-pill-bg, #3f4249);
+}
+
+.notfound_actions .button[data-wf--button--variant="ghost"]:hover {
+  background-color: transparent;
+  color: var(--treva-pill-bg, #3f4249);
+}
+
+.notfound_fade {
+  opacity: 0;
+  animation: notfoundFadeUp 0.7s ease forwards;
+}
+
+.notfound_fade--delay-1 {
+  animation-delay: 0.08s;
+}
+
+.notfound_fade--delay-2 {
+  animation-delay: 0.16s;
+}
+
+.notfound_fade--delay-3 {
+  animation-delay: 0.24s;
+}
+
+.notfound_fade--delay-4 {
+  animation-delay: 0.32s;
+}
+
+@keyframes notfoundFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 479px) {
+  .notfound_actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
