@@ -154,7 +154,12 @@ export default function ApartmentCard() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [baseFrame, setBaseFrame] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
   const viewerRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  // A pointerdown that pans/pinches still produces a click; remember where the
+  // press started so a drag never counts as a backdrop click.
+  const pointerMovedRef = useRef(false);
+  const pointerDownPointRef = useRef({ x: 0, y: 0 });
   const dragRef = useRef<{ active: boolean; startX: number; startY: number; baseX: number; baseY: number; pointerId: number | null }>({
     active: false,
     startX: 0,
@@ -409,6 +414,11 @@ export default function ApartmentCard() {
 
   const onPointerDownPan = (e: React.PointerEvent) => {
     pointerMapRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointerMapRef.current.size === 1) {
+      pointerMovedRef.current = false;
+      pointerDownPointRef.current = { x: e.clientX, y: e.clientY };
+    }
+
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 
     if (pointerMapRef.current.size >= 2) {
@@ -439,6 +449,8 @@ export default function ApartmentCard() {
 
   const onPointerMovePan = (e: React.PointerEvent) => {
     if (!pointerMapRef.current.has(e.pointerId)) return;
+    const origin = pointerDownPointRef.current;
+    if (Math.hypot(e.clientX - origin.x, e.clientY - origin.y) > 4) pointerMovedRef.current = true;
     pointerMapRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     if (pinchRef.current.active && pointerMapRef.current.size >= 2) {
@@ -474,6 +486,25 @@ export default function ApartmentCard() {
     if (dragRef.current.pointerId !== e.pointerId) return;
     dragRef.current.active = false;
     dragRef.current.pointerId = null;
+  };
+
+  // Close only when the click really landed outside the picture. A geometric
+  // test is required because pointer capture (used while panning) retargets the
+  // click to the viewer, so the image is not always in the event's path.
+  const onViewerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (pointerMovedRef.current) {
+      pointerMovedRef.current = false;
+      return;
+    }
+    const frame = frameRef.current;
+    if (frame) {
+      const r = frame.getBoundingClientRect();
+      const inside =
+        e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (inside) return;
+    }
+    closeGallery();
   };
 
   const onDoubleClickZoom = () => {
@@ -873,10 +904,11 @@ export default function ApartmentCard() {
                     onPointerUp={onPointerUpPan}
                     onPointerCancel={onPointerUpPan}
                     onDoubleClick={onDoubleClickZoom}
-                    onClick={(e) => { e.stopPropagation(); closeGallery(); }}
+                    onClick={onViewerClick}
                     role="presentation"
                   >
                     <div
+                      ref={frameRef}
                       className="apt-lightbox__frame"
                       style={{
                         width: baseFrame.w ? `${Math.round(baseFrame.w)}px` : undefined,
