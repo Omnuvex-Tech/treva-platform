@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import RichText from "./RichText";
 import "./property-location.css";
 
 interface Props {
@@ -100,7 +101,7 @@ export default function ProjectLocation({
                 </p>
               )}
               <div className="property-divider-line" />
-              {subText && <p className="property-sub-text">{subText}</p>}
+              <RichText html={subText} className="property-sub-text" />
             </div>
           )}
         </div>

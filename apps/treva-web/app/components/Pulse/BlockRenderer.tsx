@@ -75,9 +75,11 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
 }
 
 export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
+    // CMS-də gizlədilmiş bloklar heç render olunmur.
+    const visible = (blocks || []).filter(block => block?.isVisible !== false);
     return (
         <>
-            {blocks.map((block, index) => {
+            {visible.map((block, index) => {
                 switch (block.type) {
                     case "heading": {
                         const Tag = `h${block.level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
@@ -91,9 +93,12 @@ export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
                     }
 
                     case "paragraph":
+                        // <div>, <p> deyil: redaktor Tiptap-a keçdi və çıxışı özü <p> ilə
+                        // başlayır — <p> içində <p> etibarsız HTML-dir, brauzer onu qırır.
                         return (
-                            <p
+                            <div
                                 key={index}
+                                className="pulse-paragraph"
                                 style={{ marginBottom: "1rem", lineHeight: 1.7 }}
                                 dangerouslySetInnerHTML={{ __html: getLocalized(block.text as any, locale) }}
                             />

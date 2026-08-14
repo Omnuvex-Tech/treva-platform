@@ -2,6 +2,7 @@
 
 import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
+import RichText from "./RichText";
 import "./project-details.css";
 
 interface LocalizedString {
@@ -60,9 +61,9 @@ export default function ProjectFeatures({
         {/* HEADER */}
         <div className="pd-header">
           <div className="pd-header-left">
-            {headerMain && <p className="pd-header-main">{headerMain}</p>}
+            <RichText html={headerMain} className="pd-header-main" />
             <hr className="pd-divider" />
-            {headerSub && <p className="pd-header-sub">{headerSub}</p>}
+            <RichText html={headerSub} className="pd-header-sub" />
           </div>
           <div className="pd-header-right">
             <h2 className="pd-section-title">
@@ -94,7 +95,9 @@ export default function ProjectFeatures({
         {/* SECTIONS */}
         <div className="pd-grid">
           {sections.map((sec, index) => {
-            const isImageLeft = index % 2 === 0;
+            // CMS-də açıq təyin olunubsa ona hörmət et, yoxdursa növbələşdir.
+            const isImageLeft =
+              typeof sec.imageLeft === "boolean" ? sec.imageLeft : index % 2 === 0;
 
             const card = (
               <div
@@ -108,9 +111,7 @@ export default function ProjectFeatures({
                   </h3>
                   <span className="pd-card-num">.{sec.id}</span>
                 </div>
-                {loc(sec.subtitle, locale) && (
-                  <p className="pd-card-subtitle">{loc(sec.subtitle, locale)}</p>
-                )}
+                <RichText html={loc(sec.subtitle, locale)} className="pd-card-subtitle" />
                 {sec.items.length > 0 && (
                   <ul className="pd-card-list">
                     {sec.items.map((item, i) => (

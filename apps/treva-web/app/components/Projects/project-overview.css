@@ -405,3 +405,21 @@
     width: 100%;
   }
 }
+
+/* ── CMS zəngin mətn: bu bloklar artıq <div>-dir, Tiptap içəridə <p> qoyur. ──
+   Nəticə vizual olaraq köhnə <p> ilə eyni qalsın deyə sıfırlayırıq. */
+.po-description > p,
+.po-description > ul,
+.po-description > ol,
+.po-description > blockquote {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.po-description > p + p {
+  margin-top: 0.75em;
+}

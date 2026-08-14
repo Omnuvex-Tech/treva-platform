@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import PageContainer from "@/app/components/Container/PageContainer";
+import RichText from "./RichText";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Navigation } from "swiper/modules";
 import type SwiperClass from "swiper";
@@ -88,17 +89,15 @@ export default function ProjectHero({
         <div className="vision-hero__content">
           <h1 className="vision-hero__title">{title}</h1>
 
-          {desktopDescription && (
-            <p className="vision-hero__description vision-hero__description--desktop">
-              {desktopDescription}
-            </p>
-          )}
+          <RichText
+            html={desktopDescription}
+            className="vision-hero__description vision-hero__description--desktop"
+          />
 
-          {mobileDescription && (
-            <p className="vision-hero__description vision-hero__description--mobile">
-              {mobileDescription}
-            </p>
-          )}
+          <RichText
+            html={mobileDescription}
+            className="vision-hero__description vision-hero__description--mobile"
+          />
 
           {ctaText && (ctaLink || onCtaClick) && (
             onCtaClick ? (

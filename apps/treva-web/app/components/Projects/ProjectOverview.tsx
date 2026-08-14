@@ -2,6 +2,7 @@
 
 import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
+import RichText from "./RichText";
 import "./project-overview.css";
 
 interface OverviewImage {
@@ -91,9 +92,7 @@ export default function ProjectOverview({
 
             <div className="po-divider" />
 
-            {description && (
-              <p className="po-description">{description}</p>
-            )}
+            <RichText html={description} className="po-description" />
           </div>
         </div>
 

@@ -274,3 +274,19 @@
     padding-bottom: 0;
   }
 }
+
+/* ── CMS zəngin mətn: paraqraf bloku artıq <div>-dir, Tiptap içəridə <p> qoyur. ── */
+.pulse-paragraph > p,
+.pulse-paragraph > ul,
+.pulse-paragraph > ol,
+.pulse-paragraph > blockquote {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
+.pulse-paragraph > p + p {
+  margin-top: 1rem;
+}

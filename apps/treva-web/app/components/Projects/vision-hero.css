@@ -313,3 +313,21 @@
     padding: 8px 8px 8px 20px;
   }
 }
+
+/* ── CMS zəngin mətn: bu bloklar artıq <div>-dir, Tiptap içəridə <p> qoyur. ──
+   Nəticə vizual olaraq köhnə <p> ilə eyni qalsın deyə sıfırlayırıq. */
+.vision-hero__description > p,
+.vision-hero__description > ul,
+.vision-hero__description > ol,
+.vision-hero__description > blockquote {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.vision-hero__description > p + p {
+  margin-top: 0.75em;
+}

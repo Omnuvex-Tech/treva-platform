@@ -418,3 +418,31 @@
     font-size: 20px;
   }
 }
+
+/* ── CMS zəngin mətn: bu bloklar artıq <div>-dir, Tiptap içəridə <p> qoyur. ──
+   Nəticə vizual olaraq köhnə <p> ilə eyni qalsın deyə sıfırlayırıq. */
+.pd-header-main > p,
+.pd-header-main > ul,
+.pd-header-main > ol,
+.pd-header-main > blockquote,
+.pd-header-sub > p,
+.pd-header-sub > ul,
+.pd-header-sub > ol,
+.pd-header-sub > blockquote,
+.pd-card-subtitle > p,
+.pd-card-subtitle > ul,
+.pd-card-subtitle > ol,
+.pd-card-subtitle > blockquote {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+}
+
+.pd-header-main > p + p,
+.pd-header-sub > p + p,
+.pd-card-subtitle > p + p {
+  margin-top: 0.75em;
+}

@@ -3,22 +3,11 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useProjectDetail } from "@/hooks/use-project-detail";
-import type { LocalizedString } from "@/lib/project-detail.types";
 import { getAssetUrl } from "@/lib/asset-url";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
 import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
-import ProjectHero from "@/app/components/Projects/ProjectHero";
-import ProjectOverview from "@/app/components/Projects/ProjectOverview";
-import ProjectFeatures from "@/app/components/Projects/ProjectFeatures";
-import ProjectLocation from "@/app/components/Projects/ProjectLocation";
-import DynamicProjectLayouts from "@/app/components/Projects/DynamicProjectLayouts";
-
-function loc(obj: LocalizedString | undefined | null, locale: string, fallback = ""): string {
-  if (!obj) return fallback;
-  if (typeof obj === "string") return obj || fallback;
-  return (obj as any)[locale] || obj.az || obj.en || obj.ru || fallback;
-}
+import ProjectSections from "@/app/components/Projects/ProjectSections";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -122,68 +111,14 @@ export default function ProjectDetailPage() {
   return (
     <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
-      <ProjectHero
-        title={loc(detail.heroTitle, locale)}
-        desktopDescription={loc(detail.heroDesktopDesc, locale)}
-        mobileDescription={loc(detail.heroMobileDesc, locale)}
-        images={detail.heroImages || []}
-        ctaText={loc(detail.heroCtaText, locale)}
-        ctaLink={detail.heroCtaLink}
+      <ProjectSections
+        sections={detail.sections || []}
+        categorySlug={detail.categorySlug}
+        fallbackCategorySlug={slug}
+        locale={locale}
+        getImageUrl={getImageUrl}
         onCtaClick={scrollToCallbackCTA}
-        getImageUrl={getImageUrl}
       />
-
-      <ProjectOverview
-        titleLight={loc(detail.overviewTitleLight, locale, "Project ")}
-        titleBold={loc(detail.overviewTitleBold, locale, "Overview")}
-        brandName={loc(detail.overviewBrandName, locale)}
-        debutText={loc(detail.overviewDebutText, locale)}
-        locationText={loc(detail.overviewLocationText, locale)}
-        debutTextEnd={loc(detail.overviewDebutTextEnd, locale)}
-        description={loc(detail.overviewDescription, locale)}
-        images={{
-          large: {
-            url: detail.overviewImageLarge || "",
-            label: loc(detail.overviewImageLargeLabel, locale),
-          },
-          medium: {
-            url: detail.overviewImageMedium || "",
-            label: loc(detail.overviewImageMediumLabel, locale),
-          },
-          small: {
-            url: detail.overviewImageSmall || "",
-            label: loc(detail.overviewImageSmallLabel, locale),
-          },
-        }}
-        dataRows={detail.overviewDataRows || []}
-        locale={locale}
-        getImageUrl={getImageUrl}
-      />
-
-      <ProjectFeatures
-        headerMain={loc(detail.featuresHeaderMain, locale)}
-        headerSub={loc(detail.featuresHeaderSub, locale)}
-        titleLight={loc(detail.featuresTitleLight, locale, "Project ")}
-        titleBold={loc(detail.featuresTitleBold, locale, "Details")}
-        sections={detail.featuresSections || []}
-        brochureFile={detail.brochureFile}
-        locale={locale}
-        getImageUrl={getImageUrl}
-      />
-
-      <ProjectLocation
-        titleLight={loc(detail.locationTitleLight, locale, "Property ")}
-        titleBold={loc(detail.locationTitleBold, locale, "Location")}
-        brandName={loc(detail.locationBrandName, locale)}
-        mainLead={loc(detail.locationMainLead, locale)}
-        subText={loc(detail.locationSubText, locale)}
-        mapImage={detail.locationMapImage || ""}
-        footerAddress={loc(detail.locationFooterAddress, locale)}
-        googleMapsUrl={detail.locationGoogleMapsUrl}
-        getImageUrl={getImageUrl}
-      />
-
-      <DynamicProjectLayouts categorySlug={detail.categorySlug} fallbackCategorySlug={slug} locale={locale} />
 
       <CallbackForm allowedRoles={['Client']} />
 

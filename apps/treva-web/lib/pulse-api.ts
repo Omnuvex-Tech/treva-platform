@@ -2,7 +2,10 @@ import { Article } from "./pulse.types";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:10021";
 
-export type ArticleBlock =
+/** CMS hər bloka sabit id və görünürlük bayrağı yazır. */
+export type ArticleBlockCommon = { id?: string; isVisible?: boolean };
+
+export type ArticleBlock = ArticleBlockCommon & (
     | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: LocalizedString }
     | { type: "paragraph"; text: LocalizedString }
     | { type: "image"; url: string; alt: LocalizedString; caption?: LocalizedString }
@@ -10,7 +13,8 @@ export type ArticleBlock =
     | { type: "faq"; question: LocalizedString; answer: LocalizedString }
     | { type: "quote"; text: LocalizedString; author?: LocalizedString }
     | { type: "video"; url: string }
-    | { type: "gallery"; images: { url: string; alt: LocalizedString }[] };
+    | { type: "gallery"; images: { url: string; alt: LocalizedString }[] }
+);
 
 export type LocalizedString = string | { az?: string; en?: string; ru?: string };
 
