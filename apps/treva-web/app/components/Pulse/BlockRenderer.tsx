@@ -4,18 +4,7 @@
 import React, { useState } from "react";
 import type { ArticleBlock } from "@/lib/pulse-api";
 import { toAbsUrl, getLocalized } from "@/lib/pulse-api";
-
-/**
- * Paraqraf mətni CMS-dən hazır HTML kimi gəlir və içində şəkil, video, slider ola
- * bilir. Fayllar API host-unda dayanır, ünvanlar isə nisbi saxlanılır — burada
- * bağlanmasa, brauzer onları treva-web domenində axtarar və tapmaz.
- */
-function absolutizeMedia(html: string): string {
-    return html.replace(
-        /(src|href)="(\/uploads\/[^"]*)"/g,
-        (_match, attribute: string, path: string) => `${attribute}="${toAbsUrl(path)}"`,
-    );
-}
+import RichHtml from "@/app/components/RichHtml/RichHtml";
 
 type BlockRendererProps = {
     blocks: ArticleBlock[];
@@ -108,13 +97,11 @@ export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
                         // <div>, <p> deyil: redaktor Tiptap-a keçdi və çıxışı özü <p> ilə
                         // başlayır — <p> içində <p> etibarsız HTML-dir, brauzer onu qırır.
                         return (
-                            <div
+                            <RichHtml
                                 key={index}
                                 className="pulse-paragraph"
                                 style={{ marginBottom: "1rem", lineHeight: 1.7 }}
-                                dangerouslySetInnerHTML={{
-                                    __html: absolutizeMedia(getLocalized(block.text as any, locale)),
-                                }}
+                                html={getLocalized(block.text as any, locale)}
                             />
                         );
 

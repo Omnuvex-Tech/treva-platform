@@ -1,0 +1,54 @@
+/* CMS-dən gələn mətnin içindəki slider üçün naviqasiya. Qutu JS tərəfindən
+   track-in ətrafına salınır, ona görə burada yalnız yerləşdirmə var. */
+.treva-slider-wrap {
+  position: relative;
+}
+
+.treva-slider-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(26, 26, 26, 0.55);
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.treva-slider-nav:hover {
+  background: rgba(26, 26, 26, 0.8);
+}
+
+/* Kənara çatanda düymə görünmür — basmağa bir şey qalmayıb. */
+.treva-slider-nav[disabled] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.treva-slider-nav--prev {
+  left: 10px;
+}
+
+.treva-slider-nav--next {
+  right: 10px;
+}
+
+.treva-slider-nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  /* Telefonda barmaqla sürüşdürmək onsuz da rahatdır. */
+  .treva-slider-nav {
+    display: none;
+  }
+}
