@@ -4,7 +4,6 @@ import React from 'react';
 import type { ResaleApartment } from '@/lib/resale.types';
 import './property-info-cards.css';
 import RequestViewingCard from './RequestViewingCard';
-import RichHtml from '@/app/components/RichHtml/RichHtml';
 
 interface PropertyInfoCardsProps {
   apartment: ResaleApartment;
@@ -32,9 +31,10 @@ export default function PropertyInfoCards({ apartment, mapEmbedUrl, locationTitl
         <h2 className="ap-info-title">About the Apartment</h2>
         
         <div className="ap-about-section">
-          <RichHtml
-            className="ap-about-text"
-            html={apartment.description || 'Situated in one of the city\'s most established and sought-after residential districts, providing a perfect balance of prestige and urban connectivity.'}
+          <p className="ap-about-text"
+            dangerouslySetInnerHTML={{
+              __html: apartment.description || 'Situated in one of the city\'s most established and sought-after residential districts, providing a perfect balance of prestige and urban connectivity.'
+            }}
           />
         </div>
 
