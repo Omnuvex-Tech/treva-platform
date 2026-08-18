@@ -47,7 +47,7 @@ const heroDictionary = {
     location: "Layihələr",
     dealOptions: [
       "Off-Plan",
-      // "Resale",
+      "Resale",
     ],
   },
   en: {
@@ -62,7 +62,7 @@ const heroDictionary = {
     location: "Projects",
     dealOptions: [
       "Off-Plan",
-      // "Resale",
+      "Resale",
     ],
   },
   ru: {
@@ -77,7 +77,7 @@ const heroDictionary = {
     location: "Проекты",
     dealOptions: [
       "Off-Plan",
-      // "Resale",
+      "Resale",
     ],
   },
 } as const;

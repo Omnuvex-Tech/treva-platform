@@ -66,6 +66,79 @@
   text-transform: none;
 }
 
+/* The description is authored HTML, so a quote arrives here as a real
+   <blockquote> and needs the same treatment it gets in the editor. */
+.ap-about-text blockquote {
+  margin: 12px 0;
+  font-style: italic;
+  color: #00000099;
+}
+
+.ap-about-text img,
+.ap-about-text video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+
+/* Slider written by the editor. Snap points carry the sliding, so the strip
+   works on scroll and swipe with no script behind it. */
+.ap-about-text .treva-slider {
+  display: flex;
+  max-width: 100%;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+
+.ap-about-text .treva-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.ap-about-text .treva-slider img {
+  flex: 0 0 92%;
+  width: 92%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: center;
+}
+
+.ap-about-text .treva-slider img:only-child {
+  flex-basis: 100%;
+  width: 100%;
+}
+
+.ap-about-text blockquote > *:first-child::before,
+.ap-about-text blockquote > *:last-child::after {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5em;
+  line-height: 0;
+  vertical-align: -0.12em;
+  color: rgba(0, 0, 0, 0.24);
+}
+
+.ap-about-text blockquote > *:first-child::before {
+  content: "\201C";
+  margin-right: 4px;
+}
+
+.ap-about-text blockquote > *:last-child::after {
+  content: "\201D";
+  margin-left: 3px;
+}
+
+.ap-about-text blockquote p {
+  margin: 0;
+}
+
+.ap-about-text blockquote p + p {
+  margin-top: 8px;
+}
+
 .ap-fade-content {
   opacity: 0.85;
 }

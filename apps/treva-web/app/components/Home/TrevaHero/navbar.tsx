@@ -93,7 +93,7 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
     { name: "LAYİHƏLƏR", href: "/projects" },
     { name: "İNVENTAR", children: [
       { name: "Off-Plan", href: "/off-plan" },
-      // { name: "Resale", href: "/resale" },
+      { name: "Resale", href: "/resale" },
     ]},
     { name: "TƏRƏFDAŞLIQ", children: [
       { name: "Developers", href: "/developers" },
@@ -107,7 +107,7 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
     { name: "PROJECTS", href: "/projects" },
     { name: "INVENTORY", children: [
       { name: "Off-Plan", href: "/off-plan" },
-      // { name: "Resale", href: "/resale" },
+      { name: "Resale", href: "/resale" },
     ]},
     { name: "PARTNERSHIP", children: [
       { name: "Developers", href: "/developers" },
@@ -121,7 +121,7 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
     { name: "ПРОЕКТЫ", href: "/projects" },
     { name: "ИНВЕНТАРЬ", children: [
       { name: "Off-Plan", href: "/off-plan" },
-      // { name: "Resale", href: "/resale" },
+      { name: "Resale", href: "/resale" },
     ]},
     { name: "ПАРТНЁРСТВО", children: [
       { name: "Девелоперы", href: "/developers" },
