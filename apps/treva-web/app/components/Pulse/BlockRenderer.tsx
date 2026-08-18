@@ -5,6 +5,18 @@ import React, { useState } from "react";
 import type { ArticleBlock } from "@/lib/pulse-api";
 import { toAbsUrl, getLocalized } from "@/lib/pulse-api";
 
+/**
+ * Paraqraf mətni CMS-dən hazır HTML kimi gəlir və içində şəkil, video, slider ola
+ * bilir. Fayllar API host-unda dayanır, ünvanlar isə nisbi saxlanılır — burada
+ * bağlanmasa, brauzer onları treva-web domenində axtarar və tapmaz.
+ */
+function absolutizeMedia(html: string): string {
+    return html.replace(
+        /(src|href)="(\/uploads\/[^"]*)"/g,
+        (_match, attribute: string, path: string) => `${attribute}="${toAbsUrl(path)}"`,
+    );
+}
+
 type BlockRendererProps = {
     blocks: ArticleBlock[];
     locale: string;
@@ -100,7 +112,9 @@ export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
                                 key={index}
                                 className="pulse-paragraph"
                                 style={{ marginBottom: "1rem", lineHeight: 1.7 }}
-                                dangerouslySetInnerHTML={{ __html: getLocalized(block.text as any, locale) }}
+                                dangerouslySetInnerHTML={{
+                                    __html: absolutizeMedia(getLocalized(block.text as any, locale)),
+                                }}
                             />
                         );
 
