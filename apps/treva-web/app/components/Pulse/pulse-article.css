@@ -290,3 +290,68 @@
 .pulse-paragraph > p + p {
   margin-top: 1rem;
 }
+
+/* Redaktor artıq paraqrafın içinə şəkil, video və slider da qoya bilir, ona görə
+   onların da qaydası burada olmalıdır — yoxsa şəkil öz təbii ölçüsündə sütundan
+   daşır, slider isə adi şəkil yığınına çevrilir. */
+.pulse-paragraph img,
+.pulse-paragraph video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 12px;
+}
+
+.pulse-paragraph .treva-slider {
+  display: flex;
+  max-width: 100%;
+  gap: 8px;
+  margin: 1rem 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: 12px;
+}
+
+.pulse-paragraph .treva-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.pulse-paragraph .treva-slider img {
+  flex: 0 0 92%;
+  width: 92%;
+  margin: 0;
+  scroll-snap-align: center;
+}
+
+/* Tək şəkilin yanında baxılası bir şey yoxdur, ona görə tam eni tutur. */
+.pulse-paragraph .treva-slider img:only-child {
+  flex-basis: 100%;
+  width: 100%;
+}
+
+/* Yuxarıdakı sıfırlama sitatı adi mətnə çevirir; dırnaqlar onu geri qaytarır. */
+.pulse-paragraph > blockquote {
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.pulse-paragraph > blockquote > *:first-child::before,
+.pulse-paragraph > blockquote > *:last-child::after {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5em;
+  line-height: 0;
+  vertical-align: -0.12em;
+  opacity: 0.4;
+}
+
+.pulse-paragraph > blockquote > *:first-child::before {
+  content: "\201C";
+  margin-right: 4px;
+}
+
+.pulse-paragraph > blockquote > *:last-child::after {
+  content: "\201D";
+  margin-left: 3px;
+}

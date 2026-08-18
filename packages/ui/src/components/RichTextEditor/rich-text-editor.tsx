@@ -471,7 +471,10 @@ export function RichTextEditor({
         editable: !disabled,
         extensions: [
             StarterKit.configure({
-                heading: { levels: [1, 2, 3] },
+                // All six levels are parsed, not just the three the toolbar
+                // offers: a document written elsewhere keeps its deeper headings
+                // instead of silently flattening into paragraphs on the next save.
+                heading: { levels: [1, 2, 3, 4, 5, 6] },
                 link: { openOnClick: false, autolink: true },
             }),
             // Images join the alignment types so a picture can sit left, centred
