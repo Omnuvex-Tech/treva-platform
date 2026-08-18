@@ -8,7 +8,7 @@ import { categoriesApi, type Category } from "../../api/categories";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
-import { FormDropdown, FormKeywordInput } from "@repo/ui";
+import { FormDropdown, FormKeywordInput, RichTextEditor } from "@repo/ui";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { ImageLightbox } from "../../components/ImageLightbox";
 import { IoClose, IoEyeOutline } from "react-icons/io5";
@@ -1441,15 +1441,16 @@ export function HouseForm({
                     {activeTab === "description" && (
                         <div className="space-y-5">
                             <SectionBlock title="Description" description="Long-form listing copy stays in its own quiet editing area.">
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Description (HTML)</label>
-                                    <textarea
-                                        className={`${inputClass} min-h-[240px] resize-y py-3 font-mono`}
-                                        value={form.description || ""}
-                                        onChange={(e) => updateField("description", e.target.value)}
-                                        placeholder="<p>Write HTML description here...</p>"
-                                    />
-                                </div>
+                                <RichTextEditor
+                                    value={form.description || ""}
+                                    onChange={(html) => updateField("description", html)}
+                                    placeholder="Describe the unit layout — highlights, finishes, building…"
+                                    minHeight={280}
+                                    onUploadImage={async (file) => {
+                                        const res = await unitLayoutsApi.uploadFile(file);
+                                        return res.data.url;
+                                    }}
+                                />
                             </SectionBlock>
                         </div>
                     )}

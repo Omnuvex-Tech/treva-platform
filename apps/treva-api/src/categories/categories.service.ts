@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -17,7 +21,10 @@ export class CategoriesService {
     }
 
     return this.prisma.category.create({
-      data: { ...createCategoryDto, documents: createCategoryDto.documents as any },
+      data: {
+        ...createCategoryDto,
+        documents: createCategoryDto.documents as any,
+      },
     });
   }
 
@@ -64,7 +71,10 @@ export class CategoriesService {
         properties: category.propertiesCount,
         reserved: category.reservedCount,
         sold: category.soldCount,
-        available: category.propertiesCount - category.reservedCount - category.soldCount,
+        available:
+          category.propertiesCount -
+          category.reservedCount -
+          category.soldCount,
       },
     }));
   }
@@ -114,7 +124,10 @@ export class CategoriesService {
         properties: category.propertiesCount,
         reserved: category.reservedCount,
         sold: category.soldCount,
-        available: category.propertiesCount - category.reservedCount - category.soldCount,
+        available:
+          category.propertiesCount -
+          category.reservedCount -
+          category.soldCount,
       },
     };
   }
@@ -164,7 +177,10 @@ export class CategoriesService {
         properties: category.propertiesCount,
         reserved: category.reservedCount,
         sold: category.soldCount,
-        available: category.propertiesCount - category.reservedCount - category.soldCount,
+        available:
+          category.propertiesCount -
+          category.reservedCount -
+          category.soldCount,
       },
     };
   }
@@ -190,7 +206,10 @@ export class CategoriesService {
 
     return this.prisma.category.update({
       where: { id },
-      data: { ...updateCategoryDto, documents: updateCategoryDto.documents as any },
+      data: {
+        ...updateCategoryDto,
+        documents: updateCategoryDto.documents as any,
+      },
     });
   }
 

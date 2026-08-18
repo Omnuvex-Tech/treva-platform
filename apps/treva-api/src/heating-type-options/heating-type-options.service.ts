@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHeatingTypeOptionDto } from './dto/create-heating-type-option.dto';
 import { UpdateHeatingTypeOptionDto } from './dto/update-heating-type-option.dto';
@@ -31,7 +35,9 @@ export class HeatingTypeOptionsService {
   }
 
   async findOne(id: string) {
-    const option = await this.prisma.heatingTypeOption.findUnique({ where: { id } });
+    const option = await this.prisma.heatingTypeOption.findUnique({
+      where: { id },
+    });
     if (!option) throw new NotFoundException('Heating type not found');
     return option;
   }

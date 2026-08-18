@@ -84,7 +84,9 @@ export class CreateUnitLayoutDto {
   @IsString()
   seoTitle?: string;
 
-  @ApiPropertyOptional({ example: 'Premium off-plan unit layout with sea-facing facade.' })
+  @ApiPropertyOptional({
+    example: 'Premium off-plan unit layout with sea-facing facade.',
+  })
   @IsOptional()
   @IsString()
   seoDescription?: string;
@@ -94,7 +96,9 @@ export class CreateUnitLayoutDto {
   @IsString()
   seoKeywords?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/projects/sea-breeze-residence' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/projects/sea-breeze-residence',
+  })
   @IsOptional()
   @IsString()
   canonicalUrl?: string;
@@ -104,7 +108,10 @@ export class CreateUnitLayoutDto {
   @IsString()
   seoImage?: string;
 
-  @ApiPropertyOptional({ example: 'available', enum: ['available', 'reserved', 'sold'] })
+  @ApiPropertyOptional({
+    example: 'available',
+    enum: ['available', 'reserved', 'sold'],
+  })
   @IsOptional()
   @IsEnum(['available', 'reserved', 'sold'])
   status?: 'available' | 'reserved' | 'sold';

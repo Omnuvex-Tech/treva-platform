@@ -25,17 +25,21 @@ import { OffPlanObjectsSection } from "./dashboard/OffPlanObjectsSection";
 import { ObjectEditPage } from "./dashboard/ObjectEditPage";
 import { ObjectCreatePage } from "./dashboard/ObjectCreatePage";
 import { MagazineSection } from "./dashboard/MagazineSection";
+import { UsersSection } from "./dashboard/UsersSection";
 
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useAuth } from "../components/AuthProvider";
 
 type MenuKey = "offplan" | "resale" | "magazine"
     | "unitLayouts"
     | "unitTypes"
     | "apartments" | "apartmentTypes" | "owners" | "attributes" | "requests" | "locationOptions"
     | "objects"
+    | "users"
     | "offplanLocationOptions" | "offplanAttributes";
 
 const pageNames: Record<MenuKey, string> = {
+    users: "Users",
     offplan: "Off-plan",
     resale: "Resale",
     magazine: "Magazine",
@@ -53,6 +57,7 @@ const pageNames: Record<MenuKey, string> = {
 };
 
 const pageSubtitles: Record<MenuKey, string> = {
+    users: "Manage users and their project access",
     offplan: "Pre-construction project pipeline",
     resale: "Secondary market listings",
     magazine: "Per-property data catalog",
@@ -108,6 +113,7 @@ const getParentSection = (key: MenuKey): SectionKey | null => {
 };
 
 function getRouteForMenu(key: MenuKey, parent: SectionKey): string {
+    if (key === "users") return "/dashboard/users";
     if (key === "resale") return "/dashboard/resale";
     if (key === "offplan") return "/dashboard/offplan";
     if (key === "magazine") return "/dashboard/magazine";
@@ -141,6 +147,7 @@ function getMenuKeyFromPath(path: string): MenuKey | null {
         ["resale", (value) => value === "/dashboard/resale"],
         ["offplan", (value) => value === "/dashboard/offplan"],
         ["magazine", (value) => value === "/dashboard/magazine"],
+        ["users", (value) => value === "/dashboard/users"],
     ];
 
     return routeMatchers.find(([, matches]) => matches(path))?.[0] ?? null;
@@ -185,8 +192,51 @@ export function Dashboard() {
     const objectId = isEditingObject ? location.pathname.split("/")[4] : null;
     const activeMenu = getMenuKeyFromPath(location.pathname) ?? "resale";
     const [expandedSections, setExpandedSections] = useState<Set<SectionKey>>(new Set());
+    const { canAccess, isSuperAdmin, isLoading: authLoading, profile, logout } = useAuth();
+
+    const activeSection: SectionKey =
+        location.pathname.startsWith("/dashboard/offplan") ? "offplan" :
+        location.pathname.startsWith("/dashboard/resale") ? "resale" :
+        getParentSection(activeMenu) ?? "resale";
+
+    /** Sidebar entries this account may actually open; empty sections drop out. */
+    const visibleSections = useMemo(
+        () =>
+            accordionConfig
+                .map((section) => ({
+                    ...section,
+                    children: section.children.filter((item) => canAccess(section.key, item.key)),
+                }))
+                .filter((section) => section.children.length > 0),
+        [canAccess],
+    );
+
+    const firstAllowedRoute = useMemo(() => {
+        const section = visibleSections[0];
+        const child = section?.children[0];
+
+        if (section && child) return getRouteForMenu(child.key, section.key);
+        if (isSuperAdmin) return "/dashboard/users";
+
+        return null;
+    }, [visibleSections, isSuperAdmin]);
+
+    // Permissions are enforced server-side too; this only keeps the UI honest
+    // when someone types a URL for a menu they were not granted.
+    useEffect(() => {
+        if (authLoading || !profile) return;
+
+        const allowed = activeMenu === "users" ? isSuperAdmin : canAccess(activeSection, activeMenu);
+        if (allowed) return;
+
+        if (firstAllowedRoute && location.pathname !== firstAllowedRoute) {
+            navigate(firstAllowedRoute, { replace: true });
+        }
+    }, [authLoading, profile, activeMenu, activeSection, canAccess, isSuperAdmin, firstAllowedRoute, location.pathname, navigate]);
 
     useEffect(() => {
+        if (activeMenu === "users") return;
+
         const parent =
             location.pathname.startsWith("/dashboard/resale") ? "resale" :
             location.pathname.startsWith("/dashboard/offplan") ? "offplan" :
@@ -215,7 +265,7 @@ export function Dashboard() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
+        logout();
         navigate("/login");
     };
 
@@ -600,7 +650,7 @@ export function Dashboard() {
                 
                 <nav className="flex w-full flex-1 flex-col pt-6">
                     {/* Accordion sections */}
-                    {accordionConfig.map((section) => {
+                    {visibleSections.map((section) => {
                         const isOpen = expandedSections.has(section.key);
                         return (
                             <div key={section.key} className="mb-1">
@@ -650,6 +700,26 @@ export function Dashboard() {
                             </div>
                         );
                     })}
+
+                    {isSuperAdmin ? (
+                        <button
+                            type="button"
+                            onClick={() => navigate("/dashboard/users")}
+                            className="mb-1 flex h-10 w-full items-center gap-3 rounded-xl px-4 text-[13px] font-medium transition-colors cursor-pointer"
+                            style={{
+                                background: activeMenu === "users" ? "#4C525E" : "transparent",
+                                color: activeMenu === "users" ? "#FFFFFF" : "#808191",
+                            }}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                            <span className="flex-1 text-left">Users</span>
+                        </button>
+                    ) : null}
 
                     <div className="mt-auto pb-4 pt-6">
                         <div className="mb-4 h-px w-full bg-[#EBEBEB]" />
@@ -1167,6 +1237,20 @@ export function Dashboard() {
                 {activeMenu === "attributes" && <AttributesSection />}
                 {activeMenu === "requests" && <RequestsSection />}
                 {activeMenu === "magazine" && <MagazineSection />}
+                {activeMenu === "users" && isSuperAdmin && <UsersSection />}
+
+                {!authLoading && profile && !isSuperAdmin && visibleSections.length === 0 ? (
+                    <main className="flex flex-1 items-center justify-center p-8">
+                        <div className="max-w-md text-center">
+                            <h3 className="mb-2 text-[#1A1A1A]" style={{ fontWeight: 600, fontSize: 18 }}>
+                                No project access
+                            </h3>
+                            <p className="m-0 text-sm text-[#666666]">
+                                Your account has not been granted access to any project yet. Please contact an administrator.
+                            </p>
+                        </div>
+                    </main>
+                ) : null}
             </div>
         </div>
     );

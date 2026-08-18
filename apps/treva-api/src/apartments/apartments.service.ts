@@ -1,6 +1,14 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateApartmentDto, MAX_RESALE_FLOOR } from './dto/create-apartment.dto';
+import {
+  CreateApartmentDto,
+  MAX_RESALE_FLOOR,
+} from './dto/create-apartment.dto';
 import { UpdateApartmentDto } from './dto/update-apartment.dto';
 
 const APARTMENT_INCLUDE = {
@@ -48,19 +56,25 @@ export class ApartmentsService {
   private async attachOptionRelations<T extends { heatingTypeIds: string[] }>(
     apartments: T[],
   ) {
-    const heatingTypeIds = [...new Set(apartments.flatMap((apartment) => apartment.heatingTypeIds || []))];
+    const heatingTypeIds = [
+      ...new Set(
+        apartments.flatMap((apartment) => apartment.heatingTypeIds || []),
+      ),
+    ];
 
-    const heatingTypes = await (
-      heatingTypeIds.length > 0
-        ? this.prisma.heatingTypeOption.findMany({ where: { id: { in: heatingTypeIds } } })
-        : Promise.resolve([])
-    );
+    const heatingTypes = await (heatingTypeIds.length > 0
+      ? this.prisma.heatingTypeOption.findMany({
+          where: { id: { in: heatingTypeIds } },
+        })
+      : Promise.resolve([]));
 
     const heatingTypeMap = new Map(heatingTypes.map((item) => [item.id, item]));
 
     return apartments.map((apartment) => ({
       ...apartment,
-      heatingTypes: (apartment.heatingTypeIds || []).map((id) => heatingTypeMap.get(id)).filter(isDefined),
+      heatingTypes: (apartment.heatingTypeIds || [])
+        .map((id) => heatingTypeMap.get(id))
+        .filter(isDefined),
     }));
   }
 
@@ -71,17 +85,29 @@ export class ApartmentsService {
     });
   }
 
-  private async resolveCurrencyId(currencyValue?: string): Promise<string | undefined> {
+  private async resolveCurrencyId(
+    currencyValue?: string,
+  ): Promise<string | undefined> {
     if (!currencyValue) return undefined;
-    const currency = await this.prisma.currency.findUnique({ where: { value: currencyValue } });
+    const currency = await this.prisma.currency.findUnique({
+      where: { value: currencyValue },
+    });
     return currency?.id;
   }
 
-  private buildPricesWhere(minPrice?: number, maxPrice?: number, currencyId?: string) {
+  private buildPricesWhere(
+    minPrice?: number,
+    maxPrice?: number,
+    currencyId?: string,
+  ) {
     if (!minPrice && !maxPrice && !currencyId) return undefined;
     const priceFilter: any = {};
     if (minPrice) priceFilter.priceTotal = { gte: minPrice };
-    if (maxPrice) priceFilter.priceTotal = { ...(priceFilter.priceTotal || {}), lte: maxPrice };
+    if (maxPrice)
+      priceFilter.priceTotal = {
+        ...(priceFilter.priceTotal || {}),
+        lte: maxPrice,
+      };
     if (currencyId) priceFilter.currencyId = currencyId;
     return { some: priceFilter };
   }
@@ -89,10 +115,14 @@ export class ApartmentsService {
   private validateFloorRange(floorFrom?: number, floorTo?: number) {
     if (floorFrom === undefined || floorTo === undefined) return;
     if (!isValidResaleFloor(floorFrom) || !isValidResaleFloor(floorTo)) {
-      throw new BadRequestException(`Floor must be between 1 and ${MAX_RESALE_FLOOR}`);
+      throw new BadRequestException(
+        `Floor must be between 1 and ${MAX_RESALE_FLOOR}`,
+      );
     }
     if (floorFrom > floorTo) {
-      throw new BadRequestException('Floor cannot be greater than number of floors');
+      throw new BadRequestException(
+        'Floor cannot be greater than number of floors',
+      );
     }
   }
 
@@ -153,7 +183,28 @@ export class ApartmentsService {
     status?: string;
     archived?: boolean;
   }) {
-    const { page = 1, limit = 12, apartmentTypeId, city, region, purpose, mortgage, extract, ownerId, minPrice, maxPrice, roomCount, minArea, maxArea, minGrossArea, maxGrossArea, floor, currency, status, archived } = query;
+    const {
+      page = 1,
+      limit = 12,
+      apartmentTypeId,
+      city,
+      region,
+      purpose,
+      mortgage,
+      extract,
+      ownerId,
+      minPrice,
+      maxPrice,
+      roomCount,
+      minArea,
+      maxArea,
+      minGrossArea,
+      maxGrossArea,
+      floor,
+      currency,
+      status,
+      archived,
+    } = query;
     const skip = (page - 1) * limit;
 
     const resolvedCurrencyId = await this.resolveCurrencyId(currency);
@@ -168,7 +219,11 @@ export class ApartmentsService {
     if (ownerId) where.ownerId = ownerId;
     if (roomCount) where.roomCount = roomCount;
 
-    const pricesWhere = this.buildPricesWhere(minPrice, maxPrice, resolvedCurrencyId);
+    const pricesWhere = this.buildPricesWhere(
+      minPrice,
+      maxPrice,
+      resolvedCurrencyId,
+    );
     if (pricesWhere) where.prices = pricesWhere;
 
     if (minArea || maxArea) {
@@ -200,17 +255,23 @@ export class ApartmentsService {
     ]);
 
     const allAttrIds = [...new Set(data.flatMap((a) => a.attributeIds))];
-    const allAttributes = allAttrIds.length > 0
-      ? await this.prisma.attribute.findMany({ where: { id: { in: allAttrIds } } })
-      : [];
+    const allAttributes =
+      allAttrIds.length > 0
+        ? await this.prisma.attribute.findMany({
+            where: { id: { in: allAttrIds } },
+          })
+        : [];
     const attrMap = new Map(allAttributes.map((a) => [a.id, a]));
 
     const dataWithAttributes = data.map((apartment) => ({
       ...apartment,
-      attributes: apartment.attributeIds.map((id) => attrMap.get(id)).filter(Boolean),
+      attributes: apartment.attributeIds
+        .map((id) => attrMap.get(id))
+        .filter(Boolean),
     }));
 
-    const dataWithOptions = await this.attachOptionRelations(dataWithAttributes);
+    const dataWithOptions =
+      await this.attachOptionRelations(dataWithAttributes);
 
     return {
       data: dataWithOptions,
@@ -230,7 +291,9 @@ export class ApartmentsService {
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
-    const [apartmentWithOptions] = await this.attachOptionRelations([{ ...apartment, attributes }]);
+    const [apartmentWithOptions] = await this.attachOptionRelations([
+      { ...apartment, attributes },
+    ]);
     return apartmentWithOptions;
   }
 
@@ -240,9 +303,12 @@ export class ApartmentsService {
       include: APARTMENT_INCLUDE,
     });
     if (!apartment) throw new NotFoundException('Apartment not found');
-    if ((apartment as any).archived) throw new NotFoundException('Apartment not found');
+    if ((apartment as any).archived)
+      throw new NotFoundException('Apartment not found');
     const attributes = await this.resolveAttributes(apartment.attributeIds);
-    const [apartmentWithOptions] = await this.attachOptionRelations([{ ...apartment, attributes }]);
+    const [apartmentWithOptions] = await this.attachOptionRelations([
+      { ...apartment, attributes },
+    ]);
     return apartmentWithOptions;
   }
 
@@ -252,17 +318,25 @@ export class ApartmentsService {
 
     const normalizedDto = this.normalizeApartmentDto(dto);
 
-    this.validateFloorRange(normalizedDto.floorFrom ?? apartment.floorFrom, normalizedDto.floorTo ?? apartment.floorTo);
+    this.validateFloorRange(
+      normalizedDto.floorFrom ?? apartment.floorFrom,
+      normalizedDto.floorTo ?? apartment.floorTo,
+    );
 
     if (normalizedDto.slug && normalizedDto.slug !== apartment.slug) {
-      const existing = await this.prisma.apartment.findUnique({ where: { slug: normalizedDto.slug } });
-      if (existing) throw new ConflictException('Apartment with this slug already exists');
+      const existing = await this.prisma.apartment.findUnique({
+        where: { slug: normalizedDto.slug },
+      });
+      if (existing)
+        throw new ConflictException('Apartment with this slug already exists');
     }
 
     const { prices, ...apartmentData } = normalizedDto;
 
     if (prices) {
-      await this.prisma.apartmentPrice.deleteMany({ where: { apartmentId: id } });
+      await this.prisma.apartmentPrice.deleteMany({
+        where: { apartmentId: id },
+      });
       if (prices.length > 0) {
         await this.prisma.apartmentPrice.createMany({
           data: prices.map((p) => ({
@@ -305,7 +379,7 @@ export class ApartmentsService {
       where: {
         ...(Object.keys(priceWhere).length > 0 ? priceWhere : {}),
         ...apartmentRelationFilter,
-      } as any,
+      },
       _max: { priceTotal: true },
       _min: { priceTotal: true },
     });
@@ -345,7 +419,10 @@ export class ApartmentsService {
       }
 
       const start = Math.max(1, Math.floor(Math.min(from || to, to || from)));
-      const end = Math.min(MAX_RESALE_FLOOR, Math.max(start, Math.floor(Math.max(from || to, to || from))));
+      const end = Math.min(
+        MAX_RESALE_FLOOR,
+        Math.max(start, Math.floor(Math.max(from || to, to || from))),
+      );
 
       for (let floor = start; floor <= end; floor += 1) floors.add(floor);
     }
@@ -371,5 +448,4 @@ export class ApartmentsService {
 
     return [...rooms].sort((a, b) => a - b);
   }
-
 }

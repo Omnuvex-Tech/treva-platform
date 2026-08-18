@@ -1,5 +1,19 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ApartmentTypesService } from './apartment-types.service';
 import { CreateApartmentTypeDto } from './dto/create-apartment-type.dto';
 import { UpdateApartmentTypeDto } from './dto/update-apartment-type.dto';

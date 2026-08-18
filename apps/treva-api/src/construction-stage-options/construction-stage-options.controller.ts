@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ConstructionStageOptionsService } from './construction-stage-options.service';
 import { CreateConstructionStageOptionDto } from './dto/create-construction-stage-option.dto';
 import { UpdateConstructionStageOptionDto } from './dto/update-construction-stage-option.dto';
@@ -34,7 +43,10 @@ export class ConstructionStageOptionsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a construction stage option' })
-  update(@Param('id') id: string, @Body() updateDto: UpdateConstructionStageOptionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateConstructionStageOptionDto,
+  ) {
     return this.service.update(id, updateDto);
   }
 

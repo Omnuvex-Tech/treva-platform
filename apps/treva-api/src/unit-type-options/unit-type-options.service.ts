@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUnitTypeOptionDto } from './dto/create-unit-type-option.dto';
 import { UpdateUnitTypeOptionDto } from './dto/update-unit-type-option.dto';
@@ -13,7 +17,9 @@ export class UnitTypeOptionsService {
     });
 
     if (existing) {
-      throw new ConflictException('Unit type option with this name already exists');
+      throw new ConflictException(
+        'Unit type option with this name already exists',
+      );
     }
 
     return this.prisma.unitTypeOption.create({
@@ -26,7 +32,9 @@ export class UnitTypeOptionsService {
   }
 
   async findOne(id: string) {
-    const option = await this.prisma.unitTypeOption.findUnique({ where: { id } });
+    const option = await this.prisma.unitTypeOption.findUnique({
+      where: { id },
+    });
     if (!option) throw new NotFoundException('Unit type option not found');
     return option;
   }

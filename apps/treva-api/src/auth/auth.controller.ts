@@ -34,7 +34,9 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get admin profile' })
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
-  async getProfile(@Request() req: { user: { id: string; email: string } }) {
+  async getProfile(
+    @Request() req: { user: { id: string; email: string; role?: string } },
+  ) {
     return this.authService.getProfile(req.user.id);
   }
 }

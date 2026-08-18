@@ -31,7 +31,7 @@ export default function PropertyInfoCards({ apartment, mapEmbedUrl, locationTitl
         <h2 className="ap-info-title">About the Apartment</h2>
         
         <div className="ap-about-section">
-          <p className="ap-about-text"
+          <div className="ap-about-text"
             dangerouslySetInnerHTML={{
               __html: apartment.description || 'Situated in one of the city\'s most established and sought-after residential districts, providing a perfect balance of prestige and urban connectivity.'
             }}

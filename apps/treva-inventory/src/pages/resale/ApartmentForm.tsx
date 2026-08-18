@@ -12,7 +12,7 @@ import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { IoClose } from "react-icons/io5";
-import { FormKeywordInput } from "@repo/ui";
+import { FormKeywordInput, RichTextEditor } from "@repo/ui";
 
 type TabKey = "basic" | "area" | "location" | "gallery" | "description" | "seo";
 
@@ -1588,15 +1588,16 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 {activeTab === "description" && (
                     <div className="space-y-5">
                         <SectionBlock title="Description" description="Long-form listing copy stays in its own quiet editing area.">
-                            <div>
-                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Description (HTML)</label>
-                                <textarea
-                                    className={`${inputClass} min-h-[240px] resize-y py-3 font-mono`}
-                                    value={form.description || ""}
-                                    onChange={(e) => updateField("description", e.target.value)}
-                                    placeholder="<p>Write HTML description here...</p>"
-                                />
-                            </div>
+                            <RichTextEditor
+                                value={form.description || ""}
+                                onChange={(html) => updateField("description", html)}
+                                placeholder="Describe the listing — highlights, layout, neighbourhood…"
+                                minHeight={280}
+                                onUploadImage={async (file) => {
+                                    const res = await apartmentsApi.uploadFile(file);
+                                    return res.data.url;
+                                }}
+                            />
                         </SectionBlock>
                     </div>
                 )}

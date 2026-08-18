@@ -7,4 +7,3 @@ import { UnitTypeOptionsService } from './unit-type-options.service';
   providers: [UnitTypeOptionsService],
 })
 export class UnitTypeOptionsModule {}
-

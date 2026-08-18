@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateLocationOptionDto } from './dto/create-location-option.dto';
@@ -8,7 +18,9 @@ import { LocationOptionsService } from './location-options.service';
 @ApiTags('location-options')
 @Controller('location-options')
 export class LocationOptionsController {
-  constructor(private readonly locationOptionsService: LocationOptionsService) {}
+  constructor(
+    private readonly locationOptionsService: LocationOptionsService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateConstructionStageOptionDto } from './dto/create-construction-stage-option.dto';
 import { UpdateConstructionStageOptionDto } from './dto/update-construction-stage-option.dto';
@@ -12,7 +16,9 @@ export class ConstructionStageOptionsService {
       where: { value: createDto.value },
     });
     if (existing) {
-      throw new ConflictException('Construction stage option with this value already exists');
+      throw new ConflictException(
+        'Construction stage option with this value already exists',
+      );
     }
     return this.prisma.constructionStageOption.create({
       data: { value: createDto.value },
@@ -20,12 +26,17 @@ export class ConstructionStageOptionsService {
   }
 
   async findAll() {
-    return this.prisma.constructionStageOption.findMany({ orderBy: { value: 'asc' } });
+    return this.prisma.constructionStageOption.findMany({
+      orderBy: { value: 'asc' },
+    });
   }
 
   async findOne(id: string) {
-    const option = await this.prisma.constructionStageOption.findUnique({ where: { id } });
-    if (!option) throw new NotFoundException('Construction stage option not found');
+    const option = await this.prisma.constructionStageOption.findUnique({
+      where: { id },
+    });
+    if (!option)
+      throw new NotFoundException('Construction stage option not found');
     return option;
   }
 
@@ -36,7 +47,9 @@ export class ConstructionStageOptionsService {
         where: { value: updateDto.value, NOT: { id } },
       });
       if (existing) {
-        throw new ConflictException('Another construction stage option has this value');
+        throw new ConflictException(
+          'Another construction stage option has this value',
+        );
       }
     }
     return this.prisma.constructionStageOption.update({

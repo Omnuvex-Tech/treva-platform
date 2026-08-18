@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStatusOptionDto } from './dto/create-status-option.dto';
 import { UpdateStatusOptionDto } from './dto/update-status-option.dto';
@@ -12,7 +16,9 @@ export class StatusOptionsService {
       where: { value: createDto.value },
     });
     if (existing) {
-      throw new ConflictException('Status option with this value already exists');
+      throw new ConflictException(
+        'Status option with this value already exists',
+      );
     }
     return this.prisma.statusOption.create({
       data: { value: createDto.value },

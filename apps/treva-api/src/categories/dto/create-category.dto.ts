@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsBoolean, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsBoolean,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -100,7 +108,9 @@ export class CreateCategoryDto {
   @IsString()
   city?: string;
 
-  @ApiPropertyOptional({ example: 'Baku city, Murtuza Mukhtarov str, house 31' })
+  @ApiPropertyOptional({
+    example: 'Baku city, Murtuza Mukhtarov str, house 31',
+  })
   @IsOptional()
   @IsString()
   locationTitle?: string;

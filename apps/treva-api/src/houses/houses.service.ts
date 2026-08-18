@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHouseDto } from './dto/create-house.dto';
 import { UpdateHouseDto } from './dto/update-house.dto';
@@ -8,12 +12,19 @@ export class HousesService {
   constructor(private prisma: PrismaService) {}
 
   private async syncCategoryMetrics(categoryId: string) {
-    const [housesCount, propertiesCount, reservedCount, soldCount] = await Promise.all([
-      this.prisma.house.count({ where: { categoryId, archived: false } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'reserved' } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'sold' } }),
-    ]);
+    const [housesCount, propertiesCount, reservedCount, soldCount] =
+      await Promise.all([
+        this.prisma.house.count({ where: { categoryId, archived: false } }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false },
+        }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false, status: 'reserved' },
+        }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false, status: 'sold' },
+        }),
+      ]);
 
     await this.prisma.category.update({
       where: { id: categoryId },
@@ -150,7 +161,9 @@ export class HousesService {
               mainImage: true,
               prices: true,
               categoryId: true,
-              category: { select: { id: true, title: true, name: true, slug: true } },
+              category: {
+                select: { id: true, title: true, name: true, slug: true },
+              },
               _count: { select: { unitLayouts: true } },
             },
           })
@@ -236,45 +249,71 @@ export class HousesService {
     if (updateDto.name !== undefined) data.name = updateDto.name;
     if (updateDto.slug !== undefined) data.slug = updateDto.slug;
     if (updateDto.seoTitle !== undefined) data.seoTitle = updateDto.seoTitle;
-    if (updateDto.seoDescription !== undefined) data.seoDescription = updateDto.seoDescription;
-    if (updateDto.seoKeywords !== undefined) data.seoKeywords = updateDto.seoKeywords;
-    if (updateDto.canonicalUrl !== undefined) data.canonicalUrl = updateDto.canonicalUrl;
+    if (updateDto.seoDescription !== undefined)
+      data.seoDescription = updateDto.seoDescription;
+    if (updateDto.seoKeywords !== undefined)
+      data.seoKeywords = updateDto.seoKeywords;
+    if (updateDto.canonicalUrl !== undefined)
+      data.canonicalUrl = updateDto.canonicalUrl;
     if (updateDto.seoImage !== undefined) data.seoImage = updateDto.seoImage;
     if (updateDto.status !== undefined) data.status = updateDto.status;
     if (updateDto.archived !== undefined) data.archived = updateDto.archived;
-    if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
+    if (updateDto.categoryId !== undefined)
+      data.categoryId = updateDto.categoryId;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
-    if (updateDto.internalArea !== undefined) data.internalArea = updateDto.internalArea;
-    if (updateDto.balconyArea !== undefined) data.balconyArea = updateDto.balconyArea;
+    if (updateDto.internalArea !== undefined)
+      data.internalArea = updateDto.internalArea;
+    if (updateDto.balconyArea !== undefined)
+      data.balconyArea = updateDto.balconyArea;
     if (updateDto.prices !== undefined) data.prices = updateDto.prices;
-    if (updateDto.completionYear !== undefined) data.completionYear = updateDto.completionYear;
-    if (updateDto.numberOfFloors !== undefined) data.numberOfFloors = updateDto.numberOfFloors;
-    if (updateDto.similarApartmentIds !== undefined) data.similarApartmentIds = updateDto.similarApartmentIds;
+    if (updateDto.completionYear !== undefined)
+      data.completionYear = updateDto.completionYear;
+    if (updateDto.numberOfFloors !== undefined)
+      data.numberOfFloors = updateDto.numberOfFloors;
+    if (updateDto.similarApartmentIds !== undefined)
+      data.similarApartmentIds = updateDto.similarApartmentIds;
     if (updateDto.mainImage !== undefined) data.mainImage = updateDto.mainImage;
-    if (updateDto.coverImage !== undefined) data.coverImage = updateDto.coverImage;
+    if (updateDto.coverImage !== undefined)
+      data.coverImage = updateDto.coverImage;
     if (updateDto.gallery !== undefined) data.gallery = updateDto.gallery;
     if (updateDto.documents !== undefined) data.documents = updateDto.documents;
     if (updateDto.location !== undefined) data.location = updateDto.location;
-    if (updateDto.typeOfBuilding !== undefined) data.typeOfBuilding = updateDto.typeOfBuilding;
-    if (updateDto.constructionStage !== undefined) data.constructionStage = updateDto.constructionStage;
-    if (updateDto.description !== undefined) data.description = updateDto.description;
+    if (updateDto.typeOfBuilding !== undefined)
+      data.typeOfBuilding = updateDto.typeOfBuilding;
+    if (updateDto.constructionStage !== undefined)
+      data.constructionStage = updateDto.constructionStage;
+    if (updateDto.description !== undefined)
+      data.description = updateDto.description;
     if (updateDto.ownerId !== undefined) data.ownerId = updateDto.ownerId;
-    if (updateDto.heatingTypeIds !== undefined) data.heatingTypeIds = updateDto.heatingTypeIds;
-    if (updateDto.attributeIds !== undefined) data.attributeIds = updateDto.attributeIds;
-    if (updateDto.locationTitle !== undefined) data.locationTitle = updateDto.locationTitle;
-    if (updateDto.locationUrl !== undefined) data.locationUrl = updateDto.locationUrl;
-    if (updateDto.locationGoogleMapsUrl !== undefined) data.locationGoogleMapsUrl = updateDto.locationGoogleMapsUrl;
+    if (updateDto.heatingTypeIds !== undefined)
+      data.heatingTypeIds = updateDto.heatingTypeIds;
+    if (updateDto.attributeIds !== undefined)
+      data.attributeIds = updateDto.attributeIds;
+    if (updateDto.locationTitle !== undefined)
+      data.locationTitle = updateDto.locationTitle;
+    if (updateDto.locationUrl !== undefined)
+      data.locationUrl = updateDto.locationUrl;
+    if (updateDto.locationGoogleMapsUrl !== undefined)
+      data.locationGoogleMapsUrl = updateDto.locationGoogleMapsUrl;
     if (updateDto.street !== undefined) data.street = updateDto.street;
-    if (updateDto.houseNumber !== undefined) data.houseNumber = updateDto.houseNumber;
-    if (updateDto.deadlineForCommissioning !== undefined) data.deadlineForCommissioning = updateDto.deadlineForCommissioning;
-    if (updateDto.salesOffice !== undefined) data.salesOffice = updateDto.salesOffice;
-    if (updateDto.landCadastralNumber !== undefined) data.landCadastralNumber = updateDto.landCadastralNumber;
-    if (updateDto.contractAddress !== undefined) data.contractAddress = updateDto.contractAddress;
-    if (updateDto.secondContractAddress !== undefined) data.secondContractAddress = updateDto.secondContractAddress;
-    if (updateDto.showroomAvailability !== undefined) data.showroomAvailability = updateDto.showroomAvailability;
-    if (updateDto.secondShowroomAvailability !== undefined) data.secondShowroomAvailability = updateDto.secondShowroomAvailability;
+    if (updateDto.houseNumber !== undefined)
+      data.houseNumber = updateDto.houseNumber;
+    if (updateDto.deadlineForCommissioning !== undefined)
+      data.deadlineForCommissioning = updateDto.deadlineForCommissioning;
+    if (updateDto.salesOffice !== undefined)
+      data.salesOffice = updateDto.salesOffice;
+    if (updateDto.landCadastralNumber !== undefined)
+      data.landCadastralNumber = updateDto.landCadastralNumber;
+    if (updateDto.contractAddress !== undefined)
+      data.contractAddress = updateDto.contractAddress;
+    if (updateDto.secondContractAddress !== undefined)
+      data.secondContractAddress = updateDto.secondContractAddress;
+    if (updateDto.showroomAvailability !== undefined)
+      data.showroomAvailability = updateDto.showroomAvailability;
+    if (updateDto.secondShowroomAvailability !== undefined)
+      data.secondShowroomAvailability = updateDto.secondShowroomAvailability;
 
     const house = await this.prisma.house.update({
       where: { id },
@@ -314,9 +353,13 @@ export class HousesService {
 
   async countByStatus() {
     const [available, sold, reserved] = await Promise.all([
-      this.prisma.house.count({ where: { status: 'available', archived: false } }),
+      this.prisma.house.count({
+        where: { status: 'available', archived: false },
+      }),
       this.prisma.house.count({ where: { status: 'sold', archived: false } }),
-      this.prisma.house.count({ where: { status: 'reserved', archived: false } }),
+      this.prisma.house.count({
+        where: { status: 'reserved', archived: false },
+      }),
     ]);
 
     return { available, sold, reserved, total: available + sold + reserved };

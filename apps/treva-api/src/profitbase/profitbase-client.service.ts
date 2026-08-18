@@ -14,7 +14,11 @@ export interface ProfitbaseHouse {
   maxFloor: number | null;
   commissioningDate: string | null;
   currency: { code: string } | null;
-  address: { full: string | null; street: string | null; number: string | null } | null;
+  address: {
+    full: string | null;
+    street: string | null;
+    number: string | null;
+  } | null;
   contractAddress: string | null;
   minPrice: number | null;
   minPriceArea: number | null;
@@ -81,7 +85,10 @@ export class ProfitbaseClientService {
     return token;
   }
 
-  private async request<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
+  private async request<T>(
+    path: string,
+    params: Record<string, string | number> = {},
+  ): Promise<T> {
     const url = new URL(`${this.baseUrl}/${path}`);
     url.searchParams.set('access_token', this.accessToken);
     for (const [key, value] of Object.entries(params)) {
@@ -90,7 +97,9 @@ export class ProfitbaseClientService {
 
     const res = await fetch(url.toString());
     if (!res.ok) {
-      throw new Error(`Profitbase request to "${path}" failed with status ${res.status}`);
+      throw new Error(
+        `Profitbase request to "${path}" failed with status ${res.status}`,
+      );
     }
     return (await res.json()) as T;
   }
@@ -110,10 +119,13 @@ export class ProfitbaseClientService {
     let offset = 0;
 
     while (true) {
-      const res = await this.request<{ data: ProfitbaseProperty[] }>('property', {
-        limit: PROPERTY_PAGE_SIZE,
-        offset,
-      });
+      const res = await this.request<{ data: ProfitbaseProperty[] }>(
+        'property',
+        {
+          limit: PROPERTY_PAGE_SIZE,
+          offset,
+        },
+      );
       if (!res.data.length) break;
       all.push(...res.data);
       if (res.data.length < PROPERTY_PAGE_SIZE) break;

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUnitLayoutDto } from './dto/create-unit-layout.dto';
 import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
@@ -8,12 +12,19 @@ export class UnitLayoutsService {
   constructor(private prisma: PrismaService) {}
 
   private async syncCategoryMetrics(categoryId: string) {
-    const [housesCount, propertiesCount, reservedCount, soldCount] = await Promise.all([
-      this.prisma.house.count({ where: { categoryId, archived: false } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'reserved' } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'sold' } }),
-    ]);
+    const [housesCount, propertiesCount, reservedCount, soldCount] =
+      await Promise.all([
+        this.prisma.house.count({ where: { categoryId, archived: false } }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false },
+        }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false, status: 'reserved' },
+        }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false, status: 'sold' },
+        }),
+      ]);
 
     await this.prisma.category.update({
       where: { id: categoryId },
@@ -77,7 +88,7 @@ export class UnitLayoutsService {
     limit?: number;
     categoryId?: string;
     categorySlug?: string;
-      status?: 'available' | 'reserved' | 'sold';
+    status?: 'available' | 'reserved' | 'sold';
     statusOptionId?: string;
     search?: string;
     minPrice?: number;
@@ -265,10 +276,13 @@ export class UnitLayoutsService {
     }
 
     let similarApartments: any[] = [];
-    if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
+    if (
+      unitLayout.similarApartmentIds &&
+      unitLayout.similarApartmentIds.length > 0
+    ) {
       similarApartments = await this.prisma.unitLayout.findMany({
         where: { id: { in: unitLayout.similarApartmentIds } },
-      include: { category: true, house: true },
+        include: { category: true, house: true },
       });
     }
 
@@ -286,10 +300,13 @@ export class UnitLayoutsService {
     }
 
     let similarApartments: any[] = [];
-    if (unitLayout.similarApartmentIds && unitLayout.similarApartmentIds.length > 0) {
+    if (
+      unitLayout.similarApartmentIds &&
+      unitLayout.similarApartmentIds.length > 0
+    ) {
       similarApartments = await this.prisma.unitLayout.findMany({
         where: { id: { in: unitLayout.similarApartmentIds } },
-      include: { category: true, house: true },
+        include: { category: true, house: true },
       });
     }
 
@@ -310,7 +327,9 @@ export class UnitLayoutsService {
         where: { slug: updateDto.slug },
       });
       if (slugExists) {
-        throw new ConflictException('Unit layout with this slug already exists');
+        throw new ConflictException(
+          'Unit layout with this slug already exists',
+        );
       }
     }
 
@@ -319,35 +338,52 @@ export class UnitLayoutsService {
     if (updateDto.name !== undefined) data.name = updateDto.name;
     if (updateDto.slug !== undefined) data.slug = updateDto.slug;
     if (updateDto.seoTitle !== undefined) data.seoTitle = updateDto.seoTitle;
-    if (updateDto.seoDescription !== undefined) data.seoDescription = updateDto.seoDescription;
-    if (updateDto.seoKeywords !== undefined) data.seoKeywords = updateDto.seoKeywords;
-    if (updateDto.canonicalUrl !== undefined) data.canonicalUrl = updateDto.canonicalUrl;
+    if (updateDto.seoDescription !== undefined)
+      data.seoDescription = updateDto.seoDescription;
+    if (updateDto.seoKeywords !== undefined)
+      data.seoKeywords = updateDto.seoKeywords;
+    if (updateDto.canonicalUrl !== undefined)
+      data.canonicalUrl = updateDto.canonicalUrl;
     if (updateDto.seoImage !== undefined) data.seoImage = updateDto.seoImage;
     if (updateDto.status !== undefined) data.status = updateDto.status;
     if (updateDto.archived !== undefined) data.archived = updateDto.archived;
-    if (updateDto.categoryId !== undefined) data.categoryId = updateDto.categoryId;
+    if (updateDto.categoryId !== undefined)
+      data.categoryId = updateDto.categoryId;
     if (updateDto.houseId !== undefined) data.houseId = updateDto.houseId;
-    if (updateDto.unitTypeOptionId !== undefined) data.unitTypeOptionId = updateDto.unitTypeOptionId;
-    if (updateDto.realEstateType !== undefined) data.realEstateType = updateDto.realEstateType;
+    if (updateDto.unitTypeOptionId !== undefined)
+      data.unitTypeOptionId = updateDto.unitTypeOptionId;
+    if (updateDto.realEstateType !== undefined)
+      data.realEstateType = updateDto.realEstateType;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
     if (updateDto.number !== undefined) data.number = updateDto.number;
     if (updateDto.entrance !== undefined) data.entrance = updateDto.entrance;
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
-    if (updateDto.internalArea !== undefined) data.internalArea = updateDto.internalArea;
-    if (updateDto.balconyArea !== undefined) data.balconyArea = updateDto.balconyArea;
+    if (updateDto.internalArea !== undefined)
+      data.internalArea = updateDto.internalArea;
+    if (updateDto.balconyArea !== undefined)
+      data.balconyArea = updateDto.balconyArea;
     if (updateDto.prices !== undefined) data.prices = updateDto.prices;
-    if (updateDto.completionYear !== undefined) data.completionYear = updateDto.completionYear;
-    if (updateDto.numberOfFloors) data.numberOfFloors = updateDto.numberOfFloors;
-    if (updateDto.similarApartmentIds) data.similarApartmentIds = updateDto.similarApartmentIds;
+    if (updateDto.completionYear !== undefined)
+      data.completionYear = updateDto.completionYear;
+    if (updateDto.numberOfFloors)
+      data.numberOfFloors = updateDto.numberOfFloors;
+    if (updateDto.similarApartmentIds)
+      data.similarApartmentIds = updateDto.similarApartmentIds;
     if (updateDto.mainImage !== undefined) data.mainImage = updateDto.mainImage;
-        if (updateDto.coverImage !== undefined) data.coverImage = updateDto.coverImage;
+    if (updateDto.coverImage !== undefined)
+      data.coverImage = updateDto.coverImage;
     if (updateDto.gallery !== undefined) data.gallery = updateDto.gallery;
     if (updateDto.documents !== undefined) data.documents = updateDto.documents;
-    if (updateDto.typeOfBuilding !== undefined) data.typeOfBuilding = updateDto.typeOfBuilding;
-    if (updateDto.constructionStage !== undefined) data.constructionStage = updateDto.constructionStage;
-    if (updateDto.description !== undefined) data.description = updateDto.description;
-    if (updateDto.heatingTypeIds !== undefined) data.heatingTypeIds = updateDto.heatingTypeIds;
-    if (updateDto.attributeIds !== undefined) data.attributeIds = updateDto.attributeIds;
+    if (updateDto.typeOfBuilding !== undefined)
+      data.typeOfBuilding = updateDto.typeOfBuilding;
+    if (updateDto.constructionStage !== undefined)
+      data.constructionStage = updateDto.constructionStage;
+    if (updateDto.description !== undefined)
+      data.description = updateDto.description;
+    if (updateDto.heatingTypeIds !== undefined)
+      data.heatingTypeIds = updateDto.heatingTypeIds;
+    if (updateDto.attributeIds !== undefined)
+      data.attributeIds = updateDto.attributeIds;
 
     const layout = await this.prisma.unitLayout.update({
       where: { id },
@@ -390,7 +426,7 @@ export class UnitLayoutsService {
       distinct: ['floor'],
       orderBy: { floor: 'asc' },
     });
-    return result.map(r => r.floor);
+    return result.map((r) => r.floor);
   }
 
   async findRange(currency: string = 'USD') {

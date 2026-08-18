@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { PropertyTypeOptionsService } from './property-type-options.service';
 import { CreatePropertyTypeOptionDto } from './dto/create-property-type-option.dto';
 import { UpdatePropertyTypeOptionDto } from './dto/update-property-type-option.dto';
@@ -34,7 +43,10 @@ export class PropertyTypeOptionsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a property type option' })
-  update(@Param('id') id: string, @Body() updateDto: UpdatePropertyTypeOptionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdatePropertyTypeOptionDto,
+  ) {
     return this.service.update(id, updateDto);
   }
 

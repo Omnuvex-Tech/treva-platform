@@ -75,7 +75,8 @@ export class ProfitbaseSyncService {
     }
 
     const projectNameById = new Map<number, string>();
-    for (const house of houses) projectNameById.set(house.projectId, house.projectName);
+    for (const house of houses)
+      projectNameById.set(house.projectId, house.projectName);
     for (const property of properties) {
       if (!projectNameById.has(property.projectId)) {
         projectNameById.set(property.projectId, property.projectName);
@@ -84,7 +85,11 @@ export class ProfitbaseSyncService {
 
     const categoryIdByProjectId = new Map<number, string>();
     for (const [projectId, projectName] of projectNameById) {
-      const categoryId = await this.upsertCategory(projectId, projectName, summary);
+      const categoryId = await this.upsertCategory(
+        projectId,
+        projectName,
+        summary,
+      );
       categoryIdByProjectId.set(projectId, categoryId);
     }
 
@@ -107,7 +112,14 @@ export class ProfitbaseSyncService {
       const parentHouse = houseById.get(property.house_id) ?? null;
       const plan = planByPropertyId.get(String(property.id)) ?? null;
 
-      await this.upsertUnitLayout(property, plan, categoryId, houseId, parentHouse, summary);
+      await this.upsertUnitLayout(
+        property,
+        plan,
+        categoryId,
+        houseId,
+        parentHouse,
+        summary,
+      );
     }
 
     for (const categoryId of touchedCategoryIds) {
@@ -123,7 +135,9 @@ export class ProfitbaseSyncService {
     summary: ProfitbaseSyncSummary,
   ): Promise<string> {
     const externalId = String(projectId);
-    const existing = await this.prisma.category.findUnique({ where: { externalId } });
+    const existing = await this.prisma.category.findUnique({
+      where: { externalId },
+    });
 
     if (existing) {
       await this.prisma.category.update({
@@ -156,7 +170,8 @@ export class ProfitbaseSyncService {
     const externalId = String(house.id);
     const minFloor = house.minFloor ?? 1;
     const maxFloor = Math.max(house.maxFloor ?? minFloor, minFloor);
-    const completionYear = this.parseYear(house.commissioningDate) ?? new Date().getFullYear();
+    const completionYear =
+      this.parseYear(house.commissioningDate) ?? new Date().getFullYear();
     const referenceArea = Number(house.minPriceArea) || 0;
     const currencyCode = house.currency?.code || 'USD';
     const imageUrl = house.fullImage || house.image || undefined;
@@ -174,13 +189,20 @@ export class ProfitbaseSyncService {
       contractAddress: house.contractAddress || undefined,
       typeOfBuilding: house.type || undefined,
       archived: house.isArchive ?? false,
-      mainImage: imageUrl ? { url: imageUrl, alt: house.title || undefined } : undefined,
+      mainImage: imageUrl
+        ? { url: imageUrl, alt: house.title || undefined }
+        : undefined,
     };
 
-    const existing = await this.prisma.house.findUnique({ where: { externalId } });
+    const existing = await this.prisma.house.findUnique({
+      where: { externalId },
+    });
 
     if (existing) {
-      await this.prisma.house.update({ where: { id: existing.id }, data: sharedData });
+      await this.prisma.house.update({
+        where: { id: existing.id },
+        data: sharedData,
+      });
       summary.houses.updated++;
       return existing.id;
     }
@@ -214,17 +236,26 @@ export class ProfitbaseSyncService {
   ): Promise<void> {
     const externalId = String(property.id);
     const currencyCode = parentHouse?.currency?.code || 'USD';
-    const completionYear = this.parseYear(parentHouse?.commissioningDate ?? null) ?? new Date().getFullYear();
+    const completionYear =
+      this.parseYear(parentHouse?.commissioningDate ?? null) ??
+      new Date().getFullYear();
     const minFloor = parentHouse?.minFloor ?? 1;
     const maxFloor = Math.max(parentHouse?.maxFloor ?? minFloor, minFloor);
-    const statusInfo = STATUS_MAP[property.status] ?? { status: 'available', archived: false };
+    const statusInfo = STATUS_MAP[property.status] ?? {
+      status: 'available',
+      archived: false,
+    };
     const totalArea = property.area?.area_total ?? 0;
     const propertyTypeLabel = property.propertyType
-      ? REAL_ESTATE_TYPE_LABELS[property.propertyType] ?? property.propertyType
+      ? (REAL_ESTATE_TYPE_LABELS[property.propertyType] ??
+        property.propertyType)
       : undefined;
 
     const mainImage = plan?.image
-      ? { url: plan.image.big || plan.image.source, alt: plan.image.imageName || undefined }
+      ? {
+          url: plan.image.big || plan.image.source,
+          alt: plan.image.imageName || undefined,
+        }
       : undefined;
     const gallery = (plan?.planImages || []).map((img) => ({
       url: img.big || img.source,
@@ -238,7 +269,9 @@ export class ProfitbaseSyncService {
       totalArea,
       internalArea: property.area?.area_living ?? totalArea,
       balconyArea: property.area?.area_balcony ?? undefined,
-      prices: property.price?.value ? { [currencyCode]: property.price.value } : {},
+      prices: property.price?.value
+        ? { [currencyCode]: property.price.value }
+        : {},
       completionYear,
       numberOfFloors: { start: minFloor, end: maxFloor },
       realEstateType: propertyTypeLabel,
@@ -250,10 +283,15 @@ export class ProfitbaseSyncService {
       gallery,
     };
 
-    const existing = await this.prisma.unitLayout.findUnique({ where: { externalId } });
+    const existing = await this.prisma.unitLayout.findUnique({
+      where: { externalId },
+    });
 
     if (existing) {
-      await this.prisma.unitLayout.update({ where: { id: existing.id }, data: sharedData as any });
+      await this.prisma.unitLayout.update({
+        where: { id: existing.id },
+        data: sharedData as any,
+      });
       summary.unitLayouts.updated++;
       return;
     }
@@ -277,12 +315,19 @@ export class ProfitbaseSyncService {
   }
 
   private async syncCategoryMetrics(categoryId: string) {
-    const [housesCount, propertiesCount, reservedCount, soldCount] = await Promise.all([
-      this.prisma.house.count({ where: { categoryId, archived: false } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'reserved' } }),
-      this.prisma.unitLayout.count({ where: { categoryId, archived: false, status: 'sold' } }),
-    ]);
+    const [housesCount, propertiesCount, reservedCount, soldCount] =
+      await Promise.all([
+        this.prisma.house.count({ where: { categoryId, archived: false } }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false },
+        }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false, status: 'reserved' },
+        }),
+        this.prisma.unitLayout.count({
+          where: { categoryId, archived: false, status: 'sold' },
+        }),
+      ]);
 
     await this.prisma.category.update({
       where: { id: categoryId },

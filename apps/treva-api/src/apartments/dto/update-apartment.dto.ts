@@ -1,4 +1,14 @@
-import { IsOptional, IsString, IsNumber, IsArray, ValidateNested, IsIn, Min, Max, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsIn,
+  Min,
+  Max,
+  IsBoolean,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ApartmentPriceInput, MAX_RESALE_FLOOR } from './create-apartment.dto';
@@ -29,7 +39,9 @@ export class UpdateApartmentDto {
   @IsString()
   seoTitle?: string;
 
-  @ApiPropertyOptional({ example: 'Spacious apartment listing with rich details and pricing.' })
+  @ApiPropertyOptional({
+    example: 'Spacious apartment listing with rich details and pricing.',
+  })
   @IsOptional()
   @IsString()
   seoDescription?: string;
@@ -39,7 +51,9 @@ export class UpdateApartmentDto {
   @IsString()
   seoKeywords?: string;
 
-  @ApiPropertyOptional({ example: 'https://treva.az/resale/sea-breeze-residence' })
+  @ApiPropertyOptional({
+    example: 'https://treva.az/resale/sea-breeze-residence',
+  })
   @IsOptional()
   @IsString()
   canonicalUrl?: string;
@@ -138,7 +152,10 @@ export class UpdateApartmentDto {
   @IsString()
   locationGoogleMapsUrl?: string;
 
-  @ApiPropertyOptional({ example: 'renovated', enum: ['renovated', 'non-renovated'] })
+  @ApiPropertyOptional({
+    example: 'renovated',
+    enum: ['renovated', 'non-renovated'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['renovated', 'non-renovated'])
@@ -157,7 +174,10 @@ export class UpdateApartmentDto {
   @IsNumber()
   buildingAge?: number;
 
-  @ApiPropertyOptional({ example: 'furnished', enum: ['furnished', 'unfurnished'] })
+  @ApiPropertyOptional({
+    example: 'furnished',
+    enum: ['furnished', 'unfurnished'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['furnished', 'unfurnished'])
@@ -194,7 +214,10 @@ export class UpdateApartmentDto {
   @IsArray()
   requestIds?: string[];
 
-  @ApiPropertyOptional({ example: 'active', enum: ['active', 'reserved', 'sold'] })
+  @ApiPropertyOptional({
+    example: 'active',
+    enum: ['active', 'reserved', 'sold'],
+  })
   @IsOptional()
   @IsString()
   status?: string;

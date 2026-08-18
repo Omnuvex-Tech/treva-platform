@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { authApi } from "../api/auth";
+import { notifyAuthChanged } from "../components/AuthProvider";
 
 export function Login() {
     const navigate = useNavigate();
@@ -20,6 +21,7 @@ export function Login() {
         try {
             const response = await authApi.login({ email, password });
             localStorage.setItem("token", response.data.access_token);
+            notifyAuthChanged();
             navigate("/");
         } catch (err: unknown) {
             if (err && typeof err === "object" && "response" in err) {

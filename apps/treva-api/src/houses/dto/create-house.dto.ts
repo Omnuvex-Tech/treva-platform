@@ -111,7 +111,9 @@ export class CreateHouseDto {
   @IsString()
   seoKeywords?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/projects/sea-breeze-block-a' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/projects/sea-breeze-block-a',
+  })
   @IsOptional()
   @IsString()
   canonicalUrl?: string;
@@ -121,7 +123,10 @@ export class CreateHouseDto {
   @IsString()
   seoImage?: string;
 
-  @ApiPropertyOptional({ example: 'available', enum: ['available', 'reserved', 'sold'] })
+  @ApiPropertyOptional({
+    example: 'available',
+    enum: ['available', 'reserved', 'sold'],
+  })
   @IsOptional()
   @IsEnum(['available', 'reserved', 'sold'])
   status?: 'available' | 'reserved' | 'sold';

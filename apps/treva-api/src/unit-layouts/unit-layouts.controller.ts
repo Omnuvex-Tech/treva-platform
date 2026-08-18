@@ -41,7 +41,11 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiQuery({ name: 'categorySlug', required: false })
-    @ApiQuery({ name: 'status', required: false, enum: ['available', 'reserved', 'sold'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['available', 'reserved', 'sold'],
+  })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'minPrice', required: false, type: Number })
   @ApiQuery({ name: 'maxPrice', required: false, type: Number })
@@ -60,7 +64,7 @@ export class UnitLayoutsController {
     @Query('limit') limit?: string,
     @Query('categoryId') categoryId?: string,
     @Query('categorySlug') categorySlug?: string,
-      @Query('status') status?: 'available' | 'reserved' | 'sold',
+    @Query('status') status?: 'available' | 'reserved' | 'sold',
     @Query('statusOptionId') statusOptionId?: string,
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
@@ -93,7 +97,8 @@ export class UnitLayoutsController {
       rooms,
       houseId,
       houseSlug,
-      archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
+      archived:
+        archived === 'true' ? true : archived === 'false' ? false : undefined,
     });
   }
 

@@ -1,4 +1,15 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsIn, Min, Max, IsBoolean } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsIn,
+  Min,
+  Max,
+  IsBoolean,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type, Transform } from 'class-transformer';
 
@@ -9,13 +20,21 @@ export class ApartmentPriceInput {
   currencyId: string;
 
   @ApiPropertyOptional({ example: 175000 })
-  @Transform(({ value }) => (value === null || value === undefined || value === '' ? undefined : Number(value)))
+  @Transform(({ value }) =>
+    value === null || value === undefined || value === ''
+      ? undefined
+      : Number(value),
+  )
   @IsNumber()
   @IsOptional()
   priceTotal?: number;
 
   @ApiPropertyOptional({ example: 2917 })
-  @Transform(({ value }) => (value === null || value === undefined || value === '' ? undefined : Number(value)))
+  @Transform(({ value }) =>
+    value === null || value === undefined || value === ''
+      ? undefined
+      : Number(value),
+  )
   @IsNumber()
   @IsOptional()
   priceByArea?: number;
@@ -49,7 +68,9 @@ export class CreateApartmentDto {
   @IsString()
   seoTitle?: string;
 
-  @ApiPropertyOptional({ example: 'Spacious apartment listing with rich details and pricing.' })
+  @ApiPropertyOptional({
+    example: 'Spacious apartment listing with rich details and pricing.',
+  })
   @IsOptional()
   @IsString()
   seoDescription?: string;
@@ -59,7 +80,9 @@ export class CreateApartmentDto {
   @IsString()
   seoKeywords?: string;
 
-  @ApiPropertyOptional({ example: 'https://treva.az/resale/sea-breeze-residence' })
+  @ApiPropertyOptional({
+    example: 'https://treva.az/resale/sea-breeze-residence',
+  })
   @IsOptional()
   @IsString()
   canonicalUrl?: string;
@@ -158,7 +181,10 @@ export class CreateApartmentDto {
   @IsString()
   locationGoogleMapsUrl?: string;
 
-  @ApiPropertyOptional({ example: 'renovated', enum: ['renovated', 'non-renovated'] })
+  @ApiPropertyOptional({
+    example: 'renovated',
+    enum: ['renovated', 'non-renovated'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['renovated', 'non-renovated'])
@@ -177,7 +203,10 @@ export class CreateApartmentDto {
   @IsNumber()
   buildingAge?: number;
 
-  @ApiPropertyOptional({ example: 'furnished', enum: ['furnished', 'unfurnished'] })
+  @ApiPropertyOptional({
+    example: 'furnished',
+    enum: ['furnished', 'unfurnished'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['furnished', 'unfurnished'])
@@ -214,7 +243,10 @@ export class CreateApartmentDto {
   @IsArray()
   requestIds?: string[];
 
-  @ApiPropertyOptional({ example: 'active', enum: ['active', 'reserved', 'sold'] })
+  @ApiPropertyOptional({
+    example: 'active',
+    enum: ['active', 'reserved', 'sold'],
+  })
   @IsOptional()
   @IsString()
   status?: string;

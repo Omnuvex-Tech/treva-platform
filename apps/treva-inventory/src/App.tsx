@@ -10,6 +10,7 @@ import { OwnerForm } from "./pages/resale/OwnerForm";
 import { AttributeForm } from "./pages/resale/AttributeForm";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { MessageCenterProvider } from "./components/MessageCenter";
+import { AuthProvider } from "./components/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ function App() {
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
                 <MessageCenterProvider>
+                    <AuthProvider>
                     <BrowserRouter>
                         <AuthEventBridge />
                         <PreventNumberInputWheel />
@@ -95,6 +97,14 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route
                             path="/"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/users"
                             element={
                                 <ProtectedRoute>
                                     <Dashboard />
@@ -544,6 +554,7 @@ function App() {
                         />
                         </Routes>
                     </BrowserRouter>
+                    </AuthProvider>
                 </MessageCenterProvider>
             </QueryClientProvider>
         </ErrorBoundary>

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePropertyTypeOptionDto } from './dto/create-property-type-option.dto';
 import { UpdatePropertyTypeOptionDto } from './dto/update-property-type-option.dto';
@@ -12,7 +16,9 @@ export class PropertyTypeOptionsService {
       where: { value: createDto.value },
     });
     if (existing) {
-      throw new ConflictException('Property type option with this value already exists');
+      throw new ConflictException(
+        'Property type option with this value already exists',
+      );
     }
     return this.prisma.propertyTypeOption.create({
       data: { value: createDto.value },
@@ -20,11 +26,15 @@ export class PropertyTypeOptionsService {
   }
 
   async findAll() {
-    return this.prisma.propertyTypeOption.findMany({ orderBy: { value: 'asc' } });
+    return this.prisma.propertyTypeOption.findMany({
+      orderBy: { value: 'asc' },
+    });
   }
 
   async findOne(id: string) {
-    const option = await this.prisma.propertyTypeOption.findUnique({ where: { id } });
+    const option = await this.prisma.propertyTypeOption.findUnique({
+      where: { id },
+    });
     if (!option) throw new NotFoundException('Property type option not found');
     return option;
   }
@@ -36,7 +46,9 @@ export class PropertyTypeOptionsService {
         where: { value: updateDto.value, NOT: { id } },
       });
       if (existing) {
-        throw new ConflictException('Another property type option has this value');
+        throw new ConflictException(
+          'Another property type option has this value',
+        );
       }
     }
     return this.prisma.propertyTypeOption.update({

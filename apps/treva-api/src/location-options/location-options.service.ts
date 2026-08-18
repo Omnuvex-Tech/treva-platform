@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLocationOptionDto } from './dto/create-location-option.dto';
 import { UpdateLocationOptionDto } from './dto/update-location-option.dto';
@@ -28,13 +32,18 @@ export class LocationOptionsService {
   }
 
   async create(createDto: CreateLocationOptionDto) {
-    const cityId = await this.validateCityAssignment(createDto.type, createDto.cityId);
+    const cityId = await this.validateCityAssignment(
+      createDto.type,
+      createDto.cityId,
+    );
     const existing = await this.prisma.locationOption.findUnique({
       where: { type_name: { type: createDto.type, name: createDto.name } },
     });
 
     if (existing) {
-      throw new ConflictException('Location option with this type and name already exists');
+      throw new ConflictException(
+        'Location option with this type and name already exists',
+      );
     }
 
     return this.prisma.locationOption.create({
@@ -70,7 +79,9 @@ export class LocationOptionsService {
   }
 
   async update(id: string, updateDto: UpdateLocationOptionDto) {
-    const option = await this.prisma.locationOption.findUnique({ where: { id } });
+    const option = await this.prisma.locationOption.findUnique({
+      where: { id },
+    });
     if (!option) throw new NotFoundException('Location option not found');
 
     const nextType = updateDto.type ?? option.type;
@@ -82,11 +93,16 @@ export class LocationOptionsService {
       });
 
       if (existing && existing.id !== id) {
-        throw new ConflictException('Another location option with this type and name already exists');
+        throw new ConflictException(
+          'Another location option with this type and name already exists',
+        );
       }
     }
 
-    const nextCityId = await this.validateCityAssignment(nextType, updateDto.cityId ?? option.cityId);
+    const nextCityId = await this.validateCityAssignment(
+      nextType,
+      updateDto.cityId ?? option.cityId,
+    );
 
     if (option.type === 'city' && nextType !== 'city') {
       const regionCount = await this.prisma.locationOption.count({
@@ -96,7 +112,9 @@ export class LocationOptionsService {
       });
 
       if (regionCount > 0) {
-        throw new ConflictException('City with attached regions cannot be converted');
+        throw new ConflictException(
+          'City with attached regions cannot be converted',
+        );
       }
     }
 
@@ -113,7 +131,9 @@ export class LocationOptionsService {
   }
 
   async remove(id: string) {
-    const option = await this.prisma.locationOption.findUnique({ where: { id } });
+    const option = await this.prisma.locationOption.findUnique({
+      where: { id },
+    });
     if (!option) throw new NotFoundException('Location option not found');
 
     if (option.type === 'city') {
@@ -124,7 +144,9 @@ export class LocationOptionsService {
       });
 
       if (regionCount > 0) {
-        throw new ConflictException('Delete attached regions before deleting this city');
+        throw new ConflictException(
+          'Delete attached regions before deleting this city',
+        );
       }
     }
 

@@ -23,4 +23,6 @@ export {
     FormKeywordInput,
 } from "./components/Form";
 
+export { RichTextEditor, type RichTextEditorProps } from "./components/RichTextEditor";
+
 export { cn } from "./lib/utils";

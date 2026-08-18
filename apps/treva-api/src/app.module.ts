@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
 import { UnitLayoutsModule } from './unit-layouts/unit-layouts.module';
 import { UploadModule } from './upload/upload.module';
@@ -47,6 +48,7 @@ import { ProfitbaseModule } from './profitbase/profitbase.module';
     }),
     PrismaModule,
     AuthModule,
+    UsersModule,
     CategoriesModule,
     HousesModule,
     UnitLayoutsModule,
@@ -68,9 +70,6 @@ import { ProfitbaseModule } from './profitbase/profitbase.module';
     ProfitbaseModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-  ],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

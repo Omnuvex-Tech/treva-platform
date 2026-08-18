@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ApartmentsService } from './apartments.service';
 import { CreateApartmentDto } from './dto/create-apartment.dto';
 import { UpdateApartmentDto } from './dto/update-apartment.dto';
@@ -82,7 +97,8 @@ export class ApartmentsController {
       floor: floor ? parseInt(floor) : undefined,
       currency,
       status,
-      archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
+      archived:
+        archived === 'true' ? true : archived === 'false' ? false : undefined,
     });
   }
 

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateApartmentTypeDto } from './dto/create-apartment-type.dto';
 import { UpdateApartmentTypeDto } from './dto/update-apartment-type.dto';
@@ -12,7 +16,9 @@ export class ApartmentTypesService {
       where: { name: dto.name },
     });
     if (existing) {
-      throw new ConflictException('ApartmentType with this name already exists');
+      throw new ConflictException(
+        'ApartmentType with this name already exists',
+      );
     }
     return this.prisma.apartmentType.create({ data: dto });
   }
@@ -32,8 +38,13 @@ export class ApartmentTypesService {
     if (!type) throw new NotFoundException('ApartmentType not found');
 
     if (dto.name && dto.name !== type.name) {
-      const existing = await this.prisma.apartmentType.findUnique({ where: { name: dto.name } });
-      if (existing) throw new ConflictException('ApartmentType with this name already exists');
+      const existing = await this.prisma.apartmentType.findUnique({
+        where: { name: dto.name },
+      });
+      if (existing)
+        throw new ConflictException(
+          'ApartmentType with this name already exists',
+        );
     }
 
     return this.prisma.apartmentType.update({ where: { id }, data: dto });

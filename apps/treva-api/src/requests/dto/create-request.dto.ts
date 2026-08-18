@@ -10,6 +10,8 @@ export class CreateRequestDto {
   @ApiProperty({ example: '+994501234567' })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\+?[0-9]+$/, { message: 'Phone number must contain only digits and optional leading +' })
+  @Matches(/^\+?[0-9]+$/, {
+    message: 'Phone number must contain only digits and optional leading +',
+  })
   phoneNumber: string;
 }

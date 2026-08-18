@@ -31,18 +31,15 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('Seeding database...');
 
-  await prisma.admin.deleteMany({
-    where: { email: { not: 'info@treva.realestate' } },
-  });
-
   const adminPassword = await bcrypt.hash('treva12345@', 10);
   const admin = await prisma.admin.upsert({
     where: { email: 'info@treva.realestate' },
-    update: {},
+    update: { role: 'superadmin', isActive: true },
     create: {
       email: 'info@treva.realestate',
       password: adminPassword,
       name: 'Admin',
+      role: 'superadmin',
     },
   });
   console.log('Admin user created:', admin.email);

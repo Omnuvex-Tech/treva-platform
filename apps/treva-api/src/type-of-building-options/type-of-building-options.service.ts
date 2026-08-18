@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTypeOfBuildingOptionDto } from './dto/create-type-of-building-option.dto';
 import { UpdateTypeOfBuildingOptionDto } from './dto/update-type-of-building-option.dto';
@@ -12,7 +16,9 @@ export class TypeOfBuildingOptionsService {
       where: { value: createDto.value },
     });
     if (existing) {
-      throw new ConflictException('Type of building option with this value already exists');
+      throw new ConflictException(
+        'Type of building option with this value already exists',
+      );
     }
     return this.prisma.typeOfBuildingOption.create({
       data: { value: createDto.value },
@@ -20,12 +26,17 @@ export class TypeOfBuildingOptionsService {
   }
 
   async findAll() {
-    return this.prisma.typeOfBuildingOption.findMany({ orderBy: { value: 'asc' } });
+    return this.prisma.typeOfBuildingOption.findMany({
+      orderBy: { value: 'asc' },
+    });
   }
 
   async findOne(id: string) {
-    const option = await this.prisma.typeOfBuildingOption.findUnique({ where: { id } });
-    if (!option) throw new NotFoundException('Type of building option not found');
+    const option = await this.prisma.typeOfBuildingOption.findUnique({
+      where: { id },
+    });
+    if (!option)
+      throw new NotFoundException('Type of building option not found');
     return option;
   }
 
@@ -36,7 +47,9 @@ export class TypeOfBuildingOptionsService {
         where: { value: updateDto.value, NOT: { id } },
       });
       if (existing) {
-        throw new ConflictException('Another type of building option has this value');
+        throw new ConflictException(
+          'Another type of building option has this value',
+        );
       }
     }
     return this.prisma.typeOfBuildingOption.update({

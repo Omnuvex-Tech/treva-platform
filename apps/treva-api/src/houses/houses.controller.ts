@@ -41,7 +41,11 @@ export class HousesController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiQuery({ name: 'categorySlug', required: false })
-  @ApiQuery({ name: 'status', required: false, enum: ['available', 'reserved', 'sold'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['available', 'reserved', 'sold'],
+  })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'archived', required: false, type: Boolean })
   @ApiQuery({ name: 'summary', required: false, type: Boolean })
@@ -62,7 +66,8 @@ export class HousesController {
       categorySlug,
       status,
       search,
-      archived: archived === 'true' ? true : archived === 'false' ? false : undefined,
+      archived:
+        archived === 'true' ? true : archived === 'false' ? false : undefined,
       summary: summary === 'true',
     });
   }

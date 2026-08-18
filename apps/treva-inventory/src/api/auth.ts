@@ -1,4 +1,5 @@
 import apiClient from "./client";
+import type { SectionPermission } from "./users";
 
 export interface LoginData {
     email: string;
@@ -11,6 +12,8 @@ export interface LoginResponse {
         id: string;
         email: string;
         name: string | null;
+        role: string;
+        permissions: SectionPermission[];
     };
 }
 
@@ -18,7 +21,10 @@ export interface Admin {
     id: string;
     email: string;
     name: string | null;
+    role: string;
+    isActive: boolean;
     createdAt: string;
+    permissions: SectionPermission[];
 }
 
 export const authApi = {

@@ -21,7 +21,9 @@ async function bootstrap() {
     const start = Date.now();
     console.log(`[DEBUG] --> ${req.method} ${req.originalUrl}`);
     res.on('finish', () => {
-      console.log(`[DEBUG] <-- ${req.method} ${req.originalUrl} ${res.statusCode} (${Date.now() - start}ms)`);
+      console.log(
+        `[DEBUG] <-- ${req.method} ${req.originalUrl} ${res.statusCode} (${Date.now() - start}ms)`,
+      );
     });
     next();
   });
@@ -55,12 +57,14 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    crossOriginEmbedderPolicy: false,
-    contentSecurityPolicy: false,
-    crossOriginOpenerPolicy: false,
-  }));
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginEmbedderPolicy: false,
+      contentSecurityPolicy: false,
+      crossOriginOpenerPolicy: false,
+    }),
+  );
 
   app.setGlobalPrefix(apiPrefix);
 

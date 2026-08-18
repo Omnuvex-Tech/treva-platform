@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { TypeOfBuildingOptionsService } from './type-of-building-options.service';
 import { CreateTypeOfBuildingOptionDto } from './dto/create-type-of-building-option.dto';
 import { UpdateTypeOfBuildingOptionDto } from './dto/update-type-of-building-option.dto';
@@ -34,7 +43,10 @@ export class TypeOfBuildingOptionsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a type of building option' })
-  update(@Param('id') id: string, @Body() updateDto: UpdateTypeOfBuildingOptionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateTypeOfBuildingOptionDto,
+  ) {
     return this.service.update(id, updateDto);
   }
 
