@@ -321,7 +321,9 @@
 .pulse-paragraph .treva-slider img {
   flex: 0 0 92%;
   width: 92%;
+  height: 100%;
   margin: 0;
+  object-fit: cover;
   scroll-snap-align: center;
 }
 
