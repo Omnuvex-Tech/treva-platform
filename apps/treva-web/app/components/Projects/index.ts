@@ -3,4 +3,5 @@ export { default as ProjectOverview } from "./ProjectOverview";
 export { default as ProjectLocation } from "./ProjectLocation";
 export { default as ProjectLayouts } from "./ProjectLayouts";
 export { default as ProjectFeatures } from "./ProjectFeatures";
+export { default as ProjectGallery } from "./ProjectGallery";
 export { default as UnitFilter } from "./UnitFilter";

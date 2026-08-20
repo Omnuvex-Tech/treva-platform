@@ -11,7 +11,7 @@ export default function OffPlanPage({ params }: { params: { locale: string } }) 
 
   return (
     <div className="page-wrapper" data-locale={locale}>
-      <Navbar variant="solid" />
+      <Navbar locale={locale} variant="solid" />
       <main className="main-wrapper">
         <PageContainer className="off-plan-page-container">
           <Suspense fallback={null}>
@@ -20,7 +20,7 @@ export default function OffPlanPage({ params }: { params: { locale: string } }) 
         </PageContainer>
       </main>
       <CallbackForm allowedRoles={['Client']} />
-      <HomeFooter />
+      <HomeFooter locale={locale} />
     </div>
   );
 }

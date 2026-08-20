@@ -174,7 +174,7 @@ export default function ResalePage() {
 
   return (
     <div className="re-page-wrapper" data-locale={locale}>
-      <Navbar variant="solid" />
+      <Navbar locale={locale} variant="solid" />
       <main className="re-main-wrapper">
         <PageContainer className="re-page-container">
           <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
@@ -309,7 +309,7 @@ export default function ResalePage() {
         </PageContainer>
       </main>
       <CallbackForm allowedRoles={['Client']} />
-      <HomeFooter />
+      <HomeFooter locale={locale} />
     </div>
   );
 }

@@ -83,6 +83,13 @@ const featuredProjectsFallback: FeaturedProjectCard[] = [
   },
 ]
 
+/** Karusel oxlarının ekran oxuyucu etiketləri — səhifənin qalan mətni CMS-dən gəlir. */
+const navLabels = {
+  az: { prev: 'Əvvəlki', next: 'Növbəti' },
+  en: { prev: 'Previous', next: 'Next' },
+  ru: { prev: 'Предыдущий', next: 'Следующий' },
+} as const;
+
 function getLocalizedValue(value: LocalizedValue | undefined | null, locale: string, fallback = ''): string {
   if (!value) return fallback
   if (typeof value === 'string') return value || fallback
@@ -95,6 +102,7 @@ function toAssetUrl(value?: string | null): string {
 }
 
 export function DevelopersPage({ locale }: DevelopersPageProps) {
+  const nav = navLabels[locale as keyof typeof navLabels] ?? navLabels.az;
   const gsapReady = useRef(false)
   const dropdownNavRefs = useRef<Array<HTMLDivElement | null>>([])
   const projectsViewportRef = useRef<HTMLDivElement | null>(null)
@@ -969,7 +977,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                         <>
                           <button
                             type="button"
-                            aria-label="Previous"
+                            aria-label={nav.prev}
                             className="developers-projects-nav-btn developers-projects-nav-btn--prev"
                             onClick={() => handleProjectsNav('prev')}
                           >
@@ -977,7 +985,7 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                           </button>
                           <button
                             type="button"
-                            aria-label="Next"
+                            aria-label={nav.next}
                             className="developers-projects-nav-btn developers-projects-nav-btn--next"
                             onClick={() => handleProjectsNav('next')}
                           >

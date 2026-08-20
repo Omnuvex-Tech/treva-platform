@@ -36,7 +36,15 @@ interface ProjectsPageProps {
   locale: string
 }
 
+/** Layihə kartı linkinin ekran oxuyucu etiketi. */
+const cardLabels = {
+  az: 'layihəyə keç',
+  en: 'go to project',
+  ru: 'перейти к проекту',
+} as const;
+
 export function ProjectsPage({ locale }: ProjectsPageProps) {
+  const cardLabel = cardLabels[locale as keyof typeof cardLabels] ?? cardLabels.az;
   const containerRef = useRef<HTMLDivElement>(null)
   const hasAnimatedRef = useRef(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
@@ -211,7 +219,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                         {categories.map((cat) => (
                           <div key={cat.slug} role="listitem" className="w-dyn-item">
                             <a
-                              aria-label="go to project"
+                              aria-label={cardLabel}
                               href={`/${locale}/projects/${cat.slug}`}
                               className="projects_item w-inline-block"
                             >

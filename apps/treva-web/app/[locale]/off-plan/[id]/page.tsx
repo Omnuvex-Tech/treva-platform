@@ -60,6 +60,10 @@ export default function ApartmentCard() {
       sold: 'Satılıb',
       reserved: 'Bron edilib',
       floorSuffix: 'mərtəbə',
+      openGallery: 'Qalereyanı aç',
+      closeGallery: 'Qalereyanı bağla',
+      previousImage: 'Əvvəlki şəkil',
+      nextImage: 'Növbəti şəkil',
     },
     en: {
       apartmentNotFound: 'Apartment not found',
@@ -96,6 +100,10 @@ export default function ApartmentCard() {
       sold: 'Sold',
       reserved: 'Reserved',
       floorSuffix: 'floor',
+      openGallery: 'Open gallery',
+      closeGallery: 'Close gallery',
+      previousImage: 'Previous image',
+      nextImage: 'Next image',
     },
     ru: {
       apartmentNotFound: 'Квартира не найдена',
@@ -132,6 +140,10 @@ export default function ApartmentCard() {
       sold: 'Продано',
       reserved: 'Забронировано',
       floorSuffix: 'этаж',
+      openGallery: 'Открыть галерею',
+      closeGallery: 'Закрыть галерею',
+      previousImage: 'Предыдущее изображение',
+      nextImage: 'Следующее изображение',
     },
   } as const;
   const t = dictionary[(locale as 'az' | 'en' | 'ru')] || dictionary.az;
@@ -667,7 +679,7 @@ export default function ApartmentCard() {
                     className="apt-blueprint-trigger"
                     onClick={() => openGallery(0)}
                     disabled={galleryItems.length === 0}
-                    aria-label="Open gallery"
+                    aria-label={t.openGallery}
                   >
                     {layout.mainImage ? (
                       <img
@@ -841,13 +853,13 @@ export default function ApartmentCard() {
 
             {galleryOpen && galleryItems.length > 0 ? (
               <div className="apt-lightbox" role="dialog" aria-modal="true">
-                <button type="button" className="apt-lightbox__backdrop" onClick={closeGallery} aria-label="Close gallery" />
+                <button type="button" className="apt-lightbox__backdrop" onClick={closeGallery} aria-label={t.closeGallery} />
                 <div className="apt-lightbox__panel" onClick={closeGallery}>
                   <button
                     type="button"
                     className="apt-lightbox__close"
                     onClick={(e) => { e.stopPropagation(); closeGallery(); }}
-                    aria-label="Close gallery"
+                    aria-label={t.closeGallery}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <line x1="18" y1="6" x2="6" y2="18" />
@@ -887,7 +899,7 @@ export default function ApartmentCard() {
                       type="button"
                       className="apt-lightbox__nav apt-lightbox__nav--prev"
                       onClick={(e) => { e.stopPropagation(); goPrev(); }}
-                      aria-label="Previous image"
+                      aria-label={t.previousImage}
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6" />
@@ -935,7 +947,7 @@ export default function ApartmentCard() {
                       type="button"
                       className="apt-lightbox__nav apt-lightbox__nav--next"
                       onClick={(e) => { e.stopPropagation(); goNext(); }}
-                      aria-label="Next image"
+                      aria-label={t.nextImage}
                     >
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="9 18 15 12 9 6" />

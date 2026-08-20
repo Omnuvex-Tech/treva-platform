@@ -96,8 +96,10 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
       { name: "Resale", href: "/resale" },
     ]},
     { name: "TƏRƏFDAŞLIQ", children: [
-      { name: "Developers", href: "/developers" },
-      { name: "Brokers", href: "/brokers" },
+      // "Off-Plan" və "Resale" sahə terminləridir və azərbaycanca da belə işlənir;
+      // "Developers"/"Brokers" isə sadəcə tərcümə olunmamışdı.
+      { name: "Developerlər", href: "/developers" },
+      { name: "Brokerlər", href: "/brokers" },
     ]},
     { name: "PULSE", href: "/pulse" },
     { name: "HAQQIMIZDA", href: "/about-us" },
@@ -127,7 +129,8 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
       { name: "Девелоперы", href: "/developers" },
       { name: "Брокеры", href: "/brokers" },
     ]},
-    { name: "PULSE", href: "/pulse" },
+    // Brend adı, amma rus versiyasında kiril ilə yazılır.
+    { name: "ПУЛЬС", href: "/pulse" },
     { name: "О НАС", href: "/about-us" },
     { name: "КОНТАКТ", href: "/contact" },
   ],

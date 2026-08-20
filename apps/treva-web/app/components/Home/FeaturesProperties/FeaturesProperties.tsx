@@ -307,6 +307,8 @@ const localeStrings = {
     subtitle: "Portfelimiz şəhərin memarlıq dəyəri və investisiya potensialı yüksək olan strateji nöqtələrini əhatə edir. Biz əsas diqqətimizi zaman keçdikcə sahibinə davamlı kapital artımı qazandıracaq unikal layihələrə yönəldirik.",
     learnMore: "DAHA ƏTRAFLI",
     viewAll: "Hamısına bax",
+    prev: "Əvvəlki",
+    next: "Növbəti",
   },
   en: {
     titleLight: "FEATURED",
@@ -314,6 +316,8 @@ const localeStrings = {
     subtitle: "Strategic portfolio of the city's top venues. Our focus remains on architectural landmarks and long-term capital growth for investors.",
     learnMore: "LEARN MORE",
     viewAll: "View all",
+    prev: "Previous",
+    next: "Next",
   },
   ru: {
     titleLight: "ИЗБРАННЫЕ",
@@ -321,6 +325,8 @@ const localeStrings = {
     subtitle: "Наш портфель охватывает стратегические точки города с высоким архитектурным значением и инвестиционным потенциалом.",
     learnMore: "ПОДРОБНЕЕ",
     viewAll: "Смотреть все",
+    prev: "Предыдущий",
+    next: "Следующий",
   },
 };
 
@@ -739,7 +745,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
               <>
                 <button
                   type="button"
-                  aria-label="Previous"
+                  aria-label={content.prev}
                   className="featured__nav-btn featured__nav-btn--prev"
                   onClick={() => handleNav('prev')}
                 >
@@ -747,7 +753,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ locale = 'az' }
                 </button>
                 <button
                   type="button"
-                  aria-label="Next"
+                  aria-label={content.next}
                   className="featured__nav-btn featured__nav-btn--next"
                   onClick={() => handleNav('next')}
                 >

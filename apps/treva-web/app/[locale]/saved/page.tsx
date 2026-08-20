@@ -118,7 +118,7 @@ export default function SavedPage() {
 
   return (
     <div className="page-wrapper" data-locale={locale}>
-      <Navbar variant="solid" />
+      <Navbar locale={locale} variant="solid" />
       <main className="main-wrapper">
         <PageContainer className="saved-page-container">
           <header className="saved-header">
@@ -209,7 +209,7 @@ export default function SavedPage() {
         </PageContainer>
       </main>
       <CallbackForm allowedRoles={['Client']} />
-      <HomeFooter />
+      <HomeFooter locale={locale} />
     </div>
   );
 }

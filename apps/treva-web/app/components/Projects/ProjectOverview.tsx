@@ -3,6 +3,7 @@
 import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
 import RichText from "./RichText";
+import { useProjectGallery } from "@/app/components/Gallery/ProjectGalleryContext";
 import "./project-overview.css";
 
 interface OverviewImage {
@@ -58,6 +59,9 @@ export default function ProjectOverview({
   locale,
   getImageUrl,
 }: Props): React.ReactElement {
+  // Şəkillər səhifənin ümumi qalereyasına aiddir — siyahını ProjectSections qurur.
+  const gallery = useProjectGallery();
+
   return (
     <section className="po-section">
       <PageContainer className="pde-page-container">
@@ -96,46 +100,27 @@ export default function ProjectOverview({
           </div>
         </div>
 
-        {/* Images Grid */}
+        {/* Images Grid — hər şəklə klik qalereyanı açır */}
         <div className="po-images-grid">
-          {images.large.url && (
-            <div className="po-image-card po-card-large">
-              <span className="po-image-label">{images.large.label}</span>
-              <div className="po-image-wrapper">
-                <img
-                  src={getImageUrl(images.large.url)}
-                  alt={images.large.label}
-                  className="po-img"
-                />
+          {(["large", "medium", "small"] as const).map((size) => {
+            const img = images[size];
+            if (!img?.url) return null;
+            const src = getImageUrl(img.url);
+            const zoomable = Boolean(gallery?.has(src));
+            return (
+              <div key={size} className={`po-image-card po-card-${size}`}>
+                <span className="po-image-label">{img.label}</span>
+                <div className="po-image-wrapper">
+                  <img
+                    src={src}
+                    alt={img.label}
+                    className={`po-img${zoomable ? " tg-zoomable" : ""}`}
+                    onClick={zoomable ? () => gallery!.open(src) : undefined}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-
-          {images.medium.url && (
-            <div className="po-image-card po-card-medium">
-              <span className="po-image-label">{images.medium.label}</span>
-              <div className="po-image-wrapper">
-                <img
-                  src={getImageUrl(images.medium.url)}
-                  alt={images.medium.label}
-                  className="po-img"
-                />
-              </div>
-            </div>
-          )}
-
-          {images.small.url && (
-            <div className="po-image-card po-card-small">
-              <span className="po-image-label">{images.small.label}</span>
-              <div className="po-image-wrapper">
-                <img
-                  src={getImageUrl(images.small.url)}
-                  alt={images.small.label}
-                  className="po-img"
-                />
-              </div>
-            </div>
-          )}
+            );
+          })}
         </div>
 
         {/* Data Rows */}

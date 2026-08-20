@@ -3,6 +3,7 @@
 import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
 import RichText from "./RichText";
+import { useProjectGallery } from "@/app/components/Gallery/ProjectGalleryContext";
 import "./project-details.css";
 
 interface LocalizedString {
@@ -33,6 +34,13 @@ interface Props {
   getImageUrl: (url: string) => string;
 }
 
+/** Yalnız broşür düyməsi — qalan mətnlər CMS-dən lokalizasiya olunmuş gəlir. */
+const featuresDictionary = {
+  az: { downloadBrochure: "Broşürü yüklə" },
+  en: { downloadBrochure: "Download brochure" },
+  ru: { downloadBrochure: "Скачать брошюру" },
+} as const;
+
 function loc(obj: LocalizedString | undefined | null, locale: string, fallback = ""): string {
   if (!obj) return fallback;
   if (typeof obj === "string") return obj || fallback;
@@ -49,6 +57,10 @@ export default function ProjectFeatures({
   locale,
   getImageUrl,
 }: Props) {
+  // İnteryer şəkilləri səhifənin ümumi qalereyasının bir hissəsidir.
+  const gallery = useProjectGallery();
+  const t = featuresDictionary[locale as keyof typeof featuresDictionary] ?? featuresDictionary.az;
+
   const handleBrochureDownload = () => {
     if (brochureFile) {
       window.open(getImageUrl(brochureFile), "_blank");
@@ -86,7 +98,7 @@ export default function ProjectFeatures({
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-                DOWNLOAD BROCHURE
+                {t.downloadBrochure}
               </button>
             )}
           </div>
@@ -122,11 +134,16 @@ export default function ProjectFeatures({
               </div>
             );
 
+            const imgSrc = sec.image ? getImageUrl(sec.image) : "";
+            const zoomable = Boolean(imgSrc && gallery?.has(imgSrc));
+
             const img = sec.image ? (
               <div key={sec.id + "-img"} className="pd-image-cell">
                 <img
-                  src={getImageUrl(sec.image)}
+                  src={imgSrc}
                   alt={`${loc(sec.titleItalic, locale)} ${loc(sec.titleRest, locale)}`.trim()}
+                  className={zoomable ? "tg-zoomable" : undefined}
+                  onClick={zoomable ? () => gallery!.open(imgSrc) : undefined}
                 />
               </div>
             ) : null;
