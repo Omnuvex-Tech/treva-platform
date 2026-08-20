@@ -5,7 +5,10 @@
   --color-bg-icon: #f4f3ef;
   --color-border: #e2e8f0;
   --color-white: #ffffff;
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* next/font şrifti hash-lənmiş adla qeydiyyata alır və onu yalnız
+     --font-inter dəyişəni ilə çağırmaq olar. Düz 'Inter' yazılanda brauzer
+     sistemdə belə şrift axtarır, tapmır və Arial-a düşürdü. */
+  --font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .about-container {
@@ -27,7 +30,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: stretch;
-  margin-bottom: 64px;
+  margin-bottom: 48px;
 }
 
 .about-hero__content {
@@ -57,10 +60,14 @@
   margin-left: 0.2em; /* İki söz arası boşluq */
 }
 
+/* `space-between` idi: sütun şəkil hündürlüyünə uzandığı üçün paraqraflar
+   həmin boşluğa yayılırdı və aralar mətnin özündən asılı olmayaraq böyük
+   görünürdü. İndi aralıq sabitdir, artıq yer aşağıda qalır. */
 .about-hero__description {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 18px;
   flex-grow: 1;
 }
 
@@ -88,12 +95,14 @@
   color: var(--color-primary);
 }
 
+/* Sətir daxilindəki boşluq 32px idi — sətirlər arasında 64px edirdi və
+   56px-lik ikona ilə birlikdə hər sətri 120px-ə çatdırırdı. */
 .services-list__item {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: center;
-  padding: 32px 0;
+  padding: 22px 0;
   border-top: 1px solid var(--color-border);
 }
 
@@ -106,13 +115,15 @@
 .services-list__title { font-size: 18px; font-weight: 600; color: var(--color-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0; }
 .services-list__right-side { width: 100%; }
 
-.services-list__desc-text { 
-  font-size: 20px; 
-  color: var(--color-text-muted); 
-  line-height: 1.6; 
-  margin: 0; 
-  font-weight: 300; 
-  text-transform: none; 
+/* 20px idi — başlıqdan (18px) böyük olduğu üçün iyerarxiya tərsinə düşürdü,
+   həm də tez-tez ikinci sətrə keçib sıranı hündürləşdirirdi. */
+.services-list__desc-text {
+  font-size: 17px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin: 0;
+  font-weight: 300;
+  text-transform: none;
 }
 
 .about-us-callback-wrap {
@@ -151,17 +162,18 @@
   .about-hero__content { display: block; height: auto; }
   .about-hero__title { font-size: 36px; margin-bottom: 24px; }
   .about-hero__description { display: block; }
-  .about-hero__description p { font-size: 15px; line-height: 1.6; margin-bottom: 20px; max-width: 100% !important; }
+  /* Mobildə sütun "display: block"-dur, yəni "gap" işləmir — aralıq margin ilə verilir. */
+  .about-hero__description p { font-size: 15px; line-height: 1.6; margin-bottom: 16px; max-width: 100% !important; }
   .about-hero__image-wrapper { margin-top: 12px; }
   .about-hero__image { max-height: 260px; }
   .about-us-callback-wrap { padding-bottom: 28px; }
-  .services-list__item { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding: 28px 0; }
+  .services-list__item { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px 0; }
   .services-list__section-label { margin-bottom: 4px; font-size: 0.875rem; }
   .services-list__left-side { gap: 16px; width: 100%; }
   .services-list__icon-container { width: 48px; height: 48px; }
   .services-list__icon { max-width: 20px; max-height: 20px; }
   .services-list__title { font-size: 16px; }
-  .services-list__desc-text { font-size: 16.5px; line-height: 1.5; }
+  .services-list__desc-text { font-size: 15.5px; line-height: 1.5; }
 }
 
 @media (max-width: 479px) {

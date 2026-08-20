@@ -2,7 +2,10 @@
     --color-team-accent: #000;
     --color-team-text: #242424;
     --color-white: #ffffff;
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* next/font şrifti hash-lənmiş adla qeydiyyata alır və onu yalnız
+     --font-inter dəyişəni ilə çağırmaq olar. Düz 'Inter' yazılanda brauzer
+     sistemdə belə şrift axtarır, tapmır və Arial-a düşürdü. */
+  --font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .about-page-container {
@@ -43,20 +46,63 @@
     margin: 0;
 }
 
+/* Qlobal `body { text-transform: uppercase }` qaydası bu paraqrafı da böyük
+   hərfə çevirirdi. Tam böyük hərflə yazılmış cümlə oxunması çətindir — hərflərin
+   yuxarı/aşağı uzantıları itdiyi üçün göz sözləri formasına görə tanıya bilmir.
+   Başlıqda uppercase qəsdəndir, burada isə sadəcə miras qalırdı. */
 .about-team__description {
     font-family: var(--font-family);
     font-weight: 400;
-    font-size: 12px;
-    line-height: 144%;
+    font-size: 15px;
+    line-height: 1.6;
     color: var(--color-team-text);
     margin: 0;
+    text-transform: none;
 }
 
+/* Bərabər aralıq. `space-between` işlədilmir: o, yalnız SÜTUNLAR arasındakı
+   boşluğu böyüdür, sətirlər arasındakı `gap` isə olduğu kimi qalır — nəticədə
+   üfüqi və şaquli aralıq uyğunsuz olur.
+
+   Bunun əvəzinə sütunlar `1fr`-dir (bərabər bölünür), şəbəkənin öz eni isə
+   `max-width` ilə məhdudlaşır: 3 × 300px + 2 × 28px aralıq. Kart 300px-dən
+   böyüməz, aralıqlar hər iki oxda eynidir. */
 .about-team__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 310px));
-    gap: 20px;
-    justify-content: start;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    width: 100%;
+    max-width: 956px;
+}
+
+
+/* Şəbəkə + "Daha çox" düyməsi bir sütunda dayanır. */
+.about-team__right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    min-width: 0;
+}
+
+.about-team__more {
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-team-accent);
+    background: transparent;
+    border: 1px solid var(--color-team-accent);
+    border-radius: 999px;
+    padding: 12px 32px;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease;
+}
+
+.about-team__more:hover {
+    background: var(--color-team-accent);
+    color: var(--color-white);
 }
 
 .about-team__card {
@@ -68,7 +114,10 @@
     text-decoration: none;
     cursor: pointer;
     width: 100%;
-    height: 351px;
+    /* Sabit 351px idi. Sütunlar artıq eni bölüşdüyü üçün kart eni ekrana görə
+       dəyişir — sabit hündürlük nisbəti pozardı. 3/4 onsuz da digər
+       breakpoint-lərdə işlənən nisbətdir. */
+    aspect-ratio: 3 / 4;
     transition: transform 250ms ease-out;
 }
 
@@ -84,12 +133,20 @@
     display: block;
 }
 
+/* Mətnin oxunması üçün örtük. Əvvəl kartın yarısını tuturdu və 0.55 ilə
+   başlayırdı — şəkil tutqunlaşırdı. İndi daha dar sahədə, amma altda bir az
+   daha sıx: mətn eyni dərəcədə oxunaqlıdır, şəkil isə açıq qalır. */
 .about-team__card::after {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: 20px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 50%);
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.62) 0%,
+        rgba(0, 0, 0, 0.28) 22%,
+        transparent 42%
+    );
     pointer-events: none;
 }
 
@@ -103,24 +160,37 @@
     gap: 4px;
 }
 
+/* Ad əsasdır, vəzifə onun altındakı kontekstdir. Əvvəl ad 28px/300, vəzifə isə
+   18px/600 idi — vəzifə qalın olduğu üçün adla çəkidə rəqabət aparırdı.
+   İndi ad daha güclü, vəzifə isə sönük və kiçikdir. */
 .about-team__member-name {
-    font-family: 'Inter', var(--font-family);
-    font-weight: 300;
-    font-size: 28px;
-    line-height: 30px;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 21px;
+    line-height: 1.2;
     color: var(--color-white);
-    max-width: 245px;
+    max-width: 230px;
 }
 
 .about-team__member-role {
-    font-family: 'Inter', var(--font-family);
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: var(--color-white);
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.78);
 }
 
+/* Böyük ekranlarda sətirdə 4 nəfər. Standart masaüstündə 3 qalır — yuxarıdakı
+   əsas qayda onu təyin edir. */
 @media (min-width: 1600px) {
+    .about-team__grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 32px;
+        /* 4 × 300px + 3 × 32px aralıq */
+        max-width: 1296px;
+    }
+
     .about-team__card {
         height: auto;
         aspect-ratio: 3 / 4;
@@ -131,8 +201,8 @@
     }
 
     .about-team__description {
-        font-size: 16px;
-        line-height: 152%;
+        font-size: 17px;
+        line-height: 1.6;
     }
 
 }
@@ -222,7 +292,7 @@
     }
 
     .about-team__description {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .about-team__grid {
