@@ -1,7 +1,7 @@
 import React from "react";
-import Link from "next/link";
 import PageContainer from "@/app/components/Container/PageContainer";
-import { toAbsUrl, type ApiAuthor } from "@/lib/pulse-api";
+import { type ApiAuthor } from "@/lib/pulse-api";
+import TeamGrid from "./TeamGrid";
 import "./about-team.css";
 
 type Locale = "az" | "en" | "ru";
@@ -14,19 +14,19 @@ const teamDictionary: Record<
   }
 > = {
   az: {
-    title: "İlham verən komanda",
+    title: "Komandamızla tanış olun",
     description:
-      "Biz tipik bir marketinq şirkəti deyilik! Bir çox brendlər trendləri izləməyə çalışdığı zaman, biz sizə trendi yaratmağa kömək edəcəyik. Biz tipik bir marketinq şirkəti deyilik! Bir çox brendlər trendləri izləməyə çalışdığı zaman, biz sizə trendi yaratmağa kömək edəcəyik.",
+      "Daşınmaz əmlak, satış və investisiya sahələrində təcrübəmizi birləşdiririk. Hər layihəyə rəqəmlərlə yanaşırıq — məqsəd sizin üçün doğru qərarı tapmaqdır.",
   },
   en: {
-    title: "Our inspiring team",
+    title: "Meet our team",
     description:
-      "We are not a typical marketing company! While many brands try to follow trends, we help you create the trend. We are not a typical marketing company! While many brands try to follow trends, we help you create the trend.",
+      "We bring together expertise in real estate, sales and investment. Every project starts with the numbers — so the decision you make is the right one.",
   },
   ru: {
-    title: "Вдохновляющая команда",
+    title: "Знакомьтесь с командой",
     description:
-      "Мы не типичная маркетинговая компания! Пока многие бренды пытаются следовать трендам, мы помогаем вам создавать тренды. Мы не типичная маркетинговая компания! Пока многие бренды пытаются следовать трендам, мы помогаем вам создавать тренды.",
+      "Мы объединяем опыт в сфере недвижимости, продаж и инвестиций. Каждый проект начинается с цифр — чтобы ваше решение было верным.",
   },
 };
 
@@ -60,25 +60,7 @@ export default function AboutTeam({
           <p className="about-team__description">{content.description}</p>
           </div>
 
-          <div className="about-team__grid">
-            {authors.map((author) => (
-              <Link
-                key={author.id}
-                href={`/${locale}/authors/${author.slug}`}
-                className="about-team__card"
-              >
-                <img
-                  src={toAbsUrl(author.avatar || "") || AUTHOR_IMAGE_FALLBACK}
-                  alt={author.name}
-                  className="about-team__card-img"
-                />
-                <div className="about-team__card-info">
-                  <span className="about-team__member-name">{author.name}</span>
-                  <span className="about-team__member-role">{author.title || ""}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <TeamGrid authors={authors} locale={locale} />
         </div>
       </PageContainer>
     </section>
