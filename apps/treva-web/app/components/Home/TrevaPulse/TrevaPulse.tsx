@@ -21,6 +21,7 @@ const pulseDictionary = {
     categories: { all: "Hamısı" },
     viewAll: "Hamısına bax",
     noData: "Bu kateqoriyada məqalə tapılmadı.",
+    pulseWord: "PULSE",
   },
   en: {
     subtitle: [
@@ -33,6 +34,7 @@ const pulseDictionary = {
     categories: { all: "All" },
     viewAll: "View all",
     noData: "No articles found in this category.",
+    pulseWord: "PULSE",
   },
   ru: {
     subtitle: [
@@ -45,6 +47,8 @@ const pulseDictionary = {
     categories: { all: "Все" },
     viewAll: "Смотреть все",
     noData: "В этой категории статей не найдено.",
+    // Brend adı, rus versiyasında kiril ilə.
+    pulseWord: "ПУЛЬС",
   },
 } as const;
 
@@ -110,7 +114,7 @@ const TrevaPulse: React.FC<TrevaPulseProps> = ({ locale = 'az', articles = [], c
             <div className="pulse__desktop-row">
               <h2 className="pulse__title">
                 <span className="pulse__title-thin">TREVA</span>{" "}
-                <span className="pulse__title-bold">PULSE</span>
+                <span className="pulse__title-bold">{content.pulseWord}</span>
               </h2>
 
               <p className="pulse__subtitle">

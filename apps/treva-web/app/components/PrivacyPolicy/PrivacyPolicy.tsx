@@ -14,7 +14,15 @@ interface PrivacyPolicyProps {
   locale: string;
 }
 
+/** Səhifə başlığındakı şəklin alt mətni. */
+const imageAltByLocale = {
+  az: 'Taxta iş masasının üzərində noutbuk',
+  en: 'A laptop computer sitting on top of a wooden desk.',
+  ru: 'Ноутбук на деревянном рабочем столе',
+} as const;
+
 const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ locale }) => {
+  const imageAlt = imageAltByLocale[locale as keyof typeof imageAltByLocale] ?? imageAltByLocale.az;
   return (
     <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
@@ -37,7 +45,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ locale }) => {
                       loading="lazy" 
                       width="Auto" 
                       sizes="(max-width: 2000px) 100vw, 2000px" 
-                      alt="A laptop computer sitting on top of a wooden desk." 
+                      alt={imageAlt} 
                       srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/699330ca428de3a18c598073_envato-labs-image-edit-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/699330ca428de3a18c598073_envato-labs-image-edit-p-800.avif 800w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/699330ca428de3a18c598073_envato-labs-image-edit.avif 2000w" 
                       className="fullwidth-img"
                     />

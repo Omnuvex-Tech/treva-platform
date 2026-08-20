@@ -27,9 +27,17 @@ interface Props {
   ctaLink?: string;
   onCtaClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
   getImageUrl: (url: string) => string;
+  locale?: string;
 }
 
 const AUTOPLAY_DELAY = 5000;
+
+/** Slayder oxlarının ekran oxuyucu etiketləri. */
+const heroDictionary = {
+  az: { prev: "Əvvəlki slayd", next: "Növbəti slayd" },
+  en: { prev: "Previous slide", next: "Next slide" },
+  ru: { prev: "Предыдущий слайд", next: "Следующий слайд" },
+} as const;
 
 export default function ProjectHero({
   title,
@@ -40,7 +48,9 @@ export default function ProjectHero({
   ctaLink,
   onCtaClick,
   getImageUrl,
+  locale = "az",
 }: Props) {
+  const t = heroDictionary[locale as keyof typeof heroDictionary] ?? heroDictionary.az;
   const validImages = images?.filter((img) => img.url) || [];
   const [activeIndex, setActiveIndex] = useState(0);
   const [animationTick, setAnimationTick] = useState(0);
@@ -170,12 +180,12 @@ export default function ProjectHero({
             <div className="vision-hero__slider-arrows">
               <DirectionButton
                 direction="previous"
-                label="Previous slide"
+                label={t.prev}
                 className="vision-hero__prev"
               />
               <DirectionButton
                 direction="next"
-                label="Next slide"
+                label={t.next}
                 className="vision-hero__next"
               />
             </div>

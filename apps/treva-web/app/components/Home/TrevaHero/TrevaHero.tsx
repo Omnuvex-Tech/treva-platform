@@ -49,6 +49,8 @@ const heroDictionary = {
       "Off-Plan",
       "Resale",
     ],
+    prevSlide: "Əvvəlki slayd",
+    nextSlide: "Növbəti slayd",
   },
   en: {
     title: (
@@ -64,6 +66,8 @@ const heroDictionary = {
       "Off-Plan",
       "Resale",
     ],
+    prevSlide: "Previous slide",
+    nextSlide: "Next slide",
   },
   ru: {
     title: (
@@ -79,6 +83,8 @@ const heroDictionary = {
       "Off-Plan",
       "Resale",
     ],
+    prevSlide: "Предыдущий слайд",
+    nextSlide: "Следующий слайд",
   },
 } as const;
 
@@ -176,7 +182,7 @@ const [locationMenuOpen, setLocationMenuOpen] = useState(false);
 
   return (
     <>
-      <Navbar />
+      <Navbar locale={locale} />
 
       {/* ========== HERO SECTION ========== */}
       <div className="treva-hero-container">
@@ -309,7 +315,7 @@ const [locationMenuOpen, setLocationMenuOpen] = useState(false);
               type="button"
               className="treva-hero-slider-nav__arrow treva-hero-slider-nav__arrow--prev"
               onClick={prevSlide}
-              aria-label="Previous slide"
+              aria-label={content.prevSlide}
             >
               <ArrowLeft size={18} strokeWidth={2} />
             </button>
@@ -317,7 +323,7 @@ const [locationMenuOpen, setLocationMenuOpen] = useState(false);
               type="button"
               className="treva-hero-slider-nav__arrow treva-hero-slider-nav__arrow--next"
               onClick={nextSlide}
-              aria-label="Next slide"
+              aria-label={content.nextSlide}
             >
               <ArrowRight size={18} strokeWidth={2} />
             </button>

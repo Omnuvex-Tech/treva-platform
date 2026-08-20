@@ -91,6 +91,21 @@ export interface LocationSection extends SectionBase {
   googleMapsUrl: string;
 }
 
+/** Qalereyadakı bir kadr — interyer/eksteryer fotosu. */
+export interface GalleryItem {
+  url: string;
+  caption: LocalizedString;
+}
+
+/** İnteryer/eksteryer foto qalereyası — sərbəst sayda şəkil. */
+export interface GallerySection extends SectionBase {
+  type: "gallery";
+  titleLight: LocalizedString;
+  titleBold: LocalizedString;
+  description: LocalizedString;
+  items: GalleryItem[];
+}
+
 /** Mənzil planları — datasını categorySlug üzərindən özü çəkir, sahəsi yoxdur. */
 export interface LayoutsSection extends SectionBase {
   type: "layouts";
@@ -101,7 +116,8 @@ export type ProjectSection =
   | OverviewSection
   | FeaturesSection
   | LocationSection
-  | LayoutsSection;
+  | LayoutsSection
+  | GallerySection;
 
 export type ProjectSectionType = ProjectSection["type"];
 

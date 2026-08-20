@@ -82,6 +82,59 @@ type HomeFooterProps = {
   locale?: string;
 };
 
+/**
+ * Footer mətnləri. Əvvəl hamısı sabit ingiliscə idi — Azərbaycan və rus
+ * versiyalarında da "Home", "About Us", "BACK TO TOP" görünürdü.
+ *
+ * Sosial şəbəkə adları (Linkedin, Instagram, ...) tərcümə olunmur.
+ * "pulse" brend adıdır və azərbaycanca/ingiliscə olduğu kimi qalır, rus
+ * versiyasında isə kiril hərfləri ilə yazılır.
+ */
+const footerDictionary = {
+  az: {
+    sitemap: "Sayt xəritəsi",
+    socialMedia: "Sosial media",
+    home: "Ana səhifə",
+    about: "Haqqımızda",
+    projects: "Layihələr",
+    developers: "Developerlər",
+    brokers: "Brokerlər",
+    contact: "Əlaqə",
+    privacy: "Məxfilik siyasəti",
+    pulse: "pulse",
+    headOffice: "BAŞ OFİS — Ziya Yusifzadə 10, Sabah Residence",
+    backToTop: "Yuxarı qayıt",
+  },
+  en: {
+    sitemap: "Sitemap",
+    socialMedia: "Social media",
+    home: "Home",
+    about: "About Us",
+    projects: "Projects",
+    developers: "Developers",
+    brokers: "Brokers",
+    contact: "Contact",
+    privacy: "Privacy Policy",
+    pulse: "pulse",
+    headOffice: "HEADQUARTERS — Ziya Yusifzade 10, Sabah Residence",
+    backToTop: "Back to top",
+  },
+  ru: {
+    sitemap: "Карта сайта",
+    socialMedia: "Соцсети",
+    home: "Главная",
+    about: "О нас",
+    projects: "Проекты",
+    developers: "Девелоперы",
+    brokers: "Брокеры",
+    contact: "Контакт",
+    privacy: "Политика конфиденциальности",
+    pulse: "пульс",
+    headOffice: "ГЛАВНЫЙ ОФИС — Ziya Yusifzade 10, Sabah Residence",
+    backToTop: "Наверх",
+  },
+} as const;
+
 type FooterContactLinkProps = {
   href: string;
   label: string;
@@ -118,6 +171,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
   const aboutHref = `/${locale}/about-us`;
   const contactHref = `/${locale}/contact`;
   const pulseHref = `/${locale}/pulse`;
+  const t = footerDictionary[locale as keyof typeof footerDictionary] ?? footerDictionary.az;
 
   const scrollToTop = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
@@ -136,7 +190,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
               <div className="footer_wrap">
                 <div className="footer_nav-wrap">
                   <div className="footer_col">
-                    <div className="text-color-white60">sItemap</div>
+                    <div className="text-color-white60">{t.sitemap}</div>
                     <div className="footer_nav">
                       <Link
                         href={homeHref}
@@ -144,28 +198,28 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                         className="footer_link-wrap w-inline-block w--current"
                       >
                         <div className="footer_link-content">
-                          <div className="footer_link-text">Home</div>
-                          <div className="footer_link-text">Home</div>
+                          <div className="footer_link-text">{t.home}</div>
+                          <div className="footer_link-text">{t.home}</div>
                         </div>
                       </Link>
-                      <FooterNavLink href={aboutHref} label="About Us" />
-                      <FooterNavLink href={`/${locale}/projects`} label="Projects" />
-                      <FooterNavLink href={`/${locale}/developers`} label="Developers" />
-                      <FooterNavLink href={`/${locale}/brokers`} label="Brokers" />
+                      <FooterNavLink href={aboutHref} label={t.about} />
+                      <FooterNavLink href={`/${locale}/projects`} label={t.projects} />
+                      <FooterNavLink href={`/${locale}/developers`} label={t.developers} />
+                      <FooterNavLink href={`/${locale}/brokers`} label={t.brokers} />
                       <Link href={pulseHref} className="footer_link-wrap w-inline-block footer_pulse-link">
                         <div className="footer_link-content">
-                          <div className="footer_link-text">pulse</div>
-                          <div className="footer_link-text">pulse</div>
+                          <div className="footer_link-text">{t.pulse}</div>
+                          <div className="footer_link-text">{t.pulse}</div>
                         </div>
                         <FooterRedDot />
                       </Link>
-                      <FooterNavLink href={contactHref} label="Contact" />
-                      <FooterNavLink href={`/${locale}/privacy-policy`} label="Privacy Policy" />
+                      <FooterNavLink href={contactHref} label={t.contact} />
+                      <FooterNavLink href={`/${locale}/privacy-policy`} label={t.privacy} />
                     </div>
                   </div>
 
                   <div className="footer_col">
-                    <div className="text-color-white60">SocIal medIa</div>
+                    <div className="text-color-white60">{t.socialMedia}</div>
                     <div lang="en" className="footer_nav">
                       <FooterExternalLink
                         href="https://www.linkedin.com/company/trevarealestate"
@@ -218,13 +272,13 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                     rel="noopener noreferrer"
                     className="cs_scroll-wrap is-alternate w-inline-block footer_head-office"
                   >
-                    <ButtonText>HEADQUARTERS — Ziya Yusifzade 10, Sabah Residence</ButtonText>
+                    <ButtonText>{t.headOffice}</ButtonText>
                   </a>
                   <div className="footer_bottom-links">
                     <FooterActionLink
                       href="#top"
                       onClick={scrollToTop}
-                      label="BACK TO TOP"
+                      label={t.backToTop}
                       icon={
                         <div className="button-icon-wrap is-small">
                           <div className="button-icon w-embed">
@@ -236,7 +290,7 @@ export const HomeFooter = ({ locale = "en" }: HomeFooterProps) => {
                         </div>
                       }
                     />
-                    <div>TREVA 2025</div>
+                    <div>Treva © 2026</div>
                   </div>
                 </div>
               </div>

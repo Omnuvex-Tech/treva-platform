@@ -22,7 +22,18 @@ type PulseArticleDetailProps = {
   relatedArticles?: Article[];
 };
 
-function ArticleBanner() {
+/**
+  * Məqalə səhifəsinin üstündəki sürüşən lent.
+  * Mətni sabit ingiliscə idi — üç dilin hamısında ingilis görünürdü.
+  */
+const bannerText = {
+  az: 'Qlobal investorlar niyə regiona baxır',
+  en: 'Why Global Investors Are Looking to the Region',
+  ru: 'Почему глобальные инвесторы смотрят на регион',
+} as const;
+
+function ArticleBanner({ locale }: { locale: string }) {
+  const text = bannerText[locale as keyof typeof bannerText] ?? bannerText.az;
   const items = Array.from({ length: 10 }, (_, index) => index);
 
   return (
@@ -31,7 +42,7 @@ function ArticleBanner() {
         <div key={block} className="article_banner-block">
           {items.slice(0, 5).map((item) => (
             <div key={`${block}-${item}`} className="article_banner-item">
-              <div>Why Global Investors Are Looking to the Region</div>
+              <div>{text}</div>
             </div>
           ))}
         </div>
@@ -315,7 +326,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
   return (
     <div className="page-wrapper" data-locale={locale}>
       <Navbar locale={locale} variant="solid" />
-      <ArticleBanner />
+      <ArticleBanner locale={locale} />
       <style jsx global>{`
         .section_f-articles .f-articles_img-wrap { position: relative; overflow: hidden; cursor: pointer; }
         .section_f-articles .f-articles_img-wrap img { transition: transform 0.4s ease; }

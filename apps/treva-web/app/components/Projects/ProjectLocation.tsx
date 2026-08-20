@@ -14,7 +14,21 @@ interface Props {
   footerAddress: string;
   googleMapsUrl?: string;
   getImageUrl: (url: string) => string;
+  locale?: string;
 }
+
+/**
+ * Xəritə bloku mətnləri.
+ *
+ * "Google Maps-də aç" əvvəl sabit azərbaycanca idi — ingilis və rus
+ * versiyalarında da azərbaycanca görünürdü. Xəritənin title/alt mətnləri isə
+ * əksinə sabit ingiliscə idi.
+ */
+const locationDictionary = {
+  az: { openInMaps: "Google Maps-də aç", mapLabel: "Layihənin xəritədə yeri" },
+  en: { openInMaps: "Open in Google Maps", mapLabel: "Property location map" },
+  ru: { openInMaps: "Открыть в Google Maps", mapLabel: "Расположение объекта на карте" },
+} as const;
 
 /**
  * Convert any Google Maps URL to a working embed URL.
@@ -71,7 +85,9 @@ export default function ProjectLocation({
   footerAddress,
   googleMapsUrl,
   getImageUrl,
+  locale = "az",
 }: Props) {
+  const t = locationDictionary[locale as keyof typeof locationDictionary] ?? locationDictionary.az;
   const hasGoogleMapsUrl = !!googleMapsUrl;
   const embedUrl = hasGoogleMapsUrl ? toGoogleMapsEmbed(googleMapsUrl) : "";
 
@@ -118,7 +134,7 @@ export default function ProjectLocation({
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Property Location Map"
+                title={t.mapLabel}
               />
             </div>
           </div>
@@ -130,7 +146,7 @@ export default function ProjectLocation({
             <div className="property-map-container">
               <img
                 src={getImageUrl(mapImage)}
-                alt="Property Location Map"
+                alt={t.mapLabel}
                 className="property-real-map"
                 style={{ objectFit: "cover" }}
               />
@@ -141,7 +157,7 @@ export default function ProjectLocation({
                   rel="noopener noreferrer"
                   className="property-map-link"
                 >
-                  Google Maps-də aç
+                  {t.openInMaps}
                 </a>
               )}
             </div>
@@ -158,7 +174,7 @@ export default function ProjectLocation({
                 rel="noopener noreferrer"
                 className="property-map-link"
               >
-                Google Maps-də aç
+                {t.openInMaps}
               </a>
             </div>
           </div>

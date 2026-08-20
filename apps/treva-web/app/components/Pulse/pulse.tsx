@@ -191,6 +191,13 @@ function NewsCard({
   );
 }
 
+/** Səhifə başlığı. "pulse" brend adıdır — rusca kiril ilə yazılır. */
+const headingByLocale = {
+  az: 'Treva pulse',
+  en: 'Treva pulse',
+  ru: 'Treva Пульс',
+} as const;
+
 function PulseHeaderSection({
   locale,
   leftArticles,
@@ -213,7 +220,7 @@ function PulseHeaderSection({
           <div className="news-header_component">
             <div className="news-header_rec">
               <h1 className="heading-style-h1-medium">
-                Treva pulse
+                {headingByLocale[locale as keyof typeof headingByLocale] ?? headingByLocale.az}
               </h1>
             </div>
 

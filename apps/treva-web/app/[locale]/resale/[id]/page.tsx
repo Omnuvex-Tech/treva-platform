@@ -50,10 +50,24 @@ function toGoogleMapsEmbed(url: string): string {
   return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
 }
 
+/**
+ * Yüklənmə və "tapılmadı" mətnləri.
+ *
+ * Səhifə lüğəti (`pageDictionary`) apartment gəldikdən sonra qurulur, bu iki
+ * hal isə ondan əvvəl render olunur — ona görə modul səviyyəsindədir.
+ */
+const statusDictionary = {
+  az: { loading: 'Yüklənir...', notFound: 'Mənzil tapılmadı' },
+  en: { loading: 'Loading...', notFound: 'Apartment not found' },
+  ru: { loading: 'Загрузка...', notFound: 'Квартира не найдена' },
+} as const;
+
 export default function ResaleDetailPage() {
   const params = useParams();
   const slug = params?.id as string;
   const locale = (params?.locale as string) || 'az';
+
+  const st = statusDictionary[(locale as 'az' | 'en' | 'ru')] || statusDictionary.az;
 
   const { data: apartment, isLoading, error } = useResaleApartmentBySlug(slug);
 
@@ -182,14 +196,14 @@ export default function ResaleDetailPage() {
   if (isLoading) {
     return (
       <div className="pdet-page-wrapper">
-        <Navbar variant="solid" />
+        <Navbar locale={locale} variant="solid" />
         <main className="pdet-main-wrapper">
           <PageContainer className="pdet-page-container">
-            <div className="py-16 text-center text-white/50">Loading...</div>
+            <div className="py-16 text-center text-white/50">{st.loading}</div>
           </PageContainer>
         </main>
         <CallbackForm allowedRoles={['Client']} />
-        <HomeFooter />
+        <HomeFooter locale={locale} />
       </div>
     );
   }
@@ -197,14 +211,14 @@ export default function ResaleDetailPage() {
   if (error || !apartment) {
     return (
       <div className="pdet-page-wrapper">
-        <Navbar variant="solid" />
+        <Navbar locale={locale} variant="solid" />
         <main className="pdet-main-wrapper">
           <PageContainer className="pdet-page-container">
-            <div className="py-16 text-center text-white/50">Apartment not found</div>
+            <div className="py-16 text-center text-white/50">{st.notFound}</div>
           </PageContainer>
         </main>
         <CallbackForm allowedRoles={['Client']} />
-        <HomeFooter />
+        <HomeFooter locale={locale} />
       </div>
     );
   }
@@ -232,7 +246,60 @@ export default function ResaleDetailPage() {
     return `${from}/${to}`;
   })();
 
-  const title = `${apartment.roomCount}-ROOM FLAT, ${apartment.area} M², ${floorLabel} FLOOR`;
+  /**
+   * Səhifə mətnləri. Səhifənin əsas başlığı da daxil olmaqla bunlar sabit
+   * ingiliscə idi — azərbaycanca və rusca versiyalarda da ingilis görünürdü.
+   */
+  const pageDictionary = {
+    az: {
+      loading: 'Yüklənir...',
+      main: 'Ana səhifə',
+      resale: 'Təkrar satış',
+      share: 'Paylaş',
+      copied: 'Kopyalandı!',
+      copyLink: 'Linki kopyala',
+      save: 'Yadda saxla',
+      saved: 'Saxlanılıb',
+      requestCall: 'Zəng sifariş et',
+      titleTemplate: (rooms: number | string, area: number | string, floor: string) =>
+        `${rooms} OTAQLI MƏNZİL, ${area} M², ${floor}-Cİ MƏRTƏBƏ`,
+      shareIntro: 'Bu mənzilə baxın:',
+      shareLocation: 'Ünvan:',
+    },
+    en: {
+      loading: 'Loading...',
+      main: 'Main',
+      resale: 'Resale',
+      share: 'Share',
+      copied: 'Copied!',
+      copyLink: 'Copy link',
+      save: 'Save',
+      saved: 'Saved',
+      requestCall: 'Request a call',
+      titleTemplate: (rooms: number | string, area: number | string, floor: string) =>
+        `${rooms}-ROOM FLAT, ${area} M², ${floor} FLOOR`,
+      shareIntro: 'Check out this apartment:',
+      shareLocation: 'Location:',
+    },
+    ru: {
+      loading: 'Загрузка...',
+      main: 'Главная',
+      resale: 'Вторичное жильё',
+      share: 'Поделиться',
+      copied: 'Скопировано!',
+      copyLink: 'Копировать ссылку',
+      save: 'Сохранить',
+      saved: 'Сохранено',
+      requestCall: 'Заказать звонок',
+      titleTemplate: (rooms: number | string, area: number | string, floor: string) =>
+        `${rooms}-КОМНАТНАЯ КВАРТИРА, ${area} М², ${floor} ЭТАЖ`,
+      shareIntro: 'Посмотрите эту квартиру:',
+      shareLocation: 'Адрес:',
+    },
+  } as const;
+  const pt = pageDictionary[(locale as 'az' | 'en' | 'ru')] || pageDictionary.az;
+
+  const title = pt.titleTemplate(apartment.roomCount, apartment.area, floorLabel);
   const galleryDictionary = {
     az: {
       viewAll: 'Bütün',
@@ -275,7 +342,7 @@ export default function ResaleDetailPage() {
   const locationLink = apartment.locationUrl || '';
   const mapSource = apartment.locationGoogleMapsUrl || apartment.locationUrl || '';
   const mapEmbedUrl = mapSource ? toGoogleMapsEmbed(mapSource) : '';
-  const shareText = `Check out this apartment: ${title} — ${formatPrice(getPrice('total'))} ${getCurrencyValue()}${locationLink ? `\n📍 Location: ${locationLink}` : ''}`;
+  const shareText = `${pt.shareIntro} ${title} — ${formatPrice(getPrice('total'))} ${getCurrencyValue()}${locationLink ? `\n📍 ${pt.shareLocation} ${locationLink}` : ''}`;
 
   const handleShare = (platform: string) => {
     const url = shareUrl;
@@ -312,13 +379,13 @@ export default function ResaleDetailPage() {
 
   return (
     <div className="pdet-page-wrapper" data-locale={locale}>
-      {!isGalleryOpen && <Navbar variant="solid" />}
+      {!isGalleryOpen && <Navbar locale={locale} variant="solid" />}
       <main className="pdet-main-wrapper">
         <PageContainer className="pdet-page-container">
           <nav className="pdet-breadcrumb">
-            <Link href={`/${locale}`} className="pdet-breadcrumb-link">Main</Link>
+            <Link href={`/${locale}`} className="pdet-breadcrumb-link">{pt.main}</Link>
             <span className="pdet-breadcrumb-sep">/</span>
-            <Link href={`/${locale}/resale`} className="pdet-breadcrumb-link">Resale</Link>
+            <Link href={`/${locale}/resale`} className="pdet-breadcrumb-link">{pt.resale}</Link>
             <span className="pdet-breadcrumb-sep">/</span>
             <span className="pdet-breadcrumb-current">N° {apartment.slug || apartment.id.slice(0, 6)}</span>
           </nav>
@@ -404,6 +471,7 @@ export default function ResaleDetailPage() {
                     mapEmbedUrl={mapEmbedUrl}
                     locationTitle={apartment.locationTitle || ''}
                     showViewingCard={false}
+                    locale={locale}
                   />
                 </div>
               </div>
@@ -429,7 +497,7 @@ export default function ResaleDetailPage() {
                       onClick={() => setShareOpen((p) => !p)}
                     >
                       <img src="/images/resale/share.png" alt="" width="21" height="21" />
-                      <span>Share</span>
+                      <span>{pt.share}</span>
                     </button>
                     {shareOpen && (
                       <div className="pdet-share-dropdown">
@@ -475,7 +543,7 @@ export default function ResaleDetailPage() {
                           onClick={() => handleShare('copy')}
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                          <span>{copied ? 'Copied!' : 'Copy link'}</span>
+                          <span>{copied ? pt.copied : pt.copyLink}</span>
                         </button>
                       </div>
                     )}
@@ -487,7 +555,7 @@ export default function ResaleDetailPage() {
                     onClick={toggleSaveProp}
                   >
                     <img src="/images/resale/save.png" alt="" width="21" height="21" />
-                    <span>{isSaved ? 'Saved' : 'Save'}</span>
+                    <span>{isSaved ? pt.saved : pt.save}</span>
                   </button>
                 </div>
 
@@ -521,7 +589,7 @@ export default function ResaleDetailPage() {
                       className="pdet-btn-secondary"
                       style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      Request a call
+                      {pt.requestCall}
                     </a>
                   </div>
                 </div>
@@ -542,6 +610,7 @@ export default function ResaleDetailPage() {
                 mapEmbedUrl={mapEmbedUrl}
                 locationTitle={apartment.locationTitle || ''}
                 showViewingCard={false}
+                locale={locale}
               />
             </div>
           </div>
@@ -566,7 +635,7 @@ export default function ResaleDetailPage() {
                 <button
                   type="button"
                   className="pdet-lightbox-nav pdet-lightbox-nav--prev"
-                  aria-label="Previous image"
+                  aria-label={gt.previousImage}
                   onClick={(event) => {
                     event.stopPropagation();
                     showPrevImage();
@@ -586,7 +655,7 @@ export default function ResaleDetailPage() {
                 <button
                   type="button"
                   className="pdet-lightbox-nav pdet-lightbox-nav--next"
-                  aria-label="Next image"
+                  aria-label={gt.nextImage}
                   onClick={(event) => {
                     event.stopPropagation();
                     showNextImage();
@@ -615,7 +684,7 @@ export default function ResaleDetailPage() {
           </div>
         </div>
       )}
-      <HomeFooter />
+      <HomeFooter locale={locale} />
     </div>
   );
 }
