@@ -27,7 +27,15 @@ type Props = {
   categories: CategoryLike[];
 };
 
+/** Bölmə mətnləri — əvvəl sabit azərbaycanca idi. */
+const otherArticlesLabels = {
+  az: { title: 'Digər məqalələr', read: 'Məqaləni oxu' },
+  en: { title: 'Other articles', read: 'Read article' },
+  ru: { title: 'Другие статьи', read: 'Читать статью' },
+} as const;
+
 const OtherArticlesSection: React.FC<Props> = ({ locale, articles, categories }) => {
+  const ot = otherArticlesLabels[locale as keyof typeof otherArticlesLabels] ?? otherArticlesLabels.az;
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const filtered = activeCategory
@@ -36,7 +44,7 @@ const OtherArticlesSection: React.FC<Props> = ({ locale, articles, categories })
 
   return (
     <div className="other-articles">
-      <h2 className="other-articles__title">Digər məqalələr</h2>
+      <h2 className="other-articles__title">{ot.title}</h2>
 
      <div className="other-articles__filters">
         <button
@@ -78,7 +86,7 @@ const OtherArticlesSection: React.FC<Props> = ({ locale, articles, categories })
                 <div className="other-articles__img-fallback" />
               )}
               <div className="other-articles__overlay">
-                <span className="other-articles__overlay-btn">Məqaləni oxu</span>
+                <span className="other-articles__overlay-btn">{ot.read}</span>
               </div>
             </div>
 

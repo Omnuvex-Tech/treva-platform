@@ -15,6 +15,53 @@ import "./pulse-article.css";
 
 const AUTHOR_IMAGE_FALLBACK = "/assets/webflow-placeholder.svg";
 
+/** Məqalə detal səhifəsinin mətnləri — əvvəl hamısı sabit azərbaycanca idi. */
+const articleDictionary = {
+  az: {
+    featured: 'Seçilmiş məqalələr',
+    allArticles: 'Bütün məqalələr',
+    subscribeTitle: 'Xəbər bülletenimizə abunə olun',
+    subscribeSuccess: 'Abunəliyiniz uğurla qeydiyyatdan keçdi!',
+    subscribeThanks: 'TREVA ilə əlaqədə qaldığınız üçün təşəkkür edirik.',
+    newSubscription: 'Yeni abunəlik',
+    emailPlaceholder: 'E-poçt ünvanı',
+    subscribe: 'Abunə ol',
+    subscribeError: 'Xəta baş verdi. Yenidən cəhd edin.',
+    weeklyNote: 'PULSE-da hər həftə yeni məlumatları oxumağa davam edin',
+    ourArticles: '(Məqalələrimiz)',
+    readArticle: 'Məqaləni oxu',
+  },
+  en: {
+    featured: 'Featured articles',
+    allArticles: 'All articles',
+    subscribeTitle: 'Subscribe to our newsletter',
+    subscribeSuccess: 'Your subscription is confirmed!',
+    subscribeThanks: 'Thank you for staying in touch with TREVA.',
+    newSubscription: 'New subscription',
+    emailPlaceholder: 'Email address',
+    subscribe: 'Subscribe',
+    subscribeError: 'Something went wrong. Please try again.',
+    weeklyNote: 'Keep reading new insights on PULSE every week',
+    ourArticles: '(Our articles)',
+    readArticle: 'Read article',
+  },
+  ru: {
+    featured: 'Избранные статьи',
+    allArticles: 'Все статьи',
+    subscribeTitle: 'Подпишитесь на нашу рассылку',
+    subscribeSuccess: 'Ваша подписка оформлена!',
+    subscribeThanks: 'Спасибо, что остаётесь на связи с TREVA.',
+    newSubscription: 'Новая подписка',
+    emailPlaceholder: 'Адрес электронной почты',
+    subscribe: 'Подписаться',
+    subscribeError: 'Произошла ошибка. Попробуйте ещё раз.',
+    weeklyNote: 'Читайте новые материалы на ПУЛЬС каждую неделю',
+    ourArticles: '(Наши статьи)',
+    readArticle: 'Читать статью',
+  },
+} as const;
+
+
 type PulseArticleDetailProps = {
   locale: string;
   article: Article;
@@ -120,6 +167,7 @@ const ArticleHero: React.FC<{ article: Article }> = ({ article }) => (
 );
 
 const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ locale, articles }) => {
+  const t = articleDictionary[locale as keyof typeof articleDictionary] ?? articleDictionary.az;
   const [email, setEmail] = useState('');
   const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -150,7 +198,7 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
   <div className="article_sidebar">
     <div className="article_sidebar-featured">
       <div className="article_sidebar-top">
-        <h3 className="heading-style-h3-small no-animate">Seçilmiş məqalələr</h3>
+        <h3 className="heading-style-h3-small no-animate">{t.featured}</h3>
       </div>
       <div className="w-dyn-list">
         <div role="list" className="article_sidebar-list w-dyn-items">
@@ -186,14 +234,14 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
       </div>
       <div className="article_sidebar-cta">
         <a href={`/${locale}/pulse`} className="button w-inline-block">
-          <ButtonText>Bütün məqalələr</ButtonText>
+          <ButtonText>{t.allArticles}</ButtonText>
         </a>
       </div>
     </div>
 
     <div className="article_newsletter">
       <div className="article_sidebar-top">
-        <h3 className="heading-style-h3-small no-animate">Xəbər bülletenimizə abunə olun</h3>
+        <h3 className="heading-style-h3-small no-animate">{t.subscribeTitle}</h3>
       </div>
       <div className="article_form-block w-form">
         {subStatus === 'success' ? (
@@ -204,15 +252,15 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
                 <path className="newsletter-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
               </svg>
             </div>
-            <p className="newsletter-success-title">Abunəliyiniz uğurla qeydiyyatdan keçdi!</p>
-            <p className="newsletter-success-text">TREVA ilə əlaqədə qaldığınız üçün təşəkkür edirik.</p>
-            <button className="newsletter-success-btn" onClick={() => setSubStatus('idle')}>Yeni abunəlik</button>
+            <p className="newsletter-success-title">{t.subscribeSuccess}</p>
+            <p className="newsletter-success-text">{t.subscribeThanks}</p>
+            <button className="newsletter-success-btn" onClick={() => setSubStatus('idle')}>{t.newSubscription}</button>
           </div>
         ) : (
           <form className="article_form" onSubmit={handleSubscribe}>
             <input
               className="article_input-field w-input"
-              placeholder="E-poçt ünvanı"
+              placeholder={t.emailPlaceholder}
               type="email"
               name="email"
               required
@@ -221,27 +269,29 @@ const ArticleSidebar: React.FC<{ locale: string; articles: Article[] }> = ({ loc
             />
             <button type="submit" className={`article_submit-btn w-button ${subStatus === 'loading' ? 'is-loading' : ''}`} disabled={subStatus === 'loading'}>
               {subStatus === 'loading' && <span className="article-spinner" />}
-              <span>Abunə ol</span>
+              <span>{t.subscribe}</span>
             </button>
           </form>
         )}
-        {subStatus === 'error' && <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '8px' }}>Xəta baş verdi. Yenidən cəhd edin.</div>}
+        {subStatus === 'error' && <div style={{ color: '#ef4444', fontSize: '14px', marginTop: '8px' }}>{t.subscribeError}</div>}
       </div>
     </div>
   </div>
   );
 };
 
-const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; articles: Article[] }> = ({ locale, currentSlug, articles }) => (
+const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; articles: Article[] }> = ({ locale, currentSlug, articles }) => {
+  const t = articleDictionary[locale as keyof typeof articleDictionary] ?? articleDictionary.az;
+  return (
   <section className="section_f-articles">
     <div className="global-padding padding-section-medium">
       <div className="container-large">
         <div className="f-articles_component">
           <div className="f-articles_intro">
             <div className="max-width-48rem">
-              <h2 className="heading-style-h2-medium">PULSE-da hər həftə yeni məlumatları oxumağa davam edin</h2>
+              <h2 className="heading-style-h2-medium">{t.weeklyNote}</h2>
             </div>
-            <div>(Məqalələrimiz)</div>
+            <div>{t.ourArticles}</div>
           </div>
           <div className="f-articles_wrap">
             <div className="f-articles_holder">
@@ -266,7 +316,7 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
                           </div>
                           <div className="projects_overlay hide-tablet">
                             <div className="news_btn">
-                              <div>Məqaləni oxu</div>
+                              <div>{t.readArticle}</div>
                             </div>
                           </div>
                         </div>
@@ -300,7 +350,8 @@ const RelatedArticlesSection: React.FC<{ locale: string; currentSlug: string; ar
       </div>
     </div>
   </section>
-);
+  );
+};
 
 const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; slug: string }[] }> = ({ keywords }) => {
   if (!keywords || keywords.length === 0) return null;
@@ -321,6 +372,7 @@ const ArticleKeywordsBlock: React.FC<{ keywords?: { id: string; name: string; sl
 };
 
 const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article, sidebarArticles = [], relatedArticles = [] }) => {
+  const t = articleDictionary[locale as keyof typeof articleDictionary] ?? articleDictionary.az;
   useEffect(() => { window.scrollTo(0, 0); }, []);
   const articleAuthorImage = toAbsUrl(article.authorImage || "") || AUTHOR_IMAGE_FALLBACK;
   return (

@@ -47,8 +47,16 @@ export async function generateStaticParams() {
   }
 }
 
+/** Müəllif səhifəsinin mətnləri — əvvəl sabit azərbaycanca idi. */
+const authorPageLabels = {
+  az: { recent: 'Son məqalələr', read: 'Məqaləni oxu', keywords: 'Açar sözlər' },
+  en: { recent: 'Recent articles', read: 'Read article', keywords: 'Keywords' },
+  ru: { recent: 'Последние статьи', read: 'Читать статью', keywords: 'Ключевые слова' },
+} as const;
+
 export default async function AuthorPage({ params, searchParams }: Props) {
   const { locale, slug } = await params;
+  const al = authorPageLabels[locale as keyof typeof authorPageLabels] ?? authorPageLabels.az;
   const { category: activeCategory } = await searchParams;
 
   let apiAuthor;
@@ -134,7 +142,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
 
               {/* Right column — latest articles */}
               <div className="author-page_right-col">
-                <h2 className="author-page_articles-title">Son məqalələr</h2>
+                <h2 className="author-page_articles-title">{al.recent}</h2>
                 <div className="author-page_articles-list">
                   {authorArticles.map((article) => (
                     <Link
@@ -149,7 +157,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
                           <div style={{ width: "100%", height: "100%", background: "#f1f5f9" }} />
                         )}
                         <div className="author-page_img-overlay">
-                          <div className="author-page_img-btn">Məqaləni oxu</div>
+                          <div className="author-page_img-btn">{al.read}</div>
                         </div>
                       </div>
 
@@ -191,7 +199,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
           <div className="global-padding">
             <div className="container-large">
               <div className="keywords_component">
-                <h3 className="keywords_title">Açar sözlər / Keywords</h3>
+                <h3 className="keywords_title">{al.keywords}</h3>
                 <div className="keywords_list">
                   {keywords.map((kw, i) => (
                     <span key={i} className="keyword_tag">#{kw}</span>

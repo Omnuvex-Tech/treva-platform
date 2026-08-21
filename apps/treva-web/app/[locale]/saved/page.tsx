@@ -58,6 +58,8 @@ function getLocalizedApartmentTypeLabel(
 
 const savedDictionary = {
   az: {
+    titleThin: 'SEÇİLMİŞ',
+    titleBold: 'ƏMLAKLAR',
     properties: 'əmlak',
     loading: 'Yüklənir...',
     emptyTitle: 'Hələ saxlanılmış əmlak yoxdur',
@@ -68,6 +70,8 @@ const savedDictionary = {
     floor: 'mərtəbə',
   },
   en: {
+    titleThin: 'SAVED',
+    titleBold: 'PROPERTIES',
     properties: 'properties',
     loading: 'Loading...',
     emptyTitle: 'No saved properties yet',
@@ -78,6 +82,8 @@ const savedDictionary = {
     floor: 'floor',
   },
   ru: {
+    titleThin: 'ИЗБРАННАЯ',
+    titleBold: 'НЕДВИЖИМОСТЬ',
     properties: 'объектов',
     loading: 'Загрузка...',
     emptyTitle: 'Сохраненных объектов пока нет',
@@ -124,8 +130,8 @@ export default function SavedPage() {
           <header className="saved-header">
             <div className="saved-title-wrap">
               <h1 className="saved-title">
-                <span className="saved-title-thin">SEÇİLMİŞ</span>
-                <span className="saved-title-bold">ƏMLAKLAR</span>
+                <span className="saved-title-thin">{content.titleThin}</span>
+                <span className="saved-title-bold">{content.titleBold}</span>
               </h1>
               <span className="saved-count">({items.length})</span>
             </div>

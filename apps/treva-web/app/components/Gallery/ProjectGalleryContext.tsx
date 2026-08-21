@@ -32,9 +32,11 @@ export function useProjectGallery(): ProjectGalleryValue | null {
 
 export function ProjectGalleryProvider({
   images,
+  locale = "az",
   children,
 }: {
   images: GalleryImage[];
+  locale?: string;
   children: React.ReactNode;
 }) {
   const [index, setIndex] = React.useState<number | null>(null);
@@ -68,6 +70,7 @@ export function ProjectGalleryProvider({
           index={index}
           onIndexChange={setIndex}
           onClose={() => setIndex(null)}
+          locale={locale}
         />
       )}
     </ProjectGalleryContext.Provider>
