@@ -28,7 +28,8 @@
     "prisma:seed": "node ../../scripts/run-with-env.cjs .env.development ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio",
     "backfill:currencies:dev": "node ../../scripts/run-with-env.cjs .env.development ts-node scripts/backfill-unit-layout-currencies.ts",
-    "backfill:currencies:prod": "node ../../scripts/run-with-env.cjs .env.production ts-node scripts/backfill-unit-layout-currencies.ts"
+    "backfill:currencies:prod": "node ../../scripts/run-with-env.cjs .env.production ts-node scripts/backfill-unit-layout-currencies.ts",
+    "seed:fake": "node ../../scripts/run-with-env.cjs .env.development ts-node prisma/seed-fake.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

@@ -50,6 +50,12 @@ export default function RootLayout({
     return (
         <html lang="az">
             <head>
+                {/* Oak Sans — display face for headings. Loaded here rather than
+                    with an @import in globals.css: Tailwind's import resolver
+                    strips remote @import rules, so the font never reached the
+                    bundle. V1 only ever pulled it in on project-detail pages. */}
+                <link rel="preconnect" href="https://fonts.cdnfonts.com" crossOrigin="" />
+                <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/oak-sans" />
                 <script src="https://salesagent.treva.realestate/webchat/widget.js"
                     data-title="TREVA Assistant"
                     data-accent="#4b5563"
