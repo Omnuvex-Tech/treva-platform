@@ -20,7 +20,18 @@ type PartnershipCTAProps = {
   secondaryAction: CTAButton
   hideImagesOnMobile?: boolean
   centerContentOnMobile?: boolean
+  locale?: string
 }
+
+/**
+ * CTA başlığı. Sabit azərbaycanca idi — üç dilin hamısında eyni görünürdü.
+ * İki hissəyə bölünüb, çünki ikinci hissə <em> ilə vurğulanır.
+ */
+const ctaHeading = {
+  az: { lead: 'Tərəfdaşlığa', accent: 'hazırsınız?' },
+  en: { lead: 'Ready to', accent: 'partner up?' },
+  ru: { lead: 'Готовы к', accent: 'партнёрству?' },
+} as const
 
 declare global {
   interface Window {
@@ -94,9 +105,11 @@ function CTAActionButton({
 export default function PartnershipCTA({
   primaryAction,
   secondaryAction,
+  locale = 'az',
   hideImagesOnMobile = false,
   centerContentOnMobile = false,
 }: PartnershipCTAProps) {
+  const heading = ctaHeading[locale as keyof typeof ctaHeading] ?? ctaHeading.az
   const pathname = usePathname()
   const router = useRouter()
   const sectionRef = useRef<HTMLElement | null>(null)
@@ -305,7 +318,7 @@ export default function PartnershipCTA({
             <div className="cta_wrap">
               <div className="cta_content">
                 <h2 className="cta_heading">
-                  Tərəfdaşlığa <em>hazırsınız?</em>
+                  {heading.lead} <em>{heading.accent}</em>
                 </h2>
                 <div className="button-group">
                   <CTAActionButton

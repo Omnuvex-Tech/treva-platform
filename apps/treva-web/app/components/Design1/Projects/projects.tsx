@@ -43,8 +43,16 @@ const cardLabels = {
   ru: 'перейти к проекту',
 } as const;
 
+/** Kart üzərindəki hover düyməsi. */
+const viewProjectLabels = {
+  az: 'Layihəyə bax',
+  en: 'View project',
+  ru: 'Смотреть проект',
+} as const;
+
 export function ProjectsPage({ locale }: ProjectsPageProps) {
   const cardLabel = cardLabels[locale as keyof typeof cardLabels] ?? cardLabels.az;
+  const viewProject = viewProjectLabels[locale as keyof typeof viewProjectLabels] ?? viewProjectLabels.az;
   const containerRef = useRef<HTMLDivElement>(null)
   const hasAnimatedRef = useRef(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
@@ -238,7 +246,7 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                                 </div>
                                 <div className="projects_overlay">
                                   <div className="news_btn">
-                                    <div>Layihəyə bax</div>
+                                    <div>{viewProject}</div>
                                   </div>
                                 </div>
                                 <div className="img-cover"></div>

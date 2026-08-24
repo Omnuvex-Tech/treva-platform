@@ -133,18 +133,121 @@ function ConnectLink({ href, label, isLarge = false, isSmallCaps = false, extern
 }
 
 /* ── Contact Form ────────────────────────────────────────── */
-function ContactForm() {
+/**
+ * Əlaqə səhifəsinin mətnləri.
+ *
+ * Səhifə tam azərbaycanca sabit yazılmışdı — ingilis və rus versiyalarında da
+ * forma, ünvanlar və başlıqlar azərbaycanca görünürdü.
+ */
+const contactDictionary = {
+  az: {
+    successTitle: 'Mesajınız göndərildi!',
+    successText: 'Tezliklə sizinlə əlaqə saxlayacağıq.',
+    newMessage: 'Yeni mesaj göndər',
+    fullName: 'Tam ad *',
+    email: 'Email ünvanı *',
+    phone: 'Telefon nömrəsi *',
+    message: 'Mesaj',
+    submit: 'MESAJ GÖNDƏR',
+    errorText: 'Xəta baş verdi. Yenidən cəhd edin.',
+    required: 'Bu sahə mütləq doldurulmalıdır',
+    invalidEmail: 'Etibarlı e-poçt ünvanı daxil edin',
+    invalidPhone: 'Etibarlı telefon nömrəsi daxil edin',
+    contactUsLabel: '(bizimlə əlaqə)',
+    showOnMap: 'Xəritədə göstər',
+    headOffice: 'Bakı Baş Ofisi',
+    headOfficeAddress: 'Ziya Yusifzadə küçəsi 10, Sabah Residence',
+    headOfficeAlt: 'TREVA Real Estate Bakı Baş Ofisi',
+    seaBreeze: 'Sea Breeze Satış Ofisi',
+    seaBreezeAddress: 'Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097',
+    seaBreezeAlt: 'Sea Breeze Satış Ofisi',
+    stayInTouch: 'TREVA ilə əlaqədə qalın',
+    contactUsThin: 'Bizimlə Əlaqə',
+    contactUsBold: 'saxlayın',
+    stayInTouchTitle: 'TREVA ilə Əlaqədə Qalın',
+    directContact: 'Birbaşa əlaqə saxlayın',
+    pageTitle: 'Kömək üçün buradayıq, bizimlə əlaqə saxlayın',
+    pageIntro: 'Bakıdakı baş ofisimizə gəlin və ya tərəfdaşlıq imkanlarını araşdırmaq üçün Sea Breeze satış ofisimizə yaxınlaşın.',
+    ctaPrimary: 'Əlaqə saxlayın',
+    ctaSecondary: 'Şəbəkəmizə qoşulun',
+  },
+  en: {
+    successTitle: 'Your message has been sent!',
+    successText: "We'll get in touch with you shortly.",
+    newMessage: 'Send another message',
+    fullName: 'Full name *',
+    email: 'Email address *',
+    phone: 'Phone number *',
+    message: 'Message',
+    submit: 'SEND MESSAGE',
+    errorText: 'Something went wrong. Please try again.',
+    required: 'This field is required',
+    invalidEmail: 'Enter a valid email address',
+    invalidPhone: 'Enter a valid phone number',
+    contactUsLabel: '(contact us)',
+    showOnMap: 'Show on map',
+    headOffice: 'Baku Head Office',
+    headOfficeAddress: 'Ziya Yusifzade street 10, Sabah Residence',
+    headOfficeAlt: 'TREVA Real Estate Baku Head Office',
+    seaBreeze: 'Sea Breeze Sales Office',
+    seaBreezeAddress: 'Mikayil Mushfig street, Nardaran, Baku 1097',
+    seaBreezeAlt: 'Sea Breeze Sales Office',
+    stayInTouch: 'Stay in touch with TREVA',
+    contactUsThin: 'Get in',
+    contactUsBold: 'touch',
+    stayInTouchTitle: 'Stay in Touch with TREVA',
+    directContact: 'Reach us directly',
+    pageTitle: "We're here to help — get in touch",
+    pageIntro: 'Visit our head office in Baku, or drop by our Sea Breeze sales office to explore partnership opportunities.',
+    ctaPrimary: 'Get in touch',
+    ctaSecondary: 'Join our network',
+  },
+  ru: {
+    successTitle: 'Ваше сообщение отправлено!',
+    successText: 'Мы свяжемся с вами в ближайшее время.',
+    newMessage: 'Отправить ещё одно сообщение',
+    fullName: 'Полное имя *',
+    email: 'Электронная почта *',
+    phone: 'Номер телефона *',
+    message: 'Сообщение',
+    submit: 'ОТПРАВИТЬ СООБЩЕНИЕ',
+    errorText: 'Произошла ошибка. Попробуйте ещё раз.',
+    required: 'Это поле обязательно для заполнения',
+    invalidEmail: 'Введите корректный адрес электронной почты',
+    invalidPhone: 'Введите корректный номер телефона',
+    contactUsLabel: '(связаться с нами)',
+    showOnMap: 'Показать на карте',
+    headOffice: 'Главный офис в Баку',
+    headOfficeAddress: 'улица Зии Юсифзаде 10, Sabah Residence',
+    headOfficeAlt: 'Главный офис TREVA Real Estate в Баку',
+    seaBreeze: 'Офис продаж Sea Breeze',
+    seaBreezeAddress: 'улица Микаила Мушфига, Нардаран, Баку 1097',
+    seaBreezeAlt: 'Офис продаж Sea Breeze',
+    stayInTouch: 'Оставайтесь на связи с TREVA',
+    contactUsThin: 'Свяжитесь',
+    contactUsBold: 'с нами',
+    stayInTouchTitle: 'Оставайтесь на связи с TREVA',
+    directContact: 'Связаться напрямую',
+    pageTitle: 'Мы готовы помочь — свяжитесь с нами',
+    pageIntro: 'Приезжайте в наш главный офис в Баку или загляните в офис продаж Sea Breeze, чтобы обсудить возможности партнёрства.',
+    ctaPrimary: 'Связаться с нами',
+    ctaSecondary: 'Присоединиться к сети',
+  },
+} as const;
+
+function ContactForm({ locale }: { locale: string }) {
+  const t = contactDictionary[locale as keyof typeof contactDictionary] ?? contactDictionary.az;
   const [fields, setFields] = useState<ContactFields>(INITIAL_CONTACT_FIELDS)
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<ContactStatus>('idle')
 
   const validate = () => {
     const errs: ContactErrors = {}
-    if (!fields.name.trim()) errs.name = 'Bu sahə mütləq doldurulmalıdır'
+    if (!fields.name.trim()) errs.name = t.required
     if (!fields.email.trim() || !fields.email.includes('@') || !fields.email.includes('.'))
-      errs.email = 'Etibarlı e-poçt ünvanı daxil edin'
+      errs.email = t.invalidEmail
     if (!fields.phone.trim() || fields.phone.replace(/\D/g, '').length < 8)
-      errs.phone = 'Etibarlı telefon nömrəsi daxil edin'
+      errs.phone = t.invalidPhone
     return errs
   }
 
@@ -199,10 +302,10 @@ function ContactForm() {
               <path className="contact-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
             </svg>
           </div>
-          <h3 className="contact-success-title">Mesajınız göndərildi!</h3>
-          <p className="contact-success-text">Tezliklə sizinlə əlaqə saxlayacağıq.</p>
+          <h3 className="contact-success-title">{t.successTitle}</h3>
+          <p className="contact-success-text">{t.successText}</p>
           <button type="button" className="contact-success-btn" onClick={() => setStatus('idle')}>
-            Yeni mesaj göndər
+            {t.newMessage}
           </button>
         </div>
       </div>
@@ -217,7 +320,7 @@ function ContactForm() {
             className={`connect_input-field${errors.name ? ' error' : ''}`}
             name="name"
             maxLength={256}
-            placeholder="Tam ad *"
+            placeholder={t.fullName}
             type="text"
             value={fields.name}
             onChange={handleChange}
@@ -231,7 +334,7 @@ function ContactForm() {
             className={`connect_input-field${errors.email ? ' error' : ''}`}
             name="email"
             maxLength={256}
-            placeholder="Email ünvanı *"
+            placeholder={t.email}
             type="email"
             value={fields.email}
             onChange={handleChange}
@@ -245,7 +348,7 @@ function ContactForm() {
             className={`connect_input-field${errors.phone ? ' error' : ''}`}
             name="phone"
             maxLength={256}
-            placeholder="Telefon nömrəsi *"
+            placeholder={t.phone}
             type="tel"
             value={fields.phone}
             onChange={handlePhoneChange}
@@ -258,7 +361,7 @@ function ContactForm() {
           className="connect_input-field message-field"
           name="message"
           maxLength={256}
-          placeholder="Mesaj"
+          placeholder={t.message}
           type="text"
           value={fields.message}
           onChange={handleChange}
@@ -271,13 +374,13 @@ function ContactForm() {
           disabled={status === 'loading'}
         >
           {status === 'loading' && <span className="contact-spinner"></span>}
-          <span className="contact-btn-text">MESAJ GÖNDƏR</span>
+          <span className="contact-btn-text">{t.submit}</span>
         </button>
       </form>
 
       {status === 'error' && (
         <div className="cs_error" style={{ display: 'block', marginTop: '1rem' }}>
-          <div>Oops! Xəta baş verdi. Yenidən cəhd edin.</div>
+          <div>{t.errorText}</div>
         </div>
       )}
     </div>
@@ -300,6 +403,7 @@ export function ContactPage({ locale }: ContactPageProps) {
   } as const
   const officeContent =
     officeDictionary[locale as keyof typeof officeDictionary] ?? officeDictionary.az
+  const t = contactDictionary[locale as keyof typeof contactDictionary] ?? contactDictionary.az
 
   const scrollToContactForm = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
@@ -469,15 +573,14 @@ export function ContactPage({ locale }: ContactPageProps) {
                       <div className="max-width-48rem">
                         <h1 className="contact_heading-az no-animate">
                           <span className="heading-gap-h1">      </span>
-                          Kömək üçün buradayıq, bizimlə əlaqə saxlayın
+                          {t.pageTitle}
                         </h1>
                       </div>
                       <div className="contact_office-copy offices_bio-wrap">
                         <p>
-                          Bakıdakı baş ofisimizə gəlin və ya tərəfdaşlıq imkanlarını araşdırmaq
-                          üçün Sea Breeze satış ofisimizə yaxınlaşın.
+                          {t.pageIntro}
                         </p>
-                        <p className="contact_top-label">(bizimlə əlaqə)</p>
+                        <p className="contact_top-label">{t.contactUsLabel}</p>
                       </div>
                     </div>
 
@@ -491,19 +594,19 @@ export function ContactPage({ locale }: ContactPageProps) {
                         >
                           <div className="offices_img-wrap img-reveal">
                             <div className="offices_overlay">
-                              <div className="offices_btn"><div>Xəritədə göstər</div></div>
+                              <div className="offices_btn"><div>{t.showOnMap}</div></div>
                             </div>
                             <OfficeImageSlider
                               images={officeGalleryImages.trevabaku}
-                              alt="TREVA Real Estate Bakı Baş Ofisi"
+                              alt={t.headOfficeAlt}
                               delay={5000}
                             />
                             <div className="img-cover" />
                           </div>
                           <div className="offices_content-wrap">
                             <div className="offices_title-wrap">
-                              <div>Bakı Baş Ofisi</div>
-                              <div className="offices_caption">Ziya Yusifzadə küçəsi 10, Sabah Residence</div>
+                              <div>{t.headOffice}</div>
+                              <div className="offices_caption">{t.headOfficeAddress}</div>
                             </div>
                             <div className="offices_map-link">
                               <span>{officeContent.mapLinkLabel}</span>
@@ -520,19 +623,19 @@ export function ContactPage({ locale }: ContactPageProps) {
                         >
                           <div className="offices_img-wrap img-reveal">
                             <div className="offices_overlay">
-                              <div className="offices_btn"><div>Xəritədə göstər</div></div>
+                              <div className="offices_btn"><div>{t.showOnMap}</div></div>
                             </div>
                             <OfficeImageSlider
                               images={officeGalleryImages.seaBreeze}
-                              alt="Sea Breeze Satış Ofisi"
+                              alt={t.seaBreezeAlt}
                               delay={5500}
                             />
                             <div className="img-cover" />
                           </div>
                           <div className="offices_content-wrap">
                             <div className="offices_title-wrap">
-                              <div>Sea Breeze Satış Ofisi</div>
-                              <div className="offices_caption">Mikayıl Müşfiq küçəsi, Nardaran, Bakı 1097</div>
+                              <div>{t.seaBreeze}</div>
+                              <div className="offices_caption">{t.seaBreezeAddress}</div>
                             </div>
                             <div className="offices_map-link">
                               <span>{officeContent.mapLinkLabel}</span>
@@ -554,15 +657,15 @@ export function ContactPage({ locale }: ContactPageProps) {
                   <div className="connect_component">
                     <div className="connect_wrap">
                       <div className="connect_title-wrap">
-                        <p className="text-color-white60">TREVA ilə əlaqədə qalın</p>
-                        <h2 className="text-color-white contact_heading-az no-animate">Bizimlə Əlaqə <br /> saxlayın</h2>
+                        <p className="text-color-white60">{t.stayInTouch}</p>
+                        <h2 className="text-color-white contact_heading-az no-animate">{t.contactUsThin} <br /> {t.contactUsBold}</h2>
                       </div>
-                      <ContactForm />
+                      <ContactForm locale={locale} />
                     </div>
 
                     <div className="connect_contact-wrap">
                       <div className="connect_contact-block animate-up">
-                        <div>TREVA ilə Əlaqədə Qalın</div>
+                        <div>{t.stayInTouchTitle}</div>
                         <div className="connect_list-wrap">
                           <ConnectLink href="https://www.linkedin.com/company/trevarealestate" label="Linkedin" external />
                           <ConnectLink href="https://www.instagram.com/treva.realestate?igsh=cDY3OTh0b3JyOGZy" label="instagram" external />
@@ -573,7 +676,7 @@ export function ContactPage({ locale }: ContactPageProps) {
                       </div>
 
                       <div className="connect_contact-block animate-up">
-                        <div>Birbaşa əlaqə saxlayın</div>
+                        <div>{t.directContact}</div>
                         <div className="connect_list-wrap">
                           <ConnectLink href="tel:2662"            label="*2662"                isLarge />
                           <ConnectLink href="tel:+994502772662"   label="050-277-2662"          isLarge external />
@@ -588,16 +691,17 @@ export function ContactPage({ locale }: ContactPageProps) {
 
             {/* SECTION 3: CTA */}
             <PartnershipCTA
+              locale={locale}
               hideImagesOnMobile
               centerContentOnMobile
               primaryAction={{
                 href: '#get-in-touch',
-                label: 'Əlaqə saxlayın',
+                label: t.ctaPrimary,
                 onClick: scrollToContactForm,
               }}
               secondaryAction={{
                 href: `/${locale}/brokers#broker-registration`,
-                label: 'Şəbəkəmizə qoşulun',
+                label: t.ctaSecondary,
               }}
             />
 

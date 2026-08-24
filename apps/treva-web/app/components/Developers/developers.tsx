@@ -83,7 +83,173 @@ const featuredProjectsFallback: FeaturedProjectCard[] = [
   },
 ]
 
-/** Karusel oxlarının ekran oxuyucu etiketləri — səhifənin qalan mətni CMS-dən gəlir. */
+/**
+ * Developerlər səhifəsinin mətnləri.
+ *
+ * Səhifə tam azərbaycanca sabit yazılmışdı — ingilis və rus versiyalarında da
+ * başlıqlar, altı xidmət bloku və portfel bölməsi azərbaycanca görünürdü.
+ *
+ * `services` massivi altı blokun mətnini saxlayır; markup isə olduğu kimi
+ * qalır, çünki blokların şəkil atributları (srcSet, sizes, height) fərqlidir
+ * və dövrə çevirmək onları itirərdi.
+ */
+const developersDictionary = {
+  az: {
+    ourServices: '(xidmətlərimiz)',
+    heroTitle: 'Əmlak Satışlarını Gücləndiririk — Strategiyadan işin icrasına qədər',
+    heroBody: 'TREVA DEVELOPERLƏRƏ ƏMLAK LAYİHƏLƏRİNİ BAZARA ÇIXARMAQDA STRATEJİ SATIŞ VƏ MARKETİNQ DƏSTƏYİ GÖSTƏRİR. BAZARA ÇIXIŞ PLANLAMASINDAN MÜRACİƏTLƏRİN İDARƏETMƏSİNƏ QƏDƏR SATIŞLARI ARTIRMAQ VƏ LAYİHƏNİN UĞURUNU YÜKSƏLTMƏK ÜÇÜN HƏRTƏRƏFLİ HƏLLƏR TƏQDİM EDİRİK.',
+    exploreServices: 'Xidmətlərlə tanış olun',
+    exploreProjects: 'Layihələrlə tanış olun',
+    trevaServices: '(TREVA-nın xidmətləri)',
+    whatsIncluded: '(Nə daxildir)',
+    portfolioLabel: '(portfolio)',
+    featuredProjects: 'Seçilmiş layihələr',
+    portfolioNote: 'Növbəti investisiya imkanınızı tapmaq üçün layihələrimizlə tanış olun.',
+    viewFeatured: 'Seçilmiş Layihələrlə Tanış Olun',
+    services: [
+      {
+        title: 'Bazara çıxış planlaması',
+        body: 'Treva layihənizin satış uğurunu maksimum səviyyəyə çatdırmaq üçün data əsaslı bazara çıxış strategiyaları hazırlayırıq. Yanaşmamıza hədəflənmiş tədqiqat, rəqabət analizi və auditoriyanıza uyğunlaşdırılmış strateji qiymət planları daxildir.',
+        items: ['Bazar Araşdırması və Təhlili', 'Rəqabətçi Mövqeləndirmə', 'Satış Strategiyasının Hazırlanması', 'Qiymət və Ödəniş Planları'],
+        alt: 'Üç müxtəlif rəngli kub olan taxta masa.',
+      },
+      {
+        title: 'Satışın İcrası',
+        body: 'Bakıdakı təcrübəli satış komandamız dönüşümləri maksimuma çatdırmaq üçün hədəflənmiş satış kampaniyaları həyata keçirir. Potensial müştərilərin cəlb olunmasından satışın bağlanmasına qədər satış prosesinin hər mərhələsini dəqiqlik və məsuliyyətlə idarə edirik.',
+        items: ['Leadlərin Cəlbi', 'Satış Təlimi və Dəstək', 'Satış Prosesinin Optimizasiyası', 'Hesabat və Analitika'],
+        alt: 'Böyük binanın qarşısında dayanan qrup.',
+      },
+      {
+        title: 'CRM + Lead Axını',
+        body: 'Biz qabaqcıl CRM sistemləri ilə leadlərin idarəsini asanlaşdırırıq, hər bir potensial müştərini sorğudan satışa qədər izləyirik. İmkanlardan yararlanın və optimallaşdırılmış CRM həllərimizlə daha çox leadi müştəriyə çevirin.',
+        items: ['CRM-in İnteqrasiyası və Quraşdırılması', 'Leadlərin İzlənməsi və İdarə Edilməsi', 'Avtomatlaşdırılmış Xatırlatmalar', 'Performans Təhlili'],
+        alt: 'Noutbukla masa arxasında oturan kişi.',
+      },
+      {
+        title: 'Tam marketinq dəstəyi',
+        body: 'Bakı şəhərində aparıcı daşınmaz əmlak platforması – layihələrin tanıtımı, satışların artırılması və alıcı cəlbi üçün tam marketinq strategiyası. Rəqəmsal kampaniyalar, sosial şəbəkələr və ənənəvi media ilə satışlarda yüksək nəticə.',
+        items: ['Vizual Kontentin Hazırlanması', 'Sosial Media Kampaniyaları', 'Ənənəvi Marketinq', 'Çap və Rəqəmsal Materiallar'],
+        alt: 'Ofisdə kompüter arxasında işləyən komanda.',
+      },
+      {
+        title: 'BROKER ŞƏBƏKƏSİNİN AKTİVLƏŞDİRİLMƏSİ',
+        body: 'Biz etibarlı brokerlər şəbəkəmizi aktivləşdirərək layihənizi effektiv şəkildə bazara çıxarır və satışları daha sürətli həyata keçiririk. Broker aktivləşdirmə proqramlarımız məqsədli dəstək və fərdiləşdirilmiş satış vasitələri təqdim edir.',
+        items: ['Brokerlərlə əlaqə qurma və onlarla əməkdaşlığa başlama', 'Brokerlər üçün satış materialları', 'Təlim və satış dəstəyi', 'Komissiya Strukturları'],
+        alt: 'Taxta masa arxasında oturan qrup.',
+      },
+      {
+        title: 'İnvestisiya Konsultasiyası',
+        body: 'Biz developerləri potensial investorlarla bir araya gətirir və layihələrin mənfəətliliyini artırmaq üçün strateji tövsiyələr təqdim edirik — bunu hərtərəfli investisiya konsultasiyası xidmətimiz çərçivəsində edirik.',
+        items: ['İnvestorlarla Əlaqə Qurulması', 'İnvestisiya Gəliri (ROI) Təhlili', 'Maliyyələşdirmə Konsultasiyası', 'İnvestisiya Təqdimatları və Təklifləri'],
+        alt: 'İnvestisiya',
+      },
+    ],
+  },
+  en: {
+    ourServices: '(our services)',
+    heroTitle: 'We power property sales — from strategy to execution',
+    heroBody: 'TREVA GIVES DEVELOPERS STRATEGIC SALES AND MARKETING SUPPORT TO BRING PROPERTY PROJECTS TO MARKET. FROM GO-TO-MARKET PLANNING TO LEAD MANAGEMENT, WE DELIVER END-TO-END SOLUTIONS THAT GROW SALES AND RAISE PROJECT SUCCESS.',
+    exploreServices: 'Explore our services',
+    exploreProjects: 'Explore our projects',
+    trevaServices: '(TREVA services)',
+    whatsIncluded: '(What is included)',
+    portfolioLabel: '(portfolio)',
+    featuredProjects: 'Featured projects',
+    portfolioNote: 'Explore our projects to find your next investment opportunity.',
+    viewFeatured: 'View Featured Projects',
+    services: [
+      {
+        title: 'Go-to-market planning',
+        body: 'Treva builds data-driven go-to-market strategies to maximise the sales success of your project. Our approach covers targeted research, competitive analysis and strategic pricing plans tailored to your audience.',
+        items: ['Market Research and Analysis', 'Competitive Positioning', 'Sales Strategy Development', 'Pricing and Payment Plans'],
+        alt: 'A wooden table topped with three cubes of different colors.',
+      },
+      {
+        title: 'Sales Execution',
+        body: 'Our experienced sales team in Baku runs targeted sales campaigns to maximise conversion. From attracting prospects to closing the deal, we manage every stage of the sales process with precision and accountability.',
+        items: ['Lead Generation', 'Sales Training and Support', 'Sales Process Optimisation', 'Reporting and Analytics'],
+        alt: 'A group of people standing in front of a large building.',
+      },
+      {
+        title: 'CRM + Lead Flow',
+        body: 'We simplify lead management with advanced CRM systems, tracking every prospect from enquiry to sale. Seize the opportunities and convert more leads into clients with our optimised CRM solutions.',
+        items: ['CRM Integration and Setup', 'Lead Tracking and Management', 'Automated Reminders', 'Performance Analysis'],
+        alt: 'A man sitting at a table with a laptop and a glass of beer.',
+      },
+      {
+        title: 'Full marketing support',
+        body: 'The leading real estate platform in Baku — a complete marketing strategy to promote projects, grow sales and attract buyers. Strong sales results through digital campaigns, social media and traditional channels.',
+        items: ['Visual Content Production', 'Social Media Campaigns', 'Traditional Marketing', 'Print and Digital Materials'],
+        alt: 'A group of people sitting at desks working on computers.',
+      },
+      {
+        title: 'BROKER NETWORK ACTIVATION',
+        body: 'By activating our trusted broker network we take your project to market effectively and close sales faster. Our broker activation programmes provide targeted support and tailored sales tools.',
+        items: ['Broker outreach and onboarding', 'Sales materials for brokers', 'Training and sales support', 'Commission Structures'],
+        alt: 'A group of people sitting around a wooden table.',
+      },
+      {
+        title: 'Investment Consulting',
+        body: 'We connect developers with potential investors and provide strategic advice to increase project profitability — all within our end-to-end investment consulting service.',
+        items: ['Investor Outreach', 'Return on Investment (ROI) Analysis', 'Financing Consultancy', 'Investment Presentations and Proposals'],
+        alt: 'Investment',
+      },
+    ],
+  },
+  ru: {
+    ourServices: '(наши услуги)',
+    heroTitle: 'Мы усиливаем продажи недвижимости — от стратегии до реализации',
+    heroBody: 'TREVA ОКАЗЫВАЕТ ЗАСТРОЙЩИКАМ СТРАТЕГИЧЕСКУЮ ПОДДЕРЖКУ В ПРОДАЖАХ И МАРКЕТИНГЕ ПРИ ВЫВОДЕ ПРОЕКТОВ НА РЫНОК. ОТ ПЛАНИРОВАНИЯ ВЫХОДА НА РЫНОК ДО РАБОТЫ С ЗАЯВКАМИ МЫ ПРЕДЛАГАЕМ КОМПЛЕКСНЫЕ РЕШЕНИЯ, КОТОРЫЕ УВЕЛИЧИВАЮТ ПРОДАЖИ И ПОВЫШАЮТ УСПЕХ ПРОЕКТА.',
+    exploreServices: 'Ознакомиться с услугами',
+    exploreProjects: 'Ознакомиться с проектами',
+    trevaServices: '(услуги TREVA)',
+    whatsIncluded: '(Что входит)',
+    portfolioLabel: '(портфолио)',
+    featuredProjects: 'Избранные проекты',
+    portfolioNote: 'Изучите наши проекты, чтобы найти свою следующую инвестиционную возможность.',
+    viewFeatured: 'Смотреть избранные проекты',
+    services: [
+      {
+        title: 'Планирование выхода на рынок',
+        body: 'Treva разрабатывает стратегии выхода на рынок на основе данных, чтобы максимизировать успех продаж вашего проекта. Наш подход включает целевые исследования, конкурентный анализ и стратегические ценовые планы под вашу аудиторию.',
+        items: ['Исследование и анализ рынка', 'Конкурентное позиционирование', 'Разработка стратегии продаж', 'Цены и планы оплаты'],
+        alt: 'Деревянный стол с тремя разноцветными кубиками.',
+      },
+      {
+        title: 'Реализация продаж',
+        body: 'Наша опытная команда продаж в Баку проводит целевые кампании для максимальной конверсии. От привлечения потенциальных клиентов до закрытия сделки мы ведём каждый этап процесса продаж точно и ответственно.',
+        items: ['Привлечение лидов', 'Обучение и поддержка продаж', 'Оптимизация процесса продаж', 'Отчётность и аналитика'],
+        alt: 'Группа людей перед большим зданием.',
+      },
+      {
+        title: 'CRM + поток лидов',
+        body: 'Мы упрощаем управление лидами с помощью современных CRM-систем, отслеживая каждого потенциального клиента от запроса до сделки. Используйте возможности и превращайте больше лидов в клиентов с нашими оптимизированными CRM-решениями.',
+        items: ['Интеграция и настройка CRM', 'Отслеживание и управление лидами', 'Автоматические напоминания', 'Анализ эффективности'],
+        alt: 'Мужчина за столом с ноутбуком.',
+      },
+      {
+        title: 'Полная маркетинговая поддержка',
+        body: 'Ведущая платформа недвижимости в Баку — полная маркетинговая стратегия для продвижения проектов, роста продаж и привлечения покупателей. Высокие результаты благодаря цифровым кампаниям, соцсетям и традиционным медиа.',
+        items: ['Создание визуального контента', 'Кампании в социальных сетях', 'Традиционный маркетинг', 'Печатные и цифровые материалы'],
+        alt: 'Команда за компьютерами в офисе.',
+      },
+      {
+        title: 'АКТИВАЦИЯ БРОКЕРСКОЙ СЕТИ',
+        body: 'Активируя нашу проверенную сеть брокеров, мы эффективно выводим ваш проект на рынок и быстрее закрываем продажи. Наши программы активации брокеров дают целевую поддержку и индивидуальные инструменты продаж.',
+        items: ['Работа с брокерами и их подключение', 'Материалы для продаж для брокеров', 'Обучение и поддержка продаж', 'Структуры комиссий'],
+        alt: 'Группа людей за деревянным столом.',
+      },
+      {
+        title: 'Инвестиционный консалтинг',
+        body: 'Мы связываем застройщиков с потенциальными инвесторами и даём стратегические рекомендации для повышения прибыльности проектов — в рамках нашего комплексного инвестиционного консалтинга.',
+        items: ['Работа с инвесторами', 'Анализ окупаемости инвестиций (ROI)', 'Консультации по финансированию', 'Инвестиционные презентации и предложения'],
+        alt: 'Инвестиции',
+      },
+    ],
+  },
+} as const
+
+/** Karusel oxlarının ekran oxuyucu etiketləri. */
 const navLabels = {
   az: { prev: 'Əvvəlki', next: 'Növbəti' },
   en: { prev: 'Previous', next: 'Next' },
@@ -103,6 +269,7 @@ function toAssetUrl(value?: string | null): string {
 
 export function DevelopersPage({ locale }: DevelopersPageProps) {
   const nav = navLabels[locale as keyof typeof navLabels] ?? navLabels.az;
+  const t = developersDictionary[locale as keyof typeof developersDictionary] ?? developersDictionary.az
   const gsapReady = useRef(false)
   const dropdownNavRefs = useRef<Array<HTMLDivElement | null>>([])
   const projectsViewportRef = useRef<HTMLDivElement | null>(null)
@@ -655,10 +822,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                   <div className="header-services_component">
                     <div className="header-services_wrap is-services">
                       <div className="header-services_title">
-                        <p>(xidmətlərimiz)</p>
+                        <p>{t.ourServices}</p>
                         <div className="developers-header-title">
                           <h1 className="developers-header-h1 no-animate">
-                            Əmlak Satışlarını Gücləndiririk — Strategiyadan işin icrasına qədər
+                            {t.heroTitle}
                           </h1>
                         </div>
                       </div>
@@ -673,13 +840,13 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                           <div className="img-cover"></div>
                         </div>
                         <div className="header-services_content-wrap is-services">
-                          <p>TREVA DEVELOPERLƏRƏ ƏMLAK LAYİHƏLƏRİNİ BAZARA ÇIXARMAQDA STRATEJİ SATIŞ VƏ MARKETİNQ DƏSTƏYİ GÖSTƏRİR. BAZARA ÇIXIŞ PLANLAMASINDAN MÜRACİƏTLƏRİN İDARƏETMƏSİNƏ QƏDƏR SATIŞLARI ARTIRMAQ VƏ LAYİHƏNİN UĞURUNU YÜKSƏLTMƏK ÜÇÜN HƏRTƏRƏFLİ HƏLLƏR TƏQDİM EDİRİK.</p>
+                          <p>{t.heroBody}</p>
                           <div className="button-group animate-up">
                             <Link href="#services" onClick={scrollToServices} className="button w-inline-block" data-wf--button--variant="blue">
-                              <ButtonText>Xidmətlərlə tanış olun</ButtonText>
+                              <ButtonText>{t.exploreServices}</ButtonText>
                             </Link>
                             <Link href="#featured-projects" onClick={scrollToFeaturedProjects} className="button w-variant-bc0192ac-8f77-bda0-587a-2ac5ad6e5e49 w-inline-block" data-wf--button--variant="ghost">
-                              <ButtonText>Layihələrlə tanış olun</ButtonText>
+                              <ButtonText>{t.exploreProjects}</ButtonText>
                             </Link>
                           </div>
                         </div>
@@ -695,15 +862,15 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                 <div className="container-large">
                   <div id="services" className="features_component">
                     <div className="features_intro-wrap">
-                      <p className="text-color-white60">(TREVA-nın xidmətləri)</p>
+                      <p className="text-color-white60">{t.trevaServices}</p>
                     </div>
                     <div className="features_wrap">
                       
                       <div data-gsap-delay="0.4" className={`features_dropdown animate-right ${openDropdown === 0 ? 'is-open' : ''}`}>
                         <div className="features_toggle" onClick={() => toggleDropdown(0)}>
                           <div className="features_toggle-title">
-                            <div className="features_toggle-text">Bazara çıxış planlaması</div>
-                            <div className="features_toggle-text is-bottom">Bazara çıxış planlaması</div>
+                            <div className="features_toggle-text">{t.services[0].title}</div>
+                            <div className="features_toggle-text is-bottom">{t.services[0].title}</div>
                           </div>
                           <div className="features_plus w-embed">
                             <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
@@ -714,27 +881,27 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_number">(01)</div>
                             <div className="features_content-wrap">
                               <div className="features_content">
-                                <div>Treva layihənizin satış uğurunu maksimum səviyyəyə çatdırmaq üçün data əsaslı bazara çıxış strategiyaları hazırlayırıq. Yanaşmamıza hədəflənmiş tədqiqat, rəqabət analizi və auditoriyanıza uyğunlaşdırılmış strateji qiymət planları daxildir.</div>
+                                <div>{t.services[0].body}</div>
                                 <div className="features_list-wrap">
-                                  <div>(Nə daxildir)</div>
+                                  <div>{t.whatsIncluded}</div>
                                   <div className="features_list">
                                     <div className="features_item">
-                                      <div className="text-color-white60">(01)</div><div>Bazar Araşdırması və Təhlili</div>
+                                      <div className="text-color-white60">(01)</div><div>{t.services[0].items[0]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(02)</div><div>Rəqabətçi Mövqeləndirmə</div>
+                                      <div className="text-color-white60">(02)</div><div>{t.services[0].items[1]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(03)</div><div>Satış Strategiyasının Hazırlanması</div>
+                                      <div className="text-color-white60">(03)</div><div>{t.services[0].items[2]}</div>
                                     </div>
                                     <div className="features_item is-last">
-                                      <div className="text-color-white60">(04)</div><div>Qiymət və Ödəniş Planları</div>
+                                      <div className="text-color-white60">(04)</div><div>{t.services[0].items[3]}</div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="features_img-wrap img-reveal">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883624137663009b5fd7563_Go-to-market-planning.avif" loading="eager" alt="A wooden table topped with three cubes of different colors." className="fullwidth-img"/>
+                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883624137663009b5fd7563_Go-to-market-planning.avif" loading="eager" alt={t.services[0].alt} className="fullwidth-img"/>
                                 <div className="img-cover bg-color-blue100"></div>
                               </div>
                             </div>
@@ -745,8 +912,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                       <div data-gsap-delay="0.4" className={`features_dropdown animate-right ${openDropdown === 1 ? 'is-open' : ''}`}>
                         <div className="features_toggle" onClick={() => toggleDropdown(1)}>
                           <div className="features_toggle-title">
-                            <div className="features_toggle-text">Satışın İcrası</div>
-                            <div className="features_toggle-text is-bottom">Satışın İcrası</div>
+                            <div className="features_toggle-text">{t.services[1].title}</div>
+                            <div className="features_toggle-text is-bottom">{t.services[1].title}</div>
                           </div>
                           <div className="features_plus w-embed">
                             <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
@@ -757,27 +924,27 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_number">(02)</div>
                             <div className="features_content-wrap">
                               <div className="features_content">
-                                <div>Bakıdakı təcrübəli satış komandamız dönüşümləri maksimuma çatdırmaq üçün hədəflənmiş satış kampaniyaları həyata keçirir. Potensial müştərilərin <br/>cəlb olunmasından satışın bağlanmasına qədər satış prosesinin hər mərhələsini dəqiqlik <br/>və məsuliyyətlə idarə edirik.</div>
+                                <div>{t.services[1].body}</div>
                                 <div className="features_list-wrap">
-                                  <div>(Nə daxildir)</div>
+                                  <div>{t.whatsIncluded}</div>
                                   <div className="features_list">
                                     <div className="features_item">
-                                      <div className="text-color-white60">(01)</div><div>Leadlərin Cəlbi</div>
+                                      <div className="text-color-white60">(01)</div><div>{t.services[1].items[0]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(02)</div><div>Satış Təlimi və Dəstək</div>
+                                      <div className="text-color-white60">(02)</div><div>{t.services[1].items[1]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(03)</div><div>Satış Prosesinin Optimizasiyası<br/></div>
+                                      <div className="text-color-white60">(03)</div><div>{t.services[1].items[2]}</div>
                                     </div>
                                     <div className="features_item is-last">
-                                      <div className="text-color-white60">(04)</div><div>Hesabat və Analitika</div>
+                                      <div className="text-color-white60">(04)</div><div>{t.services[1].items[3]}</div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68836422104ac3b4423c628e_Sales-Execution.avif" loading="eager" alt="A group of people standing in front of a large building." className="fullwidth-img"/>
+                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/68836422104ac3b4423c628e_Sales-Execution.avif" loading="eager" alt={t.services[1].alt} className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
@@ -787,8 +954,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                       <div data-gsap-delay="0.4" className={`features_dropdown animate-right ${openDropdown === 2 ? 'is-open' : ''}`}>
                         <div className="features_toggle" onClick={() => toggleDropdown(2)}>
                           <div className="features_toggle-title">
-                            <div className="features_toggle-text">CRM + Lead Axını</div>
-                            <div className="features_toggle-text is-bottom">CRM + Lead Axını</div>
+                            <div className="features_toggle-text">{t.services[2].title}</div>
+                            <div className="features_toggle-text is-bottom">{t.services[2].title}</div>
                           </div>
                           <div className="features_plus w-embed">
                             <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
@@ -799,27 +966,27 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_number">(03)</div>
                             <div className="features_content-wrap">
                               <div className="features_content">
-                                <div>Biz qabaqcıl CRM sistemləri ilə leadlərin idarəsini asanlaşdırırıq, hər bir potensial müştərini sorğudan satışa qədər izləyirik. İmkanlardan yararlanın və optimallaşdırılmış CRM həllərimizlə daha çox leadi<br/>müştəriyə çevirin.</div>
+                                <div>{t.services[2].body}</div>
                                 <div className="features_list-wrap">
-                                  <div>(Nə daxildir)</div>
+                                  <div>{t.whatsIncluded}</div>
                                   <div className="features_list">
                                     <div className="features_item">
-                                      <div className="text-color-white60">(01)</div><div>CRM-in İnteqrasiyası və Quraşdırılması</div>
+                                      <div className="text-color-white60">(01)</div><div>{t.services[2].items[0]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(02)</div><div>Leadlərin İzlənməsi və İdarə Edilməsi</div>
+                                      <div className="text-color-white60">(02)</div><div>{t.services[2].items[1]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(03)</div><div>Avtomatlaşdırılmış Xatırlatmalar<br/></div>
+                                      <div className="text-color-white60">(03)</div><div>{t.services[2].items[2]}</div>
                                     </div>
                                     <div className="features_item is-last">
-                                      <div className="text-color-white60">(04)</div><div>Performans Təhlili</div>
+                                      <div className="text-color-white60">(04)</div><div>{t.services[2].items[3]}</div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883632adc0db4bf68a59dcd_CRM%20Lead%20flow.avif" loading="eager" sizes="(max-width: 1500px) 100vw, 1500px" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883632adc0db4bf68a59dcd_CRM%20Lead%20flow-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883632adc0db4bf68a59dcd_CRM%20Lead%20flow.avif 1500w" alt="A man sitting at a table with a laptop and a glass of beer." className="fullwidth-img"/>
+                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883632adc0db4bf68a59dcd_CRM%20Lead%20flow.avif" loading="eager" sizes="(max-width: 1500px) 100vw, 1500px" srcSet="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883632adc0db4bf68a59dcd_CRM%20Lead%20flow-p-500.avif 500w, https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883632adc0db4bf68a59dcd_CRM%20Lead%20flow.avif 1500w" alt={t.services[2].alt} className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
@@ -829,8 +996,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                       <div data-gsap-delay="0.4" className={`features_dropdown animate-right ${openDropdown === 3 ? 'is-open' : ''}`}>
                         <div className="features_toggle" onClick={() => toggleDropdown(3)}>
                           <div className="features_toggle-title">
-                            <div className="features_toggle-text">Tam marketinq dəstəyi</div>
-                            <div className="features_toggle-text is-bottom">Tam marketinq dəstəyi</div>
+                            <div className="features_toggle-text">{t.services[3].title}</div>
+                            <div className="features_toggle-text is-bottom">{t.services[3].title}</div>
                           </div>
                           <div className="features_plus w-embed">
                             <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
@@ -841,27 +1008,27 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_number">(04)</div>
                             <div className="features_content-wrap">
                               <div className="features_content">
-                                <div>Bakı şəhərində aparıcı daşınmaz əmlak platforması – layihələrin tanıtımı, satışların artırılması və alıcı cəlbi üçün tam marketinq strategiyası. Rəqəmsal kampaniyalar, sosial şəbəkələr və ənənəvi media ilə satışlarda yüksək nəticə.</div>
+                                <div>{t.services[3].body}</div>
                                 <div className="features_list-wrap">
-                                  <div>(Nə daxildir)</div>
+                                  <div>{t.whatsIncluded}</div>
                                   <div className="features_list">
                                     <div className="features_item">
-                                      <div className="text-color-white60">(01)</div><div>Vizual Kontentin Hazırlanması</div>
+                                      <div className="text-color-white60">(01)</div><div>{t.services[3].items[0]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(02)</div><div>Sosial Media Kampaniyaları</div>
+                                      <div className="text-color-white60">(02)</div><div>{t.services[3].items[1]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(03)</div><div>Ənənəvi Marketinq<br/></div>
+                                      <div className="text-color-white60">(03)</div><div>{t.services[3].items[2]}</div>
                                     </div>
                                     <div className="features_item is-last">
-                                      <div className="text-color-white60">(04)</div><div>Çap və Rəqəmsal Materiallar</div>
+                                      <div className="text-color-white60">(04)</div><div>{t.services[3].items[3]}</div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="/images/developers/sekil2.avif" loading="eager" alt="A group of people sitting at desks working on computers." className="fullwidth-img"/>
+                                <img src="/images/developers/sekil2.avif" loading="eager" alt={t.services[3].alt} className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
@@ -871,8 +1038,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                       <div data-gsap-delay="0.4" className={`features_dropdown animate-right ${openDropdown === 4 ? 'is-open' : ''}`}>
                         <div className="features_toggle" onClick={() => toggleDropdown(4)}>
                           <div className="features_toggle-title">
-                            <div className="features_toggle-text">BROKER ŞƏBƏKƏSİNİN AKTİVLƏŞDİRİLMƏSİ</div>
-                            <div className="features_toggle-text is-bottom">BROKER ŞƏBƏKƏSİNİN AKTİVLƏŞDİRİLMƏSİ</div>
+                            <div className="features_toggle-text">{t.services[4].title}</div>
+                            <div className="features_toggle-text is-bottom">{t.services[4].title}</div>
                           </div>
                           <div className="features_plus w-embed">
                             <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
@@ -883,27 +1050,27 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_number">(05)</div>
                             <div className="features_content-wrap">
                               <div className="features_content">
-                                <div>Biz etibarlı brokerlər şəbəkəmizi aktivləşdirərək layihənizi effektiv şəkildə bazara çıxarır və satışları daha sürətli həyata keçiririk. Broker aktivləşdirmə proqramlarımız məqsədli dəstək və fərdiləşdirilmiş satış vasitələri təqdim edir.</div>
+                                <div>{t.services[4].body}</div>
                                 <div className="features_list-wrap">
-                                  <div>(Nə daxildir)</div>
+                                  <div>{t.whatsIncluded}</div>
                                   <div className="features_list">
                                     <div className="features_item">
-                                      <div className="text-color-white60">(01)</div><div>Brokerlərlə əlaqə qurma və onlarla əməkdaşlığa başlama</div>
+                                      <div className="text-color-white60">(01)</div><div>{t.services[4].items[0]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(02)</div><div>Brokerlər üçün satış materialları</div>
+                                      <div className="text-color-white60">(02)</div><div>{t.services[4].items[1]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(03)</div><div>Təlim və satış dəstəyi<br/></div>
+                                      <div className="text-color-white60">(03)</div><div>{t.services[4].items[2]}</div>
                                     </div>
                                     <div className="features_item is-last">
-                                      <div className="text-color-white60">(04)</div><div>Komissiya Strukturları</div>
+                                      <div className="text-color-white60">(04)</div><div>{t.services[4].items[3]}</div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="/images/developers/sekil2@.avif" loading="eager" alt="A group of people sitting around a wooden table." className="fullwidth-img"/>
+                                <img src="/images/developers/sekil2@.avif" loading="eager" alt={t.services[4].alt} className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
@@ -913,8 +1080,8 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                       <div data-gsap-delay="0.4" className={`features_dropdown animate-right ${openDropdown === 5 ? 'is-open' : ''}`}>
                         <div className="features_toggle" onClick={() => toggleDropdown(5)}>
                           <div className="features_toggle-title">
-                            <div className="features_toggle-text">İnvestisiya Konsultasiyası</div>
-                            <div className="features_toggle-text is-bottom">İnvestisiya Konsultasiyası</div>
+                            <div className="features_toggle-text">{t.services[5].title}</div>
+                            <div className="features_toggle-text is-bottom">{t.services[5].title}</div>
                           </div>
                           <div className="features_plus w-embed">
                             <Plus size={36} strokeWidth={1.5} aria-hidden="true" />
@@ -925,27 +1092,27 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                             <div className="features_number">(06)</div>
                             <div className="features_content-wrap">
                               <div className="features_content">
-                                <div>Biz developerləri potensial investorlarla bir araya gətirir və layihələrin mənfəətliliyini artırmaq üçün strateji tövsiyələr təqdim edirik — bunu hərtərəfli investisiya konsultasiyası xidmətimiz çərçivəsində edirik.</div>
+                                <div>{t.services[5].body}</div>
                                 <div className="features_list-wrap">
-                                  <div>(Nə daxildir)</div>
+                                  <div>{t.whatsIncluded}</div>
                                   <div className="features_list">
                                     <div className="features_item">
-                                      <div className="text-color-white60">(01)</div><div>İnvestorlarla Əlaqə Qurulması</div>
+                                      <div className="text-color-white60">(01)</div><div>{t.services[5].items[0]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(02)</div><div>İnvestisiya Gəliri (ROI) Təhlili</div>
+                                      <div className="text-color-white60">(02)</div><div>{t.services[5].items[1]}</div>
                                     </div>
                                     <div className="features_item">
-                                      <div className="text-color-white60">(03)</div><div>Maliyyələşdirmə Konsultasiyası<br/></div>
+                                      <div className="text-color-white60">(03)</div><div>{t.services[5].items[2]}</div>
                                     </div>
                                     <div className="features_item is-last">
-                                      <div className="text-color-white60">(04)</div><div>İnvestisiya Təqdimatları və Təklifləri</div>
+                                      <div className="text-color-white60">(04)</div><div>{t.services[5].items[3]}</div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                               <div className="features_img-wrap">
-                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883629ea8e9bdc78d7894bf_investttttt.avif" loading="eager" alt="invest" height="Auto" className="fullwidth-img"/>
+                                <img src="https://cdn.prod.website-files.com/6825d64025f8005ef1ddfc4c/6883629ea8e9bdc78d7894bf_investttttt.avif" loading="eager" alt={t.services[5].alt} height="Auto" className="fullwidth-img"/>
                               </div>
                             </div>
                           </div>
@@ -963,9 +1130,9 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                 <div className="container-large">
                   <div className="projects-prev_component">
                     <div className="projects-prev_intro-wrap">
-                      <p>(portfolio)</p>
+                      <p>{t.portfolioLabel}</p>
                       <div className="max-width-56rem">
-                        <h2>Seçilmiş layihələr</h2>
+                        <h2>{t.featuredProjects}</h2>
                       </div>
                     </div>
                     <div
@@ -1045,10 +1212,10 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
                     </div>
                     <div className="projects-prev_cta-wrap animate-up">
                       <div className="projects-prev_cta-title">
-                        <p>Növbəti investisiya imkanınızı tapmaq üçün layihələrimizlə tanış olun.</p>
+                        <p>{t.portfolioNote}</p>
                       </div>
                       <Link href={`/${locale}/projects`} className="button w-inline-block" data-wf--button--variant="blue">
-                        <ButtonText>Seçilmiş Layihələrlə Tanış Olun</ButtonText>
+                        <ButtonText>{t.viewFeatured}</ButtonText>
                       </Link>
                     </div>
                   </div>

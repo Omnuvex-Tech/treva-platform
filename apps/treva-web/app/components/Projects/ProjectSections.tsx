@@ -131,7 +131,7 @@ export default function ProjectSections({
   }, [visible, locale, getImageUrl]);
 
   return (
-    <ProjectGalleryProvider images={galleryImages}>
+    <ProjectGalleryProvider images={galleryImages} locale={locale}>
       {visible.map((section, index) => {
         const key = `${section.type}-${index}`;
 

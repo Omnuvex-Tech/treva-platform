@@ -17,6 +17,11 @@ export default function ProjectDetailPage() {
     ? localeParam[0] ?? "az"
     : localeParam ?? "az";
 
+  // Yüklənmə mətni sabit azərbaycanca idi.
+  const loadingText = { az: 'Yüklənir...', en: 'Loading...', ru: 'Загрузка...' }[
+    locale as 'az' | 'en' | 'ru'
+  ] ?? 'Yüklənir...';
+
   const { data: detail, isLoading, error } = useProjectDetail(slug);
 
   const getImageUrl = (url: string) => {
@@ -68,7 +73,7 @@ export default function ProjectDetailPage() {
                 margin: "0 auto 16px",
               }}
             />
-            <p>Yüklənir...</p>
+            <p>{loadingText}</p>
           </div>
         </main>
         <CallbackForm allowedRoles={['Client']} />
