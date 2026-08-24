@@ -11,7 +11,15 @@ type BlockRendererProps = {
     locale: string;
 };
 
-function GalleryCarousel({ images }: { images: { url: string; alt: string }[] }) {
+/** Qalereya oxlarının ekran oxuyucu etiketləri. */
+const sliderLabels = {
+  az: { prev: 'Əvvəlki şəkil', next: 'Növbəti şəkil', image: 'Şəkil' },
+  en: { prev: 'Previous image', next: 'Next image', image: 'Image' },
+  ru: { prev: 'Предыдущее изображение', next: 'Следующее изображение', image: 'Изображение' },
+} as const;
+
+function GalleryCarousel({ images, locale }: { images: { url: string; alt: string }[]; locale: string }) {
+    const sl = sliderLabels[locale as keyof typeof sliderLabels] ?? sliderLabels.az;
     const [current, setCurrent] = useState(0);
     const [hover, setHover] = useState(false);
     const total = images.length;
@@ -42,7 +50,7 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
                                 cursor: "pointer", padding: 0,
                                 background: i === current ? "#4C525E" : "#E4E4E4",
                                 transition: "background 0.2s",
-                            }} aria-label={`Şəkil ${i + 1}`}
+                            }} aria-label={`${sl.image} ${i + 1}`}
                         />
                     ))}
                 </div>
@@ -56,7 +64,7 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
                         }}
                         onMouseEnter={() => setHover(true)}
                         onMouseLeave={() => setHover(false)}
-                        aria-label="Əvvəlki şəkil"
+                        aria-label={sl.prev}
                     >‹</button>
                     <button onClick={next}
                         style={{
@@ -67,7 +75,7 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
                         }}
                         onMouseEnter={() => setHover(true)}
                         onMouseLeave={() => setHover(false)}
-                        aria-label="Növbəti şəkil"
+                        aria-label={sl.next}
                     >›</button>
                 </div>
             </div>
@@ -76,6 +84,7 @@ function GalleryCarousel({ images }: { images: { url: string; alt: string }[] })
 }
 
 export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
+  const sl = sliderLabels[locale as keyof typeof sliderLabels] ?? sliderLabels.az;
     // CMS-də gizlədilmiş bloklar heç render olunmur.
     const visible = (blocks || []).filter(block => block?.isVisible !== false);
     return (
@@ -192,6 +201,7 @@ export function BlockRenderer({ blocks, locale }: BlockRendererProps) {
                                     url: img.url,
                                     alt: getLocalized(img.alt as any, locale),
                                 }))}
+                                locale={locale}
                             />
                         );
                     }

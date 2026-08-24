@@ -92,14 +92,13 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
   az: [
     { name: "LAYİHƏLƏR", href: "/projects" },
     { name: "İNVENTAR", children: [
-      { name: "Off-Plan", href: "/off-plan" },
-      { name: "Resale", href: "/resale" },
+      { name: "Tikilməkdə olan", href: "/off-plan" },
+      { name: "Təkrar satış", href: "/resale" },
     ]},
     { name: "TƏRƏFDAŞLIQ", children: [
-      // "Off-Plan" və "Resale" sahə terminləridir və azərbaycanca da belə işlənir;
-      // "Developers"/"Brokers" isə sadəcə tərcümə olunmamışdı.
-      { name: "Developerlər", href: "/developers" },
-      { name: "Brokerlər", href: "/brokers" },
+      // Daşınmaz əmlakda "developer" tikinti/inşaat şirkəti deməkdir.
+      { name: "Tikinti şirkətləri", href: "/developers" },
+      { name: "Vasitəçilər", href: "/brokers" },
     ]},
     { name: "PULSE", href: "/pulse" },
     { name: "HAQQIMIZDA", href: "/about-us" },
@@ -122,11 +121,11 @@ const navDictionary: Record<'az' | 'en' | 'ru', NavEntry[]> = {
   ru: [
     { name: "ПРОЕКТЫ", href: "/projects" },
     { name: "ИНВЕНТАРЬ", children: [
-      { name: "Off-Plan", href: "/off-plan" },
-      { name: "Resale", href: "/resale" },
+      { name: "Новостройки", href: "/off-plan" },
+      { name: "Вторичное жильё", href: "/resale" },
     ]},
     { name: "ПАРТНЁРСТВО", children: [
-      { name: "Девелоперы", href: "/developers" },
+      { name: "Застройщики", href: "/developers" },
       { name: "Брокеры", href: "/brokers" },
     ]},
     // Brend adı, amma rus versiyasında kiril ilə yazılır.

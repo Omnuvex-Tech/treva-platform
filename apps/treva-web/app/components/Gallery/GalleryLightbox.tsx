@@ -4,6 +4,13 @@ import { useCallback, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import "./gallery-lightbox.css";
 
+/** Lightbox-un ekran oxuyucu etiketləri. */
+const lightboxLabels = {
+  az: { gallery: 'Qalereya', close: 'Bağla', prev: 'Əvvəlki şəkil', next: 'Növbəti şəkil', nth: (i: number) => `${i}-ci şəkil` },
+  en: { gallery: 'Gallery', close: 'Close', prev: 'Previous image', next: 'Next image', nth: (i: number) => `Image ${i}` },
+  ru: { gallery: 'Галерея', close: 'Закрыть', prev: 'Предыдущее изображение', next: 'Следующее изображение', nth: (i: number) => `Изображение ${i}` },
+} as const;
+
 export type GalleryImage = {
   url: string;
   alt?: string;
@@ -23,12 +30,15 @@ export function GalleryLightbox({
   index,
   onClose,
   onIndexChange,
+  locale = "az",
 }: {
   images: GalleryImage[];
   index: number;
   onClose: () => void;
   onIndexChange: (next: number) => void;
+  locale?: string;
 }) {
+  const l = lightboxLabels[locale as keyof typeof lightboxLabels] ?? lightboxLabels.az;
   const stripRef = useRef<HTMLDivElement>(null);
   const total = images.length;
 
@@ -70,8 +80,8 @@ export function GalleryLightbox({
   if (!current) return null;
 
   return (
-    <div className="tg-lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label="Qalereya">
-      <button type="button" className="tg-lightbox__close" onClick={onClose} aria-label="Bağla">
+    <div className="tg-lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label={l.gallery}>
+      <button type="button" className="tg-lightbox__close" onClick={onClose} aria-label={l.close}>
         <X size={22} />
       </button>
 
@@ -84,7 +94,7 @@ export function GalleryLightbox({
           type="button"
           className="tg-lightbox__nav tg-lightbox__nav--prev"
           onClick={(e) => { e.stopPropagation(); go(-1); }}
-          aria-label="Əvvəlki şəkil"
+          aria-label={l.prev}
         >
           <ChevronLeft size={26} />
         </button>
@@ -100,7 +110,7 @@ export function GalleryLightbox({
           type="button"
           className="tg-lightbox__nav tg-lightbox__nav--next"
           onClick={(e) => { e.stopPropagation(); go(1); }}
-          aria-label="Növbəti şəkil"
+          aria-label={l.next}
         >
           <ChevronRight size={26} />
         </button>
@@ -115,7 +125,7 @@ export function GalleryLightbox({
               data-active={i === index}
               className={`tg-lightbox__thumb ${i === index ? "is-active" : ""}`}
               onClick={() => onIndexChange(i)}
-              aria-label={`${i + 1}-ci şəkil`}
+              aria-label={l.nth(i + 1)}
             >
               <img src={img.url} alt="" />
             </button>

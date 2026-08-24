@@ -14,6 +14,34 @@ import { ButtonText } from '@/app/components/ButtonText';
 
 const AUTHOR_IMAGE_FALLBACK = '/assets/webflow-placeholder.svg';
 
+/** Pulse siyahı səhifəsinin mətnləri — əvvəl hamısı sabit azərbaycanca idi. */
+const pulsePageDictionary = {
+  az: {
+    keywords: 'Açar sözlər',
+    allArticles: 'Bütün məqalələr',
+    campaignAlt: 'Reportage Heights 30/70 Kampaniyası',
+    search: 'Axtarış...',
+    categories: 'Kateqoriyalar',
+    showMore: 'Daha çox göstər',
+  },
+  en: {
+    keywords: 'Keywords',
+    allArticles: 'All articles',
+    campaignAlt: 'Reportage Heights 30/70 Campaign',
+    search: 'Search...',
+    categories: 'Categories',
+    showMore: 'Show more',
+  },
+  ru: {
+    keywords: 'Ключевые слова',
+    allArticles: 'Все статьи',
+    campaignAlt: 'Кампания Reportage Heights 30/70',
+    search: 'Поиск...',
+    categories: 'Категории',
+    showMore: 'Показать ещё',
+  },
+} as const;
+
 type PulseProps = {
   locale: string;
   articles: Article[];
@@ -56,7 +84,7 @@ const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, w
         onScrollToAllArticles={scrollToAllArticles}
       />
       <PulseNewsSection locale={locale} articles={articles} weekArticles={weekArticles} categories={categories} />
-      <PulseKeywordsSection />
+      <PulseKeywordsSection locale={locale} />
       <div className="pulse-callback-wrap">
         <CallbackForm />
       </div>
@@ -65,7 +93,8 @@ const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, w
   );
 };
 
-function PulseKeywordsSection() {
+function PulseKeywordsSection({ locale }: { locale: string }) {
+  const pt = pulsePageDictionary[locale as keyof typeof pulsePageDictionary] ?? pulsePageDictionary.az;
   const keywords = [
     "Daşınmaz əmlak", "Baku real estate", "Sea Breeze mənzillər",
     "Kreditlə evlər", "İpoteka", "Bakıda yeni tikililər",
@@ -78,7 +107,7 @@ function PulseKeywordsSection() {
       <div className="global-padding">
         <div className="container-large">
           <div className="keywords_component">
-            <h3 className="keywords_title">Açar sözlər / Keywords</h3>
+            <h3 className="keywords_title">{pt.keywords}</h3>
             <div className="keywords_list">
               {keywords.map((kw, i) => (
                 <span key={i} className="keyword_tag">#{kw}</span>
@@ -211,6 +240,7 @@ function PulseHeaderSection({
   rightArticles: Article[];
   onScrollToAllArticles: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
+  const pt = pulsePageDictionary[locale as keyof typeof pulsePageDictionary] ?? pulsePageDictionary.az;
   const visibleRightArticles = rightArticles.slice(0, 4);
 
   return (
@@ -297,7 +327,7 @@ function PulseHeaderSection({
 
                 <div className="news-header_right-cta-holder">
                   <a href="#all-articles" onClick={onScrollToAllArticles} className="button w-inline-block">
-                    <ButtonText>Bütün məqalələr</ButtonText>
+                    <ButtonText>{pt.allArticles}</ButtonText>
                   </a>
                 </div>
               </div>
@@ -310,6 +340,7 @@ function PulseHeaderSection({
 }
 
 function PulseNewsSection({ locale, articles: initialArticles, weekArticles, categories }: { locale: string; articles: Article[]; weekArticles: Article[]; categories: { id: string; name: string; slug: string }[] }) {
+  const pt = pulsePageDictionary[locale as keyof typeof pulsePageDictionary] ?? pulsePageDictionary.az;
   const [visibleCount, setVisibleCount] = useState(6);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
@@ -371,7 +402,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                 <div className="news_top-full-banner">
                   <Image
                     src="/images/pulse/treva-flag.png" 
-                    alt="Reportage Heights 30/70 Kampaniyası" 
+                    alt={pt.campaignAlt} 
                     className="fullwidth-img"
                     fill
                     sizes="100vw"
@@ -401,7 +432,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                     <div className="news_filters-search-wrap">
                       <input
                         className="news_filters-search w-input"
-                        placeholder="Axtarış..."
+                        placeholder={pt.search}
                         type="text"
                         value={searchQuery}
                         onChange={handleSearchChange}
@@ -409,7 +440,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                     </div>
 
                     <div className="news_filters-block">
-                      <div>Kateqoriyalar</div>
+                      <div>{pt.categories}</div>
 
                       <div className="news_tags-list">
                         <button
@@ -471,7 +502,7 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
                 {visibleCount < gridArticles.length && (
                   <div className="news_view-more-container">
                     <button onClick={handleViewMore} className="button is-view-more">
-                      <ButtonText>Daha çox göstər</ButtonText>
+                      <ButtonText>{pt.showMore}</ButtonText>
                     </button>
                   </div>
                 )}

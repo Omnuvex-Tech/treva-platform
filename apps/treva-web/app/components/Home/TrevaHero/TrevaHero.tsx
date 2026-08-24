@@ -46,8 +46,8 @@ const heroDictionary = {
     subtitle: "Doğru investisiya seçimləri və fərdi həyat tərzi həlləri təqdim edən platforma.",
     location: "Layihələr",
     dealOptions: [
-      "Off-Plan",
-      "Resale",
+      { value: "off-plan", label: "Tikilməkdə olan" },
+      { value: "resale", label: "Təkrar satış" },
     ],
     prevSlide: "Əvvəlki slayd",
     nextSlide: "Növbəti slayd",
@@ -63,8 +63,8 @@ const heroDictionary = {
     subtitle: "Curated real estate investments and tailored lifestyle solutions.",
     location: "Projects",
     dealOptions: [
-      "Off-Plan",
-      "Resale",
+      { value: "off-plan", label: "Off-Plan" },
+      { value: "resale", label: "Resale" },
     ],
     prevSlide: "Previous slide",
     nextSlide: "Next slide",
@@ -80,8 +80,8 @@ const heroDictionary = {
     subtitle: "Надёжная платформа для правильных инвестиций и индивидуальных решений для жизни.",
     location: "Проекты",
     dealOptions: [
-      "Off-Plan",
-      "Resale",
+      { value: "off-plan", label: "Новостройки" },
+      { value: "resale", label: "Вторичное жильё" },
     ],
     prevSlide: "Предыдущий слайд",
     nextSlide: "Следующий слайд",
@@ -105,7 +105,10 @@ export default function TrevaHero() {
   const locale = (detectedLocale && detectedLocale in heroDictionary) ? detectedLocale as keyof typeof heroDictionary : "az";
   const content = heroDictionary[locale];
 
-  const [dealType, setDealType] = useState<string>(content.dealOptions[0]);
+  // Seçilən dəyər dilə görə dəyişmir — yalnız etiket dəyişir.
+  const [dealType, setDealType] = useState<string>(content.dealOptions[0].value);
+  const dealLabel =
+    content.dealOptions.find((o) => o.value === dealType)?.label ?? content.dealOptions[0].label;
   const [dealMenuOpen, setDealMenuOpen] = useState(false);
   const dealDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -165,7 +168,7 @@ const [locationMenuOpen, setLocationMenuOpen] = useState(false);
   }, [nextSlide, currentSlide]);
 
   const handleHomeClick = useCallback(() => {
-    const path = dealType === "Resale" ? "resale" : "off-plan";
+    const path = dealType === "resale" ? "resale" : "off-plan";
     const categoryParam = selectedCategorySlug ? `?category=${selectedCategorySlug}` : '';
     router.push(`/${locale}/${path}${categoryParam}`);
   }, [dealType, locale, router, selectedCategorySlug]);
@@ -260,7 +263,7 @@ const [locationMenuOpen, setLocationMenuOpen] = useState(false);
                   aria-expanded={dealMenuOpen}
                   onClick={() => { setDealMenuOpen((prev) => !prev); setLocationMenuOpen(false); }}
                 >
-                  <span>{dealType}</span>
+                  <span>{dealLabel}</span>
                   <ChevronDown size={14} strokeWidth={2} />
                 </PillButton>
 
@@ -268,18 +271,18 @@ const [locationMenuOpen, setLocationMenuOpen] = useState(false);
                   <div className="treva-filter-bar__deal-menu" role="listbox">
                     {content.dealOptions.map((option) => (
                       <button
-                        key={option}
+                        key={option.value}
                         className="treva-filter-bar__deal-option"
                         type="button"
                         role="option"
-                        aria-selected={dealType === option}
+                        aria-selected={dealType === option.value}
                         onClick={() => {
-                          setDealType(option);
-                          localStorage.setItem('treva_dealType', option);
+                          setDealType(option.value);
+                          localStorage.setItem('treva_dealType', option.value);
                           setDealMenuOpen(false);
                         }}
                       >
-                        {option}
+                        {option.label}
                       </button>
                     ))}
                   </div>
