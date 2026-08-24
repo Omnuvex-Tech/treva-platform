@@ -199,6 +199,14 @@ export class UpdateApartmentDto {
   @IsString()
   apartmentTypeId?: string;
 
+  @ApiPropertyOptional({
+    example: 'category-id',
+    description: 'Off-plan object (project) this listing belongs to',
+  })
+  @IsOptional()
+  @IsString()
+  categoryId?: string | null;
+
   @ApiPropertyOptional({ example: 'owner-id' })
   @IsOptional()
   @IsString()

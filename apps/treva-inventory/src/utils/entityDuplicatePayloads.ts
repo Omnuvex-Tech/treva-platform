@@ -47,6 +47,7 @@ export function buildApartmentDuplicatePayload(
         ceilingHeight: apartment.ceilingHeight ?? undefined,
         heatingTypeIds: [],
         apartmentTypeId: apartment.apartmentTypeId,
+        categoryId: apartment.categoryId || undefined,
         ownerId: apartment.ownerId || undefined,
         attributeIds: apartment.attributeIds || [],
         requestIds: [],

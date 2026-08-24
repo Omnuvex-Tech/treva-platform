@@ -45,6 +45,8 @@ export interface Apartment {
     archived: boolean;
     apartmentTypeId: string;
     apartmentType: { id: string; title: string } | null;
+    categoryId: string | null;
+    category: { id: string; title: string; name: string; slug: string } | null;
     ownerId: string | null;
     owner: { id: string; firstName: string; lastName: string; phoneNumber?: string } | null;
     currencyId: string | null;
@@ -99,6 +101,7 @@ export interface CreateApartmentData {
     ceilingHeight?: number;
     heatingTypeIds?: string[];
     apartmentTypeId: string;
+    categoryId?: string | null;
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
@@ -143,6 +146,7 @@ export interface UpdateApartmentData {
     ceilingHeight?: number;
     heatingTypeIds?: string[];
     apartmentTypeId?: string;
+    categoryId?: string | null;
     ownerId?: string;
     attributeIds?: string[];
     requestIds?: string[];
@@ -157,6 +161,7 @@ export interface ApartmentFilters {
     limit?: number;
     search?: string;
     apartmentTypeId?: string;
+    categoryId?: string;
     ownerId?: string;
     minPrice?: number;
     maxPrice?: number;

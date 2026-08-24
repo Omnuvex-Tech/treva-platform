@@ -64,6 +64,7 @@ model Category {
 
   houses      House[]
   unitLayouts UnitLayout[]
+  apartments  Apartment[]
 }
 
 model House {
@@ -317,11 +318,15 @@ model Apartment {
   archived        Boolean       @default(false)
   apartmentTypeId String
   apartmentType   ApartmentType  @relation(fields: [apartmentTypeId], references: [id])
+  categoryId      String?
+  category        Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   ownerId         String?
   owner           Owner?         @relation(fields: [ownerId], references: [id])
   prices          ApartmentPrice[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+
+  @@index([categoryId])
 }
 
 model LocationOption {
