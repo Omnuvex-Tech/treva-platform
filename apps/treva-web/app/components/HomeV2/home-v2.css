@@ -1,0 +1,1681 @@
+/* =========================================================================
+   HOME V2 — Treva Real Estate
+   Rebuilt from Figma "Treva Real Estate" > Home (node 635-21025).
+   Everything is scoped under .hv2-root so V1 stays untouched.
+   ========================================================================= */
+
+.hv2-root {
+    /* surfaces */
+    --hv2-bg: #f2f2f2;
+    --hv2-surface: #ffffff;
+    --hv2-muted: #e9e9e9;
+    --hv2-muted-2: #f6f6f6;
+    --hv2-line: #e4e4e4;
+    --hv2-line-soft: #ededed;
+
+    /* ink — Color/Text/Primary is #000000 at 87%, Secondary at 60%; ink-2 stays a
+       slate because it also paints the dark pills, which are not black. */
+    --hv2-ink: rgba(0, 0, 0, 0.87);
+    --hv2-ink-60: rgba(0, 0, 0, 0.6);
+    --hv2-ink-2: #3f4249;
+
+    /* Color/Background/Brand/Default, Color/Border/Inverse, Color/Skeleton/Default */
+    --hv2-brand: rgba(78, 83, 94, 1);
+    --hv2-border-inverse: #ffffff;
+    --hv2-skeleton: rgba(236, 237, 238, 1);
+    --hv2-ink-soft: #7b7f87;
+    --hv2-ink-faint: #a3a7ae;
+    --hv2-on-dark: #ffffff;
+
+    /* Color/Border/Secondary Brand and Color/Icon/Neutral — the project card
+       outline and its 24px developer glyph. */
+    --hv2-pcard-line: #e2e3e2;
+    --hv2-icon-neutral: #000000;
+
+    /* Color/Background/Selected — the inventory card panel and the active tab.
+       Color/Background/Inverse — the news category pill. */
+    --hv2-selected: #edeeef;
+    --hv2-inverse-bg: #f4f5f5;
+
+    /* radii — Sizing/Radius/* tokens from the Figma file */
+    --hv2-r-xxl: 24px;
+    --hv2-r-xl: 20px;
+    --hv2-r-lg: 18px;
+    --hv2-r-md: 12px;
+    --hv2-r-sm: 9px;
+    --hv2-r-pill: 999px;
+    /* Sizing/Radius/XXXLL, used verbatim rather than collapsed into --hv2-r-pill
+       so the value in the code is the value in the design. */
+    --hv2-r-xxxll: 96px;
+
+    /* rhythm — the Figma canvas is 1440 with 48px gutters; the gutter is pulled
+       in to 32 and the shell allowed past 1440 so wide screens are not left with
+       a large empty margin on each side. */
+    --hv2-gap: 24px;
+    --hv2-row-gap: 40px;
+    --hv2-section: 120px;
+    --hv2-flow: 40px;
+    --hv2-shell: 1600px;
+    --hv2-pad: 32px;
+
+    /* type — body stays Inter, headings are Oak Sans */
+    --hv2-font-body: var(--font-inter), "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    --hv2-font-display: "Oak Sans", var(--hv2-font-body);
+
+    background: var(--hv2-bg);
+    color: var(--hv2-ink);
+    font-family: var(--hv2-font-body);
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: normal;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* The global stylesheet uppercases and letter-spaces every text node on the
+   site (container.css, body rule). V2 is mixed-case by design, so undo it once
+   here instead of fighting it per element. */
+.hv2-root,
+.hv2-root h1,
+.hv2-root h2,
+.hv2-root h3,
+.hv2-root h4,
+.hv2-root p,
+.hv2-root a,
+.hv2-root span,
+.hv2-root li,
+.hv2-root button,
+.hv2-root label,
+.hv2-root input,
+/* Only text-transform is listed per element. font-size, line-height and
+   letter-spacing are inherited from .hv2-root above — repeating them here gave
+   this block (0,1,1) specificity, which silently beat every heading class
+   (0,1,0) and pinned all headings to 14px with no letter-spacing. */
+.hv2-root select {
+    text-transform: none;
+}
+
+
+.hv2-root h1,
+.hv2-root h2,
+.hv2-root h3,
+.hv2-root h4,
+.hv2-root p {
+    margin: 0;
+}
+
+/* font-family only. `color: inherit` here is (0,1,1) and silently beat every
+   button colour class (0,1,0) — that is what kept the Search button's label
+   dark instead of white. Each control sets its own colour and size below. */
+.hv2-root button,
+.hv2-root input,
+.hv2-root select {
+    font-family: inherit;
+}
+
+/* Headings run on Oak Sans. The !important is not decoration: globals.css has
+   `[data-locale="az"] h1..h6 { font-family: ... !important }` to stop Azerbaijani
+   diacritics clipping, and without matching it here every az heading falls back
+   to Inter. See the note in the handover about that trade-off. */
+.hv2-root .hv2-h2,
+.hv2-root .hv2-search__title,
+.hv2-root .hv2-calc__title,
+.hv2-root .hv2-team__title,
+.hv2-root .hv2-footer__col-title,
+/* The whole card runs on Oak Sans in Figma, not just its heading. */
+.hv2-root .hv2-pcard__title,
+.hv2-root .hv2-pcard__dev,
+.hv2-root .hv2-pcard__price,
+.hv2-root .hv2-pcard__area,
+.hv2-root .hv2-ucard__title,
+.hv2-root .hv2-ucard__meta,
+.hv2-root .hv2-ucard__tag {
+    font-family: var(--hv2-font-display) !important;
+}
+
+.hv2-shell {
+    width: 100%;
+    max-width: var(--hv2-shell);
+    margin: 0 auto;
+    padding-left: var(--hv2-pad);
+    padding-right: var(--hv2-pad);
+}
+
+/* ---------- shared atoms ---------------------------------------------- */
+
+.hv2-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: var(--hv2-r-pill);
+    background: var(--hv2-surface);
+    color: var(--hv2-ink);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.hv2-pill:hover {
+    transform: translateY(-1px);
+}
+
+.hv2-pill--dark {
+    background: var(--hv2-brand);
+    color: var(--hv2-on-dark);
+}
+
+.hv2-pill--dark:hover {
+    background: var(--hv2-ink);
+}
+
+.hv2-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--hv2-surface);
+    color: var(--hv2-ink-2);
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.hv2-icon-btn:hover {
+    background: var(--hv2-muted);
+}
+
+/* Off-Plane / Resale tab — Figma 511:12933, 196x46.
+   The sliding white thumb is gone: the design marks the active side with a flat
+   Color/Background/Selected pill on a white, bordered track. */
+.hv2-switch {
+    display: inline-flex;
+    padding: 4px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-surface);
+}
+
+/* Body 2 — 14/20, letter-spacing 0.25; Regular when idle, Medium when active. */
+.hv2-switch button {
+    padding: 8px 20px;
+    border: 0;
+    border-radius: var(--hv2-r-xxxll);
+    background: transparent;
+    color: var(--hv2-ink-60);
+    font-family: var(--hv2-font-display);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.hv2-switch button[aria-pressed="true"] {
+    background: var(--hv2-selected);
+    color: var(--hv2-ink);
+    font-weight: 500;
+}
+
+/* Figma block heights are applied as min-height, never a fixed height: real copy
+   (Azerbaijani runs longer than the English frames) and live API titles must be
+   able to grow the block instead of being clipped. */
+.hv2-section {
+    padding-top: var(--hv2-section);
+}
+
+/* head 40 + flow 40 + two 444 card rows + 24 row gap + flow 40 + button 52. */
+.hv2-s-projects {
+    min-height: calc(var(--hv2-section) + 1084px);
+    --hv2-row-gap: 24px;
+}
+
+.hv2-s-partners {
+    min-height: calc(var(--hv2-section) + 292px);
+}
+
+.hv2-s-inventory {
+    min-height: calc(var(--hv2-section) + 648px);
+}
+
+.hv2-s-team {
+    min-height: calc(var(--hv2-section) + 888px);
+    --hv2-flow: 24px;
+    --hv2-row-gap: 24px;
+}
+
+.hv2-s-pulse {
+    min-height: calc(var(--hv2-section) + 696px);
+    --hv2-flow: 60px;
+}
+
+.hv2-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: var(--hv2-flow);
+}
+
+/* Section heading — Oak Sans Medium 32 / 40, letter-spacing 0.25. */
+.hv2-h2 {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.25px;
+}
+
+/* Body 2/Regular — 14/20, letter-spacing 0.25, Color/Text/Secondary. It used to
+   be 12.5px in a grey that is not in the palette; both were guesses from a
+   screenshot, and 12.5 is not a step on the type scale at all. */
+.hv2-lead {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+    text-align: right;
+    max-width: 340px;
+}
+
+/* =========================================================================
+   NAVBAR
+   ========================================================================= */
+
+/* Header is a floating card: 1344x90 at top 20 / left 48, radius XXL, 1px border. */
+.hv2-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding-top: 20px;
+    background: var(--hv2-bg);
+}
+
+.hv2-nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    height: 90px;
+    padding: 0 24px;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-xxl);
+    background: rgba(253, 253, 253, 0.8);
+    backdrop-filter: blur(12px);
+}
+
+.hv2-nav__logo {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    color: var(--hv2-ink);
+    text-decoration: none;
+}
+
+.hv2-nav__logo img {
+    height: 27px;
+    width: auto;
+    display: block;
+}
+
+/* The link group is the flexible middle child, so centring it inside its own
+   box lands it midway between the logo and the actions — the frame's balance. */
+.hv2-nav__links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex: 1 1 auto;
+}
+
+/* Body 1 / Regular: 16 / 24, Color/Text/Primary. */
+.hv2-nav__links a {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    color: var(--hv2-ink);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.18s ease;
+}
+
+.hv2-nav__links a:hover {
+    opacity: 0.6;
+}
+
+.hv2-nav__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.hv2-nav__phone {
+    padding: 0 16px;
+    font-weight: 500;
+}
+
+.hv2-nav__burger {
+    display: none;
+}
+
+.hv2-nav__mobile {
+    display: none;
+}
+
+/* =========================================================================
+   HERO
+   ========================================================================= */
+
+/* Hero block: 568 tall, 40px below the 90px header at top 20. The left card is
+   432 wide — the intrinsic size of va.svg, which is the whole card artwork. */
+.hv2-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 432px) minmax(0, 1fr);
+    gap: 16px;
+    padding-top: 40px;
+}
+
+/* --- left: credit calculator card --- */
+.hv2-calc {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 568px;
+    /* Horizontal padding is 16 so the CTA lands at its Figma 400x52 (432 - 32);
+       the two text layers add 4px of their own to sit at Left 20. */
+    padding: 28px 16px 16px;
+    border-radius: var(--hv2-r-xxl);
+    /* va.svg is the ENTIRE card flattened — surface, VA render, heading, subtitle
+       and button all baked in — so using it whole double-prints every label over
+       the live DOM copy. va-art.jpg is the raster that was embedded inside it:
+       the VA render on its gradient, and nothing else. cover/center reproduces
+       the placement the SVG applied to it (100% x 110.2%, -5.1% y). */
+    background: #ececec url("/va-art.jpg") center / cover no-repeat;
+    overflow: hidden;
+}
+
+/* Title  — H4 Headline/Medium, 220x80 at Top 28 / Left 20, Color/Text/Primary. */
+.hv2-calc__title {
+    margin-left: 4px;
+    max-width: 240px;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: -0.01em;
+    color: var(--hv2-ink);
+}
+
+/* Subtitle — Body 1/Regular, 158x24 at Top 116, Color/Text/Secondary. */
+.hv2-calc__subtitle {
+    margin: 8px 0 0 4px;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--hv2-ink-60);
+}
+
+/* CTA — Primary/52, fixed 400x52 at Top 500; the artwork between is background. */
+.hv2-calc__cta {
+    margin-top: auto;
+    width: 100%;
+    height: 52px;
+}
+
+/* --- right: hero visual --- */
+.hv2-heroimg {
+    position: relative;
+    min-height: 568px;
+    border-radius: var(--hv2-r-xxl);
+    overflow: hidden;
+    background: var(--hv2-muted);
+}
+
+.hv2-heroimg__media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.hv2-heroimg__media img,
+.hv2-heroimg__media video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Caption strip: frosted glass over the footage — the picture keeps running
+   underneath, blurred, so dark copy stays legible on any frame. The rgba wash
+   is the fallback where backdrop-filter is unsupported. */
+.hv2-heroimg__bar {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 88px;
+    padding: 0 22px;
+    background: rgba(253, 253, 253, 0.8);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .hv2-heroimg__bar {
+        background: rgba(255, 255, 255, 0.86);
+    }
+}
+
+.hv2-heroimg__scroll {
+    color: var(--hv2-ink);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.hv2-heroimg__cta {
+    flex: 0 0 auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================================================
+   SEARCH PANEL
+   ========================================================================= */
+
+/* Calculator block: 1344x411, radius XL, 1px border, 120px below the hero. */
+.hv2-search {
+    display: flex;
+    flex-direction: column;
+    /* Figma reads 411 Hug — the content sets the height. Forcing it as a
+       min-height stretched the body and left dead space above the footer. */
+    margin-top: var(--hv2-section);
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+    /* No overflow:hidden — it clipped the project dropdown at the card edge.
+       The footer bar rounds its own bottom corners instead. */
+}
+
+.hv2-search__body {
+    flex: 1 1 auto;
+    padding: 32px 32px 28px;
+}
+
+.hv2-search__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 26px;
+}
+
+/* Main Heading — H3 Headline/Medium, 234x96 (two 48px lines), Color/Text/Primary. */
+.hv2-search__title {
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 48px;
+    letter-spacing: -0.02em;
+    color: var(--hv2-ink);
+}
+
+.hv2-search__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px 28px;
+}
+
+.hv2-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.hv2-field__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--hv2-ink);
+}
+
+.hv2-input,
+.hv2-select {
+    width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-pill);
+    background: var(--hv2-surface);
+    font-size: 12.5px;
+    color: var(--hv2-ink);
+    outline: none;
+    transition: border-color 0.18s ease;
+}
+
+.hv2-input::placeholder {
+    color: var(--hv2-ink-faint);
+}
+
+.hv2-input:focus,
+.hv2-select:focus {
+    border-color: var(--hv2-ink-faint);
+}
+
+/* custom listbox (replaces the OS-painted <select> popup) */
+.hv2-sel {
+    position: relative;
+}
+
+.hv2-sel__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-pill);
+    background: var(--hv2-surface);
+    font-size: 12.5px;
+    color: var(--hv2-ink);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.18s ease;
+}
+
+.hv2-sel__trigger:hover,
+.hv2-sel__trigger:focus-visible {
+    border-color: var(--hv2-ink-faint);
+    outline: none;
+}
+
+.hv2-sel__trigger[data-filled="false"] .hv2-sel__value {
+    color: var(--hv2-ink-faint);
+}
+
+.hv2-sel__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hv2-sel__chevron {
+    flex: 0 0 auto;
+    color: var(--hv2-ink-soft);
+    transition: transform 0.18s ease;
+}
+
+.hv2-sel__trigger[aria-expanded="true"] .hv2-sel__chevron {
+    transform: rotate(180deg);
+}
+
+.hv2-sel__list {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    max-height: 268px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-md);
+    background: var(--hv2-surface);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
+    transform-origin: top center;
+    animation: hv2-sel-in 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes hv2-sel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.985);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hv2-sel__list {
+        animation: none;
+    }
+}
+
+.hv2-sel__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: var(--hv2-r-sm);
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--hv2-ink);
+    cursor: pointer;
+    transition: background 0.14s ease;
+}
+
+.hv2-sel__option[data-active="true"] {
+    background: var(--hv2-muted-2);
+    color: var(--hv2-ink);
+}
+
+.hv2-sel__option[aria-selected="true"] {
+    color: var(--hv2-ink);
+    font-weight: 500;
+}
+
+.hv2-sel__option svg {
+    flex: 0 0 auto;
+}
+
+/* min / max pair */
+.hv2-range {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+}
+
+.hv2-range__dash {
+    height: 1px;
+    background: var(--hv2-line);
+}
+
+/* rooms segmented control */
+.hv2-rooms {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.hv2-rooms button {
+    height: 40px;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-pill);
+    background: var(--hv2-surface);
+    font-size: 12.5px;
+    color: var(--hv2-ink-2);
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.hv2-rooms button:hover {
+    border-color: var(--hv2-ink-faint);
+}
+
+.hv2-rooms button[aria-pressed="true"] {
+    background: var(--hv2-ink-2);
+    border-color: var(--hv2-ink-2);
+    color: var(--hv2-on-dark);
+}
+
+/* Color/Skeleton/Default */
+.hv2-search__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 22px;
+    background: var(--hv2-skeleton);
+    /* -1px for the card's own border, so the fill meets the rounded edge. */
+    border-radius: 0 0 calc(var(--hv2-r-xl) - 1px) calc(var(--hv2-r-xl) - 1px);
+}
+
+.hv2-search__count {
+    font-size: 12.5px;
+    color: var(--hv2-ink-60);
+}
+
+/* Search button — Border/Inverse 1.5px, Background/Brand/Default,
+   Text/Inverse/Primary. The border is what separates it from the skeleton bar. */
+.hv2-search__cta {
+    border: 1.5px solid var(--hv2-border-inverse);
+    background: var(--hv2-brand);
+    color: #ffffff;
+}
+
+.hv2-search__cta:hover {
+    background: var(--hv2-ink-2);
+}
+
+/* =========================================================================
+   PROJECT CARDS
+   ========================================================================= */
+
+/* 3 x 432 cards + 2 x 24 column gaps = 1344. Rows are 40 apart (24 in Team). */
+.hv2-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--hv2-row-gap) var(--hv2-gap);
+}
+/* ---------- projects grid card ----------------------------------------
+   Figma node 425:5213, 432x444. This card keeps its own namespace rather than
+   joining `.hv2-ucard`: it is the only one that lifts its cover clear of the
+   frame, and none of that stacking should reach the other cards. */
+
+.hv2-pcard {
+    /* The cover overhangs the frame by a fixed 44 at every width — it is a
+       constant in the design, not a ratio, so it stays in px. */
+    --hv2-pcard-lift: 44px;
+    --hv2-pcard-foot: 132px;
+
+    display: block;
+    position: relative;
+    padding-top: var(--hv2-pcard-lift);
+    color: inherit;
+    text-decoration: none;
+}
+
+.hv2-pcard__frame {
+    position: relative;
+    /* The cover is 312/430 = 72.56% of the card width and 44 of it sits above
+       the frame, so the frame only reserves the remainder; the footer then
+       flows underneath. At the 432 design width that lands on 400 exactly. */
+    padding-top: calc(72.56% - var(--hv2-pcard-lift));
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-muted);
+    overflow: hidden;
+}
+
+/* The sky the cut-out cover is composited over. Below the cover it is only ever
+   seen through the translucent footer, which is where each card's tint comes
+   from. Cards with no separate sky reuse their cover here. */
+.hv2-pcard__sky {
+    object-fit: cover;
+}
+
+.hv2-pcard__media {
+    position: absolute;
+    top: 0;
+    left: 1px;
+    right: 1px;
+    aspect-ratio: 430 / 312;
+    overflow: hidden;
+    /* Above the frame so the lifted 44px is not clipped by its radius. */
+    z-index: 1;
+}
+
+/* Placement is set per card in cropStyle(), which spends the `transform`
+   property on the Figma crop. Hover therefore zooms through the independent
+   `scale` property instead, so neither ever overwrites the other. */
+.hv2-pcard__media img {
+    transform-origin: 0 0;
+    transition: scale 0.4s ease;
+}
+
+.hv2-pcard:hover .hv2-pcard__media img {
+    scale: 1.03;
+}
+
+/* Hover clip. It takes over the whole block rather than just the cover, so it
+   is anchored to the card and not to __media. It cross-fades in only once
+   playback actually starts — fading on hover alone flashes a black frame while
+   the file is still buffering. */
+.hv2-pcard__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--hv2-r-xl);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hv2-pcard__video[data-playing="true"] {
+    opacity: 1;
+}
+
+.hv2-pcard__body {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: var(--hv2-pcard-foot);
+    padding: 20px;
+    background: rgba(253, 253, 253, 0.8);
+}
+
+.hv2-pcard__info {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* H6 Headline/Medium — 20/28, letter-spacing 0.15. */
+.hv2-pcard__title {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink);
+}
+
+/* Body 1/Regular — 16/24, letter-spacing 0.05. */
+.hv2-pcard__dev,
+.hv2-pcard__price {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink);
+}
+
+.hv2-pcard__dev {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Color/Icon/Neutral. Both dimensions are pinned because the glyph is a 24
+   square in the design and the fallback pin has to match it. */
+.hv2-pcard__dev-icon {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    color: var(--hv2-icon-neutral);
+}
+
+/* Subtitle 1/Medium — 16/24, letter-spacing 0.15, radius XXXLL (96). */
+.hv2-pcard__area {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 12px;
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-surface);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink);
+    white-space: nowrap;
+}
+
+/* "See all projects" — Figma Button, 635:21943. The shared `.hv2-pill` is 40px
+   with an 18px gutter, which is a different component; this one is the design's
+   own: padding M/S (16/12) around a 24/16 label, so 52 tall, radius XXXLL. The
+   other CTAs on the page are left on `.hv2-pill` until their own frames are
+   checked — the navbar is built around its 40px height. */
+.hv2-pill--cta {
+    height: 52px;
+    gap: 4px;
+    padding: 12px 16px;
+    border-radius: var(--hv2-r-xxxll);
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+}
+
+.hv2-pill--cta img {
+    width: 24px;
+    height: 24px;
+}
+
+.hv2-center {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--hv2-flow);
+}
+
+/* =========================================================================
+   PARTNERS
+   ========================================================================= */
+
+/* Centred section head — Figma 683:16889, a 576-wide column with 12 between the
+   H4 and its Body 2 subheading. Shared by Partners and Treva Pulse. */
+.hv2-partners__head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: var(--hv2-flow);
+    text-align: center;
+}
+
+.hv2-partners__head .hv2-lead {
+    max-width: 576px;
+    text-align: center;
+}
+
+/* Figma node 453:10703. The instance is a 2504x160 window onto two identical
+   2352px runs — 9 tiles of 240 at a 24 gap — with the same 24 between the runs.
+   The design itself duplicates the list, which is exactly how the loop closes
+   without a seam here. The heading stays in the shell; only the strip breaks
+   out, all the way to the viewport edge rather than just to the gutter, and
+   `calc(50% - 50vw)` on each side is what cancels the container. */
+.hv2-partners__bleed {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    /* 100vw ignores the scrollbar, so the last pixels would otherwise push a
+       horizontal scrollbar onto the page. */
+    overflow: hidden;
+}
+
+.hv2-partners__track {
+    display: flex;
+    width: max-content;
+    gap: 24px;
+    animation: hv2-marquee 60s linear infinite;
+}
+
+/* Half the track is one copy plus half the gap between the copies, so the run
+   has to travel that half-gap further to land the duplicate exactly where the
+   original began — hence the extra 12px on top of -50%. */
+@keyframes hv2-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-50% - 12px));
+    }
+}
+
+.hv2-partners__bleed:hover .hv2-partners__track {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hv2-partners__track {
+        animation: none;
+    }
+
+    /* With the marquee off the strip still has to be reachable, so it becomes
+       an ordinary scroller and the duplicate pass is dropped from the flow. */
+    .hv2-partners__bleed {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .hv2-partners__track > [aria-hidden="true"] {
+        display: none;
+    }
+}
+
+.hv2-partners__row {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 24px;
+}
+
+/* 240x160 tile, radius XL, 1px Color/Border/Secondary Brand on white. */
+.hv2-partner {
+    display: flex;
+    flex: 0 0 240px;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    overflow: hidden;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+}
+
+/* Every logo has its own box in the design — a wordmark and a square emblem
+   are given different room — so the size comes from the data, not from here.
+   No grayscale filter either: the marks are already monochrome in Figma, and
+   washing them out was a carry-over from the old build. */
+.hv2-partner__logo {
+    flex: 0 0 auto;
+}
+/* =========================================================================
+   INVENTORY / TEAM / NEWS CARDS
+   ========================================================================= */
+
+/* Figma builds all three the same way: a bordered 20-radius frame with a
+   translucent footer sitting on the artwork (597:18777, 685:17036, 685:17008).
+   The project card is the same idea but lifts its cover clear of the frame, so
+   it keeps its own `.hv2-pcard` rules rather than joining in here. */
+.hv2-ucard {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hv2-ucard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+}
+
+.hv2-ucard__media img {
+    object-fit: cover;
+}
+
+.hv2-ucard__foot {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px;
+    background: rgba(253, 253, 253, 0.8);
+}
+
+.hv2-ucard__info {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* H6 Headline/Medium — 20/28, letter-spacing 0.15. */
+.hv2-ucard__title {
+    overflow: hidden;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Body 1/Regular — 16/24, letter-spacing 0.05. */
+.hv2-ucard__meta {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink);
+}
+
+.hv2-ucard__dev {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hv2-ucard__dev-icon {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+}
+
+/* Subtitle 1/Medium on Color/Background/Inverse, radius XXXLL. */
+.hv2-ucard__tag {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 12px;
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink);
+    white-space: nowrap;
+}
+
+/* ---------- inventory: 432x470 ----------------------------------------
+   A 261x280 floor plan centred on Color/Background/Selected, then a 130 footer.
+   The plan is artwork on a tinted panel, not a photo, so it is contained rather
+   than cropped. */
+.hv2-ucard--unit {
+    background: var(--hv2-selected);
+}
+
+.hv2-ucard--unit .hv2-ucard__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 432 / 340;
+}
+
+.hv2-ucard__plan {
+    position: relative;
+    width: 60.42%;
+    aspect-ratio: 261 / 280;
+}
+
+.hv2-ucard--unit .hv2-ucard__foot {
+    min-height: 130px;
+}
+
+.hv2-ucard--unit .hv2-ucard__info {
+    gap: 8px;
+}
+
+/* Figma lists these three as bulleted items indented by 24, so the separator is
+   a real disc — not a slash or a dot typed into the copy. */
+.hv2-ucard__specs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+
+.hv2-ucard__specs span + span {
+    position: relative;
+    margin-left: 24px;
+}
+
+.hv2-ucard__specs span + span::before {
+    content: "\2022";
+    position: absolute;
+    left: -14px;
+}
+
+/* ---------- team: 432x432 ---------------------------------------------
+   The portrait fills the whole card and the 96px footer floats over its foot. */
+.hv2-ucard--person {
+    aspect-ratio: 1;
+}
+
+.hv2-ucard--person .hv2-ucard__media {
+    position: absolute;
+    inset: 0;
+}
+
+.hv2-ucard--person .hv2-ucard__foot {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    min-height: 96px;
+}
+
+/* ---------- news: 432x432 ---------------------------------------------
+   Here the cover takes 335 of the 432 and the footer follows it in flow, so the
+   two together fill the card rather than overlapping. */
+.hv2-ucard--news .hv2-ucard__media {
+    position: relative;
+    aspect-ratio: 432 / 335;
+}
+
+.hv2-ucard--news .hv2-ucard__foot {
+    min-height: 96px;
+    align-items: center;
+}
+
+/* =========================================================================
+   TEAM INTRO
+   ========================================================================= */
+
+/* Figma 558:1061 — white 20-radius card at 20 padding, 40 between the heading
+   and the stat box. The stat box is bordered, also 20/20, and pushes its button
+   to the bottom so the intro lines up with the cards beside it. */
+.hv2-team__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 20px;
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+}
+
+.hv2-team__title {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink);
+}
+
+.hv2-team__stat {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+}
+
+.hv2-team__details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Oak Sans Regular 60/72, letter-spacing -0.5, Color/Text/Brand. */
+.hv2-team__count {
+    font-family: var(--hv2-font-display);
+    font-size: 60px;
+    font-weight: 400;
+    line-height: 72px;
+    letter-spacing: -0.5px;
+    color: var(--hv2-brand);
+}
+
+.hv2-team__lead {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+}
+
+/* The stat box is a stretch-aligned column, so without this the button would
+   span its full width instead of hugging its label as it does in the design. */
+.hv2-team__stat .hv2-pill {
+    align-self: flex-start;
+}
+/* =========================================================================
+   FOOTER
+   ========================================================================= */
+
+.hv2-footer-wrap {
+    padding-bottom: 40px;
+}
+
+/* Footer block: 1344x479, radius XXL, 1px border, padding 40 / 64. */
+.hv2-footer {
+    display: flex;
+    flex-direction: column;
+    min-height: 479px;
+    padding: 40px 64px;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-xxl);
+    background: var(--hv2-surface);
+}
+
+.hv2-footer__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.hv2-footer__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+}
+
+.hv2-footer__nav a {
+    font-size: 12.5px;
+    color: var(--hv2-ink-2);
+    text-decoration: none;
+}
+
+.hv2-footer__nav a:hover {
+    color: var(--hv2-ink);
+}
+
+.hv2-footer__mid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 32px;
+    margin-top: 26px;
+    /* The frame pins the legal row to the bottom of the 479px card. */
+    flex: 1 1 auto;
+    padding-bottom: 34px;
+}
+
+.hv2-footer__about {
+    max-width: 330px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--hv2-ink-soft);
+}
+
+.hv2-footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hv2-footer__col-title {
+    margin-bottom: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+.hv2-footer__col a,
+.hv2-footer__col p {
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--hv2-ink-soft);
+    text-decoration: none;
+}
+
+.hv2-footer__col a:hover {
+    color: var(--hv2-ink);
+}
+
+.hv2-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.hv2-footer__socials {
+    display: flex;
+    gap: 8px;
+}
+
+.hv2-footer__social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--hv2-muted-2);
+    color: var(--hv2-ink-2);
+    transition: background 0.18s ease;
+}
+
+.hv2-footer__social:hover {
+    background: var(--hv2-muted);
+}
+
+.hv2-footer__legal {
+    display: flex;
+    gap: 40px;
+    font-size: 11px;
+    color: var(--hv2-ink-soft);
+}
+
+.hv2-footer__langs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.hv2-footer__langs-label {
+    font-size: 10.5px;
+    color: var(--hv2-ink-faint);
+}
+
+.hv2-footer__langs-row {
+    display: flex;
+    gap: 12px;
+}
+
+.hv2-footer__langs-row a {
+    font-size: 11.5px;
+    color: var(--hv2-ink-soft);
+    text-decoration: none;
+}
+
+.hv2-footer__langs-row a[aria-current="true"] {
+    color: var(--hv2-ink);
+    font-weight: 500;
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+
+/* Below the 1440 design canvas the fixed block heights stop being meaningful —
+   release them so sections size to their content. */
+@media (max-width: 1439px) {
+    .hv2-s-projects,
+    .hv2-s-partners,
+    .hv2-s-inventory,
+    .hv2-s-team,
+    .hv2-s-pulse {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 1200px) {
+    .hv2-root {
+        --hv2-pad: 24px;
+        --hv2-section: 80px;
+        --hv2-row-gap: 32px;
+    }
+
+    .hv2-nav__links {
+        gap: 18px;
+    }
+
+    .hv2-hero {
+        grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .hv2-hero {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hv2-calc {
+        min-height: 380px;
+    }
+
+    .hv2-heroimg {
+        min-height: 340px;
+    }
+
+    .hv2-footer {
+        min-height: 0;
+        padding: 32px 32px 28px;
+    }
+
+    .hv2-search {
+        min-height: 0;
+    }
+
+    .hv2-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hv2-footer__mid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .hv2-footer__about {
+        grid-column: 1 / -1;
+        max-width: none;
+    }
+
+    .hv2-nav__links {
+        display: none;
+    }
+
+    .hv2-nav__burger {
+        display: inline-flex;
+    }
+
+    .hv2-nav__inner {
+        justify-content: space-between;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hv2-root {
+        --hv2-pad: 16px;
+        --hv2-section: 56px;
+        --hv2-gap: 16px;
+        --hv2-row-gap: 16px;
+        --hv2-flow: 24px;
+        --hv2-r-xxl: 18px;
+        --hv2-r-xl: 16px;
+    }
+
+    .hv2-nav {
+        padding-top: 12px;
+    }
+
+    .hv2-nav__inner {
+        padding: 0 16px;
+    }
+
+    .hv2-hero {
+        padding-top: 24px;
+    }
+
+    .hv2-nav__inner {
+        height: 62px;
+    }
+
+    /* Keep the phone pill and cabinet; drop the secondary circle actions. */
+    .hv2-nav__opt {
+        display: none;
+    }
+
+    .hv2-nav__mobile {
+        display: block;
+        border-top: 1px solid var(--hv2-line);
+        background: var(--hv2-bg);
+    }
+
+    .hv2-nav__mobile ul {
+        list-style: none;
+        margin: 0;
+        padding: 10px var(--hv2-pad) 18px;
+    }
+
+    .hv2-nav__mobile a {
+        display: block;
+        padding: 11px 0;
+        font-size: 15px;
+        color: var(--hv2-ink);
+        text-decoration: none;
+        border-bottom: 1px solid var(--hv2-line-soft);
+    }
+
+    .hv2-calc {
+        min-height: 320px;
+        padding: 20px;
+    }
+
+    .hv2-calc__title {
+        font-size: 22px;
+        line-height: 30px;
+    }
+
+    .hv2-calc__subtitle {
+        font-size: 14px;
+    }
+
+    .hv2-heroimg__bar {
+        height: 72px;
+        padding: 0 16px;
+    }
+
+    .hv2-calc__va {
+        font-size: 96px;
+    }
+
+    .hv2-heroimg {
+        min-height: 260px;
+    }
+
+    .hv2-search__body {
+        padding: 20px 18px 18px;
+    }
+
+    .hv2-search__head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .hv2-search__title {
+        font-size: 26px;
+    }
+
+    .hv2-search__grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .hv2-rooms {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .hv2-search__foot {
+        padding: 12px 18px;
+    }
+
+    .hv2-section-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .hv2-h2 {
+        font-size: 26px;
+    }
+
+    .hv2-lead {
+        text-align: left;
+        max-width: none;
+    }
+
+    .hv2-grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* The tile keeps its 240x160 at every width. It used to shrink to 236x76,
+       which was sized for the old shared 40px logo height and would now clip
+       the taller boxes; a marquee does not have to fit the screen anyway. */
+
+    .hv2-partners__head .hv2-lead {
+        text-align: center;
+    }
+
+    .hv2-team__intro {
+        gap: 14px;
+    }
+
+    .hv2-footer {
+        padding: 24px 20px 20px;
+    }
+
+    .hv2-footer__top {
+        gap: 18px;
+    }
+
+    .hv2-footer__nav {
+        gap: 14px 18px;
+    }
+
+    .hv2-footer__mid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+        padding-bottom: 26px;
+    }
+
+    .hv2-footer__bottom {
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .hv2-footer__legal {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .hv2-footer__langs {
+        align-items: flex-start;
+    }
+}
