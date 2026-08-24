@@ -15,6 +15,36 @@ import { useResaleApartmentBySlug } from '@/hooks/use-resale-apartments';
 import { isSaved as isSavedProp, addSaved, removeSaved } from '@/lib/saved-properties';
 import './resale-detail.css';
 
+async function copyToClipboard(text: string): Promise<boolean> {
+  // navigator.clipboard yalnız secure context-də (https və ya localhost) mövcuddur.
+  // Şəbəkə IP-si üzərindən açılan http səhifədə undefined olur və köhnə kod
+  // orada səssizcə TypeError atırdı.
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // İcazə verilmədi — aşağıdakı fallback-ə keçirik.
+    }
+  }
+
+  try {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(textarea);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 function toGoogleMapsEmbed(url: string): string {
   if (!url) return '';
 
@@ -382,11 +412,17 @@ export default function ResaleDetailPage() {
         window.open(`https://t.me/share/url?url=${encodedUrl}&text=${text}`, '_blank');
         break;
       case 'copy':
-        navigator.clipboard.writeText(locationLink ? `${url}\n📍 ${locationLink}` : url).then(() => {
+        // Dropdown açıq saxlanılır: "Kopyalandı!" yazısı yalnız onun içində
+        // görünür, dərhal bağlansaydı istifadəçi heç bir təsdiq görməzdi.
+        copyToClipboard(url).then((ok) => {
+          if (!ok) return;
           setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
+          setTimeout(() => {
+            setCopied(false);
+            setShareOpen(false);
+          }, 2000);
         });
-        break;
+        return;
       case 'native':
         if (navigator.share) {
           navigator.share({ title: shareTitle, text: shareText, url });
