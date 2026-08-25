@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -33,6 +33,17 @@ export default function NavbarV2({ locale }: Props) {
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
   const [sub, setSub] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // 10px matches kristal.az's own threshold, the reference for this effect:
+  // the card should still be transparent for a couple of wheel ticks, not
+  // flip on the very first pixel.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const href = (path: string) => `/${locale}${path}`;
 
@@ -41,14 +52,14 @@ export default function NavbarV2({ locale }: Props) {
        pointer can travel from "Projects" down into the panel without it
        vanishing on the way. */
     <header
-      className="hv2-nav"
+      className={`hv2-nav${scrolled ? " hv2-nav--scrolled" : ""}`}
       onMouseLeave={() => setMega(false)}
       onKeyDown={(event) => {
         if (event.key === "Escape") setMega(false);
       }}
     >
-      <div className="hv2-shell">
-        <div className="hv2-nav__inner">
+      <div className="hv2-nav__bar">
+        <div className="hv2-shell hv2-nav__inner">
           <Link href={`/${locale}`} className="hv2-nav__logo" aria-label="TREVA">
             {/* unoptimized: there is nothing for the image optimizer to do to an
                 SVG, and it rejects them unless dangerouslyAllowSVG is enabled. */}

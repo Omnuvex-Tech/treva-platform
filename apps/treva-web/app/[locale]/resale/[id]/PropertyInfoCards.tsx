@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { ResaleApartment } from '@/lib/resale.types';
 import './property-info-cards.css';
 import RequestViewingCard from './RequestViewingCard';
@@ -15,7 +15,14 @@ interface PropertyInfoCardsProps {
 }
 
 /**
- * Kart başlıqları və standart təsvir mətni.
+ * Mobil ekranda ilk bu qədər detal göstərilir, qalanı "Daha çox" ilə açılır.
+ * `ap-desktop-only` sinfi yalnız mobil media sorğusunda gizlədir — masaüstündə
+ * bütün detallar onsuz da görünür.
+ */
+const MOBILE_VISIBLE_DETAILS = 4;
+
+/**
+ * Kart başlıqları.
  * Əvvəl hamısı sabit ingiliscə idi — üç dilin hamısında ingilis görünürdü.
  */
 const infoDictionary = {
@@ -24,32 +31,39 @@ const infoDictionary = {
     details: 'Mənzilin detalları',
     location: 'Yerləşmə',
     showMore: 'Daha çox',
+    showLess: 'Daha az',
     mapLabel: 'Mənzilin xəritədə yeri',
-    fallbackDescription:
-      'Şəhərin ən köklü və tələb olunan yaşayış rayonlarından birində yerləşir — prestij və şəhər əlçatanlığının balansı.',
   },
   en: {
     about: 'About the Apartment',
     details: 'Apartment Details',
     location: 'Location',
     showMore: 'Show more',
+    showLess: 'Show less',
     mapLabel: 'Resale property location map',
-    fallbackDescription:
-      "Situated in one of the city's most established and sought-after residential districts, providing a perfect balance of prestige and urban connectivity.",
   },
   ru: {
     about: 'О квартире',
     details: 'Детали квартиры',
     location: 'Расположение',
     showMore: 'Показать ещё',
+    showLess: 'Свернуть',
     mapLabel: 'Расположение объекта на карте',
-    fallbackDescription:
-      'Расположена в одном из самых престижных и востребованных жилых районов города — идеальный баланс статуса и городской доступности.',
   },
 } as const;
 
+/** HTML təsvirin içi boşdursa (yalnız teqlər, &nbsp; və s.) bölmə göstərilmir. */
+function hasVisibleText(html?: string) {
+  if (!html) return false;
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .trim().length > 0;
+}
+
 export default function PropertyInfoCards({ apartment, mapEmbedUrl, locationTitle, showViewingCard = true, locale = 'az' }: PropertyInfoCardsProps) {
   const t = infoDictionary[locale as keyof typeof infoDictionary] ?? infoDictionary.az;
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
 
   const fallbackIcons = [
     '/images/resale/img1.png',
@@ -60,48 +74,63 @@ export default function PropertyInfoCards({ apartment, mapEmbedUrl, locationTitl
     '/images/resale/img6.png',
   ];
 
+  const attributes = apartment.attributes || [];
+  // Boş bölmə başlıq kimi qalmasın: mətn yoxdursa kart tamamilə çıxarılır.
+  const showAbout = hasVisibleText(apartment.description);
+  const showDetails = attributes.length > 0;
+  const showLocation = Boolean(mapEmbedUrl);
+  // Düymə yalnız mobildə gizlənən detal varsa mənalıdır.
+  const hasHiddenDetails = attributes.length > MOBILE_VISIBLE_DETAILS;
+
   return (
     <>
     <div className="ap-info-container">
-      
-      <section className="ap-info-card">
-        <h2 className="ap-info-title">{t.about}</h2>
-        
-        <div className="ap-about-section">
-          <RichHtml
-            className="ap-about-text"
-            html={apartment.description || 'Situated in one of the city\'s most established and sought-after residential districts, providing a perfect balance of prestige and urban connectivity.'}
-          />
-        </div>
 
-        <button type="button" className="ap-show-more-link" style={{ display: 'none' }}>
-          {t.showMore}
-        </button>
-      </section>
+      {showAbout && (
+        <section className="ap-info-card">
+          <h2 className="ap-info-title">{t.about}</h2>
 
-      <section className="ap-info-card">
-        <h2 className="ap-info-title">{t.details}</h2>
-        
-        <div className="ap-details-grid">
-          {(apartment.attributes || []).map((attr, index) => (
-            <div className={`ap-details-item ${index >= 4 ? 'ap-desktop-only' : ''}`} key={attr.id}>
-              <div className="ap-icon-box">
-                <img src={attr.icon || fallbackIcons[index]} alt="" width="19" height="19" />
+          <div className="ap-about-section">
+            <RichHtml className="ap-about-text" html={apartment.description!} />
+          </div>
+        </section>
+      )}
+
+      {showDetails && (
+        <section className="ap-info-card">
+          <h2 className="ap-info-title">{t.details}</h2>
+
+          <div className="ap-details-grid">
+            {attributes.map((attr, index) => (
+              <div
+                className={`ap-details-item ${index >= MOBILE_VISIBLE_DETAILS && !detailsExpanded ? 'ap-desktop-only' : ''}`}
+                key={attr.id}
+              >
+                <div className="ap-icon-box">
+                  <img src={attr.icon || fallbackIcons[index]} alt="" width="19" height="19" />
+                </div>
+                <div className="ap-details-content">
+                  <span className="ap-details-label">{attr.title}</span>
+                  <span className="ap-details-value">{attr.value}</span>
+                </div>
               </div>
-              <div className="ap-details-content">
-                <span className="ap-details-label">{attr.title}</span>
-                <span className="ap-details-value">{attr.value}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <button type="button" className="ap-show-more-link ap-mobile-only">
-          {t.showMore}
-        </button>
-      </section>
+          {hasHiddenDetails && (
+            <button
+              type="button"
+              className="ap-show-more-link ap-mobile-only"
+              aria-expanded={detailsExpanded}
+              onClick={() => setDetailsExpanded(v => !v)}
+            >
+              {detailsExpanded ? t.showLess : t.showMore}
+            </button>
+          )}
+        </section>
+      )}
 
-      {mapEmbedUrl && (
+      {showLocation && (
         <section className="ap-info-card ap-map-card">
           <h2 className="ap-info-title">{t.location}</h2>
           {locationTitle && <p className="ap-map-address">{locationTitle}</p>}

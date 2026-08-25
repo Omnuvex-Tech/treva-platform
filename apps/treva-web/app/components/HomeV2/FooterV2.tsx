@@ -80,8 +80,8 @@ export default function FooterV2({ locale }: Props) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="hv2-shell hv2-section hv2-footer-wrap">
-      <div className="hv2-footer">
+    <footer className="hv2-section hv2-footer-wrap">
+      <div className="hv2-shell hv2-footer">
         <div className="hv2-footer__col">
           <div className="hv2-footer__brand">
             <Link href={`/${locale}`} className="hv2-nav__logo" aria-label="TREVA">

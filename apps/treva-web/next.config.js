@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const trevaApiUrl = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
-const trevaOrigin = new URL(trevaApiUrl).origin;
+const trevaUrl = new URL(trevaApiUrl);
+const trevaOrigin = trevaUrl.origin;
 const cmsApiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
 const cmsOrigin = new URL(cmsApiUrl);
 
@@ -27,6 +28,18 @@ const nextConfig = {
                 protocol: cmsOrigin.protocol.replace(":", ""),
                 hostname: cmsOrigin.hostname,
                 port: cmsOrigin.port || undefined,
+            },
+            /* The Inventory strip's unit images (mainImage/coverImage) come back
+               from the API as absolute URLs on this host, not the relative
+               /uploads/ paths the rewrite below handles. In production that host
+               is never "localhost", so without its own entry here every one of
+               those images was rejected by Next's remote-image allowlist — the
+               strip only ever worked locally because "localhost" already covers
+               the dev default. */
+            {
+                protocol: trevaUrl.protocol.replace(":", ""),
+                hostname: trevaUrl.hostname,
+                port: trevaUrl.port || undefined,
             },
         ],
     },

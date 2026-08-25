@@ -38,6 +38,7 @@ export class ApartmentsController {
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
   @ApiQuery({ name: 'apartmentTypeId', required: false })
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiQuery({ name: 'city', required: false })
   @ApiQuery({ name: 'region', required: false })
   @ApiQuery({ name: 'purpose', required: false })
@@ -59,6 +60,7 @@ export class ApartmentsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('apartmentTypeId') apartmentTypeId?: string,
+    @Query('categoryId') categoryId?: string,
     @Query('city') city?: string,
     @Query('region') region?: string,
     @Query('purpose') purpose?: string,
@@ -81,6 +83,7 @@ export class ApartmentsController {
       page: page ? parseInt(page) : 1,
       limit: limit ? parseInt(limit) : 12,
       apartmentTypeId,
+      categoryId,
       city,
       region,
       purpose,

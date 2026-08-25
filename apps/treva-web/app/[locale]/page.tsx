@@ -11,7 +11,8 @@ import {
     toAbsUrl,
 } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
-import { getHomeInventory } from "@/app/components/HomeV2/inventory-api";
+import { getHomeInventory, getHomeResale } from "@/app/components/HomeV2/inventory-api";
+import { getProjectCards } from "@/app/components/HomeV2/projects-api";
 import type { InventoryCard, NewsCard, TeamMember } from "@/app/components/HomeV2/data";
 
 export const dynamicParams = false;
@@ -82,10 +83,24 @@ export default async function HomePage({
             team = [];
         }
 
+        // Seed cards with the CMS hover clip merged in; never throws.
+        const projects = await getProjectCards();
+
+        // Off-plan and resale are separate models/endpoints (unit-layouts vs
+        // apartments) — fetched in parallel so the strip's two tabs show real,
+        // distinct listings instead of the same off-plan units regardless of
+        // which one is selected.
         let inventory: InventoryCard[] | undefined;
-        const liveInventory = await getHomeInventory(3);
+        let resaleInventory: InventoryCard[] | undefined;
+        const [liveInventory, liveResale] = await Promise.all([
+            getHomeInventory(3),
+            getHomeResale(3),
+        ]);
         if (liveInventory.length > 0) {
             inventory = liveInventory;
+        }
+        if (liveResale.length > 0) {
+            resaleInventory = liveResale;
         }
 
         const news: NewsCard[] = pulseArticles.slice(0, 3).map((article, index) => ({
@@ -94,10 +109,24 @@ export default async function HomePage({
             title: article.title,
             date: article.date,
             category: article.category,
-            image: article.coverImage || article.image || "",
+            // apiArticleToArticle hands back the CMS's raw, relative path —
+            // toAbsUrl (already used for the team avatars above) is what the
+            // V1 home page's own Pulse section calls before rendering the
+            // same field. Without it every cover 404s against treva-web's own
+            // origin instead of the CMS's.
+            image: toAbsUrl(article.coverImage || article.image || ""),
         }));
 
-        return <HomeV2 locale={locale} inventory={inventory} team={team} news={news} />;
+        return (
+            <HomeV2
+                locale={locale}
+                projects={projects}
+                inventory={inventory}
+                resaleInventory={resaleInventory}
+                team={team}
+                news={news}
+            />
+        );
     }
 
     return (

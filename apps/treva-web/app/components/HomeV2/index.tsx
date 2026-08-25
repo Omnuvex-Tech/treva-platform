@@ -1,4 +1,5 @@
 import "./home-v2.css";
+import TopBackgroundV2 from "./TopBackgroundV2";
 import NavbarV2 from "./NavbarV2";
 import HeroV2 from "./HeroV2";
 import SearchPanelV2 from "./SearchPanelV2";
@@ -9,11 +10,13 @@ import TeamV2 from "./TeamV2";
 import PulseV2 from "./PulseV2";
 import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
-import type { InventoryCard, NewsCard, TeamMember } from "./data";
+import type { InventoryCard, NewsCard, ProjectCard, TeamMember } from "./data";
 
 type HomeV2Props = {
   locale: string;
+  projects?: ProjectCard[];
   inventory?: InventoryCard[];
+  resaleInventory?: InventoryCard[];
   team?: TeamMember[];
   news?: NewsCard[];
 };
@@ -25,16 +28,24 @@ type HomeV2Props = {
  * keeps its own navbar, footer and callback form. The whole tree sits inside
  * `.hv2-root` so the V2 typography reset (see home-v2.css) applies once.
  */
-export default function HomeV2({ locale, inventory, team = [], news = [] }: HomeV2Props) {
+export default function HomeV2({
+  locale,
+  projects,
+  inventory,
+  resaleInventory,
+  team = [],
+  news = [],
+}: HomeV2Props) {
   return (
     <div className="page-wrapper home-page--v2" data-locale={locale} data-design="v2">
       <div className="hv2-root">
+        <TopBackgroundV2 />
         <NavbarV2 locale={locale} />
         <HeroV2 locale={locale} />
         <SearchPanelV2 locale={locale} />
-        <ProjectsV2 locale={locale} />
+        <ProjectsV2 locale={locale} items={projects} />
         <PartnersV2 locale={locale} />
-        <InventoryV2 locale={locale} items={inventory} />
+        <InventoryV2 locale={locale} items={inventory} resaleItems={resaleInventory} />
         <TeamV2 locale={locale} members={team} />
         <PulseV2 locale={locale} items={news} />
         <CallbackV2 locale={locale} />

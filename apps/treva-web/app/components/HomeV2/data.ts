@@ -41,7 +41,12 @@ export type ProjectCard = {
      * a centred `cover`.
      */
     crop?: { width: number; height: number; left: number; top: number };
-    /** Optional hover clip. Cards without one simply keep the still cover. */
+    /**
+     * Optional hover media — an .mp4/.webm clip or an animated .gif; the card
+     * picks the right element from the extension. Cards without one simply keep
+     * the still cover. Filled from the CMS "GIF / Video" slot where a project
+     * has one (see projects-api.ts).
+     */
     video?: string;
     startingFrom: string;
     areaRange: string;
