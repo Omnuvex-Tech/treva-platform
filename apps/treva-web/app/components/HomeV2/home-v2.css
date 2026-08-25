@@ -1298,24 +1298,22 @@
 }
 
 /* ---------- inventory: 432x470 ----------------------------------------
-   A 261x280 floor plan centred on Color/Background/Selected, then a 130 footer.
-   The plan is artwork on a tinted panel, not a photo, so it is contained rather
-   than cropped. */
+   Figma frames this as a 261x280 floor-plan diagram contained on a tinted
+   panel, but the live cards (see inventory-api.ts) carry real unit photos
+   from the treva-api, not diagram artwork — cropped full-bleed across the
+   whole 432x340 frame instead. */
 .hv2-ucard--unit {
     background: var(--hv2-selected);
 }
 
 .hv2-ucard--unit .hv2-ucard__media {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     aspect-ratio: 432 / 340;
 }
 
 .hv2-ucard__plan {
-    position: relative;
-    width: 60.42%;
-    aspect-ratio: 261 / 280;
+    position: absolute;
+    inset: 0;
 }
 
 .hv2-ucard--unit .hv2-ucard__foot {

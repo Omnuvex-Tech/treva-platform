@@ -61,7 +61,7 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
                   alt={item.project}
                   fill
                   sizes={CARD_SIZES}
-                  style={{ objectFit: "contain" }}
+                  style={{ objectFit: "cover" }}
                 />
               </div>
             </div>
