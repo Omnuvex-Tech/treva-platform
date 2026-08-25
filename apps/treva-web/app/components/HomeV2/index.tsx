@@ -7,6 +7,7 @@ import PartnersV2 from "./PartnersV2";
 import InventoryV2 from "./InventoryV2";
 import TeamV2 from "./TeamV2";
 import PulseV2 from "./PulseV2";
+import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
 import type { InventoryCard, NewsCard, TeamMember } from "./data";
 
@@ -36,6 +37,7 @@ export default function HomeV2({ locale, inventory, team = [], news = [] }: Home
         <InventoryV2 locale={locale} items={inventory} />
         <TeamV2 locale={locale} members={team} />
         <PulseV2 locale={locale} items={news} />
+        <CallbackV2 locale={locale} />
         <FooterV2 locale={locale} />
       </div>
     </div>

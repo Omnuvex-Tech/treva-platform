@@ -76,7 +76,14 @@ export default function SearchPanelV2({ locale }: Props) {
                 onChange={setProject}
                 placeholder={dict.search.projectPlaceholder}
                 label={dict.search.project}
-                options={projectCards.map((item) => ({ value: item.slug, label: item.title }))}
+                /* The thumb is what puts this popup into its grid layout. It is
+                   a separate 44x44 crop, not the card cover: that one is a
+                   cut-out on transparency and would show the tile through. */
+                options={projectCards.map((item) => ({
+                  value: item.slug,
+                  label: item.title,
+                  thumb: `/images/thumbs/${item.slug}.jpg`,
+                }))}
               />
             </div>
 

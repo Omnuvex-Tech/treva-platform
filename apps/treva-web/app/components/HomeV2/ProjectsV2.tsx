@@ -13,11 +13,10 @@ export default function ProjectsV2({ locale, items = projectCards }: Props) {
     <section className="hv2-shell hv2-section hv2-s-projects">
       <div className="hv2-section-head">
         <h2 className="hv2-h2">{dict.projects.title}</h2>
-        <p className="hv2-lead">
-          {dict.projects.lead[0]}
-          <br />
-          {dict.projects.lead[1]}
-        </p>
+        {/* One paragraph wrapping inside a fixed 272px box — the design has no
+            forced break here, and hard-coding one splits the Azerbaijani and
+            Russian copy in the wrong place. */}
+        <p className="hv2-lead">{dict.projects.lead.join(" ")}</p>
       </div>
 
       <div className="hv2-grid-3">
@@ -40,7 +39,7 @@ export default function ProjectsV2({ locale, items = projectCards }: Props) {
           {/* Exported straight from the Button component; the lucide arrow it
               replaced sat at 14px against the design's 24. */}
           <Image
-            src="/images/features-pro/icons/arrow-down.svg"
+            src="/images/icons/arrow-down.svg"
             alt=""
             aria-hidden="true"
             width={24}

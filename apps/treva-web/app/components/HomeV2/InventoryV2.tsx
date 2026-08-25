@@ -10,7 +10,7 @@ type Props = { locale: string; items?: InventoryCard[] };
 type Deal = "off-plan" | "resale";
 
 const DEV_ICON = "/images/features-pro/icons/dreamfest-arena.svg";
-const CTA_ICON = "/images/features-pro/icons/arrow-up-right.svg";
+const CTA_ICON = "/images/icons/arrow-up-right.svg";
 const CARD_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
 
 /**

@@ -16,28 +16,29 @@ export type ProjectCard = {
     developer: string;
     developerLogo?: string;
     /**
-     * 24x24 glyph next to the developer name. Every card carries its own in the
-     * Figma file; the ones still waiting on theirs fall back to a generic pin.
+     * 24x24 glyph next to the developer name — its own per card in the design.
+     * Optional only so API-fed cards can omit it; those fall back to a pin.
      */
     icon?: string;
     /**
-     * The cover. In Figma this is a cut-out render on a transparent background,
-     * which is what lets the tower break past the top of the card — see `sky`.
-     * Cards still on a flat photo just fill the cover box edge to edge.
+     * The cover: a cut-out render on a transparent background, which is what
+     * lets the building break past the top of the card — see `sky`. A flat
+     * photo works too, it just fills the cover box edge to edge and hides the
+     * frame border behind it.
      */
     image: string;
     /**
      * Backdrop behind the whole card. The design layers a sky photo under the
      * cut-out, and the translucent footer sits on that same sky, so it is also
-     * what gives each card its own tint. Without one the cover doubles as the
-     * backdrop and the card reads as a plain photo.
+     * what gives each card its own tint. Optional for API-fed cards: without one
+     * the cover doubles as the backdrop and the card reads as a plain photo.
      */
     sky?: string;
     /**
      * How the cover sits inside its 430x312 window, as the four percentages
      * Figma positions the fill with. Each card is framed by hand in the design,
-     * so there is no formula to derive it — cards without one fall back to a
-     * centred `cover`.
+     * so there is no formula to derive it — anything without one falls back to
+     * a centred `cover`.
      */
     crop?: { width: number; height: number; left: number; top: number };
     /** Optional hover clip. Cards without one simply keep the still cover. */
@@ -84,6 +85,16 @@ export type NewsCard = {
 const CLIP_CONSTRUCTION = "/6825d64025f8005ef1ddfc4c_68ca8e5a67ef60d728ebc041_video-transcode.mp4";
 const CLIP_REEL = "/assets/treva-reel.mp4";
 
+/**
+ * Project cards — Figma node 457:10745, the six instances of the 432x444 card.
+ *
+ * Every card is composited from two layers of its own, never one photo: an
+ * opaque sky and a cut-out render on transparency. `crop` is the placement
+ * Figma gives that render inside its 430x312 window, framed by hand per card,
+ * so there is no formula behind the numbers — they are read straight off the
+ * design. Copy and prices are the design's too, including the comma Brabus
+ * uses where the others use a dot.
+ */
 export const projectCards: ProjectCard[] = [
     {
         slug: "panorama-by-elie-saab",
@@ -101,7 +112,10 @@ export const projectCards: ProjectCard[] = [
         slug: "arabian-ranches",
         title: "Arabian Ranches",
         developer: "Dubai Autodrome",
-        image: "/images/features-pro/arabian-cover.jpg",
+        icon: "/images/features-pro/icons/dubai-autodrome.svg",
+        image: "/images/features-pro/figma/arabian-ranches-building.png",
+        sky: "/images/features-pro/figma/arabian-ranches-sky.jpg",
+        crop: { width: 176.04, height: 136.54, left: -14.84, top: -33.65 },
         video: CLIP_REEL,
         startingFrom: "10.8570$",
         areaRange: "33 m² - 178 m²",
@@ -110,7 +124,10 @@ export const projectCards: ProjectCard[] = [
         slug: "sabah-towers",
         title: "Sabah Towers",
         developer: "Lighthouse Mall",
-        image: "/images/features-pro/sabah-cover.png",
+        icon: "/images/features-pro/icons/lighthouse-mall.svg",
+        image: "/images/features-pro/figma/sabah-towers-building.png",
+        sky: "/images/features-pro/figma/sabah-towers-sky.jpg",
+        crop: { width: 165.35, height: 128.64, left: -23.02, top: -25.73 },
         video: CLIP_CONSTRUCTION,
         startingFrom: "88.954$",
         areaRange: "36 m² - 237 m²",
@@ -119,16 +136,22 @@ export const projectCards: ProjectCard[] = [
         slug: "brabus-island-baku",
         title: "Brabus İsland Baku",
         developer: "Nikki Beach",
-        image: "/images/features-pro/brabus-cover.jpg",
+        icon: "/images/features-pro/icons/nikki-beach.svg",
+        image: "/images/features-pro/figma/brabus-island-baku-building.png",
+        sky: "/images/features-pro/figma/brabus-island-baku-sky.jpg",
+        crop: { width: 165.05, height: 127.78, left: -61.37, top: -25.24 },
         video: CLIP_REEL,
-        startingFrom: "186.833$",
+        startingFrom: "186,833$",
         areaRange: "42 m² - 266 m²",
     },
     {
         slug: "reportage-heights",
         title: "Reportage Heights",
         developer: "Sea Breeze Casino",
-        image: "/images/features-pro/reportage-cover.jpg",
+        icon: "/images/features-pro/icons/sea-breeze-casino.svg",
+        image: "/images/features-pro/figma/reportage-heights-building.png",
+        sky: "/images/features-pro/figma/reportage-heights-sky.jpg",
+        crop: { width: 150.59, height: 116.8, left: -31.92, top: -14.17 },
         video: CLIP_CONSTRUCTION,
         startingFrom: "85.864$",
         areaRange: "30 m² - 209 m²",
@@ -137,7 +160,10 @@ export const projectCards: ProjectCard[] = [
         slug: "mariana-village",
         title: "Mariana Village",
         developer: "Sea Breeze Marina",
-        image: "/images/features-pro/marina-cover.jpg",
+        icon: "/images/features-pro/icons/sea-breeze-marina.svg",
+        image: "/images/features-pro/figma/mariana-village-building.png",
+        sky: "/images/features-pro/figma/mariana-village-sky.jpg",
+        crop: { width: 100.37, height: 106.41, left: -0.07, top: 0 },
         video: CLIP_REEL,
         startingFrom: "203.744$",
         areaRange: "38 m² - 500 m²",

@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import Image from "next/image";
 import { ChevronDown, Check } from "lucide-react";
 
-export type SelectOption = { value: string; label: string };
+export type SelectOption = {
+  value: string;
+  label: string;
+  /** 44x44 preview. Options carrying one switch the popup to the grid layout. */
+  thumb?: string;
+};
 
 type Props = {
   value: string;
@@ -30,6 +36,9 @@ export default function SelectV2({ value, onChange, options, placeholder, label 
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const selected = options.find((option) => option.value === value);
+  // Figma 825:26696 lays picture options out as a 3-column grid of 173x60
+  // tiles rather than a plain list; plain options keep the single column.
+  const isGrid = options.some((option) => option.thumb);
 
   // Close on outside click / Escape while open.
   useEffect(() => {
@@ -124,7 +133,13 @@ export default function SelectV2({ value, onChange, options, placeholder, label 
       </button>
 
       {open ? (
-        <ul className="hv2-sel__list" id={listboxId} role="listbox" ref={listRef} tabIndex={-1}>
+        <ul
+          className={isGrid ? "hv2-sel__list hv2-sel__list--grid" : "hv2-sel__list"}
+          id={listboxId}
+          role="listbox"
+          ref={listRef}
+          tabIndex={-1}
+        >
           {options.map((option, index) => {
             const isSelected = option.value === value;
             return (
@@ -137,8 +152,18 @@ export default function SelectV2({ value, onChange, options, placeholder, label 
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => commit(index)}
               >
+                {option.thumb ? (
+                  <Image
+                    className="hv2-sel__thumb"
+                    src={option.thumb}
+                    alt=""
+                    aria-hidden="true"
+                    width={44}
+                    height={44}
+                  />
+                ) : null}
                 <span>{option.label}</span>
-                {isSelected ? <Check size={14} strokeWidth={2} /> : null}
+                {isSelected && !option.thumb ? <Check size={14} strokeWidth={2} /> : null}
               </li>
             );
           })}
