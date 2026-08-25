@@ -1,14 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { getDict } from "./dictionary";
 import { projectCards } from "./data";
 import ProjectsMenuV2 from "./ProjectsMenuV2";
 
 type Props = { locale: string };
+
+/** The three locales the site ships, with the flag/name the switcher shows for each. */
+const LANGUAGES = [
+  { code: "az", name: "Azerbaijan", flag: "/images/flags/az.png" },
+  { code: "en", name: "English", flag: "/images/flags/gb.png" },
+  { code: "ru", name: "Russian", flag: "/images/flags/ru.png" },
+] as const;
 
 /**
  * Header — Figma 192:1637, a floating 1344x90 card.
@@ -27,13 +35,27 @@ const ACTIONS = [
 ];
 /** The one nav entry that opens a mega-menu instead of navigating straight off. */
 const MEGA_HREF = "/projects";
+/** "Inventory" opens a small off-plan/resale popover the same way. */
+const INVENTORY_HREF = "/off-plan";
 
 export default function NavbarV2({ locale }: Props) {
   const dict = getDict(locale);
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
+  const [inv, setInv] = useState(false);
+  const [lang, setLang] = useState(false);
   const [sub, setSub] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
+  const langRefMobile = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const invItemRef = useRef<HTMLDivElement>(null);
+  // 22px is only the fallback for the first paint, before the effect below
+  // has measured anything — see that effect for why a fixed number can't be
+  // trusted on its own.
+  const [invOffset, setInvOffset] = useState(22);
+  const [langOffset, setLangOffset] = useState(22);
 
   // 10px matches kristal.az's own threshold, the reference for this effect:
   // the card should still be transparent for a couple of wheel ticks, not
@@ -45,7 +67,53 @@ export default function NavbarV2({ locale }: Props) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Click-to-open, so it needs its own outside-click close instead of the
+  // hover-based header onMouseLeave the other two menus use.
+  useEffect(() => {
+    if (!lang) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (langRef.current?.contains(target)) return;
+      if (langRefMobile.current?.contains(target)) return;
+      setLang(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [lang]);
+
+  // The Inventory and Language items sit in two different rows (nav links vs.
+  // action buttons), each centered by the browser according to real font
+  // metrics — a hardcoded "gap to the header border" guess drifts by a few
+  // px between fonts/browsers. Measuring the actual boxes instead makes both
+  // popovers land flush every time, the same way the Projects mega-menu is
+  // flush by construction (it's positioned off the header itself, not a link).
+  useEffect(() => {
+    if (!inv && !lang) return;
+    const measure = () => {
+      const barBottom = barRef.current?.getBoundingClientRect().bottom;
+      if (barBottom == null) return;
+      if (inv && invItemRef.current) {
+        setInvOffset(barBottom - invItemRef.current.getBoundingClientRect().bottom);
+      }
+      if (lang && langRef.current) {
+        setLangOffset(barBottom - langRef.current.getBoundingClientRect().bottom);
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [inv, lang]);
+
   const href = (path: string) => `/${locale}${path}`;
+
+  /** Swaps just the locale segment, keeping whatever page the switch was opened on. */
+  const langHref = (code: string) => {
+    const segments = (pathname ?? `/${locale}`).split("/").filter(Boolean);
+    segments[0] = code;
+    return `/${segments.join("/")}`;
+  };
+
+  const otherLanguages = LANGUAGES.filter((l) => l.code !== locale);
 
   return (
     /* The mega-menu closes on leaving the whole header, not the link, so the
@@ -53,12 +121,19 @@ export default function NavbarV2({ locale }: Props) {
        vanishing on the way. */
     <header
       className={`hv2-nav${scrolled ? " hv2-nav--scrolled" : ""}`}
-      onMouseLeave={() => setMega(false)}
+      onMouseLeave={() => {
+        setMega(false);
+        setInv(false);
+      }}
       onKeyDown={(event) => {
-        if (event.key === "Escape") setMega(false);
+        if (event.key === "Escape") {
+          setMega(false);
+          setInv(false);
+          setLang(false);
+        }
       }}
     >
-      <div className="hv2-nav__bar">
+      <div className="hv2-nav__bar" ref={barRef}>
         <div className="hv2-shell hv2-nav__inner">
           <Link href={`/${locale}`} className="hv2-nav__logo" aria-label="TREVA">
             {/* unoptimized: there is nothing for the image optimizer to do to an
@@ -67,17 +142,61 @@ export default function NavbarV2({ locale }: Props) {
           </Link>
 
           <nav className="hv2-nav__links">
-            {dict.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={href(item.href)}
-                aria-expanded={item.href === MEGA_HREF ? mega : undefined}
-                onMouseEnter={() => setMega(item.href === MEGA_HREF)}
-                onFocus={() => setMega(item.href === MEGA_HREF)}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {dict.nav.map((item) => {
+              const isMega = item.href === MEGA_HREF;
+              const isInventory = item.href === INVENTORY_HREF;
+              const hasDropdown = isMega || isInventory;
+
+              return (
+                <div
+                  key={item.href}
+                  className={isInventory ? "hv2-nav__item" : undefined}
+                  ref={isInventory ? invItemRef : undefined}
+                >
+                  <Link
+                    href={href(item.href)}
+                    className={hasDropdown ? "hv2-nav__link--dropdown" : undefined}
+                    aria-expanded={isMega ? mega : isInventory ? inv : undefined}
+                    onMouseEnter={() => {
+                      setMega(isMega);
+                      setInv(isInventory);
+                      setLang(false);
+                    }}
+                    onFocus={() => {
+                      setMega(isMega);
+                      setInv(isInventory);
+                      setLang(false);
+                    }}
+                  >
+                    {item.label}
+                    {hasDropdown ? (
+                      <span className="hv2-nav__chev hv2-nav__chev--nav" aria-hidden="true">
+                        <Image
+                          src="/images/icons/chevron-down.svg"
+                          alt=""
+                          width={12}
+                          height={6}
+                          style={{ width: "11.5px", height: "5.5px" }}
+                          unoptimized
+                        />
+                      </span>
+                    ) : null}
+                  </Link>
+
+                  {/* Off-Plan first, Resale second — the order the request asked for. */}
+                  {isInventory && inv ? (
+                    <div className="hv2-nav__popover" style={{ top: `calc(100% + ${invOffset}px)` }}>
+                      <Link href={href("/off-plan")} onClick={() => setInv(false)}>
+                        {dict.search.offPlan}
+                      </Link>
+                      <Link href={href("/resale")} onClick={() => setInv(false)}>
+                        {dict.search.resale}
+                      </Link>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
           </nav>
 
           <div className="hv2-nav__actions">
@@ -105,6 +224,44 @@ export default function NavbarV2({ locale }: Props) {
                   unoptimized
                 />
               );
+
+              if (key === "language") {
+                return (
+                  <div key={key} className="hv2-nav__item" ref={langRef}>
+                    <button
+                      type="button"
+                      className="hv2-nav__btn hv2-nav__btn--icon"
+                      aria-label={label}
+                      aria-haspopup="listbox"
+                      aria-expanded={lang}
+                      onClick={() => {
+                        setMega(false);
+                        setInv(false);
+                        setLang((v) => !v);
+                      }}
+                    >
+                      {glyph}
+                    </button>
+
+                    {lang ? (
+                      <div
+                        className="hv2-nav__popover hv2-nav__popover--lang"
+                        role="listbox"
+                        style={{ top: `calc(100% + ${langOffset}px)` }}
+                      >
+                        {otherLanguages.map((l) => (
+                          <Link key={l.code} href={langHref(l.code)} onClick={() => setLang(false)} role="option">
+                            <span className="hv2-nav__lang-flag" aria-hidden="true">
+                              <Image src={l.flag} alt="" width={32} height={32} unoptimized />
+                            </span>
+                            {l.name}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              }
 
               return to ? (
                 <Link key={key} href={href(to)} className="hv2-nav__btn hv2-nav__btn--icon" aria-label={label}>
@@ -235,6 +392,44 @@ export default function NavbarV2({ locale }: Props) {
                     unoptimized
                   />
                 );
+
+                if (key === "language") {
+                  return (
+                    <div key={key} className="hv2-nav__item" ref={langRefMobile}>
+                      <button
+                        type="button"
+                        className="hv2-nav__btn hv2-nav__btn--icon"
+                        aria-label={label}
+                        aria-haspopup="listbox"
+                        aria-expanded={lang}
+                        onClick={() => setLang((v) => !v)}
+                      >
+                        {glyph}
+                      </button>
+
+                      {lang ? (
+                        <div className="hv2-nav__popover hv2-nav__popover--lang" role="listbox">
+                          {otherLanguages.map((l) => (
+                            <Link
+                              key={l.code}
+                              href={langHref(l.code)}
+                              role="option"
+                              onClick={() => {
+                                setLang(false);
+                                setOpen(false);
+                              }}
+                            >
+                              <span className="hv2-nav__lang-flag" aria-hidden="true">
+                                <Image src={l.flag} alt="" width={32} height={32} unoptimized />
+                              </span>
+                              {l.name}
+                            </Link>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                }
 
                 return to ? (
                   <Link

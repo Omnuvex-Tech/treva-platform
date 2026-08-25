@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { Suspense, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
@@ -177,7 +177,9 @@ export default function ResalePage() {
       <Navbar locale={locale} variant="solid" />
       <main className="re-main-wrapper">
         <PageContainer className="re-page-container">
-          <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
+          <Suspense fallback={null}>
+            <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
+          </Suspense>
 
           <header className="re-header">
             <h1 className="re-main-title">{t.pageTitle}</h1>

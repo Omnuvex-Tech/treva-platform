@@ -37,6 +37,16 @@ export default function UnitLayout() {
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const [selectedCategorySlug, setSelectedCategorySlug] = useState(searchParams.get('category') || '');
 
+  // The range-hydration effect below resets price/area to defaults once the
+  // API range loads — captured once here so it knows not to stomp a min/max
+  // the URL (e.g. the home page search widget) already asked for.
+  const urlDefaults = useRef({
+    priceMin: searchParams.get('priceMin'),
+    priceMax: searchParams.get('priceMax'),
+    areaMin: searchParams.get('areaMin'),
+    areaMax: searchParams.get('areaMax'),
+  }).current;
+
   const dictionary = {
     az: {
       titleThin: 'Mənzil',
@@ -185,16 +195,24 @@ export default function UnitLayout() {
     if (rangeData && !rangeHydratedRef.current) {
       rangeHydratedRef.current = true;
       isHydratingRangeRef.current = true;
-      setPriceMax(rangeData.maxPrice);
-      setPriceMaxInput(rangeData.maxPrice);
-      setAreaMax(rangeData.maxTotalArea);
-      setAreaMaxInput(rangeData.maxTotalArea);
-      setPriceMin(0);
-      setPriceMinInput(0);
-      setAreaMin(0);
-      setAreaMinInput(0);
+      if (urlDefaults.priceMax == null) {
+        setPriceMax(rangeData.maxPrice);
+        setPriceMaxInput(rangeData.maxPrice);
+      }
+      if (urlDefaults.areaMax == null) {
+        setAreaMax(rangeData.maxTotalArea);
+        setAreaMaxInput(rangeData.maxTotalArea);
+      }
+      if (urlDefaults.priceMin == null) {
+        setPriceMin(0);
+        setPriceMinInput(0);
+      }
+      if (urlDefaults.areaMin == null) {
+        setAreaMin(0);
+        setAreaMinInput(0);
+      }
     }
-  }, [rangeData]);
+  }, [rangeData, urlDefaults]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

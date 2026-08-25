@@ -18,21 +18,35 @@ export default function SearchPanelV2({ locale }: Props) {
   const [project, setProject] = useState("");
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
-  const [rooms, setRooms] = useState<string[]>([]);
+  const [room, setRoom] = useState("");
   const [areaMin, setAreaMin] = useState("");
   const [areaMax, setAreaMax] = useState("");
 
-  const toggleRoom = (room: string) =>
-    setRooms((prev) => (prev.includes(room) ? prev.filter((r) => r !== room) : [...prev, room]));
+  const toggleRoom = (value: string) => setRoom((prev) => (prev === value ? "" : value));
 
+  /*
+   * Off-plan (UnitFilter) and resale (ResaleFilter) each read their own set of
+   * query params on mount — different names, and only off-plan has a project
+   * filter at all (resale listings aren't grouped by project). This widget
+   * has to speak whichever dialect the page it's sending the user to expects.
+   */
   const submit = () => {
     const query = new URLSearchParams();
-    if (project) query.set("project", project);
-    if (priceMin) query.set("priceMin", priceMin);
-    if (priceMax) query.set("priceMax", priceMax);
-    if (rooms.length) query.set("rooms", rooms.join(","));
-    if (areaMin) query.set("areaMin", areaMin);
-    if (areaMax) query.set("areaMax", areaMax);
+
+    if (deal === "off-plan") {
+      if (project) query.set("category", project);
+      if (priceMin) query.set("priceMin", priceMin);
+      if (priceMax) query.set("priceMax", priceMax);
+      if (room) query.set("rooms", room);
+      if (areaMin) query.set("areaMin", areaMin);
+      if (areaMax) query.set("areaMax", areaMax);
+    } else {
+      if (priceMin) query.set("minPrice", priceMin);
+      if (priceMax) query.set("maxPrice", priceMax);
+      if (room) query.set("roomCount", room);
+      if (areaMin) query.set("minArea", areaMin);
+      if (areaMax) query.set("maxArea", areaMax);
+    }
 
     const suffix = query.toString();
     router.push(`/${locale}/${deal}${suffix ? `?${suffix}` : ""}`);
@@ -115,14 +129,14 @@ export default function SearchPanelV2({ locale }: Props) {
             <div className="hv2-field">
               <span className="hv2-field__label">{dict.search.rooms}</span>
               <div className="hv2-rooms">
-                {roomOptions.map((room) => (
+                {roomOptions.map((option) => (
                   <button
-                    key={room}
+                    key={option}
                     type="button"
-                    aria-pressed={rooms.includes(room)}
-                    onClick={() => toggleRoom(room)}
+                    aria-pressed={room === option}
+                    onClick={() => toggleRoom(option)}
                   >
-                    {room}
+                    {option}
                   </button>
                 ))}
               </div>

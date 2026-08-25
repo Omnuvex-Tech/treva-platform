@@ -448,6 +448,105 @@
     background: var(--hv2-selected);
 }
 
+/* The mega-menu trigger gets the same 16-box chevron as the mobile
+   disclosure, rotated 180 while the panel is open. */
+.hv2-nav__link--dropdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hv2-nav__link--dropdown .hv2-nav__chev {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hv2-nav__link--dropdown .hv2-nav__chev img {
+    transition: rotate 0.2s ease;
+}
+
+.hv2-nav__link--dropdown[aria-expanded="true"] .hv2-nav__chev img {
+    rotate: 180deg;
+}
+
+/* Anchor for the small Off-Plan/Resale popover below "Inventory" — unlike the
+   Projects mega-panel this one is sized and positioned to its own link. */
+.hv2-nav__item {
+    position: relative;
+}
+
+.hv2-nav__popover {
+    position: absolute;
+    z-index: 30;
+    /* 22px matches .hv2-nav__inner's own padding-bottom, so the panel starts
+       flush with the header's bottom border, same as the Projects mega-menu. */
+    top: calc(100% + 22px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 168px;
+    padding: 6px;
+    border: 1px solid var(--hv2-line);
+    border-radius: var(--hv2-r-md);
+    background: var(--hv2-surface);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
+    transform-origin: top center;
+    animation: hv2-sel-in 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hv2-nav__popover a {
+    padding: 8px 12px;
+    border-radius: var(--hv2-r-sm);
+    font-family: var(--hv2-font-display);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--hv2-ink);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.18s ease;
+}
+
+.hv2-nav__popover a:hover {
+    background: var(--hv2-selected);
+}
+
+/* The language switcher sits near the header's right edge, so its popover
+   hangs from the button's right side instead of its left. Rows otherwise
+   match the plain Inventory popover exactly (no resting fill, hover-only),
+   just with a flag added before the name. */
+.hv2-nav__popover--lang {
+    left: auto;
+    right: 0;
+    min-width: 180px;
+}
+
+.hv2-nav__popover--lang a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hv2-nav__lang-flag {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.hv2-nav__lang-flag img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .hv2-nav__actions {
     display: flex;
     align-items: center;
@@ -1831,20 +1930,28 @@
    Figma 324:3876 — a 1344x376 panel of 321x170 cards, four across and two
    down, hanging under the header. The panel padding and both gaps are 12; the
    cards carry the borders, so the panel itself only has to hold them. */
+/* This wrapper is full-bleed (edge to edge) so `.hv2-mega` can center inside
+   it via the shell's own auto margins, but that leaves blank strips on both
+   sides that are still a DOM descendant of the header — hovering them kept
+   the menu open well past the visible card's edge. pointer-events:none lets
+   the mouse pass straight through the blank strips to whatever is behind
+   the header, so leaving the card closes the menu right at its edge; the
+   card opts back into pointer-events itself. */
 .hv2-nav__mega {
     position: absolute;
     z-index: 39;
     top: 100%;
     right: 0;
     left: 0;
+    pointer-events: none;
 }
 
 .hv2-mega {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
-    margin-top: 8px;
     padding: 12px;
+    pointer-events: auto;
     border: 1px solid var(--hv2-pcard-line);
     border-radius: var(--hv2-r-xxl);
     background: var(--hv2-surface);

@@ -242,4 +242,4 @@ export const partnerLogos: PartnerLogo[] = [
     { alt: "Best Home", src: "/images/partners/best-home.png", width: 164, height: 116 },
 ];
 
-export const roomOptions = ["1", "2", "2st", "3", "3st", "3ct"];
+export const roomOptions = ["1", "2", "3", "4", "5", "5+"];

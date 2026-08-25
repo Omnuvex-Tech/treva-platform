@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useResaleApartmentRange, useResaleCurrencies, useResaleLocationOptions, useResaleRooms, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
 import { useDebounce } from '@/hooks/use-debounce';
 import type { ResaleLocationOption } from '@/lib/resale.types';
@@ -183,6 +183,21 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const params = useParams();
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const t = filterDictionary[locale] || filterDictionary.az;
+
+  /*
+   * The home page's search widget links here with minPrice/maxPrice/minArea/
+   * maxArea/roomCount already in the URL. Read them once on mount — captured
+   * in a ref so the range-driven effect below (which sets the price/area max
+   * once the API range loads) knows not to clobber a max the URL specified.
+   */
+  const searchParams = useSearchParams();
+  const urlDefaults = useRef({
+    minPrice: Number(searchParams.get('minPrice')) || 0,
+    maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : null,
+    minArea: Number(searchParams.get('minArea')) || 0,
+    maxArea: searchParams.get('maxArea') ? Number(searchParams.get('maxArea')) : null,
+    roomCount: searchParams.get('roomCount') || '',
+  }).current;
   const { data: apartmentTypesData } = useResaleApartmentTypes();
   const { data: locationOptionsData } = useResaleLocationOptions();
   const { data: currenciesData } = useResaleCurrencies();
@@ -229,7 +244,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const [selectedMortgage, setSelectedMortgage] = useState('');
   const [selectedExtract, setSelectedExtract] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedRooms, setSelectedRooms] = useState('');
+  const [selectedRooms, setSelectedRooms] = useState(urlDefaults.roomCount);
 
   const [cityOpen, setCityOpen] = useState(false);
   const [regionOpen, setRegionOpen] = useState(false);
@@ -249,28 +264,32 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const currencyRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
-  const [priceMin, setPriceMin] = useState<number | ''>(0);
-  const [priceMax, setPriceMax] = useState<number | ''>(totalPriceMax);
-  const [priceMinInput, setPriceMinInput] = useState<number | ''>(0);
-  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(totalPriceMax);
+  const [priceMin, setPriceMin] = useState<number | ''>(urlDefaults.minPrice);
+  const [priceMax, setPriceMax] = useState<number | ''>(urlDefaults.maxPrice ?? totalPriceMax);
+  const [priceMinInput, setPriceMinInput] = useState<number | ''>(urlDefaults.minPrice);
+  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(urlDefaults.maxPrice ?? totalPriceMax);
 
-  const [areaMin, setAreaMin] = useState<number | ''>(0);
-  const [areaMax, setAreaMax] = useState<number | ''>(totalAreaMax);
-  const [areaMinInput, setAreaMinInput] = useState<number | ''>(0);
-  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(totalAreaMax);
+  const [areaMin, setAreaMin] = useState<number | ''>(urlDefaults.minArea);
+  const [areaMax, setAreaMax] = useState<number | ''>(urlDefaults.maxArea ?? totalAreaMax);
+  const [areaMinInput, setAreaMinInput] = useState<number | ''>(urlDefaults.minArea);
+  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(urlDefaults.maxArea ?? totalAreaMax);
 
   const regionOptions = selectedCity
     ? locationOptions.filter((option: ResaleLocationOption) => option.type === 'region' && option.city?.title === selectedCity)
     : [];
 
   useEffect(() => {
-    if (rangeData) {
+    if (!rangeData) return;
+    // Don't stomp a max the URL asked for with the API's own ceiling.
+    if (urlDefaults.maxPrice == null) {
       setPriceMax(rangeData.maxPrice);
       setPriceMaxInput(rangeData.maxPrice);
+    }
+    if (urlDefaults.maxArea == null) {
       setAreaMax(rangeData.maxTotalArea);
       setAreaMaxInput(rangeData.maxTotalArea);
     }
-  }, [rangeData]);
+  }, [rangeData, urlDefaults.maxPrice, urlDefaults.maxArea]);
 
   useEffect(() => {
     if (currenciesData?.length && !currency) {
