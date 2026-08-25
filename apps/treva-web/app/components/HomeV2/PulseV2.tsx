@@ -6,7 +6,7 @@ import type { NewsCard } from "./data";
 type Props = { locale: string; items: NewsCard[] };
 
 const COVER_FALLBACK = "/assets/webflow-placeholder.svg";
-const CTA_ICON = "/images/features-pro/icons/arrow-up-right.svg";
+const CTA_ICON = "/images/icons/arrow-up-right.svg";
 const CARD_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
 
 /**

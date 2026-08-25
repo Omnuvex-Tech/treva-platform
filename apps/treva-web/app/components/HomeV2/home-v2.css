@@ -174,24 +174,6 @@
     background: var(--hv2-ink);
 }
 
-.hv2-icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: var(--hv2-surface);
-    color: var(--hv2-ink-2);
-    cursor: pointer;
-    transition: background 0.18s ease, color 0.18s ease;
-}
-
-.hv2-icon-btn:hover {
-    background: var(--hv2-muted);
-}
-
 /* Off-Plane / Resale tab — Figma 511:12933, 196x46.
    The sliding white thumb is gone: the design marks the active side with a flat
    Color/Background/Selected pill on a white, bordered track. */
@@ -257,9 +239,15 @@
     --hv2-flow: 60px;
 }
 
+.hv2-s-callback {
+    min-height: calc(var(--hv2-section) + 444px);
+}
+
+/* Figma 437:5969 — the heading and its blurb are centred against each other on
+   a single 40px line, not bottom-aligned. */
 .hv2-section-head {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     gap: 32px;
     margin-bottom: var(--hv2-flow);
@@ -273,43 +261,61 @@
     letter-spacing: 0.25px;
 }
 
-/* Body 2/Regular — 14/20, letter-spacing 0.25, Color/Text/Secondary. It used to
-   be 12.5px in a grey that is not in the palette; both were guesses from a
-   screenshot, and 12.5 is not a step on the type scale at all. */
+/* Body 2/Regular — 14/20, letter-spacing 0.25. The section-head blurb sits in a
+   fixed 272px box at the right edge, but its own text is left-aligned and runs
+   in Text/Primary; only the centred heads below use Text/Secondary. */
 .hv2-lead {
+    width: 272px;
+    flex: 0 0 auto;
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
     letter-spacing: 0.25px;
-    color: var(--hv2-ink-60);
-    text-align: right;
-    max-width: 340px;
+    color: var(--hv2-ink);
+    text-align: left;
 }
 
 /* =========================================================================
    NAVBAR
    ========================================================================= */
 
-/* Header is a floating card: 1344x90 at top 20 / left 48, radius XXL, 1px border. */
+/* Header — Figma 192:1637, a floating 1344x90 card at top 20, radius XXL.
+   The strip itself has to stay transparent. It used to be painted --hv2-bg,
+   which put an opaque bar right behind the card, so the card's backdrop-filter
+   had nothing but flat colour to work on and the header never read as glass.
+   With it transparent the page scrolls under the card and the blur bites. */
 .hv2-nav {
     position: sticky;
     top: 0;
     z-index: 40;
     padding-top: 20px;
-    background: var(--hv2-bg);
+    background: transparent;
 }
 
+/* Padding 20/32 around a 48px action row is what makes the 90: the height is
+   not set, it falls out of the tallest child.
+   Figma gives this fill as a flat rgba(253,253,253,0.8) and exports no blur
+   effect, but 80% white alone leaves scrolled content legible through the
+   header. The blur is ours, and the -webkit- prefix is not optional: Safari
+   still ships backdrop-filter prefixed. */
 .hv2-nav__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 40px;
-    height: 90px;
-    padding: 0 24px;
-    border: 1px solid var(--hv2-line);
+    gap: 24px;
+    padding: 20px 32px;
+    border: 1px solid var(--hv2-pcard-line);
     border-radius: var(--hv2-r-xxl);
     background: rgba(253, 253, 253, 0.8);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+}
+
+/* Without blur support the fill has to carry legibility on its own. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .hv2-nav__inner {
+        background: rgba(255, 255, 255, 0.94);
+    }
 }
 
 .hv2-nav__logo {
@@ -332,23 +338,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 32px;
+    gap: 12px;
     flex: 1 1 auto;
 }
 
-/* Body 1 / Regular: 16 / 24, Color/Text/Primary. */
+/* Body 1/Regular 16/24 in a 12/8 pill. The radius only shows on hover, but it
+   is the shape the design gives the item, so it stays on the element. */
 .hv2-nav__links a {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-family: var(--hv2-font-display);
     font-size: 16px;
-    line-height: 24px;
     font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
     color: var(--hv2-ink);
     text-decoration: none;
     white-space: nowrap;
-    transition: opacity 0.18s ease;
+    transition: background 0.18s ease;
 }
 
 .hv2-nav__links a:hover {
-    opacity: 0.6;
+    background: var(--hv2-selected);
 }
 
 .hv2-nav__actions {
@@ -358,9 +369,49 @@
     flex: 0 0 auto;
 }
 
-.hv2-nav__phone {
-    padding: 0 16px;
+/* Every action is the same 48px Button: Color/Background/Inverse on a
+   Secondary Brand border, radius XXXLL, padding 16/12, gap 4. */
+.hv2-nav__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 48px;
+    padding: 12px 16px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+    color: var(--hv2-brand);
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
     font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.hv2-nav__btn:hover {
+    background: var(--hv2-selected);
+}
+
+/* Square variant — the 24px glyph keeps its own size, the padding gives the 48. */
+.hv2-nav__btn--icon {
+    width: 48px;
+    padding: 12px;
+    color: var(--hv2-ink);
+}
+
+.hv2-nav__btn--brand {
+    border-color: transparent;
+    background: var(--hv2-brand);
+    color: var(--hv2-on-dark);
+}
+
+.hv2-nav__btn--brand:hover {
+    background: var(--hv2-ink);
 }
 
 .hv2-nav__burger {
@@ -466,6 +517,11 @@
     height: 88px;
     padding: 0 22px;
     background: rgba(253, 253, 253, 0.8);
+    /* The comment above promised frosted glass and the @supports fallback below
+       assumed it, but the declaration itself was missing — the bar was a flat
+       80% wash over the footage. */
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -953,7 +1009,9 @@
 }
 
 .hv2-partners__head .hv2-lead {
-    max-width: 576px;
+    width: 576px;
+    max-width: 100%;
+    color: var(--hv2-ink-60);
     text-align: center;
 }
 
@@ -1286,145 +1344,510 @@
     padding-bottom: 40px;
 }
 
-/* Footer block: 1344x479, radius XXL, 1px border, padding 40 / 64. */
+/* Figma 724:19591 — 1344x479 on the same translucent panel and 24 radius as the
+   header, padding 40, two 580 columns with 104 between them. */
 .hv2-footer {
     display: flex;
-    flex-direction: column;
-    min-height: 479px;
-    padding: 40px 64px;
-    border: 1px solid var(--hv2-line);
-    border-radius: var(--hv2-r-xxl);
-    background: var(--hv2-surface);
-}
-
-.hv2-footer__top {
-    display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-between;
-    gap: 32px;
-    flex-wrap: wrap;
+    gap: 104px;
+    padding: 40px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxl);
+    background: rgba(253, 253, 253, 0.8);
 }
 
+/* Both columns are full-height and push their last row down. That is what lines
+   the socials up with the copyright, and the rights line up with the language
+   switch, without either column knowing the other's height. */
+.hv2-footer__col {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 580px;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.hv2-footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+/* Body 1/Regular in Text/Secondary, held to the design's 420. */
+.hv2-footer__about {
+    max-width: 420px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink-60);
+}
+
+.hv2-footer__row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.hv2-footer__row--top {
+    align-items: flex-start;
+}
+
+.hv2-footer__stack {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+/* Six links spread across the full 580, which is what produces the design's
+   41px gaps — they are the leftover space, not a set value. */
 .hv2-footer__nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 26px;
+    justify-content: space-between;
+    gap: 16px 41px;
 }
 
 .hv2-footer__nav a {
-    font-size: 12.5px;
-    color: var(--hv2-ink-2);
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink);
     text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.18s ease;
 }
 
 .hv2-footer__nav a:hover {
-    color: var(--hv2-ink);
+    opacity: 0.6;
 }
 
-.hv2-footer__mid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
-    gap: 32px;
-    margin-top: 26px;
-    /* The frame pins the legal row to the bottom of the 479px card. */
-    flex: 1 1 auto;
-    padding-bottom: 34px;
-}
-
-.hv2-footer__about {
-    max-width: 330px;
-    font-size: 11.5px;
-    line-height: 1.6;
-    color: var(--hv2-ink-soft);
-}
-
-.hv2-footer__col {
+.hv2-footer__group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 16px;
 }
 
+/* H6 Headline/Medium — 20/28, letter-spacing 0.15. */
 .hv2-footer__col-title {
-    margin-bottom: 6px;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 500;
-    letter-spacing: -0.01em;
-}
-
-.hv2-footer__col a,
-.hv2-footer__col p {
-    font-size: 11.5px;
-    line-height: 1.55;
-    color: var(--hv2-ink-soft);
-    text-decoration: none;
-}
-
-.hv2-footer__col a:hover {
+    line-height: 28px;
+    letter-spacing: 0.15px;
     color: var(--hv2-ink);
 }
 
-.hv2-footer__bottom {
+/* Body 2/Regular in Text/Secondary, stacked with no gap — the 20px line-height
+   is the whole rhythm of the block in the design. */
+.hv2-footer__list {
     display: flex;
+    flex-direction: column;
+}
+
+.hv2-footer__list a,
+.hv2-footer__list p {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.hv2-footer__list a:hover {
+    color: var(--hv2-ink);
+}
+
+/* Scroll-to-top. Unlike the header buttons this one carries no border. */
+.hv2-footer__totop {
+    display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
+    justify-content: center;
+    height: 52px;
+    padding: 12px;
+    border: 0;
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.hv2-footer__totop:hover {
+    background: var(--hv2-selected);
 }
 
 .hv2-footer__socials {
     display: flex;
+    align-items: flex-end;
     gap: 8px;
 }
 
+/* 36px button, 16px leaf — the leaf size is set per icon in the component
+   because the Facebook mark is narrower than the other four. */
 .hv2-footer__social {
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--hv2-muted-2);
-    color: var(--hv2-ink-2);
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
     transition: background 0.18s ease;
 }
 
 .hv2-footer__social:hover {
-    background: var(--hv2-muted);
+    background: var(--hv2-selected);
 }
 
-.hv2-footer__legal {
-    display: flex;
-    gap: 40px;
-    font-size: 11px;
-    color: var(--hv2-ink-soft);
+/* Caption/Regular — 12/16, letter-spacing 0.4, Text/Primary. */
+.hv2-footer__caption {
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-ink);
 }
 
 .hv2-footer__langs {
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
     align-items: flex-end;
-    gap: 4px;
-}
-
-.hv2-footer__langs-label {
-    font-size: 10.5px;
-    color: var(--hv2-ink-faint);
-}
-
-.hv2-footer__langs-row {
-    display: flex;
     gap: 12px;
 }
 
-.hv2-footer__langs-row a {
-    font-size: 11.5px;
-    color: var(--hv2-ink-soft);
-    text-decoration: none;
+/* Caption/Medium for the label. */
+.hv2-footer__langs-label {
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-ink);
 }
 
+/* Body 2/Medium — the active language in Text/Primary, the rest Secondary. */
+.hv2-footer__langs-row {
+    display: flex;
+    gap: 20px;
+}
+
+.hv2-footer__langs-row a {
+    font-family: var(--hv2-font-display);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.hv2-footer__langs-row a:hover,
 .hv2-footer__langs-row a[aria-current="true"] {
     color: var(--hv2-ink);
+}
+
+/* =========================================================================
+   CALLBACK BANNER
+   ========================================================================= */
+
+/* Figma 865:27787 — 1344x444, white, 20 radius, everything clipped to it. */
+.hv2-cb {
+    position: relative;
+    overflow: hidden;
+    min-height: 444px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+}
+
+/* The oversized "V" is anchored 235.25 right of centre, not to an edge, so it
+   keeps its place against the photo as the card narrows. Its own file already
+   carries the 0.3 opacity. */
+.hv2-cb__watermark {
+    position: absolute;
+    top: -1px;
+    left: calc(50% + 235.25px);
+    width: 831px;
+    height: 444px;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.hv2-cb__watermark img {
+    width: 100%;
+    height: 100%;
+}
+
+.hv2-cb__photo {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 588px;
+    height: calc(100% + 2px);
+    pointer-events: none;
+}
+
+.hv2-cb__photo img {
+    object-fit: cover;
+    object-position: top center;
+}
+
+/* The form floats over both layers, vertically centred at left 39. */
+.hv2-cb__form {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 451px;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    padding: 40px 39px;
+}
+
+.hv2-cb__text {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* H4 Headline/Medium in Text/Brand — this heading is not Text/Primary. */
+.hv2-cb__title {
+    font-family: var(--hv2-font-display);
+    font-size: 32px;
     font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-brand);
+}
+
+.hv2-cb__lead {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink-60);
+}
+
+.hv2-cb__field {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Caption/Bold — 12/16, letter-spacing 0.4. */
+.hv2-cb__label {
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-ink);
+}
+
+/* 44 tall on a 16 radius — a different radius from every other control here,
+   which is what the design specifies for form inputs. */
+.hv2-cb__field input {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: 16px;
+    background: var(--hv2-surface);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink);
+    outline: none;
+    transition: border-color 0.18s ease;
+}
+
+.hv2-cb__field input::placeholder {
+    color: var(--hv2-ink-60);
+}
+
+.hv2-cb__field input:focus {
+    border-color: var(--hv2-brand);
+}
+
+/* ---------- picture dropdown -------------------------------------------
+   Figma 825:26696 — a 639x180 panel holding a 3-column grid of 173x60 tiles,
+   20 padding, 40 between columns and 20 between rows. It only kicks in for
+   options that carry a thumb; plain options keep the single-column list. */
+.hv2-sel__list--grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 40px;
+    max-height: 180px;
+    padding: 20px;
+    border-radius: var(--hv2-r-xl);
+    scrollbar-width: thin;
+    /* The panel is 639 in the design but the trigger it hangs off is barely two
+       thirds of that, and inheriting the trigger's width squeezed three 173px
+       tiles into a third of the room each. It breaks out to its own width
+       instead, clamped so it can never run past the viewport. */
+    right: auto;
+    width: min(639px, calc(100vw - 2 * var(--hv2-pad)));
+    min-width: 100%;
+}
+
+/* Tile: 8 padding around a 44 thumb makes the 60, radius M, gap 8. */
+.hv2-sel__list--grid .hv2-sel__option {
+    justify-content: flex-start;
+    gap: 8px;
+    min-height: 60px;
+    padding: 8px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-md);
+    /* Caption/Medium — 12/16, letter-spacing 0.4. */
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    transition: background 0.14s ease, border-color 0.14s ease;
+}
+
+/* Hover swaps the outline for Color/Background/Inverse rather than tinting on
+   top of it, which is how the design draws the state. The keyboard-active and
+   selected tiles reuse it so all three read the same. */
+.hv2-sel__list--grid .hv2-sel__option:hover,
+.hv2-sel__list--grid .hv2-sel__option[data-active="true"],
+.hv2-sel__list--grid .hv2-sel__option[aria-selected="true"] {
+    border-color: transparent;
+    background: var(--hv2-inverse-bg);
+}
+
+.hv2-sel__thumb {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--hv2-r-sm);
+    object-fit: cover;
+}
+
+/* The design draws a 4px rail; keep the popup's own scrollbar that slim. */
+.hv2-sel__list--grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.hv2-sel__list--grid::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: var(--hv2-pcard-line);
+}
+
+/* ---------- projects mega-menu -----------------------------------------
+   Figma 324:3876 — a 1344x376 panel of 321x170 cards, four across and two
+   down, hanging under the header. The panel padding and both gaps are 12; the
+   cards carry the borders, so the panel itself only has to hold them. */
+.hv2-nav__mega {
+    position: absolute;
+    z-index: 39;
+    top: 100%;
+    right: 0;
+    left: 0;
+}
+
+.hv2-mega {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+    padding: 12px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxl);
+    background: var(--hv2-surface);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
+}
+
+.hv2-mega__card {
+    display: flex;
+    min-height: 170px;
+    flex-direction: column;
+    gap: 20px;
+    overflow: hidden;
+    padding: 20px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.hv2-mega__card:hover {
+    border-color: transparent;
+    background: var(--hv2-inverse-bg);
+}
+
+.hv2-mega__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* The "see all" tile pushes its button to the far edge instead of hugging the
+   label, which is the only structural difference between it and a project. */
+.hv2-mega__card--all .hv2-mega__head {
+    gap: 4px;
+    justify-content: space-between;
+}
+
+.hv2-mega__thumb {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--hv2-r-sm);
+    object-fit: cover;
+}
+
+/* Body 1/Medium — 16/24, letter-spacing 0.05. */
+.hv2-mega__title {
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink);
+}
+
+/* Body 1/Regular in Text/Secondary. */
+.hv2-mega__desc {
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: var(--hv2-ink-60);
+}
+
+.hv2-mega__go {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    padding: 12px;
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+}
+
+.hv2-mega__card--all:hover .hv2-mega__go {
+    background: var(--hv2-surface);
 }
 
 /* =========================================================================
@@ -1457,6 +1880,10 @@
     .hv2-hero {
         grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
     }
+
+    .hv2-mega {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 1024px) {
@@ -1485,12 +1912,12 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .hv2-footer__mid {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    .hv2-footer {
+        flex-direction: column;
+        gap: 48px;
     }
 
     .hv2-footer__about {
-        grid-column: 1 / -1;
         max-width: none;
     }
 
@@ -1506,25 +1933,142 @@
         justify-content: space-between;
         gap: 12px;
     }
+
+    .hv2-nav__mega {
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {
+    /* Figma 574:3019 — a 402 canvas with 370 of content, so a 16 gutter. The
+       rhythm does NOT shrink on mobile: sections stay 120 apart and every
+       heading still sits 40 above its content, which is what the frame shows.
+       The radii are design tokens and stay put too — the mobile header is still
+       drawn at XXL. */
     .hv2-root {
         --hv2-pad: 16px;
-        --hv2-section: 56px;
         --hv2-gap: 16px;
-        --hv2-row-gap: 16px;
-        --hv2-flow: 24px;
-        --hv2-r-xxl: 18px;
-        --hv2-r-xl: 16px;
+        --hv2-row-gap: 24px;
+        --hv2-flow: 40px;
     }
 
     .hv2-nav {
         padding-top: 12px;
     }
 
+    /* Header drops to 64: 12 + a 40 burger + 12. */
     .hv2-nav__inner {
-        padding: 0 16px;
+        gap: 16px;
+        padding: 12px 20px;
+    }
+
+    /* Only the logo and the burger survive; the design hides the rest behind it. */
+    .hv2-nav__logo img {
+        width: 88.889px;
+        height: 20px;
+    }
+
+    .hv2-nav__links,
+    .hv2-nav__phone,
+    .hv2-nav__btn--brand {
+        display: none;
+    }
+
+    .hv2-nav__btn--cabinet {
+        background: var(--hv2-brand);
+        color: var(--hv2-on-dark) !important;
+        border-color: #0000;
+    }
+
+    .hv2-nav__burger {
+        width: 40px;
+        height: 40px;
+        padding: 8px 12px;
+    }
+
+    .hv2-nav__burger svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* H5 Headline — 24/32. The section heading steps down one rung on mobile. */
+    .hv2-h2,
+    .hv2-team__title {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    /* The blurb takes the full column and drops back to the left. */
+    .hv2-lead {
+        width: auto;
+        max-width: none;
+    }
+
+    /* Inventory keeps three cards on one row and scrolls sideways, the way the
+       370-wide frame holds a 1094 track. */
+    .hv2-s-inventory .hv2-grid-3 {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        margin-inline: calc(var(--hv2-pad) * -1);
+        padding-inline: var(--hv2-pad);
+        scrollbar-width: none;
+    }
+
+    .hv2-s-inventory .hv2-grid-3::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hv2-s-inventory .hv2-ucard {
+        flex: 0 0 348px;
+        scroll-snap-align: start;
+    }
+
+    /* Team rows sit 20 apart, Pulse rows 60 — both differ from the 24 default. */
+    .hv2-s-team {
+        --hv2-row-gap: 20px;
+    }
+
+    .hv2-s-pulse {
+        --hv2-row-gap: 60px;
+    }
+
+    /* The banner stacks: photo on top at a fixed slice, form underneath, and the
+       watermark drops out because there is no room left for it to read. */
+    .hv2-cb {
+        min-height: 0;
+    }
+
+    .hv2-cb__watermark {
+        display: none;
+    }
+
+    .hv2-cb__photo {
+        position: relative;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 260px;
+    }
+
+    .hv2-cb__form {
+        width: 100%;
+        padding: 24px 20px 28px;
+    }
+
+    /* One tile per row once three no longer fit — and the panel gives up the
+       639 it breaks out to on desktop. That width is wider than the stacked
+       field it hangs off, and since it is anchored to the field's left edge the
+       overhang ran straight off the right of the screen. Back to the trigger's
+       own box: both edges pinned, no width of its own. */
+    .hv2-sel__list--grid {
+        right: 0;
+        width: auto;
+        min-width: 0;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        max-height: 264px;
+        padding: 12px;
     }
 
     .hv2-hero {
@@ -1532,38 +2076,13 @@
     }
 
     .hv2-nav__inner {
-        height: 62px;
+        padding: 12px 16px;
     }
 
-    /* Keep the phone pill and cabinet; drop the secondary circle actions. */
-    .hv2-nav__opt {
+    /* Keep the phone and Cabinet buttons; drop the secondary icon actions. The
+       burger is one of them, so it has to opt back in. */
+    .hv2-nav__btn--icon:not(.hv2-nav__burger) {
         display: none;
-    }
-
-    .hv2-nav__mobile {
-        display: block;
-        border-top: 1px solid var(--hv2-line);
-        background: var(--hv2-bg);
-    }
-
-    .hv2-nav__mobile ul {
-        list-style: none;
-        margin: 0;
-        padding: 10px var(--hv2-pad) 18px;
-    }
-
-    .hv2-nav__mobile a {
-        display: block;
-        padding: 11px 0;
-        font-size: 15px;
-        color: var(--hv2-ink);
-        text-decoration: none;
-        border-bottom: 1px solid var(--hv2-line-soft);
-    }
-
-    .hv2-calc {
-        min-height: 320px;
-        padding: 20px;
     }
 
     .hv2-calc__title {
@@ -1616,28 +2135,20 @@
         padding: 12px 18px;
     }
 
+    /* The head stacks, heading over blurb, 12 apart. The size and width of both
+       are set higher up in this block. */
     .hv2-section-head {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
-    }
-
-    .hv2-h2 {
-        font-size: 26px;
-    }
-
-    .hv2-lead {
-        text-align: left;
-        max-width: none;
+        gap: 12px;
     }
 
     .hv2-grid-3 {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    /* The tile keeps its 240x160 at every width. It used to shrink to 236x76,
-       which was sized for the old shared 40px logo height and would now clip
-       the taller boxes; a marquee does not have to fit the screen anyway. */
+    /* The partner tile keeps its 240x160 at every width — a marquee does not
+       have to fit the screen. */
 
     .hv2-partners__head .hv2-lead {
         text-align: center;
@@ -1647,35 +2158,289 @@
         gap: 14px;
     }
 
-    .hv2-footer {
-        padding: 24px 20px 20px;
+
+    /* ---- burger menu (Figma 783:23754) --------------------------------
+       A white 24-radius card under the header. The nav rows are Body 2 in
+       8-padded 20-radius pills, and the action buttons the header drops at
+       this width come back along its foot. */
+    .hv2-nav__mobile {
+        display: block;
+        /* The panel is 386 on a 402 canvas — 8 from each edge, where the shell
+           holds everything else at 16. It reaches past the gutter by that 8 so
+           the action row below has the width the design gives it. */
+        margin-top: 8px;
+        margin-inline: -8px;
+        /* Top padding is 12, not 20. Figma draws the header inside the panel:
+           its foot is at 72, the first row's label at 100 — 28 between them.
+           Here the two are separate cards, so that 28 has to come out of the
+           8 gap, this 12, and the row's own 8 of padding. At 20 it was 36 and
+           the menu read as detached from the header. */
+        padding: 12px 20px 20px;
+        border: 1px solid var(--hv2-pcard-line);
+        border-radius: var(--hv2-r-xxl);
+        background: var(--hv2-surface);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
+        /* The panel outgrows the screen once Projects is unfolded, so it scrolls
+           itself rather than pushing the page. 84 is what sits above it: the
+           nav's 12 of padding, the 64 header and the 8 gap; the rest is breathing
+           room at the bottom. dvh keeps it honest while mobile browser chrome
+           slides in and out, with vh as the fallback for anything older. */
+        max-height: calc(100vh - 100px);
+        max-height: calc(100dvh - 100px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
     }
 
-    .hv2-footer__top {
-        gap: 18px;
+    .hv2-nav__mobile::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .hv2-nav__mobile::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background: var(--hv2-pcard-line);
+    }
+
+    .hv2-nav__mobile ul {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .hv2-nav__mobile a {
+        display: block;
+        padding: 8px;
+        border-radius: 20px;
+        font-family: var(--hv2-font-display);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+        color: var(--hv2-ink);
+        text-decoration: none;
+        transition: background 0.18s ease;
+    }
+
+    .hv2-nav__mobile a:hover {
+        background: var(--hv2-selected);
+    }
+
+    /* "Projects" is a disclosure here, so it is a button carrying the same row
+       styling as its sibling links, plus the 16-box chevron. */
+    .hv2-nav__disclosure {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+        border: 0;
+        border-radius: 20px;
+        background: transparent;
+        font-family: var(--hv2-font-display);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+        color: var(--hv2-ink);
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .hv2-nav__disclosure:hover {
+        background: var(--hv2-selected);
+    }
+
+    /* The glyph is a 7.67x3.67 leaf centred in a 16 box — stretching it to fill
+       the box would flatten the chevron, so the two sizes stay separate. */
+    .hv2-nav__chev {
+        display: inline-flex;
+        flex: 0 0 auto;
+        width: 16px;
+        height: 16px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hv2-nav__chev img {
+        transition: rotate 0.2s ease;
+    }
+
+    .hv2-nav__disclosure[aria-expanded="true"] .hv2-nav__chev img {
+        rotate: 180deg;
+    }
+
+    /* 40px rows, 4 apart: 8 of padding around a 24 thumb. These sit after the
+       plain-link rule above because both are (0,1,1) and order decides. */
+    .hv2-nav__sublist {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin: 4px 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .hv2-nav__mobile .hv2-nav__sublist a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        /* One-off pair from the design: a lighter hairline than the site border
+           on the standard inverse fill. */
+        border: 1px solid #ecedee;
+        border-radius: 8px;
+        background: var(--hv2-inverse-bg);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 18px;
+        letter-spacing: 0;
+    }
+
+    .hv2-nav__mobile .hv2-nav__sublist a:hover {
+        background: var(--hv2-selected);
+    }
+
+    .hv2-nav__subthumb {
+        flex: 0 0 auto;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        object-fit: cover;
+    }
+
+    /* Figma 783:23754 keeps all five on one row, and it only works because the
+       row is inset 8 from the panel while the nav rows are inset 20. Pulling it
+       back out of the panel's own 20 is what buys the missing 24px — without it
+       Cabinet fell to a second line.
+       The row still cannot fit a phone narrower than the 402 canvas, so it
+       nudges sideways there instead of breaking into two lines. */
+    .hv2-nav__mobile-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        margin: 32px -12px 0;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+    }
+
+    .hv2-nav__mobile-actions::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hv2-nav__mobile-actions .hv2-nav__btn {
+        flex: 0 0 auto;
+        
+    }
+
+    .hv2-nav__mobile-actions .hv2-nav__btn,
+    .hv2-nav__mobile-actions .hv2-nav__btn--icon,
+    .hv2-nav__mobile-actions .hv2-nav__btn--brand {
+        display: inline-flex;
+    }
+
+    /* ---- hero: the calculator card ------------------------------------
+       Figma 867:30723 gives this card its own 370-wide artwork. The desktop
+       plate is composed for 432 and its baked-in render slides straight under
+       the live heading once the card narrows — that was the overlap. */
+    .hv2-calc {
+        min-height: 472px;
+        padding: 24px 20px 20px;
+        background-image: url("/images/figma/calc-art-mobile.jpg");
+        background-position: center bottom;
+    }
+
+    /* H4 32/40 at left 32, subtitle following at top 112. */
+    .hv2-calc__title {
+        margin-left: 12px;
+        max-width: none;
+        font-size: 32px;
+        line-height: 40px;
+        letter-spacing: 0.25px;
+    }
+
+    .hv2-calc__subtitle {
+        margin: 8px 0 0 12px;
+    }
+
+    .hv2-heroimg {
+        min-height: 400px;
+    }
+
+    /* ---- footer (Figma 724:19895) --------------------------------------
+       The design reorders the whole block on mobile, so the two-column
+       wrappers dissolve and the leaves are placed into one column. The last
+       row is the exception: socials sit beside the scroll-top button, which is
+       why the grid keeps a second, auto-width track. */
+    .hv2-footer {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 32px 12px;
+        padding: 32px 24px;
+    }
+
+    .hv2-footer__col,
+    .hv2-footer__stack,
+    .hv2-footer__row {
+        display: contents;
+    }
+
+    .hv2-footer > *,
+    .hv2-footer__col > *,
+    .hv2-footer__stack > *,
+    .hv2-footer__row > * {
+        grid-column: 1 / -1;
+    }
+
+    .hv2-footer__brand {
+        order: 1;
+        gap: 24px;
     }
 
     .hv2-footer__nav {
-        gap: 14px 18px;
+        order: 2;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px 24px;
+        justify-content: start;
     }
 
-    .hv2-footer__mid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 24px;
-        padding-bottom: 26px;
+    .hv2-footer__group--contact {
+        order: 3;
     }
 
-    .hv2-footer__bottom {
-        align-items: flex-start;
-        gap: 16px;
-    }
-
-    .hv2-footer__legal {
-        flex-direction: column;
-        gap: 4px;
+    .hv2-footer__group--location {
+        order: 4;
     }
 
     .hv2-footer__langs {
+        order: 5;
         align-items: flex-start;
+    }
+
+    .hv2-footer__caption--copy {
+        order: 6;
+    }
+
+    /* The copyright and the rights line read as one paragraph here, so the gap
+       between them collapses to the grid's own row rhythm minus the 32. */
+    .hv2-footer__caption--rights {
+        order: 7;
+        margin-top: -32px;
+    }
+
+    .hv2-footer__socials {
+        order: 8;
+        grid-column: 1;
+        gap: 12px;
+    }
+
+    .hv2-footer__totop {
+        order: 9;
+        display: inline-flex;
+        grid-column: 2;
+        justify-self: end;
     }
 }
