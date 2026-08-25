@@ -35,6 +35,10 @@
     /* Color/Background/Selected — the inventory card panel and the active tab.
        Color/Background/Inverse — the news category pill. */
     --hv2-selected: #edeeef;
+    /* Color/Border/Disabled — the hairline inside comparison rows. */
+    --hv2-line-disabled: #ecedee;
+    /* Color/Text/Brand-Bold — the contact entry labels. */
+    --hv2-ink-brand-bold: #373b43;
     --hv2-inverse-bg: #f4f5f5;
 
     /* radii — Sizing/Radius/* tokens from the Figma file */
@@ -250,12 +254,6 @@
     padding-top: var(--hv2-section);
 }
 
-/* padding-top 40 + head 40 + flow 8 (own head, reduced) + two 444 card rows +
-   24 row gap + flow 40 (.hv2-center) + button 52 = 1092. min-height has to be
-   recomputed by hand whenever padding-top or the head's own margin change —
-   it does not reference either, so a stale sum here silently pads the
-   section back out to its old height regardless of how tight the real
-   padding is, swallowing the whole point of pulling it in. */
 .hv2-s-projects {
     min-height: 1092px;
     --hv2-row-gap: 24px;
@@ -264,8 +262,10 @@
     padding-top: 40px;
 }
 
-/* padding-top 40 + 292 of head/strip content — see the note on Projects
-   above for why this can't just reference --hv2-section any more. */
+.hv2-s-projects--single {
+    min-height: calc(var(--hv2-section) + 616px);
+}
+
 .hv2-s-partners {
     min-height: 332px;
     /* Same pulled-in rhythm as Projects — well below the shared 120px. */
@@ -1756,47 +1756,9 @@
     color: var(--hv2-ink-60);
 }
 
-.hv2-cb__field {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* Caption/Bold — 12/16, letter-spacing 0.4. */
-.hv2-cb__label {
-    font-family: var(--hv2-font-display);
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 16px;
-    letter-spacing: 0.4px;
-    color: var(--hv2-ink);
-}
-
-/* 44 tall on a 16 radius — a different radius from every other control here,
-   which is what the design specifies for form inputs. */
-.hv2-cb__field input {
-    width: 100%;
-    height: 44px;
-    padding: 0 12px;
-    border: 1px solid var(--hv2-pcard-line);
-    border-radius: 16px;
-    background: var(--hv2-surface);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
-    letter-spacing: 0.25px;
-    color: var(--hv2-ink);
-    outline: none;
-    transition: border-color 0.18s ease;
-}
-
-.hv2-cb__field input::placeholder {
-    color: var(--hv2-ink-60);
-}
-
-.hv2-cb__field input:focus {
-    border-color: var(--hv2-brand);
+/* The banner draws the shared field one notch shorter than the contact form. */
+.hv2-cb__form .hv2-input-field {
+    --hv2-field-h: 44px;
 }
 
 /* ---------- picture dropdown -------------------------------------------
@@ -1965,6 +1927,646 @@
     background: var(--hv2-surface);
 }
 
+/* ---------- comparison ---------------------------------------------------
+   Figma 638:27901 — a heading over two 660x283 cards, 24 apart. The card puts
+   a floor plan beside a five-row table; on mobile (675:16438) the same DOM
+   stacks and the divider moves from the right edge of the plan to its bottom. */
+.hv2-s-compare {
+    /* head 40 + flow 40 + 283 of card. */
+    min-height: calc(var(--hv2-section) + 363px);
+}
+
+.hv2-cmp {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: var(--hv2-flow);
+}
+
+.hv2-cmp__card {
+    display: flex;
+    min-height: 283px;
+    overflow: hidden;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+}
+
+/* Color/Border/Disabled is a lighter hairline than the card outline itself. */
+.hv2-cmp__plan {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 25px 24px 24px;
+    border-right: 1px solid var(--hv2-line-disabled);
+}
+
+.hv2-cmp__plan img {
+    width: 172px;
+    height: 184px;
+    object-fit: contain;
+}
+    .hv2-hero {
+        grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+    }
+
+.hv2-cmp__body {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 24px;
+}
+
+/* The pair floats over the table rather than sitting above it: the rows are
+   centred in the card while the buttons keep to its top corner. */
+.hv2-cmp__actions {
+    position: absolute;
+    top: 8px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+}
+
+.hv2-cmp__rows {
+    width: 100%;
+    max-width: 312px;
+    margin: 0;
+}
+    .hv2-calc {
+        min-height: 420px;
+    }
+.hv2-cmp__row {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    min-height: 34.5px;
+    padding: 9px 0 8px;
+    border-bottom: 1px solid var(--hv2-line-disabled);
+}
+
+.hv2-cmp__row dt {
+    flex: 0 0 165px;
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-brand);
+}
+    .hv2-footer {
+        min-height: 0;
+        padding-top: 32px;
+        padding-bottom: 28px;
+    }
+
+/* Body 2/Medium — 14/20, letter-spacing 0.25. */
+.hv2-cmp__row dd {
+    min-width: 0;
+    margin: 0;
+    font-family: var(--hv2-font-display);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink);
+}
+
+.hv2-cmp__empty {
+    margin-top: var(--hv2-flow);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+}
+
+/* ---------- shared form field -------------------------------------------
+   The same control the callback banner and the contact form both draw: a
+   Caption/Bold label 4 above a 16-radius box on Color/Border/Outline. Only the
+   height differs between the two, so it rides on a variable. */
+.hv2-input-field {
+    --hv2-field-h: 48px;
+
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hv2-input-field > span {
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-ink);
+}
+
+.hv2-input-field input,
+.hv2-input-field textarea {
+    width: 100%;
+    height: var(--hv2-field-h);
+    padding: 0 12px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: 16px;
+    background: var(--hv2-surface);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink);
+    outline: none;
+    transition: border-color 0.18s ease;
+}
+
+.hv2-input-field input::placeholder,
+.hv2-input-field textarea::placeholder {
+    color: var(--hv2-ink-60);
+}
+
+.hv2-input-field input:focus,
+.hv2-input-field textarea:focus {
+    border-color: var(--hv2-brand);
+}
+
+/* ---------- contact ------------------------------------------------------
+   Figma 622:2996 — a centred headline, two 662 cards, then the two office
+   cards. Every block is 20 apart and the head is 40 above them. */
+.hv2-s-contact {
+    min-height: calc(var(--hv2-section) + 1252px);
+}
+
+.hv2-ct__head {
+    display: flex;
+    max-width: 430px;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+}
+
+/* H3 Headline/Medium — 40/48, letter-spacing 0. The only H3 on the site. */
+.hv2-ct__title {
+    font-family: var(--hv2-font-display);
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 48px;
+    letter-spacing: 0;
+    color: var(--hv2-ink);
+}
+    /* Horizontal padding still rides on `.hv2-shell` (--hv2-pad, 16px here),
+       only the vertical number here. */
+    .hv2-nav__inner {
+        gap: 16px;
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }
+
+.hv2-ct__lead {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+}
+
+.hv2-ct__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: var(--hv2-flow);
+}
+
+.hv2-ct__card {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+}
+
+.hv2-ct__cardhead {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* H5 Headline/Medium — 24/32. */
+.hv2-ct__cardtitle {
+    font-family: var(--hv2-font-display);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink);
+}
+
+.hv2-ct__cardlead {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+}
+
+.hv2-ct__entries {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 48px;
+}
+
+.hv2-ct__entry {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hv2-ct__entryhead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 32px circle on Color/Background/Inverse around a 16 leaf. */
+.hv2-ct__entryicon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: var(--hv2-inverse-bg);
+}
+
+/* Subheadline/Medium — 18/28, letter-spacing 0.15, Color/Text/Brand-Bold. */
+.hv2-ct__entrylabel {
+    font-family: var(--hv2-font-display);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink-brand-bold);
+}
+
+.hv2-ct__entryvalue {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+a.hv2-ct__entryvalue:hover {
+    color: var(--hv2-ink);
+}
+
+.hv2-ct__social {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 68px;
+}
+
+.hv2-ct__form {
+    gap: 16px;
+}
+
+/* The counter sits inside the box, so the textarea gives up its own border to
+   a wrapper and the two share one outline. */
+.hv2-input-field--area .hv2-ct__area {
+    position: relative;
+    display: block;
+}
+
+.hv2-input-field--area textarea {
+    height: 160px;
+    padding: 14px 12px 28px;
+    resize: vertical;
+}
+
+.hv2-ct__count {
+    position: absolute;
+    bottom: 8px;
+    left: 13px;
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-ink-60);
+    pointer-events: none;
+}
+
+.hv2-ct__send {
+    width: 100%;
+    margin-top: auto;
+}
+
+/* ---------- office cards -------------------------------------------------
+   662x432 with the same translucent footer the project cards use, so the card
+   itself is `.hv2-ucard--person` with only its proportions changed. */
+.hv2-ct__offices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.hv2-ct__office {
+    aspect-ratio: 662 / 432;
+}
+
+.hv2-ct__office .hv2-ucard__foot {
+    min-height: 92px;
+    align-items: center;
+}
+
+/* View Map — Background/Inverse-Secondary rather than the Inverse grey the
+   other pills use, because it sits on a photo and needs the contrast. */
+.hv2-ct__map {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 52px;
+    padding: 12px;
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-surface);
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+    color: var(--hv2-ink);
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.18s ease;
+}
+
+.hv2-ct__map:hover {
+    background: var(--hv2-selected);
+}
+
+/* ---------- credit calculator -------------------------------------------
+   Figma 635:21742 — two 396-tall cards, 24 apart, sitting 40 under the header
+   rather than a full section gap. */
+.hv2-s-credit {
+    padding-top: 40px;
+}
+
+.hv2-credit {
+    display: grid;
+    grid-template-columns: minmax(0, 641fr) minmax(0, 639fr);
+    gap: 24px;
+    min-height: 436px;
+    padding: 20px;
+    border-radius: var(--hv2-r-xxl);
+    background: var(--hv2-surface);
+}
+
+.hv2-credit__calc {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+}
+
+/* The heading sits in its own 121-tall band with a rule under it. */
+.hv2-credit__title {
+    padding: 20px;
+    border-bottom: 1px solid var(--hv2-pcard-line);
+    font-family: var(--hv2-font-display);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink);
+}
+
+/* Three rows of two, 20 apart in both directions. */
+.hv2-credit__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.hv2-credit__field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Caption/Bold — 12/16, letter-spacing 0.4. */
+.hv2-credit__field > span {
+    font-family: var(--hv2-font-display);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--hv2-ink);
+}
+
+/* The shared listbox is drawn for the search panel — 40 tall on a pill. Here
+   the design gives it the form-field shape instead: 44 on a 16 radius. */
+.hv2-credit__field .hv2-sel__trigger {
+    height: 44px;
+    padding: 0 12px;
+    border-color: var(--hv2-pcard-line);
+    border-radius: 16px;
+    font-family: var(--hv2-font-display);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+}
+
+.hv2-credit__field .hv2-sel__trigger[data-filled="false"] .hv2-sel__value {
+    color: var(--hv2-ink-60);
+}
+
+/* Result panel. Figma fills this with a checkerboard placeholder rather than
+   artwork, so the frame is reproduced and its contents left to the design —
+   see the note in CalculatorV2. */
+.hv2-credit__panel {
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-muted-2);
+}
+
+.hv2-credit__actions {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+}
+
+.hv2-credit__add {
+    flex: 1 1 auto;
+}
+
+/* 56x52 beside the CTA — padding 16/12 around a 24 glyph, which the XXXLL
+   radius rounds into the circle the frame shows. */
+.hv2-credit__print {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 52px;
+    padding: 0;
+    border-radius: var(--hv2-r-xxxll);
+}
+
+/* The listbox has to clear the panel next to it. */
+.hv2-credit__field .hv2-sel__list {
+    z-index: 40;
+    border-color: var(--hv2-pcard-line);
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Body 2 rows on a 12 radius, matching the field they drop out of. */
+.hv2-credit__field .hv2-sel__option {
+    min-height: 40px;
+    padding: 10px 12px;
+    border-radius: var(--hv2-r-md);
+    font-family: var(--hv2-font-display);
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+}
+
+.hv2-credit__field .hv2-sel__option:hover,
+.hv2-credit__field .hv2-sel__option[data-active="true"] {
+    background: var(--hv2-inverse-bg);
+}
+
+/* ---------- about ---------------------------------------------------------
+   Figma 627:17513 — a full-bleed photo, four advantage cards, then the team
+   grid. Both heads are centred columns with 12 between the two lines. */
+.hv2-s-abouthero {
+    padding-top: 40px;
+}
+
+.hv2-about__hero {
+    position: relative;
+    aspect-ratio: 1344 / 568;
+    overflow: hidden;
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-muted);
+}
+
+.hv2-about__hero img {
+    object-fit: cover;
+}
+
+.hv2-about__head {
+    display: flex;
+    max-width: 592px;
+    margin: 0 auto;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+}
+
+/* H4 Headline/Medium — 32/40, letter-spacing 0.25. */
+.hv2-about__title {
+    font-family: var(--hv2-font-display);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink);
+}
+
+.hv2-about__lead {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    color: var(--hv2-ink-60);
+}
+
+/* head 40 + flow 40 + 272 of card. */
+.hv2-s-advantages {
+    min-height: calc(var(--hv2-section) + 404px);
+}
+
+.hv2-about__cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: var(--hv2-flow);
+}
+
+/* 321x272: a 48 icon button, then 64 of air, then the copy. */
+.hv2-adv {
+    display: flex;
+    min-height: 272px;
+    flex-direction: column;
+    gap: 64px;
+    overflow: hidden;
+    padding: 32px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xl);
+    background: var(--hv2-surface);
+}
+
+.hv2-adv__icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+}
+
+.hv2-adv__text {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+}
+
+/* 18/24 and 14/20 — the sizes the design gives, on the site's own faces. */
+.hv2-adv__title {
+    font-family: var(--hv2-font-display);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--hv2-ink);
+}
+
+.hv2-adv__desc {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--hv2-ink-60);
+}
+
+/* head 40 + flow 40 + two 432 rows + 24 + flow 40 + button 52. */
+.hv2-s-teamgrid {
+    min-height: calc(var(--hv2-section) + 1060px);
+    --hv2-row-gap: 24px;
+}
+
+.hv2-about__team {
+    margin-top: var(--hv2-flow);
+}
+
 /* =========================================================================
    RESPONSIVE
    ========================================================================= */
@@ -1993,7 +2595,7 @@
     }
 
     .hv2-hero {
-        grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
     }
 
     .hv2-mega {
@@ -2007,7 +2609,7 @@
     }
 
     .hv2-calc {
-        min-height: 420px;
+        min-height: 380px;
     }
 
     .hv2-heroimg {
@@ -2016,8 +2618,7 @@
 
     .hv2-footer {
         min-height: 0;
-        padding-top: 32px;
-        padding-bottom: 28px;
+        padding: 32px 32px 28px;
     }
 
     .hv2-search {
@@ -2053,6 +2654,10 @@
     .hv2-nav__mega {
         display: none;
     }
+
+    .hv2-about__cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
@@ -2068,12 +2673,14 @@
         --hv2-flow: 40px;
     }
 
-    /* Horizontal padding still rides on `.hv2-shell` (--hv2-pad, 16px here),
-       only the vertical number here. */
+    .hv2-nav {
+        padding-top: 12px;
+    }
+
+    /* Header drops to 64: 12 + a 40 burger + 12. */
     .hv2-nav__inner {
         gap: 16px;
-        padding-top: 18px;
-        padding-bottom: 18px;
+        padding: 12px 20px;
     }
 
     /* Only the logo and the burger survive; the design hides the rest behind it. */
@@ -2553,5 +3160,133 @@
         display: inline-flex;
         grid-column: 2;
         justify-self: end;
+    }
+    /* Figma 675:16438 — 370x501: the plan sits above the table, the hairline
+       becomes a bottom border, and the 72 of top padding is what leaves room
+       for the two buttons pinned in the corner. */
+    .hv2-cmp {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    .hv2-cmp__card {
+        min-height: 0;
+        flex-direction: column;
+    }
+
+    .hv2-cmp__plan {
+        padding: 72px 24px 25px;
+        border-right: 0;
+        border-bottom: 1px solid var(--hv2-line-disabled);
+    }
+
+    .hv2-cmp__actions {
+        top: 8px;
+        right: 8px;
+    }
+
+    .hv2-cmp__rows {
+        max-width: none;
+    }
+    /* ---- contact (Figma 622:1782) --------------------------------------
+       The headline stops being centred and steps down to H5; both cards and
+       both office cards take the full column. */
+    .hv2-ct__head {
+        max-width: none;
+        text-align: left;
+    }
+
+    .hv2-ct__title {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .hv2-ct__grid,
+    .hv2-ct__offices {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hv2-ct__head + .hv2-ct__grid {
+        margin-top: 32px;
+    }
+
+    /* The office card is 370x320 here, its footer 88, and the View Map pill
+       drops its label to become the 52 square the frame shows. */
+    .hv2-ct__office {
+        aspect-ratio: 370 / 320;
+    }
+
+    .hv2-ct__office .hv2-ucard__foot {
+        min-height: 88px;
+    }
+
+    .hv2-ct__office .hv2-ucard__title {
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.05px;
+    }
+
+    .hv2-ct__office .hv2-ucard__meta {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.25px;
+    }
+
+    .hv2-ct__map {
+        width: 52px;
+        padding: 12px;
+        font-size: 0;
+        letter-spacing: 0;
+    }
+    /* ---- credit calculator (Figma 635:21026) ---------------------------
+       The 402 frame stacks the calculator over the result panel and runs the
+       six fields down a single column. */
+    .hv2-credit {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .hv2-credit__fields {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .hv2-credit__title {
+        padding: 16px;
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .hv2-credit__panel {
+        min-height: 220px;
+        padding: 16px;
+    }
+
+    .hv2-credit__actions {
+        gap: 8px;
+    }
+    /* ---- about (Figma 673:15809) ---------------------------------------- */
+    .hv2-about__cards {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .hv2-adv {
+        min-height: 0;
+        gap: 32px;
+        padding: 24px;
+    }
+
+    .hv2-about__head {
+        max-width: none;
+        text-align: left;
+    }
+
+    .hv2-about__title {
+        font-size: 24px;
+        line-height: 32px;
     }
 }

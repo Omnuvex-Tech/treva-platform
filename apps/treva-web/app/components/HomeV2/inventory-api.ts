@@ -12,6 +12,7 @@ type ApiUnit = {
     coverImage?: { url?: string } | null;
     category?: { title?: string; name?: string; developerBrand?: string } | null;
     house?: { title?: string; name?: string } | null;
+    floor?: number;
 };
 
 /**
@@ -70,6 +71,8 @@ function toCard(unit: ApiUnit, index: number): InventoryCard | null {
         price: formatPrice(unit.prices),
         rooms: unit.rooms ? String(unit.rooms) : "",
         area: formatArea(unit.totalArea),
+        building: unit.house?.title || unit.house?.name || "",
+        floor: typeof unit.floor === "number" ? String(unit.floor) : "",
         href: unit.slug ? `/off-plan/${unit.slug}` : undefined,
     };
 }
