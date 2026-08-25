@@ -41,6 +41,7 @@ const nextConfig = {
                 hostname: trevaUrl.hostname,
                 port: trevaUrl.port || undefined,
             },
+            { protocol: "https", hostname: "*.profitbase.ru" },
         ],
     },
     async rewrites() {
