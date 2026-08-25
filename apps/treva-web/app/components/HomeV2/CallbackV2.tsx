@@ -48,8 +48,8 @@ export default function CallbackV2({ locale }: Props) {
             </p>
           </div>
 
-          <label className="hv2-cb__field">
-            <span className="hv2-cb__label">{dict.callback.nameLabel}</span>
+          <label className="hv2-input-field">
+            <span>{dict.callback.nameLabel}</span>
             <input
               type="text"
               name="name"
@@ -59,8 +59,8 @@ export default function CallbackV2({ locale }: Props) {
             />
           </label>
 
-          <label className="hv2-cb__field">
-            <span className="hv2-cb__label">{dict.callback.phoneLabel}</span>
+          <label className="hv2-input-field">
+            <span>{dict.callback.phoneLabel}</span>
             <input
               type="tel"
               name="phone"

@@ -4,19 +4,32 @@ import { getDict } from "./dictionary";
 import { projectCards, type ProjectCard } from "./data";
 import ProjectCardV2 from "./ProjectCardV2";
 
-type Props = { locale: string; items?: ProjectCard[] };
+type Props = {
+  locale: string;
+  items?: ProjectCard[];
+  /** Overrides the section heading; the credit page gives it its own. */
+  title?: string;
+  /** The credit page drops the blurb — its head is a heading and nothing else. */
+  showLead?: boolean;
+};
 
-export default function ProjectsV2({ locale, items = projectCards }: Props) {
+export default function ProjectsV2({ locale, items = projectCards, title, showLead = true }: Props) {
   const dict = getDict(locale);
 
   return (
-    <section className="hv2-shell hv2-section hv2-s-projects">
+    <section
+      className={
+        items.length > 3
+          ? "hv2-shell hv2-section hv2-s-projects"
+          : "hv2-shell hv2-section hv2-s-projects hv2-s-projects--single"
+      }
+    >
       <div className="hv2-section-head">
-        <h2 className="hv2-h2">{dict.projects.title}</h2>
+        <h2 className="hv2-h2">{title ?? dict.projects.title}</h2>
         {/* One paragraph wrapping inside a fixed 272px box — the design has no
             forced break here, and hard-coding one splits the Azerbaijani and
             Russian copy in the wrong place. */}
-        <p className="hv2-lead">{dict.projects.lead.join(" ")}</p>
+        {showLead ? <p className="hv2-lead">{dict.projects.lead.join(" ")}</p> : null}
       </div>
 
       <div className="hv2-grid-3">

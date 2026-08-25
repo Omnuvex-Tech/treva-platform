@@ -55,6 +55,9 @@ export type InventoryCard = {
     price: string;
     rooms: string;
     area: string;
+    /** Comparison rows only; the home strip never shows either. */
+    building?: string;
+    floor?: string;
     href?: string;
 };
 
