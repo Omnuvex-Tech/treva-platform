@@ -16,6 +16,7 @@ type HomeV2Props = {
   locale: string;
   projects?: ProjectCard[];
   inventory?: InventoryCard[];
+  resaleInventory?: InventoryCard[];
   team?: TeamMember[];
   news?: NewsCard[];
 };
@@ -27,7 +28,14 @@ type HomeV2Props = {
  * keeps its own navbar, footer and callback form. The whole tree sits inside
  * `.hv2-root` so the V2 typography reset (see home-v2.css) applies once.
  */
-export default function HomeV2({ locale, projects, inventory, team = [], news = [] }: HomeV2Props) {
+export default function HomeV2({
+  locale,
+  projects,
+  inventory,
+  resaleInventory,
+  team = [],
+  news = [],
+}: HomeV2Props) {
   return (
     <div className="page-wrapper home-page--v2" data-locale={locale} data-design="v2">
       <div className="hv2-root">
@@ -37,7 +45,7 @@ export default function HomeV2({ locale, projects, inventory, team = [], news = 
         <SearchPanelV2 locale={locale} />
         <ProjectsV2 locale={locale} items={projects} />
         <PartnersV2 locale={locale} />
-        <InventoryV2 locale={locale} items={inventory} />
+        <InventoryV2 locale={locale} items={inventory} resaleItems={resaleInventory} />
         <TeamV2 locale={locale} members={team} />
         <PulseV2 locale={locale} items={news} />
         <CallbackV2 locale={locale} />

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { getDict } from "./dictionary";
 import { inventoryCards, type InventoryCard } from "./data";
 
-type Props = { locale: string; items?: InventoryCard[] };
+type Props = { locale: string; items?: InventoryCard[]; resaleItems?: InventoryCard[] };
 type Deal = "off-plan" | "resale";
 
 const DEV_ICON = "/images/features-pro/icons/dreamfest-arena.svg";
@@ -19,10 +19,18 @@ const CARD_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
  * The artwork is a floor plan on a tinted panel rather than a photo, so it is
  * contained at its designed 261x280 instead of being cropped to fill; the 130px
  * translucent footer below it carries price, developer and specs.
+ *
+ * Off-plan and resale are separate treva-api models (unit-layouts vs
+ * apartments — see inventory-api.ts), fetched once on the server as two
+ * separate arrays. The tabs below only ever switched a `deal` state that fed
+ * link hrefs, never which cards were shown, so every tab quietly displayed
+ * the same off-plan units — including when there is real resale inventory to
+ * show. `items`/`resaleItems` are picked between here instead.
  */
-export default function InventoryV2({ locale, items = inventoryCards }: Props) {
+export default function InventoryV2({ locale, items = inventoryCards, resaleItems = inventoryCards }: Props) {
   const dict = getDict(locale);
   const [deal, setDeal] = useState<Deal>("off-plan");
+  const visibleItems = deal === "resale" ? resaleItems : items;
 
   return (
     <section className="hv2-shell hv2-section hv2-s-inventory">
@@ -40,7 +48,7 @@ export default function InventoryV2({ locale, items = inventoryCards }: Props) {
       </div>
 
       <div className="hv2-grid-3">
-        {items.map((item) => (
+        {visibleItems.map((item) => (
           <Link
             key={item.id}
             href={item.href ? `/${locale}${item.href}` : `/${locale}/${deal}`}

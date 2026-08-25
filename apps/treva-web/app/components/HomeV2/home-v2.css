@@ -250,41 +250,72 @@
     padding-top: var(--hv2-section);
 }
 
-/* head 40 + flow 40 + two 444 card rows + 24 row gap + flow 40 + button 52. */
+/* padding-top 40 + head 40 + flow 8 (own head, reduced) + two 444 card rows +
+   24 row gap + flow 40 (.hv2-center) + button 52 = 1092. min-height has to be
+   recomputed by hand whenever padding-top or the head's own margin change —
+   it does not reference either, so a stale sum here silently pads the
+   section back out to its old height regardless of how tight the real
+   padding is, swallowing the whole point of pulling it in. */
 .hv2-s-projects {
-    min-height: calc(var(--hv2-section) + 1084px);
+    min-height: 1092px;
     --hv2-row-gap: 24px;
     /* Pulled well below the shared --hv2-section rhythm (120px) — the search
        card and this section read as one flow rather than separate blocks. */
     padding-top: 40px;
 }
 
+/* padding-top 40 + 292 of head/strip content — see the note on Projects
+   above for why this can't just reference --hv2-section any more. */
 .hv2-s-partners {
-    min-height: calc(var(--hv2-section) + 292px);
+    min-height: 332px;
     /* Same pulled-in rhythm as Projects — well below the shared 120px. */
     padding-top: 40px;
 }
 
+/* padding-top 40 + 648 of content — see the note on Projects above. */
 .hv2-s-inventory {
-    min-height: calc(var(--hv2-section) + 648px);
+    min-height: 688px;
     /* Pulled in to match Partners' own reduced padding-top above it, so the
        gap below Partners matches the one above it. */
     padding-top: 40px;
 }
 
+/* padding-top 40 + 888 of content — see the note on Projects above for why
+   this can't just reference --hv2-section any more. */
 .hv2-s-team {
-    min-height: calc(var(--hv2-section) + 888px);
+    min-height: 928px;
     --hv2-flow: 24px;
     --hv2-row-gap: 24px;
+    /* Same pulled-in rhythm as the sections above it. */
+    padding-top: 40px;
 }
 
+/* padding-top 40 + 696 of content — see the note on Projects above. The
+   --hv2-flow override that used to sit here (60px) put more air above the
+   "Bütün xəbərlərə bax" button than Inventory leaves above its own "Bütün
+   inventara bax" one (the default 40px, unoverridden) — dropped so the two
+   match. */
 .hv2-s-pulse {
-    min-height: calc(var(--hv2-section) + 696px);
-    --hv2-flow: 60px;
+    min-height: 696px;
+    /* Pulled in to match Team's own reduced padding-top above it, so the gap
+       below Team matches the one above it. */
+    padding-top: 40px;
 }
 
+/* padding-top 40 + 444 of content — see the note on Projects above. */
 .hv2-s-callback {
-    min-height: calc(var(--hv2-section) + 444px);
+    min-height: 484px;
+    /* Pulled in to match Pulse's own reduced padding-top above it, so the gap
+       below Pulse matches the one above it. */
+    padding-top: 40px;
+    /* Every other section's own padding-top reads as the gap above it because
+       every section is transparent — the page's own background shows through
+       that padding. Footer is the one section with an opaque fill of its own
+       (see .hv2-footer-wrap), so ITS padding-top just paints white immediately
+       and the two sections touch with nothing visible between them. A margin
+       here is the fix: it is genuinely outside this section's box, so nothing
+       can paint over it. */
+    margin-bottom: 40px;
 }
 
 /* Figma 437:5969 — the heading and its blurb are centred against each other on
@@ -1413,21 +1444,34 @@
    FOOTER
    ========================================================================= */
 
+/* Full-bleed white, same idea as the navbar bar: `.hv2-shell` moved onto
+   `.hv2-footer` itself (see FooterV2) so the fill on this outer element runs
+   edge to edge while the content it wraps still sits at the page's own
+   --hv2-pad gutter, not a card's own inset. */
 .hv2-footer-wrap {
-    padding-bottom: 40px;
+    /* Pulled in to the same rhythm as every other section above it. */
+    padding-top: 40px;
+    padding-bottom: 24px;
+    background: var(--hv2-surface);
 }
 
-/* Figma 724:19591 — 1344x479 on the same translucent panel and 24 radius as the
-   header, padding 40, two 580 columns with 104 between them. */
+/* Figma 724:19591 draws this as a translucent 24-radius panel like the
+   header used to be — dropped for the same reason the header's was: no
+   border, no fill of its own (the wrap above already paints solid white
+   edge to edge), padding is vertical-only since --hv2-shell now supplies
+   the horizontal inset. */
 .hv2-footer {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
     gap: 104px;
-    padding: 40px;
-    border: 1px solid var(--hv2-pcard-line);
-    border-radius: var(--hv2-r-xxl);
-    background: rgba(253, 253, 253, 0.8);
+    /* padding-top/bottom only, never the `padding: Xpx 0` shorthand — this
+       element carries `.hv2-shell` too (see FooterV2), and that shorthand's
+       implicit `padding-left/right: 0` silently wins over .hv2-shell's own
+       --hv2-pad gutter (same specificity, this rule sits later), pulling
+       every bit of footer content back out to the true viewport edge. */
+    padding-top: 24px;
+    padding-bottom: 24px;
 }
 
 /* Both columns are full-height and push their last row down. That is what lines
@@ -1445,7 +1489,7 @@
 .hv2-footer__brand {
     display: flex;
     flex-direction: column;
-    gap: 60px;
+    gap: 32px;
 }
 
 /* Body 1/Regular in Text/Secondary, held to the design's 420. */
@@ -1472,7 +1516,7 @@
 .hv2-footer__stack {
     display: flex;
     flex-direction: column;
-    gap: 60px;
+    gap: 32px;
 }
 
 /* Six links spread across the full 580, which is what produces the design's
@@ -1974,7 +2018,8 @@
 
     .hv2-footer {
         min-height: 0;
-        padding: 32px 32px 28px;
+        padding-top: 32px;
+        padding-bottom: 28px;
     }
 
     .hv2-search {
@@ -2445,7 +2490,8 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 32px 12px;
-        padding: 32px 24px;
+        padding-top: 32px;
+        padding-bottom: 32px;
     }
 
     .hv2-footer__col,
