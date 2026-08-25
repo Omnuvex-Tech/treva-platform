@@ -1,3 +1,4 @@
+import { getTrevaAssetUrl } from "@/lib/asset-url";
 import type { InventoryCard } from "./data";
 
 const TREVA_API = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
@@ -67,7 +68,11 @@ function toCard(unit: ApiUnit, index: number): InventoryCard | null {
         id: unit.id || unit.slug || `unit-${index}`,
         project: unit.category?.title || unit.category?.name || "",
         developer: unit.category?.developerBrand || unit.house?.title || unit.house?.name || "",
-        image,
+        // `mainImage.url`/`coverImage.url` come back as paths relative to the
+        // treva-api, not full URLs — unresolved, next/image requests them
+        // against treva-web's own origin and 404s. Resale's flat `image`
+        // field (below) gets the same treatment.
+        image: getTrevaAssetUrl(image),
         price: formatPrice(unit.prices),
         rooms: unit.rooms ? String(unit.rooms) : "",
         area: formatArea(unit.totalArea),
@@ -84,7 +89,7 @@ function toResaleCard(apartment: ApiApartment, index: number): InventoryCard | n
         id: apartment.id || apartment.slug || `resale-${index}`,
         project: apartment.locationTitle || apartment.apartmentType?.title || "",
         developer: apartment.apartmentType?.title || "",
-        image: apartment.image,
+        image: getTrevaAssetUrl(apartment.image),
         price: formatResalePrice(apartment),
         rooms: apartment.roomCount ? String(apartment.roomCount) : "",
         area: formatArea(apartment.area),
