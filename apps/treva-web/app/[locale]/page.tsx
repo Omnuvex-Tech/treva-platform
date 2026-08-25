@@ -12,6 +12,7 @@ import {
 } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 import { getHomeInventory } from "@/app/components/HomeV2/inventory-api";
+import { getProjectCards } from "@/app/components/HomeV2/projects-api";
 import type { InventoryCard, NewsCard, TeamMember } from "@/app/components/HomeV2/data";
 
 export const dynamicParams = false;
@@ -82,6 +83,9 @@ export default async function HomePage({
             team = [];
         }
 
+        // Seed cards with the CMS hover clip merged in; never throws.
+        const projects = await getProjectCards();
+
         let inventory: InventoryCard[] | undefined;
         const liveInventory = await getHomeInventory(3);
         if (liveInventory.length > 0) {
@@ -97,7 +101,15 @@ export default async function HomePage({
             image: article.coverImage || article.image || "",
         }));
 
-        return <HomeV2 locale={locale} inventory={inventory} team={team} news={news} />;
+        return (
+            <HomeV2
+                locale={locale}
+                projects={projects}
+                inventory={inventory}
+                team={team}
+                news={news}
+            />
+        );
     }
 
     return (

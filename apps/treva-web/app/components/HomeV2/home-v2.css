@@ -6,7 +6,7 @@
 
 .hv2-root {
     /* surfaces */
-    --hv2-bg: #f2f2f2;
+    --hv2-bg: #f6faff;
     --hv2-surface: #ffffff;
     --hv2-muted: #e9e9e9;
     --hv2-muted-2: #f6f6f6;
@@ -49,26 +49,62 @@
     --hv2-r-xxxll: 96px;
 
     /* rhythm — the Figma canvas is 1440 with 48px gutters; the gutter is pulled
-       in to 32 and the shell allowed past 1440 so wide screens are not left with
-       a large empty margin on each side. */
+       in to 32 so the same content fits a narrower column.
+
+       The shell is a border-box width, so it carries the two gutters on top of
+       the content: 1350 + 2*32 = 1414. That puts the content column at exactly
+       1350px on a wide screen, matching kristal.az, and leaves the rest of the
+       viewport as margin — 278px a side at 1920. It used to be 1600 (a 1536
+       column), which read as too wide against that reference. */
     --hv2-gap: 24px;
     --hv2-row-gap: 40px;
     --hv2-section: 120px;
     --hv2-flow: 40px;
-    --hv2-shell: 1600px;
+    --hv2-shell: 1414px;
     --hv2-pad: 32px;
 
     /* type — body stays Inter, headings are Oak Sans */
     --hv2-font-body: var(--font-inter), "Inter", "Segoe UI", Roboto, Arial, sans-serif;
     --hv2-font-display: "Oak Sans", var(--hv2-font-body);
 
-    background: var(--hv2-bg);
+    /* White is the page's own base now — the tint (`--hv2-bg`) is an explicit
+       box (`.hv2-topbg`) laid over the bottom of it, not the other way
+       round. That is what lets the tint carry its own rounded top corners:
+       radius only ever curves a box's own edge, and the base itself has no
+       edge there to curve. */
+    background: var(--hv2-surface);
     color: var(--hv2-ink);
     font-family: var(--hv2-font-body);
     font-size: 14px;
     line-height: 1.35;
     letter-spacing: normal;
     -webkit-font-smoothing: antialiased;
+    /* Containing block + stacking context for `.hv2-topbg`'s negative
+       z-index, so that box stays pinned behind this page's own content
+       instead of escaping to paint behind unrelated siblings. */
+    position: relative;
+    isolation: isolate;
+}
+
+/* The `--hv2-bg` tint, as its own box: starts at the search card's vertical
+   midpoint (see TopBackgroundV2 — `top` is set by JS, since the split point
+   tracks the card's real rendered height, which reflows across breakpoints)
+   and runs to the bottom of the page via `bottom: 0` against `.hv2-root`
+   rather than a guessed height, so it always reaches the real end of the
+   content — including whatever Footer turns out to be. Above the split, the
+   navbar/hero/top half of the search card sit on `.hv2-root`'s own white. */
+.hv2-topbg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    z-index: -1;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: var(--hv2-bg);
+    border-top-left-radius: var(--hv2-r-xxxll);
+    border-top-right-radius: var(--hv2-r-xxxll);
+    pointer-events: none;
 }
 
 /* The global stylesheet uppercases and letter-spaces every text node on the
@@ -218,14 +254,22 @@
 .hv2-s-projects {
     min-height: calc(var(--hv2-section) + 1084px);
     --hv2-row-gap: 24px;
+    /* Pulled well below the shared --hv2-section rhythm (120px) — the search
+       card and this section read as one flow rather than separate blocks. */
+    padding-top: 40px;
 }
 
 .hv2-s-partners {
     min-height: calc(var(--hv2-section) + 292px);
+    /* Same pulled-in rhythm as Projects — well below the shared 120px. */
+    padding-top: 40px;
 }
 
 .hv2-s-inventory {
     min-height: calc(var(--hv2-section) + 648px);
+    /* Pulled in to match Partners' own reduced padding-top above it, so the
+       gap below Partners matches the one above it. */
+    padding-top: 40px;
 }
 
 .hv2-s-team {
@@ -251,6 +295,12 @@
     justify-content: space-between;
     gap: 32px;
     margin-bottom: var(--hv2-flow);
+}
+
+/* Projects only: the heading sits right on top of the cards, not the shared
+   --hv2-flow gap every other section uses below its own head. */
+.hv2-s-projects .hv2-section-head {
+    margin-bottom: 8px;
 }
 
 /* Section heading — Oak Sans Medium 32 / 40, letter-spacing 0.25. */
@@ -279,43 +329,48 @@
    NAVBAR
    ========================================================================= */
 
-/* Header — Figma 192:1637, a floating 1344x90 card at top 20, radius XXL.
-   The strip itself has to stay transparent. It used to be painted --hv2-bg,
-   which put an opaque bar right behind the card, so the card's backdrop-filter
-   had nothing but flat colour to work on and the header never read as glass.
-   With it transparent the page scrolls under the card and the blur bites. */
+/* Header — Figma 192:1637 started life as a floating 1344x90 card, but the
+   reference for the real behaviour is kristal.az: a full-bleed bar that rides
+   transparent over the hero, then turns solid white edge-to-edge once the
+   page has moved past 10px (a JS scroll listener flips `.hv2-nav--scrolled`
+   the same way, see NavbarV2). The strip itself stays transparent so the
+   toggle lives entirely on `.hv2-nav__inner`. */
 .hv2-nav {
     position: sticky;
     top: 0;
     z-index: 40;
-    padding-top: 20px;
     background: transparent;
 }
 
-/* Padding 20/32 around a 48px action row is what makes the 90: the height is
-   not set, it falls out of the tallest child.
-   Figma gives this fill as a flat rgba(253,253,253,0.8) and exports no blur
-   effect, but 80% white alone leaves scrolled content legible through the
-   header. The blur is ours, and the -webkit- prefix is not optional: Safari
-   still ships backdrop-filter prefixed. */
+/* Two layers. `.hv2-nav__bar` is the full-bleed fill — it runs edge to edge
+   so the white-on-scroll background matches kristal's, with nothing left for
+   a backdrop blur to soften once it is fully opaque. `.hv2-nav__inner` sits
+   inside wearing `.hv2-shell` too (see NavbarV2), so the logo and action row
+   line up with wherever every other section's content starts instead of
+   hugging the true viewport edge — only the fill goes full width, not the
+   content. Both states share the bar's one transition so the swap fades
+   rather than snaps; border and fill are held at zero until
+   `.hv2-nav--scrolled` turns them on. */
+.hv2-nav__bar {
+    width: 100%;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hv2-nav--scrolled .hv2-nav__bar {
+    border-bottom-color: var(--hv2-pcard-line);
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
 .hv2-nav__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    padding: 20px 32px;
-    border: 1px solid var(--hv2-pcard-line);
-    border-radius: var(--hv2-r-xxl);
-    background: rgba(253, 253, 253, 0.8);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-}
-
-/* Without blur support the fill has to carry legibility on its own. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .hv2-nav__inner {
-        background: rgba(255, 255, 255, 0.94);
-    }
+    padding-top: 22px;
+    padding-bottom: 22px;
 }
 
 .hv2-nav__logo {
@@ -426,13 +481,17 @@
    HERO
    ========================================================================= */
 
-/* Hero block: 568 tall, 40px below the 90px header at top 20. The left card is
-   432 wide — the intrinsic size of va.svg, which is the whole card artwork. */
+/* Hero block: 568 tall. The left card started at 432 — the intrinsic size of
+   va.svg, the card's own artwork — widened a bit past that since the card
+   reads fine beyond its source art's native size (cover/center on the
+   background absorbs the extra). No gap to the header at all now — the bar's
+   own vertical padding carries the breathing room instead, so the hero
+   content sits flush under it. */
 .hv2-hero {
     display: grid;
-    grid-template-columns: minmax(0, 432px) minmax(0, 1fr);
-    gap: 16px;
-    padding-top: 40px;
+    grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+    gap: 24px;
+    padding-top: 0;
 }
 
 /* --- left: credit calculator card --- */
@@ -440,10 +499,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 568px;
-    /* Horizontal padding is 16 so the CTA lands at its Figma 400x52 (432 - 32);
-       the two text layers add 4px of their own to sit at Left 20. */
-    padding: 28px 16px 16px;
+    min-height: 620px;
+    /* Horizontal padding doubled from Figma's 16 — the title, subtitle and CTA
+       all read as too close to the card's edge at the card's current (wider
+       than source) width. Bottom matches the sides so the CTA sits as far
+       from the card's floor as it does from either wall. */
+    padding: 28px 32px 32px;
     border-radius: var(--hv2-r-xxl);
     /* va.svg is the ENTIRE card flattened — surface, VA render, heading, subtitle
        and button all baked in — so using it whole double-prints every label over
@@ -522,6 +583,14 @@
        80% wash over the footage. */
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+    /* `.hv2-heroimg`'s own overflow:hidden should clip this to its rounded
+       corners on its own, but a backdrop-filter child is composited on its own
+       layer and some browsers paint that layer past the ancestor's radius
+       clip — the bar's square corners then poke out past the curve at the
+       bottom of the card. Rounding the bar's own bottom corners to match
+       fixes it regardless of whether that clipping bug is in play. */
+    border-bottom-left-radius: var(--hv2-r-xxl);
+    border-bottom-right-radius: var(--hv2-r-xxl);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -545,13 +614,15 @@
    SEARCH PANEL
    ========================================================================= */
 
-/* Calculator block: 1344x411, radius XL, 1px border, 120px below the hero. */
+/* Calculator block: 1344x411, radius XL, 1px border. Pulled up closer to the
+   hero than the shared --hv2-section rhythm (120px) — the two read as one
+   flow rather than separate sections. */
 .hv2-search {
     display: flex;
     flex-direction: column;
     /* Figma reads 411 Hug — the content sets the height. Forcing it as a
        min-height stretched the body and left dead space above the footer. */
-    margin-top: var(--hv2-section);
+    margin-top: 28px;
     border: 1px solid var(--hv2-line);
     border-radius: var(--hv2-r-xl);
     background: var(--hv2-surface);
@@ -775,33 +846,35 @@
     color: var(--hv2-on-dark);
 }
 
-/* Color/Skeleton/Default */
+/* Dark action bar, filled with the same `--hv2-brand` the calculator's
+   "Kredit şərtlərinə bax" pill uses (`.hv2-pill--dark`) — the two dark fills
+   on this page match. The count reads as a quiet status line, and the button
+   stays a white pill so it's the one thing that pops against it. */
 .hv2-search__foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 14px 22px;
-    background: var(--hv2-skeleton);
+    padding: 14px 32px;
+    background: var(--hv2-brand);
     /* -1px for the card's own border, so the fill meets the rounded edge. */
     border-radius: 0 0 calc(var(--hv2-r-xl) - 1px) calc(var(--hv2-r-xl) - 1px);
 }
 
 .hv2-search__count {
     font-size: 12.5px;
-    color: var(--hv2-ink-60);
+    color: rgba(255, 255, 255, 0.64);
 }
 
-/* Search button — Border/Inverse 1.5px, Background/Brand/Default,
-   Text/Inverse/Primary. The border is what separates it from the skeleton bar. */
+/* Search button — a white pill so it pops against the dark bar. */
 .hv2-search__cta {
-    border: 1.5px solid var(--hv2-border-inverse);
-    background: var(--hv2-brand);
-    color: #ffffff;
+    border: 1.5px solid transparent;
+    background: #ffffff;
+    color: var(--hv2-brand);
 }
 
 .hv2-search__cta:hover {
-    background: var(--hv2-ink-2);
+    background: var(--hv2-muted-2);
 }
 
 /* =========================================================================
@@ -1878,7 +1951,7 @@
     }
 
     .hv2-hero {
-        grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
     }
 
     .hv2-mega {
@@ -1892,7 +1965,7 @@
     }
 
     .hv2-calc {
-        min-height: 380px;
+        min-height: 420px;
     }
 
     .hv2-heroimg {
@@ -1952,14 +2025,12 @@
         --hv2-flow: 40px;
     }
 
-    .hv2-nav {
-        padding-top: 12px;
-    }
-
-    /* Header drops to 64: 12 + a 40 burger + 12. */
+    /* Horizontal padding still rides on `.hv2-shell` (--hv2-pad, 16px here),
+       only the vertical number here. */
     .hv2-nav__inner {
         gap: 16px;
-        padding: 12px 20px;
+        padding-top: 18px;
+        padding-bottom: 18px;
     }
 
     /* Only the logo and the burger survive; the design hides the rest behind it. */
@@ -2072,11 +2143,7 @@
     }
 
     .hv2-hero {
-        padding-top: 24px;
-    }
-
-    .hv2-nav__inner {
-        padding: 12px 16px;
+        padding-top: 0;
     }
 
     /* Keep the phone and Cabinet buttons; drop the secondary icon actions. The
@@ -2346,8 +2413,8 @@
        plate is composed for 432 and its baked-in render slides straight under
        the live heading once the card narrows — that was the overlap. */
     .hv2-calc {
-        min-height: 472px;
-        padding: 24px 20px 20px;
+        min-height: 510px;
+        padding: 24px 40px 40px;
         background-image: url("/images/figma/calc-art-mobile.jpg");
         background-position: center bottom;
     }

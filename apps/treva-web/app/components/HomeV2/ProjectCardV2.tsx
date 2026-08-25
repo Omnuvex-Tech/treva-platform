@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -61,25 +61,44 @@ export default function ProjectCardV2({ item, locale, startingFromLabel }: Props
   const [armed, setArmed] = useState(false);
   const [playing, setPlaying] = useState(false);
 
+  // The CMS slot takes a GIF just as happily as a clip, and a GIF is an <img>,
+  // not a <video>. The extension is the only thing that separates them.
+  const media = item.video ?? "";
+  const isGif = /\.gif(\?.*)?$/i.test(media);
+  const mediaType = /\.webm(\?.*)?$/i.test(media) ? "video/webm" : "video/mp4";
+
   const start = useCallback(() => {
-    if (!item.video) return;
+    if (!media) return;
 
     // Honour the OS "reduce motion" setting — no auto-playing footage there.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
     setArmed(true);
     setPlaying(true);
-    // play() rejects if the browser blocks it; fall back to the still image.
-    videoRef.current?.play().catch(() => setPlaying(false));
-  }, [item.video]);
+  }, [media]);
 
   const stop = useCallback(() => {
     setPlaying(false);
+    // A GIF cannot be paused, so it is unmounted instead — which also means the
+    // next hover replays it from the first frame rather than mid-loop.
+    if (isGif) {
+      setArmed(false);
+      return;
+    }
     const video = videoRef.current;
     if (!video) return;
     video.pause();
     video.currentTime = 0;
-  }, []);
+  }, [isGif]);
+
+  // Playback waits for the element: the <video> only mounts once `armed` flips,
+  // so calling play() inside the hover handler would hit a ref that is still
+  // null on the very first hover. play() rejects if the browser blocks it —
+  // then the card just keeps the still cover.
+  useEffect(() => {
+    if (!playing || isGif) return;
+    videoRef.current?.play().catch(() => setPlaying(false));
+  }, [playing, isGif]);
 
   return (
     <Link
@@ -143,19 +162,32 @@ export default function ProjectCardV2({ item, locale, startingFromLabel }: Props
         />
       </div>
 
-      {item.video && armed ? (
-        <video
-          ref={videoRef}
-          className="hv2-pcard__video"
-          data-playing={playing ? "true" : "false"}
-          muted
-          loop
-          playsInline
-          preload="none"
-          aria-hidden="true"
-        >
-          <source src={item.video} type="video/mp4" />
-        </video>
+      {media && armed ? (
+        isGif ? (
+          // next/image freezes an animated GIF into a single frame, so the file
+          // is served raw here.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="hv2-pcard__video"
+            data-playing={playing ? "true" : "false"}
+            src={media}
+            alt=""
+            aria-hidden="true"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            className="hv2-pcard__video"
+            data-playing={playing ? "true" : "false"}
+            muted
+            loop
+            playsInline
+            preload="none"
+            aria-hidden="true"
+          >
+            <source src={media} type={mediaType} />
+          </video>
+        )
       ) : null}
     </Link>
   );
