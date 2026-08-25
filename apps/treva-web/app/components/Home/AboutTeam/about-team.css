@@ -2,6 +2,13 @@
     --color-team-accent: #000;
     --color-team-text: #242424;
     --color-white: #ffffff;
+    /* Navbar-dakı "kabinet" düyməsi ilə eyni boz pill (navbar.css:
+       --treva-pill-bg / --treva-pill-hover-bg / --treva-pill-pressed-bg).
+       Dəyərlər burada təkrarlanır, çünki navbar.css bu bölmə ilə həmişə
+       birlikdə yüklənmir. */
+    --color-team-pill: #3F4249;
+    --color-team-pill-hover: #2F3134;
+    --color-team-pill-pressed: #000000;
     /* next/font şrifti hash-lənmiş adla qeydiyyata alır və onu yalnız
      --font-inter dəyişəni ilə çağırmaq olar. Düz 'Inter' yazılanda brauzer
      sistemdə belə şrift axtarır, tapmır və Arial-a düşürdü. */
@@ -85,24 +92,35 @@
     min-width: 0;
 }
 
+/* "Daha çox" və "Daha az" yarı açıq vəziyyətdə eyni anda görünür. */
+.about-team__more-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
 .about-team__more {
     font-family: var(--font-family);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--color-team-accent);
-    background: transparent;
-    border: 1px solid var(--color-team-accent);
+    color: var(--color-white);
+    background: var(--color-team-pill);
+    border: none;
     border-radius: 999px;
     padding: 12px 32px;
     cursor: pointer;
-    transition: background 200ms ease, color 200ms ease;
+    transition: background 180ms ease, color 180ms ease;
 }
 
 .about-team__more:hover {
-    background: var(--color-team-accent);
-    color: var(--color-white);
+    background: var(--color-team-pill-hover);
+}
+
+.about-team__more:active {
+    background: var(--color-team-pill-pressed);
 }
 
 .about-team__card {

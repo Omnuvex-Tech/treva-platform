@@ -228,6 +228,14 @@ export class CreateApartmentDto {
   @IsNotEmpty()
   apartmentTypeId: string;
 
+  @ApiPropertyOptional({
+    example: 'category-id',
+    description: 'Off-plan object (project) this listing belongs to',
+  })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
   @ApiPropertyOptional({ example: 'owner-id' })
   @IsOptional()
   @IsString()

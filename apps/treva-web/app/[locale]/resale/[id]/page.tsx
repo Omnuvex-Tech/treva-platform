@@ -15,6 +15,36 @@ import { useResaleApartmentBySlug } from '@/hooks/use-resale-apartments';
 import { isSaved as isSavedProp, addSaved, removeSaved } from '@/lib/saved-properties';
 import './resale-detail.css';
 
+async function copyToClipboard(text: string): Promise<boolean> {
+  // navigator.clipboard yalnız secure context-də (https və ya localhost) mövcuddur.
+  // Şəbəkə IP-si üzərindən açılan http səhifədə undefined olur və köhnə kod
+  // orada səssizcə TypeError atırdı.
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // İcazə verilmədi — aşağıdakı fallback-ə keçirik.
+    }
+  }
+
+  try {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(textarea);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 function toGoogleMapsEmbed(url: string): string {
   if (!url) return '';
 
@@ -49,6 +79,9 @@ function toGoogleMapsEmbed(url: string): string {
 
   return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
 }
+
+/** Detal səhifəsində valyuta seçimi yoxdur — qiymət manatla göstərilir. */
+const DEFAULT_CURRENCY = 'AZN';
 
 /**
  * Yüklənmə və "tapılmadı" mətnləri.
@@ -227,17 +260,27 @@ export default function ResaleDetailPage() {
   const extraCount = Math.max(0, gallery.length - 5);
   const formatPrice = (p: number) => p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
+  /**
+   * Mənzilin qiyməti bir neçə valyutada saxlanıla bilər. Siyahı səhifəsində
+   * valyutanı filtr seçir, detal səhifəsində isə belə seçim yoxdur — əvvəl
+   * sadəcə `prices[0]` götürülürdü və məsələn EUR birinci sırada olanda
+   * azərbaycanlı istifadəçiyə qiymət avro ilə görünürdü. İndi AZN varsa o
+   * seçilir, yoxdursa ilk mövcud valyutaya keçilir.
+   */
+  const selectedPrice =
+    apartment.prices?.find(p => p.currency?.value === DEFAULT_CURRENCY) ??
+    apartment.prices?.[0];
+
   const getPrice = (type: 'total' | 'byArea') => {
-    if (apartment.prices?.length) {
-      return type === 'total' ? (apartment.prices[0]?.priceTotal ?? 0) : (apartment.prices[0]?.priceByArea ?? 0);
+    if (selectedPrice) {
+      return type === 'total' ? (selectedPrice.priceTotal ?? 0) : (selectedPrice.priceByArea ?? 0);
     }
     return type === 'total' ? apartment.priceTotal : apartment.priceByArea;
   };
 
-  const getCurrencyValue = () => {
-    if (apartment.prices?.[0]?.currency?.value) return apartment.prices[0].currency.value;
-    return 'AZN';
-  };
+  // Qiymət və valyuta eyni sətirdən götürülür — ayrı-ayrı seçilsəydi rəqəm bir
+  // valyutadan, işarə başqasından gələ bilərdi.
+  const getCurrencyValue = () => selectedPrice?.currency?.value ?? DEFAULT_CURRENCY;
 
   const floorLabel = (() => {
     const from = apartment.floorFrom ?? 0;
@@ -265,6 +308,8 @@ export default function ResaleDetailPage() {
         `${rooms} OTAQLI MƏNZİL, ${area} M², ${floor}-Cİ MƏRTƏBƏ`,
       shareIntro: 'Bu mənzilə baxın:',
       shareLocation: 'Ünvan:',
+      owner: 'Mülkiyyətçi',
+      viewPhone: 'Nömrəni göstər',
     },
     en: {
       loading: 'Loading...',
@@ -280,6 +325,8 @@ export default function ResaleDetailPage() {
         `${rooms}-ROOM FLAT, ${area} M², ${floor} FLOOR`,
       shareIntro: 'Check out this apartment:',
       shareLocation: 'Location:',
+      owner: 'Owner',
+      viewPhone: 'View phone number',
     },
     ru: {
       loading: 'Загрузка...',
@@ -295,6 +342,8 @@ export default function ResaleDetailPage() {
         `${rooms}-КОМНАТНАЯ КВАРТИРА, ${area} М², ${floor} ЭТАЖ`,
       shareIntro: 'Посмотрите эту квартиру:',
       shareLocation: 'Адрес:',
+      owner: 'Собственник',
+      viewPhone: 'Показать номер',
     },
   } as const;
   const pt = pageDictionary[(locale as 'az' | 'en' | 'ru')] || pageDictionary.az;
@@ -363,11 +412,17 @@ export default function ResaleDetailPage() {
         window.open(`https://t.me/share/url?url=${encodedUrl}&text=${text}`, '_blank');
         break;
       case 'copy':
-        navigator.clipboard.writeText(locationLink ? `${url}\n📍 ${locationLink}` : url).then(() => {
+        // Dropdown açıq saxlanılır: "Kopyalandı!" yazısı yalnız onun içində
+        // görünür, dərhal bağlansaydı istifadəçi heç bir təsdiq görməzdi.
+        copyToClipboard(url).then((ok) => {
+          if (!ok) return;
           setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
+          setTimeout(() => {
+            setCopied(false);
+            setShareOpen(false);
+          }, 2000);
         });
-        break;
+        return;
       case 'native':
         if (navigator.share) {
           navigator.share({ title: shareTitle, text: shareText, url });
@@ -566,9 +621,9 @@ export default function ResaleDetailPage() {
                     </div>
                     <div className="pdet-agent-info">
                       <h3 className="pdet-agent-name">
-                        {apartment.owner ? `${apartment.owner.firstName} ${apartment.owner.lastName}` : 'Owner'}
+                        {apartment.owner ? `${apartment.owner.firstName} ${apartment.owner.lastName}` : pt.owner}
                       </h3>
-                      <span className="pdet-agent-role">{apartment.owner?.profession || 'Owner'}</span>
+                      <span className="pdet-agent-role">{apartment.owner?.profession || pt.owner}</span>
                     </div>
                   </div>
 
@@ -581,7 +636,7 @@ export default function ResaleDetailPage() {
                       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                       </svg>
-                      <span>{showPhone ? (apartment.owner?.phoneNumber || '—') : 'View phone number'}</span>
+                      <span>{showPhone ? (apartment.owner?.phoneNumber || '—') : pt.viewPhone}</span>
                     </button>
 
                     <a

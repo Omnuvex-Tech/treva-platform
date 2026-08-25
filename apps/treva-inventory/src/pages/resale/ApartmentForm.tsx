@@ -5,6 +5,7 @@ import { apartmentsApi, CreateApartmentData, type ApartmentFurnishing, type Apar
 import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
+import { categoriesApi, type Category } from "../../api/categories";
 import { currenciesApi } from "../../api/currencies";
 import { locationOptionsApi, type LocationOption } from "../../api/location-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
@@ -333,6 +334,12 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         queryFn: () => attributesApi.getAll(),
     });
 
+    // Projects are the same off-plan objects used on the off-plan side.
+    const { data: projects } = useQuery({
+        queryKey: ["categories", "object"],
+        queryFn: () => categoriesApi.getAll("object"),
+    });
+
     const { data: currencies } = useQuery({
         queryKey: ["currencies"],
         queryFn: () => currenciesApi.getAll(),
@@ -456,6 +463,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         furnishing: undefined,
         ceilingHeight: undefined as unknown as number,
         apartmentTypeId: "",
+        categoryId: "",
         ownerId: "",
         attributeIds: [],
         requestIds: [],
@@ -501,6 +509,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 furnishing: d.furnishing || undefined,
                 ceilingHeight: d.ceilingHeight ?? undefined,
                 apartmentTypeId: d.apartmentTypeId || "",
+                categoryId: d.categoryId || "",
                 ownerId: d.ownerId || "",
                 attributeIds: d.attributeIds || [],
                 requestIds: d.requestIds || [],
@@ -637,6 +646,8 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
             locationUrl: normalizeOptionalText(form.locationUrl),
             locationGoogleMapsUrl: normalizeOptionalText(form.locationGoogleMapsUrl),
             ownerId: normalizeOptionalText(form.ownerId),
+            // Send null rather than undefined so clearing the project persists.
+            categoryId: normalizeOptionalText(form.categoryId ?? undefined) ?? null,
             heatingTypeIds: [],
             prices: (form.prices || []).map((p: any) => ({
                 currencyId: p.currencyId,
@@ -844,6 +855,11 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         const files = e.dataTransfer.files;
         if (files && files.length > 0) handleGalleryUpload(files);
     };
+
+    const projectOptions = useMemo(() => {
+        const list = Array.isArray(projects?.data) ? (projects.data as Category[]) : [];
+        return list.map((project) => ({ id: project.id, label: project.title }));
+    }, [projects?.data]);
 
     const locationOptionItems = Array.isArray(locationOptions?.data) ? locationOptions.data : [];
     const toLocationDropdownOptions = (type: "region" | "city", selectedValue?: string, cityTitle?: string) => {
@@ -1077,6 +1093,15 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                             onChange={(id) => updateField("ownerId", id)}
                                             createLabel="Create Owner"
                                             onCreateClick={() => setIsOwnerModalOpen(true)}
+                                        />
+                                    </div>
+                                    <div className="grid gap-4 lg:grid-cols-2">
+                                        <CustomSelect
+                                            label="Project"
+                                            value={form.categoryId || ""}
+                                            options={projectOptions}
+                                            placeholder="Select project (optional)"
+                                            onChange={(id) => updateField("categoryId", id)}
                                         />
                                     </div>
                                     <div className="grid gap-4 lg:grid-cols-2">

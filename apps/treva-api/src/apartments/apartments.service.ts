@@ -13,6 +13,7 @@ import { UpdateApartmentDto } from './dto/update-apartment.dto';
 
 const APARTMENT_INCLUDE = {
   apartmentType: true,
+  category: true,
   owner: true,
   prices: { include: { currency: true } },
 };
@@ -22,6 +23,16 @@ const normalizeOptionalString = (value?: string | null) => {
   if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
+};
+
+// Unlike normalizeOptionalString, an explicit empty value clears the relation
+// instead of leaving it untouched.
+const normalizeNullableId = (value?: string | null) => {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 };
 
 const isValidResaleFloor = (value: number) =>
@@ -49,8 +60,17 @@ export class ApartmentsService {
       locationUrl: normalizeOptionalString(dto.locationUrl),
       locationGoogleMapsUrl: normalizeOptionalString(dto.locationGoogleMapsUrl),
       ownerId: normalizeOptionalString(dto.ownerId),
+      categoryId: normalizeNullableId(dto.categoryId),
       archived: dto.archived,
     };
+  }
+
+  private async assertCategoryExists(categoryId?: string | null) {
+    if (!categoryId) return;
+    const category = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+    if (!category) throw new BadRequestException('Project not found');
   }
 
   private async attachOptionRelations<T extends { heatingTypeIds: string[] }>(
@@ -129,6 +149,7 @@ export class ApartmentsService {
   async create(dto: CreateApartmentDto) {
     const normalizedDto = this.normalizeApartmentDto(dto);
     this.validateFloorRange(normalizedDto.floorFrom, normalizedDto.floorTo);
+    await this.assertCategoryExists(normalizedDto.categoryId);
 
     const existing = await this.prisma.apartment.findUnique({
       where: { slug: normalizedDto.slug },
@@ -165,6 +186,7 @@ export class ApartmentsService {
     page?: number;
     limit?: number;
     apartmentTypeId?: string;
+    categoryId?: string;
     city?: string;
     region?: string;
     purpose?: string;
@@ -187,6 +209,7 @@ export class ApartmentsService {
       page = 1,
       limit = 12,
       apartmentTypeId,
+      categoryId,
       city,
       region,
       purpose,
@@ -211,6 +234,7 @@ export class ApartmentsService {
 
     const where: any = {};
     if (apartmentTypeId) where.apartmentTypeId = apartmentTypeId;
+    if (categoryId) where.categoryId = categoryId;
     if (city) where.city = city;
     if (region) where.region = region;
     if (purpose) where.purpose = purpose;
@@ -322,6 +346,7 @@ export class ApartmentsService {
       normalizedDto.floorFrom ?? apartment.floorFrom,
       normalizedDto.floorTo ?? apartment.floorTo,
     );
+    await this.assertCategoryExists(normalizedDto.categoryId);
 
     if (normalizedDto.slug && normalizedDto.slug !== apartment.slug) {
       const existing = await this.prisma.apartment.findUnique({
