@@ -3133,16 +3133,12 @@ a.hv2-ct__entryvalue:hover {
         transition: background 0.18s ease;
     }
 
-    /* Nav rows only. Without the exclusion this also caught the action pills
-       at the foot of the sheet — it is (0,2,1) and outranked
-       `.hv2-nav__btn--brand:hover` at (0,2,0), so Cabinet hovered to a light
-       grey under its own white label instead of going dark. */
-    .hv2-nav__mobile a:not(.hv2-nav__btn):hover {
-        background: var(--hv2-selected);
-    }
-
-    /* "Projects" is a disclosure here, so it is a button carrying the same row
-       styling as its sibling links, plus the 16-box chevron. */
+    /* No hover fill on the nav rows: Figma 783:23815 carries a 20 radius token
+       but no background, and the grey pill it produced read as a rounded block
+       sitting behind the heading — especially on the two disclosures, which
+       keep it while the pointer rests after a tap. The sublist cards below are
+       a different case: those are filled by design, so their hover shade
+       stays. */
     .hv2-nav__disclosure {
         display: flex;
         width: 100%;
@@ -3160,10 +3156,6 @@ a.hv2-ct__entryvalue:hover {
         color: var(--hv2-ink);
         text-align: left;
         cursor: pointer;
-    }
-
-    .hv2-nav__disclosure:hover {
-        background: var(--hv2-selected);
     }
 
     /* The glyph is a 7.67x3.67 leaf centred in a 16 box — stretching it to fill
@@ -3229,12 +3221,11 @@ a.hv2-ct__entryvalue:hover {
     /* Off-Plan/Resale have no thumbnail to set their height, so they would
        come out 36 against the project rows' 42 (Figma's 40 plus the 1px
        border on each edge, which Figma draws inside the frame and CSS cannot).
-       `min-height` holds the two dropdowns to one row rhythm; the padding-left
-       lines their labels up with the project titles, which start after a 24
-       thumb + 8 gap. */
+       `min-height` holds the two dropdowns to one row rhythm. The label starts
+       at the row's own 8px padding — there is no thumb here, so indenting it
+       to line up with the project titles just left an empty column. */
     .hv2-nav__mobile .hv2-nav__sublist--text a {
         min-height: 42px;
-        padding-left: 40px;
     }
 
     .hv2-nav__subthumb {
