@@ -53,6 +53,32 @@ body {
     pointer-events: auto;
 }
 
+/* The TREVA Assistant webchat (salesagent.treva.realestate/webchat/widget.js)
+   appends its own host div to <body> and builds the UI inside an open shadow
+   root, so the launcher is a SIBLING of <main>, not part of the page tree.
+
+   `.hv2-root` sets `isolation: isolate`, which forces a stacking context: every
+   z-index inside V2 — including `.hv2-nav`'s 40, which carries the open mobile
+   sheet — is sealed inside it and means nothing out here. `.hv2-root` itself is
+   z-index: auto, so it loses to any positive z-index on the host, which is why
+   the launcher painted over the sheet.
+
+   The fix is to make the two siblings comparable for as long as the sheet is
+   open: give `.hv2-root` a positive z-index and pin the host just below it.
+   The sheet is conditionally rendered, so :has() only matches while it is on
+   screen — the launcher keeps its normal stacking everywhere else.
+
+   !important on the host: the widget writes `all: initial` inline on it, which
+   would otherwise beat these declarations. */
+body:has(.hv2-nav__mobile) .hv2-root {
+    z-index: 2;
+}
+
+body:has(.hv2-nav__mobile) #treva-webchat-root {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
 /* GLOBAL FIX: Prevent clipping of Azerbaijani/Turkish characters (Ş, İ, Ö, Ç, Ğ, Ü, Q)
    and enforce absolute vertical centering for all button slide hover animations. */
 
