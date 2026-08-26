@@ -46,9 +46,9 @@ export default function NavbarV2({ locale }: Props) {
   const [inv, setInv] = useState(false);
   const [lang, setLang] = useState(false);
   const [sub, setSub] = useState(false);
-  const [mobileLangOpen, setMobileLangOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
+  const langRefMobile = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const invItemRef = useRef<HTMLDivElement>(null);
   // 22px is only the fallback for the first paint, before the effect below
@@ -74,6 +74,7 @@ export default function NavbarV2({ locale }: Props) {
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target as Node;
       if (langRef.current?.contains(target)) return;
+      if (langRefMobile.current?.contains(target)) return;
       setLang(false);
     };
     document.addEventListener("mousedown", onPointerDown);
@@ -113,14 +114,13 @@ export default function NavbarV2({ locale }: Props) {
   };
 
   const otherLanguages = LANGUAGES.filter((l) => l.code !== locale);
-  const currentLanguage = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
 
   return (
     /* The mega-menu closes on leaving the whole header, not the link, so the
        pointer can travel from "Projects" down into the panel without it
        vanishing on the way. */
     <header
-      className={`hv2-nav${scrolled ? " hv2-nav--scrolled" : ""}`}
+      className={`hv2-nav${scrolled ? " hv2-nav--scrolled" : ""}${open ? " hv2-nav--menu" : ""}`}
       onMouseLeave={() => {
         setMega(false);
         setInv(false);
@@ -364,59 +364,6 @@ export default function NavbarV2({ locale }: Props) {
                 </li>
               )
             )}
-
-            {/* The globe icon + floating popover works in the header bar, but
-                cramped into the mobile sheet's action row it had no room for
-                a label and its popover either mis-positioned (see the
-                header-row leak above) or read as disconnected from the
-                button. A disclosure row — same pattern as "Projects" above —
-                fits the sheet's own language instead of borrowing the
-                desktop one. */}
-            <li>
-              <button
-                type="button"
-                className="hv2-nav__disclosure"
-                aria-label="Language"
-                aria-expanded={mobileLangOpen}
-                onClick={() => setMobileLangOpen((v) => !v)}
-              >
-                <span className="hv2-nav__lang-flag" aria-hidden="true">
-                  <Image src={currentLanguage.flag} alt="" width={24} height={24} unoptimized />
-                </span>
-                {currentLanguage.name}
-                <span className="hv2-nav__chev" aria-hidden="true">
-                  <Image
-                    src="/images/icons/chevron-down.svg"
-                    alt=""
-                    width={8}
-                    height={4}
-                    style={{ width: "7.67px", height: "3.67px" }}
-                    unoptimized
-                  />
-                </span>
-              </button>
-
-              {mobileLangOpen ? (
-                <ul className="hv2-nav__sublist hv2-nav__sublist--lang">
-                  {otherLanguages.map((l) => (
-                    <li key={l.code}>
-                      <Link
-                        href={langHref(l.code)}
-                        onClick={() => {
-                          setMobileLangOpen(false);
-                          setOpen(false);
-                        }}
-                      >
-                        <span className="hv2-nav__lang-flag" aria-hidden="true">
-                          <Image src={l.flag} alt="" width={24} height={24} unoptimized />
-                        </span>
-                        {l.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </li>
           </ul>
 
           <div className="hv2-nav__mobile-actions">
@@ -432,10 +379,7 @@ export default function NavbarV2({ locale }: Props) {
               *2662
             </a>
 
-            {/* Language now has its own disclosure row up in the nav list —
-                see the "Dil" `<li>` above — so it drops out of this row
-                entirely rather than repeating the header's icon+popover. */}
-            {ACTIONS.filter(({ key }) => key !== "language").map(({ key, src, size, label, href: to }) => {
+            {ACTIONS.map(({ key, src, size, label, href: to }) => {
               const glyph = (
                 <Image
                   src={src}
@@ -447,6 +391,44 @@ export default function NavbarV2({ locale }: Props) {
                   unoptimized
                 />
               );
+
+              if (key === "language") {
+                return (
+                  <div key={key} className="hv2-nav__item" ref={langRefMobile}>
+                    <button
+                      type="button"
+                      className="hv2-nav__btn hv2-nav__btn--icon"
+                      aria-label={label}
+                      aria-haspopup="listbox"
+                      aria-expanded={lang}
+                      onClick={() => setLang((v) => !v)}
+                    >
+                      {glyph}
+                    </button>
+
+                    {lang ? (
+                      <div className="hv2-nav__popover hv2-nav__popover--lang" role="listbox">
+                        {otherLanguages.map((l) => (
+                          <Link
+                            key={l.code}
+                            href={langHref(l.code)}
+                            role="option"
+                            onClick={() => {
+                              setLang(false);
+                              setOpen(false);
+                            }}
+                          >
+                            <span className="hv2-nav__lang-flag" aria-hidden="true">
+                              <Image src={l.flag} alt="" width={24} height={24} unoptimized />
+                            </span>
+                            {l.name}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              }
 
               return to ? (
                 <Link
