@@ -3234,13 +3234,40 @@ a.hv2-ct__entryvalue:hover {
         flex: 0 0 auto;
     }
 
-    /* The language card opens off this row's `bottom` instead of the header's
-       `top` — same resting gap as the desktop popover, just flipped, because
-       opening downward from here would run the list off the bottom of the
-       screen (Figma 783:23885 places it directly above the row too). */
+    /* Figma 783:23806 measures this card at x=233 w=126, sitting 4px above the
+       action row at y=700 — i.e. flush with the globe button's own LEFT edge
+       (that button starts at 233 too) and sized to its rows, not the desktop
+       panel's right-aligned 180. It opens off `bottom` rather than the
+       header's `top` because opening downward from the foot of the sheet
+       would run the list off the screen. `max-width` is the one thing Figma
+       has no case for: at 386 the card clears the frame easily, but on a
+       narrow phone the action row wraps and the globe can land closer to the
+       right edge, so the card is kept inside the sheet's gutter. */
     .hv2-nav__mobile-actions .hv2-nav__popover--lang {
         top: auto;
-        bottom: calc(100% + 12px);
+        bottom: calc(100% + 4px);
+        left: 0;
+        right: auto;
+        min-width: 0;
+        max-width: calc(100vw - var(--hv2-pad) * 2);
+    }
+
+    /* `.hv2-nav__mobile a` (block, 8px padding, 20px radius) sits later in
+       this file than `.hv2-nav__popover--lang a` and carries the same
+       specificity, so it was winning and rendering these as 47-tall inline
+       rows — the card came out 130 instead of Figma's 84. Restore the card's
+       own row box: a plain 24-tall flex row, flag + 8 + label, no padding or
+       fill of its own, exactly as 783:23806 draws it. */
+    .hv2-nav__mobile-actions .hv2-nav__popover--lang a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .hv2-nav__mobile-actions .hv2-nav__popover--lang a:hover {
+        background: transparent;
     }
 
     .hv2-nav__mobile-actions .hv2-nav__btn,
