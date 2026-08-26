@@ -517,26 +517,32 @@
 }
 
 /* The language switcher sits near the header's right edge, so its popover
-   hangs from the button's right side instead of its left. Rows otherwise
-   match the plain Inventory popover exactly (no resting fill, hover-only),
-   just with a flag added before the name. */
+   hangs from the button's right side instead of its left. Figma 553:758 gives
+   this variant its own surface (Inverse bg, Secondary Brand border, soft
+   drop-shadow) and spacing rather than sharing the Inventory popover's. */
 .hv2-nav__popover--lang {
     left: auto;
     right: 0;
     min-width: 180px;
+    gap: 12px;
+    padding: 12px;
+    border-color: var(--hv2-pcard-line);
+    background: var(--hv2-inverse-bg);
+    box-shadow: 0 2px 3.5px rgba(0, 0, 0, 0.07);
 }
 
 .hv2-nav__popover--lang a {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    padding: 0;
 }
 
 .hv2-nav__lang-flag {
     display: inline-flex;
     flex: 0 0 auto;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     overflow: hidden;
 }
@@ -587,6 +593,30 @@
     width: 48px;
     padding: 12px;
     color: var(--hv2-ink);
+}
+
+/* Figma 771:23156 — this variant's own hover/pressed fills, darker than the
+   text buttons' light `--hv2-selected`. Most of these glyphs are static SVGs
+   with a baked-in dark stroke, not currentColor, so `filter` flips them to
+   white; the burger's lucide icons *do* use currentColor, so `color` covers
+   those instead. */
+.hv2-nav__btn--icon:hover {
+    background: #71757e;
+    color: #fff;
+}
+
+.hv2-nav__btn--icon:hover img {
+    filter: brightness(0) invert(1);
+}
+
+.hv2-nav__btn--icon:active {
+    background: #373b43;
+    color: #fff;
+    border-width: 2px;
+}
+
+.hv2-nav__btn--icon:active img {
+    filter: brightness(0) invert(1);
 }
 
 .hv2-nav__btn--brand {
@@ -900,8 +930,21 @@
     }
 }
 
+/* The mobile menu's own open animation — a full slide rather than sel-in's
+   4px pop, since it is a full-screen sheet dropping from behind the header
+   and not a small anchored popover. */
+@keyframes hv2-nav-mobile-in {
+    from {
+        transform: translateY(-100%);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .hv2-sel__list {
+        animation: none;
+    }
+
+    .hv2-nav__mobile {
         animation: none;
     }
 }
@@ -2909,6 +2952,16 @@ a.hv2-ct__entryvalue:hover {
         display: none;
     }
 
+    /* The rule above only hides the language *button* — its wrapping item
+       (and, when `lang` is open, its popover) is a sibling, not a child, so
+       it survived and rendered a second, mis-positioned copy of the popover
+       on top of the mobile sheet's own (the actual visible one, opened from
+       the language button down in `.hv2-nav__mobile-actions`). Hide the whole
+       header-row item so only the mobile sheet's copy can ever show. */
+    .hv2-nav__actions > .hv2-nav__item {
+        display: none;
+    }
+
     .hv2-calc__title {
         font-size: 22px;
         line-height: 30px;
@@ -2989,31 +3042,32 @@ a.hv2-ct__entryvalue:hover {
        this width come back along its foot. */
     .hv2-nav__mobile {
         display: block;
-        /* The panel is 386 on a 402 canvas — 8 from each edge, where the shell
-           holds everything else at 16. It reaches past the gutter by that 8 so
-           the action row below has the width the design gives it. */
-        margin-top: 8px;
-        margin-inline: -8px;
-        /* Top padding is 12, not 20. Figma draws the header inside the panel:
-           its foot is at 72, the first row's label at 100 — 28 between them.
-           Here the two are separate cards, so that 28 has to come out of the
-           8 gap, this 12, and the row's own 8 of padding. At 20 it was 36 and
-           the menu read as detached from the header. */
-        padding: 12px 20px 20px;
-        border: 1px solid var(--hv2-pcard-line);
-        border-radius: var(--hv2-r-xxl);
+        /* Fixed full-screen sheet, not a card in the flow: 65px is the bar's
+           own height at this width (12+12 padding around the 40px burger
+           button, plus the 1px border every state reserves, scrolled or not),
+           so the sheet starts flush under the header and reaches the bottom
+           of the screen on its own rather than being sized by its content.
+           Fixed positioning is also what keeps the hero exactly where it is
+           underneath — a normal-flow block would push it down instead. */
+        position: fixed;
+        top: 65px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* Same left/right gutter as every other section (--hv2-pad), not a
+           card's own inset — rows line up with the rest of the page instead
+           of reading as a narrower panel floating inside it. */
+        padding: 20px var(--hv2-pad) 24px;
+        border: 0;
+        border-top: 1px solid var(--hv2-pcard-line);
         background: var(--hv2-surface);
         box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
-        /* The panel outgrows the screen once Projects is unfolded, so it scrolls
-           itself rather than pushing the page. 84 is what sits above it: the
-           nav's 12 of padding, the 64 header and the 8 gap; the rest is breathing
-           room at the bottom. dvh keeps it honest while mobile browser chrome
-           slides in and out, with vh as the fallback for anything older. */
-        max-height: calc(100vh - 100px);
-        max-height: calc(100dvh - 100px);
         overflow-y: auto;
         overscroll-behavior: contain;
         scrollbar-width: thin;
+        /* Drops down from behind the header instead of popping in place —
+           see the reduced-motion override for the no-animation fallback. */
+        animation: hv2-nav-mobile-in 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .hv2-nav__mobile::-webkit-scrollbar {
@@ -3028,6 +3082,7 @@ a.hv2-ct__entryvalue:hover {
     .hv2-nav__mobile ul {
         display: flex;
         flex-direction: column;
+        gap: 4px;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -3095,13 +3150,13 @@ a.hv2-ct__entryvalue:hover {
         rotate: 180deg;
     }
 
-    /* 40px rows, 4 apart: 8 of padding around a 24 thumb. These sit after the
+    /* 40px rows, 6 apart: 8 of padding around a 24 thumb. These sit after the
        plain-link rule above because both are (0,1,1) and order decides. */
     .hv2-nav__sublist {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        margin: 4px 0 0;
+        gap: 6px;
+        margin: 6px 0 0;
         padding: 0;
         list-style: none;
     }
@@ -3126,6 +3181,13 @@ a.hv2-ct__entryvalue:hover {
         background: var(--hv2-selected);
     }
 
+    /* Language rows read as short names ("English"), not project titles, so
+       they get the popover's own 14/20 instead of the sublist's 12/18. */
+    .hv2-nav__mobile .hv2-nav__sublist--lang a {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
     .hv2-nav__subthumb {
         flex: 0 0 auto;
         width: 24px;
@@ -3134,29 +3196,21 @@ a.hv2-ct__entryvalue:hover {
         object-fit: cover;
     }
 
-    /* Figma 783:23754 keeps all five on one row, and it only works because the
-       row is inset 8 from the panel while the nav rows are inset 20. Pulling it
-       back out of the panel's own 20 is what buys the missing 24px — without it
-       Cabinet fell to a second line.
-       The row still cannot fit a phone narrower than the 402 canvas, so it
-       nudges sideways there instead of breaking into two lines. */
+    /* Full width at the sheet's own gutter rather than a breakout: five
+       buttons spread edge to edge with even room between them instead of
+       scrolling sideways past the panel's padding. */
     .hv2-nav__mobile-actions {
         display: flex;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
         gap: 8px;
-        margin: 32px -12px 0;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scrollbar-width: none;
-    }
-
-    .hv2-nav__mobile-actions::-webkit-scrollbar {
-        display: none;
+        width: 100%;
+        margin: 32px 0 0;
     }
 
     .hv2-nav__mobile-actions .hv2-nav__btn {
         flex: 0 0 auto;
-        
     }
 
     .hv2-nav__mobile-actions .hv2-nav__btn,

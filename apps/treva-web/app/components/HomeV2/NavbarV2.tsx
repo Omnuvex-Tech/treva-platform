@@ -46,9 +46,9 @@ export default function NavbarV2({ locale }: Props) {
   const [inv, setInv] = useState(false);
   const [lang, setLang] = useState(false);
   const [sub, setSub] = useState(false);
+  const [mobileLangOpen, setMobileLangOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
-  const langRefMobile = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const invItemRef = useRef<HTMLDivElement>(null);
   // 22px is only the fallback for the first paint, before the effect below
@@ -74,7 +74,6 @@ export default function NavbarV2({ locale }: Props) {
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target as Node;
       if (langRef.current?.contains(target)) return;
-      if (langRefMobile.current?.contains(target)) return;
       setLang(false);
     };
     document.addEventListener("mousedown", onPointerDown);
@@ -114,6 +113,7 @@ export default function NavbarV2({ locale }: Props) {
   };
 
   const otherLanguages = LANGUAGES.filter((l) => l.code !== locale);
+  const currentLanguage = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
 
   return (
     /* The mega-menu closes on leaving the whole header, not the link, so the
@@ -302,166 +302,182 @@ export default function NavbarV2({ locale }: Props) {
         </div>
       ) : null}
 
-      {/* Figma 783:23754 — the open menu is a white 24-radius card holding the
-          nav as Body 2 rows, with the phone, the three icon buttons and Cabinet
-          repeated along its foot. Those are the same controls the header drops
-          at this width, which is where the design puts them instead. */}
+      {/* The open menu is a fixed full-screen sheet, not a card in the flow —
+          position: fixed keeps the hero exactly where it is underneath
+          instead of pushing it down, and the panel applies the page gutter
+          itself instead of sitting inside a second `.hv2-shell` inset. */}
       {open ? (
-        <div className="hv2-shell">
-          <div className="hv2-nav__mobile">
-            <ul>
-              {dict.nav.map((item) =>
-                item.href === MEGA_HREF ? (
-                  /* Figma 783:23806 — on mobile "Projects" is a disclosure, not
-                     a link: tapping it unfolds the project list in place. */
-                  <li key={item.href}>
-                    <button
-                      type="button"
-                      className="hv2-nav__disclosure"
-                      aria-expanded={sub}
-                      onClick={() => setSub((v) => !v)}
-                    >
-                      {item.label}
-                      <span className="hv2-nav__chev" aria-hidden="true">
-                        <Image
-                          src="/images/icons/chevron-down.svg"
-                          alt=""
-                          width={8}
-                          height={4}
-                          style={{ width: "7.67px", height: "3.67px" }}
-                          unoptimized
-                        />
-                      </span>
-                    </button>
+        <div className="hv2-nav__mobile">
+          <ul>
+            {dict.nav.map((item) =>
+              item.href === MEGA_HREF ? (
+                /* Figma 783:23806 — on mobile "Projects" is a disclosure, not
+                   a link: tapping it unfolds the project list in place. */
+                <li key={item.href}>
+                  <button
+                    type="button"
+                    className="hv2-nav__disclosure"
+                    aria-expanded={sub}
+                    onClick={() => setSub((v) => !v)}
+                  >
+                    {item.label}
+                    <span className="hv2-nav__chev" aria-hidden="true">
+                      <Image
+                        src="/images/icons/chevron-down.svg"
+                        alt=""
+                        width={8}
+                        height={4}
+                        style={{ width: "7.67px", height: "3.67px" }}
+                        unoptimized
+                      />
+                    </span>
+                  </button>
 
-                    {sub ? (
-                      <ul className="hv2-nav__sublist">
-                        {projectCards.map((project) => (
-                          <li key={project.slug}>
-                            <Link
-                              href={`/${locale}/projects/${project.slug}`}
-                              onClick={() => setOpen(false)}
-                            >
-                              <Image
-                                className="hv2-nav__subthumb"
-                                src={`/images/thumbs/${project.slug}.jpg`}
-                                alt=""
-                                aria-hidden="true"
-                                width={24}
-                                height={24}
-                              />
-                              {project.title}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </li>
-                ) : (
-                  <li key={item.href}>
-                    <Link href={href(item.href)} onClick={() => setOpen(false)}>
-                      {item.label}
-                    </Link>
-                  </li>
-                )
-              )}
-            </ul>
+                  {sub ? (
+                    <ul className="hv2-nav__sublist">
+                      {projectCards.map((project) => (
+                        <li key={project.slug}>
+                          <Link
+                            href={`/${locale}/projects/${project.slug}`}
+                            onClick={() => setOpen(false)}
+                          >
+                            <Image
+                              className="hv2-nav__subthumb"
+                              src={`/images/thumbs/${project.slug}.jpg`}
+                              alt=""
+                              aria-hidden="true"
+                              width={24}
+                              height={24}
+                            />
+                            {project.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              ) : (
+                <li key={item.href}>
+                  <Link href={href(item.href)} onClick={() => setOpen(false)}>
+                    {item.label}
+                  </Link>
+                </li>
+              )
+            )}
 
-            <div className="hv2-nav__mobile-actions">
-              <a className="hv2-nav__btn hv2-nav__phone" href="tel:2662">
-                <Image
-                  src="/images/icons/phone.svg"
-                  alt=""
-                  aria-hidden="true"
-                  width={24}
-                  height={24}
-                  unoptimized
-                />
-                *2662
-              </a>
-
-              {ACTIONS.map(({ key, src, size, label, href: to }) => {
-                const glyph = (
+            {/* The globe icon + floating popover works in the header bar, but
+                cramped into the mobile sheet's action row it had no room for
+                a label and its popover either mis-positioned (see the
+                header-row leak above) or read as disconnected from the
+                button. A disclosure row — same pattern as "Projects" above —
+                fits the sheet's own language instead of borrowing the
+                desktop one. */}
+            <li>
+              <button
+                type="button"
+                className="hv2-nav__disclosure"
+                aria-label="Language"
+                aria-expanded={mobileLangOpen}
+                onClick={() => setMobileLangOpen((v) => !v)}
+              >
+                <span className="hv2-nav__lang-flag" aria-hidden="true">
+                  <Image src={currentLanguage.flag} alt="" width={24} height={24} unoptimized />
+                </span>
+                {currentLanguage.name}
+                <span className="hv2-nav__chev" aria-hidden="true">
                   <Image
-                    src={src}
+                    src="/images/icons/chevron-down.svg"
                     alt=""
-                    aria-hidden="true"
-                    width={Math.round(size)}
-                    height={Math.round(size)}
-                    style={{ width: `${size}px`, height: `${size}px` }}
+                    width={8}
+                    height={4}
+                    style={{ width: "7.67px", height: "3.67px" }}
                     unoptimized
                   />
-                );
+                </span>
+              </button>
 
-                if (key === "language") {
-                  return (
-                    <div key={key} className="hv2-nav__item" ref={langRefMobile}>
-                      <button
-                        type="button"
-                        className="hv2-nav__btn hv2-nav__btn--icon"
-                        aria-label={label}
-                        aria-haspopup="listbox"
-                        aria-expanded={lang}
-                        onClick={() => setLang((v) => !v)}
+              {mobileLangOpen ? (
+                <ul className="hv2-nav__sublist hv2-nav__sublist--lang">
+                  {otherLanguages.map((l) => (
+                    <li key={l.code}>
+                      <Link
+                        href={langHref(l.code)}
+                        onClick={() => {
+                          setMobileLangOpen(false);
+                          setOpen(false);
+                        }}
                       >
-                        {glyph}
-                      </button>
+                        <span className="hv2-nav__lang-flag" aria-hidden="true">
+                          <Image src={l.flag} alt="" width={24} height={24} unoptimized />
+                        </span>
+                        {l.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </li>
+          </ul>
 
-                      {lang ? (
-                        <div className="hv2-nav__popover hv2-nav__popover--lang" role="listbox">
-                          {otherLanguages.map((l) => (
-                            <Link
-                              key={l.code}
-                              href={langHref(l.code)}
-                              role="option"
-                              onClick={() => {
-                                setLang(false);
-                                setOpen(false);
-                              }}
-                            >
-                              <span className="hv2-nav__lang-flag" aria-hidden="true">
-                                <Image src={l.flag} alt="" width={32} height={32} unoptimized />
-                              </span>
-                              {l.name}
-                            </Link>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  );
-                }
+          <div className="hv2-nav__mobile-actions">
+            <a className="hv2-nav__btn hv2-nav__phone" href="tel:2662">
+              <Image
+                src="/images/icons/phone.svg"
+                alt=""
+                aria-hidden="true"
+                width={24}
+                height={24}
+                unoptimized
+              />
+              *2662
+            </a>
 
-                return to ? (
-                  <Link
-                    key={key}
-                    href={href(to)}
-                    className="hv2-nav__btn hv2-nav__btn--icon"
-                    aria-label={label}
-                    onClick={() => setOpen(false)}
-                  >
-                    {glyph}
-                  </Link>
-                ) : (
-                  <button
-                    key={key}
-                    type="button"
-                    className="hv2-nav__btn hv2-nav__btn--icon"
-                    aria-label={label}
-                  >
-                    {glyph}
-                  </button>
-                );
-              })}
+            {/* Language now has its own disclosure row up in the nav list —
+                see the "Dil" `<li>` above — so it drops out of this row
+                entirely rather than repeating the header's icon+popover. */}
+            {ACTIONS.filter(({ key }) => key !== "language").map(({ key, src, size, label, href: to }) => {
+              const glyph = (
+                <Image
+                  src={src}
+                  alt=""
+                  aria-hidden="true"
+                  width={Math.round(size)}
+                  height={Math.round(size)}
+                  style={{ width: `${size}px`, height: `${size}px` }}
+                  unoptimized
+                />
+              );
 
-              <a
-                className="hv2-nav__btn hv2-nav__btn--brand hv2-nav__btn--cabinet"
-                href="https://partner.treva.realestate/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {dict.cabinet}
-              </a>
-            </div>
+              return to ? (
+                <Link
+                  key={key}
+                  href={href(to)}
+                  className="hv2-nav__btn hv2-nav__btn--icon"
+                  aria-label={label}
+                  onClick={() => setOpen(false)}
+                >
+                  {glyph}
+                </Link>
+              ) : (
+                <button
+                  key={key}
+                  type="button"
+                  className="hv2-nav__btn hv2-nav__btn--icon"
+                  aria-label={label}
+                >
+                  {glyph}
+                </button>
+              );
+            })}
+
+            <a
+              className="hv2-nav__btn hv2-nav__btn--brand hv2-nav__btn--cabinet"
+              href="https://partner.treva.realestate/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {dict.cabinet}
+            </a>
           </div>
         </div>
       ) : null}
