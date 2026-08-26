@@ -950,9 +950,19 @@
 /* The mobile menu's own open animation — a full slide rather than sel-in's
    4px pop, since it is a full-screen sheet dropping from behind the header
    and not a small anchored popover. */
+/* Unfolds downward from the header's bottom edge, where the sheet's own top
+   sits. It used to be `translateY(-100%)`, which starts the panel a full
+   height above its resting place — once the sheet was sized to its content
+   that reads as flying in from the very top of the screen rather than
+   dropping out from under the bar. Clipping keeps the shadow hidden until
+   the edge it belongs to has arrived, too. */
 @keyframes hv2-nav-mobile-in {
     from {
-        transform: translateY(-100%);
+        clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+        clip-path: inset(0 0 0 0);
     }
 }
 
@@ -3236,21 +3246,36 @@ a.hv2-ct__entryvalue:hover {
         object-fit: cover;
     }
 
-    /* Figma 783:23879 — a fixed 8px gap between every button, not a
-       `space-between` stretch. The row's own width already comes close to
-       the content it holds, so a proportional stretch just made the gaps
-       uneven between wider (phone/Cabinet) and square (icon) buttons. */
+    /* Spans the sheet's full width, Cabinet flush to the right gutter — with
+       a fixed 8px gap the five buttons stopped short of it and the row read
+       as nudged left. `space-between` divides the leftover space evenly, so
+       every gap stays equal to every other; the 8px `gap` is its floor for
+       narrow screens. `nowrap` keeps all five on one line — wrapping would
+       strand Cabinet alone on a second row, where `space-between` has
+       nothing to spread it against. The 4px floor only bites below ~352,
+       where 8 would push Cabinet past the right gutter. */
     .hv2-nav__mobile-actions {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        justify-content: space-between;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
         width: 100%;
         margin: 32px 0 0;
     }
 
     .hv2-nav__mobile-actions .hv2-nav__btn {
         flex: 0 0 auto;
+    }
+
+    /* Safety net for the very narrowest phones, where even a 4px gap leaves
+       the five buttons wider than the gutter: the two labelled pills give up
+       a little of their padding rather than letting Cabinet hang off the
+       edge. The icon buttons stay rigid so they keep their circles. */
+    .hv2-nav__mobile-actions .hv2-nav__phone,
+    .hv2-nav__mobile-actions .hv2-nav__btn--brand {
+        flex-shrink: 1;
+        min-width: 0;
     }
 
     /* Figma 783:23806 measures this card at x=233 w=126, sitting 4px above the
