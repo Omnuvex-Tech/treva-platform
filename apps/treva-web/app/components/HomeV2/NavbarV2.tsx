@@ -46,6 +46,7 @@ export default function NavbarV2({ locale }: Props) {
   const [inv, setInv] = useState(false);
   const [lang, setLang] = useState(false);
   const [sub, setSub] = useState(false);
+  const [subInv, setSubInv] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const langRefMobile = useRef<HTMLDivElement>(null);
@@ -309,61 +310,93 @@ export default function NavbarV2({ locale }: Props) {
       {open ? (
         <div className="hv2-nav__mobile">
           <ul>
-            {dict.nav.map((item) =>
-              item.href === MEGA_HREF ? (
-                /* Figma 783:23806 — on mobile "Projects" is a disclosure, not
-                   a link: tapping it unfolds the project list in place. */
-                <li key={item.href}>
-                  <button
-                    type="button"
-                    className="hv2-nav__disclosure"
-                    aria-expanded={sub}
-                    onClick={() => setSub((v) => !v)}
-                  >
-                    {item.label}
-                    <span className="hv2-nav__chev" aria-hidden="true">
-                      <Image
-                        src="/images/icons/chevron-down.svg"
-                        alt=""
-                        width={8}
-                        height={4}
-                        style={{ width: "7.67px", height: "3.67px" }}
-                        unoptimized
-                      />
-                    </span>
-                  </button>
+            {dict.nav.map((item) => {
+              const isMega = item.href === MEGA_HREF;
+              const isInventory = item.href === INVENTORY_HREF;
 
-                  {sub ? (
-                    <ul className="hv2-nav__sublist">
-                      {projectCards.map((project) => (
-                        <li key={project.slug}>
-                          <Link
-                            href={`/${locale}/projects/${project.slug}`}
-                            onClick={() => setOpen(false)}
-                          >
-                            <Image
-                              className="hv2-nav__subthumb"
-                              src={`/images/thumbs/${project.slug}.jpg`}
-                              alt=""
-                              aria-hidden="true"
-                              width={24}
-                              height={24}
-                            />
-                            {project.title}
+              /* Figma 783:23806 — on mobile "Projects" is a disclosure, not a
+                 link: tapping it unfolds the project list in place. Inventory
+                 is one too, carrying the same Off-Plan/Resale pair its header
+                 popover holds, so the two widths offer the same entry points
+                 (the Figma frame lists those two as top-level rows instead —
+                 the dropdown is the requested change). */
+              if (isMega || isInventory) {
+                const expanded = isMega ? sub : subInv;
+                const toggle = isMega ? setSub : setSubInv;
+
+                return (
+                  <li key={item.href}>
+                    <button
+                      type="button"
+                      className="hv2-nav__disclosure"
+                      aria-expanded={expanded}
+                      onClick={() => toggle((v) => !v)}
+                    >
+                      {item.label}
+                      <span className="hv2-nav__chev" aria-hidden="true">
+                        <Image
+                          src="/images/icons/chevron-down.svg"
+                          alt=""
+                          width={8}
+                          height={4}
+                          style={{ width: "7.67px", height: "3.67px" }}
+                          unoptimized
+                        />
+                      </span>
+                    </button>
+
+                    {expanded && isMega ? (
+                      <ul className="hv2-nav__sublist">
+                        {projectCards.map((project) => (
+                          <li key={project.slug}>
+                            <Link
+                              href={`/${locale}/projects/${project.slug}`}
+                              onClick={() => setOpen(false)}
+                            >
+                              <Image
+                                className="hv2-nav__subthumb"
+                                src={`/images/thumbs/${project.slug}.jpg`}
+                                alt=""
+                                aria-hidden="true"
+                                width={24}
+                                height={24}
+                              />
+                              {project.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+
+                    {/* Off-Plan first, Resale second — the order the header
+                        popover uses. No thumbnails to pair these with, so the
+                        rows carry the card chrome on their own. */}
+                    {expanded && isInventory ? (
+                      <ul className="hv2-nav__sublist hv2-nav__sublist--text">
+                        <li>
+                          <Link href={href("/off-plan")} onClick={() => setOpen(false)}>
+                            {dict.search.offPlan}
                           </Link>
                         </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </li>
-              ) : (
+                        <li>
+                          <Link href={href("/resale")} onClick={() => setOpen(false)}>
+                            {dict.search.resale}
+                          </Link>
+                        </li>
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              }
+
+              return (
                 <li key={item.href}>
                   <Link href={href(item.href)} onClick={() => setOpen(false)}>
                     {item.label}
                   </Link>
                 </li>
-              )
-            )}
+              );
+            })}
           </ul>
 
           <div className="hv2-nav__mobile-actions">

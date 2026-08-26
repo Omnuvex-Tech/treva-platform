@@ -608,27 +608,31 @@
     color: var(--hv2-ink);
 }
 
-/* Figma 771:23156 — this variant's own hover/pressed fills, darker than the
-   text buttons' light `--hv2-selected`. Most of these glyphs are static SVGs
-   with a baked-in dark stroke, not currentColor, so `filter` flips them to
-   white; the burger's lucide icons *do* use currentColor, so `color` covers
-   those instead. */
-.hv2-nav__btn--icon:hover {
+/* Figma 771:23156 — one hover/pressed pair shared by every action button in
+   the row, the *2662 phone pill included. It used to be scoped to the icon
+   variant, which left the phone lighting up light grey while the three icons
+   beside it went dark — the odd one out in a row of four. Only the brand
+   (Cabinet) button keeps its own, since it is solid to begin with.
+
+   Most of these glyphs are static SVGs with a baked-in dark stroke rather
+   than currentColor, so `filter` flips them to white; the burger's lucide
+   icons *do* use currentColor, so `color` covers those instead. */
+.hv2-nav__btn:not(.hv2-nav__btn--brand):hover {
     background: #71757e;
     color: #fff;
 }
 
-.hv2-nav__btn--icon:hover img {
+.hv2-nav__btn:not(.hv2-nav__btn--brand):hover img {
     filter: brightness(0) invert(1);
 }
 
-.hv2-nav__btn--icon:active {
+.hv2-nav__btn:not(.hv2-nav__btn--brand):active {
     background: #373b43;
     color: #fff;
     border-width: 2px;
 }
 
-.hv2-nav__btn--icon:active img {
+.hv2-nav__btn:not(.hv2-nav__btn--brand):active img {
     filter: brightness(0) invert(1);
 }
 
@@ -3129,12 +3133,12 @@ a.hv2-ct__entryvalue:hover {
         transition: background 0.18s ease;
     }
 
-    .hv2-nav__mobile a:hover {
-        background: var(--hv2-selected);
-    }
-
-    /* "Projects" is a disclosure here, so it is a button carrying the same row
-       styling as its sibling links, plus the 16-box chevron. */
+    /* No hover fill on the nav rows: Figma 783:23815 carries a 20 radius token
+       but no background, and the grey pill it produced read as a rounded block
+       sitting behind the heading — especially on the two disclosures, which
+       keep it while the pointer rests after a tap. The sublist cards below are
+       a different case: those are filled by design, so their hover shade
+       stays. */
     .hv2-nav__disclosure {
         display: flex;
         width: 100%;
@@ -3152,10 +3156,6 @@ a.hv2-ct__entryvalue:hover {
         color: var(--hv2-ink);
         text-align: left;
         cursor: pointer;
-    }
-
-    .hv2-nav__disclosure:hover {
-        background: var(--hv2-selected);
     }
 
     /* The glyph is a 7.67x3.67 leaf centred in a 16 box — stretching it to fill
@@ -3177,13 +3177,22 @@ a.hv2-ct__entryvalue:hover {
         rotate: 180deg;
     }
 
-    /* Figma 783:23827 — 4px between rows, thumb-to-thumb, no extra gap before
-       the first one beyond the disclosure row's own padding. */
-    .hv2-nav__sublist {
+    /* Figma 783:23827 — 4px between rows. The 8 above and below is the added
+       breathing room the expanded list needs that the frame does not show:
+       there it butts straight against the rows on either side, which packed
+       the open dropdown into the plain menu items around it with nothing to
+       separate the two levels.
+
+       Scoped under `.hv2-nav__mobile` on purpose: the sheet's own
+       `.hv2-nav__mobile ul` rule is (0,1,1) and zeroes every margin, so a
+       bare `.hv2-nav__sublist` at (0,1,0) lost and the gap never appeared. */
+    .hv2-nav__mobile .hv2-nav__sublist {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        margin: 4px 0 0;
+        /* 8 above, 4 below: the parent list's own 4px gap sits under this one
+           too, so 4 here lands the same 8 of clearance on both sides. */
+        margin: 8px 0 4px;
         padding: 0;
         list-style: none;
     }
@@ -3207,6 +3216,16 @@ a.hv2-ct__entryvalue:hover {
 
     .hv2-nav__mobile .hv2-nav__sublist a:hover {
         background: var(--hv2-selected);
+    }
+
+    /* Off-Plan/Resale have no thumbnail to set their height, so they would
+       come out 36 against the project rows' 42 (Figma's 40 plus the 1px
+       border on each edge, which Figma draws inside the frame and CSS cannot).
+       `min-height` holds the two dropdowns to one row rhythm. The label starts
+       at the row's own 8px padding — there is no thumb here, so indenting it
+       to line up with the project titles just left an empty column. */
+    .hv2-nav__mobile .hv2-nav__sublist--text a {
+        min-height: 42px;
     }
 
     .hv2-nav__subthumb {
