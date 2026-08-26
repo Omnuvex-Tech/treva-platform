@@ -11,6 +11,130 @@ import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
 export class UnitLayoutsService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Search helpers.
+   *
+   * Unit layout labels are composed as `<house> · <unit code>` by the
+   * Profitbase sync (e.g. `Tower 5 · B5-705`), so search has to work on the
+   * pieces of that label in any order: "tower 5", "b5 705", "b5 tower 5",
+   * "b5-705" and "tower5" all have to reach the same unit.
+   */
+  private normalizeSearchText(value: string): string {
+    return value
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .trim();
+  }
+
+  private tokenizeSearch(term: string): string[] {
+    const normalized = this.normalizeSearchText(term);
+    return normalized ? normalized.split(' ') : [];
+  }
+
+  /**
+   * Splits glued tokens like "tower5" into ["tower", "5"]. Short prefixes such
+   * as "b5" are deliberately left whole - splitting them into "b" + "5" would
+   * match almost every unit.
+   */
+  private splitGluedToken(token: string): string[] | null {
+    const parts = token.match(/\p{L}+|\p{N}+/gu) ?? [];
+    if (parts.length < 2) return null;
+    const hasWord = parts.some(
+      (part) => part.length >= 3 && /\p{L}/u.test(part),
+    );
+    return hasWord ? parts : null;
+  }
+
+  private searchFieldMatchers(token: string) {
+    const like = { contains: token, mode: 'insensitive' as const };
+    // NOTE: `slug` is intentionally excluded. Profitbase-synced slugs end with
+    // the numeric external id (e.g. `c-tower-parking-97-17883547`), so short
+    // numeric tokens like "5" would match unrelated units through that id.
+    return [
+      { title: like },
+      { name: like },
+      { unitCode: like },
+      { house: { is: { title: like } } },
+      { house: { is: { name: like } } },
+      { category: { is: { title: like } } },
+      { category: { is: { name: like } } },
+    ];
+  }
+
+  private searchTokenMatchers(token: string) {
+    const matchers: any[] = this.searchFieldMatchers(token);
+    const parts = this.splitGluedToken(token);
+    if (parts) {
+      matchers.push({
+        AND: parts.map((part) => ({ OR: this.searchFieldMatchers(part) })),
+      });
+    }
+    return matchers;
+  }
+
+  /**
+   * Relevance score for one candidate row. Higher is better: an exact unit
+   * code or a full label match always outranks a row that merely shares a
+   * couple of tokens.
+   */
+  private scoreSearchCandidate(
+    candidate: {
+      title: string;
+      name: string;
+      unitCode?: string | null;
+      house?: { title?: string | null; name?: string | null } | null;
+      category?: { title?: string | null; name?: string | null } | null;
+    },
+    tokens: string[],
+    squashedTerm: string,
+  ): number {
+    const squash = (value: string) => value.split(' ').join('');
+    const fields = [
+      { value: candidate.unitCode, weight: 6 },
+      { value: candidate.title, weight: 5 },
+      { value: candidate.name, weight: 5 },
+      { value: candidate.house?.title, weight: 3 },
+      { value: candidate.house?.name, weight: 3 },
+      { value: candidate.category?.title, weight: 2 },
+      { value: candidate.category?.name, weight: 2 },
+    ]
+      .map((field) => ({
+        weight: field.weight,
+        normalized: field.value
+          ? this.normalizeSearchText(String(field.value))
+          : '',
+      }))
+      .filter((field) => field.normalized.length > 0);
+
+    let score = 0;
+
+    if (squashedTerm) {
+      for (const field of fields) {
+        const squashed = squash(field.normalized);
+        if (squashed === squashedTerm) score += field.weight * 100;
+        else if (squashed.startsWith(squashedTerm)) score += field.weight * 40;
+        else if (squashed.includes(squashedTerm)) score += field.weight * 25;
+      }
+    }
+
+    for (const token of tokens) {
+      let best = 0;
+      for (const field of fields) {
+        const words = field.normalized.split(' ');
+        let hit = 0;
+        if (words.includes(token)) hit = field.weight * 10;
+        else if (words.some((word) => word.startsWith(token)))
+          hit = field.weight * 6;
+        else if (field.normalized.includes(token)) hit = field.weight * 3;
+        else if (squash(field.normalized).includes(token)) hit = field.weight * 2;
+        if (hit > best) best = hit;
+      }
+      score += best;
+    }
+
+    return score;
+  }
+
   private async syncCategoryMetrics(categoryId: string) {
     const [housesCount, propertiesCount, reservedCount, soldCount] =
       await Promise.all([
@@ -162,55 +286,23 @@ export class UnitLayoutsService {
       where.archived = query.archived;
     }
 
-    if (query.search) {
-      where.OR = [
-        { title: { contains: query.search, mode: 'insensitive' } },
-        { name: { contains: query.search, mode: 'insensitive' } },
-        { slug: { contains: query.search, mode: 'insensitive' } },
+    const searchTokens = query.search ? this.tokenizeSearch(query.search) : [];
+
+    if (searchTokens.length > 0) {
+      // Every token has to match somewhere, but not necessarily in the same
+      // field - that is what makes "b5 tower 5" find `Tower 5 · B5-705`.
+      where.AND = [
+        ...(where.AND ?? []),
+        ...searchTokens.map((token) => ({ OR: this.searchTokenMatchers(token) })),
       ];
     }
 
     if (query.minPrice || query.maxPrice) {
-      where[`prices_${currency}`] = {};
-      const priceField = { path: [currency] };
-      where.OR = [
-        {
-          prices: {
-            path: [currency],
-            gte: query.minPrice || 0,
-            ...(query.maxPrice ? { lte: query.maxPrice } : {}),
-          },
-        },
-      ];
-      if (query.minPrice && query.maxPrice) {
-        where.OR = [
-          {
-            prices: {
-              path: [currency],
-              gte: query.minPrice,
-              lte: query.maxPrice,
-            },
-          },
-        ];
-      } else if (query.minPrice) {
-        where.OR = [
-          {
-            prices: {
-              path: [currency],
-              gte: query.minPrice,
-            },
-          },
-        ];
-      } else if (query.maxPrice) {
-        where.OR = [
-          {
-            prices: {
-              path: [currency],
-              lte: query.maxPrice,
-            },
-          },
-        ];
-      }
+      where.prices = {
+        path: [currency],
+        ...(query.minPrice ? { gte: query.minPrice } : {}),
+        ...(query.maxPrice ? { lte: query.maxPrice } : {}),
+      };
     }
 
     if (query.minArea || query.maxArea) {
@@ -239,17 +331,82 @@ export class UnitLayoutsService {
       }
     }
 
+    const include = {
+      category: true,
+      house: true,
+      unitTypeOption: true,
+    };
+
+    if (searchTokens.length > 0) {
+      // Ranked search: score every match on the label the UI shows, then
+      // paginate the ranked list instead of falling back to `createdAt`.
+      const candidates = await this.prisma.unitLayout.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          name: true,
+          unitCode: true,
+          createdAt: true,
+          house: { select: { title: true, name: true } },
+          category: { select: { title: true, name: true } },
+        },
+      });
+
+      const squashedTerm = searchTokens.join('');
+      const ranked = candidates
+        .map((candidate) => ({
+          id: candidate.id,
+          createdAt: candidate.createdAt,
+          titleLength: candidate.title.length,
+          score: this.scoreSearchCandidate(
+            candidate,
+            searchTokens,
+            squashedTerm,
+          ),
+        }))
+        .sort(
+          (a, b) =>
+            b.score - a.score ||
+            a.titleLength - b.titleLength ||
+            b.createdAt.getTime() - a.createdAt.getTime(),
+        );
+
+      // A token-AND match can still drag in unrelated units (the "5" of
+      // "Tower 5" also lives inside "Tower 4 · D-1405"), so drop rows that
+      // score far below the best hit.
+      const minScore = ranked.length > 0 ? ranked[0].score * 0.5 : 0;
+      const results = ranked.filter((item) => item.score >= minScore);
+
+      const pageIds = results.slice(skip, skip + limit).map((item) => item.id);
+      const rows = pageIds.length
+        ? await this.prisma.unitLayout.findMany({
+            where: { id: { in: pageIds } },
+            include,
+          })
+        : [];
+      const byId = new Map(rows.map((row) => [row.id, row]));
+
+      return {
+        data: pageIds
+          .map((id) => byId.get(id))
+          .filter((row): row is (typeof rows)[number] => Boolean(row)),
+        pagination: {
+          page,
+          limit,
+          total: results.length,
+          totalPages: Math.ceil(results.length / limit),
+        },
+      };
+    }
+
     const [data, total] = await Promise.all([
       this.prisma.unitLayout.findMany({
         where,
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: {
-          category: true,
-          house: true,
-          unitTypeOption: true,
-        },
+        include,
       }),
       this.prisma.unitLayout.count({ where }),
     ]);

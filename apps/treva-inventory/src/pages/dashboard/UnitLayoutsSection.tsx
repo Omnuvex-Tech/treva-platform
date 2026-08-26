@@ -286,7 +286,7 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search unit layouts"
+                            placeholder="Search e.g. Tower 5 B5-705"
                             className="h-10 w-[240px] border-0 bg-transparent text-sm text-[#1A1A1A] outline-none placeholder:text-[#999]"
                         />
                     </div>

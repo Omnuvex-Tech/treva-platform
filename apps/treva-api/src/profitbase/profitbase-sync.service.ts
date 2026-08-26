@@ -49,6 +49,12 @@ export class ProfitbaseSyncService {
     return slug || 'item';
   }
 
+  private parseNumber(value: string | null | undefined): number | null {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
   private parseYear(value: string | null): number | null {
     if (!value) return null;
     const match = /\d{4}/.exec(value);
@@ -68,15 +74,19 @@ export class ProfitbaseSyncService {
       unitLayouts: { created: 0, updated: 0 },
     };
 
-    const planByPropertyId = new Map<string, ProfitbasePlan>();
-    for (const plan of plans) {
-      const propertyId = plan.properties?.[0];
-      if (propertyId) planByPropertyId.set(propertyId, plan);
+    const propertyById = new Map<string, ProfitbaseProperty>();
+    for (const property of properties) {
+      propertyById.set(String(property.id), property);
     }
 
     const projectNameById = new Map<number, string>();
     for (const house of houses)
       projectNameById.set(house.projectId, house.projectName);
+    for (const plan of plans) {
+      if (!projectNameById.has(plan.projectId)) {
+        projectNameById.set(plan.projectId, plan.projectName);
+      }
+    }
     for (const property of properties) {
       if (!projectNameById.has(property.projectId)) {
         projectNameById.set(property.projectId, property.projectName);
@@ -105,21 +115,43 @@ export class ProfitbaseSyncService {
 
     const touchedCategoryIds = new Set<string>(categoryIdByProjectId.values());
 
-    for (const property of properties) {
+    // The layout data (rooms, areas, prices, plan images) comes from `plan`.
+    // `property` only resolves the house/category link plus the per-unit
+    // fields a plan does not carry at all: unit number, floor and status.
+    const syncUnit = async (
+      plan: ProfitbasePlan | null,
+      property: ProfitbaseProperty,
+    ) => {
       const categoryId = categoryIdByProjectId.get(property.projectId);
-      if (!categoryId) continue;
-      const houseId = houseIdByExternalId.get(property.house_id) ?? null;
-      const parentHouse = houseById.get(property.house_id) ?? null;
-      const plan = planByPropertyId.get(String(property.id)) ?? null;
-
+      if (!categoryId) return;
       await this.upsertUnitLayout(
-        property,
         plan,
+        property,
         categoryId,
-        houseId,
-        parentHouse,
+        houseIdByExternalId.get(property.house_id) ?? null,
+        houseById.get(property.house_id) ?? null,
         summary,
       );
+    };
+
+    const syncedPropertyIds = new Set<string>();
+
+    for (const plan of plans) {
+      for (const propertyId of plan.properties ?? []) {
+        const property = propertyById.get(String(propertyId));
+        // A plan without its property carries no unit number, floor or
+        // status, so there is nothing to key a unit layout on.
+        if (!property) continue;
+        syncedPropertyIds.add(String(property.id));
+        await syncUnit(plan, property);
+      }
+    }
+
+    // Profitbase has no plan for a handful of properties (29 sold units at the
+    // time of writing); without this pass they would drop out of the catalogue.
+    for (const property of properties) {
+      if (syncedPropertyIds.has(String(property.id))) continue;
+      await syncUnit(null, property);
     }
 
     for (const categoryId of touchedCategoryIds) {
@@ -227,8 +259,8 @@ export class ProfitbaseSyncService {
   }
 
   private async upsertUnitLayout(
-    property: ProfitbaseProperty,
     plan: ProfitbasePlan | null,
+    property: ProfitbaseProperty,
     categoryId: string,
     houseId: string | null,
     parentHouse: ProfitbaseHouse | null,
@@ -241,19 +273,38 @@ export class ProfitbaseSyncService {
       new Date().getFullYear();
     const minFloor = parentHouse?.minFloor ?? 1;
     const maxFloor = Math.max(parentHouse?.maxFloor ?? minFloor, minFloor);
+
+    // Unit number, floor and status live on the property only - a plan has no
+    // idea which apartment it was sold as.
     const statusInfo = STATUS_MAP[property.status] ?? {
       status: 'available',
       archived: false,
     };
-    const totalArea = property.area?.area_total ?? 0;
-    const propertyTypeLabel = property.propertyType
-      ? (REAL_ESTATE_TYPE_LABELS[property.propertyType] ??
-        property.propertyType)
+
+    // Everything below describes the layout itself, so the plan is the source
+    // of truth; the property values are only a fallback for the units
+    // Profitbase has no plan for.
+    const totalArea =
+      this.parseNumber(plan?.areaRange?.min) ?? property.area?.area_total ?? 0;
+    const price =
+      this.parseNumber(plan?.priceRange?.min) ?? property.price?.value ?? null;
+    const roomCount = plan?.roomsAmount ?? property.rooms_amount ?? undefined;
+    const propertyTypeAlias =
+      plan?.propertyTypeAliases?.[0] ?? property.propertyType;
+    const propertyTypeLabel = propertyTypeAlias
+      ? (REAL_ESTATE_TYPE_LABELS[propertyTypeAlias] ?? propertyTypeAlias)
       : undefined;
 
+    // Both main and cover use the original full-size `source` directly.
     const mainImage = plan?.image
       ? {
-          url: plan.image.big || plan.image.source,
+          url: plan.image.source,
+          alt: plan.image.imageName || undefined,
+        }
+      : undefined;
+    const coverImage = plan?.image
+      ? {
+          url: plan.image.source,
           alt: plan.image.imageName || undefined,
         }
       : undefined;
@@ -265,13 +316,14 @@ export class ProfitbaseSyncService {
     const sharedData = {
       floor: property.floor ?? 0,
       unitCode: property.number || undefined,
-      rooms: property.rooms_amount ?? undefined,
+      // The panel, DTO/service and the rooms filter all use the `number`
+      // column for room count; `rooms` is kept in sync for completeness.
+      number: roomCount,
+      rooms: roomCount,
       totalArea,
       internalArea: property.area?.area_living ?? totalArea,
       balconyArea: property.area?.area_balcony ?? undefined,
-      prices: property.price?.value
-        ? { [currencyCode]: property.price.value }
-        : {},
+      prices: price ? { [currencyCode]: price } : {},
       completionYear,
       numberOfFloors: { start: minFloor, end: maxFloor },
       realEstateType: propertyTypeLabel,
@@ -280,6 +332,7 @@ export class ProfitbaseSyncService {
       categoryId,
       houseId,
       mainImage,
+      coverImage,
       gallery,
     };
 
@@ -296,7 +349,7 @@ export class ProfitbaseSyncService {
       return;
     }
 
-    const title = `${property.houseName || property.projectName} · ${property.number || property.id}`;
+    const title = `${plan?.houseName || property.houseName || property.projectName} · ${property.number || property.id}`;
     const slug = `${this.slugify(title)}-${property.id}`;
 
     await this.prisma.unitLayout.create({
