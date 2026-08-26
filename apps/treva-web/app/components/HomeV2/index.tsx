@@ -10,11 +10,10 @@ import TeamV2 from "./TeamV2";
 import PulseV2 from "./PulseV2";
 import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
-import type { InventoryCard, NewsCard, ProjectCard, TeamMember } from "./data";
+import type { InventoryCard, NewsCard, TeamMember } from "./data";
 
 type HomeV2Props = {
   locale: string;
-  projects?: ProjectCard[];
   inventory?: InventoryCard[];
   resaleInventory?: InventoryCard[];
   team?: TeamMember[];
@@ -30,7 +29,6 @@ type HomeV2Props = {
  */
 export default function HomeV2({
   locale,
-  projects,
   inventory,
   resaleInventory,
   team = [],
@@ -43,9 +41,9 @@ export default function HomeV2({
         <NavbarV2 locale={locale} />
         <HeroV2 locale={locale} />
         <SearchPanelV2 locale={locale} />
-        <ProjectsV2 locale={locale} items={projects} />
-        <PartnersV2 locale={locale} />
+        <ProjectsV2 locale={locale} />
         <InventoryV2 locale={locale} items={inventory} resaleItems={resaleInventory} />
+        <PartnersV2 locale={locale} />
         <TeamV2 locale={locale} members={team} />
         <PulseV2 locale={locale} items={news} />
         <CallbackV2 locale={locale} />

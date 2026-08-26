@@ -98,7 +98,17 @@ function toResaleCard(apartment: ApiApartment, index: number): InventoryCard | n
 }
 
 /**
- * Three off-plan units for the home page Inventory strip.
+ * Over-fetch multiplier for both listings below: `toCard`/`toResaleCard`
+ * drop anything with no image, and imageless units are not spread evenly —
+ * in practice they cluster in the first few dozen records, so a plain
+ * `?limit=N` (or even `4*N`) routinely came back short (six requested, three
+ * survived, sometimes zero). 60 comfortably clears that cluster in the
+ * current data; trimming to the real `limit` happens after the filter.
+ */
+const FETCH_BUFFER = 60;
+
+/**
+ * Off-plan units for the home page Inventory strip.
  *
  * Returns an empty array on any failure so the caller can fall back to the
  * seed cards — the home page must never fail to render because the treva-api
@@ -106,7 +116,7 @@ function toResaleCard(apartment: ApiApartment, index: number): InventoryCard | n
  */
 export async function getHomeInventory(limit = 3): Promise<InventoryCard[]> {
     try {
-        const res = await fetch(`${TREVA_API}/unit-layouts?limit=${limit}`, {
+        const res = await fetch(`${TREVA_API}/unit-layouts?limit=${Math.max(limit * 4, FETCH_BUFFER)}`, {
             next: { revalidate: 60 },
         });
         if (!res.ok) return [];
@@ -116,23 +126,24 @@ export async function getHomeInventory(limit = 3): Promise<InventoryCard[]> {
         if (!Array.isArray(list)) return [];
 
         return list
-            .slice(0, limit)
             .map(toCard)
-            .filter((card): card is InventoryCard => card !== null);
+            .filter((card): card is InventoryCard => card !== null)
+            .slice(0, limit);
     } catch {
         return [];
     }
 }
 
 /**
- * Three resale apartments for the same strip's other tab — a different
+ * Resale apartments for the same strip's other tab — a different
  * endpoint/model entirely (see `ApiApartment` above), not a filtered view of
  * `getHomeInventory`. `archived: false` matches the default the resale
- * listing page itself applies.
+ * listing page itself applies. Same over-fetch-then-trim reasoning as
+ * `getHomeInventory` above.
  */
 export async function getHomeResale(limit = 3): Promise<InventoryCard[]> {
     try {
-        const res = await fetch(`${TREVA_API}/apartments?limit=${limit}&archived=false`, {
+        const res = await fetch(`${TREVA_API}/apartments?limit=${Math.max(limit * 4, FETCH_BUFFER)}&archived=false`, {
             next: { revalidate: 60 },
         });
         if (!res.ok) return [];
@@ -142,9 +153,9 @@ export async function getHomeResale(limit = 3): Promise<InventoryCard[]> {
         if (!Array.isArray(list)) return [];
 
         return list
-            .slice(0, limit)
             .map(toResaleCard)
-            .filter((card): card is InventoryCard => card !== null);
+            .filter((card): card is InventoryCard => card !== null)
+            .slice(0, limit);
     } catch {
         return [];
     }

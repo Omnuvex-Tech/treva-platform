@@ -135,6 +135,27 @@ export class UnitLayoutsService {
     return score;
   }
 
+  /**
+   * Profitbase-synced categories have slugs like `${slug}-${externalId}`.
+   * Callers (the homepage hero, the CMS project cards, bookmarked links) may
+   * only know the clean slug, so fall back to a prefix/name match before
+   * giving up.
+   */
+  private async resolveCategoryIdBySlug(slug: string): Promise<string | null> {
+    const category =
+      (await this.prisma.category.findUnique({ where: { slug } })) ??
+      (await this.prisma.category.findFirst({
+        where: {
+          OR: [
+            { slug: { startsWith: `${slug}-` } },
+            { name: slug },
+            { propertyName: slug },
+          ],
+        },
+      }));
+    return category?.id ?? null;
+  }
+
   private async syncCategoryMetrics(categoryId: string) {
     const [housesCount, propertiesCount, reservedCount, soldCount] =
       await Promise.all([
@@ -239,28 +260,9 @@ export class UnitLayoutsService {
     }
 
     if (query.categorySlug) {
-      let category = await this.prisma.category.findUnique({
-        where: { slug: query.categorySlug },
-      });
-      if (!category) {
-        // Profitbase-synced categories have slugs like `${slug}-${externalId}`.
-        // Callers (e.g. the homepage hero, bookmarked links) may only know the
-        // clean slug, so fall back to a prefix/name match before giving up.
-        category = await this.prisma.category.findFirst({
-          where: {
-            OR: [
-              { slug: { startsWith: `${query.categorySlug}-` } },
-              { name: query.categorySlug },
-              { propertyName: query.categorySlug },
-            ],
-          },
-        });
-      }
-      if (category) {
-        where.categoryId = category.id;
-      } else {
-        where.categoryId = '__missing__';
-      }
+      where.categoryId =
+        (await this.resolveCategoryIdBySlug(query.categorySlug)) ??
+        '__missing__';
     }
 
     if (query.houseId) {
@@ -586,8 +588,22 @@ export class UnitLayoutsService {
     return result.map((r) => r.floor);
   }
 
-  async findRange(currency: string = 'USD') {
+  /**
+   * Price/area extremes. Without `categorySlug` this stays the global range
+   * the filter sliders ask for. With one it is scoped to that project and
+   * skips archived units — what the home page cards need for their
+   * "starting from" line.
+   */
+  async findRange(currency: string = 'USD', categorySlug?: string) {
+    const where: any = {};
+    if (categorySlug) {
+      where.categoryId =
+        (await this.resolveCategoryIdBySlug(categorySlug)) ?? '__missing__';
+      where.archived = false;
+    }
+
     const layouts = await this.prisma.unitLayout.findMany({
+      where,
       select: { prices: true, totalArea: true },
     });
 

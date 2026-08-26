@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { getDict } from "./dictionary";
-import { projectCards } from "./data";
+import { getNavProjects, type NavProject } from "./projects-api";
 import ProjectsMenuV2 from "./ProjectsMenuV2";
 
 type Props = { locale: string };
@@ -57,6 +57,19 @@ export default function NavbarV2({ locale }: Props) {
   // trusted on its own.
   const [invOffset, setInvOffset] = useState(22);
   const [langOffset, setLangOffset] = useState(22);
+  const [navProjects, setNavProjects] = useState<NavProject[]>([]);
+
+  // The header renders on every page, so the CMS list is fetched once on
+  // mount rather than threaded down as a prop through every page shell.
+  useEffect(() => {
+    let cancelled = false;
+    getNavProjects(locale).then((items) => {
+      if (!cancelled && items.length > 0) setNavProjects(items);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
 
   // 10px matches kristal.az's own threshold, the reference for this effect:
   // the card should still be transparent for a couple of wheel ticks, not
@@ -135,7 +148,8 @@ export default function NavbarV2({ locale }: Props) {
       }}
     >
       <div className="hv2-nav__bar" ref={barRef}>
-        <div className="hv2-shell hv2-nav__inner">
+        <div className="hv2-shell">
+        <div className="hv2-nav__inner">
           <Link href={`/${locale}`} className="hv2-nav__logo" aria-label="TREVA">
             {/* unoptimized: there is nothing for the image optimizer to do to an
                 SVG, and it rejects them unless dangerouslyAllowSVG is enabled. */}
@@ -295,11 +309,12 @@ export default function NavbarV2({ locale }: Props) {
             </button>
           </div>
         </div>
+        </div>
       </div>
 
       {mega ? (
         <div className="hv2-shell hv2-nav__mega">
-          <ProjectsMenuV2 locale={locale} onNavigate={() => setMega(false)} />
+          <ProjectsMenuV2 locale={locale} items={navProjects} onNavigate={() => setMega(false)} />
         </div>
       ) : null}
 
@@ -347,20 +362,22 @@ export default function NavbarV2({ locale }: Props) {
 
                     {expanded && isMega ? (
                       <ul className="hv2-nav__sublist">
-                        {projectCards.map((project) => (
+                        {navProjects.map((project) => (
                           <li key={project.slug}>
                             <Link
                               href={`/${locale}/projects/${project.slug}`}
                               onClick={() => setOpen(false)}
                             >
-                              <Image
-                                className="hv2-nav__subthumb"
-                                src={`/images/thumbs/${project.slug}.jpg`}
-                                alt=""
-                                aria-hidden="true"
-                                width={24}
-                                height={24}
-                              />
+                              {project.image ? (
+                                <Image
+                                  className="hv2-nav__subthumb"
+                                  src={project.image}
+                                  alt=""
+                                  aria-hidden="true"
+                                  width={24}
+                                  height={24}
+                                />
+                              ) : null}
                               {project.title}
                             </Link>
                           </li>

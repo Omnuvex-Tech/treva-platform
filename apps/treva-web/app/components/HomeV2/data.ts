@@ -165,7 +165,7 @@ export const projectCards: ProjectCard[] = [
         areaRange: "30 m² - 209 m²",
     },
     {
-        slug: "mariana-village",
+        slug: "marina-village",
         title: "Mariana Village",
         developer: "Sea Breeze Marina",
         icon: "/images/features-pro/icons/sea-breeze-marina.svg",

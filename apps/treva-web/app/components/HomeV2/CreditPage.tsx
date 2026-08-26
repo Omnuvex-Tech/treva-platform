@@ -5,7 +5,6 @@ import ProjectsV2 from "./ProjectsV2";
 import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
 import { getDict } from "./dictionary";
-import { projectCards } from "./data";
 
 type Props = { locale: string };
 
@@ -13,10 +12,11 @@ type Props = { locale: string };
  * Credit calculator page — Figma 635:21099 (desktop) and 635:21026 (mobile).
  *
  * The frame is named "Contact" in the file, but it holds a credit calculator, a
- * result panel and a three-card project strip — the actual contact form lives
- * in a different frame of the same name (622:1824). Only the calculator hero is
- * new here; the projects strip is the home component with its own heading and
- * no blurb, and the banner and footer are shared.
+ * result panel and a project strip — the actual contact form lives in a
+ * different frame of the same name (622:1824). Only the calculator hero is new
+ * here; the projects strip is the home component's own six-card grid (Figma
+ * 457:10745), just with its own heading and no blurb — the banner and footer
+ * are shared too.
  */
 export default function CreditPage({ locale }: Props) {
   const dict = getDict(locale);
@@ -28,7 +28,6 @@ export default function CreditPage({ locale }: Props) {
         <CalculatorV2 locale={locale} />
         <ProjectsV2
           locale={locale}
-          items={projectCards.slice(0, 3)}
           title={dict.credit.projectsTitle}
           showLead={false}
         />

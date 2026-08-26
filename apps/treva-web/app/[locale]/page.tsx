@@ -12,7 +12,6 @@ import {
 } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 import { getHomeInventory, getHomeResale } from "@/app/components/HomeV2/inventory-api";
-import { getProjectCards } from "@/app/components/HomeV2/projects-api";
 import type { InventoryCard, NewsCard, TeamMember } from "@/app/components/HomeV2/data";
 
 export const dynamicParams = false;
@@ -72,7 +71,7 @@ export default async function HomePage({
         let team: TeamMember[] = [];
         try {
             const authors = await getAuthors(locale);
-            team = authors.slice(0, 5).map((author) => ({
+            team = authors.slice(0, 3).map((author) => ({
                 id: author.id,
                 name: author.name,
                 role: author.title || "",
@@ -83,9 +82,6 @@ export default async function HomePage({
             team = [];
         }
 
-        // Seed cards with the CMS hover clip merged in; never throws.
-        const projects = await getProjectCards();
-
         // Off-plan and resale are separate models/endpoints (unit-layouts vs
         // apartments) — fetched in parallel so the strip's two tabs show real,
         // distinct listings instead of the same off-plan units regardless of
@@ -93,8 +89,8 @@ export default async function HomePage({
         let inventory: InventoryCard[] | undefined;
         let resaleInventory: InventoryCard[] | undefined;
         const [liveInventory, liveResale] = await Promise.all([
-            getHomeInventory(3),
-            getHomeResale(3),
+            getHomeInventory(6),
+            getHomeResale(6),
         ]);
         if (liveInventory.length > 0) {
             inventory = liveInventory;
@@ -120,7 +116,6 @@ export default async function HomePage({
         return (
             <HomeV2
                 locale={locale}
-                projects={projects}
                 inventory={inventory}
                 resaleInventory={resaleInventory}
                 team={team}

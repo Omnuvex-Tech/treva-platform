@@ -81,106 +81,108 @@ export default function FooterV2({ locale }: Props) {
 
   return (
     <footer className="hv2-section hv2-footer-wrap">
-      <div className="hv2-shell hv2-footer">
-        <div className="hv2-footer__col">
-          <div className="hv2-footer__brand">
-            <Link href={`/${locale}`} className="hv2-nav__logo" aria-label="TREVA">
-              <Image src="/Logo.svg" alt="TREVA" width={120} height={27} unoptimized />
-            </Link>
-            <p className="hv2-footer__about">{dict.footer.about}</p>
-          </div>
-
-          <div className="hv2-footer__row">
-            <div className="hv2-footer__socials">
-              {SOCIALS.map(({ label, href, src, w, h }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={label}
-                  className="hv2-footer__social"
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    aria-hidden="true"
-                    width={Math.round(w)}
-                    height={Math.round(h)}
-                    style={{ width: `${w}px`, height: `${h}px` }}
-                    unoptimized
-                  />
-                </a>
-              ))}
+      <div className="hv2-shell">
+        <div className="hv2-footer">
+          <div className="hv2-footer__col">
+            <div className="hv2-footer__brand">
+              <Link href={`/${locale}`} className="hv2-nav__logo" aria-label="TREVA">
+                <Image src="/Logo.svg" alt="TREVA" width={120} height={27} unoptimized />
+              </Link>
+              <p className="hv2-footer__about">{dict.footer.about}</p>
             </div>
 
-            <p className="hv2-footer__caption hv2-footer__caption--rights">{dict.footer.rights}</p>
-          </div>
-        </div>
-
-        <div className="hv2-footer__col">
-          <div className="hv2-footer__stack">
-            <nav className="hv2-footer__nav">
-              {dict.nav.map((item) => (
-                <Link key={item.href} href={`/${locale}${item.href}`}>
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="hv2-footer__row hv2-footer__row--top">
-              <div className="hv2-footer__group hv2-footer__group--contact">
-                <h3 className="hv2-footer__col-title">{dict.footer.contactTitle}</h3>
-                <div className="hv2-footer__list">
-                  <a href="tel:2662">*2662</a>
-                  <a href="tel:+994502772662">050-277-2662</a>
-                  <a href="mailto:info@treva.realestate">info@treva.realestate</a>
-                </div>
-              </div>
-
-              <div className="hv2-footer__group hv2-footer__group--location">
-                <h3 className="hv2-footer__col-title">{dict.footer.locationTitle}</h3>
-                <div className="hv2-footer__list">
-                  <p>{dict.footer.addressLine1}</p>
-                  <p>{dict.footer.addressLine2}</p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="hv2-footer__totop"
-                aria-label={dict.footer.backToTop}
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                <Image
-                  src="/images/icons/scroll-top.svg"
-                  alt=""
-                  aria-hidden="true"
-                  width={28}
-                  height={28}
-                  unoptimized
-                />
-              </button>
-            </div>
-          </div>
-
-          <div className="hv2-footer__row">
-            <p className="hv2-footer__caption hv2-footer__caption--copy">
-              &copy; {year} — {dict.footer.copyright}
-            </p>
-
-            <div className="hv2-footer__langs">
-              <span className="hv2-footer__langs-label">{dict.footer.languages}</span>
-              <div className="hv2-footer__langs-row">
-                {LANGUAGES.map((language) => (
-                  <Link
-                    key={language.code}
-                    href={`/${language.code}?v=2`}
-                    aria-current={language.code === locale ? "true" : undefined}
+            <div className="hv2-footer__row">
+              <div className="hv2-footer__socials">
+                {SOCIALS.map(({ label, href, src, w, h }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className="hv2-footer__social"
                   >
-                    {language.label}
+                    <Image
+                      src={src}
+                      alt=""
+                      aria-hidden="true"
+                      width={Math.round(w)}
+                      height={Math.round(h)}
+                      style={{ width: `${w}px`, height: `${h}px` }}
+                      unoptimized
+                    />
+                  </a>
+                ))}
+              </div>
+
+              <p className="hv2-footer__caption hv2-footer__caption--rights">{dict.footer.rights}</p>
+            </div>
+          </div>
+
+          <div className="hv2-footer__col">
+            <div className="hv2-footer__stack">
+              <nav className="hv2-footer__nav">
+                {dict.nav.map((item) => (
+                  <Link key={item.href} href={`/${locale}${item.href}`}>
+                    {item.label}
                   </Link>
                 ))}
+              </nav>
+
+              <div className="hv2-footer__row hv2-footer__row--top">
+                <div className="hv2-footer__group hv2-footer__group--contact">
+                  <h3 className="hv2-footer__col-title">{dict.footer.contactTitle}</h3>
+                  <div className="hv2-footer__list">
+                    <a href="tel:2662">*2662</a>
+                    <a href="tel:+994502772662">050-277-2662</a>
+                    <a href="mailto:info@treva.realestate">info@treva.realestate</a>
+                  </div>
+                </div>
+
+                <div className="hv2-footer__group hv2-footer__group--location">
+                  <h3 className="hv2-footer__col-title">{dict.footer.locationTitle}</h3>
+                  <div className="hv2-footer__list">
+                    <p>{dict.footer.addressLine1}</p>
+                    <p>{dict.footer.addressLine2}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="hv2-footer__totop"
+                  aria-label={dict.footer.backToTop}
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                  <Image
+                    src="/images/icons/scroll-top.svg"
+                    alt=""
+                    aria-hidden="true"
+                    width={28}
+                    height={28}
+                    unoptimized
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div className="hv2-footer__row">
+              <p className="hv2-footer__caption hv2-footer__caption--copy">
+                &copy; {year} — {dict.footer.copyright}
+              </p>
+
+              <div className="hv2-footer__langs">
+                <span className="hv2-footer__langs-label">{dict.footer.languages}</span>
+                <div className="hv2-footer__langs-row">
+                  {LANGUAGES.map((language) => (
+                    <Link
+                      key={language.code}
+                      href={`/${language.code}?v=2`}
+                      aria-current={language.code === locale ? "true" : undefined}
+                    >
+                      {language.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

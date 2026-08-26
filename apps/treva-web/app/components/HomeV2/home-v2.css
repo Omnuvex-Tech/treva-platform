@@ -159,7 +159,6 @@
 .hv2-root .hv2-h2,
 .hv2-root .hv2-search__title,
 .hv2-root .hv2-calc__title,
-.hv2-root .hv2-team__title,
 .hv2-root .hv2-footer__col-title,
 /* The whole card runs on Oak Sans in Figma, not just its heading. */
 .hv2-root .hv2-pcard__title,
@@ -272,20 +271,25 @@
     padding-top: 40px;
 }
 
-/* padding-top 40 + 648 of content — see the note on Projects above. */
+/* padding-top 40 + 1158 of content: the single-row 648 plus a second row of
+   470-tall cards (Figma 597:18777) and the 40px row-gap between them. Whichever
+   tab (off-plan/resale) has three or fewer cards drops to the shorter
+   `--single` variant below instead of reserving a second row it won't use. */
 .hv2-s-inventory {
-    min-height: 688px;
+    min-height: 1198px;
     /* Pulled in to match Partners' own reduced padding-top above it, so the
        gap below Partners matches the one above it. */
     padding-top: 40px;
 }
 
-/* padding-top 40 + 888 of content — see the note on Projects above for why
-   this can't just reference --hv2-section any more. */
+.hv2-s-inventory--single {
+    min-height: 688px;
+}
+
+/* padding-top 40 + 560 of content (Figma 1000:5542: 48 header + 40 gap + 380
+   card row + 40 gap + 52 button) — a one-row teaser, not the full roster. */
 .hv2-s-team {
-    min-height: 928px;
-    --hv2-flow: 24px;
-    --hv2-row-gap: 24px;
+    min-height: 600px;
     /* Same pulled-in rhythm as the sections above it. */
     padding-top: 40px;
 }
@@ -360,12 +364,16 @@
    NAVBAR
    ========================================================================= */
 
-/* Header — Figma 192:1637 started life as a floating 1344x90 card, but the
-   reference for the real behaviour is kristal.az: a full-bleed bar that rides
-   transparent over the hero, then turns solid white edge-to-edge once the
-   page has moved past 10px (a JS scroll listener flips `.hv2-nav--scrolled`
-   the same way, see NavbarV2). The strip itself stays transparent so the
-   toggle lives entirely on `.hv2-nav__inner`. */
+/* Header — Figma 192:1637: a floating 1344x90 card on a 1px
+   Border/Secondary-Brand edge, 24 radius — the same border and radius the
+   footer carries at rest (see .hv2-footer), but solid white rather than the
+   footer's translucent fill: over page content a flat white reads cleaner
+   than a fill that keeps tinting with whatever scrolls underneath it. The
+   header only earns the card once scrolled: at the top of the page it rides
+   transparent over the hero (a JS
+   scroll listener flips `.hv2-nav--scrolled` past 10px, see NavbarV2), and a
+   bordered card there would cut across the hero photo instead of floating on
+   it. */
 .hv2-nav {
     position: sticky;
     top: 0;
@@ -373,48 +381,69 @@
     background: transparent;
 }
 
-/* Two layers. `.hv2-nav__bar` is the full-bleed fill — it runs edge to edge
-   so the white-on-scroll background matches kristal's, with nothing left for
-   a backdrop blur to soften once it is fully opaque. `.hv2-nav__inner` sits
-   inside wearing `.hv2-shell` too (see NavbarV2), so the logo and action row
-   line up with wherever every other section's content starts instead of
-   hugging the true viewport edge — only the fill goes full width, not the
-   content. Both states share the bar's one transition so the swap fades
-   rather than snaps; border and fill are held at zero until
-   `.hv2-nav--scrolled` turns them on. */
+/* Two layers. `.hv2-nav__bar` is a full-bleed, always-transparent strip — it
+   exists so the sticky header keeps a consistent hit area, but it never
+   paints anything itself. The floating card is `.hv2-nav__inner` instead,
+   which sits inside wearing `.hv2-shell` too (see NavbarV2): shell's own
+   32px gutter already matches Figma's card padding exactly, so the card's
+   edges land precisely where the bar would have run full width, while the
+   card itself stays only as wide as the shell column — the page shows
+   through on either side once scrolled, same as the header floats over the
+   hero before that. */
 .hv2-nav__bar {
     width: 100%;
-    border-bottom: 1px solid transparent;
-    background: transparent;
-    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    /* Floats clear of the viewport top once scrolled, echoing the gap the
+       footer card keeps below itself (--hv2-footer-wrap's padding-bottom) —
+       tighter than that 24px so it doesn't eat too much into the content
+       below. `transform`, not `top`: `.hv2-nav` is already `position:
+       sticky`, and changing `top` on a class that's toggled after the
+       element has already stuck did not reliably re-run the browser's own
+       sticky offset calculation — the computed position just stayed put
+       (verified: the class applied, the rule was there, the box never
+       moved). `transform` sits outside that whole calculation, so it always
+       animates. It also has to land on `.hv2-nav__bar` and not `.hv2-nav`
+       itself: a `transform` on `.hv2-nav` would make it the containing block
+       for `.hv2-nav__mobile` (`position: fixed`, a sibling of this bar, not
+       a descendant of it), which would then position itself relative to the
+       header's own box instead of the viewport. */
+    transition: transform 0.25s ease;
 }
 
 .hv2-nav--scrolled .hv2-nav__bar {
-    border-bottom-color: var(--hv2-pcard-line);
-    background: #fff;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    transform: translateY(12px);
 }
 
-/* The open mobile sheet needs the same solid bar as the scrolled state, even
-   at scrollY 0: the sheet is opaque white, so a transparent bar above it
-   would show the page through the strip around the logo. Its border is also
-   the single line between header and sheet — drawn here, on the bar's own
-   bottom edge, so it clears the close button by the bar's 12px padding
-   instead of running through it (which is what happened when the sheet drew
-   its own border-top 1px under the button). No shadow: the sheet's own
-   shadow covers that seam. */
-.hv2-nav--menu .hv2-nav__bar {
-    border-bottom-color: var(--hv2-pcard-line);
-    background: #fff;
-}
-
+/* `.hv2-shell` now wraps this from a separate parent element (see NavbarV2)
+   instead of sharing its class, the same split the footer card uses: shell's
+   own gutter only ever positions the card's outer edge, so the border sits
+   there at every viewport width — including the ones narrower than
+   `--hv2-shell`'s max-width, where shell has no room left to center and used
+   to leave the border flush against the true screen edge with nothing but
+   padding (inside that same border) standing between it and the content.
+   32px horizontal here is Figma's own header padding, which happens to match
+   the site's desktop gutter number but is a separate, always-on inset now,
+   not a coincidence borrowed from the wrapper. */
 .hv2-nav__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    padding-top: 22px;
-    padding-bottom: 22px;
+    padding: 22px 32px;
+    border: 1px solid transparent;
+    border-radius: var(--hv2-r-xxl);
+    background: transparent;
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Opening the menu at rest (unscrolled) does NOT put a border/fill on the
+   header — it stays exactly as transparent as it is any other time at the
+   top of the page, still floating borderless over the hero. Only scroll
+   earns the card; the sheet below (`.hv2-nav__mobile`) carries its own
+   shadow and needs nothing from the header to read as a separate surface. */
+.hv2-nav--scrolled .hv2-nav__inner {
+    border-color: var(--hv2-pcard-line);
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
 }
 
 .hv2-nav__logo {
@@ -947,22 +976,30 @@
     }
 }
 
-/* The mobile menu's own open animation — a full slide rather than sel-in's
-   4px pop, since it is a full-screen sheet dropping from behind the header
-   and not a small anchored popover. */
-/* Unfolds downward from the header's bottom edge, where the sheet's own top
-   sits. It used to be `translateY(-100%)`, which starts the panel a full
-   height above its resting place — once the sheet was sized to its content
-   that reads as flying in from the very top of the screen rather than
-   dropping out from under the bar. Clipping keeps the shadow hidden until
-   the edge it belongs to has arrived, too. */
+/* The mobile menu's own open animation — a slide rather than sel-in's 4px
+   pop, since it is a full-screen sheet dropping from behind the header and
+   not a small anchored popover. Slides the same 12px the header itself
+   slides by when it drops down on scroll (see `.hv2-nav--scrolled`'s `top`),
+   so opening the menu reads as the same motion as the header's own — a
+   `top` offset, not a wipe-reveal. It used to be `translateY(-100%)`, which
+   started the panel a full height above its resting place and read as
+   flying in from the very top of the screen; 12px is small enough that it
+   doesn't have that problem.
+   Opacity rides along too: the header's own transition fades its
+   background/border/shadow in together with the position change (see
+   `.hv2-nav__inner`'s transition list) — this sheet's shadow and fill had
+   nothing animating them at all, popping in at full strength the instant it
+   mounted while only the position slid, which is what read as abrupt next to
+   the header's everything-moves-together feel. */
 @keyframes hv2-nav-mobile-in {
     from {
-        clip-path: inset(0 0 100% 0);
+        transform: translateY(-12px);
+        opacity: 0;
     }
 
     to {
-        clip-path: inset(0 0 0 0);
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
@@ -1046,35 +1083,35 @@
     color: var(--hv2-on-dark);
 }
 
-/* Dark action bar, filled with the same `--hv2-brand` the calculator's
-   "Kredit şərtlərinə bax" pill uses (`.hv2-pill--dark`) — the two dark fills
-   on this page match. The count reads as a quiet status line, and the button
-   stays a white pill so it's the one thing that pops against it. */
+/* Light action bar (Color/Background/Inverse) — Figma node 578:8013 reads a
+   quiet #f4f5f5 fill here, not the dark brand fill; that one belongs to the
+   pill button instead. */
 .hv2-search__foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     padding: 14px 32px;
-    background: var(--hv2-brand);
+    background: var(--hv2-inverse-bg);
     /* -1px for the card's own border, so the fill meets the rounded edge. */
     border-radius: 0 0 calc(var(--hv2-r-xl) - 1px) calc(var(--hv2-r-xl) - 1px);
 }
 
 .hv2-search__count {
     font-size: 12.5px;
-    color: rgba(255, 255, 255, 0.64);
+    color: var(--hv2-ink-60);
 }
 
-/* Search button — a white pill so it pops against the dark bar. */
+/* Search button — the dark brand pill, the one thing that pops against the
+   light bar. Same dark-pill hover every other `--hv2-brand` button uses. */
 .hv2-search__cta {
     border: 1.5px solid transparent;
-    background: #ffffff;
-    color: var(--hv2-brand);
+    background: var(--hv2-brand);
+    color: var(--hv2-on-dark);
 }
 
 .hv2-search__cta:hover {
-    background: var(--hv2-muted-2);
+    background: var(--hv2-ink);
 }
 
 /* =========================================================================
@@ -1171,12 +1208,20 @@
 .hv2-pcard__body {
     position: relative;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
+    flex-direction: column;
+    gap: 8px;
     min-height: var(--hv2-pcard-foot);
     padding: 20px;
     background: rgba(253, 253, 253, 0.8);
+}
+
+/* Developer/price on the left, the area pill on the right — everything below
+   the title, which gets the full-width row above to itself. */
+.hv2-pcard__row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
 }
 
 .hv2-pcard__info {
@@ -1186,13 +1231,19 @@
     gap: 8px;
 }
 
-/* H6 Headline/Medium — 20/28, letter-spacing 0.15. */
+/* H6 Headline/Medium — 20/28, letter-spacing 0.15. Figma's own title node is a
+   fixed 28px tall, single line — the overflow guard is a safety net, not the
+   normal case, now that the title spans the card's full width instead of
+   sharing a row with the area pill. */
 .hv2-pcard__title {
+    overflow: hidden;
     font-size: 20px;
     font-weight: 500;
     line-height: 28px;
     letter-spacing: 0.15px;
     color: var(--hv2-ink);
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 /* Body 1/Regular — 16/24, letter-spacing 0.05. */
@@ -1544,69 +1595,13 @@
     align-items: center;
 }
 
-/* =========================================================================
-   TEAM INTRO
-   ========================================================================= */
-
-/* Figma 558:1061 — white 20-radius card at 20 padding, 40 between the heading
-   and the stat box. The stat box is bordered, also 20/20, and pushes its button
-   to the bottom so the intro lines up with the cards beside it. */
-.hv2-team__intro {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    padding: 20px;
-    border-radius: var(--hv2-r-xl);
-    background: var(--hv2-surface);
+/* Figma 1000:5542 — the home teaser's cards are the shared 432-square
+   `.hv2-ucard--person` at a shorter 380 (the about page's own full roster
+   keeps the square, so the override is scoped here rather than shared). */
+.hv2-s-team .hv2-ucard--person {
+    aspect-ratio: 432 / 380;
 }
 
-.hv2-team__title {
-    font-size: 32px;
-    font-weight: 500;
-    line-height: 40px;
-    letter-spacing: 0.25px;
-    color: var(--hv2-ink);
-}
-
-.hv2-team__stat {
-    display: flex;
-    flex: 1 0 0;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 20px;
-    border: 1px solid var(--hv2-pcard-line);
-    border-radius: var(--hv2-r-xl);
-}
-
-.hv2-team__details {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-/* Oak Sans Regular 60/72, letter-spacing -0.5, Color/Text/Brand. */
-.hv2-team__count {
-    font-family: var(--hv2-font-display);
-    font-size: 60px;
-    font-weight: 400;
-    line-height: 72px;
-    letter-spacing: -0.5px;
-    color: var(--hv2-brand);
-}
-
-.hv2-team__lead {
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0.25px;
-    color: var(--hv2-ink-60);
-}
-
-/* The stat box is a stretch-aligned column, so without this the button would
-   span its full width instead of hugging its label as it does in the design. */
-.hv2-team__stat .hv2-pill {
-    align-self: flex-start;
-}
 /* =========================================================================
    FOOTER
    ========================================================================= */
@@ -1622,23 +1617,25 @@
     background: var(--hv2-surface);
 }
 
-/* Figma 724:19591 draws this as a translucent 24-radius panel like the
-   header used to be — dropped for the same reason the header's was: no
-   border, no fill of its own (the wrap above already paints solid white
-   edge to edge), padding is vertical-only since --hv2-shell now supplies
-   the horizontal inset. */
+/* Figma 724:19591 draws this as a translucent 24-radius panel — rgba(253,253,253,0.8)
+   fill, a 1px Border/Secondary-Brand edge, 40 padding all round. The header
+   drops that same treatment at rest (it floats over the hero, transparent
+   until scrolled — see .hv2-nav__bar), but the footer has no hero under it to
+   stay transparent for, so it keeps the card look at all times.
+   `.hv2-shell` now sits on its own wrapper above this element (see FooterV2)
+   instead of sharing this class, which is what lets `padding: 40px` be a
+   plain shorthand here: the card's border sits flush with every other
+   section's content edge, and 40px is purely the border-to-content inset,
+   not fighting the page gutter for the same property. */
 .hv2-footer {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
     gap: 104px;
-    /* padding-top/bottom only, never the `padding: Xpx 0` shorthand — this
-       element carries `.hv2-shell` too (see FooterV2), and that shorthand's
-       implicit `padding-left/right: 0` silently wins over .hv2-shell's own
-       --hv2-pad gutter (same specificity, this rule sits later), pulling
-       every bit of footer content back out to the true viewport edge. */
-    padding-top: 24px;
-    padding-bottom: 24px;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxl);
+    background: rgba(253, 253, 253, 0.8);
+    padding: 40px;
 }
 
 /* Both columns are full-height and push their last row down. That is what lines
@@ -1656,7 +1653,7 @@
 .hv2-footer__brand {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 60px;
 }
 
 /* Body 1/Regular in Text/Secondary, held to the design's 420. */
@@ -1683,16 +1680,20 @@
 .hv2-footer__stack {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 60px;
 }
 
 /* Six links spread across the full 580, which is what produces the design's
-   41px gaps — they are the leftover space, not a set value. */
+   41px gaps — they are `space-between`'s leftover space, not a set value, so
+   only `row-gap` is fixed here. A fixed column-gap on top of `space-between`
+   reserves that width twice (once as gap, once as distributed space) and
+   pushed a locale with wider labels than the English reference into a wrap
+   this row was never meant to take. */
 .hv2-footer__nav {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 16px 41px;
+    row-gap: 16px;
 }
 
 .hv2-footer__nav a {
@@ -1774,7 +1775,10 @@
 }
 
 /* 36px button, 16px leaf — the leaf size is set per icon in the component
-   because the Facebook mark is narrower than the other four. */
+   because the Facebook mark is narrower than the other four. The fill and
+   border are real (confirmed against Figma's own generated markup, not just
+   the flat export — #f4f5f5 on #fdfdfd/80% reads as barely-there in a
+   screenshot but is there in the node). */
 .hv2-footer__social {
     display: inline-flex;
     flex: 0 0 auto;
@@ -2078,14 +2082,20 @@
     color: var(--hv2-ink);
 }
 
-/* Body 1/Regular in Text/Secondary. */
+/* Body 1/Regular in Text/Secondary. Clamped to two lines — the CMS blurb
+   runs longer than the card's 170px min-height budget, so it ellipsizes
+   instead of pushing the grid row taller. */
 .hv2-mega__desc {
+    display: -webkit-box;
+    overflow: hidden;
     font-family: var(--hv2-font-display);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     letter-spacing: 0.05px;
     color: var(--hv2-ink-60);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .hv2-mega__go {
@@ -2295,13 +2305,6 @@
     letter-spacing: 0;
     color: var(--hv2-ink);
 }
-    /* Horizontal padding still rides on `.hv2-shell` (--hv2-pad, 16px here),
-       only the vertical number here. */
-    .hv2-nav__inner {
-        gap: 16px;
-        padding-top: 18px;
-        padding-bottom: 18px;
-    }
 
 .hv2-ct__lead {
     font-size: 14px;
@@ -2895,8 +2898,7 @@ a.hv2-ct__entryvalue:hover {
     }
 
     /* H5 Headline — 24/32. The section heading steps down one rung on mobile. */
-    .hv2-h2,
-    .hv2-team__title {
+    .hv2-h2 {
         font-size: 24px;
         line-height: 32px;
     }
@@ -2907,8 +2909,8 @@ a.hv2-ct__entryvalue:hover {
         max-width: none;
     }
 
-    /* Inventory keeps three cards on one row and scrolls sideways, the way the
-       370-wide frame holds a 1094 track. */
+    /* Inventory keeps every card on one row and scrolls sideways, the way the
+       370-wide frame holds a track wider than the screen. */
     .hv2-s-inventory .hv2-grid-3 {
         display: flex;
         overflow-x: auto;
@@ -3063,13 +3065,12 @@ a.hv2-ct__entryvalue:hover {
         text-align: center;
     }
 
-    .hv2-team__intro {
-        gap: 14px;
-    }
-
-
     /* ---- burger menu (Figma 783:23754) --------------------------------
-       A white 24-radius card under the header. The nav rows are Body 2 in
+       A white 24-radius card under the header — genuinely one now: it opens
+       from the same `--hv2-pad` inset as the header card sits at when it has
+       one (see `.hv2-nav--scrolled .hv2-nav__inner`) instead of the
+       viewport's own edges, so the two line up instead of a rounded card
+       sitting on top of a wider square sheet. The nav rows are Body 2 in
        8-padded 20-radius pills, and the action buttons the header drops at
        this width come back along its foot. */
     .hv2-nav__mobile {
@@ -3085,30 +3086,47 @@ a.hv2-ct__entryvalue:hover {
            Figma's own sheet (783:23807), which is a fixed content height,
            not screen height. 65px is the header's own height at this width
            (12+12 padding around the 40px burger button, plus its 1px
-           border). */
+           border) — `top` itself always stays exactly that; the extra 20px
+           clearance for an already-scrolled header (see
+           `.hv2-nav--scrolled .hv2-nav__mobile` below) is a `transform`, the
+           same reasoning as `.hv2-nav__bar`'s own scrolled slide: this
+           element's `position: fixed` is relative to the true viewport, and
+           it has to stay that way, so nothing here — including this sheet
+           itself — can carry a `transform` at rest, only the scrolled
+           override does. */
         position: fixed;
         top: 65px;
-        left: 0;
-        right: 0;
+        transition: transform 0.25s ease;
+        left: var(--hv2-pad);
+        right: var(--hv2-pad);
         max-height: calc(100vh - 65px);
-        /* Same left/right gutter as every other section (--hv2-pad), not a
-           card's own inset — rows line up with the rest of the page instead
-           of reading as a narrower panel floating inside it. Top and bottom
-           match each other on purpose (see above). */
+        /* 16px horizontal — --hv2-pad's own value, matching the general page
+           gutter every other section indents its content by. Every direct
+           child (the plain rows, the project chips, the action-button row)
+           inherits it instead of setting its own, which is what had a few of
+           them flush against the sheet's own wall while others held an 8px
+           gap from their own link padding — one inset, top to bottom. Top and
+           bottom still match each other on purpose (see above). */
         padding: 24px var(--hv2-pad);
-        /* No border of its own: the line between header and sheet is the
-           bar's border-bottom (see `.hv2-nav--menu`), which sits a full 12px
-           below the close button rather than 1px. Drawing it here as well
-           would double it. */
-        border: 0;
+        border-radius: var(--hv2-r-xxl);
         background: var(--hv2-surface);
         box-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
         overflow-y: auto;
         overscroll-behavior: contain;
         scrollbar-width: thin;
-        /* Drops down from behind the header instead of popping in place —
-           see the reduced-motion override for the no-animation fallback. */
-        animation: hv2-nav-mobile-in 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Drops down from behind the header instead of popping in place — same
+           0.25s ease the header itself slides down with (see
+           `.hv2-nav__bar`'s scrolled `transform`), so the two read as one
+           motion. See the reduced-motion override for the no-animation
+           fallback. */
+        animation: hv2-nav-mobile-in 0.25s ease;
+    }
+
+    /* Same 20px `.hv2-nav--scrolled` itself adds to its own `top` — see the
+       note above on why this is a `transform`, not a `top` change. */
+    .hv2-nav--scrolled .hv2-nav__mobile {
+        transform: translateY(20px);
+        max-height: calc(100vh - 65px - 20px);
     }
 
     .hv2-nav__mobile::-webkit-scrollbar {
@@ -3201,7 +3219,11 @@ a.hv2-ct__entryvalue:hover {
         flex-direction: column;
         gap: 4px;
         /* 8 above, 4 below: the parent list's own 4px gap sits under this one
-           too, so 4 here lands the same 8 of clearance on both sides. */
+           too, so 4 here lands the same 8 of clearance on both sides.
+           Horizontal padding stays at 0: `.hv2-nav__mobile`'s own 20px (see
+           above) is what insets every row, chips included, so a second copy
+           here would push just this list in further than everything around
+           it. */
         margin: 8px 0 4px;
         padding: 0;
         list-style: none;
@@ -3359,6 +3381,13 @@ a.hv2-ct__entryvalue:hover {
         gap: 32px 12px;
         padding-top: 32px;
         padding-bottom: 32px;
+        /* The 1024px breakpoint's own 32px horizontal (still in effect below
+           this one too, since nothing here reset it) reads too wide once the
+           card is this narrow — the callback banner right above it drops to
+           20px at the same width (see `.hv2-cb__form`), and the footer card
+           should match it rather than run its own, wider number. */
+        padding-left: 20px;
+        padding-right: 20px;
     }
 
     .hv2-footer__col,

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getDict } from "./dictionary";
-import { projectCards } from "./data";
+import type { NavProject } from "./projects-api";
 
-type Props = { locale: string; onNavigate?: () => void };
+type Props = { locale: string; items: NavProject[]; onNavigate?: () => void };
 
 /**
  * "Projects" mega-menu — Figma 324:3876, a 1344x376 panel of 321x170 cards laid
@@ -13,17 +13,16 @@ type Props = { locale: string; onNavigate?: () => void };
  * grid is built from the project list plus one trailing tile rather than from a
  * uniform array.
  *
- * The design fills each card's second line with Lorem Ipsum. Rather than invent
- * marketing copy this renders the developer and the area range, which is real
- * data we already hold; a proper blurb should come from the CMS when the list
- * stops being seeded.
+ * The design fills each card's second line with Lorem Ipsum; the real line is
+ * the CMS description, clamped to two lines in CSS (`.hv2-mega__desc`) rather
+ * than cut off mid-word.
  */
-export default function ProjectsMenuV2({ locale, onNavigate }: Props) {
+export default function ProjectsMenuV2({ locale, items, onNavigate }: Props) {
   const dict = getDict(locale);
 
   return (
     <div className="hv2-mega">
-      {projectCards.map((item) => (
+      {items.map((item) => (
         <Link
           key={item.slug}
           href={`/${locale}/projects/${item.slug}`}
@@ -31,20 +30,20 @@ export default function ProjectsMenuV2({ locale, onNavigate }: Props) {
           onClick={onNavigate}
         >
           <span className="hv2-mega__head">
-            <Image
-              className="hv2-mega__thumb"
-              src={`/images/thumbs/${item.slug}.jpg`}
-              alt=""
-              aria-hidden="true"
-              width={60}
-              height={60}
-            />
+            {item.image ? (
+              <Image
+                className="hv2-mega__thumb"
+                src={item.image}
+                alt=""
+                aria-hidden="true"
+                width={60}
+                height={60}
+              />
+            ) : null}
             <span className="hv2-mega__title">{item.title}</span>
           </span>
 
-          <span className="hv2-mega__desc">
-            {item.developer} · {item.areaRange}
-          </span>
+          <span className="hv2-mega__desc">{item.desc}</span>
         </Link>
       ))}
 

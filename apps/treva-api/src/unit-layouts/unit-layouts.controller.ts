@@ -111,8 +111,12 @@ export class UnitLayoutsController {
   @Get('range')
   @ApiOperation({ summary: 'Get price and area range from unit layouts' })
   @ApiQuery({ name: 'currency', required: false })
-  async getRange(@Query('currency') currency?: string) {
-    return this.unitLayoutsService.findRange(currency || 'USD');
+  @ApiQuery({ name: 'categorySlug', required: false })
+  async getRange(
+    @Query('currency') currency?: string,
+    @Query('categorySlug') categorySlug?: string,
+  ) {
+    return this.unitLayoutsService.findRange(currency || 'USD', categorySlug);
   }
 
   @Get('stats')

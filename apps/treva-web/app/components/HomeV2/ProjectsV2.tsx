@@ -1,11 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getDict } from "./dictionary";
-import { projectCards, type ProjectCard } from "./data";
+import type { ProjectCard } from "./data";
+import { getProjectCards } from "./projects-api";
 import ProjectCardV2 from "./ProjectCardV2";
 
 type Props = {
   locale: string;
+  /** Skips the CMS fetch and renders exactly this list — the credit page's
+      three-card strip, static and unenriched. Omit it for the full,
+      CMS-enriched six-card home grid: a plain `<ProjectsV2 locale={locale} />`
+      is a complete, self-fetching section, so any future page can drop it in
+      without wiring its own data. */
   items?: ProjectCard[];
   /** Overrides the section heading; the credit page gives it its own. */
   title?: string;
@@ -13,13 +19,14 @@ type Props = {
   showLead?: boolean;
 };
 
-export default function ProjectsV2({ locale, items = projectCards, title, showLead = true }: Props) {
+export default async function ProjectsV2({ locale, items, title, showLead = true }: Props) {
   const dict = getDict(locale);
+  const list = items ?? (await getProjectCards(locale));
 
   return (
     <section
       className={
-        items.length > 3
+        list.length > 3
           ? "hv2-shell hv2-section hv2-s-projects"
           : "hv2-shell hv2-section hv2-s-projects hv2-s-projects--single"
       }
@@ -33,7 +40,7 @@ export default function ProjectsV2({ locale, items = projectCards, title, showLe
       </div>
 
       <div className="hv2-grid-3">
-        {items.map((item) => (
+        {list.map((item) => (
           <ProjectCardV2
             key={item.slug}
             item={item}

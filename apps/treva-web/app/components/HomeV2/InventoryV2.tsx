@@ -33,7 +33,13 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
   const visibleItems = deal === "resale" ? resaleItems : items;
 
   return (
-    <section className="hv2-shell hv2-section hv2-s-inventory">
+    <section
+      className={
+        visibleItems.length > 3
+          ? "hv2-shell hv2-section hv2-s-inventory"
+          : "hv2-shell hv2-section hv2-s-inventory hv2-s-inventory--single"
+      }
+    >
       <div className="hv2-section-head">
         <h2 className="hv2-h2">{dict.inventory.title}</h2>
 

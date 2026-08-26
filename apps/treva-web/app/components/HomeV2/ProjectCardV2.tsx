@@ -25,8 +25,26 @@ const MEDIA_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
  * so the pair lands exactly where the designer dragged it. Origin and the
  * hover zoom are handled in CSS.
  */
+/**
+ * Framing for a cover with no hand-framed crop — every CMS-fed card.
+ *
+ * `cover` alone leaves the render at exactly the window's height, so the
+ * building sits inside the frame and nothing reaches the 44px overhang the card
+ * is built around. The four seed renders all zoom past `cover` to get there —
+ * 1.18x, 1.37x, 1.29x and 1.28x of the window height — anchored so the
+ * foreground stays pinned to the window's bottom edge. An uploaded cover gets
+ * the average of those, from the same anchor.
+ */
+const UNCROPPED_ZOOM = 1.28;
+
 function cropStyle(crop: ProjectCard["crop"]): CSSProperties {
-  if (!crop) return { objectFit: "cover" };
+  if (!crop) {
+    return {
+      objectFit: "cover",
+      transform: `scale(${UNCROPPED_ZOOM})`,
+      transformOrigin: "50% 100%",
+    };
+  }
 
   return {
     objectFit: "fill",
@@ -120,35 +138,48 @@ export default function ProjectCardV2({ item, locale, startingFromLabel }: Props
         />
 
         <div className="hv2-pcard__body">
-          <div className="hv2-pcard__info">
-            <h3 className="hv2-pcard__title">{item.title}</h3>
+          {/* Its own full-width row — sharing one with the area pill left a
+              long title (e.g. "Panorama by ELIE SAAB" next to a wide
+              "40.7 m² - 380.8 m²" badge) squeezed into a half-width column
+              and ellipsized well before the card's edge. */}
+          <h3 className="hv2-pcard__title">{item.title}</h3>
 
-            {/* `unoptimized`: the image optimizer rejects SVG unless
-                `dangerouslyAllowSVG` is set globally, and serving one 1.4KB
-                glyph as-is is cheaper than loosening that site-wide. */}
-            <p className="hv2-pcard__dev">
-              {item.icon ? (
-                <Image
-                  className="hv2-pcard__dev-icon"
-                  src={item.icon}
-                  alt=""
-                  aria-hidden="true"
-                  width={24}
-                  height={24}
-                  unoptimized
-                />
-              ) : (
-                <MapPin className="hv2-pcard__dev-icon" size={24} strokeWidth={1.5} />
-              )}
-              {item.developer}
-            </p>
+          <div className="hv2-pcard__row">
+            <div className="hv2-pcard__info">
+              {/* `unoptimized`: the image optimizer rejects SVG unless
+                  `dangerouslyAllowSVG` is set globally, and serving one 1.4KB
+                  glyph as-is is cheaper than loosening that site-wide. */}
+              <p className="hv2-pcard__dev">
+                {item.icon ? (
+                  <Image
+                    className="hv2-pcard__dev-icon"
+                    src={item.icon}
+                    alt=""
+                    aria-hidden="true"
+                    width={24}
+                    height={24}
+                    unoptimized
+                  />
+                ) : (
+                  <MapPin className="hv2-pcard__dev-icon" size={24} strokeWidth={1.5} />
+                )}
+                {item.developer}
+              </p>
 
-            <p className="hv2-pcard__price">
-              {startingFromLabel} {item.startingFrom}
-            </p>
+              {/* Price and area come from the inventory, not the CMS, so a
+                  project with nothing published yet has neither — the lines are
+                  dropped rather than rendered as a bare label. */}
+              {item.startingFrom ? (
+                <p className="hv2-pcard__price">
+                  {startingFromLabel} {item.startingFrom}
+                </p>
+              ) : null}
+            </div>
+
+            {item.areaRange ? (
+              <span className="hv2-pcard__area">{item.areaRange}</span>
+            ) : null}
           </div>
-
-          <span className="hv2-pcard__area">{item.areaRange}</span>
         </div>
       </div>
 
