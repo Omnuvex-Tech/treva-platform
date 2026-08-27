@@ -791,6 +791,16 @@
     border-radius: var(--hv2-r-xxl);
     overflow: hidden;
     background: var(--hv2-muted);
+    /* `overflow: hidden` + `border-radius` is exactly the pair a composited
+       child can escape: the <video> gets its own layer and the ancestor's
+       rounded clip is not always pushed down onto it, so the footage's square
+       bottom corners printed into the two wedges outside the curve. Whatever
+       frame was playing showed there — dark ones read as black notches, light
+       ones as pale tabs. `clip-path` is a hard clip over the whole subtree
+       rather than a paint-time rounding of this box, so no descendant layer
+       can reach past it. Kept alongside the radius, not instead of it: the
+       radius is still what shapes the box's own background and border.  */
+    clip-path: inset(0 round var(--hv2-r-xxl));
 }
 
 .hv2-heroimg__media {
@@ -808,9 +818,10 @@
     object-fit: cover;
 }
 
-/* Caption strip: frosted glass over the footage — the picture keeps running
-   underneath, blurred, so dark copy stays legible on any frame. The rgba wash
-   is the fallback where backdrop-filter is unsupported. */
+/* Caption strip: a translucent wash over the footage — the picture keeps
+   running underneath, dimmed rather than blurred, so dark copy stays legible
+   on any frame. It asked for frosted glass until the blur turned out to be
+   what smudged the card's bottom corners; see the background declaration. */
 .hv2-heroimg__bar {
     position: absolute;
     inset: auto 0 0 0;
@@ -820,27 +831,25 @@
     gap: 16px;
     height: 88px;
     padding: 0 22px;
-    background: rgba(253, 253, 253, 0.8);
-    /* The comment above promised frosted glass and the @supports fallback below
-       assumed it, but the declaration itself was missing — the bar was a flat
-       80% wash over the footage. */
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    /* `.hv2-heroimg`'s own overflow:hidden should clip this to its rounded
-       corners on its own, but a backdrop-filter child is composited on its own
-       layer and some browsers paint that layer past the ancestor's radius
-       clip — the bar's square corners then poke out past the curve at the
-       bottom of the card. Rounding the bar's own bottom corners to match
-       fixes it regardless of whether that clipping bug is in play. */
+    /* A flat wash, not the frosted glass this bar used to ask for. The blur
+       was the whole of the corner artefact: at the card's two bottom corners
+       the filter dragged whatever sat behind the bar into the curve, which
+       read as dark smudges hugging the radius. Verified by elimination in
+       Chrome — turning the blur off is the only change that cleared them.
+       Rounding the footage, giving the card its own backdrop root
+       (`isolation`/`filter`), dropping the card's background and lowering the
+       blur to 4px were each tried and each left the smudge exactly as it was.
+       0.86 is the opacity the old `@supports` fallback already used for
+       browsers without backdrop-filter, so this is the look that block was
+       written for, now the only one. */
+    background: rgba(255, 255, 255, 0.86);
+    /* Matches the card's own curve. With no filtered layer in the subtree the
+       ancestor's overflow:hidden clips correctly on its own, but the bar is
+       flush to that edge and rounding it costs nothing. */
     border-bottom-left-radius: var(--hv2-r-xxl);
     border-bottom-right-radius: var(--hv2-r-xxl);
 }
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .hv2-heroimg__bar {
-        background: rgba(255, 255, 255, 0.86);
-    }
-}
 
 .hv2-heroimg__scroll {
     color: var(--hv2-ink);
