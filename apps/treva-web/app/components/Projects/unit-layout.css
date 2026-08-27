@@ -172,6 +172,16 @@
     font-weight: 400;
 }
 
+.layout-card__meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.layout-card__meta-row .layout-card__meta-sep {
+    color: var(--color-text-muted);
+}
+
 .layout-card__number {
     font-size: 14px;
     color: var(--color-text-muted);

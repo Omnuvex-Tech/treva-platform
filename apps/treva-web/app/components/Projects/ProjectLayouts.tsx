@@ -132,8 +132,11 @@ export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllH
                 <div className="layout-card__header">
                   <div className="layout-card__title-block">
                     <span className="layout-card__code">{layout.code}</span>
-                    <span className="layout-card__floor">{layout.floor}</span>
-                    <span className="layout-card__number">{layout.number}</span>
+                    <span className="layout-card__meta-row">
+                      <span className="layout-card__floor">{layout.floor}</span>
+                      <span className="layout-card__meta-sep">•</span>
+                      <span className="layout-card__number">{layout.number}</span>
+                    </span>
                   </div>
                 </div>
 
