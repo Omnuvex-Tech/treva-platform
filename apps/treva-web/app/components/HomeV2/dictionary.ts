@@ -78,7 +78,7 @@ export const dictionary = {
             price: "Qiymət",
             compare: "Müqayisədən çıxar",
             save: "Seçilmişlərə əlavə et",
-            empty: "Müqayisə üçün hələ heç nə seçilməyib.",
+            empty: "Məlumat daxil edilməyib.",
         },
         contact: {
             title: ["Əlaqə quraq və birlikdə", "irəli gedək"],
@@ -208,7 +208,7 @@ export const dictionary = {
             price: "Price",
             compare: "Remove from comparison",
             save: "Add to saved",
-            empty: "Nothing has been picked for comparison yet.",
+            empty: "No data has been entered.",
         },
         contact: {
             title: ["Let's Connect And", "Move Forward Together"],
@@ -338,7 +338,7 @@ export const dictionary = {
             price: "Цена",
             compare: "Убрать из сравнения",
             save: "Добавить в избранное",
-            empty: "Для сравнения пока ничего не выбрано.",
+            empty: "Данные не введены.",
         },
         contact: {
             title: ["Свяжемся и вместе", "пойдём вперёд"],

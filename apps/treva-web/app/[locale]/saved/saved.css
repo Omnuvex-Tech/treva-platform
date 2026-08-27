@@ -53,6 +53,24 @@
   top: -16px;
 }
 
+.saved-section {
+  margin-bottom: 56px;
+}
+
+.saved-section:last-child {
+  margin-bottom: 0;
+}
+
+.saved-section-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 20px;
+}
+
 .saved-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -499,6 +499,7 @@
 }
 
 .cards-grid .layout-card__visual {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -508,6 +509,12 @@
   height: 240px;
   padding: 0;
   box-sizing: border-box;
+}
+
+.cards-grid .layout-card__visual-link {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .cards-grid .layout-card__blueprint {
@@ -526,6 +533,61 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+/* Heart + compare pair, top-right of the photo — same Figma pattern as the
+   Comparison page card, added here so off-plan units get the same actions
+   resale listings already have. */
+.cards-grid .layout-card__actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.cards-grid .layout-card__action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: background-color 0.18s ease;
+}
+
+.cards-grid .layout-card__action-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Figma 771:23156 — hover (grey, #71757e) and checked (near-black, #373b43
+   with a 2px border) are two distinct states, not one shared shade. */
+.cards-grid .layout-card__action-btn:hover {
+  background-color: #71757e;
+}
+
+.cards-grid .layout-card__action-btn.active {
+  background-color: #373b43;
+  border: 2px solid #e2e3e2;
+}
+
+/* Hovering an already-active button still reads as hover, not "extra
+   checked" — same grey it'd show unchecked. */
+.cards-grid .layout-card__action-btn.active:hover {
+  background-color: #71757e;
+  border: none;
+}
+
+.cards-grid .layout-card__action-btn:hover img,
+.cards-grid .layout-card__action-btn.active img {
+  filter: brightness(0) invert(1);
 }
 
 .cards-grid .layout-card__footer {

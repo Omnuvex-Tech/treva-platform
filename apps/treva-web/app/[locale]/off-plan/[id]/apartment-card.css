@@ -548,6 +548,22 @@
   background-color: var(--treva-pill-bg-hover);
 }
 
+.apt-icon-btn img {
+  width: 18px;
+  height: 18px;
+  /* The compare/heart assets are flat dark SVGs — on this button's dark
+     fill they'd be invisible without inverting them to white first. */
+  filter: brightness(0) invert(1);
+}
+
+.apt-icon-btn.active {
+  background-color: #ffffff;
+}
+
+.apt-icon-btn.active img {
+  filter: none;
+}
+
 .apt-share-btn svg {
   display: block;
   flex: 0 0 auto;

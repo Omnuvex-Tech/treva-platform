@@ -9,6 +9,8 @@ import { useCurrencies } from '@/hooks/use-currencies';
 import { useDebounce } from '@/hooks/use-debounce';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
+import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
+import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import './unit-filter.css';
 
 const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string }> = [
@@ -76,6 +78,10 @@ export default function UnitLayout() {
       sold: 'Satılıb',
       reserved: 'Bron edilib',
       floorSuffix: 'mərtəbə',
+      saveListing: 'Seçilmişlərə əlavə et',
+      removeFromSaved: 'Seçilmişlərdən sil',
+      compareListing: 'Müqayisəyə əlavə et',
+      removeFromCompare: 'Müqayisədən çıxar',
     },
     en: {
       titleThin: 'Unit',
@@ -105,6 +111,10 @@ export default function UnitLayout() {
       sold: 'Sold',
       reserved: 'Reserved',
       floorSuffix: 'floor',
+      saveListing: 'Add to saved',
+      removeFromSaved: 'Remove from saved',
+      compareListing: 'Add to comparison',
+      removeFromCompare: 'Remove from comparison',
     },
     ru: {
       titleThin: 'План',
@@ -134,6 +144,10 @@ export default function UnitLayout() {
       sold: 'Продано',
       reserved: 'Забронировано',
       floorSuffix: 'этаж',
+      saveListing: 'Добавить в избранное',
+      removeFromSaved: 'Удалить из избранного',
+      compareListing: 'Добавить к сравнению',
+      removeFromCompare: 'Убрать из сравнения',
     },
   } as const;
 
@@ -169,6 +183,13 @@ export default function UnitLayout() {
   const limit = 12;
 
   const [categories, setCategories] = useState<Array<{ slug: string; title: string }>>([]);
+  const [savedItems, setSavedItems] = useState<string[]>([]);
+  const [comparedItems, setComparedItems] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSavedItems(getSaved().filter(p => p.type === 'off-plan').map(p => p.id));
+    setComparedItems(getCompared().filter(p => p.type === 'off-plan').map(p => p.id));
+  }, []);
 
   const { data: statusOptionsData } = useStatusOptions();
   const statusOptions = statusOptionsData || [];
@@ -382,6 +403,52 @@ export default function UnitLayout() {
 
   const getCardCode = (layout: UnitLayout) => {
     return layout.title || layout.name;
+  };
+
+  const toggleSave = (layout: UnitLayout) => {
+    if (savedItems.includes(layout.id)) {
+      removeSaved(layout.id);
+      setSavedItems(prev => prev.filter(id => id !== layout.id));
+    } else {
+      addSaved({
+        id: layout.id,
+        slug: layout.slug,
+        type: 'off-plan',
+        image: (layout.coverImage || layout.mainImage)?.url ? getAssetUrl((layout.coverImage || layout.mainImage)!.url) : '',
+        price: layout.prices?.[currency] || 0,
+        currency,
+        rooms: String(layout.number ?? ''),
+        area: String(layout.totalArea ?? ''),
+        floor: formatFloorRange(layout),
+        location: layout.category?.title || '',
+        project: layout.category?.title || '',
+        title: getCardCode(layout),
+      });
+      setSavedItems(prev => [...prev, layout.id]);
+    }
+  };
+
+  const toggleCompare = (layout: UnitLayout) => {
+    if (comparedItems.includes(layout.id)) {
+      removeCompared(layout.id);
+      setComparedItems(prev => prev.filter(id => id !== layout.id));
+    } else {
+      addCompared({
+        id: layout.id,
+        slug: layout.slug,
+        type: 'off-plan',
+        image: (layout.coverImage || layout.mainImage)?.url ? getAssetUrl((layout.coverImage || layout.mainImage)!.url) : '',
+        price: layout.prices?.[currency] || 0,
+        currency,
+        rooms: String(layout.number ?? ''),
+        area: String(layout.totalArea ?? ''),
+        floor: formatFloorRange(layout),
+        building: layout.entrance,
+        project: layout.category?.title || '',
+        title: getCardCode(layout),
+      });
+      setComparedItems(prev => [...prev, layout.id]);
+    }
   };
 
   return (
@@ -768,7 +835,7 @@ export default function UnitLayout() {
               )}
               <div className={`cards-grid${!showSpinner ? ' cards-grid--fadein' : ''}`} style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
                 {layouts.map((layout: UnitLayout) => (
-                  <Link key={layout.id} href={`/${locale}/off-plan/${layout.slug}`} className="layout-card-wrapper">
+                  <div key={layout.id} className="layout-card-wrapper">
                     <div className="layout-card">
                       <div className="layout-card__header">
                         <div className="layout-card__title-block">
@@ -782,17 +849,38 @@ export default function UnitLayout() {
                       </div>
 
                       <div className="layout-card__visual">
-                        {layout.coverImage || layout.mainImage ? (
-                          <img
-                            src={getAssetUrl((layout.coverImage || layout.mainImage)!.url)}
-                            alt={(layout.coverImage || layout.mainImage)!.alt || layout.title}
-                            className="layout-card__blueprint"
-                          />
-                        ) : (
-                          <div className="layout-card__blueprint layout-card__blueprint--placeholder">
-                            <span>{t.noImage}</span>
-                          </div>
-                        )}
+                        <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__visual-link" aria-label={t.viewApartmentDetails}>
+                          {layout.coverImage || layout.mainImage ? (
+                            <img
+                              src={getAssetUrl((layout.coverImage || layout.mainImage)!.url)}
+                              alt={(layout.coverImage || layout.mainImage)!.alt || layout.title}
+                              className="layout-card__blueprint"
+                            />
+                          ) : (
+                            <div className="layout-card__blueprint layout-card__blueprint--placeholder">
+                              <span>{t.noImage}</span>
+                            </div>
+                          )}
+                        </Link>
+
+                        <div className="layout-card__actions">
+                          <button
+                            type="button"
+                            className={`layout-card__action-btn ${comparedItems.includes(layout.id) ? 'active' : ''}`}
+                            onClick={() => toggleCompare(layout)}
+                            aria-label={comparedItems.includes(layout.id) ? t.removeFromCompare : t.compareListing}
+                          >
+                            <img src="/images/icons/compare.svg" alt="" width={16} height={16} />
+                          </button>
+                          <button
+                            type="button"
+                            className={`layout-card__action-btn ${savedItems.includes(layout.id) ? 'active' : ''}`}
+                            onClick={() => toggleSave(layout)}
+                            aria-label={savedItems.includes(layout.id) ? t.removeFromSaved : t.saveListing}
+                          >
+                            <img src="/images/icons/heart.svg" alt="" width={16} height={16} />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="layout-card__footer">
@@ -804,8 +892,8 @@ export default function UnitLayout() {
                         <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
                       </div>
                     </div>
-                    <span className="layout-card__cta">{t.viewApartmentDetails}</span>
-                  </Link>
+                    <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__cta">{t.viewApartmentDetails}</Link>
+                  </div>
                 ))}
               </div>
             </div>
