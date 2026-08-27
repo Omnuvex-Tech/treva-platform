@@ -11,6 +11,8 @@ import PageContainer from '@/app/components/Container/PageContainer';
 import { useUnitLayoutBySlug } from '@/hooks/use-unit-layouts';
 import { useCurrencies } from '@/hooks/use-currencies';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
+import { isSaved as isSavedProp, addSaved, removeSaved } from '@/lib/saved-properties';
+import { isCompared as isComparedProp, addCompared, removeCompared } from '@/lib/compare-properties';
 import { trevaApi as api } from "@/lib/api";
 import { endpoints } from "@/config/endpoints";
 import type { UnitLayout } from "@/lib/unit-layout.types";
@@ -34,6 +36,10 @@ export default function ApartmentCard() {
       share: 'Paylaş',
       copied: 'Kopyalandı!',
       copyLink: 'Linki kopyala',
+      save: 'Seçilmişlərə əlavə et',
+      saved: 'Seçilmişlərdə',
+      compare: 'Müqayisəyə əlavə et',
+      compared: 'Müqayisədə',
       floor: 'Mərtəbə',
       totalArea: 'Ümumi sahə',
       internalArea: 'Daxili sahə',
@@ -74,6 +80,10 @@ export default function ApartmentCard() {
       share: 'Share',
       copied: 'Copied!',
       copyLink: 'Copy link',
+      save: 'Add to saved',
+      saved: 'Saved',
+      compare: 'Add to comparison',
+      compared: 'In comparison',
       floor: 'Floor',
       totalArea: 'Total Area',
       internalArea: 'Internal Area',
@@ -114,6 +124,10 @@ export default function ApartmentCard() {
       share: 'Поделиться',
       copied: 'Скопировано!',
       copyLink: 'Скопировать ссылку',
+      save: 'Добавить в избранное',
+      saved: 'В избранном',
+      compare: 'Добавить к сравнению',
+      compared: 'В сравнении',
       floor: 'Этаж',
       totalArea: 'Общая площадь',
       internalArea: 'Внутренняя площадь',
@@ -159,6 +173,8 @@ export default function ApartmentCard() {
   const [shareOpen, setShareOpen] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isCompared, setIsCompared] = useState(false);
   const similarLimit = 6;
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
@@ -244,6 +260,63 @@ export default function ApartmentCard() {
     }
     const floor = item?.floor;
     return typeof floor === 'number' ? `${floor}` : '';
+  };
+
+  useEffect(() => {
+    if (layout) {
+      setIsSaved(isSavedProp(layout.id));
+      setIsCompared(isComparedProp(layout.id));
+    }
+  }, [layout]);
+
+  const toggleSaveProp = () => {
+    if (!layout) return;
+    const image = (layout.coverImage || layout.mainImage)?.url ? getAssetUrl((layout.coverImage || layout.mainImage)!.url) : '';
+    if (isSavedProp(layout.id)) {
+      removeSaved(layout.id);
+      setIsSaved(false);
+    } else {
+      addSaved({
+        id: layout.id,
+        slug: layout.slug,
+        type: 'off-plan',
+        image,
+        price: layout.prices?.[currency] || 0,
+        currency,
+        rooms: String(layout.number ?? ''),
+        area: String(layout.totalArea ?? ''),
+        floor: formatFloorRange(layout),
+        location: layout.category?.title || '',
+        project: layout.category?.title || '',
+        title: layout.title || layout.name,
+      });
+      setIsSaved(true);
+    }
+  };
+
+  const toggleCompareProp = () => {
+    if (!layout) return;
+    const image = (layout.coverImage || layout.mainImage)?.url ? getAssetUrl((layout.coverImage || layout.mainImage)!.url) : '';
+    if (isComparedProp(layout.id)) {
+      removeCompared(layout.id);
+      setIsCompared(false);
+    } else {
+      addCompared({
+        id: layout.id,
+        slug: layout.slug,
+        type: 'off-plan',
+        image,
+        price: layout.prices?.[currency] || 0,
+        currency,
+        rooms: String(layout.number ?? ''),
+        area: String(layout.totalArea ?? ''),
+        floor: formatFloorRange(layout),
+        building: layout.entrance,
+        project: layout.category?.title || '',
+        title: layout.title || layout.name,
+      });
+      setIsCompared(true);
+    }
   };
 
   const panoramaBannerUrl = layout?.category?.bannerImage ? getAssetUrl(layout.category.bannerImage) : '';
@@ -737,6 +810,22 @@ export default function ApartmentCard() {
                         <span className="apt-badge__text">PDF</span>
                       </a>
                     ) : null}
+                    <button
+                      type="button"
+                      className={`apt-share-btn apt-icon-btn ${isCompared ? 'active' : ''}`}
+                      aria-label={isCompared ? t.compared : t.compare}
+                      onClick={toggleCompareProp}
+                    >
+                      <img src="/images/icons/compare.svg" alt="" />
+                    </button>
+                    <button
+                      type="button"
+                      className={`apt-share-btn apt-icon-btn ${isSaved ? 'active' : ''}`}
+                      aria-label={isSaved ? t.saved : t.save}
+                      onClick={toggleSaveProp}
+                    >
+                      <img src="/images/icons/heart.svg" alt="" />
+                    </button>
                     <div className="apt-share-container" ref={shareRef}>
                       <button type="button" className="apt-share-btn" aria-label={t.share} onClick={() => setShareOpen((prev) => !prev)} aria-haspopup="listbox" aria-expanded={shareOpen}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

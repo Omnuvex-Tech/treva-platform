@@ -1,26 +1,23 @@
-const STORAGE_KEY = 'treva_saved';
-const EVENT_NAME = 'treva-saved-changed';
+const STORAGE_KEY = 'treva_compare';
+const EVENT_NAME = 'treva-compare-changed';
 
-export type SavedProperty = {
+export type CompareProperty = {
   id: string;
   slug: string;
   type: 'resale' | 'off-plan';
   image: string;
   price: number;
-  priceByArea?: number;
   currency: string;
   rooms: string;
   area: string;
   floor: string;
-  location: string;
+  /** Complex/project name (off-plan) or listing location (resale). */
+  project: string;
+  building?: string;
   title: string;
-  apartmentTypeSlug?: string;
-  apartmentTypeTitle?: string;
-  /** Off-plan only: the residential complex the unit belongs to. */
-  project?: string;
 };
 
-function readAll(): SavedProperty[] {
+function readAll(): CompareProperty[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -30,40 +27,40 @@ function readAll(): SavedProperty[] {
   }
 }
 
-function writeAll(items: SavedProperty[]) {
+function writeAll(items: CompareProperty[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: { count: items.length } }));
 }
 
-export function onSavedChange(callback: (count: number) => void): () => void {
+export function onCompareChange(callback: (count: number) => void): () => void {
   const handler = (e: Event) => callback((e as CustomEvent).detail.count);
   window.addEventListener(EVENT_NAME, handler);
   return () => window.removeEventListener(EVENT_NAME, handler);
 }
 
-export function getSaved(): SavedProperty[] {
+export function getCompared(): CompareProperty[] {
   return readAll();
 }
 
-export function getSavedByType(type: SavedProperty['type']): SavedProperty[] {
+export function getComparedByType(type: CompareProperty['type']): CompareProperty[] {
   return readAll().filter(p => p.type === type);
 }
 
-export function isSaved(id: string): boolean {
+export function isCompared(id: string): boolean {
   return readAll().some(p => p.id === id);
 }
 
-export function addSaved(property: SavedProperty): void {
+export function addCompared(property: CompareProperty): void {
   const all = readAll();
   if (all.some(p => p.id === property.id)) return;
   all.push(property);
   writeAll(all);
 }
 
-export function removeSaved(id: string): void {
+export function removeCompared(id: string): void {
   writeAll(readAll().filter(p => p.id !== id));
 }
 
-export function getSavedCount(): number {
+export function getComparedCount(): number {
   return readAll().length;
 }

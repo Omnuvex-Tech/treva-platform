@@ -2155,16 +2155,88 @@
    Figma 638:27901 — a heading over two 660x283 cards, 24 apart. The card puts
    a floor plan beside a five-row table; on mobile (675:16438) the same DOM
    stacks and the divider moves from the right edge of the plan to its bottom. */
+/* Callback right below carries a fixed 40px padding-top of its own; matching
+   that here keeps the gap above the heading and the gap below the cards
+   actually equal instead of one being header-flush and the other 40px. */
 .hv2-s-compare {
-    /* head 40 + flow 40 + 283 of card. */
-    min-height: calc(var(--hv2-section) + 363px);
+    padding-top: 40px;
+}
+
+.hv2-cmp__group + .hv2-cmp__group {
+    margin-top: 64px;
+}
+
+.hv2-cmp__group-title {
+    margin: var(--hv2-flow) 0 0;
+    font-family: var(--hv2-font-display);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+    color: var(--hv2-ink);
+}
+
+/* Figma 675:16466 — a dedicated 48x48 circle rather than the header's
+   `.hv2-nav__btn--icon` (that class carries hover/press rules tuned for a
+   16-item action row and, combined with `active`, could end up a different
+   width than its sibling — the two buttons touched instead of keeping their
+   8px gap). Fixed, explicit sizing here removes that risk entirely. */
+.hv2-cmp__action-btn {
+    display: flex;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.hv2-cmp__action-btn img {
+    width: 24px;
+    height: 24px;
+    transition: filter 0.18s ease;
+}
+
+/* Figma 771:23156 — three distinct states: default (light), hover (grey,
+   brand/hover #71757e) and checked (near-black, brand/pressed #373b43,
+   with a 2px border instead of 1px). Hover and active were sharing the same
+   grey before, which made an already-saved/compared item look identical to
+   just hovering over any button. */
+.hv2-cmp__action-btn:hover {
+    background: #71757e;
+}
+
+.hv2-cmp__action-btn.active {
+    background: #373b43;
+    border-width: 2px;
+}
+
+/* Hovering a checked button still reads as hover, not "extra checked" — the
+   compare icon on this page is always checked (removing it is the only
+   action it offers), so without this it would never show the grey state
+   the heart button gets on hover. */
+.hv2-cmp__action-btn.active:hover {
+    background: #71757e;
+    border-width: 1px;
+}
+
+.hv2-cmp__action-btn:hover img,
+.hv2-cmp__action-btn.active img {
+    filter: brightness(0) invert(1);
 }
 
 .hv2-cmp {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
-    margin-top: var(--hv2-flow);
+    /* The group title already carries the full --hv2-flow gap down from the
+       heading above it; stacking another 40 here on top of that read as
+       double the space Figma's single heading-to-cards hop uses. */
+    margin-top: 16px;
 }
 
 .hv2-cmp__card {
@@ -2218,7 +2290,11 @@
 .hv2-cmp__rows {
     width: 100%;
     max-width: 312px;
-    margin: 0;
+    /* The body centers this block vertically, which can pull its first row up
+       close enough to sit right under the icons (bottom edge at 8+48=56px)
+       with no visible gap. A fixed top margin guarantees breathing room
+       between them regardless of how the centering math works out. */
+    margin: 16px 0 0;
 }
     .hv2-calc {
         min-height: 420px;
@@ -2251,6 +2327,9 @@
 .hv2-cmp__row dd {
     min-width: 0;
     margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-family: var(--hv2-font-display);
     font-size: 14px;
     font-weight: 500;

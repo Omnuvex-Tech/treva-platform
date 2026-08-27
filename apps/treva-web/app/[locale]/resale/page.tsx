@@ -10,6 +10,7 @@ import PageContainer from '@/app/components/Container/PageContainer';
 import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
 import { useResaleApartments } from '@/hooks/use-resale-apartments';
 import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
+import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import type { ResaleApartment } from '@/lib/resale.types';
 import './resale-listing.css';
 
@@ -67,6 +68,8 @@ export default function ResalePage() {
       properties: 'elan',
       noApartments: 'Mənzil tapılmadı',
       saveListing: 'Elanı yadda saxla',
+      compareListing: 'Müqayisəyə əlavə et',
+      removeFromCompare: 'Müqayisədən çıxar',
       room: 'otaqlı',
       floor: 'mərtəbə',
       details: 'Mənzilə bax',
@@ -76,6 +79,8 @@ export default function ResalePage() {
       properties: 'properties',
       noApartments: 'No apartments found',
       saveListing: 'Save listing',
+      compareListing: 'Add to comparison',
+      removeFromCompare: 'Remove from comparison',
       room: 'room',
       floor: 'floor',
       details: 'View Apartment Details',
@@ -85,6 +90,8 @@ export default function ResalePage() {
       properties: 'объектов',
       noApartments: 'Квартиры не найдены',
       saveListing: 'Сохранить объявление',
+      compareListing: 'Добавить к сравнению',
+      removeFromCompare: 'Убрать из сравнения',
       room: 'комн.',
       floor: 'этаж',
       details: 'Смотреть квартиру',
@@ -92,6 +99,7 @@ export default function ResalePage() {
   } as const;
   const t = dictionary[locale] || dictionary.az;
   const [savedItems, setSavedItems] = useState<string[]>([]);
+  const [comparedItems, setComparedItems] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<ResaleFilterState>({});
   const [isDebouncing, setIsDebouncing] = useState(false);
@@ -108,6 +116,7 @@ export default function ResalePage() {
 
   useEffect(() => {
     setSavedItems(getSaved().filter(p => p.type === 'resale').map(p => p.id));
+    setComparedItems(getCompared().filter(p => p.type === 'resale').map(p => p.id));
   }, []);
 
   const formatFloorLabel = (floorFrom: number | null | undefined, floorTo: number | null | undefined) => {
@@ -139,6 +148,28 @@ export default function ResalePage() {
         apartmentTypeTitle: apt.apartmentType?.title,
       });
       setSavedItems(prev => [...prev, apt.id]);
+    }
+  };
+
+  const toggleCompare = (apt: ResaleApartment) => {
+    if (comparedItems.includes(apt.id)) {
+      removeCompared(apt.id);
+      setComparedItems(prev => prev.filter(item => item !== apt.id));
+    } else {
+      addCompared({
+        id: apt.id,
+        slug: apt.slug,
+        type: 'resale',
+        image: apt.image || '',
+        price: apt.prices?.[0]?.priceTotal ?? apt.priceTotal ?? 0,
+        currency: apt.prices?.[0]?.currency?.value ?? 'AZN',
+        rooms: String(apt.roomCount ?? ''),
+        area: String(apt.area ?? ''),
+        floor: formatFloorLabel(apt.floorFrom, apt.floorTo),
+        project: apt.locationTitle || '',
+        title: apt.title || '',
+      });
+      setComparedItems(prev => [...prev, apt.id]);
     }
   };
 
@@ -232,16 +263,24 @@ export default function ResalePage() {
                         <div className="re-card-body">
                           <div className="re-card-meta-row">
                             <span className="re-badge">{getLocalizedApartmentTypeLabel(apt.apartmentType, locale)}</span>
-                            <button
-                              type="button"
-                              className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
-                              onClick={() => toggleSave(apt)}
-                              aria-label={t.saveListing}
-                            >
-                              <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
-                              </svg>
-                            </button>
+                            <div className="re-card-actions">
+                              <button
+                                type="button"
+                                className={`re-compare-btn ${comparedItems.includes(apt.id) ? 'active' : ''}`}
+                                onClick={() => toggleCompare(apt)}
+                                aria-label={comparedItems.includes(apt.id) ? t.removeFromCompare : t.compareListing}
+                              >
+                                <img src="/images/icons/compare.svg" alt="" width={16} height={16} />
+                              </button>
+                              <button
+                                type="button"
+                                className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
+                                onClick={() => toggleSave(apt)}
+                                aria-label={t.saveListing}
+                              >
+                                <img src="/images/icons/heart.svg" alt="" width={16} height={16} />
+                              </button>
+                            </div>
                           </div>
 
                           <div className="re-price-block">

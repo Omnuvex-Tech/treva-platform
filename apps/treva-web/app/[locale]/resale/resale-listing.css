@@ -244,10 +244,16 @@
   text-transform: uppercase;
 }
 
-.re-bookmark-btn {
-  background-color: transparent;
-  color: #9AA5B4;
-  border: 1.2px solid rgba(154, 165, 180, 0.4);
+.re-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.re-bookmark-btn,
+.re-compare-btn {
+  background-color: #f4f5f5;
+  border: 1px solid #e2e3e2;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -255,18 +261,42 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.18s ease;
   padding: 0;
 }
 
-.re-bookmark-btn:hover {
-  background-color: rgba(154, 165, 180, 0.15);
-  color: #7A8A9D;
+.re-bookmark-btn img,
+.re-compare-btn img {
+  width: 16px;
+  height: 16px;
 }
 
-.re-bookmark-btn.active {
-  color: #4A4E57;
-  border-color: #4A4E57;
+/* Figma 771:23156 — hover (grey, #71757e) and checked (near-black, #373b43
+   with a 2px border) are two distinct states, not one shared shade. */
+.re-bookmark-btn:hover,
+.re-compare-btn:hover {
+  background-color: #71757e;
+}
+
+.re-bookmark-btn.active,
+.re-compare-btn.active {
+  background-color: #373b43;
+  border-width: 2px;
+}
+
+/* Hovering an already-active button still reads as hover, not "extra
+   checked" — same grey it'd show unchecked. */
+.re-bookmark-btn.active:hover,
+.re-compare-btn.active:hover {
+  background-color: #71757e;
+  border-width: 1px;
+}
+
+.re-bookmark-btn:hover img,
+.re-compare-btn:hover img,
+.re-bookmark-btn.active img,
+.re-compare-btn.active img {
+  filter: brightness(0) invert(1);
 }
 
 .re-price-block {

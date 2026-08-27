@@ -8,6 +8,7 @@ import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { getSaved, removeSaved, type SavedProperty } from '@/lib/saved-properties';
+import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import '../resale/resale-listing.css';
 import './saved.css';
 
@@ -65,9 +66,13 @@ const savedDictionary = {
     emptyTitle: 'Hələ saxlanılmış əmlak yoxdur',
     browse: 'ƏMLAKLARA BAX',
     removeLabel: 'Seçilmişlərdən sil',
+    compareListing: 'Müqayisəyə əlavə et',
+    removeFromCompare: 'Müqayisədən çıxar',
     viewDetails: 'Mənzilə bax',
     room: 'otaqlı',
     floor: 'mərtəbə',
+    offPlanTitle: 'Tikilməkdə',
+    resaleTitle: 'Təkrar satış',
   },
   en: {
     titleThin: 'SAVED',
@@ -77,9 +82,13 @@ const savedDictionary = {
     emptyTitle: 'No saved properties yet',
     browse: 'BROWSE PROPERTIES',
     removeLabel: 'Remove from saved',
+    compareListing: 'Add to comparison',
+    removeFromCompare: 'Remove from comparison',
     viewDetails: 'View Apartment Details',
     room: 'room',
     floor: 'floor',
+    offPlanTitle: 'Off-Plan',
+    resaleTitle: 'Resale',
   },
   ru: {
     titleThin: 'ИЗБРАННАЯ',
@@ -89,9 +98,13 @@ const savedDictionary = {
     emptyTitle: 'Сохраненных объектов пока нет',
     browse: 'СМОТРЕТЬ ОБЪЕКТЫ',
     removeLabel: 'Удалить из сохраненных',
+    compareListing: 'Добавить к сравнению',
+    removeFromCompare: 'Убрать из сравнения',
     viewDetails: 'Смотреть квартиру',
     room: 'комн.',
     floor: 'этаж',
+    offPlanTitle: 'Новостройки',
+    resaleTitle: 'Вторичное',
   },
 } as const;
 
@@ -100,16 +113,40 @@ export default function SavedPage() {
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const content = savedDictionary[locale as keyof typeof savedDictionary] ?? savedDictionary.az;
   const [items, setItems] = useState<SavedProperty[]>([]);
+  const [comparedIds, setComparedIds] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setItems(getSaved());
+    setComparedIds(getCompared().map((p) => p.id));
     setLoaded(true);
   }, []);
 
   const handleRemove = (id: string) => {
     removeSaved(id);
     setItems(prev => prev.filter(p => p.id !== id));
+  };
+
+  const toggleCompare = (item: SavedProperty) => {
+    if (comparedIds.includes(item.id)) {
+      removeCompared(item.id);
+      setComparedIds(prev => prev.filter(id => id !== item.id));
+    } else {
+      addCompared({
+        id: item.id,
+        slug: item.slug,
+        type: item.type,
+        image: item.image,
+        price: item.price,
+        currency: item.currency,
+        rooms: item.rooms,
+        area: item.area,
+        floor: item.floor,
+        project: item.project || item.location,
+        title: item.title,
+      });
+      setComparedIds(prev => [...prev, item.id]);
+    }
   };
 
   const formatPrice = (p: number) =>
@@ -120,6 +157,78 @@ export default function SavedPage() {
     const numericArea = Number(String(item.area).replace(',', '.'));
     if (!Number.isFinite(numericArea) || numericArea <= 0) return 0;
     return Math.round(item.price / numericArea);
+  };
+
+  const offPlanItems = items.filter((item) => item.type === 'off-plan');
+  const resaleItems = items.filter((item) => item.type === 'resale');
+
+  const renderCard = (item: SavedProperty) => {
+    const detailHref = item.type === 'off-plan'
+      ? `/${locale}/off-plan/${item.slug}`
+      : `/${locale}/resale/${item.slug}`;
+    const badge = item.type === 'off-plan'
+      ? (item.project || '')
+      : (getLocalizedApartmentTypeLabel(
+          { slug: item.apartmentTypeSlug, title: item.apartmentTypeTitle },
+          locale
+        ) || (item.rooms ? `${item.rooms} ${content.room}` : ''));
+
+    return (
+      <div key={item.id} className="re-card-wrapper">
+        <article className="re-card">
+          <Link href={detailHref} className="re-card-media-link" aria-label={content.viewDetails}>
+            <div className="re-card-media">
+              <img
+                src={item.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
+                alt={item.location || item.title}
+                className="re-card-img"
+              />
+            </div>
+          </Link>
+
+          <div className="re-card-body">
+            <div className="re-card-meta-row">
+              <span className="re-badge">{badge}</span>
+              <div className="re-card-actions">
+                <button
+                  type="button"
+                  className={`re-compare-btn ${comparedIds.includes(item.id) ? 'active' : ''}`}
+                  onClick={() => toggleCompare(item)}
+                  aria-label={comparedIds.includes(item.id) ? content.removeFromCompare : content.compareListing}
+                >
+                  <img src="/images/icons/compare.svg" alt="" width={16} height={16} />
+                </button>
+                <button
+                  type="button"
+                  className="re-bookmark-btn active"
+                  onClick={() => handleRemove(item.id)}
+                  aria-label={content.removeLabel}
+                >
+                  <img src="/images/icons/heart.svg" alt="" width={16} height={16} />
+                </button>
+              </div>
+            </div>
+
+            <div className="re-price-block">
+              <h2 className="re-main-price">{formatPrice(item.price)} {item.currency}</h2>
+              <div className="re-sqm-price">{formatPrice(getPriceByArea(item))} {item.currency}/m²</div>
+            </div>
+
+            <div className="re-tags-row">
+              {item.rooms && <span className="re-tag">{item.rooms}-{content.room}</span>}
+              {item.area && <span className="re-tag">{item.area} m²</span>}
+              {item.floor && <span className="re-tag">{item.floor} {content.floor}</span>}
+            </div>
+
+            <p className="re-address">{item.location || item.project || '—'}</p>
+          </div>
+        </article>
+
+        <Link href={detailHref} className="re-action-btn">
+          {content.viewDetails}
+        </Link>
+      </div>
+    );
   };
 
   return (
@@ -156,61 +265,21 @@ export default function SavedPage() {
               </div>
             </div>
           ) : (
-            <main className="re-grid">
-              {items.map((item) => (
-                <div key={item.id} className="re-card-wrapper">
-                  <article className="re-card">
-                    <Link href={`/${locale}/resale/${item.slug}`} className="re-card-media-link" aria-label={content.viewDetails}>
-                      <div className="re-card-media">
-                        <img
-                          src={item.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
-                          alt={item.location || item.title}
-                          className="re-card-img"
-                        />
-                      </div>
-                    </Link>
+            <>
+              {offPlanItems.length > 0 && (
+                <section className="saved-section">
+                  <h2 className="saved-section-title">{content.offPlanTitle}</h2>
+                  <main className="re-grid">{offPlanItems.map(renderCard)}</main>
+                </section>
+              )}
 
-                    <div className="re-card-body">
-                      <div className="re-card-meta-row">
-                        <span className="re-badge">
-                          {getLocalizedApartmentTypeLabel(
-                            { slug: item.apartmentTypeSlug, title: item.apartmentTypeTitle },
-                            locale
-                          ) || (item.rooms ? `${item.rooms} ${content.room}` : '')}
-                        </span>
-                        <button
-                          type="button"
-                          className="re-bookmark-btn active"
-                          onClick={() => handleRemove(item.id)}
-                          aria-label={content.removeLabel}
-                        >
-                          <svg width="15" height="30" viewBox="0 0 20 26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2 0C0.89543 0 0 0.89543 0 2V24.5L10 19L20 24.5V2C20 0.89543 19.1046 0 18 0H2Z"/>
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="re-price-block">
-                        <h2 className="re-main-price">{formatPrice(item.price)} {item.currency}</h2>
-                        <div className="re-sqm-price">{formatPrice(getPriceByArea(item))} {item.currency}/m²</div>
-                      </div>
-
-                      <div className="re-tags-row">
-                        {item.rooms && <span className="re-tag">{item.rooms}-{content.room}</span>}
-                        {item.area && <span className="re-tag">{item.area} m²</span>}
-                        {item.floor && <span className="re-tag">{item.floor} {content.floor}</span>}
-                      </div>
-
-                      <p className="re-address">{item.location || '—'}</p>
-                    </div>
-                  </article>
-
-                  <Link href={`/${locale}/resale/${item.slug}`} className="re-action-btn">
-                    {content.viewDetails}
-                  </Link>
-                </div>
-              ))}
-            </main>
+              {resaleItems.length > 0 && (
+                <section className="saved-section">
+                  <h2 className="saved-section-title">{content.resaleTitle}</h2>
+                  <main className="re-grid">{resaleItems.map(renderCard)}</main>
+                </section>
+              )}
+            </>
           )}
         </PageContainer>
       </main>

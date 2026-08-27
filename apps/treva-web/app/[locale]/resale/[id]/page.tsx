@@ -13,6 +13,7 @@ import PropertyInfoCards from './PropertyInfoCards';
 import RequestViewingCard from './RequestViewingCard';
 import { useResaleApartmentBySlug } from '@/hooks/use-resale-apartments';
 import { isSaved as isSavedProp, addSaved, removeSaved } from '@/lib/saved-properties';
+import { isCompared as isComparedProp, addCompared, removeCompared } from '@/lib/compare-properties';
 import './resale-detail.css';
 
 async function copyToClipboard(text: string): Promise<boolean> {
@@ -106,6 +107,7 @@ export default function ResaleDetailPage() {
 
   const [showPhone, setShowPhone] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isCompared, setIsCompared] = useState(false);
   const [activeThumb, setActiveThumb] = useState(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -127,6 +129,7 @@ export default function ResaleDetailPage() {
   useEffect(() => {
     if (apartment) {
       setIsSaved(isSavedProp(apartment.id));
+      setIsCompared(isComparedProp(apartment.id));
     }
   }, [apartment]);
 
@@ -226,6 +229,35 @@ export default function ResaleDetailPage() {
     }
   };
 
+  const toggleCompareProp = () => {
+    if (!apartment) return;
+    const formatFloorLabel = (floorFrom: number | null | undefined, floorTo: number | null | undefined) => {
+      const from = floorFrom ?? 0;
+      const to = floorTo ?? null;
+      if (!to || to === from) return String(from);
+      return `${from}/${to}`;
+    };
+    if (isComparedProp(apartment.id)) {
+      removeCompared(apartment.id);
+      setIsCompared(false);
+    } else {
+      addCompared({
+        id: apartment.id,
+        slug: apartment.slug,
+        type: 'resale',
+        image: apartment.image || (typeof apartment.gallery?.[0] === 'string' ? apartment.gallery[0] : apartment.gallery?.[0]?.url) || '',
+        price: apartment.prices?.[0]?.priceTotal ?? apartment.priceTotal ?? 0,
+        currency: apartment.prices?.[0]?.currency?.value ?? 'AZN',
+        rooms: String(apartment.roomCount ?? ''),
+        area: String(apartment.area ?? ''),
+        floor: formatFloorLabel(apartment.floorFrom, apartment.floorTo),
+        project: apartment.locationTitle || '',
+        title: apartment.title || '',
+      });
+      setIsCompared(true);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="pdet-page-wrapper">
@@ -303,6 +335,8 @@ export default function ResaleDetailPage() {
       copyLink: 'Linki kopyala',
       save: 'Yadda saxla',
       saved: 'Saxlanılıb',
+      compare: 'Müqayisəyə əlavə et',
+      compared: 'Müqayisədə',
       requestCall: 'Zəng sifariş et',
       titleTemplate: (rooms: number | string, area: number | string, floor: string) =>
         `${rooms} OTAQLI MƏNZİL, ${area} M², ${floor}-Cİ MƏRTƏBƏ`,
@@ -320,6 +354,8 @@ export default function ResaleDetailPage() {
       copyLink: 'Copy link',
       save: 'Save',
       saved: 'Saved',
+      compare: 'Add to comparison',
+      compared: 'In comparison',
       requestCall: 'Request a call',
       titleTemplate: (rooms: number | string, area: number | string, floor: string) =>
         `${rooms}-ROOM FLAT, ${area} M², ${floor} FLOOR`,
@@ -337,6 +373,8 @@ export default function ResaleDetailPage() {
       copyLink: 'Копировать ссылку',
       save: 'Сохранить',
       saved: 'Сохранено',
+      compare: 'Добавить к сравнению',
+      compared: 'В сравнении',
       requestCall: 'Заказать звонок',
       titleTemplate: (rooms: number | string, area: number | string, floor: string) =>
         `${rooms}-КОМНАТНАЯ КВАРТИРА, ${area} М², ${floor} ЭТАЖ`,
@@ -611,6 +649,15 @@ export default function ResaleDetailPage() {
                   >
                     <img src="/images/resale/save.png" alt="" width="21" height="21" />
                     <span>{isSaved ? pt.saved : pt.save}</span>
+                  </button>
+                  <div className="pdet-widget-divider"></div>
+                  <button
+                    type="button"
+                    className={`pdet-widget-btn ${isCompared ? 'saved' : ''}`}
+                    onClick={toggleCompareProp}
+                  >
+                    <img src="/images/icons/compare.svg" alt="" width={21} height={21} />
+                    <span>{isCompared ? pt.compared : pt.compare}</span>
                   </button>
                 </div>
 
