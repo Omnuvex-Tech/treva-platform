@@ -6,6 +6,8 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getDict } from "./dictionary";
 import { inventoryCards, type InventoryCard } from "./data";
+import { getSaved, addSaved, removeSaved } from "@/lib/saved-properties";
+import { getCompared, addCompared, removeCompared } from "@/lib/compare-properties";
 
 type Props = { locale: string; items?: InventoryCard[]; resaleItems?: InventoryCard[] };
 type Deal = "off-plan" | "resale";
@@ -32,6 +34,62 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
   const dict = getDict(locale);
   const [deal, setDeal] = useState<Deal>("off-plan");
   const visibleItems = deal === "resale" ? resaleItems : items;
+
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [comparedIds, setComparedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSavedIds(getSaved().map((p) => p.id));
+    setComparedIds(getCompared().map((p) => p.id));
+  }, []);
+
+  const slugOf = (item: InventoryCard) => item.href?.split("/").filter(Boolean).pop() || item.id;
+
+  const toggleSave = (item: InventoryCard) => {
+    if (savedIds.includes(item.id)) {
+      removeSaved(item.id);
+      setSavedIds((prev) => prev.filter((id) => id !== item.id));
+    } else {
+      addSaved({
+        id: item.id,
+        slug: slugOf(item),
+        type: deal,
+        image: item.image,
+        price: Number(item.price.replace(/[^\d]/g, "")) || 0,
+        currency: "USD",
+        rooms: item.rooms,
+        area: item.area,
+        floor: item.floor || "",
+        location: item.project,
+        project: item.project,
+        title: item.project,
+      });
+      setSavedIds((prev) => [...prev, item.id]);
+    }
+  };
+
+  const toggleCompare = (item: InventoryCard) => {
+    if (comparedIds.includes(item.id)) {
+      removeCompared(item.id);
+      setComparedIds((prev) => prev.filter((id) => id !== item.id));
+    } else {
+      addCompared({
+        id: item.id,
+        slug: slugOf(item),
+        type: deal,
+        image: item.image,
+        price: Number(item.price.replace(/[^\d]/g, "")) || 0,
+        currency: "USD",
+        rooms: item.rooms,
+        area: item.area,
+        floor: item.floor || "",
+        building: item.building,
+        project: item.project,
+        title: item.project,
+      });
+      setComparedIds((prev) => [...prev, item.id]);
+    }
+  };
 
   const trackRef = useRef<HTMLDivElement>(null);
   // Both false is also the desktop state and the "fits on screen" state, which
@@ -128,50 +186,70 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
 
       <div className="hv2-grid-3" ref={trackRef} onScroll={sync}>
         {visibleItems.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href ? `/${locale}${item.href}` : `/${locale}/${deal}`}
-            className="hv2-ucard hv2-ucard--unit"
-          >
-            <div className="hv2-ucard__media">
-              <div className="hv2-ucard__plan">
-                <Image
-                  src={item.image}
-                  alt={item.project}
-                  fill
-                  sizes={CARD_SIZES}
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            </div>
-
-            <div className="hv2-ucard__foot">
-              <div className="hv2-ucard__info">
-                <p className="hv2-ucard__title">{item.price}</p>
-
-                <p className="hv2-ucard__meta hv2-ucard__dev">
+          <div key={item.id} className="hv2-ucard-wrap">
+            <Link
+              href={item.href ? `/${locale}${item.href}` : `/${locale}/${deal}`}
+              className="hv2-ucard hv2-ucard--unit"
+            >
+              <div className="hv2-ucard__media">
+                <div className="hv2-ucard__plan">
                   <Image
-                    className="hv2-ucard__dev-icon"
-                    src={DEV_ICON}
-                    alt=""
-                    aria-hidden="true"
-                    width={24}
-                    height={24}
-                    unoptimized
+                    src={item.image}
+                    alt={item.project}
+                    fill
+                    sizes={CARD_SIZES}
+                    style={{ objectFit: "cover" }}
                   />
-                  {item.developer}
-                </p>
-
-                <p className="hv2-ucard__meta hv2-ucard__specs">
-                  <span>{item.project}</span>
-                  <span>
-                    {item.rooms} {dict.inventory.rooms}
-                  </span>
-                  <span>{item.area}</span>
-                </p>
+                </div>
               </div>
+
+              <div className="hv2-ucard__foot">
+                <div className="hv2-ucard__info">
+                  <p className="hv2-ucard__title">{item.price}</p>
+
+                  <p className="hv2-ucard__meta hv2-ucard__dev">
+                    <Image
+                      className="hv2-ucard__dev-icon"
+                      src={DEV_ICON}
+                      alt=""
+                      aria-hidden="true"
+                      width={24}
+                      height={24}
+                      unoptimized
+                    />
+                    {item.developer}
+                  </p>
+
+                  <p className="hv2-ucard__meta hv2-ucard__specs">
+                    <span>{item.project}</span>
+                    <span>
+                      {item.rooms} {dict.inventory.rooms}
+                    </span>
+                    <span>{item.area}</span>
+                  </p>
+                </div>
+              </div>
+            </Link>
+
+            <div className="hv2-ucard__actions">
+              <button
+                type="button"
+                className={`hv2-ucard__action-btn${comparedIds.includes(item.id) ? " active" : ""}`}
+                aria-label={comparedIds.includes(item.id) ? dict.inventory.compared : dict.inventory.compare}
+                onClick={() => toggleCompare(item)}
+              >
+                <Image src="/images/icons/compare.svg" alt="" aria-hidden="true" width={20} height={20} unoptimized />
+              </button>
+              <button
+                type="button"
+                className={`hv2-ucard__action-btn${savedIds.includes(item.id) ? " active" : ""}`}
+                aria-label={savedIds.includes(item.id) ? dict.inventory.saved : dict.inventory.save}
+                onClick={() => toggleSave(item)}
+              >
+                <Image src="/images/icons/heart.svg" alt="" aria-hidden="true" width={20} height={20} unoptimized />
+              </button>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 

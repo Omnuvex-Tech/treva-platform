@@ -30,7 +30,7 @@ const LANGUAGES = [
  */
 const ACTIONS = [
   { key: "compare", src: "/images/icons/compare.svg", size: 23.0496, label: "Compare", href: "/compare" },
-  { key: "saved", src: "/images/icons/heart.svg", size: 24, label: "Saved", href: "/saved" },
+  { key: "saved", src: "/images/icons/heart.svg", size: 24, label: "Saved", href: "/wishlist" },
   { key: "language", src: "/images/icons/globe.svg", size: 24, label: "Language" },
 ];
 /** The one nav entry that opens a mega-menu instead of navigating straight off. */

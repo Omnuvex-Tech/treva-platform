@@ -199,6 +199,11 @@
   width: 16px;
   height: 16px;
 }
+.treva-navbar__icon-svg {
+  /* compare.svg / heart.svg are flat dark strokes, not currentColor — invert
+     them to white to match the dark pill this button always used before. */
+  filter: brightness(0) invert(1);
+}
 .treva-navbar__saved-badge {
   position: absolute;
   top: -4px;
