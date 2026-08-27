@@ -10,7 +10,7 @@ import PageContainer from '@/app/components/Container/PageContainer';
 import { getSaved, removeSaved, type SavedProperty } from '@/lib/saved-properties';
 import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import '../resale/resale-listing.css';
-import './saved.css';
+import './wishlist.css';
 
 function getLocalizedApartmentTypeLabel(
   apartmentType: { slug?: string; title?: string } | undefined,

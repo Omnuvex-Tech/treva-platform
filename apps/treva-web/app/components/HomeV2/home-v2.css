@@ -1563,6 +1563,65 @@
     background: var(--hv2-selected);
 }
 
+/* The heart/compare pair sits outside `.hv2-ucard` itself — that element is
+   an `<a>`, and a `<button>` cannot legally nest inside one — so this
+   wrapper (not the card) is what the actions overlay is absolute against,
+   as a sibling of the link rather than a descendant of it. */
+.hv2-ucard-wrap {
+    position: relative;
+}
+
+.hv2-ucard__actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+}
+
+/* Same three Figma 771:23156 states as everywhere else this pair shows up:
+   default light, grey on hover, near-black once checked. */
+.hv2-ucard__action-btn {
+    display: flex;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-xxxll);
+    background: var(--hv2-inverse-bg);
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.hv2-ucard__action-btn img {
+    width: 20px;
+    height: 20px;
+    transition: filter 0.18s ease;
+}
+
+.hv2-ucard__action-btn:hover {
+    background: #71757e;
+}
+
+.hv2-ucard__action-btn.active {
+    background: #373b43;
+    border-width: 2px;
+}
+
+.hv2-ucard__action-btn.active:hover {
+    background: #71757e;
+    border-width: 1px;
+}
+
+.hv2-ucard__action-btn:hover img,
+.hv2-ucard__action-btn.active img {
+    filter: brightness(0) invert(1);
+}
+
 .hv2-ucard--unit .hv2-ucard__media {
     position: relative;
     aspect-ratio: 432 / 340;
@@ -3049,7 +3108,11 @@ a.hv2-ct__entryvalue:hover {
         display: none;
     }
 
-    .hv2-s-inventory .hv2-ucard {
+    /* The heart/compare pair needed `.hv2-ucard` (an `<a>`) wrapped in a plain
+       div sibling — a `<button>` cannot legally nest inside an anchor — so the
+       flex/scroll-snap sizing that used to target the card itself now has to
+       land on that wrapper instead. */
+    .hv2-s-inventory .hv2-ucard-wrap {
         flex: 0 0 348px;
         scroll-snap-align: start;
     }

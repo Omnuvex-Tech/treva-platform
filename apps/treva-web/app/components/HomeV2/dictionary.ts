@@ -37,7 +37,7 @@ export const dictionary = {
             title: "Tərəfdaşlarımız",
             lead: ["Peşəkarlıq, innovativ baxış və nəticəyönümlü yanaşma", "bizi ölkənin aparıcı brendlərinin etibarlı tərəfdaşına çevirdi."],
         },
-        inventory: { title: "İnventar", rooms: "otaq", seeAll: "Bütün inventara bax", prev: "Əvvəlki", next: "Növbəti" },
+        inventory: { title: "İnventar", rooms: "otaq", seeAll: "Bütün inventara bax", prev: "Əvvəlki", next: "Növbəti", save: "Seçilmişlərə əlavə et", saved: "Seçilmişlərdə", compare: "Müqayisəyə əlavə et", compared: "Müqayisədə" },
         team: {
             title: "Komandamızla tanış olun",
             count: "15+",
@@ -167,7 +167,7 @@ export const dictionary = {
             title: "Our Partners",
             lead: ["Professionalism, an innovative vision, and", "a results-driven approach have made us a trusted partner of the country's leading brands"],
         },
-        inventory: { title: "Inventory", rooms: "room", seeAll: "View All Inventory", prev: "Previous", next: "Next" },
+        inventory: { title: "Inventory", rooms: "room", seeAll: "View All Inventory", prev: "Previous", next: "Next", save: "Add to saved", saved: "Saved", compare: "Add to comparison", compared: "In comparison" },
         team: {
             title: "Meet our Team",
             count: "15+",
@@ -297,7 +297,7 @@ export const dictionary = {
             title: "Наши партнёры",
             lead: ["Профессионализм, инновационное видение и", "ориентация на результат сделали нас надёжным партнёром ведущих брендов страны"],
         },
-        inventory: { title: "Инвентарь", rooms: "комн.", seeAll: "Весь инвентарь", prev: "Назад", next: "Вперёд" },
+        inventory: { title: "Инвентарь", rooms: "комн.", seeAll: "Весь инвентарь", prev: "Назад", next: "Вперёд", save: "Добавить в избранное", saved: "В избранном", compare: "Добавить к сравнению", compared: "В сравнении" },
         team: {
             title: "Наша команда",
             count: "15+",

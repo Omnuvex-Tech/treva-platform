@@ -7,6 +7,7 @@ import { IoMdClose, IoMdMenu } from 'react-icons/io';
 import { ChevronDown } from 'lucide-react';
 import { createPortal } from "react-dom";
 import { getSavedCount, onSavedChange } from '@/lib/saved-properties';
+import { getComparedCount, onCompareChange } from '@/lib/compare-properties';
 
 type PillButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   isPressed?: boolean;
@@ -150,6 +151,7 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [solidBgReady, setSolidBgReady] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
+  const [comparedCount, setComparedCount] = useState(0);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -195,6 +197,12 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
   useEffect(() => {
     setSavedCount(getSavedCount());
     const unsubscribe = onSavedChange((count) => setSavedCount(count));
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    setComparedCount(getComparedCount());
+    const unsubscribe = onCompareChange((count) => setComparedCount(count));
     return unsubscribe;
   }, []);
 
@@ -364,13 +372,22 @@ export default function Navbar({ locale = 'az', variant = 'overlay' }: NavbarPro
           <div className="treva-navbar__controls">
             <div className="treva-navbar__actions">
               <a
-                href={routeHref('/saved')}
+                href={routeHref('/compare')}
+                className="treva-navbar__saved-btn"
+                aria-label={`Compared properties (${comparedCount})`}
+              >
+                <img src="/images/icons/compare.svg" alt="" width={16} height={16} className="treva-navbar__icon-svg" />
+                {comparedCount > 0 && (
+                  <span className="treva-navbar__saved-badge">{comparedCount}</span>
+                )}
+              </a>
+
+              <a
+                href={routeHref('/wishlist')}
                 className="treva-navbar__saved-btn"
                 aria-label={`Saved properties (${savedCount})`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                </svg>
+                <img src="/images/icons/heart.svg" alt="" width={16} height={16} className="treva-navbar__icon-svg" />
                 {savedCount > 0 && (
                   <span className="treva-navbar__saved-badge">{savedCount}</span>
                 )}

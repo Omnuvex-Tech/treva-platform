@@ -172,10 +172,79 @@
     font-weight: 400;
 }
 
+.layout-card__meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.layout-card__meta-row .layout-card__meta-sep {
+    color: var(--color-text-muted);
+}
+
 .layout-card__number {
     font-size: 14px;
     color: var(--color-text-muted);
     font-weight: 400;
+}
+
+/* The heart/compare pair sits outside `.layout-card` itself — that element
+   is an `<a>`, and a `<button>` cannot legally nest inside one — so this
+   wrapper (not the card) is what the actions overlay is absolute against,
+   as a sibling of the link rather than a descendant of it. */
+.layout-card-wrap {
+    position: relative;
+}
+
+.layout-card__actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+}
+
+/* Same three Figma 771:23156 states as everywhere else this pair shows up:
+   default light, grey on hover, near-black once checked. */
+.layout-card__action-btn {
+    display: flex;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e3e2;
+    border-radius: 999px;
+    background: #f4f5f5;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.layout-card__action-btn img {
+    width: 20px;
+    height: 20px;
+    transition: filter 0.18s ease;
+}
+
+.layout-card__action-btn:hover {
+    background: #71757e;
+}
+
+.layout-card__action-btn.active {
+    background: #373b43;
+    border-width: 2px;
+}
+
+.layout-card__action-btn.active:hover {
+    background: #71757e;
+    border-width: 1px;
+}
+
+.layout-card__action-btn:hover img,
+.layout-card__action-btn.active img {
+    filter: brightness(0) invert(1);
 }
 
 /* Blueprint Container */
