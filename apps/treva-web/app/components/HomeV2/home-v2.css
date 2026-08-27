@@ -246,6 +246,43 @@
     font-weight: 500;
 }
 
+/* Prev/next pair for a section that turns into a swipe track on a narrow
+   screen — Inventory is the only one today. Display is the mobile switch: the
+   track only scrolls below 768, so above it there is nothing for these to
+   drive. The component hides them a second way, by not rendering the pair at
+   all when the deck already fits, so a short tab shows no dead arrows. */
+.hv2-cnav {
+    display: none;
+    gap: 8px;
+}
+
+.hv2-cnav__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--hv2-pcard-line);
+    border-radius: var(--hv2-r-pill);
+    background: var(--hv2-surface);
+    color: var(--hv2-ink);
+    cursor: pointer;
+    transition: background 0.25s ease, opacity 0.25s ease;
+}
+
+.hv2-cnav__btn:hover:not(:disabled) {
+    background: var(--hv2-selected);
+}
+
+/* Kept in the flow rather than removed at either end: the pair is a fixed
+   landmark next to the tabs, and collapsing to one button would shift the
+   other sideways on the first swipe. */
+.hv2-cnav__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
 /* Figma block heights are applied as min-height, never a fixed height: real copy
    (Azerbaijani runs longer than the English frames) and live API titles must be
    able to grow the block instead of being clipped. */
@@ -2910,13 +2947,22 @@ a.hv2-ct__entryvalue:hover {
     }
 
     /* Inventory keeps every card on one row and scrolls sideways, the way the
-       370-wide frame holds a track wider than the screen. */
+       370-wide frame holds a track wider than the screen.
+
+       The negative margin plus matching padding is what full-bleeds the track:
+       cards run past both screen edges while the first and last still rest on
+       the page's own --hv2-pad gutter. `scroll-padding-inline` is what makes the
+       left one survive — a snapport is the padding box unless it is told
+       otherwise, so `scroll-snap-align: start` was snapping card one flush to
+       x=0 and eating that gutter, leaving 0 on the left against 16 on the
+       right. Inset the snapport by the same gutter and both sides read alike. */
     .hv2-s-inventory .hv2-grid-3 {
         display: flex;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         margin-inline: calc(var(--hv2-pad) * -1);
         padding-inline: var(--hv2-pad);
+        scroll-padding-inline: var(--hv2-pad);
         scrollbar-width: none;
     }
 
@@ -2927,6 +2973,31 @@ a.hv2-ct__entryvalue:hover {
     .hv2-s-inventory .hv2-ucard {
         flex: 0 0 348px;
         scroll-snap-align: start;
+    }
+
+    /* Last row of the head, under the tabs — the head is already a column
+       stack at this width, so the pair only has to opt out of the stack's
+       flex-start and ride the right gutter instead, directly above the track
+       it drives. Sharing the tabs' row is not an option: 245 + 88 does not
+       fit the 343 of usable width at 375. */
+    /* The arrows get their own rhythm, tighter than the --hv2-flow every head
+       keeps above its content: at that distance the pair floats between the
+       tabs and the track instead of belonging to either. Scoped to heads that
+       actually carry a pair — a deck short enough not to render one keeps the
+       shared 40 the other sections use, so nothing shifts under it. */
+    .hv2-s-inventory .hv2-section-head:has(.hv2-cnav) {
+        --hv2-cnav-flow: 20px;
+        margin-bottom: var(--hv2-cnav-flow);
+    }
+
+    .hv2-cnav {
+        display: flex;
+        align-self: flex-end;
+        /* Same distance above the pair as below it. The stack's gap already
+           sits between the tabs and the pair, so only the remainder is added
+           here — taken from the variables themselves so the two stay equal if
+           either is retuned. */
+        margin-top: calc(var(--hv2-cnav-flow) - var(--hv2-head-gap));
     }
 
     /* Team rows sit 20 apart, Pulse rows 60 — both differ from the 24 default. */
@@ -3047,11 +3118,13 @@ a.hv2-ct__entryvalue:hover {
     }
 
     /* The head stacks, heading over blurb, 12 apart. The size and width of both
-       are set higher up in this block. */
+       are set higher up in this block. The gap is a variable because Inventory's
+       arrows have to cancel it out to sit further down — see `.hv2-cnav`. */
     .hv2-section-head {
+        --hv2-head-gap: 12px;
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: var(--hv2-head-gap);
     }
 
     .hv2-grid-3 {

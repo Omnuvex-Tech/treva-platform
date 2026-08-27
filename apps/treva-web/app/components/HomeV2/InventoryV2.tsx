@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getDict } from "./dictionary";
 import { inventoryCards, type InventoryCard } from "./data";
 
@@ -32,6 +33,49 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
   const [deal, setDeal] = useState<Deal>("off-plan");
   const visibleItems = deal === "resale" ? resaleItems : items;
 
+  const trackRef = useRef<HTMLDivElement>(null);
+  // Both false is also the desktop state and the "fits on screen" state, which
+  // is what hides the pair: with nothing to scroll neither end is reachable.
+  const [reach, setReach] = useState({ prev: false, next: false });
+
+  const sync = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const max = track.scrollWidth - track.clientWidth;
+    // 1px of slack: a fractional scrollLeft at either end is normal once the
+    // track is snapped, and without it the far button never quite disables.
+    setReach({ prev: track.scrollLeft > 1, next: track.scrollLeft < max - 1 });
+  }, []);
+
+  // Re-measures on mount, on every tab switch (the two decks are different
+  // lengths) and on resize, where the grid stops being a scroller entirely.
+  useEffect(() => {
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, [sync, visibleItems]);
+
+  // A tab switch swaps the whole deck, so leaving the track parked mid-track
+  // would drop the reader into the middle of a list they have not seen.
+  useEffect(() => {
+    trackRef.current?.scrollTo({ left: 0 });
+  }, [deal]);
+
+  const step = (dir: -1 | 1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    // Measured, not hard-coded: the card is 348 and the gap 16 today, but both
+    // are CSS, and a page-width fallback keeps the button useful if the first
+    // child ever stops being a card.
+    const card = track.firstElementChild as HTMLElement | null;
+    const gap = Number.parseFloat(getComputedStyle(track).columnGap) || 0;
+    const by = card ? card.getBoundingClientRect().width + gap : track.clientWidth;
+    // Same "reduce motion" contract the project cards honour for their hover
+    // clips — the jump still happens, it just does not animate.
+    const smooth = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    track.scrollBy({ left: dir * by, behavior: smooth ? "smooth" : "auto" });
+  };
+
   return (
     <section
       className={
@@ -51,9 +95,38 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
             {dict.search.resale}
           </button>
         </div>
+
+        {/* Mobile only — below 768 the grid turns into a one-row swipe track
+            (see home-v2.css) and these drive it for anyone not swiping. Their
+            own row under the tabs: the pair is 88 wide and the tabs 245, which
+            does not leave the two a shared row at 375. Dropped entirely rather
+            than disabled when the deck already fits, so a short tab shows no
+            dead pair. */}
+        {reach.prev || reach.next ? (
+          <div className="hv2-cnav">
+            <button
+              type="button"
+              className="hv2-cnav__btn"
+              aria-label={dict.inventory.prev}
+              disabled={!reach.prev}
+              onClick={() => step(-1)}
+            >
+              <ChevronLeft size={20} strokeWidth={1.5} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="hv2-cnav__btn"
+              aria-label={dict.inventory.next}
+              disabled={!reach.next}
+              onClick={() => step(1)}
+            >
+              <ChevronRight size={20} strokeWidth={1.5} aria-hidden="true" />
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      <div className="hv2-grid-3">
+      <div className="hv2-grid-3" ref={trackRef} onScroll={sync}>
         {visibleItems.map((item) => (
           <Link
             key={item.id}

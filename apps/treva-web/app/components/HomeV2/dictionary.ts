@@ -37,7 +37,7 @@ export const dictionary = {
             title: "Tərəfdaşlarımız",
             lead: ["Peşəkarlıq, innovativ baxış və nəticəyönümlü yanaşma", "bizi ölkənin aparıcı brendlərinin etibarlı tərəfdaşına çevirdi."],
         },
-        inventory: { title: "İnventar", rooms: "otaq", seeAll: "Bütün inventara bax" },
+        inventory: { title: "İnventar", rooms: "otaq", seeAll: "Bütün inventara bax", prev: "Əvvəlki", next: "Növbəti" },
         team: {
             title: "Komandamızla tanış olun",
             count: "15+",
@@ -167,7 +167,7 @@ export const dictionary = {
             title: "Our Partners",
             lead: ["Professionalism, an innovative vision, and", "a results-driven approach have made us a trusted partner of the country's leading brands"],
         },
-        inventory: { title: "Inventory", rooms: "room", seeAll: "View All Inventory" },
+        inventory: { title: "Inventory", rooms: "room", seeAll: "View All Inventory", prev: "Previous", next: "Next" },
         team: {
             title: "Meet our Team",
             count: "15+",
@@ -297,7 +297,7 @@ export const dictionary = {
             title: "Наши партнёры",
             lead: ["Профессионализм, инновационное видение и", "ориентация на результат сделали нас надёжным партнёром ведущих брендов страны"],
         },
-        inventory: { title: "Инвентарь", rooms: "комн.", seeAll: "Весь инвентарь" },
+        inventory: { title: "Инвентарь", rooms: "комн.", seeAll: "Весь инвентарь", prev: "Назад", next: "Вперёд" },
         team: {
             title: "Наша команда",
             count: "15+",

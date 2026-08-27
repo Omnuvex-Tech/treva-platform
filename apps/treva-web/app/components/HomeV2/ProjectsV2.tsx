@@ -1,17 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getDict } from "./dictionary";
-import type { ProjectCard } from "./data";
-import { getProjectCards } from "./projects-api";
+import { projectCards, type ProjectCard } from "./data";
 import ProjectCardV2 from "./ProjectCardV2";
 
 type Props = {
   locale: string;
-  /** Skips the CMS fetch and renders exactly this list — the credit page's
-      three-card strip, static and unenriched. Omit it for the full,
-      CMS-enriched six-card home grid: a plain `<ProjectsV2 locale={locale} />`
-      is a complete, self-fetching section, so any future page can drop it in
-      without wiring its own data. */
+  /** Renders exactly this list instead of the seed — the credit page's
+      three-card strip. Omit it for the full six-card home grid, which is
+      deliberately static: the cards' copy, order, prices and hover clips are
+      all the design's own (see `projectCards`), never the CMS's, so a plain
+      `<ProjectsV2 locale={locale} />` needs no data wired to it. */
   items?: ProjectCard[];
   /** Overrides the section heading; the credit page gives it its own. */
   title?: string;
@@ -19,9 +18,9 @@ type Props = {
   showLead?: boolean;
 };
 
-export default async function ProjectsV2({ locale, items, title, showLead = true }: Props) {
+export default function ProjectsV2({ locale, items, title, showLead = true }: Props) {
   const dict = getDict(locale);
-  const list = items ?? (await getProjectCards(locale));
+  const list = items ?? projectCards;
 
   return (
     <section

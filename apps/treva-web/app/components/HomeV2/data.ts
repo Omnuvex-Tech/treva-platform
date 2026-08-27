@@ -84,14 +84,12 @@ export type NewsCard = {
 };
 
 /**
- * Hover clips. `public/` holds eight .mp4 files but only these two are distinct
- * — the rest are byte-identical copies under assets/ and cdn-assets/. The Figma
- * file carries no downloadable footage (its card fills export as PNG only), so
- * every card is pointed at one of the two until the real per-project clips land,
- * and swapping them in is a one-line change per entry.
+ * Hover clips — one per project, under `public/videos/projects/` named after
+ * the card's own slug. They replaced the two shared placeholder reels the grid
+ * ran on before the real per-project footage existed. The CMS "GIF / Video"
+ * slot still wins over any of them when a project has one — projects-api.ts.
  */
-const CLIP_CONSTRUCTION = "/6825d64025f8005ef1ddfc4c_68ca8e5a67ef60d728ebc041_video-transcode.mp4";
-const CLIP_REEL = "/assets/treva-reel.mp4";
+const clip = (slug: string) => `/videos/projects/${slug}.mp4`;
 
 /**
  * Project cards — Figma node 457:10745, the six instances of the 432x444 card.
@@ -112,7 +110,7 @@ export const projectCards: ProjectCard[] = [
         image: "/images/features-pro/figma/panorama-building.png",
         sky: "/images/features-pro/figma/panorama-sky.jpg",
         crop: { width: 152.55, height: 118.27, left: -52.55, top: -18.27 },
-        video: CLIP_CONSTRUCTION,
+        video: clip("panorama-by-elie-saab"),
         startingFrom: "156.734$",
         areaRange: "43 m² - 431 m²",
     },
@@ -124,7 +122,7 @@ export const projectCards: ProjectCard[] = [
         image: "/images/features-pro/figma/arabian-ranches-building.png",
         sky: "/images/features-pro/figma/arabian-ranches-sky.jpg",
         crop: { width: 176.04, height: 136.54, left: -14.84, top: -33.65 },
-        video: CLIP_REEL,
+        video: clip("arabian-ranches"),
         startingFrom: "10.8570$",
         areaRange: "33 m² - 178 m²",
     },
@@ -136,7 +134,7 @@ export const projectCards: ProjectCard[] = [
         image: "/images/features-pro/figma/sabah-towers-building.png",
         sky: "/images/features-pro/figma/sabah-towers-sky.jpg",
         crop: { width: 165.35, height: 128.64, left: -23.02, top: -25.73 },
-        video: CLIP_CONSTRUCTION,
+        video: clip("sabah-towers"),
         startingFrom: "88.954$",
         areaRange: "36 m² - 237 m²",
     },
@@ -148,7 +146,7 @@ export const projectCards: ProjectCard[] = [
         image: "/images/features-pro/figma/brabus-island-baku-building.png",
         sky: "/images/features-pro/figma/brabus-island-baku-sky.jpg",
         crop: { width: 165.05, height: 127.78, left: -61.37, top: -25.24 },
-        video: CLIP_REEL,
+        video: clip("brabus-island-baku"),
         startingFrom: "186,833$",
         areaRange: "42 m² - 266 m²",
     },
@@ -160,7 +158,7 @@ export const projectCards: ProjectCard[] = [
         image: "/images/features-pro/figma/reportage-heights-building.png",
         sky: "/images/features-pro/figma/reportage-heights-sky.jpg",
         crop: { width: 150.59, height: 116.8, left: -31.92, top: -14.17 },
-        video: CLIP_CONSTRUCTION,
+        video: clip("reportage-heights"),
         startingFrom: "85.864$",
         areaRange: "30 m² - 209 m²",
     },
@@ -172,7 +170,7 @@ export const projectCards: ProjectCard[] = [
         image: "/images/features-pro/figma/mariana-village-building.png",
         sky: "/images/features-pro/figma/mariana-village-sky.jpg",
         crop: { width: 100.37, height: 106.41, left: -0.07, top: 0 },
-        video: CLIP_REEL,
+        video: clip("marina-village"),
         startingFrom: "203.744$",
         areaRange: "38 m² - 500 m²",
     },
