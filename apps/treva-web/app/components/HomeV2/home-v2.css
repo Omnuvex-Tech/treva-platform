@@ -1030,7 +1030,7 @@
    the header's everything-moves-together feel. */
 @keyframes hv2-nav-mobile-in {
     from {
-        transform: translateY(-12px);
+        transform: translateY(-16px);
         opacity: 0;
     }
 
@@ -3161,15 +3161,18 @@ a.hv2-ct__entryvalue:hover {
            (12+12 padding around the 40px burger button, plus its 1px
            border) — `top` itself always stays exactly that; the extra 20px
            clearance for an already-scrolled header (see
-           `.hv2-nav--scrolled .hv2-nav__mobile` below) is a `transform`, the
-           same reasoning as `.hv2-nav__bar`'s own scrolled slide: this
-           element's `position: fixed` is relative to the true viewport, and
-           it has to stay that way, so nothing here — including this sheet
-           itself — can carry a `transform` at rest, only the scrolled
-           override does. */
+           `.hv2-nav--scrolled .hv2-nav__mobile` below) is a `translate`, the
+           independent property rather than a `transform` function: the open
+           animation below owns `transform` outright, and the two would
+           otherwise be writing the same property. They did — the animation
+           held the sheet at translateY(0) for its whole run and it snapped
+           the 20px down the instant the animation stopped applying, which is
+           the break the entry had when opened on a scrolled page. `translate`
+           composes with `transform` instead of replacing it, so the offset
+           and the entry can both be live at once. */
         position: fixed;
         top: 65px;
-        transition: transform 0.25s ease;
+        transition: translate 0.25s ease;
         left: var(--hv2-pad);
         right: var(--hv2-pad);
         max-height: calc(100vh - 65px);
@@ -3187,18 +3190,23 @@ a.hv2-ct__entryvalue:hover {
         overflow-y: auto;
         overscroll-behavior: contain;
         scrollbar-width: thin;
-        /* Drops down from behind the header instead of popping in place — same
-           0.25s ease the header itself slides down with (see
-           `.hv2-nav__bar`'s scrolled `transform`), so the two read as one
-           motion. See the reduced-motion override for the no-animation
-           fallback. */
-        animation: hv2-nav-mobile-in 0.25s ease;
+        /* Drops down from behind the header instead of popping in place. The
+           travel and the curve are the sheet's own, not the header's 0.25s
+           ease: 12px of `ease` is short enough and even enough that the sheet
+           reads as appearing rather than moving, which is most obvious at the
+           top of the page where the header is still transparent and there is
+           no card edge for it to emerge from. A longer decelerating curve
+           covers more distance up front and settles at the end, so the motion
+           reads as one continuous drop at either scroll position. See the
+           reduced-motion override for the no-animation fallback. */
+        animation: hv2-nav-mobile-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Same 20px `.hv2-nav--scrolled` itself adds to its own `top` — see the
-       note above on why this is a `transform`, not a `top` change. */
+       note above on why this is a `translate`, and not a `top` change or a
+       `transform` one. */
     .hv2-nav--scrolled .hv2-nav__mobile {
-        transform: translateY(20px);
+        translate: 0 20px;
         max-height: calc(100vh - 65px - 20px);
     }
 
