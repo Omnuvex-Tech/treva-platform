@@ -8,6 +8,8 @@ import { Menu, X } from "lucide-react";
 import { getDict } from "./dictionary";
 import { getNavProjects, type NavProject } from "./projects-api";
 import ProjectsMenuV2 from "./ProjectsMenuV2";
+import { getSavedCount, onSavedChange } from "@/lib/saved-properties";
+import { getComparedCount, onCompareChange } from "@/lib/compare-properties";
 
 type Props = { locale: string };
 
@@ -58,6 +60,8 @@ export default function NavbarV2({ locale }: Props) {
   const [invOffset, setInvOffset] = useState(22);
   const [langOffset, setLangOffset] = useState(22);
   const [navProjects, setNavProjects] = useState<NavProject[]>([]);
+  const [savedCount, setSavedCount] = useState(0);
+  const [comparedCount, setComparedCount] = useState(0);
 
   // The header renders on every page, so the CMS list is fetched once on
   // mount rather than threaded down as a prop through every page shell.
@@ -70,6 +74,16 @@ export default function NavbarV2({ locale }: Props) {
       cancelled = true;
     };
   }, [locale]);
+
+  useEffect(() => {
+    setSavedCount(getSavedCount());
+    return onSavedChange(setSavedCount);
+  }, []);
+
+  useEffect(() => {
+    setComparedCount(getComparedCount());
+    return onCompareChange(setComparedCount);
+  }, []);
 
   // 10px matches kristal.az's own threshold, the reference for this effect:
   // the card should still be transparent for a couple of wheel ticks, not
@@ -278,9 +292,12 @@ export default function NavbarV2({ locale }: Props) {
                 );
               }
 
+              const count = key === "saved" ? savedCount : key === "compare" ? comparedCount : 0;
+
               return to ? (
-                <Link key={key} href={href(to)} className="hv2-nav__btn hv2-nav__btn--icon" aria-label={label}>
+                <Link key={key} href={href(to)} className="hv2-nav__btn hv2-nav__btn--icon" aria-label={`${label} (${count})`}>
                   {glyph}
+                  {count > 0 ? <span className="hv2-nav__badge">{count}</span> : null}
                 </Link>
               ) : (
                 <button key={key} type="button" className="hv2-nav__btn hv2-nav__btn--icon" aria-label={label}>
@@ -480,15 +497,18 @@ export default function NavbarV2({ locale }: Props) {
                 );
               }
 
+              const count = key === "saved" ? savedCount : key === "compare" ? comparedCount : 0;
+
               return to ? (
                 <Link
                   key={key}
                   href={href(to)}
                   className="hv2-nav__btn hv2-nav__btn--icon"
-                  aria-label={label}
+                  aria-label={`${label} (${count})`}
                   onClick={() => setOpen(false)}
                 >
                   {glyph}
+                  {count > 0 ? <span className="hv2-nav__badge">{count}</span> : null}
                 </Link>
               ) : (
                 <button

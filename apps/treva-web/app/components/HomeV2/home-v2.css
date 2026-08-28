@@ -642,6 +642,7 @@
 /* Every action is the same 48px Button: Color/Background/Inverse on a
    Secondary Brand border, radius XXXLL, padding 16/12, gap 4. */
 .hv2-nav__btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -661,6 +662,25 @@
     white-space: nowrap;
     text-decoration: none;
     transition: background 0.18s ease, color 0.18s ease;
+}
+
+/* Wishlist/compare count — same small red pill every badge on the site uses. */
+.hv2-nav__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #e53e3e;
+    color: #fff;
+    font-family: var(--hv2-font-display);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    pointer-events: none;
 }
 
 .hv2-nav__btn:hover {
@@ -2221,12 +2241,20 @@
     padding-top: 40px;
 }
 
+/* padding, not margin — a margin here sits on the group-title itself, which
+   is the group's *first child*, and adjoining margins between a block and
+   its first child collapse straight through to the outside, landing on the
+   h1 above instead of actually opening up space under it. Padding on the
+   group itself can't collapse away, so the gap always renders. */
+.hv2-cmp__group {
+    padding-top: var(--hv2-flow);
+}
+
 .hv2-cmp__group + .hv2-cmp__group {
-    margin-top: 64px;
+    margin-top: 24px;
 }
 
 .hv2-cmp__group-title {
-    margin: var(--hv2-flow) 0 0;
     font-family: var(--hv2-font-display);
     font-size: 20px;
     font-weight: 500;
