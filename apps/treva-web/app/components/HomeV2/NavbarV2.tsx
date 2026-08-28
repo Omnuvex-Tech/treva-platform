@@ -8,6 +8,8 @@ import { Menu, X } from "lucide-react";
 import { getDict } from "./dictionary";
 import { getNavProjects, type NavProject } from "./projects-api";
 import ProjectsMenuV2 from "./ProjectsMenuV2";
+import { getSavedCount, onSavedChange } from "@/lib/saved-properties";
+import { getComparedCount, onCompareChange } from "@/lib/compare-properties";
 
 type Props = { locale: string };
 
@@ -58,6 +60,10 @@ export default function NavbarV2({ locale }: Props) {
   const [invOffset, setInvOffset] = useState(22);
   const [langOffset, setLangOffset] = useState(22);
   const [navProjects, setNavProjects] = useState<NavProject[]>([]);
+  // Both counters live in localStorage, so they can only be read after mount —
+  // starting at 0 keeps the server render and the first client paint identical.
+  const [savedCount, setSavedCount] = useState(0);
+  const [comparedCount, setComparedCount] = useState(0);
 
   // The header renders on every page, so the CMS list is fetched once on
   // mount rather than threaded down as a prop through every page shell.
@@ -70,6 +76,19 @@ export default function NavbarV2({ locale }: Props) {
       cancelled = true;
     };
   }, [locale]);
+
+  // The wishlist and compare stores broadcast a custom event on every add or
+  // remove, so the badges follow along from any page without a reload — the
+  // same wiring the V1 header uses.
+  useEffect(() => {
+    setSavedCount(getSavedCount());
+    return onSavedChange(setSavedCount);
+  }, []);
+
+  useEffect(() => {
+    setComparedCount(getComparedCount());
+    return onCompareChange(setComparedCount);
+  }, []);
 
   // 10px matches kristal.az's own threshold, the reference for this effect:
   // the card should still be transparent for a couple of wheel ticks, not
@@ -240,6 +259,11 @@ export default function NavbarV2({ locale }: Props) {
                 />
               );
 
+              const badgeCount =
+                key === "compare" ? comparedCount : key === "saved" ? savedCount : 0;
+              const badge =
+                badgeCount > 0 ? <span className="hv2-nav__badge">{badgeCount}</span> : null;
+
               if (key === "language") {
                 return (
                   <div key={key} className="hv2-nav__item" ref={langRef}>
@@ -279,12 +303,19 @@ export default function NavbarV2({ locale }: Props) {
               }
 
               return to ? (
-                <Link key={key} href={href(to)} className="hv2-nav__btn hv2-nav__btn--icon" aria-label={label}>
+                <Link
+                  key={key}
+                  href={href(to)}
+                  className="hv2-nav__btn hv2-nav__btn--icon"
+                  aria-label={badgeCount > 0 ? `${label} (${badgeCount})` : label}
+                >
                   {glyph}
+                  {badge}
                 </Link>
               ) : (
                 <button key={key} type="button" className="hv2-nav__btn hv2-nav__btn--icon" aria-label={label}>
                   {glyph}
+                  {badge}
                 </button>
               );
             })}
@@ -442,6 +473,11 @@ export default function NavbarV2({ locale }: Props) {
                 />
               );
 
+              const badgeCount =
+                key === "compare" ? comparedCount : key === "saved" ? savedCount : 0;
+              const badge =
+                badgeCount > 0 ? <span className="hv2-nav__badge">{badgeCount}</span> : null;
+
               if (key === "language") {
                 return (
                   <div key={key} className="hv2-nav__item" ref={langRefMobile}>
@@ -485,10 +521,11 @@ export default function NavbarV2({ locale }: Props) {
                   key={key}
                   href={href(to)}
                   className="hv2-nav__btn hv2-nav__btn--icon"
-                  aria-label={label}
+                  aria-label={badgeCount > 0 ? `${label} (${badgeCount})` : label}
                   onClick={() => setOpen(false)}
                 >
                   {glyph}
+                  {badge}
                 </Link>
               ) : (
                 <button
@@ -498,6 +535,7 @@ export default function NavbarV2({ locale }: Props) {
                   aria-label={label}
                 >
                   {glyph}
+                  {badge}
                 </button>
               );
             })}

@@ -38,9 +38,10 @@ export default async function AboutUsRoute({
   const authors = await getAuthors(locale).catch(() => []);
 
   if (resolveDesignVersion(v) === "v2") {
-    // The grid is six across two rows in the design; anything the feed returns
-    // beyond that would start a ragged third row.
-    const members = authors.slice(0, 6).map((author) => ({
+    // The whole feed goes down now: the grid opens on the design's six and its
+    // "more" button walks the rest of the list six at a time (TeamGridV2), so
+    // truncating here would leave that button nothing to reveal.
+    const members = authors.map((author) => ({
       id: author.id,
       name: author.name,
       role: author.title || "",

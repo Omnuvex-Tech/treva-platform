@@ -672,6 +672,28 @@
     width: 48px;
     padding: 12px;
     color: var(--hv2-ink);
+    position: relative;
+}
+
+/* Wishlist/compare counters, same red pill the V1 header uses so the two
+   headers read as one site. Anchored to the button, hence the relative above;
+   pointer-events off so it never swallows the click meant for the link. */
+.hv2-nav__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #e53e3e;
+    color: #fff;
+    font-family: var(--hv2-font-display);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    pointer-events: none;
 }
 
 /* Figma 771:23156 — one hover/pressed pair shared by every action button in
@@ -1719,7 +1741,10 @@
     /* Pulled in to the same rhythm as every other section above it. */
     padding-top: 40px;
     padding-bottom: 24px;
-    background: var(--hv2-surface);
+    /* Deliberately no fill: this used to paint white over the bottom of the
+       `--hv2-bg` tint, which cut the tint off short of the real end of the
+       page. The footer card itself is translucent (see .hv2-footer), so it
+       now reads as a panel floating on the tint the whole way down. */
 }
 
 /* Figma 724:19591 draws this as a translucent 24-radius panel — rgba(253,253,253,0.8)
@@ -2123,6 +2148,17 @@
     right: 0;
     left: 0;
     pointer-events: none;
+    /* Matches .hv2-nav__bar's own, so the two move as one — see below. */
+    transition: transform 0.25s ease;
+}
+
+/* The panel hangs off the header, not off the bar inside it, so the bar's
+   scrolled `translateY` doesn't carry it along the way it carries the
+   Inventory and Language popovers (those are nested inside the bar). Without
+   this it stayed put while the bar dropped, opening a 12px gap between the
+   two. Same distance, same easing. */
+.hv2-nav--scrolled .hv2-nav__mega {
+    transform: translateY(12px);
 }
 
 .hv2-mega {
@@ -2230,12 +2266,18 @@
     padding-top: 40px;
 }
 
+/* The group titles carry their own top margin now (see below), so this drops
+   from 64 to 40 to keep the gap between the two groups at the same 64. */
 .hv2-cmp__group + .hv2-cmp__group {
-    margin-top: 64px;
+    margin-top: 40px;
 }
 
-.hv2-cmp__group-title {
-    margin: var(--hv2-flow) 0 0;
+/* `.hv2-root h2` (the V2 reset, margin: 0) is one class more specific than a
+   bare `.hv2-cmp__group-title`, so the margin below never applied and the
+   group title sat flush under the page's own "Müqayisə" heading. Scoping this
+   rule to .hv2-root as well wins the tie and gives the pair some air. */
+.hv2-root .hv2-cmp__group-title {
+    margin: 24px 0 0;
     font-family: var(--hv2-font-display);
     font-size: 20px;
     font-weight: 500;
@@ -2309,7 +2351,10 @@
 
 .hv2-cmp__card {
     display: flex;
-    min-height: 283px;
+    /* 283 in Figma, but that leaves the centred rows only ~36px of slack to
+       share with the floating action pair — not enough to clear them. The
+       extra 17 buys the gap without changing the card's proportions. */
+    min-height: 300px;
     overflow: hidden;
     border: 1px solid var(--hv2-pcard-line);
     border-radius: var(--hv2-r-xl);
@@ -2350,7 +2395,9 @@
 .hv2-cmp__actions {
     position: absolute;
     top: 8px;
-    right: 24px;
+    /* Same 8px as the top inset — at 24 (the body's own side padding) the pair
+       sat noticeably further from the right edge than from the top one. */
+    right: 8px;
     display: flex;
     gap: 8px;
 }
@@ -2358,11 +2405,12 @@
 .hv2-cmp__rows {
     width: 100%;
     max-width: 312px;
-    /* The body centers this block vertically, which can pull its first row up
-       close enough to sit right under the icons (bottom edge at 8+48=56px)
-       with no visible gap. A fixed top margin guarantees breathing room
-       between them regardless of how the centering math works out. */
-    margin: 16px 0 0;
+    /* The body centers this block vertically, which pulls its first row up
+       under the floating icons (their bottom edge is at 8+48=56px) — at 16px
+       the two actually overlapped. The margin is part of the flex item's
+       outer box, so half of it comes back out of the centring: it has to
+       clear the icons *and* the slack the card has left over. */
+    margin: 48px 0 0;
 }
     .hv2-calc {
         min-height: 420px;
@@ -2467,8 +2515,12 @@
 /* ---------- contact ------------------------------------------------------
    Figma 622:2996 — a centred headline, two 662 cards, then the two office
    cards. Every block is 20 apart and the head is 40 above them. */
+/* Same 40px the comparison page leaves above its own heading, rather than the
+   shared 120px section rhythm: both are single-block pages that open right
+   under the header, so they should start at the same height. */
 .hv2-s-contact {
-    min-height: calc(var(--hv2-section) + 1252px);
+    padding-top: 40px;
+    min-height: calc(40px + 1252px);
 }
 
 .hv2-ct__head {
@@ -2509,6 +2561,10 @@
     display: flex;
     flex-direction: column;
     padding: 24px;
+    /* The same hairline the comparison cards carry — the two sit half in the
+       tint now, and without an outline their white bottom half dissolved into
+       the white above the split. */
+    border: 1px solid var(--hv2-pcard-line);
     border-radius: var(--hv2-r-xl);
     background: var(--hv2-surface);
 }
@@ -2692,6 +2748,7 @@ a.hv2-ct__entryvalue:hover {
     gap: 24px;
     min-height: 436px;
     padding: 20px;
+    border: 1px solid var(--hv2-pcard-line);
     border-radius: var(--hv2-r-xxl);
     background: var(--hv2-surface);
 }
@@ -2759,16 +2816,91 @@ a.hv2-ct__entryvalue:hover {
     color: var(--hv2-ink-60);
 }
 
-/* Result panel. Figma fills this with a checkerboard placeholder rather than
-   artwork, so the frame is reproduced and its contents left to the design —
-   see the note in CalculatorV2. */
+/* Result panel — Figma 635:21913. A clipped 20-radius card: the 3D artwork
+   under a 20%-black scrim, "Calculation Result" and its figures pinned top,
+   the controls pinned bottom. */
 .hv2-credit__panel {
+    position: relative;
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    overflow: hidden;
     padding: 20px;
-    border: 1px solid var(--hv2-pcard-line);
     border-radius: var(--hv2-r-xl);
     background: var(--hv2-muted-2);
+    isolation: isolate;
+}
+
+.hv2-credit__art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+}
+
+.hv2-credit__art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* The 20%-black scrim from the design. */
+.hv2-credit__art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 17, 17, 0.2);
+}
+
+.hv2-credit__result {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 451px;
+    color: #fff;
+}
+
+/* H4 32/40, letter-spacing 0.25. The bare `h2 { color }` rule in the global
+   webflow stylesheet lands directly on the element and beats the white this
+   panel inherits, so the heading has to take the panel colour back explicitly
+   to read the same as the figures below it. */
+.hv2-credit__result-title {
+    color: inherit;
+    font-family: var(--hv2-font-display);
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: 0.25px;
+}
+
+.hv2-credit__stats {
+    display: flex;
+    gap: 12px;
+}
+
+.hv2-credit__stat {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Body 1 label 16/24 over an H6 value 20/28. */
+.hv2-credit__stat span {
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+}
+
+.hv2-credit__stat strong {
+    font-family: var(--hv2-font-display);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: 0.15px;
 }
 
 .hv2-credit__actions {
@@ -2777,8 +2909,22 @@ a.hv2-ct__entryvalue:hover {
     gap: 12px;
 }
 
+/* Both controls are the Color/Background/Inverse pill from the design — light
+   fill, dark glyph — 52 tall. */
+.hv2-credit__add,
+.hv2-credit__print {
+    height: 52px;
+    background: var(--hv2-inverse-bg);
+    color: var(--hv2-ink);
+}
+
 .hv2-credit__add {
     flex: 1 1 auto;
+}
+
+.hv2-credit__add:hover,
+.hv2-credit__print:hover {
+    background: var(--hv2-inverse-bg);
 }
 
 /* 56x52 beside the CTA — padding 16/12 around a 24 glyph, which the XXXLL
@@ -2786,7 +2932,6 @@ a.hv2-ct__entryvalue:hover {
 .hv2-credit__print {
     flex: 0 0 auto;
     width: 56px;
-    height: 52px;
     padding: 0;
     border-radius: var(--hv2-r-xxxll);
 }
@@ -2923,8 +3068,12 @@ a.hv2-ct__entryvalue:hover {
 
 /* head 40 + flow 40 + two 432 rows + 24 + flow 40 + button 52. */
 .hv2-s-teamgrid {
-    min-height: calc(var(--hv2-section) + 1060px);
+    min-height: calc(40px + 1060px);
     --hv2-row-gap: 24px;
+    /* The same pulled-in 40 every home page section uses, rather than the
+       shared 120px rhythm: the advantage cards and the team that follows them
+       read as one flow, not two separate blocks. */
+    padding-top: 40px;
 }
 
 .hv2-about__team {
@@ -3784,8 +3933,26 @@ a.hv2-ct__entryvalue:hover {
     }
 
     .hv2-credit__panel {
-        min-height: 220px;
+        min-height: 380px;
         padding: 16px;
+    }
+
+    .hv2-credit__result {
+        gap: 16px;
+    }
+
+    .hv2-credit__result-title {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .hv2-credit__stats {
+        flex-wrap: wrap;
+        gap: 12px 16px;
+    }
+
+    .hv2-credit__stat {
+        flex-basis: calc(50% - 8px);
     }
 
     .hv2-credit__actions {

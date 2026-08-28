@@ -17,7 +17,10 @@ export default function HeroV2({ locale }: Props) {
           <h2 className="hv2-calc__title">{dict.calculator.title}</h2>
           <p className="hv2-calc__subtitle">{dict.calculator.subtitle}</p>
 
-          <Link href={`/${locale}/contact`} className="hv2-pill hv2-pill--dark hv2-calc__cta">
+          {/* The calculator card's own CTA goes to the calculator page, not the
+              contact form — the consultation pill below is the one that asks
+              for a person. */}
+          <Link href={`/${locale}/credit`} className="hv2-pill hv2-pill--dark hv2-calc__cta">
             {dict.calculator.cta}
             <CreditCard size={15} strokeWidth={1.6} />
           </Link>

@@ -1,10 +1,18 @@
 import "./home-v2.css";
 import NavbarV2 from "./NavbarV2";
 import CalculatorV2 from "./CalculatorV2";
+import TopBackgroundV2, { type BgAnchor } from "./TopBackgroundV2";
 import ProjectsV2 from "./ProjectsV2";
 import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
 import { getDict } from "./dictionary";
+
+/**
+ * The tint splits through the calculator card, the way the home page's splits
+ * through its search card — the page's own heading sits inside that card, so
+ * everything above the split stays on white.
+ */
+const CREDIT_ANCHORS: BgAnchor[] = [{ from: ".hv2-credit" }];
 
 type Props = { locale: string };
 
@@ -24,6 +32,7 @@ export default function CreditPage({ locale }: Props) {
   return (
     <div className="page-wrapper credit-page--v2" data-locale={locale} data-design="v2">
       <div className="hv2-root">
+        <TopBackgroundV2 anchors={CREDIT_ANCHORS} />
         <NavbarV2 locale={locale} />
         <CalculatorV2 locale={locale} />
         <ProjectsV2

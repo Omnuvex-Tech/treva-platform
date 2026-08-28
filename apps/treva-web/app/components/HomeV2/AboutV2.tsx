@@ -1,12 +1,9 @@
-import Link from "next/link";
 import Image from "next/image";
 import { getDict } from "./dictionary";
+import TeamGridV2 from "./TeamGridV2";
 import type { TeamMember } from "./data";
 
 type Props = { locale: string; members?: TeamMember[] };
-
-const AVATAR_FALLBACK = "/assets/webflow-placeholder.svg";
-const CARD_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
 
 /** One glyph per advantage, in the order the design lists the cards. */
 const ADVANTAGE_ICONS = [
@@ -80,41 +77,7 @@ export default function AboutV2({ locale, members = [] }: Props) {
             <p className="hv2-about__lead">{dict.about.teamLead}</p>
           </div>
 
-          <div className="hv2-grid-3 hv2-about__team">
-            {members.map((member) => (
-              <Link key={member.id} href={member.href} className="hv2-ucard hv2-ucard--person">
-                <div className="hv2-ucard__media">
-                  <Image
-                    src={member.avatar || AVATAR_FALLBACK}
-                    alt={member.name}
-                    fill
-                    sizes={CARD_SIZES}
-                  />
-                </div>
-
-                <div className="hv2-ucard__foot">
-                  <div className="hv2-ucard__info">
-                    <p className="hv2-ucard__title">{member.name}</p>
-                    {member.role ? <p className="hv2-ucard__meta">{member.role}</p> : null}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <div className="hv2-center">
-            <Link href={`/${locale}/authors`} className="hv2-pill hv2-pill--dark hv2-pill--cta">
-              {dict.about.teamCta}
-              <Image
-                src="/images/icons/arrow-up-right.svg"
-                alt=""
-                aria-hidden="true"
-                width={24}
-                height={24}
-                unoptimized
-              />
-            </Link>
-          </div>
+          <TeamGridV2 locale={locale} members={members} />
         </section>
       ) : null}
     </>

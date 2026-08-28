@@ -22,14 +22,20 @@ const toOptions = (values: string[]): SelectOption[] =>
  *
  * Two 396-tall cards: the calculator on the left, the result panel on the right.
  *
- * That right panel is deliberately blank. In Figma its fill is a checkerboard
- * placeholder — the designer's "artwork goes here" marker, not artwork — so
- * shipping it would put a literal checkerboard on the page. The frame, its
- * radius and both of its controls are reproduced exactly; only the contents of
- * the panel are left for the design to decide.
+ * The right panel (Figma 635:21913 "Consultation") is a clipped 20-radius card
+ * layered as: the 3D "TREVA" artwork under a 20%-black scrim, the "Calculation
+ * Result" heading with its three payment figures pinned top-left, and the
+ * Add Credit / print controls pinned to the bottom. There is no calculator
+ * endpoint yet, so `result` stays null and every figure reads as 0.00 $ until
+ * one is wired.
  */
+type CreditResult = { monthly: number; down: number };
+
+const money = (value: number) => `${value.toFixed(2)} $`;
+
 export default function CalculatorV2({ locale }: Props) {
   const dict = getDict(locale);
+  const [result] = useState<CreditResult | null>(null);
   const [values, setValues] = useState({
     project: "",
     rooms: "",
@@ -92,11 +98,38 @@ export default function CalculatorV2({ locale }: Props) {
         </div>
 
         <div className="hv2-credit__panel">
+          <div className="hv2-credit__art" aria-hidden="true">
+            <Image
+              src="/images/figma/credit-result-art.jpg"
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 100vw, 639px"
+            />
+          </div>
+
+          <div className="hv2-credit__result">
+            <h2 className="hv2-credit__result-title">{dict.credit.resultTitle}</h2>
+            <div className="hv2-credit__stats">
+              <div className="hv2-credit__stat">
+                <span>{dict.credit.monthlyPayment}</span>
+                <strong>{money(result?.monthly ?? 0)}</strong>
+              </div>
+              <div className="hv2-credit__stat">
+                <span>{dict.credit.downPayment}</span>
+                <strong>{money(result?.down ?? 0)}</strong>
+              </div>
+              <div className="hv2-credit__stat">
+                <span>{dict.credit.monthlyPayment}</span>
+                <strong>{money(result?.monthly ?? 0)}</strong>
+              </div>
+            </div>
+          </div>
+
           <div className="hv2-credit__actions">
-            <button type="button" className="hv2-pill hv2-pill--dark hv2-pill--cta hv2-credit__add">
+            <button type="button" className="hv2-pill hv2-pill--cta hv2-credit__add">
               {dict.credit.addCredit}
               <Image
-                src="/images/icons/arrow-right-light.svg"
+                src="/images/icons/arrow-right-dark.svg"
                 alt=""
                 aria-hidden="true"
                 width={24}
@@ -107,11 +140,11 @@ export default function CalculatorV2({ locale }: Props) {
 
             <button
               type="button"
-              className="hv2-pill hv2-pill--dark hv2-credit__print"
+              className="hv2-pill hv2-credit__print"
               aria-label={dict.credit.print}
             >
               <Image
-                src="/images/icons/printer-light.svg"
+                src="/images/icons/printer-dark.svg"
                 alt=""
                 aria-hidden="true"
                 width={24}
