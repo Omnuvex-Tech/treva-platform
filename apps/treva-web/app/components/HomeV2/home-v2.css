@@ -2753,9 +2753,16 @@ a.hv2-ct__entryvalue:hover {
     background: var(--hv2-surface);
 }
 
+/* The z-index is what the open listboxes ride on, and it has to clear the
+   project cards further down the page, not just the result panel beside it:
+   this element is a stacking context, so the 40 its listbox carries is
+   clamped to whatever level the card itself sits at. At 1 that tied with
+   .hv2-pcard__media (also 1), and a tie is broken by document order — so the
+   building cut-outs, which come later, painted straight over an open
+   dropdown. 20 clears them while staying under the sticky header (40). */
 .hv2-credit__calc {
     position: relative;
-    z-index: 1;
+    z-index: 20;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--hv2-pcard-line);
@@ -2901,6 +2908,20 @@ a.hv2-ct__entryvalue:hover {
     font-weight: 500;
     line-height: 28px;
     letter-spacing: 0.15px;
+    /* The grouping spaces are real spaces, so a narrow column would otherwise
+       wrap "204 500.00 $" mid-figure or drop the currency onto its own line. */
+    white-space: nowrap;
+}
+
+/* Stands in for the three figures until a unit and a plan are both chosen —
+   the design has no empty state, but the panel cannot show a sum it has not
+   been given the inputs for. */
+.hv2-credit__hint {
+    font-family: var(--hv2-font-display);
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.05px;
+    color: rgba(255, 255, 255, 0.82);
 }
 
 .hv2-credit__actions {
@@ -2922,16 +2943,32 @@ a.hv2-ct__entryvalue:hover {
     flex: 1 1 auto;
 }
 
+.hv2-credit__add:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.hv2-credit__add:disabled:hover {
+    transform: none;
+}
+
 .hv2-credit__add:hover,
 .hv2-credit__print:hover {
     background: var(--hv2-inverse-bg);
 }
 
-/* 56x52 beside the CTA — padding 16/12 around a 24 glyph, which the XXXLL
+/* Both glyphs are 28 in the frame; .hv2-pill--cta sizes its own icon at 24. */
+.hv2-credit__add img,
+.hv2-credit__print img {
+    width: 28px;
+    height: 28px;
+}
+
+/* 52x52 beside the CTA — 12 of padding around that 28 glyph, which the XXXLL
    radius rounds into the circle the frame shows. */
 .hv2-credit__print {
     flex: 0 0 auto;
-    width: 56px;
+    width: 52px;
     padding: 0;
     border-radius: var(--hv2-r-xxxll);
 }
@@ -2958,6 +2995,45 @@ a.hv2-ct__entryvalue:hover {
 .hv2-credit__field .hv2-sel__option:hover,
 .hv2-credit__field .hv2-sel__option[data-active="true"] {
     background: var(--hv2-inverse-bg);
+}
+
+/* ---------- projects page -------------------------------------------------
+   Figma 3164:5025 (desktop) and 3164:4957 (mobile). Header, map hero, the
+   six-card grid, the callback banner, footer — only the hero is this page's
+   own; the rest are the home page's components, instanced here exactly as
+   the frame instances them.
+
+   No section-gap overrides on purpose. Both frames draw the blocks 120
+   apart, but the page runs the shared V2 rhythm instead — the same 40 the
+   home page puts between Projects, the callback banner and the footer — so
+   the redesign reads as one site rather than one page spaced to itself. */
+
+/* 40 under the header, the same offset the credit hero takes. */
+.hv2-s-projmap {
+    padding-top: 40px;
+}
+
+.hv2-projmap {
+    position: relative;
+    aspect-ratio: 1344 / 568;
+    overflow: hidden;
+    border-radius: var(--hv2-r-xl);
+    /* Shows for the moment before the plate decodes; the artwork is edge to
+       edge, so nothing of this is visible afterwards. */
+    background: var(--hv2-muted-2);
+}
+
+.hv2-projmap img {
+    object-fit: cover;
+    /* The plate renders 1344x752 into a 568-tall frame and the design pulls it
+       up 64px — 35% of the 184px that overflows. Stated as a percentage so the
+       crop stays put instead of drifting as the card narrows. */
+    object-position: center 35%;
+}
+
+/* 40 between the head and the first card row here, against the home grid's 8. */
+.projects-page--v2 .hv2-s-projects .hv2-section-head {
+    margin-bottom: var(--hv2-flow);
 }
 
 /* ---------- about ---------------------------------------------------------
@@ -3958,6 +4034,27 @@ a.hv2-ct__entryvalue:hover {
     .hv2-credit__actions {
         gap: 8px;
     }
+    /* ---- projects page (Figma 3164:4957) --------------------------------
+       402 canvas, 370 of content. The map is redrawn at 370x262 rather than
+       kept at its desktop ratio, and it is the same plate: cover crops it to
+       the sides at this ratio, which is why the outer two signs sit half in
+       frame the way the mobile frame shows them. */
+    .hv2-projmap {
+        aspect-ratio: 370 / 262;
+    }
+
+    /* The CTA runs the full column instead of hugging its label. */
+    .projects-page--v2 .hv2-s-projects .hv2-center .hv2-pill {
+        width: 100%;
+    }
+
+    /* The mobile frame carries two of the six cards and then the CTA. The cut
+       is a display rule rather than a shorter list because the server cannot
+       know the viewport — the same markup has to serve both widths. */
+    .projects-page--v2 .hv2-s-projects .hv2-grid-3 > *:nth-child(n + 3) {
+        display: none;
+    }
+
     /* ---- about (Figma 673:15809) ---------------------------------------- */
     .hv2-about__cards {
         grid-template-columns: minmax(0, 1fr);

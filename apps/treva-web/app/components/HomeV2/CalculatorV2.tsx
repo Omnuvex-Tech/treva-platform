@@ -1,21 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { getDict } from "./dictionary";
-import { projectCards } from "./data";
+import type { CreditUnit } from "./inventory-api";
 import SelectV2, { type SelectOption } from "./SelectV2";
 
-type Props = { locale: string };
+type Props = { locale: string; units?: CreditUnit[] };
 
-const ROOMS = ["1", "2", "3", "4", "5+"];
-const AREAS = ["40-60", "60-80", "80-100", "100-140", "140+"];
-const FLOORS = ["1-5", "6-10", "11-15", "16-20", "20+"];
-const PAYMENTS = ["10%", "20%", "30%", "40%", "50%"];
-const TERMS = ["12", "24", "36", "48", "60"];
+/** Percentages, not amounts — the field is a dropdown, so it cannot take a sum. */
+const DOWN_PAYMENTS = [10, 20, 30, 40, 50];
+const TERMS = [12, 24, 36, 48, 60];
 
-const toOptions = (values: string[]): SelectOption[] =>
-  values.map((value) => ({ value, label: value }));
+type Selection = {
+  project: string;
+  rooms: string;
+  area: string;
+  floor: string;
+  payment: string;
+  term: string;
+};
+
+const EMPTY: Selection = { project: "", rooms: "", area: "", floor: "", payment: "", term: "" };
+
+/** Ascending numeric options with the duplicates collapsed. */
+function numericOptions(values: (number | null)[], label: (value: number) => string): SelectOption[] {
+  return Array.from(new Set(values.filter((value): value is number => value !== null)))
+    .sort((a, b) => a - b)
+    .map((value) => ({ value: String(value), label: label(value) }));
+}
+
+/** "2800.6" -> "2 800.60 $" — the design's dot decimal, grouped like the resale listing. */
+function formatMoney(amount: number, currency: string): string {
+  const [whole = "0", fraction = "00"] = amount.toFixed(2).split(".");
+  return `${whole.replace(/\B(?=(\d{3})+(?!\d))/g, " ")}.${fraction} ${currency}`;
+}
 
 /**
  * Credit calculator hero — Figma 635:21742.
@@ -25,51 +44,141 @@ const toOptions = (values: string[]): SelectOption[] =>
  * The right panel (Figma 635:21913 "Consultation") is a clipped 20-radius card
  * layered as: the 3D "TREVA" artwork under a 20%-black scrim, the "Calculation
  * Result" heading with its three payment figures pinned top-left, and the
- * Add Credit / print controls pinned to the bottom. There is no calculator
- * endpoint yet, so `result` stays null and every figure reads as 0.00 $ until
- * one is wired.
+ * Add Credit / print controls pinned to the bottom.
+ *
+ * The six dropdowns are cascading views of the real off-plan inventory
+ * (`getCreditUnits`), not fixed lists: picking a project narrows the room
+ * counts to the ones that project actually has, those narrow the areas, and
+ * those narrow the floors. So every combination the user can reach resolves to
+ * a unit that exists — there is no way to ask for a quote on an apartment
+ * nobody is selling. Down payment and term are the only free choices.
+ *
+ * The sum itself is the internal (developer) instalment plan, which carries no
+ * interest: the down payment comes off the price and what is left is split
+ * evenly across the term. A bank-style amortised rate would need a rate field
+ * the design does not have.
  */
-type CreditResult = { monthly: number; down: number };
-
-const money = (value: number) => `${value.toFixed(2)} $`;
-
-export default function CalculatorV2({ locale }: Props) {
+export default function CalculatorV2({ locale, units = [] }: Props) {
   const dict = getDict(locale);
-  const [result] = useState<CreditResult | null>(null);
-  const [values, setValues] = useState({
-    project: "",
-    rooms: "",
-    area: "",
-    floor: "",
-    payment: "",
-    term: "",
-  });
+  const [values, setValues] = useState<Selection>(EMPTY);
+  const [calculated, setCalculated] = useState(false);
 
-  const set = (key: keyof typeof values) => (value: string) =>
-    setValues((current) => ({ ...current, [key]: value }));
+  // Each step narrows the pool the next step chooses from.
+  const byProject = useMemo(
+    () => (values.project ? units.filter((unit) => unit.projectSlug === values.project) : units),
+    [units, values.project],
+  );
+  const byRooms = useMemo(
+    () => (values.rooms ? byProject.filter((unit) => String(unit.rooms) === values.rooms) : byProject),
+    [byProject, values.rooms],
+  );
+  const byArea = useMemo(
+    () => (values.area ? byRooms.filter((unit) => String(unit.area) === values.area) : byRooms),
+    [byRooms, values.area],
+  );
+  const byFloor = useMemo(
+    () => (values.floor ? byArea.filter((unit) => String(unit.floor) === values.floor) : byArea),
+    [byArea, values.floor],
+  );
+
+  const projectOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    units.forEach((unit) => {
+      if (unit.projectSlug && !seen.has(unit.projectSlug)) seen.set(unit.projectSlug, unit.projectTitle);
+    });
+    return Array.from(seen, ([value, label]) => ({ value, label })).sort((a, b) =>
+      a.label.localeCompare(b.label, locale),
+    );
+  }, [units, locale]);
+
+  /**
+   * Selecting a project cannot leave a room count from the previous one
+   * standing, so every change clears the steps below it.
+   */
+  const set =
+    (key: keyof Selection, ...clears: (keyof Selection)[]) =>
+    (value: string) => {
+      setValues((current) => ({
+        ...current,
+        [key]: value,
+        ...Object.fromEntries(clears.map((field) => [field, ""])),
+      }));
+    };
 
   const fields: {
-    key: keyof typeof values;
+    key: keyof Selection;
     label: string;
     placeholder: string;
     options: SelectOption[];
+    onChange: (value: string) => void;
   }[] = [
     {
       key: "project",
       label: dict.search.project,
       placeholder: dict.search.projectPlaceholder,
-      options: projectCards.map((item) => ({
-        value: item.slug,
-        label: item.title,
-        thumb: `/images/thumbs/${item.slug}.jpg`,
-      })),
+      options: projectOptions,
+      onChange: set("project", "rooms", "area", "floor"),
     },
-    { key: "rooms", label: dict.search.rooms, placeholder: dict.credit.selectRooms, options: toOptions(ROOMS) },
-    { key: "area", label: dict.credit.areaLabel, placeholder: dict.credit.selectArea, options: toOptions(AREAS) },
-    { key: "floor", label: dict.credit.floorLabel, placeholder: dict.credit.selectFloor, options: toOptions(FLOORS) },
-    { key: "payment", label: dict.credit.downPayment, placeholder: dict.credit.selectPayment, options: toOptions(PAYMENTS) },
-    { key: "term", label: dict.credit.term, placeholder: dict.credit.selectTerm, options: toOptions(TERMS) },
+    {
+      key: "rooms",
+      label: dict.search.rooms,
+      placeholder: dict.credit.selectRooms,
+      options: numericOptions(byProject.map((unit) => unit.rooms), String),
+      onChange: set("rooms", "area", "floor"),
+    },
+    {
+      key: "area",
+      label: dict.credit.areaLabel,
+      placeholder: dict.credit.selectArea,
+      options: numericOptions(byRooms.map((unit) => unit.area), (value) => `${value} m²`),
+      onChange: set("area", "floor"),
+    },
+    {
+      key: "floor",
+      label: dict.credit.floorLabel,
+      placeholder: dict.credit.selectFloor,
+      options: numericOptions(byArea.map((unit) => unit.floor), String),
+      onChange: set("floor"),
+    },
+    {
+      key: "payment",
+      label: dict.credit.downPayment,
+      placeholder: dict.credit.selectPayment,
+      options: DOWN_PAYMENTS.map((percent) => ({ value: String(percent), label: `${percent}%` })),
+      onChange: set("payment"),
+    },
+    {
+      key: "term",
+      label: dict.credit.term,
+      placeholder: dict.credit.selectTerm,
+      options: TERMS.map((months) => ({ value: String(months), label: dict.credit.months(months) })),
+      onChange: set("term"),
+    },
   ];
+
+  const result = useMemo(() => {
+    // All four unit fields have to be answered before a price exists; two units
+    // can still share the last one (same project, rooms, area and floor), and
+    // then either quote is equally true, so the first stands in.
+    const resolved = values.project && values.rooms && values.area && values.floor;
+    const unit = resolved ? (byFloor[0] ?? null) : null;
+    if (!unit || !values.payment || !values.term) return null;
+
+    const price = unit.priceUsd ?? unit.priceAzn;
+    if (price === null) return null;
+
+    const currency = unit.priceUsd !== null ? "$" : "AZN";
+    const downPayment = (price * Number(values.payment)) / 100;
+    const monthly = (price - downPayment) / Number(values.term);
+
+    return {
+      monthly: formatMoney(monthly, currency),
+      downPayment: formatMoney(downPayment, currency),
+      total: formatMoney(price, currency),
+    };
+  }, [byFloor, values]);
+
+  const shown = calculated ? result : null;
 
   return (
     <section className="hv2-shell hv2-s-credit">
@@ -87,7 +196,7 @@ export default function CalculatorV2({ locale }: Props) {
                 <span>{field.label}</span>
                 <SelectV2
                   value={values[field.key]}
-                  onChange={set(field.key)}
+                  onChange={field.onChange}
                   options={field.options}
                   placeholder={field.placeholder}
                   label={field.label}
@@ -109,31 +218,46 @@ export default function CalculatorV2({ locale }: Props) {
 
           <div className="hv2-credit__result">
             <h2 className="hv2-credit__result-title">{dict.credit.resultTitle}</h2>
-            <div className="hv2-credit__stats">
-              <div className="hv2-credit__stat">
-                <span>{dict.credit.monthlyPayment}</span>
-                <strong>{money(result?.monthly ?? 0)}</strong>
+
+            {shown ? (
+              <div className="hv2-credit__stats">
+                {/* The frame labels its third column "Monthly Payment" a second
+                    time, which duplicates the first; the total is what belongs
+                    beside a monthly figure and a deposit. */}
+                <div className="hv2-credit__stat">
+                  <span>{dict.credit.monthlyPayment}</span>
+                  <strong>{shown.monthly}</strong>
+                </div>
+                <div className="hv2-credit__stat">
+                  <span>{dict.credit.downPayment}</span>
+                  <strong>{shown.downPayment}</strong>
+                </div>
+                <div className="hv2-credit__stat">
+                  <span>{dict.credit.totalPrice}</span>
+                  <strong>{shown.total}</strong>
+                </div>
               </div>
-              <div className="hv2-credit__stat">
-                <span>{dict.credit.downPayment}</span>
-                <strong>{money(result?.down ?? 0)}</strong>
-              </div>
-              <div className="hv2-credit__stat">
-                <span>{dict.credit.monthlyPayment}</span>
-                <strong>{money(result?.monthly ?? 0)}</strong>
-              </div>
-            </div>
+            ) : (
+              <p className="hv2-credit__hint">
+                {units.length === 0 ? dict.credit.noMatch : dict.credit.emptyHint}
+              </p>
+            )}
           </div>
 
           <div className="hv2-credit__actions">
-            <button type="button" className="hv2-pill hv2-pill--cta hv2-credit__add">
+            <button
+              type="button"
+              className="hv2-pill hv2-pill--cta hv2-credit__add"
+              onClick={() => setCalculated(true)}
+              disabled={result === null}
+            >
               {dict.credit.addCredit}
               <Image
                 src="/images/icons/arrow-right-dark.svg"
                 alt=""
                 aria-hidden="true"
-                width={24}
-                height={24}
+                width={28}
+                height={28}
                 unoptimized
               />
             </button>
@@ -142,13 +266,14 @@ export default function CalculatorV2({ locale }: Props) {
               type="button"
               className="hv2-pill hv2-credit__print"
               aria-label={dict.credit.print}
+              onClick={() => window.print()}
             >
               <Image
                 src="/images/icons/printer-dark.svg"
                 alt=""
                 aria-hidden="true"
-                width={24}
-                height={24}
+                width={28}
+                height={28}
                 unoptimized
               />
             </button>

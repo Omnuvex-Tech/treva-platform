@@ -6,6 +6,7 @@ import ProjectsV2 from "./ProjectsV2";
 import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
 import { getDict } from "./dictionary";
+import { getCreditUnits } from "./inventory-api";
 
 /**
  * The tint splits through the calculator card, the way the home page's splits
@@ -26,15 +27,16 @@ type Props = { locale: string };
  * 457:10745), just with its own heading and no blurb — the banner and footer
  * are shared too.
  */
-export default function CreditPage({ locale }: Props) {
+export default async function CreditPage({ locale }: Props) {
   const dict = getDict(locale);
+  const units = await getCreditUnits();
 
   return (
     <div className="page-wrapper credit-page--v2" data-locale={locale} data-design="v2">
       <div className="hv2-root">
         <TopBackgroundV2 anchors={CREDIT_ANCHORS} />
         <NavbarV2 locale={locale} />
-        <CalculatorV2 locale={locale} />
+        <CalculatorV2 locale={locale} units={units} />
         <ProjectsV2
           locale={locale}
           title={dict.credit.projectsTitle}

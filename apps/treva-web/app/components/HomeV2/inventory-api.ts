@@ -11,7 +11,7 @@ type ApiUnit = {
     prices?: Record<string, number>;
     mainImage?: { url?: string } | null;
     coverImage?: { url?: string } | null;
-    category?: { title?: string; name?: string; developerBrand?: string } | null;
+    category?: { slug?: string; title?: string; name?: string; developerBrand?: string } | null;
     house?: { title?: string; name?: string } | null;
     floor?: number;
 };
@@ -156,6 +156,78 @@ export async function getHomeResale(limit = 3): Promise<InventoryCard[]> {
             .map(toResaleCard)
             .filter((card): card is InventoryCard => card !== null)
             .slice(0, limit);
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * One inventory unit reduced to the six facts the credit calculator needs.
+ *
+ * The calculator does not show units — it narrows the inventory down to a
+ * single one through its dropdowns and then divides that unit's price — so it
+ * needs neither the images nor the formatted strings `InventoryCard` carries.
+ * Numbers stay numbers here: the arithmetic happens in the component, and
+ * formatting only at the point of display.
+ */
+export type CreditUnit = {
+    id: string;
+    projectSlug: string;
+    projectTitle: string;
+    rooms: number | null;
+    area: number | null;
+    floor: number | null;
+    priceUsd: number | null;
+    priceAzn: number | null;
+};
+
+function toCreditUnit(unit: ApiUnit, index: number): CreditUnit | null {
+    const priceUsd = unit.prices?.USD ?? null;
+    const priceAzn = unit.prices?.AZN ?? null;
+    // A unit with no price cannot be paid off in instalments, so it would only
+    // ever widen the dropdowns into dead ends.
+    if (priceUsd === null && priceAzn === null) return null;
+
+    return {
+        id: unit.id || unit.slug || `credit-unit-${index}`,
+        projectSlug: unit.category?.slug || "",
+        projectTitle: unit.category?.title || unit.category?.name || "",
+        rooms: typeof unit.rooms === "number" ? unit.rooms : null,
+        area: typeof unit.totalArea === "number" ? unit.totalArea : null,
+        floor: typeof unit.floor === "number" ? unit.floor : null,
+        priceUsd,
+        priceAzn,
+    };
+}
+
+/**
+ * Every off-plan unit the credit calculator is allowed to quote on.
+ *
+ * Fetched whole rather than filtered per dropdown: the calculator's six
+ * selects cascade — picking a project has to narrow the room counts, which
+ * narrows the areas, and so on — and driving that from the server would mean
+ * a round trip per keystroke over a list that is currently 48 rows. `limit`
+ * is set well above the real total so a single request covers it; raise it if
+ * the inventory ever outgrows a page.
+ *
+ * `sold` units are excluded: they cannot be bought, so quoting instalments on
+ * one would be a lie. `reserved` stays — a reservation lapses.
+ */
+export async function getCreditUnits(): Promise<CreditUnit[]> {
+    try {
+        const res = await fetch(`${TREVA_API}/unit-layouts?limit=500&archived=false`, {
+            next: { revalidate: 60 },
+        });
+        if (!res.ok) return [];
+
+        const raw = await res.json();
+        const list: (ApiUnit & { status?: string })[] = Array.isArray(raw) ? raw : (raw?.data ?? raw?.items ?? []);
+        if (!Array.isArray(list)) return [];
+
+        return list
+            .filter((unit) => unit.status !== "sold")
+            .map(toCreditUnit)
+            .filter((unit): unit is CreditUnit => unit !== null);
     } catch {
         return [];
     }
