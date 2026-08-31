@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+ * TREVA Broker — design tokens
+ *
+ * Every value below is pulled from the Figma variable set of
+ * "TREVA Real Estate Admin CRM" (file SJRCdsOsEa1DCArrbghoPr). The Figma name
+ * is kept in the comment so a token can be traced back to the source of truth.
+ *
+ * RULE: never write a raw hex/px value in a component. If a value is missing
+ * here, add it here first — that is what keeps the three roles visually
+ * identical, which is the whole premise of this app.
+ * ------------------------------------------------------------------------- */
+@theme {
+    /* --- Background ------------------------------------------------------ */
+    --color-bg-primary: #ffffff; /* Background/Primary */
+    --color-bg-secondary: #f4f5f5; /* Background/Secondary */
+    --color-bg-tertiary: #ebebeb; /* Background/Teritary [sic, as in Figma] */
+    --color-bg-brand: #4e525d; /* Background/Brand */
+    --color-bg-dark: #28303f; /* Dark */
+    --color-bg-positive-subtle: #d7f3e3; /* Background/Positive Subtle */
+    --color-bg-notice-subtle: #fdf4e0; /* Background/Notice Subtle */
+    --color-bg-info-subtle: #d6e6f4; /* Background/Info Subtle */
+    /* Derived: Figma has no Negative Subtle yet — same recipe as the other
+       subtle fills (content colour lightened to a ~92% tint). Replace with the
+       real token as soon as design publishes it. */
+    --color-bg-negative-subtle: #fde3e0;
+
+    /* --- Content (text / icons) ------------------------------------------ */
+    --color-content-primary: #1a1a1a; /* Content/Primary */
+    --color-content-secondary: #333333; /* Content/Secondary */
+    --color-content-tertiary: #666666; /* Content/Tertiary */
+    --color-content-disabled: #a6a6a6; /* Content/Disabled */
+    --color-content-inverse: #ffffff; /* Content/Primary Inverse */
+    --color-content-brand: #4e525d; /* Content/Brand */
+    --color-content-brand-bold: #373a42; /* Content/Brand Bold */
+    --color-content-positive: #00c274; /* Content/Positive */
+    --color-content-positive-bold: #2d9a5b; /* Content/Positive Bold */
+    --color-content-notice: #ffbb00; /* Content/Notice */
+    --color-content-negative: #f31100; /* Content/Negative */
+    --color-content-link: #007be2; /* Content/Link */
+
+    /* --- Border ---------------------------------------------------------- */
+    --color-border-subtle: #ebebeb; /* Border/Subtle */
+    --color-border-tertiary: #cccccc; /* Border/Tertiary */
+    --color-border-brand: #4e525d; /* Border/Brand */
+    --color-border-inverse: #ffffff; /* Border/Inverse */
+    --color-border-notice: #ffbb00; /* Border/Notice */
+
+    /* --- Radius ---------------------------------------------------------- */
+    --radius-xs: 0px; /* Border radius/XS */
+    --radius-s: 8px; /* s */
+    --radius-md: 12px; /* Border radius/XXL */
+    --radius-lg: 16px; /* Border radius/3XL */
+    --radius-xl: 20px; /* Border radius/4XL */
+    --radius-pill: 9999px; /* Border radius/PILL */
+
+    /* --- Type scale ------------------------------------------------------ */
+    --font-sans: "Oak Sans", "Inter", ui-sans-serif, system-ui, -apple-system,
+        "Segoe UI", Roboto, Arial, sans-serif;
+
+    --text-2xs: 10px; /* Font/Size/10 */
+    --text-2xs--line-height: 14px;
+    --text-xs: 12px; /* Font/Size/12 */
+    --text-xs--line-height: 18px;
+    --text-sm: 14px; /* Font/Size/14 */
+    --text-sm--line-height: 20px;
+    --text-base: 16px; /* Font/Size/16 */
+    --text-base--line-height: 20px;
+    --text-2xl: 24px; /* Font/Size/24 */
+    --text-2xl--line-height: 32px;
+    --text-3xl: 32px; /* Font/Size/32 */
+    --text-3xl--line-height: 40px;
+
+    /* --- Elevation ------------------------------------------------------- */
+    --shadow-l2: 0 0 4px 0 #00000014, 0 4px 8px 0 #0000001a; /* Shadow/L2 */
+    --shadow-l7: 0 8px 16px 0 #3232470f, 0 8px 8px 0 #32324705; /* Shadow/L7 */
+
+    /* --- Layout ---------------------------------------------------------- */
+    --spacing-sidebar: 280px; /* Sidebar frame width in every artboard */
+    --spacing-header: 80px; /* Logo + AppHeader row height */
+    --spacing-navbar: 24px; /* Padding/Navbar */
+}
+
+/**
+ * Chart tokens — deliberately a plain `:root` rule, NOT `@theme`.
+ *
+ * Tailwind v4 tree-shakes theme variables: it keeps only the ones some
+ * generated utility references. These are consumed exclusively through
+ * `var()` inside inline SVG attributes, and the donut even builds the name
+ * dynamically (`--color-chart-${n}`), so Tailwind cannot see them at all and
+ * dropped them from the compiled `:root`. The result was silent: `stroke`
+ * resolved to `none` and the donut ring and line simply did not render.
+ * `@theme static` did not save them either. Plain CSS is never tree-shaken.
+ *
+ * Values are darker steps of the design hues: the UI tokens
+ * (Content/Positive #00c274, Content/Notice #ffbb00) are too light to carry a
+ * chart mark and fail both the lightness band and the 3:1 contrast floor.
+ * Validated with the dataviz six-checks script against a white surface — all
+ * PASS.
+ *
+ * ORDER MATTERS: green, blue, amber, red. Green beside amber is the one
+ * adjacency that fails colour-blind separation (protan deltaE 5.8), so blue sits
+ * between them. Assign in order; never re-order per chart.
+ */
+:root {
+    --color-chart-1: #1f8a5f;
+    --color-chart-2: #0b5fa5;
+    --color-chart-3: #b07d00;
+    --color-chart-4: #a3231a;
+    /* Single-series marks use the brand ink (7.4:1 on white). */
+    --color-chart-line: #4e525d;
+    --color-chart-grid: #ebebeb;
+}
+
+/* ---------------------------------------------------------------------------
+ * Base layer
+ * ------------------------------------------------------------------------- */
+@layer base {
+    * {
+        border-color: var(--color-border-subtle);
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        /* The 1440x1024 artboards are white end to end — the grey token is for
+           inset surfaces (inputs, table headers, segmented tracks), not the page. */
+        background-color: var(--color-bg-primary);
+        color: var(--color-content-primary);
+        font-family: var(--font-sans);
+        font-size: var(--text-sm);
+        line-height: var(--text-sm--line-height);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Every screen in the design is a fixed 1440x1024 desktop frame with no
+       page-level horizontal scroll — wide content scrolls inside its own
+       container instead. */
+    body {
+        overflow-x: hidden;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-border-brand);
+        outline-offset: 2px;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * Utilities used often enough to earn a name
+ * ------------------------------------------------------------------------- */
+@utility scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-tertiary) transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-border-tertiary);
+        border-radius: var(--radius-pill);
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+}
