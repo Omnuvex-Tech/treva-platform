@@ -251,6 +251,28 @@
 }
 
 /* ── CMS zəngin mətn: paraqraf bloku artıq <div>-dir, Tiptap içəridə <p> qoyur. ── */
+
+/* Blok <div> olduğu üçün `.article_richtext p`-nin yazı tərtibatı ona dəymir və
+   içəridəki mətn səhifənin 14px-lik baza ölçüsünə düşürdü: dar sətir aralığı,
+   uzun sətirlər və body-dən miras qalan -0.68px sıxlıq (34px başlıq üçün
+   yazılmış -0.02em) oxumağı yorurdu. Ölçü, rəng və hərf aralığı burada zəngin
+   mətnin öz qaydasına qaytarılır — aşağıdakı `font: inherit` artıq düzgün
+   dəyəri paylayır. */
+.pulse-paragraph {
+  color: var(--_color---blue-300);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  letter-spacing: normal;
+}
+
+/* Başlıq mətn deyil, ekran tipografiyasıdır: bir az sıxlıq ona yaraşır. */
+.pulse-paragraph h1,
+.pulse-paragraph h2,
+.pulse-paragraph h3,
+.pulse-paragraph h4 {
+  letter-spacing: -0.02em;
+}
+
 .pulse-paragraph > p,
 .pulse-paragraph > blockquote {
   margin: 0;
