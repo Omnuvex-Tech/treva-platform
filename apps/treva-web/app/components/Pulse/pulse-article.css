@@ -252,8 +252,6 @@
 
 /* ── CMS zəngin mətn: paraqraf bloku artıq <div>-dir, Tiptap içəridə <p> qoyur. ── */
 .pulse-paragraph > p,
-.pulse-paragraph > ul,
-.pulse-paragraph > ol,
 .pulse-paragraph > blockquote {
   margin: 0;
   padding: 0;
@@ -264,6 +262,74 @@
 
 .pulse-paragraph > p + p {
   margin-top: 1rem;
+}
+
+/* Siyahı bu sıfırlamadan kənardadır: `padding: 0` işarəni mətnin solundakı
+   boşluqdan qoparıb görünməz edirdi, Tiptap-ın hər bəndə qoyduğu <p> isə öz
+   paraqraf boşluğunu alıb bəndləri bir-birindən aralayırdı — nəticədə siyahı
+   oxucuya sadəcə qalın sətirlər yığını kimi görünürdü. Şrift və rəng yenə
+   paraqrafdan gəlir ki, mətn bir bütöv kimi oxunsun. */
+.pulse-paragraph ul,
+.pulse-paragraph ol {
+  margin: 1rem 0;
+  padding-left: 1.75rem;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
+.pulse-paragraph ul {
+  list-style: disc outside;
+}
+
+.pulse-paragraph ol {
+  list-style: decimal outside;
+}
+
+/* İç-içə siyahı öz səviyyəsini göstərsin, üstündəki boşluq isə təkrarlanmasın. */
+.pulse-paragraph li > ul,
+.pulse-paragraph li > ol {
+  margin: 0.25rem 0;
+}
+
+.pulse-paragraph li > ul {
+  list-style-type: circle;
+}
+
+/* Bəndin mətni içəridəki <p>-dən, nömrə isə <li>-dən şrift alır. İkisi eyni
+   ölçüdə olmasa, 18px sözün yanında 14px rəqəm qalır və sətir əyri görünür —
+   ona görə <li> zəngin mətnin öz paraqraf ölçüsünü götürür. */
+.pulse-paragraph li {
+  padding: 0.125rem 0;
+  color: var(--_color---blue-300);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+/* Siyahı başlıqlarla eyni incəlikdə qalır: köhnə Webflow mətnində hər şey
+   <strong> içində gəldiyi üçün `.article_richtext strong` 400-ə endirilib,
+   CMS-in siyahısı da eyni qaydaya tabedir — bənd qalın deyil, sadəcə paraqrafdan
+   bir az irididir. */
+.pulse-paragraph li strong,
+.pulse-paragraph li b {
+  font-weight: inherit;
+}
+
+/* Hər bənd Tiptap-da <p> ilə gəlir; onun öz kənar boşluğu bəndləri ayrı-ayrı
+   paraqraflara çevirirdi. */
+.pulse-paragraph li > p {
+  margin: 0;
+}
+
+/* Nömrə və işarə bəndin öz mətni ilə eyni sətirdə, eyni ölçü, çəki və rəngdə
+   oturur: ::marker mətnin sətir qutusuna bağlı olduğu üçün hizalanma özündən
+   gəlir, bura yalnız şrift lazımdır. */
+.pulse-paragraph li::marker {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
 }
 
 /* Redaktor artıq paraqrafın içinə şəkil, video və slider da qoya bilir, ona görə
