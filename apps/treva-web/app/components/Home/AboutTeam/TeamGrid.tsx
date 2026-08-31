@@ -6,15 +6,15 @@ import { toAbsUrl, type ApiAuthor } from "@/lib/pulse-api";
 
 type Locale = "az" | "en" | "ru";
 
-/** Başlanğıcda göstərilən kart sayı. Hər klikdə bu qədər artır/azalır. */
+/** Başlanğıcda göstərilən kart sayı. Hər klikdə bu qədər artır. */
 const STEP = 6;
 
 const AUTHOR_IMAGE_FALLBACK = "/assets/webflow-placeholder.svg";
 
-const labels: Record<Locale, { more: string; less: string }> = {
-  az: { more: "Daha çox", less: "Daha az" },
-  en: { more: "Show more", less: "Show less" },
-  ru: { more: "Показать ещё", less: "Свернуть" },
+const labels: Record<Locale, string> = {
+  az: "Daha çox",
+  en: "Show more",
+  ru: "Показать ещё",
 };
 
 /**
@@ -23,9 +23,9 @@ const labels: Record<Locale, { more: string; less: string }> = {
  * Yalnız bu hissə client komponentidir — "Daha çox" düyməsi vəziyyət tələb
  * edir. Başlıq və təsvir server tərəfdə qalır.
  *
- * Siyahı hamısı birdən açılmır: hər "Daha çox" 6 kart əlavə edir, "Daha az"
- * isə 6 kart geri yığır. Ona görə də iki düymə eyni anda görünə bilər —
- * tək düymə olsaydı, yarı açıq vəziyyətdə hansısa istiqamət əlçatmaz qalardı.
+ * Siyahı hamısı birdən açılmır: hər "Daha çox" 6 kart əlavə edir, hamısı
+ * göstəriləndə isə düymə itir. Geri yığmaq yoxdur — oxucunun artıq keçdiyi
+ * siyahını qısaltmaq onun altındakı yeri sürüşdürür.
  */
 export default function TeamGrid({
   authors,
@@ -40,7 +40,6 @@ export default function TeamGrid({
 
   const visible = authors.slice(0, count);
   const canShowMore = count < authors.length;
-  const canShowLess = count > STEP;
 
   return (
     <div className="about-team__right">
@@ -64,29 +63,15 @@ export default function TeamGrid({
         ))}
       </div>
 
-      {(canShowMore || canShowLess) && (
+      {canShowMore && (
         <div className="about-team__more-actions">
-          {canShowMore && (
-            <button
-              type="button"
-              className="about-team__more"
-              /* `authors.length`-ə kəsilmir: 20 müəllifdə say 18→20 olsaydı,
-                 "Daha az" 20−6=14 verib sətirləri 6-lıq addımdan çıxarardı.
-                 Say həmişə 6-nın qatı qalır, artıq hissəni `slice` kəsir. */
-              onClick={() => setCount((c) => c + STEP)}
-            >
-              {labels[activeLocale].more}
-            </button>
-          )}
-          {canShowLess && (
-            <button
-              type="button"
-              className="about-team__more"
-              onClick={() => setCount((c) => Math.max(c - STEP, STEP))}
-            >
-              {labels[activeLocale].less}
-            </button>
-          )}
+          <button
+            type="button"
+            className="about-team__more"
+            onClick={() => setCount((c) => c + STEP)}
+          >
+            {labels[activeLocale]}
+          </button>
         </div>
       )}
     </div>

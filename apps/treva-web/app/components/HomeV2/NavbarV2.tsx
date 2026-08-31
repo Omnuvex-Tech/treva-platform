@@ -60,6 +60,8 @@ export default function NavbarV2({ locale }: Props) {
   const [invOffset, setInvOffset] = useState(22);
   const [langOffset, setLangOffset] = useState(22);
   const [navProjects, setNavProjects] = useState<NavProject[]>([]);
+  // Both counters live in localStorage, so they can only be read after mount —
+  // starting at 0 keeps the server render and the first client paint identical.
   const [savedCount, setSavedCount] = useState(0);
   const [comparedCount, setComparedCount] = useState(0);
 
@@ -75,6 +77,9 @@ export default function NavbarV2({ locale }: Props) {
     };
   }, [locale]);
 
+  // The wishlist and compare stores broadcast a custom event on every add or
+  // remove, so the badges follow along from any page without a reload — the
+  // same wiring the V1 header uses.
   useEffect(() => {
     setSavedCount(getSavedCount());
     return onSavedChange(setSavedCount);
@@ -254,6 +259,11 @@ export default function NavbarV2({ locale }: Props) {
                 />
               );
 
+              const badgeCount =
+                key === "compare" ? comparedCount : key === "saved" ? savedCount : 0;
+              const badge =
+                badgeCount > 0 ? <span className="hv2-nav__badge">{badgeCount}</span> : null;
+
               if (key === "language") {
                 return (
                   <div key={key} className="hv2-nav__item" ref={langRef}>
@@ -292,16 +302,20 @@ export default function NavbarV2({ locale }: Props) {
                 );
               }
 
-              const count = key === "saved" ? savedCount : key === "compare" ? comparedCount : 0;
-
               return to ? (
-                <Link key={key} href={href(to)} className="hv2-nav__btn hv2-nav__btn--icon" aria-label={`${label} (${count})`}>
+                <Link
+                  key={key}
+                  href={href(to)}
+                  className="hv2-nav__btn hv2-nav__btn--icon"
+                  aria-label={badgeCount > 0 ? `${label} (${badgeCount})` : label}
+                >
                   {glyph}
-                  {count > 0 ? <span className="hv2-nav__badge">{count}</span> : null}
+                  {badge}
                 </Link>
               ) : (
                 <button key={key} type="button" className="hv2-nav__btn hv2-nav__btn--icon" aria-label={label}>
                   {glyph}
+                  {badge}
                 </button>
               );
             })}
@@ -459,6 +473,11 @@ export default function NavbarV2({ locale }: Props) {
                 />
               );
 
+              const badgeCount =
+                key === "compare" ? comparedCount : key === "saved" ? savedCount : 0;
+              const badge =
+                badgeCount > 0 ? <span className="hv2-nav__badge">{badgeCount}</span> : null;
+
               if (key === "language") {
                 return (
                   <div key={key} className="hv2-nav__item" ref={langRefMobile}>
@@ -497,18 +516,16 @@ export default function NavbarV2({ locale }: Props) {
                 );
               }
 
-              const count = key === "saved" ? savedCount : key === "compare" ? comparedCount : 0;
-
               return to ? (
                 <Link
                   key={key}
                   href={href(to)}
                   className="hv2-nav__btn hv2-nav__btn--icon"
-                  aria-label={`${label} (${count})`}
+                  aria-label={badgeCount > 0 ? `${label} (${badgeCount})` : label}
                   onClick={() => setOpen(false)}
                 >
                   {glyph}
-                  {count > 0 ? <span className="hv2-nav__badge">{count}</span> : null}
+                  {badge}
                 </Link>
               ) : (
                 <button
@@ -518,6 +535,7 @@ export default function NavbarV2({ locale }: Props) {
                   aria-label={label}
                 >
                   {glyph}
+                  {badge}
                 </button>
               );
             })}

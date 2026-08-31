@@ -41,6 +41,11 @@ function formatMoney(amount: number, currency: string): string {
  *
  * Two 396-tall cards: the calculator on the left, the result panel on the right.
  *
+ * The right panel (Figma 635:21913 "Consultation") is a clipped 20-radius card
+ * layered as: the 3D "TREVA" artwork under a 20%-black scrim, the "Calculation
+ * Result" heading with its three payment figures pinned top-left, and the
+ * Add Credit / print controls pinned to the bottom.
+ *
  * The six dropdowns are cascading views of the real off-plan inventory
  * (`getCreditUnits`), not fixed lists: picking a project narrows the room
  * counts to the ones that project actually has, those narrow the areas, and
@@ -175,14 +180,6 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
 
   const shown = calculated ? result : null;
 
-  const stats = shown
-    ? [
-        { label: dict.credit.monthlyPayment, value: shown.monthly },
-        { label: dict.credit.downPayment, value: shown.downPayment },
-        { label: dict.credit.totalPrice, value: shown.total },
-      ]
-    : [];
-
   return (
     <section className="hv2-shell hv2-s-credit">
       <div className="hv2-credit">
@@ -210,18 +207,36 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
         </div>
 
         <div className="hv2-credit__panel">
+          <div className="hv2-credit__art" aria-hidden="true">
+            <Image
+              src="/images/figma/credit-result-art.jpg"
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 100vw, 639px"
+            />
+          </div>
+
           <div className="hv2-credit__result">
             <h2 className="hv2-credit__result-title">{dict.credit.resultTitle}</h2>
 
             {shown ? (
-              <dl className="hv2-credit__stats">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="hv2-credit__stat">
-                    <dt>{stat.label}</dt>
-                    <dd>{stat.value}</dd>
-                  </div>
-                ))}
-              </dl>
+              <div className="hv2-credit__stats">
+                {/* The frame labels its third column "Monthly Payment" a second
+                    time, which duplicates the first; the total is what belongs
+                    beside a monthly figure and a deposit. */}
+                <div className="hv2-credit__stat">
+                  <span>{dict.credit.monthlyPayment}</span>
+                  <strong>{shown.monthly}</strong>
+                </div>
+                <div className="hv2-credit__stat">
+                  <span>{dict.credit.downPayment}</span>
+                  <strong>{shown.downPayment}</strong>
+                </div>
+                <div className="hv2-credit__stat">
+                  <span>{dict.credit.totalPrice}</span>
+                  <strong>{shown.total}</strong>
+                </div>
+              </div>
             ) : (
               <p className="hv2-credit__hint">
                 {units.length === 0 ? dict.credit.noMatch : dict.credit.emptyHint}
@@ -230,9 +245,6 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
           </div>
 
           <div className="hv2-credit__actions">
-            {/* Both controls sit on the artwork, so the design gives them the
-                light Background/Inverse fill and the dark 28px glyphs — not the
-                white-on-brand pill the rest of the page uses. */}
             <button
               type="button"
               className="hv2-pill hv2-pill--cta hv2-credit__add"

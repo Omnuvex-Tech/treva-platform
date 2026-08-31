@@ -1,7 +1,15 @@
 import "./home-v2.css";
 import NavbarV2 from "./NavbarV2";
 import ContactV2 from "./ContactV2";
+import TopBackgroundV2, { type BgAnchor } from "./TopBackgroundV2";
 import FooterV2 from "./FooterV2";
+
+/**
+ * The tint splits through the two contact cards, the way the home page's
+ * splits through its search card — so the page's own title and lead stay
+ * above it on white, and the cards read as floating half in each.
+ */
+const CT_ANCHORS: BgAnchor[] = [{ from: ".hv2-ct__grid" }];
 
 type Props = { locale: string };
 
@@ -16,6 +24,7 @@ export default function ContactPage({ locale }: Props) {
   return (
     <div className="page-wrapper contact-page--v2" data-locale={locale} data-design="v2">
       <div className="hv2-root">
+        <TopBackgroundV2 anchors={CT_ANCHORS} />
         <NavbarV2 locale={locale} />
         <ContactV2 locale={locale} />
         <FooterV2 locale={locale} />
