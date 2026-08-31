@@ -32,6 +32,7 @@ export const dictionary = {
             lead: ["İlham verən, birləşdirən və gündəlik həyatı", "zənginləşdirən layihələri kəşf edin."],
             startingFrom: "Başlanğıc",
             seeAll: "Bütün layihələrə bax",
+            mapAlt: "TREVA layihələrinin yerləşdiyi ərazinin quş baxışı planı",
         },
         partners: {
             title: "Tərəfdaşlarımız",
@@ -117,6 +118,12 @@ export const dictionary = {
             selectFloor: "Mərtəbə seçin",
             selectPayment: "İlkin ödəniş seçin",
             selectTerm: "Müddət seçin",
+            resultTitle: "Hesablama nəticəsi",
+            monthlyPayment: "Aylıq ödəniş",
+            totalPrice: "Ümumi dəyər",
+            months: (n: number) => `${n} ay`,
+            emptyHint: "Hesablamaq üçün layihə, otaq sayı, sahə və mərtəbə seçin.",
+            noMatch: "Bu seçimə uyğun mənzil inventarda yoxdur.",
         },
         about: {
             advantagesTitle: "Bizi fərqləndirən nədir?",
@@ -162,6 +169,7 @@ export const dictionary = {
             lead: ["Explore projects designed to inspire,", "connect, and elevate everyday living."],
             startingFrom: "Starting from",
             seeAll: "See all projects",
+            mapAlt: "Aerial plan showing where the TREVA projects are located",
         },
         partners: {
             title: "Our Partners",
@@ -247,6 +255,12 @@ export const dictionary = {
             selectFloor: "Select floor",
             selectPayment: "Select down payment",
             selectTerm: "Select term",
+            resultTitle: "Calculation Result",
+            monthlyPayment: "Monthly Payment",
+            totalPrice: "Total Price",
+            months: (n: number) => `${n} months`,
+            emptyHint: "Pick a project, room count, area and floor to calculate.",
+            noMatch: "No unit in the inventory matches this selection.",
         },
         about: {
             advantagesTitle: "What Sets Us Apart?",
@@ -292,6 +306,7 @@ export const dictionary = {
             lead: ["Откройте для себя проекты, которые вдохновляют,", "объединяют и улучшают повседневную жизнь."],
             startingFrom: "От",
             seeAll: "Все проекты",
+            mapAlt: "План с высоты птичьего полёта с расположением проектов TREVA",
         },
         partners: {
             title: "Наши партнёры",
@@ -377,6 +392,12 @@ export const dictionary = {
             selectFloor: "Выберите этаж",
             selectPayment: "Выберите первый взнос",
             selectTerm: "Выберите срок",
+            resultTitle: "Результат расчёта",
+            monthlyPayment: "Ежемесячный платёж",
+            totalPrice: "Общая стоимость",
+            months: (n: number) => `${n} мес.`,
+            emptyHint: "Выберите проект, количество комнат, площадь и этаж для расчёта.",
+            noMatch: "В инвентаре нет квартиры под этот выбор.",
         },
         about: {
             advantagesTitle: "Что нас отличает?",
