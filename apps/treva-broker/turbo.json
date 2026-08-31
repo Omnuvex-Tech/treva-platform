@@ -1,0 +1,14 @@
+{
+    "$schema": "https://turborepo.dev/schema.json",
+    "extends": ["//"],
+    "tasks": {
+        "build": {
+            "env": ["NODE_ENV"],
+            "passThroughEnv": ["NEXT_PUBLIC_*"]
+        },
+        "dev": {
+            "env": ["NODE_ENV"],
+            "passThroughEnv": ["NEXT_PUBLIC_*"]
+        }
+    }
+}
