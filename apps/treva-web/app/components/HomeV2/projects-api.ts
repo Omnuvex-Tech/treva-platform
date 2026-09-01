@@ -1,3 +1,5 @@
+import { projectCards, type ProjectCard } from "./data";
+
 const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
 
 type LocalizedValue = string | { az?: string; en?: string; ru?: string } | null;
@@ -64,5 +66,56 @@ export async function getNavProjects(locale = "az"): Promise<NavProject[]> {
             }));
     } catch {
         return [];
+    }
+}
+
+/**
+ * The project grid, keyed off the CMS.
+ *
+ * The CMS is the source of truth for *which* projects exist and in *what*
+ * order. The static `projectCards` are a skin on top of it: where a CMS
+ * project's slug matches a seed card, that hand-framed card — its cut-out
+ * render, sky, hover clip, price and area — is what renders. A CMS project
+ * with no matching seed still shows, drawn from its CMS "Şəkil" cover and
+ * brand. A seed card whose slug the CMS does not list is dropped.
+ *
+ * If the CMS is unreachable the full static seed is returned unchanged, so the
+ * grid never comes back empty.
+ *
+ * Revalidated every 5 minutes: the projects route is statically generated now
+ * that it no longer reads `?v=2`, so this is what lets a newly published CMS
+ * project appear without a redeploy.
+ */
+export async function getProjectCards(locale = "az"): Promise<ProjectCard[]> {
+    try {
+        const res = await fetch(`${CMS_API}/layihelerimiz/categories/visible`, {
+            next: { revalidate: 300 },
+        });
+        if (!res.ok) return projectCards;
+
+        const raw = await res.json();
+        const list: ApiCategory[] = Array.isArray(raw) ? raw : (raw?.value ?? []);
+
+        const merged = list
+            .filter((category): category is ApiCategory & { slug: string } => Boolean(category.slug))
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((category): ProjectCard => {
+                const seed = projectCards.find((card) => card.slug === category.slug);
+                if (seed) return seed;
+
+                return {
+                    slug: category.slug,
+                    title: localized(category.title, locale),
+                    developer: localized(category.brand, locale),
+                    icon: toAbsUrl(category.brandImage ?? "") || undefined,
+                    image: toAbsUrl(category.image ?? ""),
+                    startingFrom: "",
+                    areaRange: "",
+                };
+            });
+
+        return merged.length ? merged : projectCards;
+    } catch {
+        return projectCards;
     }
 }

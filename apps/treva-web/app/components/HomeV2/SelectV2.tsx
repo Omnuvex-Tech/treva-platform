@@ -17,6 +17,13 @@ type Props = {
   options: SelectOption[];
   placeholder: string;
   label?: string;
+  /** Greyed out and unopenable — the credit calculator locks a step until the
+      one before it is answered. */
+  disabled?: boolean;
+  /** Controlled open state. Pass both to let a parent drive which listbox is
+      open (the calculator opens the next step as soon as one is picked). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 /**
@@ -27,13 +34,29 @@ type Props = {
  * design. Keyboard behaviour follows the ARIA listbox pattern: Up/Down move the
  * active option, Enter/Space commit, Escape closes, Home/End jump.
  */
-export default function SelectV2({ value, onChange, options, placeholder, label }: Props) {
+export default function SelectV2({
+  value,
+  onChange,
+  options,
+  placeholder,
+  label,
+  disabled = false,
+  open: openProp,
+  onOpenChange,
+}: Props) {
   const listboxId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+
+  const open = openProp ?? uncontrolledOpen;
+  const setOpen = (next: boolean) => {
+    if (disabled && next) return;
+    if (onOpenChange) onOpenChange(next);
+    else setUncontrolledOpen(next);
+  };
 
   const selected = options.find((option) => option.value === value);
   // Figma 825:26696 lays picture options out as a 3-column grid of 173x60
@@ -121,6 +144,7 @@ export default function SelectV2({ value, onChange, options, placeholder, label 
         type="button"
         className="hv2-sel__trigger"
         data-filled={selected ? "true" : "false"}
+        disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}

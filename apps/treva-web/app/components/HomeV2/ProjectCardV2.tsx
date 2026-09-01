@@ -10,6 +10,8 @@ type Props = {
   item: ProjectCard;
   locale: string;
   startingFromLabel: string;
+  /** Shown in place of the price when `item.soldOut` — localized "all units sold". */
+  soldOutLabel: string;
 };
 
 const MEDIA_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
@@ -74,10 +76,15 @@ function cropStyle(crop: ProjectCard["crop"]): CSSProperties {
  * six of them, so nothing is fetched until a card is actually hovered, and the
  * <video> only mounts after that first hover for the same reason.
  */
-export default function ProjectCardV2({ item, locale, startingFromLabel }: Props) {
+export default function ProjectCardV2({ item, locale, startingFromLabel, soldOutLabel }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [armed, setArmed] = useState(false);
   const [playing, setPlaying] = useState(false);
+
+  // A CMS project can be published before its cover is uploaded. With no cover
+  // there is nothing to composite: the frame keeps its muted fill and the
+  // overhang render is skipped rather than handed an empty src.
+  const hasCover = Boolean(item.image);
 
   // The CMS slot takes a GIF just as happily as a clip, and a GIF is an <img>,
   // not a <video>. The extension is the only thing that separates them.
@@ -128,14 +135,16 @@ export default function ProjectCardV2({ item, locale, startingFromLabel }: Props
       onBlur={stop}
     >
       <div className="hv2-pcard__frame">
-        <Image
-          className="hv2-pcard__sky"
-          src={item.sky ?? item.image}
-          alt=""
-          aria-hidden="true"
-          fill
-          sizes={MEDIA_SIZES}
-        />
+        {item.sky || hasCover ? (
+          <Image
+            className="hv2-pcard__sky"
+            src={item.sky ?? item.image}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes={MEDIA_SIZES}
+          />
+        ) : null}
 
         <div className="hv2-pcard__body">
           {/* Its own full-width row — sharing one with the area pill left a
@@ -168,8 +177,12 @@ export default function ProjectCardV2({ item, locale, startingFromLabel }: Props
 
               {/* Price and area come from the inventory, not the CMS, so a
                   project with nothing published yet has neither — the lines are
-                  dropped rather than rendered as a bare label. */}
-              {item.startingFrom ? (
+                  dropped rather than rendered as a bare label. A sold-out
+                  project replaces the price outright with the "all units sold"
+                  line (Figma 3178:5597). */}
+              {item.soldOut ? (
+                <p className="hv2-pcard__price">{soldOutLabel}</p>
+              ) : item.startingFrom ? (
                 <p className="hv2-pcard__price">
                   {startingFromLabel} {item.startingFrom}
                 </p>
@@ -183,15 +196,17 @@ export default function ProjectCardV2({ item, locale, startingFromLabel }: Props
         </div>
       </div>
 
-      <div className="hv2-pcard__media">
-        <Image
-          src={item.image}
-          alt={item.title}
-          fill
-          sizes={MEDIA_SIZES}
-          style={cropStyle(item.crop)}
-        />
-      </div>
+      {hasCover ? (
+        <div className="hv2-pcard__media">
+          <Image
+            src={item.image}
+            alt={item.title}
+            fill
+            sizes={MEDIA_SIZES}
+            style={cropStyle(item.crop)}
+          />
+        </div>
+      ) : null}
 
       {media && armed ? (
         isGif ? (

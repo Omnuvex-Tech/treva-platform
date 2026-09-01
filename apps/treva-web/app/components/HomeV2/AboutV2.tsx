@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getDict } from "./dictionary";
 import TeamGridV2 from "./TeamGridV2";
+import VideoV2 from "./VideoV2";
 import type { TeamMember } from "./data";
 
 type Props = { locale: string; members?: TeamMember[] };
@@ -14,7 +15,17 @@ const ADVANTAGE_ICONS = [
 ];
 
 /**
- * About — Figma 627:17513: a full-bleed photo, the four advantage cards, then
+ * The hero footage. Figma 658:8865 ("Consultation") leaves this frame blank —
+ * it is a video slot — so it runs its own clip. No poster: the design's own
+ * hero still is a different scene, so the page read as loading one image and
+ * then swapping it for the footage a beat later. `preload="auto"` fetches the
+ * clip up front instead, so the first thing painted in the frame is the
+ * video's own opening. muted + playsInline are what let it autoplay on mobile.
+ */
+const HERO_VIDEO = "/videos/about-hero.mp4";
+
+/**
+ * About — Figma 627:17513: a full-bleed hero, the four advantage cards, then
  * the team grid.
  *
  * The advantage cards are the one place in the file that reaches for Poppins
@@ -30,14 +41,7 @@ export default function AboutV2({ locale, members = [] }: Props) {
     <>
       <section className="hv2-shell hv2-s-abouthero">
         <div className="hv2-about__hero">
-          <Image
-            src="/images/figma/about-hero.jpg"
-            alt=""
-            aria-hidden="true"
-            fill
-            sizes="(max-width: 1600px) 100vw, 1344px"
-            priority
-          />
+          <VideoV2 src={HERO_VIDEO} />
         </div>
       </section>
 

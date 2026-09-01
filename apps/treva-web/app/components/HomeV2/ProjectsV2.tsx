@@ -1,26 +1,44 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getDict } from "./dictionary";
-import { projectCards, type ProjectCard } from "./data";
+import type { ProjectCard } from "./data";
+import { getProjectCards } from "./projects-api";
 import ProjectCardV2 from "./ProjectCardV2";
 
 type Props = {
   locale: string;
-  /** Renders exactly this list instead of the seed — the credit page's
-      three-card strip. Omit it for the full six-card home grid, which is
-      deliberately static: the cards' copy, order, prices and hover clips are
-      all the design's own (see `projectCards`), never the CMS's, so a plain
-      `<ProjectsV2 locale={locale} />` needs no data wired to it. */
+  /** Renders exactly this list instead of fetching. Omit it and the grid is
+      the CMS project list, skinned by the static seed where a slug matches
+      (see `getProjectCards`). */
   items?: ProjectCard[];
   /** Overrides the section heading; the credit page gives it its own. */
   title?: string;
   /** The credit page drops the blurb — its head is a heading and nothing else. */
   showLead?: boolean;
+  /**
+   * The trailing "see all projects" pill. On by default for the home and
+   * credit strips; the projects page turns it off — that page *is* the full
+   * list, so a link back to itself is noise.
+   */
+  showSeeAll?: boolean;
+  /**
+   * Caps the grid. The home and credit strips pass 6; the projects page omits
+   * it and shows every project the CMS lists.
+   */
+  limit?: number;
 };
 
-export default function ProjectsV2({ locale, items, title, showLead = true }: Props) {
+export default async function ProjectsV2({
+  locale,
+  items,
+  title,
+  showLead = true,
+  showSeeAll = true,
+  limit,
+}: Props) {
   const dict = getDict(locale);
-  const list = items ?? projectCards;
+  const all = items ?? (await getProjectCards(locale));
+  const list = limit ? all.slice(0, limit) : all;
 
   return (
     <section
@@ -45,28 +63,31 @@ export default function ProjectsV2({ locale, items, title, showLead = true }: Pr
             item={item}
             locale={locale}
             startingFromLabel={dict.projects.startingFrom}
+            soldOutLabel={dict.projects.soldOut}
           />
         ))}
       </div>
 
-      <div className="hv2-center">
-        <Link
-          href={`/${locale}/projects`}
-          className="hv2-pill hv2-pill--dark hv2-pill--cta"
-        >
-          {dict.projects.seeAll}
-          {/* Exported straight from the Button component; the lucide arrow it
-              replaced sat at 14px against the design's 24. */}
-          <Image
-            src="/images/icons/arrow-down.svg"
-            alt=""
-            aria-hidden="true"
-            width={24}
-            height={24}
-            unoptimized
-          />
-        </Link>
-      </div>
+      {showSeeAll ? (
+        <div className="hv2-center">
+          <Link
+            href={`/${locale}/projects`}
+            className="hv2-pill hv2-pill--dark hv2-pill--cta"
+          >
+            {dict.projects.seeAll}
+            {/* Exported straight from the Button component; the lucide arrow it
+                replaced sat at 14px against the design's 24. */}
+            <Image
+              src="/images/icons/arrow-down.svg"
+              alt=""
+              aria-hidden="true"
+              width={24}
+              height={24}
+              unoptimized
+            />
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

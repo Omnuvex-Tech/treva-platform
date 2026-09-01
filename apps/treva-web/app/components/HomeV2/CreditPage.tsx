@@ -41,6 +41,7 @@ export default async function CreditPage({ locale }: Props) {
           locale={locale}
           title={dict.credit.projectsTitle}
           showLead={false}
+          limit={6}
         />
         <CallbackV2 locale={locale} />
         <FooterV2 locale={locale} />

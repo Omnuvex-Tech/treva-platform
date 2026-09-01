@@ -37,27 +37,21 @@ const ACTIONS = [
 ];
 /** The one nav entry that opens a mega-menu instead of navigating straight off. */
 const MEGA_HREF = "/projects";
-/** "Inventory" opens a small off-plan/resale popover the same way. */
-const INVENTORY_HREF = "/off-plan";
 
 export default function NavbarV2({ locale }: Props) {
   const dict = getDict(locale);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
-  const [inv, setInv] = useState(false);
   const [lang, setLang] = useState(false);
   const [sub, setSub] = useState(false);
-  const [subInv, setSubInv] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const langRefMobile = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const invItemRef = useRef<HTMLDivElement>(null);
   // 22px is only the fallback for the first paint, before the effect below
   // has measured anything — see that effect for why a fixed number can't be
   // trusted on its own.
-  const [invOffset, setInvOffset] = useState(22);
   const [langOffset, setLangOffset] = useState(22);
   const [navProjects, setNavProjects] = useState<NavProject[]>([]);
   // Both counters live in localStorage, so they can only be read after mount —
@@ -114,28 +108,22 @@ export default function NavbarV2({ locale }: Props) {
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [lang]);
 
-  // The Inventory and Language items sit in two different rows (nav links vs.
-  // action buttons), each centered by the browser according to real font
+  // The Language button is centered by the browser according to real font
   // metrics — a hardcoded "gap to the header border" guess drifts by a few
-  // px between fonts/browsers. Measuring the actual boxes instead makes both
-  // popovers land flush every time, the same way the Projects mega-menu is
+  // px between fonts/browsers. Measuring the actual box instead makes the
+  // popover land flush every time, the same way the Projects mega-menu is
   // flush by construction (it's positioned off the header itself, not a link).
   useEffect(() => {
-    if (!inv && !lang) return;
+    if (!lang) return;
     const measure = () => {
       const barBottom = barRef.current?.getBoundingClientRect().bottom;
-      if (barBottom == null) return;
-      if (inv && invItemRef.current) {
-        setInvOffset(barBottom - invItemRef.current.getBoundingClientRect().bottom);
-      }
-      if (lang && langRef.current) {
-        setLangOffset(barBottom - langRef.current.getBoundingClientRect().bottom);
-      }
+      if (barBottom == null || !langRef.current) return;
+      setLangOffset(barBottom - langRef.current.getBoundingClientRect().bottom);
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [inv, lang]);
+  }, [lang]);
 
   const href = (path: string) => `/${locale}${path}`;
 
@@ -154,14 +142,10 @@ export default function NavbarV2({ locale }: Props) {
        vanishing on the way. */
     <header
       className={`hv2-nav${scrolled ? " hv2-nav--scrolled" : ""}${open ? " hv2-nav--menu" : ""}`}
-      onMouseLeave={() => {
-        setMega(false);
-        setInv(false);
-      }}
+      onMouseLeave={() => setMega(false)}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           setMega(false);
-          setInv(false);
           setLang(false);
         }
       }}
@@ -178,32 +162,24 @@ export default function NavbarV2({ locale }: Props) {
           <nav className="hv2-nav__links">
             {dict.nav.map((item) => {
               const isMega = item.href === MEGA_HREF;
-              const isInventory = item.href === INVENTORY_HREF;
-              const hasDropdown = isMega || isInventory;
 
               return (
-                <div
-                  key={item.href}
-                  className={isInventory ? "hv2-nav__item" : undefined}
-                  ref={isInventory ? invItemRef : undefined}
-                >
+                <div key={item.href}>
                   <Link
                     href={href(item.href)}
-                    className={hasDropdown ? "hv2-nav__link--dropdown" : undefined}
-                    aria-expanded={isMega ? mega : isInventory ? inv : undefined}
+                    className={isMega ? "hv2-nav__link--dropdown" : undefined}
+                    aria-expanded={isMega ? mega : undefined}
                     onMouseEnter={() => {
                       setMega(isMega);
-                      setInv(isInventory);
                       setLang(false);
                     }}
                     onFocus={() => {
                       setMega(isMega);
-                      setInv(isInventory);
                       setLang(false);
                     }}
                   >
                     {item.label}
-                    {hasDropdown ? (
+                    {isMega ? (
                       <span className="hv2-nav__chev hv2-nav__chev--nav" aria-hidden="true">
                         <Image
                           src="/images/icons/chevron-down.svg"
@@ -216,18 +192,6 @@ export default function NavbarV2({ locale }: Props) {
                       </span>
                     ) : null}
                   </Link>
-
-                  {/* Off-Plan first, Resale second — the order the request asked for. */}
-                  {isInventory && inv ? (
-                    <div className="hv2-nav__popover" style={{ top: `calc(100% + ${invOffset}px)` }}>
-                      <Link href={href("/off-plan")} onClick={() => setInv(false)}>
-                        {dict.search.offPlan}
-                      </Link>
-                      <Link href={href("/resale")} onClick={() => setInv(false)}>
-                        {dict.search.resale}
-                      </Link>
-                    </div>
-                  ) : null}
                 </div>
               );
             })}
@@ -275,7 +239,6 @@ export default function NavbarV2({ locale }: Props) {
                       aria-expanded={lang}
                       onClick={() => {
                         setMega(false);
-                        setInv(false);
                         setLang((v) => !v);
                       }}
                     >
@@ -358,25 +321,18 @@ export default function NavbarV2({ locale }: Props) {
           <ul>
             {dict.nav.map((item) => {
               const isMega = item.href === MEGA_HREF;
-              const isInventory = item.href === INVENTORY_HREF;
 
               /* Figma 783:23806 — on mobile "Projects" is a disclosure, not a
-                 link: tapping it unfolds the project list in place. Inventory
-                 is one too, carrying the same Off-Plan/Resale pair its header
-                 popover holds, so the two widths offer the same entry points
-                 (the Figma frame lists those two as top-level rows instead —
-                 the dropdown is the requested change). */
-              if (isMega || isInventory) {
-                const expanded = isMega ? sub : subInv;
-                const toggle = isMega ? setSub : setSubInv;
-
+                 link: tapping it unfolds the project list in place. Off-Plan
+                 and Resale are plain rows here, as they are in the header. */
+              if (isMega) {
                 return (
                   <li key={item.href}>
                     <button
                       type="button"
                       className="hv2-nav__disclosure"
-                      aria-expanded={expanded}
-                      onClick={() => toggle((v) => !v)}
+                      aria-expanded={sub}
+                      onClick={() => setSub((v) => !v)}
                     >
                       {item.label}
                       <span className="hv2-nav__chev" aria-hidden="true">
@@ -391,7 +347,7 @@ export default function NavbarV2({ locale }: Props) {
                       </span>
                     </button>
 
-                    {expanded && isMega ? (
+                    {sub ? (
                       <ul className="hv2-nav__sublist">
                         {navProjects.map((project) => (
                           <li key={project.slug}>
@@ -413,24 +369,6 @@ export default function NavbarV2({ locale }: Props) {
                             </Link>
                           </li>
                         ))}
-                      </ul>
-                    ) : null}
-
-                    {/* Off-Plan first, Resale second — the order the header
-                        popover uses. No thumbnails to pair these with, so the
-                        rows carry the card chrome on their own. */}
-                    {expanded && isInventory ? (
-                      <ul className="hv2-nav__sublist hv2-nav__sublist--text">
-                        <li>
-                          <Link href={href("/off-plan")} onClick={() => setOpen(false)}>
-                            {dict.search.offPlan}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href={href("/resale")} onClick={() => setOpen(false)}>
-                            {dict.search.resale}
-                          </Link>
-                        </li>
                       </ul>
                     ) : null}
                   </li>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { getDict } from "./dictionary";
+import OfficeSliderV2 from "./OfficeSliderV2";
 
 type Props = { locale: string };
 
@@ -13,10 +14,33 @@ const PHONE_HREF = "+994502772662";
 const HEAD_ADDRESS = "Ziya Yusifzade 10, Sabah Residence";
 const ASAN_ADDRESS = "Baku \"ASAN service\" center 1";
 
-/** The design's two offices, each with the photo Figma places on its card. */
+/**
+ * The two offices. Each card runs the same rotating photo gallery the V1
+ * contact page uses (see `officeGalleryImages` in Contact/contact-page.tsx) —
+ * two shots for the head office, four for Sea Breeze — rather than the single
+ * Figma still it shipped with.
+ */
 const OFFICES = [
-  { key: "head", photo: "/images/figma/office-1.jpg", address: HEAD_ADDRESS },
-  { key: "sales", photo: "/images/figma/office-2.jpg", address: "Mikayıl Müşfiq, Nardaran, Baku 1097" },
+  {
+    key: "head",
+    images: [
+      "/images/contact/trevabaku/office1.webp",
+      "/images/contact/trevabaku/office2.webp",
+    ],
+    delay: 5000,
+    address: HEAD_ADDRESS,
+  },
+  {
+    key: "sales",
+    images: [
+      "/images/contact/sea-breeze/office1.webp",
+      "/images/contact/sea-breeze/office2.webp",
+      "/images/contact/sea-breeze/office3.webp",
+      "/images/contact/sea-breeze/office4.webp",
+    ],
+    delay: 5500,
+    address: "Mikayıl Müşfiq, Nardaran, Baku 1097",
+  },
 ];
 
 const SOCIALS = [
@@ -168,13 +192,7 @@ export default function ContactV2({ locale }: Props) {
         {OFFICES.map((office) => (
           <article key={office.key} className="hv2-ucard hv2-ucard--person hv2-ct__office">
             <div className="hv2-ucard__media">
-              <Image
-                src={office.photo}
-                alt=""
-                aria-hidden="true"
-                fill
-                sizes="(max-width: 1024px) 100vw, 662px"
-              />
+              <OfficeSliderV2 images={office.images} delay={office.delay} />
             </div>
 
             <div className="hv2-ucard__foot">

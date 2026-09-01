@@ -3,6 +3,12 @@ import type { InventoryCard } from "./data";
 
 const TREVA_API = process.env.NEXT_PUBLIC_TREVA_API_URL || "http://localhost:10011/api/v1";
 
+/**
+ * Manat is pegged to the dollar. The off-plan feed carries USD only, so the
+ * credit calculator converts at the peg to quote in AZN.
+ */
+const USD_TO_AZN = 1.7;
+
 type ApiUnit = {
     id?: string;
     slug?: string;
@@ -14,6 +20,9 @@ type ApiUnit = {
     category?: { slug?: string; title?: string; name?: string; developerBrand?: string } | null;
     house?: { title?: string; name?: string } | null;
     floor?: number;
+    /** "Apartment" | "parking" | "Commercial" | "Villa" | "Townhouse" — the
+        credit calculator quotes on apartments only. */
+    realEstateType?: string;
 };
 
 /**
@@ -183,7 +192,9 @@ export type CreditUnit = {
 
 function toCreditUnit(unit: ApiUnit, index: number): CreditUnit | null {
     const priceUsd = unit.prices?.USD ?? null;
-    const priceAzn = unit.prices?.AZN ?? null;
+    // The feed is USD-only in practice; fall back to the pegged conversion so
+    // there is always an AZN figure — the calculator quotes in manat.
+    const priceAzn = unit.prices?.AZN ?? (priceUsd !== null ? priceUsd * USD_TO_AZN : null);
     // A unit with no price cannot be paid off in instalments, so it would only
     // ever widen the dropdowns into dead ends.
     if (priceUsd === null && priceAzn === null) return null;
@@ -201,22 +212,33 @@ function toCreditUnit(unit: ApiUnit, index: number): CreditUnit | null {
 }
 
 /**
- * Every off-plan unit the credit calculator is allowed to quote on.
+ * Every off-plan apartment the credit calculator is allowed to quote on.
  *
- * Fetched whole rather than filtered per dropdown: the calculator's six
- * selects cascade — picking a project has to narrow the room counts, which
- * narrows the areas, and so on — and driving that from the server would mean
- * a round trip per keystroke over a list that is currently 48 rows. `limit`
- * is set well above the real total so a single request covers it; raise it if
- * the inventory ever outgrows a page.
+ * Fetched whole rather than filtered per dropdown: the calculator's selects
+ * cascade — picking a project has to narrow the room counts, which narrows the
+ * areas, and so on — and driving that from the server would mean a round trip
+ * per keystroke. The feed is ~5000 rows, so `limit` is set above that to pull
+ * it in one request; raise it again if the inventory outgrows this.
  *
- * `sold` units are excluded: they cannot be bought, so quoting instalments on
- * one would be a lie. `reserved` stays — a reservation lapses.
+ * Only `realEstateType === "Apartment"` is kept — parking, commercial, villas
+ * and townhouses are not what "off-plan apartment" means, and their room/area
+ * numbers would only pollute the dropdowns. `sold` units are excluded too:
+ * they cannot be bought. `reserved` stays — a reservation lapses.
+ *
+ * The full feed is ~20MB, over Next's 2MB data-cache ceiling, so it re-fetches
+ * on every revalidation rather than being cached. Off-plan pricing and stock
+ * move slowly, so the window is an hour, not the minute the smaller feeds use.
+ *
+ * The result is then deduped to one row per (project, rooms, area, floor): the
+ * calculator only ever reads the first unit a full selection resolves to, so
+ * the thousand-plus duplicate rows behind each combination are dead weight in
+ * the payload shipped to the client component. ~3500 apartments collapse to
+ * ~1700 combinations.
  */
 export async function getCreditUnits(): Promise<CreditUnit[]> {
     try {
-        const res = await fetch(`${TREVA_API}/unit-layouts?limit=500&archived=false`, {
-            next: { revalidate: 60 },
+        const res = await fetch(`${TREVA_API}/unit-layouts?limit=5000&archived=false`, {
+            next: { revalidate: 3600 },
         });
         if (!res.ok) return [];
 
@@ -224,10 +246,18 @@ export async function getCreditUnits(): Promise<CreditUnit[]> {
         const list: (ApiUnit & { status?: string })[] = Array.isArray(raw) ? raw : (raw?.data ?? raw?.items ?? []);
         if (!Array.isArray(list)) return [];
 
+        const seen = new Set<string>();
         return list
             .filter((unit) => unit.status !== "sold")
+            .filter((unit) => unit.realEstateType === "Apartment")
             .map(toCreditUnit)
-            .filter((unit): unit is CreditUnit => unit !== null);
+            .filter((unit): unit is CreditUnit => unit !== null)
+            .filter((unit) => {
+                const key = `${unit.projectSlug}|${unit.rooms}|${unit.area}|${unit.floor}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
     } catch {
         return [];
     }

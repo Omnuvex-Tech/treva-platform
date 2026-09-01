@@ -22,10 +22,12 @@ type Props = { locale: string };
  * carries; what it holds is the projects screen — map hero, the six-card grid,
  * the callback banner and the footer.
  *
- * Only the map is new. The grid is the home page's own `ProjectsV2` with its
- * default six cards, and the banner is `CallbackV2` unchanged — both are the
- * same Figma components this page instances, so they are reused rather than
- * rebuilt.
+ * Only the map is new. The grid and the banner are the home page's own
+ * `ProjectsV2` / `CallbackV2` — the same Figma components this page instances,
+ * so they are reused rather than rebuilt. Two things differ from the home
+ * strip: no `limit`, so every project the CMS lists shows (skinned by the
+ * static seed where a slug matches — see `getProjectCards`), and the trailing
+ * "see all" pill is dropped, since this page is where that link went.
  */
 export default function ProjectsPage({ locale }: Props) {
   return (
@@ -34,7 +36,7 @@ export default function ProjectsPage({ locale }: Props) {
         <TopBackgroundV2 anchors={PROJECTS_ANCHORS} />
         <NavbarV2 locale={locale} />
         <ProjectsMapV2 locale={locale} />
-        <ProjectsV2 locale={locale} />
+        <ProjectsV2 locale={locale} showSeeAll={false} />
         <CallbackV2 locale={locale} />
         <FooterV2 locale={locale} />
       </div>

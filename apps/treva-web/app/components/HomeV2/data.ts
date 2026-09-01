@@ -50,6 +50,12 @@ export type ProjectCard = {
     video?: string;
     startingFrom: string;
     areaRange: string;
+    /**
+     * Sold-out state — the footer shows a localized "all units sold" line
+     * (Figma node 3178:5597) in place of the "starting from" price. Off by
+     * default; a project keeps showing its price until every unit is gone.
+     */
+    soldOut?: boolean;
 };
 
 export type InventoryCard = {
@@ -137,6 +143,22 @@ export const projectCards: ProjectCard[] = [
         video: clip("sabah-towers"),
         startingFrom: "88.954$",
         areaRange: "36 m² - 237 m²",
+    },
+    {
+        // Sold out — the CMS lists this project (slug `sabah-residence`) with
+        // no static artwork of its own, so this seed skins it: the cut-out
+        // render, sky and skyline glyph are exported from Figma 3178:5597, and
+        // the footer drops the price for a localized "all units sold" line.
+        slug: "sabah-residence",
+        title: "Sabah Residence",
+        developer: "Flame Towers",
+        icon: "/images/features-pro/icons/sabah-residence.svg",
+        image: "/images/features-pro/figma/sabah-residence-building.png",
+        sky: "/images/features-pro/figma/sabah-residence-sky.jpg",
+        crop: { width: 129.07, height: 118.97, left: -18.14, top: -16.08 },
+        startingFrom: "",
+        areaRange: "82 m² - 303 m²",
+        soldOut: true,
     },
     {
         slug: "brabus-island-baku",

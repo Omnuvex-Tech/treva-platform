@@ -21,7 +21,7 @@ type HomeV2Props = {
 };
 
 /**
- * Home V2 — the redesign served at `?v=2`.
+ * Home V2 — the redesign, now the site's default home (no `?v=2` switch).
  *
  * Every section is V2-native: nothing is shared with the V1 home page, which
  * keeps its own navbar, footer and callback form. The whole tree sits inside
@@ -41,7 +41,7 @@ export default function HomeV2({
         <NavbarV2 locale={locale} />
         <HeroV2 locale={locale} />
         <SearchPanelV2 locale={locale} />
-        <ProjectsV2 locale={locale} />
+        <ProjectsV2 locale={locale} limit={6} />
         <InventoryV2 locale={locale} items={inventory} resaleItems={resaleInventory} />
         <PartnersV2 locale={locale} />
         <TeamV2 locale={locale} members={team} />

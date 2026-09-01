@@ -176,7 +176,7 @@ export default function FooterV2({ locale }: Props) {
                   {LANGUAGES.map((language) => (
                     <Link
                       key={language.code}
-                      href={`/${language.code}?v=2`}
+                      href={`/${language.code}`}
                       aria-current={language.code === locale ? "true" : undefined}
                     >
                       {language.label}

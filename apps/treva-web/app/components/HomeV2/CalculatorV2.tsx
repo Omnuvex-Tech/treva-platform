@@ -23,6 +23,21 @@ type Selection = {
 
 const EMPTY: Selection = { project: "", rooms: "", area: "", floor: "", payment: "", term: "" };
 
+/** The dropdowns are answered top to bottom — a step unlocks only once every
+    step above it holds a value, and picking one opens the next. */
+const ORDER: (keyof Selection)[] = ["project", "rooms", "area", "floor", "payment", "term"];
+
+/** Re-answering a step invalidates every step after it — the sequence restarts
+    from wherever the user reaches back to. */
+const CLEARS: Record<keyof Selection, (keyof Selection)[]> = {
+  project: ["rooms", "area", "floor", "payment", "term"],
+  rooms: ["area", "floor", "payment", "term"],
+  area: ["floor", "payment", "term"],
+  floor: ["payment", "term"],
+  payment: ["term"],
+  term: [],
+};
+
 /** Ascending numeric options with the duplicates collapsed. */
 function numericOptions(values: (number | null)[], label: (value: number) => string): SelectOption[] {
   return Array.from(new Set(values.filter((value): value is number => value !== null)))
@@ -30,7 +45,7 @@ function numericOptions(values: (number | null)[], label: (value: number) => str
     .map((value) => ({ value: String(value), label: label(value) }));
 }
 
-/** "2800.6" -> "2 800.60 $" — the design's dot decimal, grouped like the resale listing. */
+/** "2800.6" -> "2 800.60 ₼" — the design's dot decimal, grouped like the resale listing. */
 function formatMoney(amount: number, currency: string): string {
   const [whole = "0", fraction = "00"] = amount.toFixed(2).split(".");
   return `${whole.replace(/\B(?=(\d{3})+(?!\d))/g, " ")}.${fraction} ${currency}`;
@@ -62,6 +77,7 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
   const dict = getDict(locale);
   const [values, setValues] = useState<Selection>(EMPTY);
   const [calculated, setCalculated] = useState(false);
+  const [openKey, setOpenKey] = useState<keyof Selection | null>(null);
 
   // Each step narrows the pool the next step chooses from.
   const byProject = useMemo(
@@ -92,67 +108,64 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
   }, [units, locale]);
 
   /**
-   * Selecting a project cannot leave a room count from the previous one
-   * standing, so every change clears the steps below it.
+   * Commit a step: store the value, wipe the steps it invalidates, and open the
+   * next step's dropdown so the user is carried straight down the sequence.
    */
-  const set =
-    (key: keyof Selection, ...clears: (keyof Selection)[]) =>
-    (value: string) => {
-      setValues((current) => ({
-        ...current,
-        [key]: value,
-        ...Object.fromEntries(clears.map((field) => [field, ""])),
-      }));
-    };
+  const choose = (key: keyof Selection) => (value: string) => {
+    setValues((current) => ({
+      ...current,
+      [key]: value,
+      ...Object.fromEntries(CLEARS[key].map((field) => [field, ""])),
+    }));
+    const next = ORDER[ORDER.indexOf(key) + 1];
+    setOpenKey(next ?? null);
+  };
+
+  /** A step is reachable only once every step above it holds a value. */
+  const isReachable = (key: keyof Selection) =>
+    ORDER.slice(0, ORDER.indexOf(key)).every((earlier) => values[earlier]);
 
   const fields: {
     key: keyof Selection;
     label: string;
     placeholder: string;
     options: SelectOption[];
-    onChange: (value: string) => void;
   }[] = [
     {
       key: "project",
       label: dict.search.project,
       placeholder: dict.search.projectPlaceholder,
       options: projectOptions,
-      onChange: set("project", "rooms", "area", "floor"),
     },
     {
       key: "rooms",
       label: dict.search.rooms,
       placeholder: dict.credit.selectRooms,
-      options: numericOptions(byProject.map((unit) => unit.rooms), String),
-      onChange: set("rooms", "area", "floor"),
+      options: values.project ? numericOptions(byProject.map((unit) => unit.rooms), String) : [],
     },
     {
       key: "area",
       label: dict.credit.areaLabel,
       placeholder: dict.credit.selectArea,
-      options: numericOptions(byRooms.map((unit) => unit.area), (value) => `${value} m²`),
-      onChange: set("area", "floor"),
+      options: values.rooms ? numericOptions(byRooms.map((unit) => unit.area), (value) => `${value} m²`) : [],
     },
     {
       key: "floor",
       label: dict.credit.floorLabel,
       placeholder: dict.credit.selectFloor,
-      options: numericOptions(byArea.map((unit) => unit.floor), String),
-      onChange: set("floor"),
+      options: values.area ? numericOptions(byArea.map((unit) => unit.floor), String) : [],
     },
     {
       key: "payment",
       label: dict.credit.downPayment,
       placeholder: dict.credit.selectPayment,
       options: DOWN_PAYMENTS.map((percent) => ({ value: String(percent), label: `${percent}%` })),
-      onChange: set("payment"),
     },
     {
       key: "term",
       label: dict.credit.term,
       placeholder: dict.credit.selectTerm,
       options: TERMS.map((months) => ({ value: String(months), label: dict.credit.months(months) })),
-      onChange: set("term"),
     },
   ];
 
@@ -164,17 +177,18 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
     const unit = resolved ? (byFloor[0] ?? null) : null;
     if (!unit || !values.payment || !values.term) return null;
 
-    const price = unit.priceUsd ?? unit.priceAzn;
+    // Quoted in manat — `priceAzn` is always set (pegged from USD when the feed
+    // has no AZN figure of its own; see inventory-api).
+    const price = unit.priceAzn;
     if (price === null) return null;
 
-    const currency = unit.priceUsd !== null ? "$" : "AZN";
     const downPayment = (price * Number(values.payment)) / 100;
     const monthly = (price - downPayment) / Number(values.term);
 
     return {
-      monthly: formatMoney(monthly, currency),
-      downPayment: formatMoney(downPayment, currency),
-      total: formatMoney(price, currency),
+      monthly: formatMoney(monthly, "₼"),
+      downPayment: formatMoney(downPayment, "₼"),
+      total: formatMoney(price, "₼"),
     };
   }, [byFloor, values]);
 
@@ -196,10 +210,17 @@ export default function CalculatorV2({ locale, units = [] }: Props) {
                 <span>{field.label}</span>
                 <SelectV2
                   value={values[field.key]}
-                  onChange={field.onChange}
+                  onChange={choose(field.key)}
                   options={field.options}
                   placeholder={field.placeholder}
                   label={field.label}
+                  disabled={!isReachable(field.key)}
+                  open={openKey === field.key}
+                  onOpenChange={(next) =>
+                    setOpenKey((current) =>
+                      next ? field.key : current === field.key ? null : current,
+                    )
+                  }
                 />
               </div>
             ))}
