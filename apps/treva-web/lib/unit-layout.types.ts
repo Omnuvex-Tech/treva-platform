@@ -105,4 +105,6 @@ export interface UnitLayoutFilters {
     floor?: number;
     rooms?: string;
     unitTypeOptionId?: string;
+    /** Left off entirely by the API unless passed — the site always sends `false`. */
+    archived?: boolean;
 }

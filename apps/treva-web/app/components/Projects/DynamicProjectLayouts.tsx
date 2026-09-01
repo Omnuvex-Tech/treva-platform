@@ -67,7 +67,7 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
 
         const fetchForSlug = async (slug: string) => {
           const res = await fetch(
-            `${trevaApiUrl}/unit-layouts?categorySlug=${encodeURIComponent(slug)}&limit=3`
+            `${trevaApiUrl}/unit-layouts?categorySlug=${encodeURIComponent(slug)}&limit=3&archived=false`
           );
           if (!res.ok) return [];
           const rawData = await res.json();

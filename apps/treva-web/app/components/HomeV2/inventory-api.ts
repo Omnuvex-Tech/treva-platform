@@ -125,7 +125,7 @@ const FETCH_BUFFER = 60;
  */
 export async function getHomeInventory(limit = 3): Promise<InventoryCard[]> {
     try {
-        const res = await fetch(`${TREVA_API}/unit-layouts?limit=${Math.max(limit * 4, FETCH_BUFFER)}`, {
+        const res = await fetch(`${TREVA_API}/unit-layouts?limit=${Math.max(limit * 4, FETCH_BUFFER)}&archived=false`, {
             next: { revalidate: 60 },
         });
         if (!res.ok) return [];

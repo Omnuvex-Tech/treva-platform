@@ -293,6 +293,11 @@ export default function UnitLayout() {
   const filters = useMemo(() => ({
     page,
     limit,
+    // The API only filters on `archived` when it is asked to, so the listing
+    // has to say so: archiving is how the panel takes a unit off the site
+    // (parkings are archived wholesale), and without this they came back in
+    // the results anyway.
+    archived: false,
     ...(selectedCategorySlug && { categorySlug: selectedCategorySlug }),
     ...(floor && { floor: parseInt(floor) }),
     ...(selectedStatus && { statusOptionId: selectedStatus }),
