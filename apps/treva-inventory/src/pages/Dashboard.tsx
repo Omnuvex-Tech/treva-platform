@@ -284,6 +284,7 @@ export function Dashboard() {
     const [resaleListingsTotal, setResaleListingsTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [syncingProfitbase, setSyncingProfitbase] = useState(false);
+    const [syncingCurrencies, setSyncingCurrencies] = useState(false);
     const { showSuccess, showError } = useMessageCenter();
 
     const loadOffplanDashboardData = useCallback(() => {
@@ -323,6 +324,27 @@ export function Dashboard() {
             showError({ title: "Profitbase transfer failed", description: getApiErrorMessage(error, "Please try again.") });
         } finally {
             setSyncingProfitbase(false);
+        }
+    };
+
+    /**
+     * Profitbase prices a unit in one currency only, so the listings had
+     * nothing to show when a visitor asked for another. This fills the other
+     * two in from whichever one the unit carries.
+     */
+    const handleSyncCurrencies = async () => {
+        setSyncingCurrencies(true);
+        try {
+            const res = await unitLayoutsApi.syncCurrencies();
+            showSuccess({
+                title: "Currencies synced",
+                description: `${res.data.updated} of ${res.data.scanned} unit layouts updated.`,
+            });
+            if (activeMenu === "offplan") await loadOffplanDashboardData();
+        } catch (error) {
+            showError({ title: "Currency sync failed", description: getApiErrorMessage(error, "Please try again.") });
+        } finally {
+            setSyncingCurrencies(false);
         }
     };
 
@@ -784,7 +806,15 @@ export function Dashboard() {
                         <LoadingSpinner label="Loading overview" className="min-h-[256px]" />
                     ) : (
                     <>
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-end gap-2">
+                        <button
+                            type="button"
+                            onClick={handleSyncCurrencies}
+                            disabled={syncingCurrencies}
+                            className="flex h-[44px] items-center justify-center gap-2 rounded-[16px] border border-gray-200 bg-white px-4 py-2 text-[13px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                            <span>{syncingCurrencies ? "Syncing…" : "Sync Currencies"}</span>
+                        </button>
                         <button
                             type="button"
                             onClick={handleProfitbaseTransfer}

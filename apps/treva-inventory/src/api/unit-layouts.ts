@@ -254,6 +254,12 @@ export const unitLayoutsApi = {
     delete: (id: string) =>
         apiClient.delete(`/unit-layouts/${id}`),
 
+    /** Fills in each unit's missing currencies from the one it is priced in. */
+    syncCurrencies: () =>
+        apiClient.post<{ scanned: number; updated: number }>(
+            "/unit-layouts/sync-currencies"
+        ),
+
     getStats: () =>
         apiClient.get<UnitLayoutStats>("/unit-layouts/stats"),
 

@@ -629,6 +629,61 @@ export class UnitLayoutsService {
     };
   }
 
+  /**
+   * Fills in the currencies a unit is missing from the one it has.
+   *
+   * Profitbase syncs a unit in a single currency (whatever the project is
+   * priced in), so a listing asked for in another one had nothing to show.
+   * Same rates as `scripts/backfill-unit-layout-currencies.ts`, which this
+   * replaces for anyone without a terminal: 1 AZN = 0.59 USD, 1 USD = 0.87
+   * EUR. USD is the base when a unit already carries several, because that is
+   * the one the sync writes — the others are always derived.
+   */
+  async syncCurrencies() {
+    const AZN_PER_USD = 1 / 0.59;
+    const EUR_PER_USD = 0.87;
+
+    const layouts = await this.prisma.unitLayout.findMany({
+      select: { id: true, prices: true },
+    });
+
+    let updated = 0;
+
+    for (const layout of layouts) {
+      const prices = (layout.prices as Record<string, number>) || {};
+      const value = (key: string) => {
+        const amount = Number(prices[key]);
+        return Number.isFinite(amount) && amount > 0 ? amount : null;
+      };
+
+      const usd =
+        value('USD') ??
+        (value('AZN') !== null ? value('AZN')! * 0.59 : null) ??
+        (value('EUR') !== null ? value('EUR')! / EUR_PER_USD : null);
+      if (usd === null) continue;
+
+      const next = {
+        ...prices,
+        USD: Math.round(usd),
+        AZN: Math.round(usd * AZN_PER_USD),
+        EUR: Math.round(usd * EUR_PER_USD),
+      };
+
+      const unchanged = (['USD', 'AZN', 'EUR'] as const).every(
+        (key) => prices[key] === next[key],
+      );
+      if (unchanged) continue;
+
+      await this.prisma.unitLayout.update({
+        where: { id: layout.id },
+        data: { prices: next },
+      });
+      updated++;
+    }
+
+    return { scanned: layouts.length, updated };
+  }
+
   async countByStatus() {
     const [available, sold, reserved] = await Promise.all([
       this.prisma.unitLayout.count({ where: { status: 'available' } }),

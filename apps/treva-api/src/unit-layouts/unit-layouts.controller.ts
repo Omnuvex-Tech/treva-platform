@@ -102,6 +102,18 @@ export class UnitLayoutsController {
     });
   }
 
+  @Post('sync-currencies')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Derive the missing currencies on every unit from the one it is priced in',
+  })
+  @ApiResponse({ status: 201, description: 'Returns how many units changed' })
+  async syncCurrencies() {
+    return this.unitLayoutsService.syncCurrencies();
+  }
+
   @Get('floors')
   @ApiOperation({ summary: 'Get distinct floor values' })
   async getFloors() {
