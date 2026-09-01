@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
-import Navbar from '@/app/components/Home/TrevaHero/navbar'
-import { HomeFooter } from '@/app/components/Home/HomeFooter'
-import PartnershipCTA from '@/app/components/PartnershipCTA'
+import Navbar from '@/app/components/HomeV2/V2Nav'
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer'
+import CallbackV2 from '@/app/components/HomeV2/V2Callback'
 import './brokers.css'
 import '../Contact/contact.css'
 
@@ -761,13 +761,7 @@ export function BrokersPage({ locale }: BrokersPageProps) {
               </div>
             </section>
 
-            <PartnershipCTA
-              locale={locale}
-              hideImagesOnMobile
-              centerContentOnMobile
-              primaryAction={{ href: `/${locale}/contact#get-in-touch`, label: t.ctaContact }}
-              secondaryAction={{ href: '#broker-registration', label: t.joinNetwork }}
-            />
+            <CallbackV2 locale={locale} role="Broker" />
 
           </main>
 

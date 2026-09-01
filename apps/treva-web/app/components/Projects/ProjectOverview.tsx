@@ -4,6 +4,7 @@ import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
 import RichText from "./RichText";
 import { useProjectGallery } from "@/app/components/Gallery/ProjectGalleryContext";
+import { cmsImage } from "@/lib/cms-image";
 import "./project-overview.css";
 
 interface OverviewImage {
@@ -112,7 +113,10 @@ export default function ProjectOverview({
                 <span className="po-image-label">{img.label}</span>
                 <div className="po-image-wrapper">
                   <img
-                    src={src}
+                    {...cmsImage(src, { max: 1200 })}
+                    sizes="(max-width: 768px) 100vw, 45vw"
+                    loading="lazy"
+                    decoding="async"
                     alt={img.label}
                     className={`po-img${zoomable ? " tg-zoomable" : ""}`}
                     onClick={zoomable ? () => gallery!.open(src) : undefined}

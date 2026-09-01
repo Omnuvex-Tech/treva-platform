@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { cmsImage } from "@/lib/cms-image";
 import "./gallery-lightbox.css";
 
 /** Lightbox-un ekran oxuyucu etiketləri. */
@@ -101,7 +102,13 @@ export function GalleryLightbox({
       )}
 
       <figure className="tg-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-        <img src={current.url} alt={current.alt || current.label || ""} className="tg-lightbox__img" />
+        <img
+          {...cmsImage(current.url, { max: 1920 })}
+          sizes="100vw"
+          decoding="async"
+          alt={current.alt || current.label || ""}
+          className="tg-lightbox__img"
+        />
         {current.label && <figcaption className="tg-lightbox__caption">{current.label}</figcaption>}
       </figure>
 
@@ -127,7 +134,7 @@ export function GalleryLightbox({
               onClick={() => onIndexChange(i)}
               aria-label={l.nth(i + 1)}
             >
-              <img src={img.url} alt="" />
+              <img {...cmsImage(img.url, { max: 256 })} sizes="120px" loading="lazy" decoding="async" alt="" />
             </button>
           ))}
         </div>

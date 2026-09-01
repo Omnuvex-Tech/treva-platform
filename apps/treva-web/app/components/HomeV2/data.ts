@@ -129,7 +129,7 @@ export const projectCards: ProjectCard[] = [
         sky: "/images/features-pro/figma/arabian-ranches-sky.jpg",
         crop: { width: 176.04, height: 136.54, left: -14.84, top: -33.65 },
         video: clip("arabian-ranches"),
-        startingFrom: "10.8570$",
+        startingFrom: "108.570$",
         areaRange: "33 m² - 178 m²",
     },
     {

@@ -71,6 +71,9 @@ export const dictionary = {
             phoneLabel: "Nömrə",
             phonePlaceholder: "+994 50 123 45 67",
             cta: "Mənə zəng edin",
+            sending: "Göndərilir...",
+            success: "Təşəkkürlər! Menecerimiz tezliklə sizinlə əlaqə saxlayacaq.",
+            error: "Göndərilmədi. Yenidən cəhd edin.",
         },
         comparison: {
             title: "Müqayisə",
@@ -217,6 +220,9 @@ export const dictionary = {
             phoneLabel: "Number",
             phonePlaceholder: "+994 50 123 45 67",
             cta: "Contact me",
+            sending: "Sending...",
+            success: "Thank you! Our manager will contact you shortly.",
+            error: "Could not send. Please try again.",
         },
         comparison: {
             title: "Comparison",
@@ -363,6 +369,9 @@ export const dictionary = {
             phoneLabel: "Номер",
             phonePlaceholder: "+994 50 123 45 67",
             cta: "Свяжитесь со мной",
+            sending: "Отправка...",
+            success: "Спасибо! Наш менеджер скоро свяжется с вами.",
+            error: "Не удалось отправить. Попробуйте снова.",
         },
         comparison: {
             title: "Сравнение",

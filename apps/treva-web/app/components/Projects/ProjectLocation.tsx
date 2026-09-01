@@ -2,6 +2,7 @@
 
 import React from "react";
 import RichText from "./RichText";
+import { cmsImage } from "@/lib/cms-image";
 import "./property-location.css";
 
 interface Props {
@@ -149,7 +150,10 @@ export default function ProjectLocation({
           <div className="property-map-wrapper">
             <div className="property-map-container">
               <img
-                src={getImageUrl(mapImage)}
+                {...cmsImage(getImageUrl(mapImage), { max: 1200 })}
+                sizes="(max-width: 768px) 100vw, 1100px"
+                loading="lazy"
+                decoding="async"
                 alt={t.mapLabel}
                 className="property-real-map"
                 style={{ objectFit: "cover" }}

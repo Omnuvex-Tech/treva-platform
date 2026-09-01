@@ -31,13 +31,12 @@ export default function HeroV2({ locale }: Props) {
 
         {/* Hero visual. The caption sits in a light bar under the footage rather
             than over it — the frame keeps the two apart.
-            muted + playsInline are what let the video autoplay on mobile. No
-            poster: the still it used to carry is a different scene from the
-            clip, so the hero read as loading a photo and then swapping it out.
-            `preload="auto"` fetches the footage up front instead. */}
+            muted + playsInline are what let the video autoplay on mobile. The
+            poster is a frame from the clip itself (see VideoV2), so it paints
+            the hero instantly while the file streams. */}
         <div className="hv2-heroimg">
           <div className="hv2-heroimg__media">
-            <VideoV2 src={HERO_VIDEO} />
+            <VideoV2 src={HERO_VIDEO} poster="/images/figma/hero-poster.jpg" />
           </div>
 
           <div className="hv2-heroimg__bar">

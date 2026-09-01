@@ -4,6 +4,7 @@ import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
 import RichText from "./RichText";
 import { useProjectGallery } from "@/app/components/Gallery/ProjectGalleryContext";
+import { cmsImage } from "@/lib/cms-image";
 import "./project-gallery.css";
 
 interface GalleryItem {
@@ -59,9 +60,11 @@ export default function ProjectGallery({
               <figure key={`${src}-${i}`} className="pg-item">
                 <div className="pg-item-frame">
                   <img
-                    src={src}
+                    {...cmsImage(src, { max: 1200 })}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     alt={item.caption}
                     loading="lazy"
+                    decoding="async"
                     className={`pg-img${zoomable ? " tg-zoomable" : ""}`}
                     onClick={zoomable ? () => gallery!.open(src) : undefined}
                   />

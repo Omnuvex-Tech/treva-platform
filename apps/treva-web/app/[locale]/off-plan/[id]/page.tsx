@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import UnitCardV2 from '@/app/components/UnitCardV2';
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import Navbar from '@/app/components/Home/TrevaHero/navbar';
-import { HomeFooter } from '@/app/components/Home/HomeFooter';
-import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
+import Navbar from '@/app/components/HomeV2/V2Nav';
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer';
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import PageContainer from '@/app/components/Container/PageContainer';
 import { useUnitLayoutBySlug } from '@/hooks/use-unit-layouts';
 import { useCurrencies } from '@/hooks/use-currencies';
@@ -701,7 +701,7 @@ export default function ApartmentCard() {
             <div />
           </PageContainer>
         </main>
-        <CallbackForm allowedRoles={['Client']} />
+        <CallbackV2 locale={locale} />
         <HomeFooter locale={locale} />
         <div className="apt-loading-overlay" role="status" aria-live="polite" aria-busy="true">
           <div className="apt-spinner" />
@@ -724,7 +724,7 @@ export default function ApartmentCard() {
             </div>
           </PageContainer>
         </main>
-        <CallbackForm allowedRoles={['Client']} />
+        <CallbackV2 locale={locale} />
         <HomeFooter locale={locale} />
       </div>
     );
@@ -1198,7 +1198,7 @@ export default function ApartmentCard() {
           </div>
         </PageContainer>
       </main>
-      <CallbackForm allowedRoles={['Client']} />
+      <CallbackV2 locale={locale} />
       <HomeFooter locale={locale} />
     </div>
   );

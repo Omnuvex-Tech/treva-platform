@@ -1,7 +1,7 @@
 import React from "react";
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import Navbar from "@/app/components/HomeV2/V2Nav";
+import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import OtherArticlesSection from "./OtherArticlesSection";
 import Link from "next/link";
 import {
@@ -211,7 +211,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
         </section>
       </main>
 
-      <CallbackForm />
+      <CallbackV2 locale={locale} />
       <HomeFooter locale={locale} />
     </div>
   );

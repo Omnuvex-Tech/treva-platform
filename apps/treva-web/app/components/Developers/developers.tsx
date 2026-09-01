@@ -7,9 +7,10 @@ import type { MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react'
-import Navbar from '@/app/components/Home/TrevaHero/navbar'
-import { HomeFooter } from '@/app/components/Home/HomeFooter'
-import CallbackForm from '@/app/components/Home/Callback/CallbackForm'
+import Navbar from '@/app/components/HomeV2/V2Nav'
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer'
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
+import ProjectsGridV2 from "@/app/components/HomeV2/ProjectsGridV2";
 import './developers.css'
 
 declare global {
@@ -1125,108 +1126,18 @@ export function DevelopersPage({ locale }: DevelopersPageProps) {
               </div>
             </section>
 
-            <section id="featured-projects" className="section_projects-prev is-services">
-              <div className="global-padding padding-section-medium">
-                <div className="container-large">
-                  <div className="projects-prev_component">
-                    <div className="projects-prev_intro-wrap">
-                      <p>{t.portfolioLabel}</p>
-                      <div className="max-width-56rem">
-                        <h2>{t.featuredProjects}</h2>
-                      </div>
-                    </div>
-                    <div
-                      className="w-dyn-list developers-projects-slider"
-                      onMouseEnter={handleProjectsMouseEnter}
-                      onMouseLeave={handleProjectsMouseLeave}
-                    >
-                      {featuredProjects.length > 0 && (
-                        <>
-                          <button
-                            type="button"
-                            aria-label={nav.prev}
-                            className="developers-projects-nav-btn developers-projects-nav-btn--prev"
-                            onClick={() => handleProjectsNav('prev')}
-                          >
-                            <ArrowLeft size={18} strokeWidth={2} />
-                          </button>
-                          <button
-                            type="button"
-                            aria-label={nav.next}
-                            className="developers-projects-nav-btn developers-projects-nav-btn--next"
-                            onClick={() => handleProjectsNav('next')}
-                          >
-                            <ArrowRight size={18} strokeWidth={2} />
-                          </button>
-                        </>
-                      )}
-                      <div
-                        className={`developers-projects-viewport${isProjectsDragging ? ' is-dragging' : ''}`}
-                        ref={projectsViewportRef}
-                        onPointerDown={handleProjectsPointerDown}
-                        onPointerMove={handleProjectsPointerMove}
-                        onPointerUp={handleProjectsPointerUp}
-                        onPointerCancel={handleProjectsPointerCancel}
-                        onClickCapture={handleProjectsClickCapture}
-                        onDragStart={(event) => event.preventDefault()}
-                      >
-                        <div role="list" className="projects-prev_wrap developers-projects-track w-dyn-items" ref={projectsTrackRef}>
-                          {renderedFeaturedProjects.map((project, index) => {
-                          const title = getLocalizedValue(project.title, locale)
-                          const location = getLocalizedValue(project.location, locale)
-                          const href = `/${locale}/projects/${project.slug}`
-
-                          return (
-                            <div
-                              key={`${project.slug}-${index}`}
-                              role="listitem"
-                              className="projects-prev_item developers-projects-item img-reveal w-dyn-item"
-                              style={projectsCardWidth ? { width: `${projectsCardWidth}px`, flex: `0 0 ${projectsCardWidth}px` } : undefined}
-                            >
-                              <div className="projects-prev_holder">
-                                <div className="projects-prev_img-wrap">
-                                  <img src={project.image} loading="lazy" alt={title} className="fullwidth-img ease0-6" draggable={false} />
-                                </div>
-                                <Link aria-label={`go to ${title} project`} href={href} className="projects_overlay w-inline-block">
-                                  <div className="projects_btn">
-                                    <div className="icon-large w-embed">
-                                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.6557 10.4994C17.6557 10.6575 17.5929 10.8092 17.4811 10.921C17.3692 11.0328 17.2176 11.0957 17.0594 11.0957H11.0964V17.0587C11.0964 17.2168 11.0336 17.3685 10.9217 17.4803C10.8099 17.5922 10.6582 17.655 10.5001 17.655C10.3419 17.655 10.1903 17.5922 10.0784 17.4803C9.96662 17.3685 9.90379 17.2168 9.90379 17.0587V11.0957H3.94078C3.78263 11.0957 3.63096 11.0328 3.51914 10.921C3.40731 10.8092 3.34448 10.6575 3.34448 10.4994C3.34448 10.3412 3.40731 10.1895 3.51914 10.0777C3.63096 9.96589 3.78263 9.90306 3.94078 9.90306H9.90379V3.94005C9.90379 3.7819 9.96662 3.63023 10.0784 3.5184C10.1903 3.40657 10.3419 3.34375 10.5001 3.34375C10.6582 3.34375 10.8099 3.40657 10.9217 3.5184C11.0336 3.63023 11.0964 3.7819 11.0964 3.94005V9.90306H17.0594C17.2176 9.90306 17.3692 9.96589 17.4811 10.0777C17.5929 10.1895 17.6557 10.3412 17.6557 10.4994Z" fill="white"/>
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <div className="projects_caption">{title}</div>
-                                </Link>
-                                <div className="img-cover bg-color-grey200"></div>
-                              </div>
-                              <Link aria-label={`go to ${title} project`} href={href} className="projects_content-wrap show-landscape w-inline-block">
-                                <div className="heading-style-h3 text-color-blue400">{title}</div>
-                                <div fs-list-field="location">{location}</div>
-                                <div fs-list-field="status" className="hide"></div>
-                              </Link>
-                            </div>
-                          )
-                        })}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="projects-prev_cta-wrap animate-up">
-                      <div className="projects-prev_cta-title">
-                        <p>{t.portfolioNote}</p>
-                      </div>
-                      <Link href={`/${locale}/projects`} className="button w-inline-block" data-wf--button--variant="blue">
-                        <ButtonText>{t.viewFeatured}</ButtonText>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Featured projects — the home page's own 6-card grid (ProjectsV2),
+                in its client twin so it works inside this "use client" page. The
+                bespoke drag/autoplay carousel this replaced is left in the file
+                but no longer rendered; its state and handlers above are dead. */}
+            <section id="featured-projects">
+              <ProjectsGridV2 locale={locale} limit={6} />
             </section>
 
           </main>
 
           <div className="developers-callback-wrap">
-            <CallbackForm allowedRoles={['Developer']} sectionId="developers-callback-cta" />
+            <CallbackV2 locale={locale} role="Developer" />
           </div>
           <HomeFooter locale={locale} />
       </div>

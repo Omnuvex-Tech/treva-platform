@@ -64,8 +64,8 @@
     --hv2-row-gap: 40px;
     --hv2-section: 120px;
     --hv2-flow: 40px;
-    --hv2-shell: 1414px;
-    --hv2-pad: 32px;
+    --hv2-shell: 1440px;
+    --hv2-pad: 24px;
 
     /* type — body stays Inter, headings are Oak Sans */
     --hv2-font-body: var(--font-inter), "Inter", "Segoe UI", Roboto, Arial, sans-serif;
@@ -88,6 +88,96 @@
        instead of escaping to paint behind unrelated siblings. */
     position: relative;
     isolation: isolate;
+}
+
+/* ---------- V2 chrome on a V1 page (see V2Nav / V2Footer / V2Callback) ----
+   The header, callback banner and footer are dropped onto pages whose body is
+   still V1. Each is wrapped in `.hv2-root .hv2-chrome`: `.hv2-root` for the
+   `--hv2-*` tokens and mixed-case type it styles itself from, `.hv2-chrome`
+   only as the hook the rules below need.
+
+   The old header was `position: fixed`; every V1 page already reserves a strip
+   for it in its own CSS as `padding-top: calc(var(--treva-nav-height) + N)`.
+   Rather than convert the header to `sticky` (which would need every one of
+   those offsets retuned), keep it `fixed` here and just point that variable at
+   the V2 header's own height, so the existing reserves land right. The home
+   and other native-V2 pages carry a `.hv2-nav` too but never read this
+   variable, so the rule is a no-op there.
+
+   The wrapper is `display: contents` so it adds no box of its own — the banner
+   and footer sit in the page flow exactly where they were, and the fixed
+   header (out of flow anyway) is unaffected. */
+.hv2-chrome {
+    display: contents;
+}
+
+.hv2-chrome > .hv2-nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+}
+
+body:has(.hv2-nav) {
+    --treva-nav-height: 92px;
+}
+
+/* No page tint behind them on a V1 page, so the scrolled header card and the
+   translucent footer card would sit on bare white and barely read — give the
+   footer strip the same tint the home page runs under both. */
+.hv2-chrome .hv2-footer-wrap {
+    background: var(--hv2-bg);
+}
+
+/* One content column for every page — home included. The site's other pages
+   ran a 1440 cap with a small gutter (`.global-padding` + `.container-large`);
+   that is the width the whole site uses now, so `.hv2-shell` (see its own rule
+   + the `--hv2-shell` / `--hv2-pad` tokens above, dropped to 1440 / 24) and the
+   V1 wrappers all resolve to it and their edges line up. `.page-container` had
+   no cap at all — give it the same one. `.global-padding`'s own inset is
+   dropped so it does not stack on top. */
+body:has(.hv2-nav) .global-padding {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+body:has(.hv2-nav) :is(.page-container, .container-large) {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 24px;
+}
+
+@media (max-width: 768px) {
+    body:has(.hv2-nav) :is(.page-container, .container-large) {
+        padding-inline: 16px;
+    }
+}
+
+/* Old-design pages that open on a full-bleed hero (project detail's
+   `.vision-hero`). The old header was drawn to sit *over* that hero; the V2
+   header is fixed and transparent at rest, built to sit on white like the home
+   page's. Drop the hero below the header instead of under it, so the strip
+   behind the header is the page's own white and the logo/links read. The hero
+   then owns one viewport minus the header, and its inner nav-clearance padding
+   is no longer needed. */
+body:has(.hv2-nav) .vision-hero {
+    margin-top: var(--treva-nav-height);
+    height: calc(100vh - var(--treva-nav-height));
+    min-height: calc(100vh - var(--treva-nav-height));
+}
+
+body:has(.hv2-nav) .vision-hero__container {
+    padding-top: 24px;
+}
+
+@media (max-width: 768px) {
+    body:has(.hv2-nav) .vision-hero {
+        height: calc(100svh - var(--treva-nav-height));
+        min-height: 560px;
+    }
+
+    body:has(.hv2-nav) .vision-hero__container {
+        padding-top: 24px;
+    }
 }
 
 /* The `--hv2-bg` tint, as its own box: starts at the search card's vertical
@@ -2094,6 +2184,12 @@
 /* The banner draws the shared field one notch shorter than the contact form. */
 .hv2-cb__form .hv2-input-field {
     --hv2-field-h: 44px;
+}
+
+.hv2-cb__error {
+    font-size: 13px;
+    line-height: 18px;
+    color: #c0362c;
 }
 
 /* ---------- picture dropdown -------------------------------------------

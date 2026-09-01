@@ -2,9 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import Navbar from "@/app/components/HomeV2/V2Nav";
+import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import "./privacy-policy.css";
 
 import { ButtonText } from '@/app/components/ButtonText';
@@ -116,7 +116,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ locale }) => {
         </section>
       </main>
       
-      <CallbackForm />
+      <CallbackV2 locale={locale} />
       <HomeFooter locale={locale} />
     </div>
   );

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { getDict } from "./dictionary";
 import { projectCards, roomOptions } from "./data";
+import { getFilterProjects, type FilterProject } from "./projects-api";
 import SelectV2 from "./SelectV2";
 
 type Props = { locale: string };
@@ -16,6 +17,10 @@ export default function SearchPanelV2({ locale }: Props) {
 
   const [deal, setDeal] = useState<Deal>("off-plan");
   const [project, setProject] = useState("");
+  // The project list is CMS-fed, same source and cover image as the header
+  // "Projects" menu. Until it arrives — and if the CMS is unreachable — the
+  // static seed stands in, keyed to its `/images/thumbs/*` crop.
+  const [projects, setProjects] = useState<FilterProject[]>([]);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [room, setRoom] = useState("");
@@ -23,6 +28,24 @@ export default function SearchPanelV2({ locale }: Props) {
   const [areaMax, setAreaMax] = useState("");
 
   const toggleRoom = (value: string) => setRoom((prev) => (prev === value ? "" : value));
+
+  useEffect(() => {
+    let cancelled = false;
+    getFilterProjects(locale).then((items) => {
+      if (!cancelled && items.length > 0) setProjects(items);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
+
+  const projectOptions: FilterProject[] = projects.length
+    ? projects
+    : projectCards.map((item) => ({
+        slug: item.slug,
+        title: item.title,
+        image: `/images/thumbs/${item.slug}.jpg`,
+      }));
 
   /*
    * Off-plan (UnitFilter) and resale (ResaleFilter) each read their own set of
@@ -90,13 +113,13 @@ export default function SearchPanelV2({ locale }: Props) {
                 onChange={setProject}
                 placeholder={dict.search.projectPlaceholder}
                 label={dict.search.project}
-                /* The thumb is what puts this popup into its grid layout. It is
-                   a separate 44x44 crop, not the card cover: that one is a
-                   cut-out on transparency and would show the tile through. */
-                options={projectCards.map((item) => ({
+                /* The thumb is what puts this popup into its grid layout — the
+                   CMS "Şəkil" cover, a flat photo (same as the header menu),
+                   not the transparent card render. */
+                options={projectOptions.map((item) => ({
                   value: item.slug,
                   label: item.title,
-                  thumb: `/images/thumbs/${item.slug}.jpg`,
+                  thumb: item.image || undefined,
                 }))}
               />
             </div>

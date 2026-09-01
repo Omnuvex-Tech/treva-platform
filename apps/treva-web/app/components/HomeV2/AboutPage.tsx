@@ -2,6 +2,7 @@ import "./home-v2.css";
 import NavbarV2 from "./NavbarV2";
 import AboutV2 from "./AboutV2";
 import TopBackgroundV2, { type BgAnchor } from "./TopBackgroundV2";
+import CallbackV2 from "./CallbackV2";
 import FooterV2 from "./FooterV2";
 import type { TeamMember } from "./data";
 
@@ -17,9 +18,9 @@ type Props = { locale: string; members?: TeamMember[] };
 /**
  * About page — Figma 627:17513 (desktop) and 673:15809 (mobile).
  *
- * Header, hero photo, advantages, team, footer. No callback banner: the design
- * ends on the team's "see the whole team" button and goes straight to the
- * footer.
+ * Header, hero photo, advantages, team, callback banner, footer. The Figma
+ * frame ends the team section straight into the footer, but the callback
+ * banner is the site-wide CTA now — every page carries it above the footer.
  */
 export default function AboutPage({ locale, members }: Props) {
   return (
@@ -28,6 +29,7 @@ export default function AboutPage({ locale, members }: Props) {
         <TopBackgroundV2 anchors={ABOUT_ANCHORS} />
         <NavbarV2 locale={locale} />
         <AboutV2 locale={locale} members={members} />
+        <CallbackV2 locale={locale} />
         <FooterV2 locale={locale} />
       </div>
     </div>

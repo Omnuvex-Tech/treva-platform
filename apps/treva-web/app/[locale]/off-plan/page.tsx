@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import Navbar from "@/app/components/HomeV2/V2Nav";
+import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import PageContainer from "@/app/components/Container/PageContainer";
 import UnitFilter from "@/app/components/Projects/UnitFilter";
 import "./off-plan.css";
@@ -19,7 +19,7 @@ export default function OffPlanPage({ params }: { params: { locale: string } }) 
           </Suspense>
         </PageContainer>
       </main>
-      <CallbackForm allowedRoles={['Client']} />
+      <CallbackV2 locale={locale} />
       <HomeFooter locale={locale} />
     </div>
   );

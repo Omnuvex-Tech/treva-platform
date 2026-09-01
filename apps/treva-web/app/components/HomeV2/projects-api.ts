@@ -39,8 +39,8 @@ export type NavProject = { slug: string; title: string; desc: string; image: str
  * (see ProjectsV2). Every thumbnail here is the CMS "Şəkil" cover, not the
  * hand-framed static render: the render is a cut-out on transparency, so used
  * bare — without the sky it sits on everywhere else — it renders as blank.
- * Capped at six, same as the home grid (Figma node 457:10745) and the same
- * reason: the "see all" tile is what /projects is for.
+ * Capped at seven — the 4x2 grid's eighth cell is the "see all" tile — so every
+ * project beyond that is what /projects is for.
  *
  * `desc` is the CMS blurb; a project with none falls back to its developer,
  * the next best one-liner, the same as the card showed before the CMS had a
@@ -57,11 +57,47 @@ export async function getNavProjects(locale = "az"): Promise<NavProject[]> {
         return list
             .filter((category): category is ApiCategory & { slug: string } => Boolean(category.slug))
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .slice(0, 6)
+            .slice(0, 7)
             .map((category) => ({
                 slug: category.slug,
                 title: localized(category.title, locale),
                 desc: localized(category.description, locale) || localized(category.brand, locale),
+                image: toAbsUrl(category.image ?? ""),
+            }));
+    } catch {
+        return [];
+    }
+}
+
+export type FilterProject = { slug: string; title: string; image: string };
+
+/**
+ * The "Project" option list for the home search panel's dropdown (SearchPanelV2).
+ *
+ * Same CMS source as the header menu, and the thumbnail is the same CMS "Şəkil"
+ * cover — not the `/images/thumbs/*` crops the panel used to hard-code, which
+ * only existed for the seed slugs and 404'd for every CMS project without one
+ * (e.g. `marina-village`, `sabah-residence`). Unlike the header menu this is a
+ * filter, not a teaser, so it is not capped at six — every visible project has
+ * to be selectable.
+ *
+ * Returns `[]` if the CMS is unreachable; the caller falls back to the static
+ * `projectCards` so the dropdown is never empty.
+ */
+export async function getFilterProjects(locale = "az"): Promise<FilterProject[]> {
+    try {
+        const res = await fetch(`${CMS_API}/layihelerimiz/categories/visible`);
+        if (!res.ok) return [];
+
+        const raw = await res.json();
+        const list: ApiCategory[] = Array.isArray(raw) ? raw : (raw?.value ?? []);
+
+        return list
+            .filter((category): category is ApiCategory & { slug: string } => Boolean(category.slug))
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((category) => ({
+                slug: category.slug,
+                title: localized(category.title, locale),
                 image: toAbsUrl(category.image ?? ""),
             }));
     } catch {

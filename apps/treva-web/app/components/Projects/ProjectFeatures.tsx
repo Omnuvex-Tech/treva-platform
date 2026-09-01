@@ -4,6 +4,7 @@ import React from "react";
 import PageContainer from "@/app/components/Container/PageContainer";
 import RichText from "./RichText";
 import { useProjectGallery } from "@/app/components/Gallery/ProjectGalleryContext";
+import { cmsImage } from "@/lib/cms-image";
 import "./project-details.css";
 
 interface LocalizedString {
@@ -140,7 +141,10 @@ export default function ProjectFeatures({
             const img = sec.image ? (
               <div key={sec.id + "-img"} className="pd-image-cell">
                 <img
-                  src={imgSrc}
+                  {...cmsImage(imgSrc, { max: 1200 })}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  loading="lazy"
+                  decoding="async"
                   alt={`${loc(sec.titleItalic, locale)} ${loc(sec.titleRest, locale)}`.trim()}
                   className={zoomable ? "tg-zoomable" : undefined}
                   onClick={zoomable ? () => gallery!.open(imgSrc) : undefined}

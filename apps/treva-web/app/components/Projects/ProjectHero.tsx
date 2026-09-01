@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import PageContainer from "@/app/components/Container/PageContainer";
 import RichText from "./RichText";
+import { cmsImage } from "@/lib/cms-image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Navigation } from "swiper/modules";
 import type SwiperClass from "swiper";
@@ -80,7 +81,11 @@ export default function ProjectHero({
           {validImages.map((img, idx) => (
             <SwiperSlide key={idx}>
               <img
-                src={getImageUrl(img.url)}
+                {...cmsImage(getImageUrl(img.url))}
+                sizes="100vw"
+                loading={idx === 0 ? "eager" : "lazy"}
+                fetchPriority={idx === 0 ? "high" : "auto"}
+                decoding="async"
                 alt={img.alt || title || "Project Banner"}
                 className="vision-hero__bg-img"
               />

@@ -41,7 +41,7 @@ export default function AboutV2({ locale, members = [] }: Props) {
     <>
       <section className="hv2-shell hv2-s-abouthero">
         <div className="hv2-about__hero">
-          <VideoV2 src={HERO_VIDEO} />
+          <VideoV2 src={HERO_VIDEO} poster="/images/figma/about-hero-poster.jpg" />
         </div>
       </section>
 

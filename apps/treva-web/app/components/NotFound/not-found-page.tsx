@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import Navbar from '@/app/components/Home/TrevaHero/navbar'
-import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import Navbar from '@/app/components/HomeV2/V2Nav'
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer'
 import { ButtonText } from '@/app/components/ButtonText'
 import './not-found.css'
 

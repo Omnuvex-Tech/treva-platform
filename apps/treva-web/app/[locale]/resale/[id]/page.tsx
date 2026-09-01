@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { IoMdClose } from 'react-icons/io';
-import Navbar from '@/app/components/Home/TrevaHero/navbar';
-import { HomeFooter } from '@/app/components/Home/HomeFooter';
-import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
+import Navbar from '@/app/components/HomeV2/V2Nav';
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer';
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import PageContainer from '@/app/components/Container/PageContainer';
 import PropertyInfoCards from './PropertyInfoCards';
 import RequestViewingCard from './RequestViewingCard';
@@ -267,7 +267,7 @@ export default function ResaleDetailPage() {
             <div className="py-16 text-center text-white/50">{st.loading}</div>
           </PageContainer>
         </main>
-        <CallbackForm allowedRoles={['Client']} />
+        <CallbackV2 locale={locale} />
         <HomeFooter locale={locale} />
       </div>
     );
@@ -282,7 +282,7 @@ export default function ResaleDetailPage() {
             <div className="py-16 text-center text-white/50">{st.notFound}</div>
           </PageContainer>
         </main>
-        <CallbackForm allowedRoles={['Client']} />
+        <CallbackV2 locale={locale} />
         <HomeFooter locale={locale} />
       </div>
     );

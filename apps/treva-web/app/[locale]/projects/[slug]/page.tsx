@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useProjectDetail } from "@/hooks/use-project-detail";
 import { useCategoryLocation } from "@/hooks/use-category-location";
 import { getAssetUrl } from "@/lib/asset-url";
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import Navbar from "@/app/components/HomeV2/V2Nav";
+import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import ProjectSections from "@/app/components/Projects/ProjectSections";
 
 export default function ProjectDetailPage() {
@@ -40,17 +40,13 @@ export default function ProjectDetailPage() {
   const scrollToCallbackCTA = () => {
     if (typeof window === "undefined") return;
 
-    const target = document.querySelector(".callbackContainer");
+    // The CTA above the footer is now the V2 callback banner (.hv2-s-callback);
+    // 96px clears the sticky V2 header that sits over the scrolled-to point.
+    const target = document.querySelector(".hv2-s-callback");
     if (!target) return;
 
-    const navHeightValue = window
-      .getComputedStyle(document.documentElement)
-      .getPropertyValue("--treva-nav-height");
-    const navHeight = Number.parseFloat(navHeightValue) || 64;
-    const offset = navHeight + 24;
-
     window.scrollTo({
-      top: Math.max(target.getBoundingClientRect().top + window.scrollY - offset, 0),
+      top: Math.max(target.getBoundingClientRect().top + window.scrollY - 96, 0),
       behavior: "smooth",
     });
   };
@@ -83,7 +79,7 @@ export default function ProjectDetailPage() {
             <p>{loadingText}</p>
           </div>
         </main>
-        <CallbackForm allowedRoles={['Client']} />
+        <CallbackV2 locale={locale} />
         <HomeFooter locale={locale} />
       </div>
     );
@@ -114,7 +110,7 @@ export default function ProjectDetailPage() {
             </Link>
           </div>
         </main>
-        <CallbackForm allowedRoles={['Client']} />
+        <CallbackV2 locale={locale} />
         <HomeFooter locale={locale} />
       </div>
     );
@@ -133,7 +129,7 @@ export default function ProjectDetailPage() {
         adminMapUrl={adminMapUrl}
       />
 
-      <CallbackForm allowedRoles={['Client']} />
+      <CallbackV2 locale={locale} />
 
       <HomeFooter locale={locale} />
     </div>

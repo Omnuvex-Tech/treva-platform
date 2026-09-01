@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import React, { useState, useMemo } from 'react';
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import Navbar from "@/app/components/HomeV2/V2Nav";
+import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import Link from "next/link";
 import { Article } from "@/lib/pulse.types";
 import { toAbsUrl } from "@/lib/pulse-api";
@@ -86,7 +86,7 @@ const Pulse = ({ locale, articles, leftArticles, centerArticle, rightArticles, w
       <PulseNewsSection locale={locale} articles={articles} weekArticles={weekArticles} categories={categories} />
       <PulseKeywordsSection locale={locale} />
       <div className="pulse-callback-wrap">
-        <CallbackForm />
+        <CallbackV2 locale={locale} />
       </div>
       <HomeFooter locale={locale} />
     </main>

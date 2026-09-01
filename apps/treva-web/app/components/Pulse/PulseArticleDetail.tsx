@@ -4,9 +4,9 @@ import { ButtonText } from '@/app/components/ButtonText';
 
 import Image from "next/image";
 import React, { useEffect, useState, FormEvent } from "react";
-import Navbar from "@/app/components/Home/TrevaHero/navbar";
-import { HomeFooter } from "@/app/components/Home/HomeFooter";
-import CallbackForm from "@/app/components/Home/Callback/CallbackForm";
+import Navbar from "@/app/components/HomeV2/V2Nav";
+import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import { Article } from "@/lib/pulse.types";
 import { BlockRenderer } from "./BlockRenderer";
 import { toAbsUrl } from "@/lib/pulse-api";
@@ -453,7 +453,7 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
       </main>
 
       <div className="pulse-article-callback-wrap">
-        <CallbackForm />
+        <CallbackV2 locale={locale} />
       </div>
       <HomeFooter locale={locale} />
     </div>

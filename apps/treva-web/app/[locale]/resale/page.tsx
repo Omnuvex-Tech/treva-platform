@@ -4,9 +4,9 @@ import React, { Suspense, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import UnitCardV2 from '@/app/components/UnitCardV2';
 import { useParams } from 'next/navigation';
-import Navbar from '@/app/components/Home/TrevaHero/navbar';
-import { HomeFooter } from '@/app/components/Home/HomeFooter';
-import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
+import Navbar from '@/app/components/HomeV2/V2Nav';
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer';
+import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import PageContainer from '@/app/components/Container/PageContainer';
 import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
 import { useResaleApartments } from '@/hooks/use-resale-apartments';
@@ -319,7 +319,7 @@ export default function ResalePage() {
           )}
         </PageContainer>
       </main>
-      <CallbackForm allowedRoles={['Client']} />
+      <CallbackV2 locale={locale} />
       <HomeFooter locale={locale} />
     </div>
   );
