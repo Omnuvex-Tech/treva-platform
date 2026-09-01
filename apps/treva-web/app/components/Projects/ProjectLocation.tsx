@@ -91,10 +91,14 @@ export default function ProjectLocation({
   const hasGoogleMapsUrl = !!googleMapsUrl;
   const embedUrl = hasGoogleMapsUrl ? toGoogleMapsEmbed(googleMapsUrl) : "";
 
-  const showIframe = !!embedUrl;
-  const showImage = !showIframe && !!mapImage;
-  const showLinkOnly = !showIframe && !showImage && hasGoogleMapsUrl;
-  const showEmpty = !showIframe && !showImage && !showLinkOnly;
+  // Prioritet: admin-də yüklənmiş xəritə şəkli. Əvvəl iframe birinci idi —
+  // location blokunda həm şəkil, həm Google Maps linki olanda (adi hal) şəkil
+  // heç vaxt görünmürdü. Şəkil varsa onu göstəririk, link isə üstündəki
+  // "Google Maps-də aç" düyməsi kimi qalır.
+  const showImage = !!mapImage;
+  const showIframe = !showImage && !!embedUrl;
+  const showLinkOnly = !showImage && !showIframe && hasGoogleMapsUrl;
+  const showEmpty = !showImage && !showIframe && !showLinkOnly;
 
   return (
     <section className="property-location-section">
@@ -122,7 +126,7 @@ export default function ProjectLocation({
           )}
         </div>
 
-        {/* Case 1: Google Maps URL provided → full height iframe */}
+        {/* Case 2: Şəkil yoxdur, amma Google Maps linki var → canlı iframe */}
         {showIframe && (
           <div className="property-map-wrapper">
             <div className="property-map-container">
@@ -140,7 +144,7 @@ export default function ProjectLocation({
           </div>
         )}
 
-        {/* Case 2: No iframe, but map image available → show image + link */}
+        {/* Case 1: Admin-də xəritə şəkli var → şəkil + "Google Maps-də aç" */}
         {showImage && (
           <div className="property-map-wrapper">
             <div className="property-map-container">
