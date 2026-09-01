@@ -7,6 +7,7 @@ import { requireSession } from "@/lib/auth/guard";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { SessionProvider } from "@/providers/session-provider";
 import { StoreHydration } from "@/providers/store-hydration";
+import { ToastProvider } from "@/providers/toast-provider";
 
 /**
  * The shell shared by all three roles: an 80px top row (logo cell + header)
@@ -30,20 +31,24 @@ export default async function DashboardLayout({
 
     return (
         <SessionProvider user={session.user}>
-            <StoreHydration />
-            <div className="flex h-dvh flex-col overflow-hidden">
-                <div className="flex h-header shrink-0">
-                    <LogoCell />
-                    <div className="min-w-0 flex-1">
-                        <AppHeader />
+            <ToastProvider>
+                <StoreHydration />
+                <div className="flex h-dvh flex-col overflow-hidden">
+                    <div className="flex h-header shrink-0 border-b border-border-subtle">
+                        <LogoCell />
+                        <div className="min-w-0 flex-1">
+                            <AppHeader />
+                        </div>
+                    </div>
+
+                    <div className="flex min-h-0 flex-1">
+                        <Sidebar />
+                        <main className="scrollbar-thin min-w-0 flex-1 overflow-y-auto bg-bg-app">
+                            {children}
+                        </main>
                     </div>
                 </div>
-
-                <div className="flex min-h-0 flex-1">
-                    <Sidebar />
-                    <main className="scrollbar-thin min-w-0 flex-1 overflow-y-auto">{children}</main>
-                </div>
-            </div>
+            </ToastProvider>
         </SessionProvider>
     );
 }

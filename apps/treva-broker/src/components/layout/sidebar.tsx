@@ -2,15 +2,27 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 import { cn } from "@/lib/utils/cn";
-import { NAV_ITEMS, visibleNavItems, type NavItem } from "@/config/navigation";
+import { NAV_ITEMS, visibleNavItems } from "@/config/navigation";
 import { stripLocale } from "@/config/page-meta";
 import { useSession } from "@/providers/session-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useUiStore } from "@/stores/ui-store";
 
+/**
+ * The navigation rail.
+ *
+ * The rail is pure white and sits against the #fafafa app surface, divided by a
+ * single #f0f1f1 rule — both values measured off the artboard render.
+ *
+ * There are NO separators between the rows: the artboard draws none, and the
+ * hairline that used to be here read far heavier than anything in the design.
+ * The rule under the header is drawn by the layout across the full width, so
+ * this component contributes only the vertical one.
+ */
 export function Sidebar() {
     const pathname = usePathname();
     const { locale, t } = useI18n();
@@ -18,18 +30,17 @@ export function Sidebar() {
     const collapsed = useUiStore((state) => state.sidebarCollapsed);
     const toggleSidebar = useUiStore((state) => state.toggleSidebar);
 
-    // The nav is filtered by permission, not by role — see config/navigation.ts.
-    // This is what makes the Admin Panel group appear for admins only, with no
-    // per-role nav array anywhere in the app.
+    // Filtered by permission, not by role — see config/navigation.ts. This is
+    // what makes Users appear for admins only, with no per-role nav array.
     const items = visibleNavItems(NAV_ITEMS, can);
     const path = stripLocale(pathname);
 
     return (
         <aside
             className={cn(
-                "relative shrink-0 border-r border-border-subtle bg-bg-primary transition-[width] duration-200",
-                // 76px collapsed — measured off the collapsed-sidebar artboard
-                // (873:48750), where the rail is 76 and content grows to 1364.
+                "relative shrink-0 border-r border-border-rail bg-bg-primary transition-[width] duration-200",
+                // 76px collapsed, measured off the collapsed artboard (873:48750),
+                // where the rail is 76 and the content area grows to 1364.
                 collapsed ? "w-19" : "w-sidebar",
             )}
         >
@@ -44,90 +55,43 @@ export function Sidebar() {
                     "transition-colors hover:text-content-primary",
                 )}
             >
-                <ChevronLeft className={cn("size-3.5 transition-transform", collapsed && "rotate-180")} />
+                <HugeiconsIcon
+                    icon={ArrowLeft01Icon}
+                    size={14}
+                    strokeWidth={1.8}
+                    className={cn("transition-transform", collapsed && "rotate-180")}
+                />
             </button>
 
-            <nav className="flex h-full flex-col gap-0.5 overflow-y-auto p-4 scrollbar-thin">
-                {items.map((item) => (
-                    <SidebarItem
-                        key={item.key}
-                        item={item}
-                        currentPath={path}
-                        collapsed={collapsed}
-                        renderLabel={(navItem) => navItem.label(t)}
-                        locale={locale}
-                    />
-                ))}
-            </nav>
-        </aside>
-    );
-}
+            <nav className="scrollbar-thin flex h-full flex-col overflow-y-auto p-4">
+                {items.map((item) => {
+                    const target = stripLocale(item.href(locale));
+                    const active = path === target || path.startsWith(`${target}/`);
+                    const Icon = item.icon;
+                    const label = item.label(t);
 
-interface SidebarItemProps {
-    item: NavItem;
-    currentPath: string;
-    collapsed: boolean;
-    renderLabel: (item: NavItem) => string;
-    locale: Parameters<NavItem["href"]>[0];
-}
-
-function SidebarItem({ item, currentPath, collapsed, renderLabel, locale }: SidebarItemProps) {
-    const href = item.href(locale);
-    const target = stripLocale(href);
-
-    // A parent (Admin Panel) is "active" for any path beneath its group, so the
-    // group stays highlighted while a child page is open.
-    const groupPath = item.children?.length ? `/${item.key}` : target;
-    const active = currentPath === target || currentPath.startsWith(`${groupPath}/`);
-    const Icon = item.icon;
-
-    return (
-        <div>
-            <Link
-                href={href}
-                aria-current={currentPath === target ? "page" : undefined}
-                title={collapsed ? renderLabel(item) : undefined}
-                className={cn(
-                    "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
-                    collapsed && "justify-center px-0",
-                    active
-                        ? "bg-bg-brand text-content-inverse"
-                        : "text-content-secondary hover:bg-bg-secondary hover:text-content-primary",
-                )}
-            >
-                <Icon className="size-4 shrink-0" />
-                {collapsed ? null : <span className="truncate">{renderLabel(item)}</span>}
-            </Link>
-
-            {/* Hairline between rows, matching the sidebar in the artboards. */}
-            {collapsed ? null : <span className="mx-3 block h-px bg-border-subtle" />}
-
-            {item.children?.length && active && !collapsed ? (
-                <div className="mt-0.5 ml-3 flex flex-col gap-0.5 border-l border-border-subtle pl-3">
-                    {item.children.map((child) => {
-                        const childTarget = stripLocale(child.href(locale));
-                        const childActive = currentPath === childTarget;
-                        const ChildIcon = child.icon;
-
-                        return (
+                    return (
+                        <div key={item.key}>
                             <Link
-                                key={child.key}
-                                href={child.href(locale)}
-                                aria-current={childActive ? "page" : undefined}
+                                href={item.href(locale)}
+                                aria-current={active ? "page" : undefined}
+                                title={collapsed ? label : undefined}
                                 className={cn(
-                                    "flex h-9 items-center gap-2.5 rounded-s px-2.5 text-xs font-medium transition-colors",
-                                    childActive
-                                        ? "bg-bg-secondary text-content-primary"
-                                        : "text-content-tertiary hover:text-content-primary",
+                                    "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
+                                    collapsed && "justify-center px-0",
+                                    active
+                                        ? "bg-bg-brand text-content-inverse"
+                                        : "text-content-secondary hover:bg-bg-secondary hover:text-content-primary",
                                 )}
                             >
-                                <ChildIcon className="size-3.5 shrink-0" />
-                                <span className="truncate">{renderLabel(child)}</span>
+                                <HugeiconsIcon icon={Icon} size={18} strokeWidth={1.6} className="shrink-0" />
+                                {collapsed ? null : <span className="truncate">{label}</span>}
                             </Link>
-                        );
-                    })}
-                </div>
-            ) : null}
-        </div>
+
+                        </div>
+                    );
+                })}
+            </nav>
+        </aside>
     );
 }

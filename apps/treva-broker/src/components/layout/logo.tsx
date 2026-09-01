@@ -6,10 +6,10 @@ import { HOME_ROUTE } from "@/config/routes";
 /**
  * TREVA wordmark.
  *
- * Drawn as text rather than an <img> so it inherits the type scale. The logo
- * cell keeps its full width when the sidebar collapses (873:48750), so there
- * is no separate collapsed mark. Swap in the official SVG here when design
- * exports it — no call site changes.
+ * Drawn as text rather than an <img> so it inherits the type scale. It has no
+ * collapsed variant: the logo cell keeps its 280px width even when the rail
+ * collapses (see LogoCell), so the full wordmark is always on screen. Swap in
+ * the official SVG here when design exports it — no call site changes.
  */
 export function Logo({ locale }: { locale: Locale }) {
     return (

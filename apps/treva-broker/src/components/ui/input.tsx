@@ -11,11 +11,19 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
     leadingIcon?: ReactNode;
     trailingIcon?: ReactNode;
     containerClassName?: string;
+    /**
+     * `filled` is the grey field used inside pages; `outlined` is the white,
+     * bordered field the app header uses. Both appear in the artboards.
+     */
+    surface?: "filled" | "outlined";
 }
 
 /**
- * The `Input / TextInput Light` component from the design: grey fill, no
- * visible border at rest, 12px radius, optional leading icon.
+ * The `Input / TextInput Light` component from the design.
+ *
+ * Two surfaces, both of which appear in the artboards: `filled` is the grey
+ * field used inside pages, `outlined` is the white bordered field in the app
+ * header — measured at #ffffff against the header's #fafafa ground.
  */
 export function Input({
     label,
@@ -24,6 +32,7 @@ export function Input({
     leadingIcon,
     trailingIcon,
     containerClassName,
+    surface = "filled",
     className,
     id,
     disabled,
@@ -34,17 +43,22 @@ export function Input({
     const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined;
 
     return (
-        <div className={cn("flex w-full flex-col gap-1.5", containerClassName)}>
+        <div className={cn("flex w-full flex-col", containerClassName)}>
             {label ? (
-                <label htmlFor={inputId} className="text-xs font-medium text-content-secondary">
+                <label
+                    htmlFor={inputId}
+                    className="mb-0.5 text-xs leading-3 font-medium text-content-secondary"
+                >
                     {label}
                 </label>
             ) : null}
 
             <div
                 className={cn(
-                    "flex items-center gap-2 rounded-md bg-bg-secondary px-3 transition-colors",
-                    "border border-transparent",
+                    "flex items-center gap-2 rounded-md px-3 transition-colors",
+                    surface === "outlined"
+                        ? "border border-border-subtle bg-bg-primary"
+                        : "border border-transparent bg-bg-secondary",
                     "focus-within:border-border-brand focus-within:bg-bg-primary",
                     error && "border-content-negative",
                     disabled && "opacity-60",
@@ -78,11 +92,11 @@ export function Input({
             </div>
 
             {error ? (
-                <p id={`${inputId}-error`} className="text-xs text-content-negative">
+                <p id={`${inputId}-error`} className="mt-1.5 text-xs text-content-negative">
                     {error}
                 </p>
             ) : hint ? (
-                <p id={`${inputId}-hint`} className="text-xs text-content-tertiary">
+                <p id={`${inputId}-hint`} className="mt-1.5 text-xs text-content-tertiary">
                     {hint}
                 </p>
             ) : null}

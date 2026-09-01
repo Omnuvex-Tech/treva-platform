@@ -16,6 +16,14 @@ export function useNewsList(query: NewsListQuery) {
     });
 }
 
+export function useNewsPost(id: string | undefined) {
+    return useQuery({
+        queryKey: queryKeys.news.detail(id ?? ""),
+        queryFn: () => newsService.detail(id!),
+        enabled: Boolean(id),
+    });
+}
+
 export function usePinnedNews() {
     return useQuery({
         queryKey: [...queryKeys.news.all, "pinned"],

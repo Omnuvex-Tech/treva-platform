@@ -83,7 +83,7 @@ export function FinanceView() {
     const to = data ? Math.min(data.page * data.perPage, data.total) : 0;
 
     return (
-        <div className="flex flex-col gap-4 p-6">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-8">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {summaryQuery.isPending || !summary ? (
                     Array.from({ length: 4 }, (_, index) => (
@@ -96,28 +96,28 @@ export function FinanceView() {
                             value={formatCurrency(summary.totalCommission, locale)}
                             delta={summary.commissionDelta}
                             hint={t.finance.vsPrev}
-                            icon={Wallet}
+                            icon={<Wallet />}
                         />
                         <StatTile
                             label={t.finance.pendingPayout}
                             value={formatCurrency(summary.pendingPayout, locale)}
                             delta={summary.pendingDelta}
                             hint={t.finance.vsPrev}
-                            icon={Banknote}
+                            icon={<Banknote />}
                         />
                         <StatTile
                             label={t.finance.closedDeals}
                             value={formatNumber(summary.closedDeals, locale)}
                             delta={summary.closedDealsDelta}
                             hint={t.finance.vsPrev}
-                            icon={Handshake}
+                            icon={<Handshake />}
                         />
                         <StatTile
                             label={t.finance.avgDeal}
                             value={formatCurrency(summary.averageDealValue, locale)}
                             delta={summary.averageDealDelta}
                             hint={t.finance.vsPrev}
-                            icon={TrendingUp}
+                            icon={<TrendingUp />}
                         />
                     </>
                 )}
@@ -188,7 +188,7 @@ export function FinanceView() {
                 <TableSkeleton rows={PER_PAGE} columns={7} />
             ) : listQuery.isError ? (
                 <EmptyState
-                    icon={Wallet}
+                    icon={<Wallet />}
                     title={t.common.error}
                     action={
                         <Button variant="outline" onClick={() => listQuery.refetch()}>
@@ -262,7 +262,7 @@ export function FinanceView() {
                     />
                 </>
             ) : (
-                <EmptyState icon={Wallet} title={t.common.empty} description={t.common.emptyHint} />
+                <EmptyState icon={<Wallet />} title={t.common.empty} description={t.common.emptyHint} />
             )}
         </div>
     );

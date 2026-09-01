@@ -16,12 +16,21 @@ import { isPublicPath } from "@/config/routes";
  *  2. Bounce anonymous visitors to the login screen, and signed-in visitors
  *     away from it.
  *
- * What it deliberately does NOT do is check permissions. Middleware runs on the
- * Edge runtime and would have to decode (and eventually verify) the session on
- * every asset-adjacent request; permission checks belong in
- * `lib/auth/guard.ts`, on the server, next to the page that needs them.
+ * What it deliberately does NOT do is check permissions. This runs on the Edge
+ * runtime and would have to decode (and eventually verify) the session on every
+ * asset-adjacent request; permission checks belong in `lib/auth/guard.ts`, on
+ * the server, next to the page that needs them.
+ *
+ * Named `proxy.ts`, not `middleware.ts`: Next 16 renamed the convention. The old
+ * name still works but warns on every build and is slated for removal, and the
+ * handler must now be the default export (or a named `proxy` export). Keeping
+ * both files is a hard build error, so there is only this one.
+ *
+ * It lives under `src/` because the app uses a src directory — at the package
+ * root Next ignores it silently, and the only symptom is that locale redirects
+ * quietly stop happening.
  */
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const [, firstSegment = ""] = pathname.split("/");
 

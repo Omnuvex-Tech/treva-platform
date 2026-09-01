@@ -5,6 +5,7 @@ export {
     formatNumber,
     formatCurrency,
     formatCompact,
+    formatBytes,
     formatPercent,
     initials,
 } from "./format";

@@ -14,7 +14,11 @@ export const routes = {
     resetPassword: (locale: Locale) => `/${locale}/reset-password`,
 
     newsFeed: (locale: Locale) => `/${locale}/news-feed`,
+    newsNew: (locale: Locale) => `/${locale}/news-feed/new`,
+    newsDetail: (locale: Locale, id: string) => `/${locale}/news-feed/${id}`,
+    newsEdit: (locale: Locale, id: string) => `/${locale}/news-feed/${id}/edit`,
     clients: (locale: Locale) => `/${locale}/clients`,
+    clientDetail: (locale: Locale, id: string) => `/${locale}/clients/${id}`,
     brokerRole: (locale: Locale) => `/${locale}/broker-role`,
     finance: (locale: Locale) => `/${locale}/finance`,
     projects: (locale: Locale) => `/${locale}/projects`,
@@ -22,7 +26,6 @@ export const routes = {
 
     adminUsers: (locale: Locale) => `/${locale}/admin/users`,
     adminListings: (locale: Locale) => `/${locale}/admin/listings`,
-    adminLanguage: (locale: Locale) => `/${locale}/admin/language`,
 } as const;
 
 /** Where a signed-in user lands — News Feed is the first sidebar item in every role. */

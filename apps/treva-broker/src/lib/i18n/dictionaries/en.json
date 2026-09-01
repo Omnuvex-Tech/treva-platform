@@ -1,211 +1,370 @@
 {
-    "common": {
-        "search": "Search",
-        "save": "Save",
-        "cancel": "Cancel",
-        "edit": "Edit",
-        "delete": "Delete",
-        "create": "Create",
-        "confirm": "Confirm",
-        "loading": "Loading…",
-        "empty": "Nothing here yet",
-        "emptyHint": "Once there is data it will show up on this page.",
-        "error": "Something went wrong",
-        "retry": "Try again",
-        "signOut": "Sign out",
-        "profile": "Profile",
-        "language": "Language",
-        "showing": "Showing {from}–{to} of {total}",
-        "previous": "Previous",
-        "next": "Next"
+  "common": {
+    "search": "Search",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "confirm": "Confirm",
+    "loading": "Loading…",
+    "empty": "Nothing here yet",
+    "emptyHint": "Once there is data it will show up on this page.",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "signOut": "Sign out",
+    "profile": "Profile",
+    "language": "Language",
+    "showing": "Showing {from}–{to} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "all": "All",
+    "datePicker": {
+      "placeholder": "Select date",
+      "today": "Today",
+      "clear": "Clear",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month"
     },
-    "nav": {
-        "newsFeed": "News Feed",
-        "clients": "Clients",
-        "brokerRole": "Broker Role",
-        "finance": "Finance",
-        "projects": "Projects",
-        "floorPlan": "Floor Plan",
-        "adminPanel": "Admin Panel",
-        "users": "Users",
-        "listings": "Listings",
-        "language": "Language"
-    },
-    "auth": {
-        "welcomeTitle": "Welcome to TREVA",
-        "welcomeSubtitle": "Premium real estate management platform",
-        "email": "Email address",
-        "emailPlaceholder": "admin@treva.az",
-        "password": "Password",
-        "rememberMe": "Remember me",
-        "forgotPassword": "Forgot password?",
-        "signIn": "Sign in to dashboard",
-        "securityNote": "Protected by enterprise-grade security",
-        "invalidCredentials": "Email or password is incorrect"
-    },
-    "news": {
-        "title": "News Feed",
-        "subtitle": "View and manage the latest news, announcements, and project updates",
-        "add": "Add news",
-        "pinned": "Pinned",
-        "quickStats": "Quick Stats",
-        "postsThisWeek": "Posts this week",
-        "unread": "Unread",
-        "newToday": "New today",
-        "categoryNews": "New",
-        "categoryAnnouncement": "Announcements"
-    },
-    "clients": {
-        "title": "Clients",
-        "subtitle": "Manage your client base, leads, and their activity",
-        "count": "{total} clients",
-        "add": "Add client",
-        "filter": "Filter",
-        "searchPlaceholder": "Search clients",
-        "columns": {
-            "client": "Client",
-            "contact": "Contact",
-            "broker": "Assigned broker",
-            "status": "Status"
-        },
-        "status": {
-            "lead": "Lead",
-            "active": "Active",
-            "negotiating": "Negotiating",
-            "closed": "Closed",
-            "lost": "Lost"
-        },
-        "selected": "{count} selected",
-        "form": {
-            "createTitle": "New client",
-            "editTitle": "Edit client",
-            "firstName": "First name",
-            "lastName": "Last name",
-            "phone": "Phone number",
-            "email": "Email address",
-            "broker": "Assigned broker",
-            "budget": "Budget",
-            "interest": "Interested in",
-            "notes": "Notes",
-            "notesPlaceholder": "Context, preferences, call history…",
-            "consent": "Client agreed to be contacted about new listings",
-            "save": "Save"
-        },
-        "deleteConfirm": "Delete this client? This cannot be undone."
-    },
-    "brokerRole": {
-        "title": "Broker Role",
-        "subtitle": "Team structure, targets, and broker performance"
-    },
-    "finance": {
-        "title": "Finance",
-        "subtitle": "Commissions, payouts, and financial performance",
-        "commission": "Total commission",
-        "pendingPayout": "Pending payout",
-        "closedDeals": "Closed deals",
-        "avgDeal": "Average deal value",
-        "vsPrev": "vs previous period",
-        "monthlyTitle": "Commission over the last 12 months",
-        "splitTitle": "Commission by status",
-        "transactions": "Transactions",
-        "searchPlaceholder": "Search by reference, client or project",
-        "columns": {
-            "reference": "Reference",
-            "client": "Client",
-            "project": "Project",
-            "broker": "Broker",
-            "amount": "Amount",
-            "commission": "Commission",
-            "status": "Status",
-            "date": "Date"
-        },
-        "status": {
-            "paid": "Paid",
-            "pending": "Pending",
-            "processing": "Processing",
-            "cancelled": "Cancelled"
-        },
-        "tabs": {
-            "all": "All",
-            "paid": "Paid",
-            "processing": "Processing",
-            "pending": "Pending",
-            "cancelled": "Cancelled"
-        }
-    },
-    "projects": {
-        "title": "Projects",
-        "subtitle": "Browse and manage development projects"
-    },
-    "floorPlan": {
-        "title": "Floor Plan",
-        "subtitle": "Explore buildings, floors, and unit availability"
-    },
-    "users": {
-        "title": "Users",
-        "subtitle": "Manage platform accounts, roles, and permissions",
-        "tabs": {
-            "all": "All",
-            "active": "Active",
-            "blocked": "Blocked",
-            "invited": "Invited"
-        },
-        "add": "Add user",
-        "export": "Export",
-        "searchPlaceholder": "Search by name, email or phone",
-        "columns": {
-            "name": "Name",
-            "email": "Email",
-            "phone": "Phone",
-            "role": "Role",
-            "team": "Team",
-            "status": "Status",
-            "actions": "Actions"
-        },
-        "status": {
-            "active": "Active",
-            "blocked": "Blocked",
-            "invited": "Invited"
-        },
-        "form": {
-            "createTitle": "New user",
-            "editTitle": "Edit user",
-            "firstName": "First name",
-            "lastName": "Last name",
-            "email": "Email address",
-            "password": "Password",
-            "generate": "Generate password",
-            "phone": "Phone number",
-            "jobTitle": "Job title",
-            "team": "Team",
-            "role": "Role",
-            "roleHint": "Decides which screens and actions this account gets",
-            "blockAgent": "Block agent",
-            "blockHint": "A blocked account cannot sign in",
-            "save": "Save",
-            "confirmPassword": "Confirm password",
-            "passwordMismatch": "Passwords do not match"
-        },
-        "deleteConfirm": "Delete this user? This cannot be undone."
-    },
-    "listings": {
-        "title": "Listings",
-        "subtitle": "Manage published listings across the platform"
-    },
-    "languageAdmin": {
-        "title": "Language",
-        "subtitle": "Manage interface languages and translations"
-    },
-    "errors": {
-        "notFoundTitle": "Page not found",
-        "notFoundBody": "The page you are looking for does not exist or has been moved.",
-        "forbiddenTitle": "No access",
-        "forbiddenBody": "Your role does not have permission to open this page.",
-        "backToDashboard": "Back to dashboard"
-    },
-    "roles": {
-        "broker": "Broker",
-        "top_broker": "Top Broker",
-        "admin": "Admin"
+    "deleteTitle": "Delete this item?",
+    "deleteIrreversible": "This cannot be undone.",
+    "deleteSelectedTitle": "Delete selected?",
+    "confirmDelete": "Delete",
+    "detail": "Detail"
+  },
+  "nav": {
+    "newsFeed": "News Feed",
+    "clients": "Clients",
+    "brokerRole": "Broker Role",
+    "finance": "Finance",
+    "projects": "Projects",
+    "floorPlan": "Floor Plan",
+    "adminPanel": "Admin Panel",
+    "users": "Users",
+    "listings": "Listings",
+    "language": "Language"
+  },
+  "auth": {
+    "welcomeTitle": "Welcome to TREVA",
+    "welcomeSubtitle": "Premium real estate management platform",
+    "email": "Email address",
+    "emailPlaceholder": "admin@treva.az",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in to dashboard",
+    "securityNote": "Protected by enterprise-grade security",
+    "invalidCredentials": "Email or password is incorrect",
+    "panelTitle": "Manage Azerbaijan's Premium Real Estate",
+    "panelSubtitle": "Complete property lifecycle management with advanced tools for brokers, teams and administrators.",
+    "feature1Title": "Every project in one place",
+    "feature1Body": "Floor plans, availability and pricing, always current.",
+    "feature2Title": "Clients and deals end to end",
+    "feature2Body": "From first enquiry to handover, with nothing lost in between.",
+    "feature3Title": "Commission you can verify",
+    "feature3Body": "Transparent payouts for brokers and their teams."
+  },
+  "news": {
+    "title": "News Feed",
+    "subtitle": "View and manage the latest news, announcements, and project updates",
+    "add": "Add news",
+    "pinned": "Pinned",
+    "quickStats": "Quick Stats",
+    "postsThisWeek": "Posts this week",
+    "unread": "Unread",
+    "newToday": "New today",
+    "categoryNews": "New",
+    "categoryAnnouncement": "Announcements",
+    "editor": {
+      "createTitle": "New article",
+      "editTitle": "Edit article",
+      "autosavedDraft": "Auto-saved as draft",
+      "autosaved": "Auto-saved",
+      "saving": "Saving…",
+      "basicInformation": "Basic Information",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Give the article a headline",
+      "summaryLabel": "Summary",
+      "summaryPlaceholder": "One or two sentences shown on the card",
+      "categoryLabel": "Category",
+      "coverImage": "Cover Image",
+      "coverDrop": "Upload a cover",
+      "coverHint": "PNG or JPG · 1600×1000 recommended",
+      "coverReplace": "Replace image",
+      "coverRemove": "Remove image",
+      "newsContent": "News Content",
+      "contentPlaceholder": "Start writing your news content here…",
+      "contentHint": "Begin typing to start the article.",
+      "preview": "Preview",
+      "attachments": "Attachments",
+      "attachHint": "PDF, Word, Excel, or Images · Max 25 MB",
+      "attachFiles": "Attach files",
+      "addFile": "Add file",
+      "publishing": "Publishing",
+      "publishDate": "Publish date",
+      "publishTime": "Time",
+      "expiryDate": "Expires",
+      "expiryPolicy": "After expiry",
+      "expiryKeep": "Keep visible",
+      "expiryArchive": "Archive",
+      "expiryDelete": "Delete",
+      "author": "Author",
+      "visibility": "Visibility",
+      "audience": {
+        "brokers": "Brokers",
+        "topBrokers": "Top brokers",
+        "admins": "Admins",
+        "agencies": "Agencies",
+        "clients": "Clients"
+      },
+      "audienceHint": {
+        "brokers": "Everyone with a broker account",
+        "topBrokers": "Team leads only",
+        "admins": "Platform administrators",
+        "agencies": "Partner real-estate agencies",
+        "clients": "Shown in the client portal"
+      },
+      "saveDraft": "Save draft",
+      "publish": "Publish",
+      "update": "Update",
+      "discard": "Discard",
+      "publishedToast": "Article published",
+      "draftToast": "Draft saved",
+      "tooLarge": "{name} is larger than 25 MB and was not attached",
+      "backToFeed": "Back to news feed"
     }
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "Manage your client base, leads, and their activity",
+    "count": "{total} clients",
+    "add": "Add client",
+    "filter": "Filter",
+    "searchPlaceholder": "Search clients",
+    "columns": {
+      "client": "Client",
+      "contact": "Contact",
+      "broker": "Assigned broker",
+      "status": "Status"
+    },
+    "status": {
+      "lead": "Lead",
+      "active": "Active",
+      "negotiating": "Negotiating",
+      "closed": "Closed",
+      "lost": "Lost"
+    },
+    "selected": "{count} selected",
+    "form": {
+      "createTitle": "New client",
+      "editTitle": "Edit client",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone number",
+      "email": "Email address",
+      "broker": "Assigned broker",
+      "budget": "Budget",
+      "interest": "Interested in",
+      "notes": "Notes",
+      "notesPlaceholder": "Context, preferences, call history…",
+      "consent": "Client agreed to be contacted about new listings",
+      "save": "Save",
+      "addPhone": "Add another number"
+    },
+    "deleteConfirm": "Delete this client? This cannot be undone.",
+    "noClients": "No clients yet",
+    "noMatches": "No clients match your search",
+    "approvalStatus": "Approval status",
+    "agentName": "Agent name",
+    "interestedIn": "Interested in",
+    "tabs": {
+      "overview": "Overview",
+      "activity": "Activity",
+      "deals": "Deals"
+    }
+  },
+  "brokerRole": {
+    "title": "Broker Role",
+    "subtitle": "Shared brochures, price lists, floor plans and presentations",
+    "count": "{total} files",
+    "upload": "Upload file",
+    "download": "Download",
+    "share": "Share",
+    "remove": "Remove",
+    "downloads": "{count} downloads",
+    "version": "v{version}",
+    "searchPlaceholder": "Search materials",
+    "details": "File details",
+    "currentVersion": "Current version",
+    "uploadedBy": "Uploaded by",
+    "uploadDate": "Upload date",
+    "lastModified": "Last modified",
+    "fileSize": "File size",
+    "fileType": "File type",
+    "visibility": "Visibility",
+    "visibilityAll": "All brokers",
+    "visibilityTop": "Top brokers only",
+    "visibilityAdmin": "Admins only",
+    "deleteConfirm": "Remove this file? Brokers will lose access to it."
+  },
+  "finance": {
+    "title": "Finance",
+    "subtitle": "Commissions, payouts, and financial performance",
+    "commission": "Total commission",
+    "pendingPayout": "Pending payout",
+    "closedDeals": "Closed deals",
+    "avgDeal": "Average deal value",
+    "vsPrev": "vs previous period",
+    "monthlyTitle": "Commission over the last 12 months",
+    "splitTitle": "Commission by status",
+    "transactions": "Transactions",
+    "searchPlaceholder": "Search by reference, client or project",
+    "columns": {
+      "reference": "Reference",
+      "client": "Client",
+      "project": "Project",
+      "broker": "Broker",
+      "amount": "Amount",
+      "commission": "Commission",
+      "status": "Status",
+      "date": "Date"
+    },
+    "status": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "processing": "Processing",
+      "cancelled": "Cancelled"
+    },
+    "tabs": {
+      "all": "All",
+      "paid": "Paid",
+      "processing": "Processing",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Browse and manage development projects",
+    "count": "{total} projects",
+    "add": "Add project",
+    "searchPlaceholder": "Search projects",
+    "from": "from",
+    "units": "{available} of {total} units",
+    "status": {
+      "planning": "Planning",
+      "construction": "Under construction",
+      "ready": "Ready",
+      "soldOut": "Sold out"
+    },
+    "delivery": "Delivery"
+  },
+  "floorPlan": {
+    "title": "Floor Plan",
+    "subtitle": "Explore buildings, floors, and unit availability",
+    "legend": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "blocked": "Blocked"
+    },
+    "unit": "Unit {code}",
+    "floor": "Floor {level}",
+    "specs": "{beds} bed · {area} m²",
+    "selectUnit": "Select a unit to see its details",
+    "totalUnits": "{total} units"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage all off-plan development objects",
+    "tabs": {
+      "user": "User",
+      "agency": "Real Estate Agencies"
+    },
+    "add": "Add user",
+    "export": "Export",
+    "searchPlaceholder": "Search by name, email or phone",
+    "columns": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Phone",
+      "role": "Role",
+      "team": "Team",
+      "status": "Status",
+      "actions": "Actions",
+      "manager": "Manager",
+      "contacts": "Contacts",
+      "organization": "Organization"
+    },
+    "status": {
+      "active": "Active",
+      "blocked": "Blocked",
+      "invited": "Invited"
+    },
+    "form": {
+      "createTitle": "New user",
+      "editTitle": "Edit user",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "generate": "Generate password",
+      "phone": "Phone number",
+      "jobTitle": "Job title",
+      "team": "Team",
+      "role": "Role",
+      "roleHint": "Decides which screens and actions this account gets",
+      "blockAgent": "Block agent",
+      "blockHint": "A blocked account cannot sign in",
+      "save": "Save",
+      "confirmPassword": "Confirm password",
+      "passwordMismatch": "Passwords do not match",
+      "organization": "Organization"
+    },
+    "deleteConfirm": "Delete this user? This cannot be undone.",
+    "addUser": "Add user",
+    "addAgency": "Add agency",
+    "userAdded": "User Successfully Added",
+    "agencyAdded": "Agency Successfully Added",
+    "userDeleted": "User removed",
+    "agencyDeleted": "Agency removed",
+    "searchUsers": "Search users",
+    "searchAgencies": "Search agencies",
+    "userUpdated": "User updated"
+  },
+  "listings": {
+    "title": "Listings",
+    "subtitle": "Manage published listings across the platform",
+    "count": "{total} listings",
+    "searchPlaceholder": "Search listings",
+    "add": "Add listing",
+    "sections": {
+      "sale": "For sale",
+      "rent": "For rent"
+    },
+    "views": "{count} views",
+    "perMonth": "/mo",
+    "specs": "{beds} bed · {baths} bath · {area} m²",
+    "status": {
+      "published": "Published",
+      "draft": "Draft",
+      "archived": "Archived"
+    }
+  },
+  "languageAdmin": {
+    "title": "Language",
+    "subtitle": "Manage interface languages and translations"
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The page you are looking for does not exist or has been moved.",
+    "forbiddenTitle": "No access",
+    "forbiddenBody": "Your role does not have permission to open this page.",
+    "backToDashboard": "Back to dashboard"
+  },
+  "roles": {
+    "broker": "Broker",
+    "top_broker": "Top Broker",
+    "admin": "Admin"
+  }
 }

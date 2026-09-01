@@ -1,10 +1,15 @@
-import { ComingSoon } from "@/components/common/coming-soon";
+import { NotDesignedYet } from "@/components/common/not-designed-yet";
 
 /**
- * The Welcome section of each Figma role has six artboards — sign in plus the
- * password-recovery steps. Only sign in is built; this route exists so the
- * "Forgot password?" link is not dead.
+ * The Welcome section of each role has six artboards, but only the first (sign
+ * in) has anything drawn in it — the other five are empty 1440x1024 frames.
+ * This route exists so the "Forgot password?" link is not dead.
  */
 export default function ForgotPasswordPage() {
-    return <ComingSoon figmaNodes={{ admin: "873:48461", topBroker: "873:60083", broker: "873:72848" }} />;
+    return (
+        <NotDesignedYet
+            nodeId="873:72848"
+            purpose="Requesting a password-reset link."
+        />
+    );
 }

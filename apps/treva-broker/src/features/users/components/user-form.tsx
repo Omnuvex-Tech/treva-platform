@@ -61,7 +61,7 @@ export function UserForm({ user, onDone, onCancel }: UserFormProps) {
             email: String(formData.get("email") ?? "").trim(),
             phone: String(formData.get("phone") ?? "").trim(),
             jobTitle: String(formData.get("jobTitle") ?? "").trim(),
-            team: String(formData.get("team") ?? "").trim(),
+            organization: String(formData.get("organization") ?? "").trim(),
             password,
             role,
             blocked,
@@ -171,7 +171,12 @@ export function UserForm({ user, onDone, onCancel }: UserFormProps) {
                         defaultValue={user?.jobTitle}
                         required
                     />
-                    <Input name="team" label={t.users.form.team} defaultValue={user?.team} required />
+                    <Input
+                        name="organization"
+                        label={t.users.form.organization}
+                        defaultValue={user?.organization}
+                        required
+                    />
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">

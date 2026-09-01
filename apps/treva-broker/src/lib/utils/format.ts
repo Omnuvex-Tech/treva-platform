@@ -97,3 +97,26 @@ export function initials(fullName: string): string {
         .map((part) => part.charAt(0).toUpperCase())
         .join("");
 }
+
+/**
+ * Human file size. Uses binary units (1 KiB = 1024 B) but the conventional
+ * "KB / MB" labels, which is what file managers and the design both show.
+ */
+export function formatBytes(bytes: number, locale: Locale): string {
+    if (bytes < 1024) return `${bytes} B`;
+
+    const units = ["KB", "MB", "GB", "TB"];
+    let value = bytes / 1024;
+    let unitIndex = 0;
+
+    while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024;
+        unitIndex += 1;
+    }
+
+    const formatted = new Intl.NumberFormat(INTL_LOCALES[locale], {
+        maximumFractionDigits: value < 10 ? 1 : 0,
+    }).format(value);
+
+    return `${formatted} ${units[unitIndex]}`;
+}

@@ -19,8 +19,8 @@ export function LoginForm() {
 
     return (
         <form action={formAction} className="flex flex-col gap-5">
-            <div className="text-center">
-                <h1 className="text-3xl font-semibold text-content-primary">{t.auth.welcomeTitle}</h1>
+            <div>
+                <h1 className="text-3xl font-medium text-content-primary">{t.auth.welcomeTitle}</h1>
                 <p className="mt-1 text-sm text-content-tertiary">{t.auth.welcomeSubtitle}</p>
             </div>
 
@@ -64,7 +64,11 @@ export function LoginForm() {
                 </p>
             ) : null}
 
-            <Button type="submit" size="lg" block loading={pending} className="h-12">
+            {/* 52px tall and full width, as in the artboard. Note the design
+                shows a *second* 508x52 button under this one whose label is not
+                in the file (it lives inside a component instance) — likely an
+                SSO option. Left out rather than guessed at. */}
+            <Button type="submit" size="lg" block loading={pending} className="h-13">
                 {t.auth.signIn}
             </Button>
 
