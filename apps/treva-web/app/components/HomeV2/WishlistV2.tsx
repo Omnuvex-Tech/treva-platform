@@ -6,12 +6,17 @@ import Link from "next/link";
 import PlanImage from "./PlanImage";
 import { getDict } from "./dictionary";
 import {
+  getSaved,
+  removeSaved,
+  onSavedChange,
+  type SavedProperty,
+} from "@/lib/saved-properties";
+import {
   getCompared,
+  addCompared,
   removeCompared,
   onCompareChange,
-  type CompareProperty,
 } from "@/lib/compare-properties";
-import { addSaved, removeSaved, isSaved, onSavedChange } from "@/lib/saved-properties";
 
 type Props = { locale: string };
 
@@ -19,44 +24,39 @@ type Props = { locale: string };
 const PLAN_FALLBACK = "/images/figma/unit-plan.png";
 
 /**
- * Comparison — Figma 638:27901, a heading over two 660x283 cards.
+ * Seçilmişlər — müqayisə səhifəsinin (Figma 638:27901) eyni kartı.
  *
- * Each card splits a floor plan from a table of five fields. On desktop the two
- * sit side by side with a hairline between them; on mobile the card stacks and
- * that hairline becomes the divider under the plan. Both states are one DOM:
- * only the flex direction and which edge carries the rule change.
- *
- * Off-plan and resale each get their own group (off-plan first, per the
- * product spec) rather than one mixed grid — the two aren't really
- * comparable against each other, and splitting them is what "seçilmiş
- * off-planlar" / "seçilmiş resale" turned into once there were two kinds of
- * item that could land on this page.
+ * `ComparisonV2` ilə eyni DOM və eyni `hv2-cmp__*` sinifləri işlənir: kart plan
+ * şəklini beş sətirlik cədvəldən ayırır, mobildə isə eyni DOM alt-alta düzülür.
+ * Fərq yalnız mənbədə və düymələrin mənasında: siyahı `saved-properties`-dən
+ * gəlir, ürək həmişə aktivdir və basanda seçilmişlərdən çıxarır, müqayisə
+ * düyməsi isə elementi müqayisəyə əlavə edir/çıxarır.
  */
-export default function ComparisonV2({ locale }: Props) {
+export default function WishlistV2({ locale }: Props) {
   const dict = getDict(locale);
-  const [items, setItems] = useState<CompareProperty[]>([]);
-  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [items, setItems] = useState<SavedProperty[]>([]);
+  const [comparedIds, setComparedIds] = useState<string[]>([]);
 
   useEffect(() => {
     const refresh = () => {
-      setItems(getCompared());
-      setSavedIds(getCompared().map((i) => i.id).filter((id) => isSaved(id)));
+      setItems(getSaved());
+      setComparedIds(getCompared().map((item) => item.id));
     };
     refresh();
-    const offCompare = onCompareChange(refresh);
     const offSaved = onSavedChange(refresh);
+    const offCompare = onCompareChange(refresh);
     return () => {
-      offCompare();
       offSaved();
+      offCompare();
     };
   }, []);
 
-  const toggleSave = (item: CompareProperty) => {
-    if (isSaved(item.id)) {
-      removeSaved(item.id);
-      setSavedIds((prev) => prev.filter((id) => id !== item.id));
+  const toggleCompare = (item: SavedProperty) => {
+    if (comparedIds.includes(item.id)) {
+      removeCompared(item.id);
+      setComparedIds((prev) => prev.filter((id) => id !== item.id));
     } else {
-      addSaved({
+      addCompared({
         id: item.id,
         slug: item.slug,
         type: item.type,
@@ -67,28 +67,28 @@ export default function ComparisonV2({ locale }: Props) {
         area: item.area,
         floor: item.floor,
         building: item.building,
-        location: item.project,
-        project: item.project,
+        project: item.project || item.location,
         title: item.title,
       });
-      setSavedIds((prev) => [...prev, item.id]);
+      setComparedIds((prev) => [...prev, item.id]);
     }
   };
 
   const offPlanItems = items.filter((item) => item.type === "off-plan");
   const resaleItems = items.filter((item) => item.type === "resale");
 
-  const renderGroup = (label: string, groupItems: CompareProperty[]) => {
+  const renderGroup = (label: string, groupItems: SavedProperty[]) => {
     if (groupItems.length === 0) return null;
 
     return (
-    <div className="hv2-cmp__group">
-      <h2 className="hv2-cmp__group-title">{label}</h2>
+      <div className="hv2-cmp__group">
+        <h2 className="hv2-cmp__group-title">{label}</h2>
 
         <div className="hv2-cmp">
           {groupItems.map((item) => {
+            const project = item.project || item.location;
             const rows = [
-              { label: dict.comparison.complex, value: item.project },
+              { label: dict.comparison.complex, value: project },
               {
                 label: dict.comparison.roomsArea,
                 value: [item.rooms, item.area].filter(Boolean).join(" / "),
@@ -103,19 +103,21 @@ export default function ComparisonV2({ locale }: Props) {
                 ? `/${locale}/off-plan/${item.slug}`
                 : `/${locale}/resale/${item.slug}`;
 
+            const compared = comparedIds.includes(item.id);
+
             return (
               <article key={item.id} className="hv2-cmp__card">
                 <Link href={detailHref} className="hv2-cmp__plan">
-                  <PlanImage src={item.image} alt={item.project} fallback={PLAN_FALLBACK} />
+                  <PlanImage src={item.image} alt={project} fallback={PLAN_FALLBACK} />
                 </Link>
 
                 <div className="hv2-cmp__body">
                   <div className="hv2-cmp__actions">
                     <button
                       type="button"
-                      className="hv2-cmp__action-btn active"
-                      aria-label={dict.comparison.compare}
-                      onClick={() => removeCompared(item.id)}
+                      className={`hv2-cmp__action-btn${compared ? " active" : ""}`}
+                      aria-label={compared ? dict.wishlist.compared : dict.wishlist.compare}
+                      onClick={() => toggleCompare(item)}
                     >
                       <Image
                         src="/images/icons/compare.svg"
@@ -128,9 +130,9 @@ export default function ComparisonV2({ locale }: Props) {
                     </button>
                     <button
                       type="button"
-                      className={`hv2-cmp__action-btn${savedIds.includes(item.id) ? " active" : ""}`}
-                      aria-label={dict.comparison.save}
-                      onClick={() => toggleSave(item)}
+                      className="hv2-cmp__action-btn active"
+                      aria-label={dict.wishlist.remove}
+                      onClick={() => removeSaved(item.id)}
                     >
                       <Image
                         src="/images/icons/heart.svg"
@@ -156,16 +158,16 @@ export default function ComparisonV2({ locale }: Props) {
             );
           })}
         </div>
-    </div>
+      </div>
     );
   };
 
   return (
-    <section className="hv2-shell hv2-section hv2-s-compare">
-      <h1 className="hv2-h2">{dict.comparison.title}</h1>
+    <section className="hv2-shell hv2-section hv2-s-wishlist">
+      <h1 className="hv2-h2">{dict.wishlist.title}</h1>
 
       {items.length === 0 ? (
-        <p className="hv2-cmp__empty">{dict.comparison.empty}</p>
+        <p className="hv2-cmp__empty">{dict.wishlist.empty}</p>
       ) : (
         <>
           {renderGroup(dict.search.offPlan, offPlanItems)}

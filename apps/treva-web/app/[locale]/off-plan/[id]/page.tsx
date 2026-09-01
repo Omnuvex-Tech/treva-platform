@@ -287,6 +287,7 @@ export default function ApartmentCard() {
         rooms: String(layout.number ?? ''),
         area: String(layout.totalArea ?? ''),
         floor: formatFloorRange(layout),
+        building: layout.entrance,
         location: layout.category?.title || '',
         project: layout.category?.title || '',
         title: layout.title || layout.name,

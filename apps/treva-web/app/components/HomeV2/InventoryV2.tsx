@@ -60,6 +60,7 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
         rooms: item.rooms,
         area: item.area,
         floor: item.floor || "",
+        building: item.building,
         location: item.project,
         project: item.project,
         title: item.project,

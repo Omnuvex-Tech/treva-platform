@@ -83,6 +83,13 @@ export const dictionary = {
             save: "Seçilmişlərə əlavə et",
             empty: "Məlumat daxil edilməyib.",
         },
+        wishlist: {
+            title: "Seçilmişlər",
+            empty: "Məlumat daxil edilməyib.",
+            remove: "Seçilmişlərdən çıxar",
+            compare: "Müqayisəyə əlavə et",
+            compared: "Müqayisədən çıxar",
+        },
         contact: {
             title: ["Əlaqə quraq və birlikdə", "irəli gedək"],
             lead: "Sualınız, rəyiniz və ya əməkdaşlıq təklifiniz var? Sizi dinləməkdən məmnun olarıq.",
@@ -222,6 +229,13 @@ export const dictionary = {
             save: "Add to saved",
             empty: "No data has been entered.",
         },
+        wishlist: {
+            title: "Saved",
+            empty: "No data has been entered.",
+            remove: "Remove from saved",
+            compare: "Add to comparison",
+            compared: "Remove from comparison",
+        },
         contact: {
             title: ["Let's Connect And", "Move Forward Together"],
             lead: "Have questions, feedback, or partnership inquiries? We'd love to hear from you.",
@@ -360,6 +374,13 @@ export const dictionary = {
             compare: "Убрать из сравнения",
             save: "Добавить в избранное",
             empty: "Данные не введены.",
+        },
+        wishlist: {
+            title: "Избранное",
+            empty: "Данные не введены.",
+            remove: "Удалить из избранного",
+            compare: "Добавить к сравнению",
+            compared: "Убрать из сравнения",
         },
         contact: {
             title: ["Свяжемся и вместе", "пойдём вперёд"],

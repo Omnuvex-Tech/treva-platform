@@ -426,6 +426,7 @@ export default function UnitLayout() {
         rooms: String(layout.number ?? ''),
         area: String(layout.totalArea ?? ''),
         floor: formatFloorRange(layout),
+        building: layout.entrance,
         location: layout.category?.title || '',
         project: layout.category?.title || '',
         title: getCardCode(layout),

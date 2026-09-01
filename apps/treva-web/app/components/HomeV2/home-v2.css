@@ -2294,7 +2294,8 @@
 /* Callback right below carries a fixed 40px padding-top of its own; matching
    that here keeps the gap above the heading and the gap below the cards
    actually equal instead of one being header-flush and the other 40px. */
-.hv2-s-compare {
+.hv2-s-compare,
+.hv2-s-wishlist {
     padding-top: 40px;
 }
 

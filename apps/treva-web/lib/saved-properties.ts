@@ -18,6 +18,8 @@ export type SavedProperty = {
   apartmentTypeTitle?: string;
   /** Off-plan only: the residential complex the unit belongs to. */
   project?: string;
+  /** Seçilmişlər kartındakı "Bina" sətri — müqayisə kartındakı ilə eyni. */
+  building?: string;
 };
 
 function readAll(): SavedProperty[] {
