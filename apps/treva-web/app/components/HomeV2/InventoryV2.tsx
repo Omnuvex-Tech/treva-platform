@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import CardImage from "@/app/components/CardImage";
+import UnitCardV2 from "@/app/components/UnitCardV2";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getDict } from "./dictionary";
 import { inventoryCards, type InventoryCard } from "./data";
@@ -13,7 +13,6 @@ import { getCompared, addCompared, removeCompared } from "@/lib/compare-properti
 type Props = { locale: string; items?: InventoryCard[]; resaleItems?: InventoryCard[] };
 type Deal = "off-plan" | "resale";
 
-const DEV_ICON = "/images/features-pro/icons/dreamfest-arena.svg";
 const CTA_ICON = "/images/icons/arrow-up-right.svg";
 const CARD_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 432px";
 
@@ -187,70 +186,21 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
 
       <div className="hv2-grid-3" ref={trackRef} onScroll={sync}>
         {visibleItems.map((item) => (
-          <div key={item.id} className="hv2-ucard-wrap">
-            <Link
-              href={item.href ? `/${locale}${item.href}` : `/${locale}/${deal}`}
-              className="hv2-ucard hv2-ucard--unit"
-            >
-              <div className="hv2-ucard__media">
-                <div className="hv2-ucard__plan">
-                  <CardImage
-                    src={item.image}
-                    alt={item.project}
-                    fill
-                    sizes={CARD_SIZES}
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              </div>
-
-              <div className="hv2-ucard__foot">
-                <div className="hv2-ucard__info">
-                  <p className="hv2-ucard__title">{item.price}</p>
-
-                  <p className="hv2-ucard__meta hv2-ucard__dev">
-                    <Image
-                      className="hv2-ucard__dev-icon"
-                      src={DEV_ICON}
-                      alt=""
-                      aria-hidden="true"
-                      width={24}
-                      height={24}
-                      unoptimized
-                    />
-                    {item.developer}
-                  </p>
-
-                  <p className="hv2-ucard__meta hv2-ucard__specs">
-                    <span>{item.project}</span>
-                    <span>
-                      {item.rooms} {dict.inventory.rooms}
-                    </span>
-                    <span>{item.area}</span>
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <div className="hv2-ucard__actions">
-              <button
-                type="button"
-                className={`hv2-ucard__action-btn${comparedIds.includes(item.id) ? " active" : ""}`}
-                aria-label={comparedIds.includes(item.id) ? dict.inventory.compared : dict.inventory.compare}
-                onClick={() => toggleCompare(item)}
-              >
-                <Image src="/images/icons/compare.svg" alt="" aria-hidden="true" width={20} height={20} unoptimized />
-              </button>
-              <button
-                type="button"
-                className={`hv2-ucard__action-btn${savedIds.includes(item.id) ? " active" : ""}`}
-                aria-label={savedIds.includes(item.id) ? dict.inventory.saved : dict.inventory.save}
-                onClick={() => toggleSave(item)}
-              >
-                <Image src="/images/icons/heart.svg" alt="" aria-hidden="true" width={20} height={20} unoptimized />
-              </button>
-            </div>
-          </div>
+          <UnitCardV2
+            key={item.id}
+            href={item.href ? `/${locale}${item.href}` : `/${locale}/${deal}`}
+            image={item.image}
+            alt={item.project}
+            price={item.price}
+            developer={item.developer}
+            specs={[item.project, item.rooms ? `${item.rooms} ${dict.inventory.rooms}` : "", item.area]}
+            saved={savedIds.includes(item.id)}
+            compared={comparedIds.includes(item.id)}
+            onSave={() => toggleSave(item)}
+            onCompare={() => toggleCompare(item)}
+            labels={dict.inventory}
+            sizes={CARD_SIZES}
+          />
         ))}
       </div>
 

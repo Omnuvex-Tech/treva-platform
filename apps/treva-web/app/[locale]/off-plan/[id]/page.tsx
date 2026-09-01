@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import CardImage from '@/app/components/CardImage';
+import UnitCardV2 from '@/app/components/UnitCardV2';
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
@@ -1134,49 +1134,30 @@ export default function ApartmentCard() {
                 ) : (
                   <>
                     <div className="similar-grid">
-                      {visibleSimilarLayouts.map((item) => (
-                        <Link key={item.id} href={`/${locale}/off-plan/${item.slug}`} className="layout-card">
-                          <div className="layout-card__header">
-                            <div className="layout-card__title-block">
-                              <span className="layout-card__code">{item.title || item.name}</span>
-                              <span className="layout-card__floor">{formatFloorRange(item)} {t.floorSuffix}</span>
-                            </div>
-                            <div className="layout-card__number-block">
-                              <span className="layout-card__number">{formatRooms(item.number)}</span>
-                              <span className="layout-card__status">{formatStatus(item.statusOption?.value || "")}</span>
-                            </div>
-                          </div>
-
-                          <div className="layout-card__visual">
-                            {item.coverImage || item.mainImage ? (
-                              <CardImage
-                                src={getAssetUrl((item.coverImage || item.mainImage)!.url)}
-                                alt={(item.coverImage || item.mainImage)!.alt || item.title}
-                                className="layout-card__blueprint"
-                                fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 360px"
-                              />
-                            ) : (
-                              <div className="layout-card__blueprint layout-card__blueprint--placeholder">
-                                <span>{t.noImage}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="layout-card__footer">
-                            <div className="layout-card__meta">
-                              {item.unitTypeOption?.title ? <span>{item.unitTypeOption.title}</span> : null}
-                              {item.unitTypeOption?.title ? <span className="layout-card__meta-sep">•</span> : null}
-                              <span>{item.totalArea} m²</span>
-                            </div>
-                            {typeof item.prices?.[currency] === "number" && item.prices[currency] > 0 && (
-                              <span className="layout-card__price">
-                                {currency} {formatNumber(item.prices[currency])}
-                              </span>
-                            )}
-                          </div>
-                        </Link>
-                      ))}
+                      {visibleSimilarLayouts.map((item) => {
+                        const cover = item.coverImage || item.mainImage;
+                        const price = item.prices?.[currency];
+                        return (
+                          <UnitCardV2
+                            key={item.id}
+                            href={`/${locale}/off-plan/${item.slug}`}
+                            image={cover ? getAssetUrl(cover.url) : undefined}
+                            alt={cover?.alt || item.title}
+                            price={
+                              typeof price === "number" && price > 0
+                                ? `${currency} ${formatNumber(price)}`
+                                : "—"
+                            }
+                            developer={item.title || item.name}
+                            specs={[
+                              item.unitTypeOption?.title,
+                              formatRooms(item.number),
+                              `${item.totalArea} m²`,
+                              `${formatFloorRange(item)} ${t.floorSuffix}`,
+                            ]}
+                          />
+                        );
+                      })}
                     </div>
 
                     {similarTotalPages > 1 && (

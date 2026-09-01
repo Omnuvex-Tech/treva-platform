@@ -1627,6 +1627,13 @@
     position: relative;
 }
 
+/* The shared card (UnitCardV2) carries `.hv2-root` on this wrapper so the
+   `--hv2-*` tokens resolve on the V1 listing pages too. The card paints its
+   own surface, so the wrapper must not also paint the root's. */
+.hv2-ucard-wrap.hv2-root {
+    background: transparent;
+}
+
 .hv2-ucard__actions {
     position: absolute;
     top: 12px;

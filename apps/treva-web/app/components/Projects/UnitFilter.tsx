@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import CardImage from '@/app/components/CardImage';
+import UnitCardV2 from '@/app/components/UnitCardV2';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useStatusOptions } from '@/hooks/use-status-options';
@@ -840,72 +840,35 @@ export default function UnitLayout() {
                 </div>
               )}
               <div className={`cards-grid${!showSpinner ? ' cards-grid--fadein' : ''}`} style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
-                {layouts.map((layout: UnitLayout) => (
-                  <div key={layout.id} className="layout-card-wrapper">
-                    <div className="layout-card">
-                      <div className="layout-card__header">
-                        <div className="layout-card__title-block">
-                          <span className="layout-card__code">{getCardCode(layout)}</span>
-                          <span className="layout-card__floor">{formatFloorRange(layout)}</span>
-                        </div>
-                        <div className="layout-card__number-block">
-                          <span className="layout-card__number">{formatRooms(layout.number)}</span>
-                          <span className="layout-card__status">{formatStatus(layout.statusOption?.value || '')}</span>
-                        </div>
-                      </div>
-
-                      <div className="layout-card__visual">
-                        <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__visual-link" aria-label={t.viewApartmentDetails}>
-                          {layout.coverImage || layout.mainImage ? (
-                            /* Profitbase stores the full-size render (~1.5MB each),
-                               so twelve of them per page went over the wire raw.
-                               `sizes` is what tells the optimizer which width to cut. */
-                            <CardImage
-                              src={getAssetUrl((layout.coverImage || layout.mainImage)!.url)}
-                              alt={(layout.coverImage || layout.mainImage)!.alt || layout.title}
-                              className="layout-card__blueprint"
-                              fill
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-                            />
-                          ) : (
-                            <div className="layout-card__blueprint layout-card__blueprint--placeholder">
-                              <span>{t.noImage}</span>
-                            </div>
-                          )}
-                        </Link>
-
-                        <div className="layout-card__actions">
-                          <button
-                            type="button"
-                            className={`layout-card__action-btn ${comparedItems.includes(layout.id) ? 'active' : ''}`}
-                            onClick={() => toggleCompare(layout)}
-                            aria-label={comparedItems.includes(layout.id) ? t.removeFromCompare : t.compareListing}
-                          >
-                            <img src="/images/icons/compare.svg" alt="" width={16} height={16} />
-                          </button>
-                          <button
-                            type="button"
-                            className={`layout-card__action-btn ${savedItems.includes(layout.id) ? 'active' : ''}`}
-                            onClick={() => toggleSave(layout)}
-                            aria-label={savedItems.includes(layout.id) ? t.removeFromSaved : t.saveListing}
-                          >
-                            <img src="/images/icons/heart.svg" alt="" width={16} height={16} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="layout-card__footer">
-                        <div className="layout-card__meta">
-                          {layout.unitTypeOption?.title ? <span>{layout.unitTypeOption.title}</span> : null}
-                          {layout.unitTypeOption?.title ? <span className="layout-card__meta-sep">•</span> : null}
-                          <span>{layout.totalArea} m²</span>
-                        </div>
-                        <span className="layout-card__price">{formatPrice(layout.prices, currency)}</span>
-                      </div>
-                    </div>
-                    <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__cta">{t.viewApartmentDetails}</Link>
-                  </div>
-                ))}
+                {layouts.map((layout: UnitLayout) => {
+                  const cover = layout.coverImage || layout.mainImage;
+                  return (
+                    <UnitCardV2
+                      key={layout.id}
+                      href={`/${locale}/off-plan/${layout.slug}`}
+                      image={cover ? getAssetUrl(cover.url) : undefined}
+                      alt={cover?.alt || layout.title}
+                      price={formatPrice(layout.prices, currency)}
+                      developer={getCardCode(layout)}
+                      specs={[
+                        layout.unitTypeOption?.title,
+                        formatRooms(layout.number),
+                        `${layout.totalArea} m²`,
+                        formatFloorRange(layout),
+                      ]}
+                      saved={savedItems.includes(layout.id)}
+                      compared={comparedItems.includes(layout.id)}
+                      onSave={() => toggleSave(layout)}
+                      onCompare={() => toggleCompare(layout)}
+                      labels={{
+                        save: t.saveListing,
+                        saved: t.removeFromSaved,
+                        compare: t.compareListing,
+                        compared: t.removeFromCompare,
+                      }}
+                    />
+                  );
+                })}
               </div>
             </div>
           )}

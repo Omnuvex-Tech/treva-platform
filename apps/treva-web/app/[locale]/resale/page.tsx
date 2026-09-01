@@ -2,7 +2,7 @@
 
 import React, { Suspense, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import CardImage from '@/app/components/CardImage';
+import UnitCardV2 from '@/app/components/UnitCardV2';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
@@ -248,70 +248,32 @@ export default function ResalePage() {
                     </div>
                   )}
                   <main className={`re-grid${!showSpinner ? ' re-grid--fadein' : ''}`} style={{ opacity: showSpinner ? 0.5 : 1, transition: 'opacity 0.2s', minHeight: '300px' }}>
-                    {apartments.map((apt) => {
-                      return (
-                    <div key={apt.id} className="re-card-wrapper">
-                      <article className="re-card">
-                        <Link href={`/${locale}/resale/${apt.slug}`} className="re-card-media-link" aria-label={t.details}>
-                          <div className="re-card-media">
-                            {/* next/image so the card gets a card-sized WebP of the
-                                CMS original, lazily. No photo means no photo. */}
-                            {getAssetUrl(apt.image) ? (
-                              <CardImage
-                                src={getAssetUrl(apt.image)}
-                                alt={apt.locationTitle || apt.title}
-                                className="re-card-img"
-                                fill
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-                              />
-                            ) : null}
-                          </div>
-                        </Link>
-
-                        <div className="re-card-body">
-                          <div className="re-card-meta-row">
-                            <span className="re-badge">{getLocalizedApartmentTypeLabel(apt.apartmentType, locale)}</span>
-                            <div className="re-card-actions">
-                              <button
-                                type="button"
-                                className={`re-compare-btn ${comparedItems.includes(apt.id) ? 'active' : ''}`}
-                                onClick={() => toggleCompare(apt)}
-                                aria-label={comparedItems.includes(apt.id) ? t.removeFromCompare : t.compareListing}
-                              >
-                                <img src="/images/icons/compare.svg" alt="" width={16} height={16} />
-                              </button>
-                              <button
-                                type="button"
-                                className={`re-bookmark-btn ${savedItems.includes(apt.id) ? 'active' : ''}`}
-                                onClick={() => toggleSave(apt)}
-                                aria-label={t.saveListing}
-                              >
-                                <img src="/images/icons/heart.svg" alt="" width={16} height={16} />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="re-price-block">
-                            <h2 className="re-main-price">{formatPrice(getAptPrice(apt, 'total'))} {getAptCurrencyValue(apt)}</h2>
-                            <div className="re-sqm-price">{formatPrice(getAptPrice(apt, 'byArea'))} {getAptCurrencyValue(apt)}/m²</div>
-                          </div>
-
-                          <div className="re-tags-row">
-                            <span className="re-tag">{apt.roomCount}-{t.room}</span>
-                            <span className="re-tag">{apt.area} m²</span>
-                            <span className="re-tag">{formatFloorLabel(apt.floorFrom, apt.floorTo)} {t.floor}</span>
-                          </div>
-
-                          <p className="re-address">{apt.locationTitle || '—'}</p>
-                        </div>
-                      </article>
-
-                      <Link href={`/${locale}/resale/${apt.slug}`} className="re-action-btn">
-                        {t.details}
-                      </Link>
-                    </div>
-                      );
-                    })}
+                    {apartments.map((apt) => (
+                      <UnitCardV2
+                        key={apt.id}
+                        href={`/${locale}/resale/${apt.slug}`}
+                        image={getAssetUrl(apt.image) || undefined}
+                        alt={apt.locationTitle || apt.title}
+                        price={`${formatPrice(getAptPrice(apt, 'total'))} ${getAptCurrencyValue(apt)}`}
+                        developer={apt.locationTitle || undefined}
+                        specs={[
+                          getLocalizedApartmentTypeLabel(apt.apartmentType, locale),
+                          `${apt.roomCount}-${t.room}`,
+                          `${apt.area} m²`,
+                          `${formatFloorLabel(apt.floorFrom, apt.floorTo)} ${t.floor}`,
+                        ]}
+                        saved={savedItems.includes(apt.id)}
+                        compared={comparedItems.includes(apt.id)}
+                        onSave={() => toggleSave(apt)}
+                        onCompare={() => toggleCompare(apt)}
+                        labels={{
+                          save: t.saveListing,
+                          saved: t.saveListing,
+                          compare: t.compareListing,
+                          compared: t.removeFromCompare,
+                        }}
+                      />
+                    ))}
                   </main>
                 </div>
               )}

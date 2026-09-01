@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import CardImage from "@/app/components/CardImage";
+import UnitCardV2 from "@/app/components/UnitCardV2";
 import PageContainer from "@/app/components/Container/PageContainer";
 import { getSaved, addSaved, removeSaved } from "@/lib/saved-properties";
 import { getCompared, addCompared, removeCompared } from "@/lib/compare-properties";
@@ -128,62 +128,25 @@ export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllH
 
         <div className="layouts-grid">
           {layouts.map((layout, idx) => (
-            <div key={idx} className="layout-card-wrap">
-              <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card layout-card--link">
-                <div className="layout-card__header">
-                  <div className="layout-card__title-block">
-                    <span className="layout-card__code">{layout.code}</span>
-                    <span className="layout-card__meta-row">
-                      <span className="layout-card__floor">{layout.floor}</span>
-                      <span className="layout-card__meta-sep">•</span>
-                      <span className="layout-card__number">{layout.number}</span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="layout-card__visual">
-                  {layout.image ? (
-                    <CardImage
-                      src={layout.image}
-                      alt={layout.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 360px"
-                      style={{ objectFit: "contain" }}
-                    />
-                  ) : layout.svgBlueprint ? (
-                    layout.svgBlueprint
-                  ) : null}
-                </div>
-
-                <div className="layout-card__footer">
-                  <div className="layout-card__meta">
-                    {layout.unitType ? <span>{layout.unitType}</span> : null}
-                    {layout.unitType ? <span className="layout-card__meta-sep">•</span> : null}
-                    {typeof layout.area === "number" ? <span>{layout.area} m²</span> : null}
-                  </div>
-                  <span className="layout-card__price">{layout.price}</span>
-                </div>
-              </Link>
-
-              <div className="layout-card__actions">
-                <button
-                  type="button"
-                  className={`layout-card__action-btn${comparedIds.includes(layout.slug) ? " active" : ""}`}
-                  aria-label={comparedIds.includes(layout.slug) ? t.compared : t.compare}
-                  onClick={() => toggleCompare(layout)}
-                >
-                  <img src="/images/icons/compare.svg" alt="" width={20} height={20} />
-                </button>
-                <button
-                  type="button"
-                  className={`layout-card__action-btn${savedIds.includes(layout.slug) ? " active" : ""}`}
-                  aria-label={savedIds.includes(layout.slug) ? t.saved : t.save}
-                  onClick={() => toggleSave(layout)}
-                >
-                  <img src="/images/icons/heart.svg" alt="" width={20} height={20} />
-                </button>
-              </div>
-            </div>
+            <UnitCardV2
+              key={idx}
+              href={`/${locale}/off-plan/${layout.slug}`}
+              image={layout.image}
+              alt={layout.title}
+              price={layout.price}
+              developer={layout.code}
+              specs={[
+                layout.unitType,
+                layout.number,
+                typeof layout.area === "number" ? `${layout.area} m²` : "",
+                layout.floor,
+              ]}
+              saved={savedIds.includes(layout.slug)}
+              compared={comparedIds.includes(layout.slug)}
+              onSave={() => toggleSave(layout)}
+              onCompare={() => toggleCompare(layout)}
+              labels={{ save: t.save, saved: t.saved, compare: t.compare, compared: t.compared }}
+            />
           ))}
         </div>
       </PageContainer>

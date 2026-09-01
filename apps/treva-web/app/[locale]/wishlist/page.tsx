@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import CardImage from '@/app/components/CardImage';
+import UnitCardV2 from '@/app/components/UnitCardV2';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
@@ -176,66 +176,30 @@ export default function SavedPage() {
         ) || (item.rooms ? `${item.rooms} ${content.room}` : ''));
 
     return (
-      <div key={item.id} className="re-card-wrapper">
-        <article className="re-card">
-          <Link href={detailHref} className="re-card-media-link" aria-label={content.viewDetails}>
-            <div className="re-card-media">
-              {/* Same card as the resale grid: optimized, lazy, and blank when
-                  the saved item has no photo of its own. */}
-              {getAssetUrl(item.image) ? (
-                <CardImage
-                  src={getAssetUrl(item.image)}
-                  alt={item.location || item.title}
-                  className="re-card-img"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-                />
-              ) : null}
-            </div>
-          </Link>
-
-          <div className="re-card-body">
-            <div className="re-card-meta-row">
-              <span className="re-badge">{badge}</span>
-              <div className="re-card-actions">
-                <button
-                  type="button"
-                  className={`re-compare-btn ${comparedIds.includes(item.id) ? 'active' : ''}`}
-                  onClick={() => toggleCompare(item)}
-                  aria-label={comparedIds.includes(item.id) ? content.removeFromCompare : content.compareListing}
-                >
-                  <img src="/images/icons/compare.svg" alt="" width={16} height={16} />
-                </button>
-                <button
-                  type="button"
-                  className="re-bookmark-btn active"
-                  onClick={() => handleRemove(item.id)}
-                  aria-label={content.removeLabel}
-                >
-                  <img src="/images/icons/heart.svg" alt="" width={16} height={16} />
-                </button>
-              </div>
-            </div>
-
-            <div className="re-price-block">
-              <h2 className="re-main-price">{formatPrice(item.price)} {item.currency}</h2>
-              <div className="re-sqm-price">{formatPrice(getPriceByArea(item))} {item.currency}/m²</div>
-            </div>
-
-            <div className="re-tags-row">
-              {item.rooms && <span className="re-tag">{item.rooms}-{content.room}</span>}
-              {item.area && <span className="re-tag">{item.area} m²</span>}
-              {item.floor && <span className="re-tag">{item.floor} {content.floor}</span>}
-            </div>
-
-            <p className="re-address">{item.location || item.project || '—'}</p>
-          </div>
-        </article>
-
-        <Link href={detailHref} className="re-action-btn">
-          {content.viewDetails}
-        </Link>
-      </div>
+      <UnitCardV2
+        key={item.id}
+        href={detailHref}
+        image={getAssetUrl(item.image) || undefined}
+        alt={item.location || item.title}
+        price={`${formatPrice(item.price)} ${item.currency}`}
+        developer={item.location || item.project || undefined}
+        specs={[
+          badge,
+          item.rooms ? `${item.rooms}-${content.room}` : '',
+          item.area ? `${item.area} m²` : '',
+          item.floor ? `${item.floor} ${content.floor}` : '',
+        ]}
+        saved
+        compared={comparedIds.includes(item.id)}
+        onSave={() => handleRemove(item.id)}
+        onCompare={() => toggleCompare(item)}
+        labels={{
+          save: content.removeLabel,
+          saved: content.removeLabel,
+          compare: content.compareListing,
+          compared: content.removeFromCompare,
+        }}
+      />
     );
   };
 

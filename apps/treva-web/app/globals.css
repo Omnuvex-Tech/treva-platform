@@ -207,35 +207,3 @@ body:has(.hv2-nav__mobile) #treva-webchat-root {
     transform: translateY(-100%) !important;
 }
 
-.layout-card__visual {
-    overflow: hidden;
-}
-
-.layout-card__blueprint,
-.layout-card__visual > img {
-    will-change: transform;
-    transform: translateZ(0);
-    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.layout-card:hover .layout-card__blueprint,
-.layout-card:hover .layout-card__visual > img,
-.layout-card-wrapper:hover .layout-card__blueprint,
-.layout-card-wrapper:hover .layout-card__visual > img {
-    transform: scale(1.05);
-}
-
-.layout-card__meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    line-height: 1.2;
-    font-weight: 500;
-    color: #3f4249;
-}
-
-.layout-card__meta-sep {
-    opacity: 0.65;
-}
-
