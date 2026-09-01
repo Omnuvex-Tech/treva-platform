@@ -249,6 +249,8 @@
 
 /* Blueprint Container */
 .layout-card__visual {
+    /* Containing block for the card image, which fills it. */
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;

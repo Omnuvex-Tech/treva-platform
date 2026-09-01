@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import CardImage from '@/app/components/CardImage';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
 import { useStatusOptions } from '@/hooks/use-status-options';
@@ -856,10 +857,15 @@ export default function UnitLayout() {
                       <div className="layout-card__visual">
                         <Link href={`/${locale}/off-plan/${layout.slug}`} className="layout-card__visual-link" aria-label={t.viewApartmentDetails}>
                           {layout.coverImage || layout.mainImage ? (
-                            <img
+                            /* Profitbase stores the full-size render (~1.5MB each),
+                               so twelve of them per page went over the wire raw.
+                               `sizes` is what tells the optimizer which width to cut. */
+                            <CardImage
                               src={getAssetUrl((layout.coverImage || layout.mainImage)!.url)}
                               alt={(layout.coverImage || layout.mainImage)!.alt || layout.title}
                               className="layout-card__blueprint"
+                              fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
                             />
                           ) : (
                             <div className="layout-card__blueprint layout-card__blueprint--placeholder">

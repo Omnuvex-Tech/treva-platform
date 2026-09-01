@@ -126,6 +126,8 @@
 }
 
 .similar-grid .layout-card__visual {
+  /* Containing block for the card image, which fills it (see the page). */
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import CardImage from "@/app/components/CardImage";
 import PageContainer from "@/app/components/Container/PageContainer";
 import { getSaved, addSaved, removeSaved } from "@/lib/saved-properties";
 import { getCompared, addCompared, removeCompared } from "@/lib/compare-properties";
@@ -142,10 +143,12 @@ export default function ProjectLayouts({ layouts, categorySlug, locale, viewAllH
 
                 <div className="layout-card__visual">
                   {layout.image ? (
-                    <img
+                    <CardImage
                       src={layout.image}
                       alt={layout.title}
-                      style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 360px"
+                      style={{ objectFit: "contain" }}
                     />
                   ) : layout.svgBlueprint ? (
                     layout.svgBlueprint

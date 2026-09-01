@@ -22,7 +22,6 @@ const nextConfig = {
         dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
         remotePatterns: [
             { protocol: "http", hostname: "localhost" },
-            { protocol: "https", hostname: "images.unsplash.com" },
             { protocol: "https", hostname: "cdn.prod.website-files.com" },
             {
                 protocol: cmsOrigin.protocol.replace(":", ""),

@@ -2,6 +2,7 @@
 
 import React, { Suspense, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import CardImage from '@/app/components/CardImage';
 import { useParams } from 'next/navigation';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
@@ -12,6 +13,7 @@ import { useResaleApartments } from '@/hooks/use-resale-apartments';
 import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
 import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import type { ResaleApartment } from '@/lib/resale.types';
+import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import './resale-listing.css';
 
 function getLocalizedApartmentTypeLabel(
@@ -252,11 +254,17 @@ export default function ResalePage() {
                       <article className="re-card">
                         <Link href={`/${locale}/resale/${apt.slug}`} className="re-card-media-link" aria-label={t.details}>
                           <div className="re-card-media">
-                            <img
-                              src={apt.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
-                              alt={apt.locationTitle || apt.title}
-                              className="re-card-img"
-                            />
+                            {/* next/image so the card gets a card-sized WebP of the
+                                CMS original, lazily. No photo means no photo. */}
+                            {getAssetUrl(apt.image) ? (
+                              <CardImage
+                                src={getAssetUrl(apt.image)}
+                                alt={apt.locationTitle || apt.title}
+                                className="re-card-img"
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+                              />
+                            ) : null}
                           </div>
                         </Link>
 

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import CardImage from "@/app/components/CardImage";
 import { MapPin } from "lucide-react";
 import type { ProjectCard } from "./data";
 
@@ -198,7 +199,7 @@ export default function ProjectCardV2({ item, locale, startingFromLabel, soldOut
 
       {hasCover ? (
         <div className="hv2-pcard__media">
-          <Image
+          <CardImage
             src={item.image}
             alt={item.title}
             fill

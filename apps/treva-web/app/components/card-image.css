@@ -1,0 +1,50 @@
+/* Loading spinner for card and hero media — a tapered arc masked out of a conic
+   sweep, centred in whatever frame it is dropped into. The frame supplies its
+   own background; this only ever paints the ring, and fades off the moment the
+   image or clip has something to show. */
+.tv-spin {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.tv-spin--done {
+    opacity: 0;
+}
+
+.tv-spin::before {
+    content: "";
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.45) 100%);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    animation: tv-spin 0.9s linear infinite;
+}
+
+/* Small frames (card thumbnails) can't carry the full ring. */
+@media (max-width: 480px) {
+    .tv-spin::before {
+        width: 34px;
+        height: 34px;
+    }
+}
+
+@keyframes tv-spin {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+/* Slowed rather than stopped: a still arc reads as stuck, and it is the only
+   thing on screen while the file downloads. */
+@media (prefers-reduced-motion: reduce) {
+    .tv-spin::before {
+        animation-duration: 2.4s;
+    }
+}

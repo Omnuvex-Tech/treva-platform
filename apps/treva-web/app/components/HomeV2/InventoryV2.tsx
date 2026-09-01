@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import CardImage from "@/app/components/CardImage";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getDict } from "./dictionary";
 import { inventoryCards, type InventoryCard } from "./data";
@@ -193,7 +194,7 @@ export default function InventoryV2({ locale, items = inventoryCards, resaleItem
             >
               <div className="hv2-ucard__media">
                 <div className="hv2-ucard__plan">
-                  <Image
+                  <CardImage
                     src={item.image}
                     alt={item.project}
                     fill

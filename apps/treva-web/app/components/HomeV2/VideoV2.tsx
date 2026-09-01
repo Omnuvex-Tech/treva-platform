@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import "../card-image.css";
 
 type Props = { src: string; className?: string };
 
@@ -10,8 +11,8 @@ type Props = { src: string; className?: string };
  * Neither hero carries a poster any more — the stills on file are different
  * scenes from the footage, so the page read as loading a photo and then
  * swapping it out. Without one the <video> box is simply empty while the file
- * downloads, which is what this fills: the spinner sits on the container's own
- * muted fill and fades off the moment there is a frame to show.
+ * downloads, which is what this fills: the shared `.tv-spin` ring sits on the
+ * container's own muted fill and fades off the moment there is a frame.
  */
 export default function VideoV2({ src, className }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -51,7 +52,7 @@ export default function VideoV2({ src, className }: Props) {
       </video>
 
       {gone ? null : (
-        <span className={`hv2-vspin${ready ? " hv2-vspin--done" : ""}`} aria-hidden="true" />
+        <span className={`tv-spin${ready ? " tv-spin--done" : ""}`} aria-hidden="true" />
       )}
     </>
   );

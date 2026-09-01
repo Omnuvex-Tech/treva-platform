@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import CardImage from "@/app/components/CardImage";
 import { getDict } from "./dictionary";
 import type { NewsCard } from "./data";
 
@@ -40,7 +41,7 @@ export default function PulseV2({ locale, items }: Props) {
             className="hv2-ucard hv2-ucard--news"
           >
             <div className="hv2-ucard__media">
-              <Image
+              <CardImage
                 src={item.image || COVER_FALLBACK}
                 alt={item.title}
                 fill

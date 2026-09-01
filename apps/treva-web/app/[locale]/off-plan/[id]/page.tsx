@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import CardImage from '@/app/components/CardImage';
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
@@ -1148,10 +1149,12 @@ export default function ApartmentCard() {
 
                           <div className="layout-card__visual">
                             {item.coverImage || item.mainImage ? (
-                              <img
+                              <CardImage
                                 src={getAssetUrl((item.coverImage || item.mainImage)!.url)}
                                 alt={(item.coverImage || item.mainImage)!.alt || item.title}
                                 className="layout-card__blueprint"
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 360px"
                               />
                             ) : (
                               <div className="layout-card__blueprint layout-card__blueprint--placeholder">

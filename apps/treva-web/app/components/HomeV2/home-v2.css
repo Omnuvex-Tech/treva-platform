@@ -831,48 +831,6 @@
     overflow: hidden;
 }
 
-/* Shown over either hero's video frame until the clip has one to paint (see
-   VideoV2). It covers the whole box rather than floating a ring over an empty
-   one, so what loads is a filled surface that resolves into footage — the
-   `--hv2-muted` fill is the same one both containers already carry
-   underneath. */
-.hv2-vspin {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    background: var(--hv2-muted);
-    pointer-events: none;
-    transition: opacity 0.35s ease;
-}
-
-.hv2-vspin--done {
-    opacity: 0;
-}
-
-/* A tapered arc rather than a plain border ring: the conic sweep fades from
-   nothing to full ink around the circle, and the radial mask cuts the disc
-   back to a 3px stroke. `currentColor` would inherit the section's own ink,
-   which is near-black on both — the arc is deliberately lighter than that so
-   it reads as chrome, not as content. */
-.hv2-vspin::before {
-    content: "";
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.45) 100%);
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
-    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
-    animation: hv2-vspin 0.9s linear infinite;
-}
-
-@keyframes hv2-vspin {
-    to {
-        transform: rotate(1turn);
-    }
-}
-
 .hv2-heroimg__media img,
 .hv2-heroimg__media video {
     position: absolute;
@@ -1131,12 +1089,6 @@
 
     .hv2-nav__mobile {
         animation: none;
-    }
-
-    /* Slowed rather than stopped: a still arc says "stuck", and this is the
-       only thing on screen while the clip downloads. */
-    .hv2-vspin::before {
-        animation-duration: 2.4s;
     }
 }
 

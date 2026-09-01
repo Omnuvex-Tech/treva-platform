@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import CardImage from '@/app/components/CardImage';
 import Navbar from '@/app/components/Home/TrevaHero/navbar';
 import { HomeFooter } from '@/app/components/Home/HomeFooter';
 import CallbackForm from '@/app/components/Home/Callback/CallbackForm';
 import PageContainer from '@/app/components/Container/PageContainer';
 import { getSaved, removeSaved, type SavedProperty } from '@/lib/saved-properties';
+import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import '../resale/resale-listing.css';
 import './wishlist.css';
@@ -178,11 +180,17 @@ export default function SavedPage() {
         <article className="re-card">
           <Link href={detailHref} className="re-card-media-link" aria-label={content.viewDetails}>
             <div className="re-card-media">
-              <img
-                src={item.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'}
-                alt={item.location || item.title}
-                className="re-card-img"
-              />
+              {/* Same card as the resale grid: optimized, lazy, and blank when
+                  the saved item has no photo of its own. */}
+              {getAssetUrl(item.image) ? (
+                <CardImage
+                  src={getAssetUrl(item.image)}
+                  alt={item.location || item.title}
+                  className="re-card-img"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+                />
+              ) : null}
             </div>
           </Link>
 
