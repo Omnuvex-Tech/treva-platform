@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useProjectDetail } from "@/hooks/use-project-detail";
+import { useCategoryLocation } from "@/hooks/use-category-location";
 import { getAssetUrl } from "@/lib/asset-url";
 import Navbar from "@/app/components/Home/TrevaHero/navbar";
 import { HomeFooter } from "@/app/components/Home/HomeFooter";
@@ -23,6 +24,12 @@ export default function ProjectDetailPage() {
   ] ?? 'Yüklənir...';
 
   const { data: detail, isLoading, error } = useProjectDetail(slug);
+
+  // Xəritə inventory admin-də obyektin "Location" tabında saxlanır — CMS
+  // blokundan asılı olmadan burada göstərilir.
+  const { data: categoryLocation } = useCategoryLocation([detail?.categorySlug, slug]);
+  const adminMapUrl =
+    categoryLocation?.locationGoogleMapsUrl || categoryLocation?.locationUrl || "";
 
   const getImageUrl = (url: string) => {
     if (!url) return "";
@@ -123,6 +130,7 @@ export default function ProjectDetailPage() {
         locale={locale}
         getImageUrl={getImageUrl}
         onCtaClick={scrollToCallbackCTA}
+        adminMapUrl={adminMapUrl}
       />
 
       <CallbackForm allowedRoles={['Client']} />

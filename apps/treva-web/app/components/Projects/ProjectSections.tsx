@@ -64,6 +64,11 @@ interface Props {
   locale: string;
   getImageUrl: (url: string) => string;
   onCtaClick?: () => void;
+  /**
+   * Inventory admin-in "Location" tabında əlavə etdiyi xəritə linki.
+   * CMS blokundakı linkdən üstündür — obyektin mənbəyi admin sayılır.
+   */
+  adminMapUrl?: string;
 }
 
 export default function ProjectSections({
@@ -73,13 +78,33 @@ export default function ProjectSections({
   locale,
   getImageUrl,
   onCtaClick,
+  adminMapUrl,
 }: Props) {
   const d = sectionTitleDefaults[locale as keyof typeof sectionTitleDefaults] ?? sectionTitleDefaults.az;
 
-  const visible = React.useMemo(
-    () => (sections || []).filter((section) => section?.isVisible !== false),
-    [sections],
-  );
+  const visible = React.useMemo(() => {
+    const list = (sections || []).filter((section) => section?.isVisible !== false);
+
+    // Admin-də xəritə var, amma CMS-də location bloku ümumiyyətlə yoxdursa —
+    // bloku özümüz əlavə edirik ki, xəritə səhifədə itməsin. Başlıqlar defolt
+    // dəyərlərdən gəlir.
+    if (adminMapUrl && !list.some((section) => section.type === "location")) {
+      const mapOnlyLocation: LocationSection = {
+        type: "location",
+        titleLight: {},
+        titleBold: {},
+        brandName: {},
+        mainLead: {},
+        subText: {},
+        mapImage: "",
+        footerAddress: {},
+        googleMapsUrl: adminMapUrl,
+      };
+      list.push(mapOnlyLocation);
+    }
+
+    return list;
+  }, [sections, adminMapUrl]);
 
   // Səhifənin ümumi qalereyası. Sıra CMS bloklarının sırasıdır: hero kadrları,
   // sonra ümumi baxış şəkilləri, sonra interyer bölmələrinin şəkilləri.
@@ -219,7 +244,7 @@ export default function ProjectSections({
                 subText={loc(s.subText, locale)}
                 mapImage={s.mapImage || ""}
                 footerAddress={loc(s.footerAddress, locale)}
-                googleMapsUrl={s.googleMapsUrl}
+                googleMapsUrl={adminMapUrl || s.googleMapsUrl}
                 getImageUrl={getImageUrl}
                 locale={locale}
               />
