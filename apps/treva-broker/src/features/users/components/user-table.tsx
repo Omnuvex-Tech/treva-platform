@@ -1,6 +1,7 @@
 "use client";
 
-import { Pencil, Trash2 } from "lucide-react";
+import { Delete02Icon, PencilEdit02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,8 +30,10 @@ export interface UserTableProps {
 }
 
 /**
- * Seven columns, matching the artboard: six equal-width content columns plus a
- * narrow trailing actions column (167px x 6 + 69px in a 1072px table).
+ * The User tab (873:48476): six equal-width content columns plus the narrow
+ * trailing actions column (167px x 6 + 69px in a 1072px table). Column names
+ * follow the vocabulary the Agencies tab spells out — Contacts, Organization,
+ * E-Mail — so the two tables read as one screen.
  */
 export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
     const { t } = useI18n();
@@ -44,12 +47,12 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
             <TableHead>
                 <TableRow>
                     <TableHeaderCell>{t.users.columns.name}</TableHeaderCell>
+                    <TableHeaderCell>{t.users.columns.contacts}</TableHeaderCell>
+                    <TableHeaderCell>{t.users.columns.organization}</TableHeaderCell>
                     <TableHeaderCell>{t.users.columns.email}</TableHeaderCell>
-                    <TableHeaderCell>{t.users.columns.phone}</TableHeaderCell>
                     <TableHeaderCell>{t.users.columns.role}</TableHeaderCell>
-                    <TableHeaderCell>{t.users.columns.team}</TableHeaderCell>
                     <TableHeaderCell>{t.users.columns.status}</TableHeaderCell>
-                    <TableHeaderCell className="w-[69px] text-right">
+                    <TableHeaderCell className="relative w-[69px] text-right">
                         <span className="sr-only">{t.users.columns.actions}</span>
                     </TableHeaderCell>
                 </TableRow>
@@ -62,12 +65,12 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                             {user.firstName} {user.lastName}
                             <span className="block text-xs text-content-tertiary">{user.jobTitle}</span>
                         </TableCell>
-                        <TableCell className="text-content-secondary">{user.email}</TableCell>
                         <TableCell className="whitespace-nowrap text-content-secondary">
                             {user.phone}
                         </TableCell>
+                        <TableCell className="text-content-secondary">{user.organization}</TableCell>
+                        <TableCell className="text-content-secondary">{user.email}</TableCell>
                         <TableCell>{t.roles[user.role]}</TableCell>
-                        <TableCell className="text-content-secondary">{user.team}</TableCell>
                         <TableCell>
                             <Badge tone={STATUS_TONE[user.status]}>{t.users.status[user.status]}</Badge>
                         </TableCell>
@@ -80,7 +83,7 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                                         aria-label={`${t.common.edit}: ${user.email}`}
                                         onClick={() => onEdit(user)}
                                     >
-                                        <Pencil />
+                                        <HugeiconsIcon icon={PencilEdit02Icon} size={16} strokeWidth={1.6} />
                                     </Button>
                                 ) : null}
 
@@ -92,7 +95,7 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                                         onClick={() => onDelete(user)}
                                         className="text-content-tertiary hover:text-content-negative"
                                     >
-                                        <Trash2 />
+                                        <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
                                     </Button>
                                 ) : null}
                             </div>

@@ -2,7 +2,7 @@ import { delay, paginate, searchBy } from "@/lib/api/mock";
 import { ApiError } from "@/lib/api/errors";
 import type { Paginated } from "@/lib/api/types";
 import { MOCK_NEWS, MOCK_NEWS_STATS } from "@/mocks/news";
-import type { NewsInput, NewsListQuery, NewsPost, NewsStats } from "../types";
+import { EMPTY_VISIBILITY, type NewsInput, type NewsListQuery, type NewsPost, type NewsStats } from "../types";
 
 /**
  * In-memory store. Mutations are applied to this array so create/edit/delete
@@ -62,6 +62,11 @@ export async function create(input: NewsInput): Promise<NewsPost> {
         publishedAt: new Date().toISOString(),
         pinned: input.pinned ?? false,
         authorName: "You",
+        status: input.status ?? "draft",
+        attachments: input.attachments ?? [],
+        visibility: input.visibility ?? EMPTY_VISIBILITY,
+        publishAt: input.publishAt ?? "",
+        expiresAt: input.expiresAt ?? "",
     };
 
     posts = [post, ...posts];

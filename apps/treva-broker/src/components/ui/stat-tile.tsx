@@ -1,5 +1,5 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -9,7 +9,8 @@ export interface StatTileProps {
     /** Percentage change against the previous period; omit when there is none. */
     delta?: number;
     hint?: string;
-    icon?: LucideIcon;
+    /** Any icon node — the app is mid-migration from lucide to hugeicons. */
+    icon?: ReactNode;
     className?: string;
 }
 
@@ -21,7 +22,7 @@ export interface StatTileProps {
  * The trend arrow carries an icon as well as a colour, so direction is never
  * communicated by colour alone.
  */
-export function StatTile({ label, value, delta, hint, icon: Icon, className }: StatTileProps) {
+export function StatTile({ label, value, delta, hint, icon, className }: StatTileProps) {
     const rising = (delta ?? 0) >= 0;
     const TrendIcon = rising ? TrendingUp : TrendingDown;
 
@@ -34,7 +35,9 @@ export function StatTile({ label, value, delta, hint, icon: Icon, className }: S
         >
             <div className="flex items-start justify-between gap-2">
                 <p className="text-xs text-content-tertiary">{label}</p>
-                {Icon ? <Icon className="size-4 shrink-0 text-content-tertiary" /> : null}
+                {icon ? (
+                    <span className="shrink-0 text-content-tertiary [&_svg]:size-4">{icon}</span>
+                ) : null}
             </div>
 
             <div>

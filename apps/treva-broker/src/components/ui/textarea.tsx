@@ -27,9 +27,12 @@ export function Textarea({
     const textareaId = id ?? generatedId;
 
     return (
-        <div className={cn("flex w-full flex-col gap-1.5", containerClassName)}>
+        <div className={cn("flex w-full flex-col", containerClassName)}>
             {label ? (
-                <label htmlFor={textareaId} className="text-xs font-medium text-content-secondary">
+                <label
+                    htmlFor={textareaId}
+                    className="mb-0.5 text-xs leading-3 font-medium text-content-secondary"
+                >
                     {label}
                 </label>
             ) : null}
@@ -52,9 +55,9 @@ export function Textarea({
             />
 
             {error ? (
-                <p className="text-xs text-content-negative">{error}</p>
+                <p className="mt-1.5 text-xs text-content-negative">{error}</p>
             ) : hint ? (
-                <p className="text-xs text-content-tertiary">{hint}</p>
+                <p className="mt-1.5 text-xs text-content-tertiary">{hint}</p>
             ) : null}
         </div>
     );

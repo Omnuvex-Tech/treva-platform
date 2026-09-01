@@ -11,7 +11,10 @@ import { cn } from "@/lib/utils/cn";
 export function Table({ className, ...props }: HTMLAttributes<HTMLTableElement>) {
     return (
         <div className="scrollbar-thin w-full overflow-x-auto">
-            <table className={cn("w-full border-collapse text-left text-sm", className)} {...props} />
+            <table
+                className={cn("w-full border-collapse text-left text-sm", className)}
+                {...props}
+            />
         </div>
     );
 }
@@ -46,7 +49,9 @@ export function TableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTa
         <th
             scope="col"
             className={cn(
-                "px-4 py-3 text-xs font-medium whitespace-nowrap text-content-tertiary",
+                // 34px header row / 40px body row, per the table content block
+                // in 873:49772 — the artboards' th and td instances.
+                "h-[34px] px-4 text-xs font-medium whitespace-nowrap text-content-tertiary",
                 className,
             )}
             {...props}
@@ -55,5 +60,5 @@ export function TableHeaderCell({ className, ...props }: ThHTMLAttributes<HTMLTa
 }
 
 export function TableCell({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
-    return <td className={cn("px-4 py-3 text-sm text-content-primary", className)} {...props} />;
+    return <td className={cn("h-10 px-4 text-sm text-content-primary", className)} {...props} />;
 }

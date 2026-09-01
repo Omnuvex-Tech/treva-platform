@@ -14,6 +14,14 @@
 @theme {
     /* --- Background ------------------------------------------------------ */
     --color-bg-primary: #ffffff; /* Background/Primary */
+    /**
+     * The app surface behind the header and the main content area. It is NOT
+     * in the published variable set — measured off the artboard render, where
+     * the header, the content area and the right rail all read #fafafa while
+     * the navigation rail stays pure white. Ask design to publish it as a
+     * token; until then this comment is the provenance.
+     */
+    --color-bg-app: #fafafa;
     --color-bg-secondary: #f4f5f5; /* Background/Secondary */
     --color-bg-tertiary: #ebebeb; /* Background/Teritary [sic, as in Figma] */
     --color-bg-brand: #4e525d; /* Background/Brand */
@@ -42,6 +50,8 @@
 
     /* --- Border ---------------------------------------------------------- */
     --color-border-subtle: #ebebeb; /* Border/Subtle */
+    /* The rail's right edge reads a shade lighter than Border/Subtle. */
+    --color-border-rail: #f0f1f1;
     --color-border-tertiary: #cccccc; /* Border/Tertiary */
     --color-border-brand: #4e525d; /* Border/Brand */
     --color-border-inverse: #ffffff; /* Border/Inverse */
@@ -78,6 +88,7 @@
 
     /* --- Layout ---------------------------------------------------------- */
     --spacing-sidebar: 280px; /* Sidebar frame width in every artboard */
+    --spacing-rail: 259px; /* "Rightside" frame — the Pinned / Quick Stats column */
     --spacing-header: 80px; /* Logo + AppHeader row height */
     --spacing-navbar: 24px; /* Padding/Navbar */
 }
@@ -126,9 +137,9 @@
     }
 
     body {
-        /* The 1440x1024 artboards are white end to end — the grey token is for
-           inset surfaces (inputs, table headers, segmented tracks), not the page. */
-        background-color: var(--color-bg-primary);
+        /* The app surface is #fafafa; only the navigation rail and the cards
+           sitting on it are pure white. */
+        background-color: var(--color-bg-app);
         color: var(--color-content-primary);
         font-family: var(--font-sans);
         font-size: var(--text-sm);
@@ -144,6 +155,33 @@
         overflow-x: hidden;
     }
 
+    /* ── Dialog entry ─────────────────────────────────────────────────────
+       A keyframe animation rather than a transition + @starting-style: the
+       latter is the tidier modern form, but this build pipeline strips it and
+       the rules never reach the browser. An animation on [open] is universally
+       supported and covers the case that matters — the modal appearing.
+
+       Entry only. Animating the exit needs the dialog to stay in the top layer
+       past close(), which is exactly the discrete-transition machinery that is
+       unavailable here. */
+    dialog[open] {
+        animation: dialog-in 160ms ease-out;
+    }
+
+    dialog::backdrop {
+        background-color: rgb(0 0 0 / 0.4);
+    }
+
+    dialog[open]::backdrop {
+        animation: dialog-backdrop-in 160ms ease-out;
+    }
+
+    /* Reduced motion keeps the fade and drops the travel. */
+    @media (prefers-reduced-motion: reduce) {
+        dialog[open] {
+            animation-name: dialog-in-reduced;
+        }
+    }
     :focus-visible {
         outline: 2px solid var(--color-border-brand);
         outline-offset: 2px;
@@ -169,5 +207,24 @@
 
     &::-webkit-scrollbar-track {
         background-color: transparent;
+    }
+}
+
+@keyframes dialog-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+}
+
+@keyframes dialog-in-reduced {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes dialog-backdrop-in {
+    from {
+        background-color: rgb(0 0 0 / 0);
     }
 }

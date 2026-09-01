@@ -9,14 +9,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/providers/i18n-provider";
 import { usePinnedNews, useNewsStats } from "../hooks/use-news";
 
-/** The right-hand rail of the News Feed screen: Pinned + Quick Stats. */
+/**
+ * The right-hand rail of the News Feed screen: Pinned + Quick Stats.
+ *
+ * 259px wide (the "Rightside" frame, 873:49305) with 20px padding around its
+ * 219px inner column, and NO divider on its left edge — scanning the artboard
+ * across that boundary shows an unbroken #fafafa ground. The grey band that
+ * looks like a rule there is the custom scrollbar of the content column.
+ */
 export function NewsSideRail() {
     const { locale, t } = useI18n();
     const pinnedQuery = usePinnedNews();
     const statsQuery = useNewsStats();
 
     return (
-        <aside className="flex w-70 shrink-0 flex-col gap-4 border-l border-border-subtle p-6">
+        <aside className="flex w-rail shrink-0 flex-col gap-4 p-5">
             <section>
                 <h2 className="mb-2 flex items-center gap-1.5 text-xs font-medium text-content-tertiary">
                     <Pin className="size-3.5" />

@@ -15,7 +15,7 @@ export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>
 /** Placeholder shaped like the news/project card grid. */
 export function CardGridSkeleton({ count = 6 }: { count?: number }) {
     return (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: count }, (_, index) => (
                 <div
                     key={index}

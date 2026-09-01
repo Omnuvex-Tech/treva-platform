@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { cn } from "@/lib/utils/cn";
+import { Flag } from "@/components/ui/flag";
 import { LOCALES, LOCALE_LABELS, LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE } from "@/lib/i18n/config";
 import type { Locale } from "@/lib/i18n/config";
 import { stripLocale } from "@/config/page-meta";
@@ -40,8 +41,8 @@ export function LanguageSwitcher() {
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 className={cn(
-                    "flex h-11 items-center justify-center rounded-md bg-bg-secondary px-3 text-xs font-semibold text-content-secondary",
-                    "transition-colors hover:bg-bg-tertiary disabled:opacity-60",
+                    "flex h-11 items-center justify-center rounded-md bg-bg-tertiary px-3 text-xs font-semibold text-content-secondary",
+                    "transition-colors hover:bg-border-tertiary disabled:opacity-60",
                 )}
             >
                 {LOCALE_LABELS[locale].short}
@@ -71,16 +72,14 @@ export function LanguageSwitcher() {
                                     aria-selected={code === locale}
                                     onClick={() => switchTo(code)}
                                     className={cn(
-                                        "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm transition-colors",
+                                        "flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors",
                                         code === locale
                                             ? "bg-bg-secondary text-content-primary"
                                             : "text-content-secondary hover:bg-bg-secondary",
                                     )}
                                 >
-                                    {LOCALE_LABELS[code].native}
-                                    <span className="text-2xs font-semibold text-content-tertiary">
-                                        {LOCALE_LABELS[code].short}
-                                    </span>
+                                    <Flag locale={code} />
+                                    {LOCALE_LABELS[code].label}
                                 </button>
                             </li>
                         ))}

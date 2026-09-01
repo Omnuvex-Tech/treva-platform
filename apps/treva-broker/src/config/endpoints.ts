@@ -24,6 +24,15 @@ export const endpoints = {
         list: "/brokers",
         detail: (id: string) => `/brokers/${id}`,
     },
+    /**
+     * The Broker Role screen is the shared marketing-materials library — see the
+     * note in features/brokers/types.ts for why the name and the content differ.
+     */
+    brokerRole: {
+        documents: "/broker-role/documents",
+        document: (id: string) => `/broker-role/documents/${id}`,
+        download: (id: string) => `/broker-role/documents/${id}/download`,
+    },
     finance: {
         summary: "/finance/summary",
         transactions: "/finance/transactions",
@@ -35,6 +44,14 @@ export const endpoints = {
     floorPlan: {
         buildings: "/floor-plan/buildings",
         floors: (buildingId: string) => `/floor-plan/buildings/${buildingId}/floors`,
+    },
+    listings: {
+        sections: "/listings/sections",
+        list: "/listings",
+    },
+    agencies: {
+        list: "/agencies",
+        detail: (id: string) => `/agencies/${id}`,
     },
     users: {
         list: "/users",

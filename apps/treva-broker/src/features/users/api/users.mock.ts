@@ -9,7 +9,7 @@ let users: PlatformUser[] = [...MOCK_USERS];
 export async function list(query: UserListQuery = {}): Promise<Paginated<PlatformUser>> {
     await delay();
 
-    let filtered = searchBy(users, query.search, ["firstName", "lastName", "email", "phone", "team"]);
+    let filtered = searchBy(users, query.search, ["firstName", "lastName", "email", "phone", "organization"]);
 
     if (query.status && query.status !== "all") {
         filtered = filtered.filter((user) => user.status === query.status);
@@ -46,7 +46,7 @@ export async function create(input: UserInput): Promise<PlatformUser> {
         email,
         phone: input.phone,
         role: input.role,
-        team: input.team,
+        organization: input.organization,
         jobTitle: input.jobTitle,
         // A new account has not signed in yet, so it starts as invited unless it
         // was created blocked outright.

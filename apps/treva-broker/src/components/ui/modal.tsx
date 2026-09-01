@@ -71,7 +71,6 @@ export function Modal({
             aria-labelledby="modal-title"
             className={cn(
                 "m-auto w-[calc(100vw-2rem)] rounded-lg bg-bg-primary p-0 text-content-primary shadow-l7",
-                "backdrop:bg-black/40",
                 sizeClasses[size],
                 className,
             )}
