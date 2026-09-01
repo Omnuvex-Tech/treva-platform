@@ -48,10 +48,13 @@ type ApiApartment = {
 
 /** "396000" -> "396.000$" — dot grouping, matching the design. */
 function formatPrice(prices: Record<string, number> | undefined): string {
-    const usd = prices?.USD ?? prices?.AZN;
-    if (typeof usd !== "number") return "";
-    const suffix = prices?.USD ? "$" : " AZN";
-    return `${Math.round(usd).toLocaleString("de-DE")}${suffix}`;
+    // AZN is the site's currency: every card quotes manat unless a listing
+    // filter is switched to something else, and only those pages have a
+    // switch. USD is the fallback for a unit priced in nothing else.
+    const azn = prices?.AZN ?? prices?.USD;
+    if (typeof azn !== "number") return "";
+    const suffix = prices?.AZN ? " AZN" : "$";
+    return `${Math.round(azn).toLocaleString("de-DE")}${suffix}`;
 }
 
 /** Same "396 000 AZN" grouping the resale listing page itself uses. */

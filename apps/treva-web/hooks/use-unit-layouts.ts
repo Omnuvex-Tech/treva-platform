@@ -43,7 +43,7 @@ export function useUnitLayout(id: string | undefined) {
     });
 }
 
-export function useUnitLayoutRange(currency: string = 'USD') {
+export function useUnitLayoutRange(currency: string = 'AZN') {
     return useQuery({
         queryKey: ["unit-layout-range", currency],
         queryFn: async () => {

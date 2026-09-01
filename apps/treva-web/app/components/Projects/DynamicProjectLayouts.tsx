@@ -138,10 +138,10 @@ export default function DynamicProjectLayouts({ categorySlug, fallbackCategorySl
               number: formatRooms(item.number),
               unitType: item.unitTypeOption?.title || "",
               area: item.totalArea,
-              price: item.prices?.USD
+              price: item.prices?.AZN
+                ? `${item.prices.AZN.toLocaleString()} AZN`
+                : item.prices?.USD
                 ? `$${item.prices.USD.toLocaleString()}`
-                : item.prices?.AZN
-                ? `₼${item.prices.AZN.toLocaleString()}`
                 : "",
               slug: item.slug,
               image: (item.coverImage || item.mainImage)?.url

@@ -167,7 +167,7 @@ export default function ApartmentCard() {
   const { data: currenciesData } = useCurrencies();
   const currencies = currenciesData || [];
 
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('AZN');
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
   const [similarPage, setSimilarPage] = useState(1);
@@ -918,7 +918,7 @@ export default function ApartmentCard() {
                             {c.value}
                           </button>
                         ))}
-                        {currencies.length === 0 && ['USD', 'AZN'].map((c) => (
+                        {currencies.length === 0 && ['AZN', 'USD'].map((c) => (
                           <button
                             key={c}
                             type="button"

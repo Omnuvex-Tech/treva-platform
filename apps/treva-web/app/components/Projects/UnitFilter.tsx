@@ -154,7 +154,7 @@ export default function UnitLayout() {
 
   const t = dictionary[locale] || dictionary.az;
 
-  const [currency, setCurrency] = useState(searchParams.get('currency') || 'USD');
+  const [currency, setCurrency] = useState(searchParams.get('currency') || 'AZN');
   const [floor, setFloor] = useState(searchParams.get('floor') || '');
   const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
   const [selectedRooms, setSelectedRooms] = useState<string>(searchParams.get('rooms') || '');
@@ -250,7 +250,7 @@ export default function UnitLayout() {
   useEffect(() => {
     const sp = new URLSearchParams();
     if (selectedCategorySlug) sp.set('category', selectedCategorySlug);
-    if (currency && currency !== 'USD') sp.set('currency', currency);
+    if (currency && currency !== 'AZN') sp.set('currency', currency);
     if (floor) sp.set('floor', floor);
     if (selectedStatus) sp.set('status', selectedStatus);
     if (selectedRooms) sp.set('rooms', selectedRooms);
@@ -557,14 +557,14 @@ export default function UnitLayout() {
               </div>
               <div className="custom-select currency-select" ref={currencyRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={currencyOpen} onClick={() => setCurrencyOpen((p) => !p)}>
-                  <span>{currency || 'USD'}</span>
+                  <span>{currency || 'AZN'}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
                 {currencyOpen && (
                   <div className="custom-select__dropdown">
-                    {(currencies.length ? currencies.map(c => c.value) : ['USD', 'AZN']).map((c) => (
+                    {(currencies.length ? currencies.map(c => c.value) : ['AZN', 'USD']).map((c) => (
                       <button
                         key={c}
                         type="button"

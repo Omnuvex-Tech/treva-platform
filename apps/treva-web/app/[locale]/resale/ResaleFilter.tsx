@@ -291,9 +291,12 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     }
   }, [rangeData, urlDefaults.maxPrice, urlDefaults.maxArea]);
 
+  // AZN is what the listing opens in — the picker still switches it, and the
+  // API's own first currency is only the fallback for a catalogue without one.
   useEffect(() => {
     if (currenciesData?.length && !currency) {
-      setCurrency(currenciesData[0]?.value || '');
+      const azn = currenciesData.find((c) => c.value === 'AZN');
+      setCurrency(azn?.value || currenciesData[0]?.value || '');
     }
   }, [currenciesData, currency]);
 
@@ -440,7 +443,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
 
             <div className="custom-select currency-select" ref={currencyRef}>
               <button type="button" className="custom-select__trigger" aria-expanded={currencyOpen} onClick={() => setCurrencyOpen((p) => !p)}>
-                <span>{currency || 'USD'}</span>
+                <span>{currency || 'AZN'}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
