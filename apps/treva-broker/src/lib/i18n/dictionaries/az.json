@@ -1,0 +1,211 @@
+{
+    "common": {
+        "search": "Axtarış",
+        "save": "Yadda saxla",
+        "cancel": "Ləğv et",
+        "edit": "Redaktə et",
+        "delete": "Sil",
+        "create": "Yarat",
+        "confirm": "Təsdiqlə",
+        "loading": "Yüklənir…",
+        "empty": "Hələ heç nə yoxdur",
+        "emptyHint": "Məlumat əlavə olunduqda burada görünəcək.",
+        "error": "Xəta baş verdi",
+        "retry": "Yenidən cəhd et",
+        "signOut": "Çıxış",
+        "profile": "Profil",
+        "language": "Dil",
+        "showing": "{total} nəticədən {from}–{to}",
+        "previous": "Əvvəlki",
+        "next": "Növbəti"
+    },
+    "nav": {
+        "newsFeed": "Xəbər lenti",
+        "clients": "Müştərilər",
+        "brokerRole": "Broker rolu",
+        "finance": "Maliyyə",
+        "projects": "Layihələr",
+        "floorPlan": "Mərtəbə planı",
+        "adminPanel": "Admin panel",
+        "users": "İstifadəçilər",
+        "listings": "Elanlar",
+        "language": "Dil"
+    },
+    "auth": {
+        "welcomeTitle": "TREVA-ya xoş gəlmisiniz",
+        "welcomeSubtitle": "Premium daşınmaz əmlak idarəetmə platforması",
+        "email": "E-poçt ünvanı",
+        "emailPlaceholder": "admin@treva.az",
+        "password": "Şifrə",
+        "rememberMe": "Məni xatırla",
+        "forgotPassword": "Şifrəni unutmusunuz?",
+        "signIn": "Panelə daxil ol",
+        "securityNote": "Korporativ səviyyəli təhlükəsizliklə qorunur",
+        "invalidCredentials": "E-poçt və ya şifrə yanlışdır"
+    },
+    "news": {
+        "title": "Xəbər lenti",
+        "subtitle": "Ən son xəbərlərə, elanlara və layihə yeniliklərinə baxın və idarə edin",
+        "add": "Xəbər əlavə et",
+        "pinned": "Sabitlənmiş",
+        "quickStats": "Qısa statistika",
+        "postsThisWeek": "Bu həftəki paylaşımlar",
+        "unread": "Oxunmamış",
+        "newToday": "Bu gün yeni",
+        "categoryNews": "Yeni",
+        "categoryAnnouncement": "Elanlar"
+    },
+    "clients": {
+        "title": "Müştərilər",
+        "subtitle": "Müştəri bazasını, potensial müştəriləri və fəaliyyəti idarə edin",
+        "count": "{total} müştəri",
+        "add": "Müştəri əlavə et",
+        "filter": "Filtr",
+        "searchPlaceholder": "Müştəri axtar",
+        "columns": {
+            "client": "Müştəri",
+            "contact": "Əlaqə",
+            "broker": "Təyin olunmuş broker",
+            "status": "Status"
+        },
+        "status": {
+            "lead": "Potensial",
+            "active": "Aktiv",
+            "negotiating": "Danışıqlarda",
+            "closed": "Bağlanıb",
+            "lost": "İtirilib"
+        },
+        "selected": "{count} seçilib",
+        "form": {
+            "createTitle": "Yeni müştəri",
+            "editTitle": "Müştərini redaktə et",
+            "firstName": "Ad",
+            "lastName": "Soyad",
+            "phone": "Telefon nömrəsi",
+            "email": "E-poçt ünvanı",
+            "broker": "Təyin olunmuş broker",
+            "budget": "Büdcə",
+            "interest": "Maraqlandığı",
+            "notes": "Qeydlər",
+            "notesPlaceholder": "Kontekst, üstünlüklər, zəng tarixçəsi…",
+            "consent": "Müştəri yeni elanlar barədə əlaqə saxlanılmasına razıdır",
+            "save": "Yadda saxla"
+        },
+        "deleteConfirm": "Bu müştəri silinsin? Geri qaytarmaq mümkün olmayacaq."
+    },
+    "brokerRole": {
+        "title": "Broker rolu",
+        "subtitle": "Komanda strukturu, hədəflər və broker performansı"
+    },
+    "finance": {
+        "title": "Maliyyə",
+        "subtitle": "Komissiyalar, ödənişlər və maliyyə göstəriciləri",
+        "commission": "Ümumi komissiya",
+        "pendingPayout": "Gözləyən ödəniş",
+        "closedDeals": "Bağlanmış sövdələşmələr",
+        "avgDeal": "Orta sövdələşmə dəyəri",
+        "vsPrev": "əvvəlki dövrlə müqayisədə",
+        "monthlyTitle": "Son 12 ayın komissiyası",
+        "splitTitle": "Statusa görə komissiya",
+        "transactions": "Əməliyyatlar",
+        "searchPlaceholder": "Nömrə, müştəri və ya layihə ilə axtar",
+        "columns": {
+            "reference": "Nömrə",
+            "client": "Müştəri",
+            "project": "Layihə",
+            "broker": "Broker",
+            "amount": "Məbləğ",
+            "commission": "Komissiya",
+            "status": "Status",
+            "date": "Tarix"
+        },
+        "status": {
+            "paid": "Ödənilib",
+            "pending": "Gözləyir",
+            "processing": "İcradadır",
+            "cancelled": "Ləğv edilib"
+        },
+        "tabs": {
+            "all": "Hamısı",
+            "paid": "Ödənilib",
+            "processing": "İcradadır",
+            "pending": "Gözləyir",
+            "cancelled": "Ləğv edilib"
+        }
+    },
+    "projects": {
+        "title": "Layihələr",
+        "subtitle": "İnkişaf layihələrinə baxın və idarə edin"
+    },
+    "floorPlan": {
+        "title": "Mərtəbə planı",
+        "subtitle": "Binalar, mərtəbələr və mənzil mövcudluğu"
+    },
+    "users": {
+        "title": "İstifadəçilər",
+        "subtitle": "Hesabları, rolları və icazələri idarə edin",
+        "tabs": {
+            "all": "Hamısı",
+            "active": "Aktiv",
+            "blocked": "Bloklanmış",
+            "invited": "Dəvət olunmuş"
+        },
+        "add": "İstifadəçi əlavə et",
+        "export": "İxrac et",
+        "searchPlaceholder": "Ad, e-poçt və ya telefonla axtar",
+        "columns": {
+            "name": "Ad",
+            "email": "E-poçt",
+            "phone": "Telefon",
+            "role": "Rol",
+            "team": "Komanda",
+            "status": "Status",
+            "actions": "Əməliyyatlar"
+        },
+        "status": {
+            "active": "Aktiv",
+            "blocked": "Bloklanmış",
+            "invited": "Dəvət olunmuş"
+        },
+        "form": {
+            "createTitle": "Yeni istifadəçi",
+            "editTitle": "İstifadəçini redaktə et",
+            "firstName": "Ad",
+            "lastName": "Soyad",
+            "email": "E-poçt ünvanı",
+            "password": "Şifrə",
+            "generate": "Şifrə yarat",
+            "phone": "Telefon nömrəsi",
+            "jobTitle": "Vəzifə",
+            "team": "Komanda",
+            "role": "Rol",
+            "roleHint": "Bu hesabın hansı ekranlara və əməliyyatlara çıxışı olacağını təyin edir",
+            "blockAgent": "Agenti blokla",
+            "blockHint": "Bloklanmış hesab sistemə daxil ola bilmir",
+            "save": "Yadda saxla",
+            "confirmPassword": "Şifrəni təsdiqlə",
+            "passwordMismatch": "Şifrələr uyğun gəlmir"
+        },
+        "deleteConfirm": "Bu istifadəçi silinsin? Geri qaytarmaq mümkün olmayacaq."
+    },
+    "listings": {
+        "title": "Elanlar",
+        "subtitle": "Platformada dərc olunmuş elanları idarə edin"
+    },
+    "languageAdmin": {
+        "title": "Dil",
+        "subtitle": "İnterfeys dillərini və tərcümələri idarə edin"
+    },
+    "errors": {
+        "notFoundTitle": "Səhifə tapılmadı",
+        "notFoundBody": "Axtardığınız səhifə mövcud deyil və ya köçürülüb.",
+        "forbiddenTitle": "Giriş yoxdur",
+        "forbiddenBody": "Rolunuzun bu səhifəni açmaq icazəsi yoxdur.",
+        "backToDashboard": "Panelə qayıt"
+    },
+    "roles": {
+        "broker": "Broker",
+        "top_broker": "Top Broker",
+        "admin": "Admin"
+    }
+}
