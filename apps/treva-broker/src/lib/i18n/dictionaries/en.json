@@ -3,6 +3,7 @@
     "search": "Search",
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "edit": "Edit",
     "delete": "Delete",
     "create": "Create",
@@ -30,7 +31,18 @@
     "deleteIrreversible": "This cannot be undone.",
     "deleteSelectedTitle": "Delete selected?",
     "confirmDelete": "Delete",
-    "detail": "Detail"
+    "detail": "Detail",
+    "upload": {
+      "title": "Add Files",
+      "name": "Name",
+      "dragDrop": "Drag & drop here",
+      "formats": "JPEG, PNG, PDF and MP4 format, up to 60MB",
+      "or": "or",
+      "selectFile": "Select file",
+      "tooLarge": "{name} is larger than {limit} and was not added",
+      "enterToAdd": "Press Enter to add",
+      "selectFirst": "Choose a file first"
+    }
   },
   "nav": {
     "newsFeed": "News Feed",
@@ -137,64 +149,66 @@
   "clients": {
     "title": "Clients",
     "subtitle": "Manage your client base, leads, and their activity",
-    "count": "{total} clients",
-    "add": "Add client",
-    "filter": "Filter",
+    "allClients": "All clients",
+    "add": "Register a new lead",
     "searchPlaceholder": "Search clients",
     "columns": {
-      "client": "Client",
-      "contact": "Contact",
-      "broker": "Assigned broker",
+      "index": "№",
+      "fullName": "Full Name",
+      "contacts": "Contacts",
+      "objectOfInterest": "Object of interest",
       "status": "Status"
     },
     "status": {
-      "lead": "Lead",
-      "active": "Active",
-      "negotiating": "Negotiating",
-      "closed": "Closed",
-      "lost": "Lost"
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "approvedUntil": "Approved until {date}"
     },
-    "selected": "{count} selected",
     "form": {
-      "createTitle": "New client",
-      "editTitle": "Edit client",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "phone": "Phone number",
-      "email": "Email address",
-      "broker": "Assigned broker",
-      "budget": "Budget",
-      "interest": "Interested in",
-      "notes": "Notes",
-      "notesPlaceholder": "Context, preferences, call history…",
-      "consent": "Client agreed to be contacted about new listings",
-      "save": "Save",
-      "addPhone": "Add another number"
+      "createTitle": "Register a new lead",
+      "editTitle": "Edit lead",
+      "name": "Name",
+      "surname": "Surname",
+      "primaryNumber": "Primary number",
+      "addPhone": "Add another number",
+      "removePhone": "Remove this number",
+      "email": "Email",
+      "objectOfInterest": "Object of interest",
+      "objectOfInterestPlaceholder": "Select a project",
+      "developerBrand": "Developer Brand",
+      "website": "Website",
+      "comments": "Comments",
+      "consentBefore": "I confirm that the Client read and acknowledged the Privacy policy and provided the",
+      "consentLink": "Consent",
+      "consentAfter": "to the",
+      "submit": "Submit for approval"
     },
     "deleteConfirm": "Delete this client? This cannot be undone.",
-    "noClients": "No clients yet",
+    "noClients": "You don't have any clients yet",
     "noMatches": "No clients match your search",
-    "approvalStatus": "Approval status",
-    "agentName": "Agent name",
-    "interestedIn": "Interested in",
+    "detail": {
+      "email": "Email",
+      "phone": "Phone",
+      "approvalStatus": "Approval status",
+      "agent": "Agent",
+      "reviewTitle": "Results of the review",
+      "reviewBody": "In days working with this client, please wait for the results of the review. You will be notified once the assessment is complete."
+    },
     "tabs": {
-      "overview": "Overview",
-      "activity": "Activity",
-      "deals": "Deals"
+      "salesOpportunities": "Sales Opportunities",
+      "history": "History"
     }
   },
   "brokerRole": {
     "title": "Broker Role",
     "subtitle": "Shared brochures, price lists, floor plans and presentations",
-    "count": "{total} files",
-    "upload": "Upload file",
+    "addFiles": "Add Files",
+    "addedToast": "File added",
     "download": "Download",
-    "share": "Share",
-    "remove": "Remove",
     "downloads": "{count} downloads",
     "version": "v{version}",
-    "searchPlaceholder": "Search materials",
-    "details": "File details",
+    "details": "File Details",
     "currentVersion": "Current version",
     "uploadedBy": "Uploaded by",
     "uploadDate": "Upload date",
@@ -202,62 +216,95 @@
     "fileSize": "File size",
     "fileType": "File type",
     "visibility": "Visibility",
-    "visibilityAll": "All brokers",
-    "visibilityTop": "Top brokers only",
-    "visibilityAdmin": "Admins only",
-    "deleteConfirm": "Remove this file? Brokers will lose access to it."
+    "deleteConfirm": "Remove this file? Brokers will lose access to it.",
+    "editor": {
+      "autosaved": "Auto-saved as draft",
+      "saved": "All changes saved",
+      "save": "Save changes",
+      "deleteFile": "Delete File",
+      "fileInformation": "File Information",
+      "fileName": "File Name",
+      "category": "File Category",
+      "language": "Language",
+      "description": "Comments"
+    },
+    "categories": {
+      "brochure": "Brochure",
+      "price_list": "Price list",
+      "floor_plan": "Floor plan",
+      "presentation": "Presentation",
+      "policy": "Policy",
+      "other": "Other"
+    },
+    "languages": {
+      "az": "Azerbaijani",
+      "en": "English",
+      "ru": "Russian"
+    },
+    "flags": {
+      "active": "Active",
+      "featured": "Featured File",
+      "allowDownload": "Allow Download",
+      "notifyBrokers": "Notify Brokers About Changes"
+    }
   },
   "finance": {
     "title": "Finance",
-    "subtitle": "Commissions, payouts, and financial performance",
-    "commission": "Total commission",
-    "pendingPayout": "Pending payout",
-    "closedDeals": "Closed deals",
-    "avgDeal": "Average deal value",
-    "vsPrev": "vs previous period",
-    "monthlyTitle": "Commission over the last 12 months",
-    "splitTitle": "Commission by status",
-    "transactions": "Transactions",
-    "searchPlaceholder": "Search by reference, client or project",
+    "subtitle": "Manage budgets, cash flow, expenses, and payments in one place",
+    "kpi": {
+      "commission": "Total Commission",
+      "deals": "Deals Closed",
+      "volume": "Sales Volume",
+      "rank": "Rank Position",
+      "vsLastMonth": "{value} vs last month",
+      "topPercent": "Top {percent}% of brokers"
+    },
+    "trendTitle": "Sales Trend",
+    "trendSubtitle": "Last 6 months performance",
+    "revenueTitle": "Revenue by Project",
+    "leaderboard": "All Broker Leaderboard",
     "columns": {
-      "reference": "Reference",
-      "client": "Client",
-      "project": "Project",
-      "broker": "Broker",
-      "amount": "Amount",
-      "commission": "Commission",
-      "status": "Status",
-      "date": "Date"
-    },
-    "status": {
+      "index": "№",
+      "project": "Project Name",
+      "unit": "A 23 - 02",
+      "listingPrice": "Listing Price",
+      "salesPrice": "Sales Price",
+      "receivable": "Receivable",
       "paid": "Paid",
-      "pending": "Pending",
-      "processing": "Processing",
-      "cancelled": "Cancelled"
+      "remaining": "Remaining",
+      "salesDate": "Sales Date",
+      "name": "Name",
+      "deals": "Deals",
+      "commission": "Commission"
     },
-    "tabs": {
-      "all": "All",
-      "paid": "Paid",
-      "processing": "Processing",
-      "pending": "Pending",
-      "cancelled": "Cancelled"
+    "request": {
+      "name": "Name",
+      "surname": "Surname",
+      "number": "Number",
+      "finId": "Fin Id",
+      "downPayment": "Down Payment",
+      "creditTerm": "Credit term",
+      "lastPaymentDate": "Last Payment Date",
+      "approvedUntil": "Approved until {date}",
+      "consentPrefix": "I confirm that the Client read and acknowledged the Privacy policy and provided the ",
+      "consentLink": "Consent",
+      "consentSuffix": " to the",
+      "submit": "Send Request",
+      "sentToast": "Request sent"
     }
   },
   "projects": {
     "title": "Projects",
-    "subtitle": "Browse and manage development projects",
-    "count": "{total} projects",
-    "add": "Add project",
-    "searchPlaceholder": "Search projects",
-    "from": "from",
-    "units": "{available} of {total} units",
+    "subtitle": "Create, organize, and manage all your real estate projects from a single dashboard",
+    "add": "Add new projects",
     "status": {
-      "planning": "Planning",
-      "construction": "Under construction",
-      "ready": "Ready",
-      "soldOut": "Sold out"
+      "active": "Active",
+      "inactive": "Inactive"
     },
-    "delivery": "Delivery"
+    "unitsTotal": "{total} units total",
+    "unitsAvailable": "{available} available",
+    "deleteConfirm": "Remove this project? Brokers will lose access to its units.",
+    "from": "from"
   },
   "floorPlan": {
     "title": "Floor Plan",

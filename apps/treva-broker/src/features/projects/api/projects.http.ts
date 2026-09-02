@@ -18,3 +18,7 @@ export async function list(query: ProjectListQuery = {}): Promise<Paginated<Proj
 export async function detail(id: string): Promise<Project> {
     return http.get<Project>(endpoints.projects.detail(id));
 }
+
+export async function remove(id: string): Promise<void> {
+    await http.delete<void>(endpoints.projects.detail(id));
+}

@@ -8,7 +8,13 @@ export interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
     label?: string;
 }
 
-/** The `Toggle` component from the design — used in Users and Language screens. */
+/**
+ * The `Toggle` component from the design (I873:52115).
+ *
+ * 32x20 with a 16px knob inset 2 — so the travel is 12, not 16. The off state
+ * is Background/Teritary, a step lighter than the Border/Tertiary an earlier
+ * pass used.
+ */
 export function Switch({ label, className, id, ...props }: SwitchProps) {
     const generatedId = useId();
     const switchId = id ?? generatedId;
@@ -21,7 +27,8 @@ export function Switch({ label, className, id, ...props }: SwitchProps) {
                     type="checkbox"
                     role="switch"
                     className={cn(
-                        "peer h-5 w-9 cursor-pointer appearance-none rounded-pill bg-border-tertiary transition-colors",
+                        // 32x20 with a 16px knob (873:52115) — w-9 was 36.
+                        "peer h-5 w-8 cursor-pointer appearance-none rounded-pill bg-bg-tertiary transition-colors",
                         "checked:bg-bg-brand",
                         "disabled:cursor-not-allowed disabled:opacity-50",
                         className,
@@ -30,7 +37,7 @@ export function Switch({ label, className, id, ...props }: SwitchProps) {
                 />
                 <span
                     aria-hidden
-                    className="pointer-events-none absolute top-0.5 left-0.5 size-4 rounded-pill bg-bg-primary shadow-l2 transition-transform peer-checked:translate-x-4"
+                    className="pointer-events-none absolute top-0.5 left-0.5 size-4 rounded-pill bg-bg-primary shadow-l2 transition-transform peer-checked:translate-x-3"
                 />
             </span>
 

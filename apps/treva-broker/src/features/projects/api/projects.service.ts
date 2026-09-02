@@ -8,6 +8,7 @@ import * as mockAdapter from "./projects.mock";
 export interface ProjectsService {
     list(query?: ProjectListQuery): Promise<Paginated<Project>>;
     detail(id: string): Promise<Project>;
+    remove(id: string): Promise<void>;
 }
 
 export const projectsService: ProjectsService = config.api.useMock ? mockAdapter : httpAdapter;

@@ -64,6 +64,38 @@ export function formatDateTime(value: string | Date, locale: Locale): string {
     }).format(date);
 }
 
+const RELATIVE_UNITS: readonly [Intl.RelativeTimeFormatUnit, number][] = [
+    ["year", 365 * 24 * 3600],
+    ["month", 30 * 24 * 3600],
+    ["day", 24 * 3600],
+    ["hour", 3600],
+    ["minute", 60],
+];
+
+/**
+ * "2 hr. ago" — the stamp on a project card (I873:49156;13186:150).
+ *
+ * The artboard writes it as "2h ago", which is English shorthand; `Intl` is
+ * used instead so az and ru get their own forms rather than a hand-rolled
+ * abbreviation that only reads as English.
+ */
+export function formatRelativeTime(value: string | Date, locale: Locale): string {
+    const date = typeof value === "string" ? new Date(value) : value;
+    if (Number.isNaN(date.getTime())) return "—";
+
+    const seconds = Math.round((date.getTime() - Date.now()) / 1000);
+    const formatter = new Intl.RelativeTimeFormat(INTL_LOCALES[locale], {
+        numeric: "auto",
+        style: "narrow",
+    });
+
+    for (const [unit, size] of RELATIVE_UNITS) {
+        if (Math.abs(seconds) >= size) return formatter.format(Math.round(seconds / size), unit);
+    }
+
+    return formatter.format(seconds, "second");
+}
+
 export function formatNumber(value: number, locale: Locale): string {
     return numberFormatter(locale, {}).format(value);
 }
@@ -74,6 +106,18 @@ export function formatCurrency(value: number, locale: Locale, currency = "AZN"):
         currency,
         maximumFractionDigits: 0,
     }).format(value);
+}
+
+/**
+ * "₼ 47,250" — the sign in front, then a space, then locale grouping.
+ *
+ * No `Intl` currency style produces this for any of the three locales: `en`
+ * puts the narrow symbol tight against the digits and both `az` and `ru` put it
+ * after the number. The artboards write it this way everywhere (1173:17975),
+ * so the shape is fixed here and only the grouping stays locale-aware.
+ */
+export function formatManat(value: number, locale: Locale): string {
+    return `₼ ${formatNumber(value, locale)}`;
 }
 
 /** "1.2M", "248K" — for stat tiles where the full number would not fit. */

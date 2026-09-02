@@ -53,13 +53,32 @@
     /* The rail's right edge reads a shade lighter than Border/Subtle. */
     --color-border-rail: #f0f1f1;
     --color-border-tertiary: #cccccc; /* Border/Tertiary */
+    /* The dashed edge of `upload: drag upload` (382:13475) — a full step darker
+       than Border/Tertiary, which is why the dropzone reads as an active
+       target rather than as another divider. */
+    --color-border-primary: #666666; /* Border/Primary */
     --color-border-brand: #4e525d; /* Border/Brand */
     --color-border-inverse: #ffffff; /* Border/Inverse */
+    --color-border-negative: #f31100; /* Border/Negative */
     --color-border-notice: #ffbb00; /* Border/Notice */
 
     /* --- Radius ---------------------------------------------------------- */
     --radius-xs: 0px; /* Border radius/XS */
-    --radius-s: 8px; /* s */
+    /**
+     * Figma calls this one "Border radius/md" (4px), but the `md` slot here is
+     * already Border radius/XXL — the name the rest of the app's 12px surfaces
+     * are written against. Renaming that would touch every card and field, so
+     * the 4px step gets its own name instead. Used by the checkbox.
+     */
+    --radius-xxs: 4px; /* Border radius/md */
+    /**
+     * Named "sm", not "s". Tailwind reads a bare rounded-s as the logical
+     * INLINE-START side plus its own default radius, so a --radius-s token can
+     * never win: every 8px corner in the app was silently rendering as 4px on
+     * two corners only. A theme key that shadows a built-in name ("sm") does
+     * win, which is why this one works.
+     */
+    --radius-sm: 8px; /* s */
     --radius-md: 12px; /* Border radius/XXL */
     --radius-lg: 16px; /* Border radius/3XL */
     --radius-xl: 20px; /* Border radius/4XL */
@@ -83,6 +102,7 @@
     --text-3xl--line-height: 40px;
 
     /* --- Elevation ------------------------------------------------------- */
+    --shadow-l1: 0 0 2px 0 #00000014, 0 2px 4px 0 #00000014; /* Shadow/L1 */
     --shadow-l2: 0 0 4px 0 #00000014, 0 4px 8px 0 #0000001a; /* Shadow/L2 */
     --shadow-l7: 0 8px 16px 0 #3232470f, 0 8px 8px 0 #32324705; /* Shadow/L7 */
 
@@ -122,6 +142,17 @@
     /* Single-series marks use the brand ink (7.4:1 on white). */
     --color-chart-line: #4e525d;
     --color-chart-grid: #ebebeb;
+
+    /**
+     * Two colours the file editor needs (873:52069 / 876:13886). They live here
+     * for the same reason the chart tokens do: a freshly added `@theme` key is
+     * not always picked up by the running build, and the failure is silent —
+     * the utility resolves to nothing and the element quietly inherits. Plain
+     * CSS is never tree-shaken and never stale, so these are consumed as
+     * `text-[var(--color-content-tertiary-inverse)]` at the call site.
+     */
+    --color-content-tertiary-inverse: #b2b2b2; /* Content/Tertiary Inverse */
+    --color-border-overlay: rgba(0, 0, 0, 0.06); /* Overlay/20 */
 }
 
 /* ---------------------------------------------------------------------------

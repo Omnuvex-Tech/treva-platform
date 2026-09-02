@@ -99,7 +99,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                             type="button"
                             onClick={() => dismiss(toast.id)}
                             aria-label="Dismiss"
-                            className="ml-2 flex size-6 items-center justify-center rounded-s text-content-tertiary transition-colors hover:bg-bg-secondary hover:text-content-primary"
+                            className="ml-2 flex size-6 items-center justify-center rounded-sm text-content-tertiary transition-colors hover:bg-bg-secondary hover:text-content-primary"
                         >
                             <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={1.8} />
                         </button>

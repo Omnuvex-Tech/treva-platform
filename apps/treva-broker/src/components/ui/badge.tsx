@@ -20,6 +20,14 @@ const badgeVariants = cva(
             size: {
                 sm: "px-2 py-0.5 text-2xs",
                 md: "px-2.5 py-1 text-xs",
+                /**
+                 * The status pill that stands in for a form control
+                 * (I1173:18675;11095:28383) — 12/Medium in sentence case. The
+                 * base is built for the card pills ("NEW", "ANNOUNCEMENTS"),
+                 * which are upper case and tracked out; a sentence reading
+                 * "Approved until 5 Aug 2026" cannot wear either.
+                 */
+                field: "px-2 py-1 text-xs font-medium tracking-normal normal-case",
             },
         },
         defaultVariants: {

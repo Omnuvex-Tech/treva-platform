@@ -35,7 +35,8 @@ export const endpoints = {
     },
     finance: {
         summary: "/finance/summary",
-        transactions: "/finance/transactions",
+        sales: "/finance/sales",
+        leaderboard: "/finance/leaderboard",
     },
     projects: {
         list: "/projects",

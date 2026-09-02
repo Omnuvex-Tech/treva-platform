@@ -1,5 +1,9 @@
 import type { Project } from "@/features/projects/types";
 
+function hoursAgo(hours: number): string {
+    return new Date(Date.now() - hours * 3600 * 1000).toISOString();
+}
+
 function inMonths(months: number): string {
     const date = new Date();
     date.setMonth(date.getMonth() + months);
@@ -8,9 +12,10 @@ function inMonths(months: number): string {
 }
 
 /**
- * Cover images are left null: the artboard shows placeholder tiles, and a real
- * asset pipeline does not exist yet. `ProjectCard` renders its own placeholder,
- * so nothing here depends on a remote host being reachable.
+ * Three projects carry the photographs the artboard puts on its first row,
+ * exported from the file and served from `public/projects`. The rest leave
+ * `coverImageUrl` null so `ProjectCard`'s own placeholder keeps being
+ * exercised; nothing here depends on a remote host being reachable.
  */
 export const MOCK_PROJECTS: Project[] = [
     {
@@ -18,55 +23,59 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Pearl Towers",
         developer: "Caspian Development",
         location: "Baku, Narimanov",
-        status: "construction",
+        status: "active",
         priceFrom: 168_000,
         unitsTotal: 248,
         unitsAvailable: 91,
         bedroomsFrom: 1,
         bedroomsTo: 4,
         deliveryDate: inMonths(14),
-        coverImageUrl: null,
+        updatedAt: hoursAgo(2),
+        coverImageUrl: "/projects/brabus-island.jpg",
     },
     {
         id: "prj_2",
         name: "Seaside Residence",
         developer: "Azure Group",
         location: "Baku, Bayil",
-        status: "construction",
+        status: "active",
         priceFrom: 245_000,
         unitsTotal: 164,
         unitsAvailable: 38,
         bedroomsFrom: 2,
         bedroomsTo: 5,
         deliveryDate: inMonths(9),
-        coverImageUrl: null,
+        updatedAt: hoursAgo(5),
+        coverImageUrl: "/projects/sabah-towers.jpg",
     },
     {
         id: "prj_3",
         name: "Marina View",
         developer: "Caspian Development",
         location: "Baku, White City",
-        status: "ready",
+        status: "active",
         priceFrom: 132_000,
         unitsTotal: 320,
         unitsAvailable: 47,
         bedroomsFrom: 1,
         bedroomsTo: 3,
         deliveryDate: inMonths(-2),
-        coverImageUrl: null,
+        updatedAt: hoursAgo(26),
+        coverImageUrl: "/projects/reportage-heights.jpg",
     },
     {
         id: "prj_4",
         name: "Highland Park",
         developer: "Orion Estates",
         location: "Baku, Yasamal",
-        status: "planning",
+        status: "active",
         priceFrom: 118_000,
         unitsTotal: 210,
         unitsAvailable: 210,
         bedroomsFrom: 1,
         bedroomsTo: 3,
         deliveryDate: inMonths(30),
+        updatedAt: hoursAgo(49),
         coverImageUrl: null,
     },
     {
@@ -74,13 +83,14 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Crystal Gardens",
         developer: "Azure Group",
         location: "Baku, Khatai",
-        status: "construction",
+        status: "active",
         priceFrom: 196_000,
         unitsTotal: 188,
         unitsAvailable: 64,
         bedroomsFrom: 2,
         bedroomsTo: 4,
         deliveryDate: inMonths(18),
+        updatedAt: hoursAgo(8),
         coverImageUrl: null,
     },
     {
@@ -88,13 +98,14 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Old City Lofts",
         developer: "Heritage Build",
         location: "Baku, Icherisheher",
-        status: "soldOut",
+        status: "inactive",
         priceFrom: 289_000,
         unitsTotal: 42,
         unitsAvailable: 0,
         bedroomsFrom: 1,
         bedroomsTo: 2,
         deliveryDate: inMonths(-8),
+        updatedAt: hoursAgo(73),
         coverImageUrl: null,
     },
     {
@@ -102,13 +113,14 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Green Valley",
         developer: "Orion Estates",
         location: "Absheron, Mardakan",
-        status: "planning",
+        status: "active",
         priceFrom: 95_000,
         unitsTotal: 140,
         unitsAvailable: 140,
         bedroomsFrom: 1,
         bedroomsTo: 4,
         deliveryDate: inMonths(36),
+        updatedAt: hoursAgo(14),
         coverImageUrl: null,
     },
     {
@@ -116,13 +128,14 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Port Baku Heights",
         developer: "Caspian Development",
         location: "Baku, Sabail",
-        status: "ready",
+        status: "active",
         priceFrom: 410_000,
         unitsTotal: 96,
         unitsAvailable: 12,
         bedroomsFrom: 2,
         bedroomsTo: 5,
         deliveryDate: inMonths(-5),
+        updatedAt: hoursAgo(121),
         coverImageUrl: null,
     },
     {
@@ -130,13 +143,14 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Riverside Quarter",
         developer: "Azure Group",
         location: "Baku, Nizami",
-        status: "construction",
+        status: "active",
         priceFrom: 154_000,
         unitsTotal: 276,
         unitsAvailable: 133,
         bedroomsFrom: 1,
         bedroomsTo: 3,
         deliveryDate: inMonths(22),
+        updatedAt: hoursAgo(30),
         coverImageUrl: null,
     },
     {
@@ -144,13 +158,14 @@ export const MOCK_PROJECTS: Project[] = [
         name: "Sunset Terraces",
         developer: "Heritage Build",
         location: "Absheron, Novkhani",
-        status: "planning",
+        status: "active",
         priceFrom: 88_000,
         unitsTotal: 120,
         unitsAvailable: 120,
         bedroomsFrom: 1,
         bedroomsTo: 3,
         deliveryDate: inMonths(28),
+        updatedAt: hoursAgo(3),
         coverImageUrl: null,
     },
 ];

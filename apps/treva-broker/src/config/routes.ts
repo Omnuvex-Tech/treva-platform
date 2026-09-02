@@ -20,6 +20,7 @@ export const routes = {
     clients: (locale: Locale) => `/${locale}/clients`,
     clientDetail: (locale: Locale, id: string) => `/${locale}/clients/${id}`,
     brokerRole: (locale: Locale) => `/${locale}/broker-role`,
+    brokerRoleEdit: (locale: Locale, id: string) => `/${locale}/broker-role/${id}/edit`,
     finance: (locale: Locale) => `/${locale}/finance`,
     projects: (locale: Locale) => `/${locale}/projects`,
     floorPlan: (locale: Locale) => `/${locale}/floor-plan`,

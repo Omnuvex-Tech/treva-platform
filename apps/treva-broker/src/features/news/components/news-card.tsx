@@ -90,7 +90,7 @@ export function NewsCard({ post, onEdit, onDelete }: NewsCardProps) {
                 )}
             >
                 {hasImageArea ? (
-                    <div className="relative aspect-[247/200] w-full overflow-hidden rounded-s bg-bg-secondary">
+                    <div className="relative aspect-[247/200] w-full overflow-hidden rounded-sm bg-bg-secondary">
                         {post.coverImageUrl ? (
                             <Image
                                 src={post.coverImageUrl}
@@ -122,7 +122,7 @@ export function NewsCard({ post, onEdit, onDelete }: NewsCardProps) {
                 <CardText post={post} href={routes.newsDetail(locale, post.id)} />
 
                 <div className="mt-auto flex h-7 items-center justify-between gap-2 px-[5px]">
-                    <span className="inline-flex items-center gap-1.5 rounded-s bg-bg-secondary px-2 py-1 text-xs text-content-secondary">
+                    <span className="inline-flex items-center gap-1.5 rounded-sm bg-bg-secondary px-2 py-1 text-xs text-content-secondary">
                         <HugeiconsIcon icon={Clock01Icon} size={14} strokeWidth={1.6} />
                         {formatDate(post.publishedAt, locale)}
                     </span>

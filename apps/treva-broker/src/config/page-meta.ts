@@ -98,6 +98,18 @@ export function getPageHeading(pathname: string, t: Dictionary, locale: Locale):
         };
     }
 
+    // The file editor swaps the section title for a trail, exactly as the
+    // article detail does — 873:52026 draws "Broker Role" then "Edit".
+    if (/^\/broker-role\/[^/]+\/edit$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.brokerRole.title, href: routes.brokerRole(locale) },
+                { label: t.common.edit },
+            ],
+        };
+    }
+
     // Longest-prefix match so a future nested route still shows its section
     // header instead of falling through to the app name.
     const match = Object.keys(PAGE_META)

@@ -31,7 +31,7 @@ export function Textarea({
             {label ? (
                 <label
                     htmlFor={textareaId}
-                    className="mb-0.5 text-xs leading-3 font-medium text-content-secondary"
+                    className="mb-1 text-xs font-semibold text-content-secondary"
                 >
                     {label}
                 </label>

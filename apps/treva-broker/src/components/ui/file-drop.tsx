@@ -63,7 +63,7 @@ export function FileDrop({
             )}
             style={{ minHeight }}
         >
-            <span className="flex size-9 items-center justify-center rounded-s bg-bg-secondary text-content-tertiary">
+            <span className="flex size-9 items-center justify-center rounded-sm bg-bg-secondary text-content-tertiary">
                 <HugeiconsIcon icon={icon} size={15} strokeWidth={1.6} />
             </span>
 

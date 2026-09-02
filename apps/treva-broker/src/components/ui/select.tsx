@@ -25,6 +25,8 @@ export interface SelectProps {
     /** Renders a hidden input so the value is submitted with a `<form>`. */
     name?: string;
     disabled?: boolean;
+    /** Draws the red asterisk beside the label, as the design's fields do. */
+    required?: boolean;
     id?: string;
     "aria-label"?: string;
     containerClassName?: string;
@@ -51,6 +53,7 @@ export function Select({
     onChange,
     name,
     disabled,
+    required,
     id,
     "aria-label": ariaLabel,
     containerClassName,
@@ -156,9 +159,10 @@ export function Select({
             {label ? (
                 <label
                     htmlFor={triggerId}
-                    className="mb-0.5 text-xs leading-3 font-medium text-content-secondary"
+                    className="mb-1 text-xs font-semibold text-content-secondary"
                 >
                     {label}
+                    {required ? <span className="text-content-negative">*</span> : null}
                 </label>
             ) : null}
 
