@@ -53,5 +53,6 @@ export const queryKeys = {
         all: ["users"] as const,
         list: (query: PageQuery) => ["users", "list", query] as const,
         detail: (id: string) => ["users", "detail", id] as const,
+        agencyLink: (id: string) => ["users", "agency-link", id] as const,
     },
 } as const;

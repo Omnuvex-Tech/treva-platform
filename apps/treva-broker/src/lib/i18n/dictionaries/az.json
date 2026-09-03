@@ -65,6 +65,7 @@
     "rememberMe": "Məni xatırla",
     "forgotPassword": "Şifrəni unutmusunuz?",
     "signIn": "Panelə daxil ol",
+    "register": "Qeydiyyat",
     "securityNote": "Korporativ səviyyəli təhlükəsizliklə qorunur",
     "invalidCredentials": "E-poçt və ya şifrə yanlışdır",
     "panelTitle": "Azərbaycanın premium daşınmaz əmlakını idarə edin",
@@ -74,7 +75,28 @@
     "feature2Title": "Müştəri və sövdələşmələr baş-başa",
     "feature2Body": "İlk müraciətdən təhvilə qədər, heç nə itmədən.",
     "feature3Title": "Yoxlana bilən komissiya",
-    "feature3Body": "Brokerlər və komandaları üçün şəffaf ödənişlər."
+    "feature3Body": "Brokerlər və komandaları üçün şəffaf ödənişlər.",
+    "registerType": {
+      "step": "Addım {current} / {total}",
+      "title": "Qeydiyyat növünü seçin",
+      "subtitle": "Necə qeydiyyatdan keçmək istədiyinizi bildirin — komanda üzvlərini sonra da əlavə edə bilərsiniz.",
+      "individual": "Fərdi",
+      "individualHint": "Şəxsi hesab kimi qeydiyyatdan keçin.",
+      "company": "Şirkət",
+      "companyHint": "Şirkət adından qeydiyyatdan keçin.",
+      "companySetup": "Şirkət quraşdırması",
+      "createCompany": "Yeni şirkət yarat",
+      "createCompanyHint": "Yeni şirkət qeydiyyatdan keçirin və onun ilk administratoru olun.",
+      "joinCompany": "Mövcud şirkətə qoşul",
+      "joinCompanyHint": "Artıq platformadan istifadə edən şirkətə qoşulmaq üçün sorğu göndərin.",
+      "searchCompany": "Şirkət axtarın və ya seçin",
+      "back": "Geri",
+      "continue": "Davam et",
+      "legalPrefix": "Davam etməklə siz",
+      "legalAnd": "və",
+      "terms": "İstifadə Şərtlərini",
+      "privacy": "Məxfilik Siyasətini"
+    }
   },
   "news": {
     "title": "Xəbər lenti",
@@ -304,7 +326,82 @@
     "unitsTotal": "Cəmi {total} vahid",
     "unitsAvailable": "{available} mövcud",
     "deleteConfirm": "Bu layihə silinsin? Brokerlər onun vahidlərinə çıxışı itirəcək.",
-    "from": "başlayır"
+    "from": "başlayır",
+    "editor": {
+      "name": "Layihənin adı",
+      "publicUrl": "İctimai URL",
+      "save": "Dəyişiklikləri saxla",
+      "heroImage": "Örtük şəkli",
+      "galleryImage": "Qalereya şəkli",
+      "highlights": "Əsas məqamlar",
+      "highlightsHint": "Alıcıya layihəni tez qiymətləndirməyə kömək edən qısa faktlar.",
+      "highlightLabel": "Etiket",
+      "highlightValue": "Dəyər",
+      "highlightEnabled": "Bu məqamı göstər",
+      "addHighlight": "Məqam əlavə et",
+      "offers": "Xüsusi təkliflər",
+      "offersHint": "Müddətli kampaniyaları və alıcı stimullarını önə çıxarın.",
+      "offerTag": "Təklif nişanı",
+      "offerTitle": "Təklifin başlığı",
+      "offerDescription": "Təklifi təsvir edin…",
+      "offerEnabled": "Bu təklifi göstər",
+      "offerTags": {
+        "new": "Yeni",
+        "limited": "Məhdud",
+        "exclusive": "Eksklüziv"
+      },
+      "expires": "Bitir:",
+      "expiresPlaceholder": "Tarix seçin",
+      "addOffer": "Təklif əlavə et",
+      "materials": "Marketinq materialları",
+      "materialsHint": "Agentlər və alıcılar üçün broşürlər, təqdimatlar və sənədlər.",
+      "columns": {
+        "file": "Fayl",
+        "category": "Kateqoriya",
+        "language": "Dil",
+        "size": "Ölçü",
+        "actions": "Əməliyyatlar"
+      },
+      "replace": "Faylı əvəz et",
+      "dropTitle": "Buraya sürüşdürüb buraxın",
+      "dropHint": "JPEG, PNG, PDF və MP4 formatı, 60MB-a qədər",
+      "or": "və ya",
+      "selectFile": "Fayl seç",
+      "availability": "Canlı mövcudluq",
+      "availabilityHint": "İctimai elanda göstərilən real vaxt vahid sayı.",
+      "autoCalculate": "Avtomatik hesabla",
+      "buckets": {
+        "available": "Mövcud",
+        "reserved": "Rezerv",
+        "sold": "Satılıb"
+      },
+      "shareOfTotal": "ümumidən {percent}%",
+      "createTitle": "Yeni layihə əlavə et",
+      "editTitle": "Layihəni redaktə et",
+      "delete": "Layihəni sil",
+      "imageHint": "Klikləyin və ya şəkli buraxın",
+      "replaceImage": "Şəkli dəyiş"
+    },
+    "detail": {
+      "pageLink": "Səhifə keçidi",
+      "download": "Yüklə",
+      "downloads": "{count} yükləmə",
+      "finance": "Maliyyə",
+      "floorPlan": "Mərtəbə planı",
+      "lastSynced": "Son sinxronizasiya: {when}",
+      "edit": "Redaktə et",
+      "financeColumns": {
+        "index": "№",
+        "projectName": "Layihə adı",
+        "unitCode": "Mənzil",
+        "listingPrice": "Elan qiyməti",
+        "salesPrice": "Satış qiyməti",
+        "received": "Daxil.",
+        "paid": "Ödənilib",
+        "remaining": "Qalıq",
+        "salesDate": "Satış tarixi"
+      }
+    }
   },
   "floorPlan": {
     "title": "Mərtəbə planı",
@@ -313,13 +410,40 @@
       "available": "Mövcud",
       "reserved": "Rezerv",
       "sold": "Satılıb",
-      "blocked": "Bloklanıb"
+      "blocked": "Əlçatmaz"
     },
     "unit": "Mənzil {code}",
     "floor": "{level}-ci mərtəbə",
     "specs": "{beds} otaq · {area} m²",
     "selectUnit": "Detalları görmək üçün mənzil seçin",
-    "totalUnits": "{total} mənzil"
+    "totalUnits": "{total} mənzil",
+    "views": {
+      "grid": "Şəbəkə",
+      "gridPlus": "Şəbəkə+",
+      "properties": "Mənzillər",
+      "layouts": "Planlar"
+    },
+    "sorts": {
+      "lowestPrice": "Ən aşağı qiymət",
+      "highestPrice": "Ən yüksək qiymət",
+      "largestArea": "Ən böyük sahə"
+    },
+    "sortBy": "Sırala",
+    "card": {
+      "floor": "Mərtəbə",
+      "type": "Tip",
+      "area": "Sahə",
+      "loggia": "Lodjiya"
+    },
+    "layout": {
+      "priceFrom": "{price}-dan",
+      "properties": "{count} mənzil"
+    },
+    "building": "Bina",
+    "listing": {
+      "floors": "{count} mərtəbə",
+      "units": "{count} yaşayış vahidi"
+    }
   },
   "users": {
     "title": "İstifadəçilər",
@@ -328,16 +452,20 @@
       "user": "İstifadəçi",
       "agency": "Daşınmaz Əmlak Agentlikləri"
     },
-    "add": "İstifadəçi əlavə et",
-    "export": "İxrac et",
-    "searchPlaceholder": "Ad, e-poçt və ya telefonla axtar",
+    "cooperationType": "Əməkdaşlıq növü",
+    "cooperationTypes": {
+      "exclusive": "Eksklüziv",
+      "partner": "Tərəfdaş",
+      "external": "Xarici"
+    },
     "columns": {
       "name": "Ad",
       "email": "E-poçt",
+      "password": "Şifrə",
       "phone": "Telefon",
       "role": "Rol",
-      "team": "Komanda",
       "status": "Status",
+      "lastLogin": "Son giriş",
       "actions": "Əməliyyatlar",
       "manager": "Menecer",
       "contacts": "Əlaqə",
@@ -345,38 +473,61 @@
     },
     "status": {
       "active": "Aktiv",
-      "blocked": "Bloklanmış",
+      "blocked": "Deaktiv",
       "invited": "Dəvət olunmuş"
     },
     "form": {
-      "createTitle": "Yeni istifadəçi",
-      "editTitle": "İstifadəçini redaktə et",
+      "createTitle": "Agent yarat",
+      "editTitle": "Agenti redaktə et",
+      "createCrumb": "Yarat",
       "firstName": "Ad",
       "lastName": "Soyad",
-      "email": "E-poçt ünvanı",
+      "email": "E-poçt",
       "password": "Şifrə",
-      "generate": "Şifrə yarat",
-      "phone": "Telefon nömrəsi",
-      "jobTitle": "Vəzifə",
-      "team": "Komanda",
+      "phone": "Əsas nömrə",
+      "addPhone": "Başqa nömrə əlavə et",
+      "cooperationType": "Əməkdaşlıq növü",
+      "agentlik": "Agentlik",
+      "agency": "Agentlik adı",
+      "accessPermissions": "Giriş icazələri",
+      "accessPermissionOptions": {
+        "full": "Tam giriş",
+        "extended": "Genişləndirilmiş",
+        "standard": "Standart"
+      },
       "role": "Rol",
-      "roleHint": "Bu hesabın hansı ekranlara və əməliyyatlara çıxışı olacağını təyin edir",
+      "roleOptions": {
+        "broker": "Agent",
+        "top_broker": "Aparıcı agent",
+        "admin": "Direktor"
+      },
       "blockAgent": "Agenti blokla",
-      "blockHint": "Bloklanmış hesab sistemə daxil ola bilmir",
-      "save": "Yadda saxla",
-      "confirmPassword": "Şifrəni təsdiqlə",
-      "passwordMismatch": "Şifrələr uyğun gəlmir",
-      "organization": "Təşkilat"
+      "create": "Yarat",
+      "save": "Yadda saxla"
+    },
+    "profile": {
+      "title": "Profil"
+    },
+    "agencyColumns": {
+      "status": "Status",
+      "marketingName": "Marketinq adı",
+      "city": "Şəhər",
+      "registrationDate": "Qeydiyyat tarixi",
+      "crmConnection": "CRM bağlantısı"
+    },
+    "agencyStatus": {
+      "new": "Yeni",
+      "active": "Aktiv",
+      "pending": "Gözləyir"
     },
     "deleteConfirm": "Bu istifadəçi silinsin? Geri qaytarmaq mümkün olmayacaq.",
     "addUser": "İstifadəçi əlavə et",
-    "addAgency": "Agentlik əlavə et",
     "userAdded": "İstifadəçi uğurla əlavə edildi",
     "agencyAdded": "Agentlik uğurla əlavə edildi",
     "userDeleted": "İstifadəçi silindi",
     "agencyDeleted": "Agentlik silindi",
-    "searchUsers": "İstifadəçi axtar",
-    "searchAgencies": "Agentlik axtar",
+    "searchUsers": "Ad, soyad və ya telefon nömrəsi ilə axtar",
+    "searchAgencies": "Daşınmaz Əmlak Agentlikləri",
     "userUpdated": "İstifadəçi yeniləndi"
   },
   "listings": {
@@ -411,7 +562,7 @@
   },
   "roles": {
     "broker": "Broker",
-    "top_broker": "Top Broker",
+    "top_broker": "Menecer",
     "admin": "Admin"
   }
 }

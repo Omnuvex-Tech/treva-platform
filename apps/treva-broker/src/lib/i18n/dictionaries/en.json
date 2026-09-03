@@ -65,6 +65,7 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password?",
     "signIn": "Sign in to dashboard",
+    "register": "Register",
     "securityNote": "Protected by enterprise-grade security",
     "invalidCredentials": "Email or password is incorrect",
     "panelTitle": "Manage Azerbaijan's Premium Real Estate",
@@ -74,7 +75,28 @@
     "feature2Title": "Clients and deals end to end",
     "feature2Body": "From first enquiry to handover, with nothing lost in between.",
     "feature3Title": "Commission you can verify",
-    "feature3Body": "Transparent payouts for brokers and their teams."
+    "feature3Body": "Transparent payouts for brokers and their teams.",
+    "registerType": {
+      "step": "Step {current} of {total}",
+      "title": "Choose Registration Type",
+      "subtitle": "Tell us how you'd like to register — you can always add teammates later.",
+      "individual": "Individual",
+      "individualHint": "Register as a personal account.",
+      "company": "Company",
+      "companyHint": "Register on behalf of a company.",
+      "companySetup": "Company setup",
+      "createCompany": "Create New Company",
+      "createCompanyHint": "Register a new company and become its first administrator.",
+      "joinCompany": "Join Existing Company",
+      "joinCompanyHint": "Request to join a company already using the platform.",
+      "searchCompany": "Search or select a company",
+      "back": "Back",
+      "continue": "Continue",
+      "legalPrefix": "By continuing you agree to our",
+      "legalAnd": "and",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    }
   },
   "news": {
     "title": "News Feed",
@@ -304,7 +326,82 @@
     "unitsTotal": "{total} units total",
     "unitsAvailable": "{available} available",
     "deleteConfirm": "Remove this project? Brokers will lose access to its units.",
-    "from": "from"
+    "from": "from",
+    "editor": {
+      "name": "Project name",
+      "publicUrl": "Public URL",
+      "save": "Save Changes",
+      "heroImage": "Cover image",
+      "galleryImage": "Gallery image",
+      "highlights": "Key Highlights",
+      "highlightsHint": "Concise facts that help buyers quickly assess this project.",
+      "highlightLabel": "Label",
+      "highlightValue": "Value",
+      "highlightEnabled": "Show this highlight",
+      "addHighlight": "Add Highlight",
+      "offers": "Special Offers",
+      "offersHint": "Highlight limited-time promotions and buyer incentives.",
+      "offerTag": "Offer tag",
+      "offerTitle": "Offer title",
+      "offerDescription": "Describe the offer…",
+      "offerEnabled": "Show this offer",
+      "offerTags": {
+        "new": "New",
+        "limited": "Limited",
+        "exclusive": "Exclusive"
+      },
+      "expires": "Expires:",
+      "expiresPlaceholder": "Select date",
+      "addOffer": "Add Offer",
+      "materials": "Marketing Materials",
+      "materialsHint": "Brochures, presentations, and documents for agents and buyers.",
+      "columns": {
+        "file": "File",
+        "category": "Category",
+        "language": "Language",
+        "size": "Size",
+        "actions": "Actions"
+      },
+      "replace": "Replace file",
+      "dropTitle": "Drag & drop here",
+      "dropHint": "JPEG, PNG, PDF and MP4 format, up to 60MB",
+      "or": "or",
+      "selectFile": "Select file",
+      "availability": "Live Availability",
+      "availabilityHint": "Real-time unit count displayed on the public listing.",
+      "autoCalculate": "Auto Calculate",
+      "buckets": {
+        "available": "Available",
+        "reserved": "Reserved",
+        "sold": "Sold"
+      },
+      "shareOfTotal": "{percent}% of total",
+      "createTitle": "Add new projects",
+      "editTitle": "Edit project",
+      "delete": "Delete project",
+      "imageHint": "Click or drop an image",
+      "replaceImage": "Replace image"
+    },
+    "detail": {
+      "pageLink": "Page Link",
+      "download": "Download",
+      "downloads": "{count} downloads",
+      "finance": "Finance",
+      "floorPlan": "Floor Plan",
+      "lastSynced": "Last synced: {when}",
+      "edit": "Edit",
+      "financeColumns": {
+        "index": "No",
+        "projectName": "Project Name",
+        "unitCode": "Unit",
+        "listingPrice": "Listing Price",
+        "salesPrice": "Sales Price",
+        "received": "Rec.",
+        "paid": "Paid",
+        "remaining": "Rem.",
+        "salesDate": "Sales Date"
+      }
+    }
   },
   "floorPlan": {
     "title": "Floor Plan",
@@ -313,13 +410,40 @@
       "available": "Available",
       "reserved": "Reserved",
       "sold": "Sold",
-      "blocked": "Blocked"
+      "blocked": "Unavailable"
     },
     "unit": "Unit {code}",
     "floor": "Floor {level}",
     "specs": "{beds} bed · {area} m²",
     "selectUnit": "Select a unit to see its details",
-    "totalUnits": "{total} units"
+    "totalUnits": "{total} units",
+    "views": {
+      "grid": "Grid",
+      "gridPlus": "Grid+",
+      "properties": "Properties",
+      "layouts": "Layouts"
+    },
+    "sorts": {
+      "lowestPrice": "Lowest price",
+      "highestPrice": "Highest price",
+      "largestArea": "Largest area"
+    },
+    "sortBy": "Sort by",
+    "card": {
+      "floor": "Floor",
+      "type": "Type",
+      "area": "Area",
+      "loggia": "Loggia"
+    },
+    "layout": {
+      "priceFrom": "From {price}",
+      "properties": "{count} property"
+    },
+    "building": "Building",
+    "listing": {
+      "floors": "{count} Floors",
+      "units": "{count} residential units"
+    }
   },
   "users": {
     "title": "Users",
@@ -328,16 +452,20 @@
       "user": "User",
       "agency": "Real Estate Agencies"
     },
-    "add": "Add user",
-    "export": "Export",
-    "searchPlaceholder": "Search by name, email or phone",
+    "cooperationType": "Cooperation Type",
+    "cooperationTypes": {
+      "exclusive": "Exclusive",
+      "partner": "Partner",
+      "external": "External"
+    },
     "columns": {
       "name": "Name",
       "email": "E-Mail",
+      "password": "Password",
       "phone": "Phone",
       "role": "Role",
-      "team": "Team",
       "status": "Status",
+      "lastLogin": "Last Login",
       "actions": "Actions",
       "manager": "Manager",
       "contacts": "Contacts",
@@ -345,38 +473,61 @@
     },
     "status": {
       "active": "Active",
-      "blocked": "Blocked",
+      "blocked": "Deactive",
       "invited": "Invited"
     },
     "form": {
-      "createTitle": "New user",
-      "editTitle": "Edit user",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "email": "Email address",
+      "createTitle": "Agent create",
+      "editTitle": "Agent edit",
+      "createCrumb": "Create",
+      "firstName": "Name",
+      "lastName": "Surname",
+      "email": "Email",
       "password": "Password",
-      "generate": "Generate password",
-      "phone": "Phone number",
-      "jobTitle": "Job title",
-      "team": "Team",
+      "phone": "Primary number",
+      "addPhone": "Add another number",
+      "cooperationType": "Cooperation Type",
+      "agentlik": "Agentlik",
+      "agency": "Agency",
+      "accessPermissions": "Access Permissions",
+      "accessPermissionOptions": {
+        "full": "Full access",
+        "extended": "Extended",
+        "standard": "Standard"
+      },
       "role": "Role",
-      "roleHint": "Decides which screens and actions this account gets",
-      "blockAgent": "Block agent",
-      "blockHint": "A blocked account cannot sign in",
-      "save": "Save",
-      "confirmPassword": "Confirm password",
-      "passwordMismatch": "Passwords do not match",
-      "organization": "Organization"
+      "roleOptions": {
+        "broker": "Agent",
+        "top_broker": "Managing Agent",
+        "admin": "Director"
+      },
+      "blockAgent": "Block Agent",
+      "create": "Create",
+      "save": "Save"
+    },
+    "profile": {
+      "title": "Profile"
+    },
+    "agencyColumns": {
+      "status": "Status",
+      "marketingName": "Marketing Name",
+      "city": "City",
+      "registrationDate": "Registration Date",
+      "crmConnection": "CRM Connection"
+    },
+    "agencyStatus": {
+      "new": "New",
+      "active": "Active",
+      "pending": "Pending"
     },
     "deleteConfirm": "Delete this user? This cannot be undone.",
-    "addUser": "Add user",
-    "addAgency": "Add agency",
+    "addUser": "Add User",
     "userAdded": "User Successfully Added",
     "agencyAdded": "Agency Successfully Added",
     "userDeleted": "User removed",
     "agencyDeleted": "Agency removed",
-    "searchUsers": "Search users",
-    "searchAgencies": "Search agencies",
+    "searchUsers": "Search by name, surname, or phone number",
+    "searchAgencies": "Real Estate Agencies",
     "userUpdated": "User updated"
   },
   "listings": {
@@ -411,7 +562,7 @@
   },
   "roles": {
     "broker": "Broker",
-    "top_broker": "Top Broker",
+    "top_broker": "Manager",
     "admin": "Admin"
   }
 }

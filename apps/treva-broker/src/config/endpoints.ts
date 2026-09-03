@@ -57,5 +57,7 @@ export const endpoints = {
     users: {
         list: "/users",
         detail: (id: string) => `/users/${id}`,
+        /** The agency row under the agent editor (873:48887). */
+        agencyLink: (id: string) => `/users/${id}/agency`,
     },
 } as const;

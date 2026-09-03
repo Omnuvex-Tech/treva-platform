@@ -23,9 +23,12 @@ export interface AgencyTableProps {
 }
 
 /**
- * The Real Estate Agencies tab (873:48597): five equal content columns —
- * Name, Manager, Contacts, Organization, E-Mail — plus the 69px actions column,
- * in a 1072px table.
+ * The Real Estate Agencies tab (873:48597 / 907:14578).
+ *
+ * Five equal content columns — Name, Manager, Contacts, Organization, E-Mail —
+ * at 200.6 each, plus the same 69px two-cell actions column the User tab uses.
+ * Every cell is Content/Brand Bold: the artboard does not step the secondary
+ * columns down a tone.
  */
 export function AgencyTable({ agencies, onEdit, onDelete }: AgencyTableProps) {
     const { t } = useI18n();
@@ -38,12 +41,18 @@ export function AgencyTable({ agencies, onEdit, onDelete }: AgencyTableProps) {
         <Table>
             <TableHead>
                 <TableRow>
-                    <TableHeaderCell>{t.users.columns.name}</TableHeaderCell>
-                    <TableHeaderCell>{t.users.columns.manager}</TableHeaderCell>
-                    <TableHeaderCell>{t.users.columns.contacts}</TableHeaderCell>
-                    <TableHeaderCell>{t.users.columns.organization}</TableHeaderCell>
-                    <TableHeaderCell>{t.users.columns.email}</TableHeaderCell>
-                    <TableHeaderCell className="w-[69px] text-right">
+                    <TableHeaderCell className="w-[18.7%]">{t.users.columns.name}</TableHeaderCell>
+                    <TableHeaderCell className="w-[18.7%]">
+                        {t.users.columns.manager}
+                    </TableHeaderCell>
+                    <TableHeaderCell className="w-[18.7%]">
+                        {t.users.columns.contacts}
+                    </TableHeaderCell>
+                    <TableHeaderCell className="w-[18.7%]">
+                        {t.users.columns.organization}
+                    </TableHeaderCell>
+                    <TableHeaderCell className="w-[18.7%]">{t.users.columns.email}</TableHeaderCell>
+                    <TableHeaderCell className="w-[69px]">
                         {t.users.columns.actions}
                     </TableHeaderCell>
                 </TableRow>
@@ -52,38 +61,49 @@ export function AgencyTable({ agencies, onEdit, onDelete }: AgencyTableProps) {
             <TableBody>
                 {agencies.map((agency) => (
                     <TableRow key={agency.id}>
-                        <TableCell>{agency.name}</TableCell>
-                        <TableCell className="text-content-secondary">{agency.managerName}</TableCell>
-                        <TableCell className="whitespace-nowrap text-content-secondary">
-                            {agency.phone}
-                        </TableCell>
-                        <TableCell className="text-content-secondary">{agency.organization}</TableCell>
-                        <TableCell className="text-content-secondary">{agency.email}</TableCell>
+                        <TableCell className="truncate">{agency.name}</TableCell>
+                        <TableCell className="truncate">{agency.managerName}</TableCell>
+                        <TableCell className="whitespace-nowrap">{agency.phone}</TableCell>
+                        <TableCell className="truncate">{agency.organization}</TableCell>
+                        <TableCell className="truncate">{agency.email}</TableCell>
 
-                        <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                                {canEdit ? (
-                                    <Button
-                                        variant="ghost"
-                                        size="iconSm"
-                                        aria-label={`${t.common.edit}: ${agency.name}`}
-                                        onClick={() => onEdit(agency)}
-                                    >
-                                        <HugeiconsIcon icon={PencilEdit02Icon} size={16} strokeWidth={1.6} />
-                                    </Button>
-                                ) : null}
+                        <TableCell className="px-0">
+                            <div className="flex items-center">
+                                <span className="flex flex-1 justify-center">
+                                    {canEdit ? (
+                                        <Button
+                                            variant="ghost"
+                                            size="iconSm"
+                                            aria-label={`${t.common.edit}: ${agency.name}`}
+                                            onClick={() => onEdit(agency)}
+                                            className="text-content-secondary"
+                                        >
+                                            <HugeiconsIcon
+                                                icon={PencilEdit02Icon}
+                                                size={16}
+                                                strokeWidth={1.6}
+                                            />
+                                        </Button>
+                                    ) : null}
+                                </span>
 
-                                {canDelete ? (
-                                    <Button
-                                        variant="ghost"
-                                        size="iconSm"
-                                        aria-label={`${t.common.delete}: ${agency.name}`}
-                                        onClick={() => onDelete(agency)}
-                                        className="text-content-tertiary hover:text-content-negative"
-                                    >
-                                        <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
-                                    </Button>
-                                ) : null}
+                                <span className="flex flex-1 justify-center">
+                                    {canDelete ? (
+                                        <Button
+                                            variant="ghost"
+                                            size="iconSm"
+                                            aria-label={`${t.common.delete}: ${agency.name}`}
+                                            onClick={() => onDelete(agency)}
+                                            className="text-content-secondary hover:text-content-negative"
+                                        >
+                                            <HugeiconsIcon
+                                                icon={Delete02Icon}
+                                                size={16}
+                                                strokeWidth={1.6}
+                                            />
+                                        </Button>
+                                    ) : null}
+                                </span>
                             </div>
                         </TableCell>
                     </TableRow>

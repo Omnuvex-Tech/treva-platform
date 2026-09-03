@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { interpolate } from "@/lib/i18n/interpolate";
+import { cn } from "@/lib/utils/cn";
 import { formatNumber, formatRelativeTime } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
@@ -21,14 +22,10 @@ const STATUS_TONE: Record<ProjectStatus, "positive" | "neutral"> = {
 export interface ProjectCardProps {
     project: Project;
     onDelete?: (project: Project) => void;
-    /**
-     * Optional on purpose, and unwired for now. The artboard draws the Edit
-     * button but the file has no project editor to send it to, so there is
-     * nowhere for the click to go yet. The button is still rendered: dropping
-     * it would make the card differ from the artboard in a way that reads as
-     * unfinished rather than as a deliberate gap.
-     */
+    /** Goes to the editor (873:51091). */
     onEdit?: (project: Project) => void;
+    /** Goes to the project's own screen (1173:16211). */
+    onOpen?: (project: Project) => void;
 }
 
 /**
@@ -42,14 +39,32 @@ export interface ProjectCardProps {
  * The footer's two controls are both 28 tall: a grey clock chip carrying how
  * long ago the project changed, and the brand Edit button.
  */
-export function ProjectCard({ project, onDelete, onEdit }: ProjectCardProps) {
+export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardProps) {
     const { locale, t } = useI18n();
     const { can } = useSession();
 
     return (
         <article className="flex h-92 flex-col gap-3 rounded-xl border border-border-subtle bg-bg-primary px-2 pt-2 pb-3">
-            {/* I873:49156;13186:128 — 200 tall, same 4XL radius as the card. */}
-            <div className="relative h-50 w-full shrink-0 overflow-hidden rounded-xl bg-bg-secondary">
+            {/* I873:49156;13186:128 — 200 tall, same 4XL radius as the card. The
+                cover is the way into the project's own screen; the artboard
+                draws no separate control for it and the footer's Edit button
+                already owns the other destination. */}
+            <div
+                role={onOpen ? "button" : undefined}
+                tabIndex={onOpen ? 0 : undefined}
+                onClick={() => onOpen?.(project)}
+                onKeyDown={(event) => {
+                    if (!onOpen) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onOpen(project);
+                    }
+                }}
+                className={cn(
+                    "relative h-50 w-full shrink-0 overflow-hidden rounded-xl bg-bg-secondary",
+                    onOpen && "cursor-pointer",
+                )}
+            >
                 {project.coverImageUrl ? (
                     <Image
                         src={project.coverImageUrl}

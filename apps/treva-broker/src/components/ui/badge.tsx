@@ -45,4 +45,42 @@ export function Badge({ className, tone, size, ...props }: BadgeProps) {
     return <span className={cn(badgeVariants({ tone, size }), className)} {...props} />;
 }
 
+/**
+ * The dot form of the same component — `Badge, Type=2` (I873:48552).
+ *
+ * No fill and no radius: a 6px disc 4px from a 12/Regular label on
+ * Content/Tertiary, boxed at 80px minimum so a column of them lines up whether
+ * it reads "Active" or "Deactive". Only the disc carries the status colour,
+ * which is why this cannot be the pill above with a smaller padding.
+ */
+const dotTones = {
+    positive: "bg-content-positive",
+    /** Figma's "processing" blue — what Deactive is drawn in. */
+    info: "bg-content-link",
+    notice: "bg-content-notice",
+    negative: "bg-content-negative",
+    neutral: "bg-content-disabled",
+} as const;
+
+export type StatusBadgeTone = keyof typeof dotTones;
+
+export interface StatusBadgeProps extends HTMLAttributes<HTMLSpanElement> {
+    tone?: StatusBadgeTone;
+}
+
+export function StatusBadge({ className, tone = "neutral", children, ...props }: StatusBadgeProps) {
+    return (
+        <span
+            className={cn(
+                "inline-flex min-w-20 items-center gap-1 px-2 py-1 text-xs whitespace-nowrap text-content-tertiary",
+                className,
+            )}
+            {...props}
+        >
+            <span aria-hidden className={cn("size-1.5 shrink-0 rounded-pill", dotTones[tone])} />
+            {children}
+        </span>
+    );
+}
+
 export { badgeVariants };

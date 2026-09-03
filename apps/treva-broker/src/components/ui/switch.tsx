@@ -14,13 +14,17 @@ export interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
  * 32x20 with a 16px knob inset 2 — so the travel is 12, not 16. The off state
  * is Background/Teritary, a step lighter than the Border/Tertiary an earlier
  * pass used.
+ *
+ * The labelled form is the "Block Agent" row on the agent form (I873:48747):
+ * 4px from the control, 16/Regular on Content/Secondary — a size up from the
+ * 14px the rest of the app's body copy uses.
  */
 export function Switch({ label, className, id, ...props }: SwitchProps) {
     const generatedId = useId();
     const switchId = id ?? generatedId;
 
     return (
-        <div className="inline-flex items-center gap-2">
+        <div className="inline-flex items-center gap-1">
             <span className="relative inline-flex">
                 <input
                     id={switchId}
@@ -42,7 +46,10 @@ export function Switch({ label, className, id, ...props }: SwitchProps) {
             </span>
 
             {label ? (
-                <label htmlFor={switchId} className="cursor-pointer text-sm text-content-primary">
+                <label
+                    htmlFor={switchId}
+                    className="cursor-pointer text-base leading-5 text-content-secondary"
+                >
                     {label}
                 </label>
             ) : null}

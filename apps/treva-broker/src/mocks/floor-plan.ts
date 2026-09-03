@@ -1,4 +1,4 @@
-import type { Building, Floor, Unit, UnitStatus } from "@/features/floor-plan/types";
+import type { Building, Floor, Layout, Unit, UnitStatus } from "@/features/floor-plan/types";
 
 /**
  * The artboard draws an 18-floor stack, 8 units wide, in 28x28 cells.
@@ -58,6 +58,7 @@ function buildFloors(seed: number): Floor[] {
                 status: pickStatus(random, level),
                 bedrooms,
                 areaSqm,
+                loggiaSqm: bedrooms === 1 ? 4.5 : bedrooms === 2 ? 6.3 : 7,
                 // Higher floors carry a premium, as they do in the real price list.
                 price: Math.round((areaSqm * 2_050 + level * 1_400) / 100) * 100,
             });
@@ -96,3 +97,19 @@ export const MOCK_BUILDINGS: Building[] = [
     makeBuilding("bld_b", "Tower B", "Pearl Towers", 20250402),
     makeBuilding("bld_c", "Seaside Block", "Seaside Residence", 20250403),
 ];
+
+/**
+ * The eight drawings the Layouts tab lays out four across (873:50474).
+ *
+ * `planImageUrl` is null: the artboard shows real architectural plans, and no
+ * such asset exists in the repo — the card renders its own placeholder well
+ * rather than inventing a drawing.
+ */
+export const MOCK_LAYOUTS: Layout[] = Array.from({ length: 8 }, (_, index) => ({
+    id: `lay_${index + 1}`,
+    label: "Reportage Heights, R1",
+    priceFrom: 200_000,
+    areaSqm: [101.25, 123.25, 102.25, 144.25, 114.25, 118.25, 102.25, 100.25][index]!,
+    propertyCount: 1,
+    planImageUrl: null,
+}));

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent , type ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 import { AnchoredPopover } from "./popover";
@@ -31,6 +31,12 @@ export interface SelectProps {
     "aria-label"?: string;
     containerClassName?: string;
     className?: string;
+    /**
+     * Draws the chosen value yourself. Special Offers (873:51241) puts a Badge
+     * in the field rather than plain text, which no combination of classes on
+     * the label can produce.
+     */
+    renderValue?: (value: string) => ReactNode;
 }
 
 /**
@@ -58,6 +64,7 @@ export function Select({
     "aria-label": ariaLabel,
     containerClassName,
     className,
+    renderValue,
 }: SelectProps) {
     const generatedId = useId();
     const triggerId = id ?? generatedId;
@@ -193,7 +200,9 @@ export function Select({
                 )}
             >
                 <span className={cn("truncate", !selectedOption && "text-content-tertiary")}>
-                    {selectedOption?.label ?? placeholder ?? ""}
+                    {selectedOption && renderValue
+                        ? renderValue(selectedOption.value)
+                        : (selectedOption?.label ?? placeholder ?? "")}
                 </span>
                 <ChevronDown
                     aria-hidden

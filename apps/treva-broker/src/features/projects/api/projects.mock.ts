@@ -2,7 +2,8 @@ import { delay, paginate, searchBy } from "@/lib/api/mock";
 import { ApiError } from "@/lib/api/errors";
 import type { Paginated } from "@/lib/api/types";
 import { MOCK_PROJECTS } from "@/mocks/projects";
-import type { Project, ProjectListQuery } from "../types";
+import { emptyProject } from "../empty-project";
+import type { Project, ProjectInput, ProjectListQuery } from "../types";
 
 let projects: Project[] = [...MOCK_PROJECTS];
 
@@ -26,6 +27,36 @@ export async function detail(id: string): Promise<Project> {
     if (!project) throw new ApiError("Project not found", 404, "not_found");
 
     return project;
+}
+
+export async function create(input: Partial<ProjectInput>): Promise<Project> {
+    await delay();
+
+    const project: Project = {
+        ...emptyProject(),
+        ...input,
+        id: `prj_${Date.now().toString(36)}`,
+        updatedAt: new Date().toISOString(),
+    };
+
+    projects = [project, ...projects];
+    return project;
+}
+
+export async function update(
+    id: string,
+    input: Partial<ProjectInput>,
+): Promise<Project> {
+    await delay();
+
+    const index = projects.findIndex((entry) => entry.id === id);
+    if (index === -1) throw new ApiError("Project not found", 404, "not_found");
+
+    const current = projects[index]!;
+    const updated: Project = { ...current, ...input, updatedAt: new Date().toISOString() };
+
+    projects = projects.map((entry, entryIndex) => (entryIndex === index ? updated : entry));
+    return updated;
 }
 
 export async function remove(id: string): Promise<void> {

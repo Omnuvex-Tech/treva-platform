@@ -1,7 +1,7 @@
 import { http } from "@/lib/api/http";
 import type { Paginated } from "@/lib/api/types";
 import { endpoints } from "@/config/endpoints";
-import type { PlatformUser, UserInput, UserListQuery } from "../types";
+import type { PlatformUser, UserAgencyLink, UserInput, UserListQuery } from "../types";
 
 /** Real adapter — see the note in features/auth/api/auth.http.ts. */
 export async function list(query: UserListQuery = {}): Promise<Paginated<PlatformUser>> {
@@ -11,12 +11,17 @@ export async function list(query: UserListQuery = {}): Promise<Paginated<Platfor
             perPage: query.perPage,
             search: query.search,
             status: query.status === "all" ? undefined : query.status,
+            cooperationType: query.cooperationType,
         },
     });
 }
 
 export async function detail(id: string): Promise<PlatformUser> {
     return http.get<PlatformUser>(endpoints.users.detail(id));
+}
+
+export async function agencyLink(id: string): Promise<UserAgencyLink | null> {
+    return http.get<UserAgencyLink | null>(endpoints.users.agencyLink(id));
 }
 
 export async function create(input: UserInput): Promise<PlatformUser> {

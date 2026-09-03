@@ -3,6 +3,7 @@
 import { Add01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Building2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { routes } from "@/config/routes";
 import { useConfirm } from "@/hooks/use-confirm";
 import { interpolate } from "@/lib/i18n/interpolate";
 import { useI18n } from "@/providers/i18n-provider";
@@ -37,8 +39,9 @@ const PER_PAGE = 8;
  * it stays, because the fixtures already run past one page.
  */
 export function ProjectsView() {
-    const { t } = useI18n();
+    const { locale, t } = useI18n();
     const { can } = useSession();
+    const router = useRouter();
 
     const [page, setPage] = useState(1);
 
@@ -75,6 +78,7 @@ export function ProjectsView() {
                         // to 12px, this button is 16.
                         className="shrink-0 rounded-lg border border-border-inverse px-3.5"
                         leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
+                        onClick={() => router.push(routes.projectNew(locale))}
                     >
                         {t.projects.add}
                     </Button>
@@ -108,6 +112,12 @@ export function ProjectsView() {
                                     key={project.id}
                                     project={project}
                                     onDelete={confirmDelete.ask}
+                                    onEdit={(target) =>
+                                        router.push(routes.projectEdit(locale, target.id))
+                                    }
+                                    onOpen={(target) =>
+                                        router.push(routes.projectDetail(locale, target.id))
+                                    }
                                 />
                             ))}
                         </div>

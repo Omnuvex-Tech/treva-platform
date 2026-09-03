@@ -15,6 +15,12 @@ export interface TabsProps<T extends string = string> {
     value: T;
     onChange: (value: T) => void;
     variant?: TabsVariant;
+    /**
+     * Pill height. `md` is the 44px panel a client's screen draws (873:49450);
+     * `sm` is the 36px one on Users (873:48496) — 8px of padding around a 20px
+     * line, not a shrunken 44.
+     */
+    size?: "sm" | "md";
     className?: string;
 }
 
@@ -38,6 +44,7 @@ export function Tabs<T extends string = string>({
     value,
     onChange,
     variant = "track",
+    size = "md",
     className,
 }: TabsProps<T>) {
     const pill = variant === "pill";
@@ -66,7 +73,7 @@ export function Tabs<T extends string = string>({
                         className={cn(
                             "inline-flex items-center gap-1.5 font-medium transition-colors",
                             pill
-                                ? "h-11 rounded-pill text-sm"
+                                ? cn("rounded-pill text-sm", size === "sm" ? "h-9" : "h-11")
                                 : "h-8 rounded-sm px-3 text-xs",
                             pill && (active ? "px-3.5" : "px-3"),
                             active

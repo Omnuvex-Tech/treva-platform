@@ -22,6 +22,12 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
     surface?: "filled" | "outlined" | "form" | "light";
     /** `md` is the 44px field; `sm` is the 36px one the lead form draws. */
     size?: "sm" | "md";
+    /**
+     * Glyph size in the leading/trailing slots. 16 everywhere by default, which
+     * is what the list and header searches draw; the company field on sign-up
+     * (873:60467) is the one that draws 20.
+     */
+    iconSize?: 16 | 20;
 }
 
 /**
@@ -45,6 +51,7 @@ export function Input({
     containerClassName,
     surface = "filled",
     size = "md",
+    iconSize = 16,
     className,
     id,
     disabled,
@@ -60,7 +67,13 @@ export function Input({
             {label ? (
                 <label
                     htmlFor={inputId}
-                    className="mb-1 text-xs font-semibold text-content-secondary"
+                    className={cn(
+                        "mb-1 text-xs font-semibold",
+                        // The read-only fields on Profile (I873:48774) grey the
+                        // label as well as the field — a disabled row reads as
+                        // one block, not as a live label over a dead box.
+                        disabled ? "text-content-disabled" : "text-content-secondary",
+                    )}
                 >
                     {label}
                     {required ? <span className="text-content-negative">*</span> : null}
@@ -88,11 +101,20 @@ export function Input({
                             : "border border-transparent bg-bg-secondary",
                     "focus-within:border-border-brand focus-within:bg-bg-primary",
                     error && "border-content-negative",
-                    disabled && "opacity-60",
+                    // Background/Disabled is Background/Secondary — the field
+                    // keeps its edge and loses its white (I873:48774). An
+                    // opacity fade cannot produce that: it washes the border out
+                    // too, and the artboard keeps it at full strength.
+                    disabled && "border-border-subtle bg-bg-secondary focus-within:bg-bg-secondary",
                 )}
             >
                 {leadingIcon ? (
-                    <span className="flex shrink-0 items-center text-content-tertiary [&_svg]:size-4">
+                    <span
+                        className={cn(
+                            "flex shrink-0 items-center text-content-tertiary",
+                            iconSize === 20 ? "[&_svg]:size-5" : "[&_svg]:size-4",
+                        )}
+                    >
                         {leadingIcon}
                     </span>
                 ) : null}
@@ -106,14 +128,19 @@ export function Input({
                     className={cn(
                         "h-full w-full min-w-0 bg-transparent text-sm text-content-primary outline-none",
                         "placeholder:text-content-tertiary",
-                        "disabled:cursor-not-allowed",
+                        "disabled:cursor-not-allowed disabled:text-content-disabled disabled:placeholder:text-content-disabled",
                         className,
                     )}
                     {...props}
                 />
 
                 {trailingIcon ? (
-                    <span className="flex shrink-0 items-center text-content-tertiary [&_svg]:size-4">
+                    <span
+                        className={cn(
+                            "flex shrink-0 items-center text-content-tertiary",
+                            iconSize === 20 ? "[&_svg]:size-5" : "[&_svg]:size-4",
+                        )}
+                    >
                         {trailingIcon}
                     </span>
                 ) : null}

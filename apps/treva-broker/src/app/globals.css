@@ -29,10 +29,7 @@
     --color-bg-positive-subtle: #d7f3e3; /* Background/Positive Subtle */
     --color-bg-notice-subtle: #fdf4e0; /* Background/Notice Subtle */
     --color-bg-info-subtle: #d6e6f4; /* Background/Info Subtle */
-    /* Derived: Figma has no Negative Subtle yet — same recipe as the other
-       subtle fills (content colour lightened to a ~92% tint). Replace with the
-       real token as soon as design publishes it. */
-    --color-bg-negative-subtle: #fde3e0;
+    --color-bg-negative-subtle: #fdd9d7; /* Background/Negative Subtle */
 
     /* --- Content (text / icons) ------------------------------------------ */
     --color-content-primary: #1a1a1a; /* Content/Primary */
@@ -153,6 +150,11 @@
      */
     --color-content-tertiary-inverse: #b2b2b2; /* Content/Tertiary Inverse */
     --color-border-overlay: rgba(0, 0, 0, 0.06); /* Overlay/20 */
+    /* The darkened tones the Live Availability percentages use (873:51393 /
+       873:51402); Positive Bold is already a theme token. */
+    --color-content-notice-bold: #967b38; /* Content/Notice Bold */
+    --color-content-negative-bold: #c3362b; /* Content/Negative Bold */
+    --color-border-positive: #00c274; /* Border/Positive — the Available swatch edge */
 }
 
 /* ---------------------------------------------------------------------------
