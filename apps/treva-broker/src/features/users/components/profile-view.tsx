@@ -128,6 +128,7 @@ export function ProfileView() {
                             autoComplete="new-password"
                             surface="form"
                             size="sm"
+                            containerClassName="flex-1"
                         />
                         <div className="hidden flex-1 md:block" />
                     </div>

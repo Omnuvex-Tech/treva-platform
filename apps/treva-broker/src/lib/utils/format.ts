@@ -6,7 +6,9 @@ import type { Locale } from "@/lib/i18n/config";
  * Node and browser ICU builds, which do not always agree on the bare tag.
  */
 const INTL_LOCALES: Record<Locale, string> = {
-    en: "en-GB",
+    // en-US, not en-GB: every date in the file is month-first
+    // ("Apr 18, 2025", "July 7, 2026"), which is the US order.
+    en: "en-US",
     az: "az-AZ",
     ru: "ru-RU",
 };
@@ -49,6 +51,17 @@ export function formatDate(value: string | Date, locale: Locale): string {
     if (Number.isNaN(date.getTime())) return "—";
 
     return dateFormatter(locale, { day: "numeric", month: "short", year: "numeric" }).format(date);
+}
+
+/**
+ * "July 7, 2026" — the spelled-out month the agency row under the agent
+ * editor uses (873:48887), where the tables elsewhere abbreviate it.
+ */
+export function formatLongDate(value: string | Date, locale: Locale): string {
+    const date = typeof value === "string" ? new Date(value) : value;
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return dateFormatter(locale, { day: "numeric", month: "long", year: "numeric" }).format(date);
 }
 
 export function formatDateTime(value: string | Date, locale: Locale): string {

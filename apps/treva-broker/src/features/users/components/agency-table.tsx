@@ -1,6 +1,6 @@
 "use client";
 
-import { Delete02Icon, PencilEdit02Icon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, Edit03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,9 @@ export function AgencyTable({ agencies, onEdit, onDelete }: AgencyTableProps) {
                     <TableHeaderCell className="w-[18.7%]">
                         {t.users.columns.organization}
                     </TableHeaderCell>
-                    <TableHeaderCell className="w-[18.7%]">{t.users.columns.email}</TableHeaderCell>
+                    <TableHeaderCell className="w-[18.7%]">
+                        {t.users.columns.emailAgency}
+                    </TableHeaderCell>
                     <TableHeaderCell className="w-[69px]">
                         {t.users.columns.actions}
                     </TableHeaderCell>
@@ -79,7 +81,7 @@ export function AgencyTable({ agencies, onEdit, onDelete }: AgencyTableProps) {
                                             className="text-content-secondary"
                                         >
                                             <HugeiconsIcon
-                                                icon={PencilEdit02Icon}
+                                                icon={Edit03Icon}
                                                 size={16}
                                                 strokeWidth={1.6}
                                             />

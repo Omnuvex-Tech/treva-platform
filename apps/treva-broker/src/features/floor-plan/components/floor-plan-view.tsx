@@ -3,30 +3,21 @@
 import { LayoutGrid } from "lucide-react";
 import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, type TabItem } from "@/components/ui/tabs";
 import { MOCK_LAYOUTS } from "@/mocks/floor-plan";
-import { interpolate } from "@/lib/i18n/interpolate";
 import { cn } from "@/lib/utils/cn";
-import { formatCurrency } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
 import { useBuilding } from "../hooks/use-floor-plan";
 import { FLOOR_PLAN_VIEWS, UNIT_STATUSES, type FloorPlanView, type Unit, type UnitStatus } from "../types";
 import { LayoutsGrid } from "./layouts-grid";
 import { STATUS_SWATCH, StackingPlan } from "./stacking-plan";
 import { UnitCards } from "./unit-cards";
-
-const STATUS_TONE: Record<UnitStatus, "positive" | "notice" | "brand" | "neutral"> = {
-    available: "positive",
-    reserved: "notice",
-    sold: "brand",
-    blocked: "neutral",
-};
+import { UnitRail } from "./unit-rail";
 
 /** The Layouts tab's own control, 134x44 in the headline (873:50496). */
 const SORTS = ["lowestPrice", "highestPrice", "largestArea"] as const;
@@ -51,7 +42,7 @@ export interface FloorPlanViewProps {
 }
 
 export function FloorPlanView({ buildingId }: FloorPlanViewProps) {
-    const { locale, t } = useI18n();
+    const { t } = useI18n();
 
     const [view, setView] = useState<FloorPlanView>("grid");
     const [sort, setSort] = useState<string>("lowestPrice");
@@ -69,11 +60,24 @@ export function FloorPlanView({ buildingId }: FloorPlanViewProps) {
         label: t.floorPlan.views[value],
     }));
 
-    /** Grid+ and its Layouts twin are the two states drawn with a rail. */
+    /** Grid+ is the state drawn with a rail (873:49834). */
     const withRail = view === "gridPlus";
 
+    /**
+     * Picking a unit on the plain Grid moves to Grid+.
+     *
+     * Grid has no rail to show the unit in, so a click there would otherwise
+     * do nothing visible — the artboards put the rail on Grid+ and that is the
+     * tab a selection belongs to.
+     */
+    function selectUnit(unit: Unit) {
+        setSelectedUnit(unit);
+        if (view === "grid") setView("gridPlus");
+    }
+
     return (
-        <div className="flex flex-col gap-4 px-4 pt-4 pb-8">
+        <div className="flex items-stretch gap-3">
+            <div className="flex min-w-0 flex-1 flex-col gap-4 px-4 pt-4 pb-8">
             {/* 873:48931 — 60 tall, the strip inset 8; Layouts adds the sort. */}
             <div className="flex h-15 items-center justify-between gap-3 px-2">
                 <Tabs
@@ -151,18 +155,13 @@ export function FloorPlanView({ buildingId }: FloorPlanViewProps) {
                         }
                     />
                 ) : building ? (
-                    <div
-                        className={cn(
-                            "grid gap-4",
-                            withRail && "lg:grid-cols-[minmax(0,1fr)_18rem]",
-                        )}
-                    >
+                    <div className="flex">
                         <Card className={view === "properties" ? "p-5" : "w-fit"}>
                             {view === "properties" ? (
                                 <UnitCards
                                     building={building}
                                     selectedUnitId={selectedUnit?.id ?? null}
-                                    onSelect={setSelectedUnit}
+                                    onSelect={selectUnit}
                                     filter={filter}
                                 />
                             ) : (
@@ -170,73 +169,27 @@ export function FloorPlanView({ buildingId }: FloorPlanViewProps) {
                                     <StackingPlan
                                         building={building}
                                         selectedUnitId={selectedUnit?.id ?? null}
-                                        onSelect={setSelectedUnit}
+                                        onSelect={selectUnit}
                                         filter={filter}
                                     />
                                 </CardContent>
                             )}
                         </Card>
-
-                        {withRail ? (
-                            <Card className="h-fit">
-                                <CardHeader>
-                                    <CardTitle>
-                                        {selectedUnit
-                                            ? interpolate(t.floorPlan.unit, {
-                                                  code: selectedUnit.code,
-                                              })
-                                            : t.floorPlan.title}
-                                    </CardTitle>
-                                </CardHeader>
-
-                                <CardContent>
-                                    {selectedUnit ? (
-                                        <dl className="flex flex-col gap-3 text-sm">
-                                            <div className="flex items-center justify-between gap-3">
-                                                <dt className="text-content-tertiary">
-                                                    {t.users.columns.status}
-                                                </dt>
-                                                <dd>
-                                                    <Badge tone={STATUS_TONE[selectedUnit.status]}>
-                                                        {t.floorPlan.legend[selectedUnit.status]}
-                                                    </Badge>
-                                                </dd>
-                                            </div>
-
-                                            <div className="flex items-center justify-between gap-3">
-                                                <dt className="text-content-tertiary">
-                                                    {interpolate(t.floorPlan.floor, {
-                                                        level: selectedUnit.floor,
-                                                    })}
-                                                </dt>
-                                                <dd className="text-content-primary">
-                                                    {interpolate(t.floorPlan.specs, {
-                                                        beds: selectedUnit.bedrooms,
-                                                        area: selectedUnit.areaSqm,
-                                                    })}
-                                                </dd>
-                                            </div>
-
-                                            <div className="flex items-center justify-between gap-3 border-t border-border-subtle pt-3">
-                                                <dt className="text-content-tertiary">
-                                                    {t.projects.from}
-                                                </dt>
-                                                <dd className="text-base font-semibold text-content-primary">
-                                                    {formatCurrency(selectedUnit.price, locale)}
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    ) : (
-                                        <p className="text-sm text-content-tertiary">
-                                            {t.floorPlan.selectUnit}
-                                        </p>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        ) : null}
                     </div>
                 ) : null}
+                </div>
             </div>
+
+            {/* 873:50064 — the rail is a SIBLING of the content column and
+                starts at its top edge, level with the tab strip, not below the
+                legend. It only appears once a unit is picked. */}
+            {withRail && building && selectedUnit ? (
+                <UnitRail
+                    building={building}
+                    unit={selectedUnit}
+                    onClose={() => setSelectedUnit(null)}
+                />
+            ) : null}
         </div>
     );
 }

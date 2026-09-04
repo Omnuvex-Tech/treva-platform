@@ -96,6 +96,12 @@
       "legalAnd": "və",
       "terms": "İstifadə Şərtlərini",
       "privacy": "Məxfilik Siyasətini"
+    },
+    "registerCredentials": {
+      "title": "Hesabınızı yaradın",
+      "subtitle": "Daxil olacağınız e-poçtu yazın.",
+      "passwordHint": "Ən azı 8 simvol.",
+      "submit": "Hesab yarat"
     }
   },
   "news": {
@@ -443,6 +449,27 @@
     "listing": {
       "floors": "{count} mərtəbə",
       "units": "{count} yaşayış vahidi"
+    },
+    "rail": {
+      "residentialUnit": "Yaşayış vahidi",
+      "unitNo": "N№ {code}",
+      "close": "Bağla",
+      "area": "Sahə",
+      "floor": "Mərtəbə",
+      "status": "Status",
+      "floorPlan": "Mərtəbə planı",
+      "selectUnit": "Vahidi seç",
+      "priceNote": "Qiymət cədvələ uyğundur ©",
+      "pricePerSqm": "{price} / m²",
+      "propertyDetails": "Obyekt məlumatları",
+      "apartmentNumber": "Mənzil nömrəsi",
+      "subType": "Alt tip",
+      "address": "Ünvan",
+      "buildingEntrance": "Bina girişi",
+      "floorLabel": "Mərtəbə",
+      "buildingName": "Binanın adı",
+      "complex": "Kompleks",
+      "totalArea": "Ümumi sahə, m²"
     }
   },
   "users": {
@@ -461,6 +488,7 @@
     "columns": {
       "name": "Ad",
       "email": "E-poçt",
+      "emailAgency": "E-Mail",
       "password": "Şifrə",
       "phone": "Telefon",
       "role": "Rol",

@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/providers/i18n-provider";
 
 /** The two cards in the top row (873:60407 / 873:60417). */
-type RegistrationType = "individual" | "company";
+export type RegistrationType = "individual" | "company";
 
 /** The two rows that appear under "Company setup" (873:60433 / 873:60445). */
 type CompanySetup = "create" | "join";

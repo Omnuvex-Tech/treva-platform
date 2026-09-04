@@ -96,6 +96,12 @@
       "legalAnd": "and",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy"
+    },
+    "registerCredentials": {
+      "title": "Create your account",
+      "subtitle": "Use the email you'll sign in with.",
+      "passwordHint": "At least 8 characters.",
+      "submit": "Create account"
     }
   },
   "news": {
@@ -443,6 +449,27 @@
     "listing": {
       "floors": "{count} Floors",
       "units": "{count} residential units"
+    },
+    "rail": {
+      "residentialUnit": "Residential unit",
+      "unitNo": "N№ {code}",
+      "close": "Close",
+      "area": "Area",
+      "floor": "Floor",
+      "status": "Status",
+      "floorPlan": "Floor plan",
+      "selectUnit": "Select unit",
+      "priceNote": "Price according to the price list ©",
+      "pricePerSqm": "{price} / m²",
+      "propertyDetails": "Property details",
+      "apartmentNumber": "Apartment number",
+      "subType": "Sub-Type",
+      "address": "Address",
+      "buildingEntrance": "Building entrance",
+      "floorLabel": "Floor",
+      "buildingName": "Name of building",
+      "complex": "Complex",
+      "totalArea": "Total area, m²"
     }
   },
   "users": {
@@ -460,7 +487,8 @@
     },
     "columns": {
       "name": "Name",
-      "email": "E-Mail",
+      "email": "Email",
+      "emailAgency": "E-Mail",
       "password": "Password",
       "phone": "Phone",
       "role": "Role",

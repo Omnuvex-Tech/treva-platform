@@ -1,5 +1,5 @@
 import { config } from "@/config";
-import type { LoginPayload, Session } from "@/types/auth";
+import type { LoginPayload, RegisterPayload, Session } from "@/types/auth";
 
 import * as httpAdapter from "./auth.http";
 import * as mockAdapter from "./auth.mock";
@@ -11,6 +11,7 @@ import * as mockAdapter from "./auth.mock";
  */
 export interface AuthService {
     login(payload: LoginPayload): Promise<Session>;
+    register(payload: RegisterPayload): Promise<Session>;
     logout(): Promise<void>;
 }
 

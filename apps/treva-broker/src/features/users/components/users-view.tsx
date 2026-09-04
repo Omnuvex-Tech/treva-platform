@@ -165,7 +165,10 @@ export function UsersView() {
                                 })),
                             ]}
                             aria-label={t.users.cooperationType}
-                            className="justify-center gap-2 rounded-lg border-border-brand bg-bg-primary px-3.5 text-content-brand [&>span]:text-content-brand [&_svg]:text-content-brand"
+                            // px-3, not the button's usual 3.5: the resting
+                            // label is the widest thing the 166px pill ever
+                            // shows, and 14px of padding clipped it by a pixel.
+                            className="justify-center gap-2 rounded-lg border-border-brand bg-bg-primary px-3 text-content-brand [&>span]:text-content-brand [&_svg]:text-content-brand"
                             containerClassName="w-[166px] shrink-0"
                         />
                     ) : null}

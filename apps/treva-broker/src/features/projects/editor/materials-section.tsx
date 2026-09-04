@@ -158,10 +158,12 @@ export function MaterialsSection({
                 </Card>
             </div>
 
-            {/* 873:51365 — 197 tall, dashed, with an "or" rule above the
-                button. `FileDrop` has no slot for that second half. */}
+            {/* 873:51365 / 382:13475 — dashed Border/Primary on a 16px radius,
+                padded 24 with 12 between the icon and the instructions, and an
+                "or" rule above the button. `FileDrop` has no slot for that
+                second half, which is why this one is written out here. */}
             <div className="px-2">
-                <div className="flex h-[197px] w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border-primary bg-bg-primary">
+                <div className="flex h-[197px] w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border-primary bg-bg-primary p-6">
                     <HugeiconsIcon
                         icon={FolderUploadIcon}
                         size={24}
@@ -169,12 +171,16 @@ export function MaterialsSection({
                         className="text-content-primary"
                     />
 
-                    <p className="text-base font-semibold text-content-primary">
-                        {t.projects.editor.dropTitle}
-                    </p>
-                    <p className="text-sm text-content-tertiary">{t.projects.editor.dropHint}</p>
+                    <div className="flex flex-col items-center gap-[5px] text-center">
+                        <p className="text-base font-semibold text-content-primary">
+                            {t.projects.editor.dropTitle}
+                        </p>
+                        <p className="text-sm text-content-tertiary">
+                            {t.projects.editor.dropHint}
+                        </p>
+                    </div>
 
-                    <div className="flex w-50 items-center gap-3 py-1">
+                    <div className="flex w-[201px] items-center gap-3">
                         <span className="h-px flex-1 bg-border-subtle" />
                         <span className="text-sm text-content-tertiary">
                             {t.projects.editor.or}
@@ -182,7 +188,14 @@ export function MaterialsSection({
                         <span className="h-px flex-1 bg-border-subtle" />
                     </div>
 
-                    <Button type="button" size="md" disabled={disabled} onClick={pick}>
+                    {/* 382:13521 — 32 tall on the XXL radius, label 14/Regular. */}
+                    <Button
+                        type="button"
+                        size="sm"
+                        disabled={disabled}
+                        onClick={pick}
+                        className="h-8 shrink-0 rounded-md px-4 text-sm font-normal"
+                    >
                         {t.projects.editor.selectFile}
                     </Button>
                 </div>

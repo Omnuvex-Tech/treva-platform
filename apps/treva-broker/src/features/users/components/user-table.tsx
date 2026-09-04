@@ -1,6 +1,6 @@
 "use client";
 
-import { Delete02Icon, PencilEdit02Icon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, Edit03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { Badge, StatusBadge, type StatusBadgeTone } from "@/components/ui/badge";
@@ -124,7 +124,7 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                                                 className="text-content-secondary"
                                             >
                                                 <HugeiconsIcon
-                                                    icon={PencilEdit02Icon}
+                                                    icon={Edit03Icon}
                                                     size={16}
                                                     strokeWidth={1.6}
                                                 />

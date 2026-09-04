@@ -2,7 +2,7 @@ import { delay } from "@/lib/api/mock";
 import { ApiError } from "@/lib/api/errors";
 import { SESSION_MAX_AGE } from "@/lib/auth/session-cookie";
 import type { Role } from "@/lib/auth/roles";
-import type { LoginPayload, Session, SessionUser } from "@/types/auth";
+import type { LoginPayload, RegisterPayload, Session, SessionUser } from "@/types/auth";
 
 /**
  * Three fixed accounts, one per Figma section — this stands in for the API's
@@ -67,6 +67,46 @@ export async function login(payload: LoginPayload): Promise<Session> {
 
     return {
         user: { ...user, email },
+        accessToken: "",
+        expiresAt: new Date(Date.now() + SESSION_MAX_AGE * 1000).toISOString(),
+    };
+}
+
+/**
+ * Creates an account and signs it in.
+ *
+ * A new address is a plain broker — the mock never hands out a privileged role
+ * to someone who just typed an email — and the display name is derived from the
+ * address until a profile step exists to ask for one.
+ */
+export async function register(payload: RegisterPayload): Promise<Session> {
+    await delay(600);
+
+    const email = payload.email.trim().toLowerCase();
+
+    if (!email) {
+        throw new ApiError("Email is required", 400, "invalid_credentials");
+    }
+    if (ACCOUNTS[email]) {
+        throw new ApiError("That address is already registered", 409, "conflict");
+    }
+
+    const local = email.split("@")[0] ?? email;
+    const user: SessionUser = {
+        ...MOCK_USERS.broker,
+        id: `usr_${Date.now().toString(36)}`,
+        email,
+        // "leyla.hasanova" -> "Leyla Hasanova", so the header chip has
+        // something to show until a profile step asks for a real name.
+        fullName: local
+            .split(/[._-]+/)
+            .filter(Boolean)
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(" "),
+    };
+
+    return {
+        user,
         accessToken: "",
         expiresAt: new Date(Date.now() + SESSION_MAX_AGE * 1000).toISOString(),
     };

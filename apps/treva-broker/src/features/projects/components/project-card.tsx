@@ -95,7 +95,13 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
                             type="button"
                             aria-label={t.common.delete}
                             title={t.common.delete}
-                            onClick={() => onDelete(project)}
+                            onClick={(event) => {
+                                // The chip sits inside the cover, and the
+                                // cover opens the project — without this the
+                                // click would also navigate away.
+                                event.stopPropagation();
+                                onDelete(project);
+                            }}
                             className="flex h-8 shrink-0 items-center justify-center rounded-xl bg-bg-tertiary px-2 text-content-secondary transition-colors hover:bg-border-tertiary"
                         >
                             <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
@@ -107,8 +113,22 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
             {/* I873:49156;13186:134 — inset 4, with 24 between the two blocks. */}
             <div className="flex flex-1 flex-col justify-between gap-6 px-1">
                 <div className="flex min-w-0 flex-col gap-3">
-                    <h3 className="truncate text-base font-semibold text-content-primary">
-                        {project.name}
+                    {/* The title is the other way into the project, alongside
+                        the cover above it. It stays a button rather than a
+                        link so both entry points go through the same onOpen
+                        the parent already routes. */}
+                    <h3 className="min-w-0 text-base font-semibold text-content-primary">
+                        {onOpen ? (
+                            <button
+                                type="button"
+                                onClick={() => onOpen(project)}
+                                className="block w-full cursor-pointer truncate text-left hover:underline"
+                            >
+                                {project.name}
+                            </button>
+                        ) : (
+                            <span className="block truncate">{project.name}</span>
+                        )}
                     </h3>
 
                     <p className="flex min-w-0 items-center gap-1 text-sm font-medium text-content-brand">

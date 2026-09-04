@@ -96,6 +96,12 @@
       "legalAnd": "и",
       "terms": "Условиями обслуживания",
       "privacy": "Политикой конфиденциальности"
+    },
+    "registerCredentials": {
+      "title": "Создайте аккаунт",
+      "subtitle": "Укажите почту, с которой будете входить.",
+      "passwordHint": "Минимум 8 символов.",
+      "submit": "Создать аккаунт"
     }
   },
   "news": {
@@ -443,6 +449,27 @@
     "listing": {
       "floors": "{count} этажей",
       "units": "{count} жилых юнитов"
+    },
+    "rail": {
+      "residentialUnit": "Жилой юнит",
+      "unitNo": "N№ {code}",
+      "close": "Закрыть",
+      "area": "Площадь",
+      "floor": "Этаж",
+      "status": "Статус",
+      "floorPlan": "Планировка",
+      "selectUnit": "Выбрать юнит",
+      "priceNote": "Цена согласно прайс-листу ©",
+      "pricePerSqm": "{price} / м²",
+      "propertyDetails": "Данные объекта",
+      "apartmentNumber": "Номер квартиры",
+      "subType": "Подтип",
+      "address": "Адрес",
+      "buildingEntrance": "Подъезд",
+      "floorLabel": "Этаж",
+      "buildingName": "Название здания",
+      "complex": "Комплекс",
+      "totalArea": "Общая площадь, м²"
     }
   },
   "users": {
@@ -460,7 +487,8 @@
     },
     "columns": {
       "name": "Имя",
-      "email": "Эл. почта",
+      "email": "Email",
+      "emailAgency": "E-Mail",
       "password": "Пароль",
       "phone": "Телефон",
       "role": "Роль",

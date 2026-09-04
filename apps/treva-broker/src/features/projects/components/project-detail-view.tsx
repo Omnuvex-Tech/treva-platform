@@ -82,6 +82,8 @@ export function ProjectDetailView({ project }: ProjectDetailViewProps) {
     const copy = t.projects.detail;
 
     const activeHighlights = project.highlights.filter((highlight) => highlight.enabled);
+    /** Empty slots are not drawn here — see the note on the gallery below. */
+    const gallery = project.galleryImageUrls.filter(Boolean);
     const activeOffers = project.offers.filter((offer) => offer.enabled);
     const { available, reserved, sold } = project.availability;
     const total = available + reserved + sold;
@@ -111,19 +113,26 @@ export function ProjectDetailView({ project }: ProjectDetailViewProps) {
             </div>
 
             <div className="flex flex-col px-2">
-                {/* 1173:16228 — a 368 hero over three 200 tiles, 24 apart. */}
-                <Hero url={project.heroImageUrl} className="h-92" sizes="1108px" />
+                {/* 1173:16228 — a 368 hero over three 200 tiles, 24 apart.
+                    This screen only reads, so a slot with no picture is drawn
+                    as nothing at all rather than as an empty well: the editor
+                    is where a missing image is something to act on. */}
+                {project.heroImageUrl ? (
+                    <Hero url={project.heroImageUrl} className="h-92" sizes="1108px" />
+                ) : null}
 
-                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    {[0, 1, 2].map((index) => (
-                        <Hero
-                            key={index}
-                            url={project.galleryImageUrls[index] ?? null}
-                            className="h-50"
-                            sizes="355px"
-                        />
-                    ))}
-                </div>
+                {gallery.length > 0 ? (
+                    <div
+                        className={cn(
+                            "grid grid-cols-1 gap-3 sm:grid-cols-3",
+                            project.heroImageUrl && "mt-6",
+                        )}
+                    >
+                        {gallery.map((url) => (
+                            <Hero key={url} url={url} className="h-50" sizes="355px" />
+                        ))}
+                    </div>
+                ) : null}
 
                 {/* 1173:16235 — three across, two down, 12 apart horizontally
                     and 8 vertically. */}
@@ -463,7 +472,12 @@ function Hero({
             )}
         >
             {url ? (
-                <Image src={url} alt="" fill sizes={sizes} className="object-cover" />
+                url.startsWith("data:") ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={url} alt="" className="absolute inset-0 size-full object-cover" />
+                ) : (
+                    <Image src={url} alt="" fill sizes={sizes} className="object-cover" />
+                )
             ) : (
                 <span className="flex size-full items-center justify-center text-content-disabled">
                     <HugeiconsIcon icon={Image01Icon} size={24} strokeWidth={1.5} />

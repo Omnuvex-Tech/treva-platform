@@ -23,14 +23,13 @@ import {
 import { routes } from "@/config/routes";
 import { isApiError } from "@/lib/api/errors";
 import { ROLES, type Role } from "@/lib/auth/roles";
-import { formatDate } from "@/lib/utils/format";
+import { formatLongDate } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
 import { useCreateUser, useUpdateUser, useUserAgencyLink } from "../hooks/use-users";
 import type { PlatformUser, UserInput } from "../types";
 
 const ACCESS_PERMISSIONS = ["full", "extended", "standard"] as const;
-const COOPERATION_OPTIONS = ["exclusive", "partner", "external"] as const;
 
 export interface UserFormViewProps {
     /** `null` creates a new account, otherwise the form edits this one. */
@@ -63,10 +62,12 @@ export function UserFormView({ user }: UserFormViewProps) {
     const editing = user !== null;
     const agencyLink = useUserAgencyLink(user?.id ?? "");
 
-    const [role, setRole] = useState<Role>(user?.role ?? "broker");
+    // 873:48735-48737 draw all three options empty on the create artboard —
+    // Role carries no asterisk, so nothing is preselected. Edit opens on the
+    // account's own role (873:48865).
+    const [role, setRole] = useState<Role | "">(user?.role ?? "");
     const [blocked, setBlocked] = useState(user?.status === "blocked");
     const [accessPermission, setAccessPermission] = useState(user?.accessPermission ?? "");
-    const [cooperationType, setCooperationType] = useState(user?.cooperationType ?? "");
     const [error, setError] = useState<string | null>(null);
 
     const pending = createUser.isPending || updateUser.isPending;
@@ -83,11 +84,14 @@ export function UserFormView({ user }: UserFormViewProps) {
             phone: String(formData.get("phone") ?? "").trim(),
             jobTitle: user?.jobTitle ?? "",
             organization: String(formData.get("agency") ?? "").trim(),
-            cooperationType,
+            cooperationType: String(formData.get("cooperationType") ?? "").trim(),
             agentlik: String(formData.get("agentlik") ?? "").trim(),
             agency: String(formData.get("agency") ?? "").trim(),
             accessPermission,
-            role,
+            // Nothing is preselected, and the field is not required; an
+            // account created without one gets the least-privileged role,
+            // the same fallback the sign-in adapter uses.
+            role: role || "broker",
             blocked,
         };
 
@@ -181,18 +185,12 @@ export function UserFormView({ user }: UserFormViewProps) {
                     </div>
 
                     <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-                        <Select
+                        <Input
+                            name="cooperationType"
                             label={t.users.form.cooperationType}
-                            value={cooperationType}
-                            onChange={setCooperationType}
-                            options={COOPERATION_OPTIONS.map((value) => ({
-                                value,
-                                label: t.users.cooperationTypes[value],
-                            }))}
-                            // The form select draws a 20px direction-down glyph
-                            // where the shared trigger fixes its chevron at 16
-                            // (I873:48725;8154:5401).
-                            className="h-9 border-border-tertiary bg-bg-primary pr-3 pl-4 [&_svg]:size-5"
+                            defaultValue={user?.cooperationType}
+                            surface="form"
+                            size="sm"
                         />
                         <Input
                             name="agentlik"
@@ -314,7 +312,7 @@ export function UserFormView({ user }: UserFormViewProps) {
                                     </TableCell>
                                     <TableCell className="truncate">{link.city}</TableCell>
                                     <TableCell className="whitespace-nowrap">
-                                        {formatDate(link.registrationDate, locale)}
+                                        {formatLongDate(link.registrationDate, locale)}
                                     </TableCell>
                                     <TableCell>{link.crmConnection}</TableCell>
                                 </TableRow>
