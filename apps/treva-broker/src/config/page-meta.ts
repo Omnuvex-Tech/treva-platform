@@ -98,6 +98,88 @@ export function getPageHeading(pathname: string, t: Dictionary, locale: Locale):
         };
     }
 
+    // A building swaps the section title for a trail, the way every other
+    // second-level screen does.
+    if (/^\/floor-plan\/[^/]+$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.floorPlan.title, href: routes.floorPlan(locale) },
+                { label: t.floorPlan.building },
+            ],
+        };
+    }
+
+    // The project editor does the same — 873:51097 draws "Projects" then
+    // "Add new projects" on the create screen, and the edit screen is that
+    // screen with its last crumb swapped.
+    if (path === "/projects/new") {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.projects.title, href: routes.projects(locale) },
+                { label: t.projects.add },
+            ],
+        };
+    }
+    if (/^\/projects\/[^/]+\/edit$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.projects.title, href: routes.projects(locale) },
+                { label: t.common.edit },
+            ],
+        };
+    }
+
+    // A project's own screen (1173:16217). The artboard's last crumb is the
+    // project's name, which a static map cannot know — see the note at the top
+    // of this file. News and client detail resolve the same way.
+    if (/^\/projects\/[^/]+$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.projects.title, href: routes.projects(locale) },
+                { label: t.common.detail },
+            ],
+        };
+    }
+
+    // The agent form does the same in both directions — 873:48692 draws "User"
+    // then "Creat", 873:48820 "User" then "Edit". Profile is deliberately not
+    // here: 873:48750 keeps the section's Title + Subtitle block, so it falls
+    // through to the /admin/users entry below.
+    if (path === "/admin/users/new") {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.users.tabs.user, href: routes.adminUsers(locale) },
+                { label: t.users.form.createCrumb },
+            ],
+        };
+    }
+    if (/^\/admin\/users\/[^/]+\/edit$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.users.tabs.user, href: routes.adminUsers(locale) },
+                { label: t.common.edit },
+            ],
+        };
+    }
+
+    // The file editor swaps the section title for a trail, exactly as the
+    // article detail does — 873:52026 draws "Broker Role" then "Edit".
+    if (/^\/broker-role\/[^/]+\/edit$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.brokerRole.title, href: routes.brokerRole(locale) },
+                { label: t.common.edit },
+            ],
+        };
+    }
+
     // Longest-prefix match so a future nested route still shows its section
     // header instead of falling through to the app name.
     const match = Object.keys(PAGE_META)

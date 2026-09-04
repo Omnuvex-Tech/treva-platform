@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { FloorPlanView } from "@/features/floor-plan/components/floor-plan-view";
+import { ListingsView } from "@/features/floor-plan/components/listings-view";
 import { requirePermission } from "@/lib/auth/guard";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
@@ -22,5 +22,7 @@ export default async function FloorPlanPage({ params }: { params: Promise<{ loca
 
     await requirePermission(locale, "floorplan:read");
 
-    return <FloorPlanView />;
+    // Floor Plan opens on Listings (886:15740); picking a building goes to
+    // /floor-plan/[id], which is where the tab strip lives.
+    return <ListingsView />;
 }

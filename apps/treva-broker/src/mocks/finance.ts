@@ -1,18 +1,27 @@
-import type { FinanceSummary, Transaction } from "@/features/finance/types";
+import type { FinanceSummary, LeaderboardRow, SaleRow } from "@/features/finance/types";
 
-function daysAgo(days: number): string {
+function monthsAgo(months: number, day: number): string {
     const date = new Date();
-    date.setDate(date.getDate() - days);
+    date.setDate(1);
+    date.setMonth(date.getMonth() - months);
+    date.setDate(day);
     date.setHours(12, 0, 0, 0);
     return date.toISOString();
 }
 
-/** Last 12 month labels, oldest first, ending with the current month. */
-function lastTwelveMonths(): string[] {
+function monthsAhead(months: number): string {
+    const date = new Date();
+    date.setMonth(date.getMonth() + months);
+    date.setHours(12, 0, 0, 0);
+    return date.toISOString();
+}
+
+/** Six month labels, oldest first, ending with the current month. */
+function lastSixMonths(): string[] {
     const formatter = new Intl.DateTimeFormat("en-GB", { month: "short" });
     const months: string[] = [];
 
-    for (let offset = 11; offset >= 0; offset -= 1) {
+    for (let offset = 5; offset >= 0; offset -= 1) {
         const date = new Date();
         date.setDate(1);
         date.setMonth(date.getMonth() - offset);
@@ -22,175 +31,177 @@ function lastTwelveMonths(): string[] {
     return months;
 }
 
-const MONTHLY_VALUES = [
-    18_400, 21_900, 17_600, 24_300, 28_100, 26_700, 31_200, 29_800, 34_500, 32_100, 38_900, 41_200,
+/**
+ * The shape the artboard's line draws — up, a deep dip in the third month,
+ * then a climb past where it started (the six markers of 1173:18042).
+ */
+const TREND_VALUES = [28_400, 30_100, 16_900, 18_700, 28_600, 35_400];
+
+/**
+ * Bar lengths read off the artboard: the second is 73% of the first, the third
+ * 54%, the fourth 33% (1173:18074 to 1173:18080).
+ */
+const REVENUE_BY_PROJECT: FinanceSummary["revenueByProject"] = [
+    { label: "Brabus Island Baku", value: 600 },
+    { label: "Sabah Towers", value: 440 },
+    { label: "Panorama by ELIE SAAB", value: 325 },
+    { label: "Reportage Heights", value: 195 },
 ];
 
 export const MOCK_FINANCE_SUMMARY: FinanceSummary = {
-    totalCommission: 344_700,
+    totalCommission: 47_250,
     commissionDelta: 12.4,
-    pendingPayout: 58_300,
-    pendingDelta: -4.2,
-    closedDeals: 34,
-    closedDealsDelta: 18.0,
-    averageDealValue: 289_400,
-    averageDealDelta: 3.1,
-    monthly: lastTwelveMonths().map((label, index) => ({
+    dealsClosed: 23,
+    dealsClosedDelta: 4,
+    salesVolume: 4_820_000,
+    salesVolumeDelta: 8.2,
+    rank: 3,
+    rankPercentile: 15,
+    trend: lastSixMonths().map((label, index) => ({
         label,
-        value: MONTHLY_VALUES[index]!,
+        value: TREND_VALUES[index] ?? 0,
     })),
-    // Order matches the chart token order: green, blue, amber, red.
-    byStatus: [
-        { label: "Paid", value: 214_600 },
-        { label: "Processing", value: 71_800 },
-        { label: "Pending", value: 46_100 },
-        { label: "Cancelled", value: 12_200 },
-    ],
+    revenueByProject: REVENUE_BY_PROJECT,
 };
 
-export const MOCK_TRANSACTIONS: Transaction[] = [
+/**
+ * The artboard fills every sales row with the same placeholder ("Test",
+ * "Brabus Island" under each price). The columns it names are real, so the
+ * fixture keeps the columns and puts values of the right kind under them —
+ * shipping the designer's lorem ipsum would make the table unreadable and hide
+ * the formatting the cells actually need.
+ */
+export const MOCK_SALES: SaleRow[] = [
     {
-        id: "tr_1",
-        reference: "TRV-2451",
-        clientName: "Emin Aliyev",
-        projectName: "Pearl Towers",
-        brokerId: "usr_broker_1",
-        brokerName: "Leyla Hasanova",
-        amount: 320_000,
-        commission: 9_600,
-        status: "processing",
-        date: daysAgo(2),
+        id: "sale_1",
+        projectName: "Brabus Island Baku",
+        buildingName: "Tower B",
+        unit: "A 23 - 02",
+        listingPrice: 485_000,
+        salesPrice: 468_000,
+        receivable: 468_000,
+        paid: 93_600,
+        remaining: 374_400,
+        salesDate: monthsAgo(0, 6),
+        downPayment: 93_600,
+        creditTerm: "36 months",
+        approvedUntil: monthsAhead(14),
     },
     {
-        id: "tr_2",
-        reference: "TRV-2448",
-        clientName: "Rauf Baghirov",
-        projectName: "Seaside Residence",
-        brokerId: "usr_broker_2",
-        brokerName: "Kamran Mammadov",
-        amount: 540_000,
-        commission: 16_200,
-        status: "paid",
-        date: daysAgo(6),
+        id: "sale_2",
+        projectName: "Sabah Towers",
+        buildingName: "Tower A",
+        unit: "B 11 - 07",
+        listingPrice: 312_000,
+        salesPrice: 305_000,
+        receivable: 305_000,
+        paid: 305_000,
+        remaining: 0,
+        salesDate: monthsAgo(0, 2),
+        downPayment: 305_000,
+        creditTerm: "Cash",
+        approvedUntil: monthsAhead(2),
     },
     {
-        id: "tr_3",
-        reference: "TRV-2440",
-        clientName: "Aygun Nasirova",
-        projectName: "Marina View",
-        brokerId: "usr_broker_4",
-        brokerName: "Gunel Ismayilova",
-        amount: 240_000,
-        commission: 7_200,
-        status: "paid",
-        date: daysAgo(11),
+        id: "sale_3",
+        projectName: "Panorama by ELIE SAAB",
+        buildingName: "Block C",
+        unit: "C 08 - 14",
+        listingPrice: 720_000,
+        salesPrice: 698_500,
+        receivable: 698_500,
+        paid: 139_700,
+        remaining: 558_800,
+        salesDate: monthsAgo(1, 24),
+        downPayment: 139_700,
+        creditTerm: "24 months",
+        approvedUntil: monthsAhead(11),
     },
     {
-        id: "tr_4",
-        reference: "TRV-2437",
-        clientName: "Vusal Ahmadov",
-        projectName: "Pearl Towers",
-        brokerId: "usr_top_broker_1",
-        brokerName: "Rashad Guliyev",
-        amount: 410_000,
-        commission: 12_300,
-        status: "pending",
-        date: daysAgo(14),
+        id: "sale_4",
+        projectName: "Reportage Heights",
+        buildingName: "Block A",
+        unit: "A 05 - 09",
+        listingPrice: 268_000,
+        salesPrice: 268_000,
+        receivable: 268_000,
+        paid: 80_400,
+        remaining: 187_600,
+        salesDate: monthsAgo(1, 17),
+        downPayment: 80_400,
+        creditTerm: "48 months",
+        approvedUntil: monthsAhead(6),
     },
     {
-        id: "tr_5",
-        reference: "TRV-2429",
-        clientName: "Ilkin Suleymanov",
-        projectName: "Seaside Residence",
-        brokerId: "usr_broker_1",
-        brokerName: "Leyla Hasanova",
-        amount: 275_000,
-        commission: 8_250,
-        status: "processing",
-        date: daysAgo(19),
+        id: "sale_5",
+        projectName: "Brabus Island Baku",
+        buildingName: "Tower D",
+        unit: "D 17 - 01",
+        listingPrice: 540_000,
+        salesPrice: 512_000,
+        receivable: 512_000,
+        paid: 460_800,
+        remaining: 51_200,
+        salesDate: monthsAgo(2, 11),
+        downPayment: 153_600,
+        creditTerm: "12 months",
+        approvedUntil: monthsAhead(3),
     },
     {
-        id: "tr_6",
-        reference: "TRV-2418",
-        clientName: "Zeynab Karimova",
-        projectName: "Marina View",
-        brokerId: "usr_broker_2",
-        brokerName: "Kamran Mammadov",
-        amount: 210_000,
-        commission: 6_300,
-        status: "paid",
-        date: daysAgo(26),
+        id: "sale_6",
+        projectName: "Sabah Towers",
+        buildingName: "Tower A",
+        unit: "B 04 - 12",
+        listingPrice: 295_000,
+        salesPrice: 289_000,
+        receivable: 289_000,
+        paid: 57_800,
+        remaining: 231_200,
+        salesDate: monthsAgo(2, 3),
+        downPayment: 57_800,
+        creditTerm: "60 months",
+        approvedUntil: monthsAhead(9),
     },
     {
-        id: "tr_7",
-        reference: "TRV-2411",
-        clientName: "Anar Jafarov",
-        projectName: "Seaside Residence",
-        brokerId: "usr_top_broker_1",
-        brokerName: "Rashad Guliyev",
-        amount: 620_000,
-        commission: 18_600,
-        status: "pending",
-        date: daysAgo(31),
+        id: "sale_7",
+        projectName: "Panorama by ELIE SAAB",
+        buildingName: "Block C",
+        unit: "C 12 - 06",
+        listingPrice: 655_000,
+        salesPrice: 640_000,
+        receivable: 640_000,
+        paid: 192_000,
+        remaining: 448_000,
+        salesDate: monthsAgo(3, 21),
+        downPayment: 192_000,
+        creditTerm: "36 months",
+        approvedUntil: monthsAhead(17),
     },
     {
-        id: "tr_8",
-        reference: "TRV-2404",
-        clientName: "Nurana Qasimova",
-        projectName: "Marina View",
-        brokerId: "usr_broker_2",
-        brokerName: "Kamran Mammadov",
-        amount: 150_000,
-        commission: 4_500,
-        status: "cancelled",
-        date: daysAgo(38),
+        id: "sale_8",
+        projectName: "Reportage Heights",
+        buildingName: "Block B",
+        unit: "A 09 - 03",
+        listingPrice: 244_000,
+        salesPrice: 238_500,
+        receivable: 238_500,
+        paid: 214_650,
+        remaining: 23_850,
+        salesDate: monthsAgo(3, 8),
+        downPayment: 71_550,
+        creditTerm: "24 months",
+        approvedUntil: monthsAhead(4),
     },
-    {
-        id: "tr_9",
-        reference: "TRV-2396",
-        clientName: "Lala Huseynli",
-        projectName: "Pearl Towers",
-        brokerId: "usr_broker_4",
-        brokerName: "Gunel Ismayilova",
-        amount: 199_000,
-        commission: 5_970,
-        status: "paid",
-        date: daysAgo(44),
-    },
-    {
-        id: "tr_10",
-        reference: "TRV-2388",
-        clientName: "Murad Eyvazov",
-        projectName: "Marina View",
-        brokerId: "usr_broker_1",
-        brokerName: "Leyla Hasanova",
-        amount: 355_000,
-        commission: 10_650,
-        status: "paid",
-        date: daysAgo(51),
-    },
-    {
-        id: "tr_11",
-        reference: "TRV-2379",
-        clientName: "Ulviyya Salimova",
-        projectName: "Pearl Towers",
-        brokerId: "usr_broker_4",
-        brokerName: "Gunel Ismayilova",
-        amount: 168_000,
-        commission: 5_040,
-        status: "processing",
-        date: daysAgo(58),
-    },
-    {
-        id: "tr_12",
-        reference: "TRV-2370",
-        clientName: "Sevinj Mammadova",
-        projectName: "Marina View",
-        brokerId: "usr_broker_1",
-        brokerName: "Leyla Hasanova",
-        amount: 185_000,
-        commission: 5_550,
-        status: "paid",
-        date: daysAgo(64),
-    },
+];
+
+/** The eight brokers the artboard ranks, commissions included (1173:18174). */
+export const MOCK_LEADERBOARD: LeaderboardRow[] = [
+    { id: "usr_1", name: "Nigar Həsənova", deals: 31, commission: 68_400, trend: "up" },
+    { id: "usr_2", name: "Elvin Məmmədov", deals: 28, commission: 54_200, trend: "up" },
+    { id: "usr_3", name: "Anar Rzayev", deals: 23, commission: 47_250, trend: "up" },
+    { id: "usr_4", name: "Leyla Əliyeva", deals: 21, commission: 41_800, trend: "up" },
+    { id: "usr_5", name: "Kamran Hüseynov", deals: 19, commission: 38_100, trend: "down" },
+    { id: "usr_6", name: "Günel Babayeva", deals: 17, commission: 33_600, trend: "down" },
+    { id: "usr_7", name: "Rauf İsmayılov", deals: 14, commission: 27_900, trend: "down" },
+    { id: "usr_8", name: "Sevinc Quliyeva", deals: 12, commission: 24_100, trend: "down" },
 ];

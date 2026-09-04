@@ -3,6 +3,7 @@
     "search": "Axtarış",
     "save": "Yadda saxla",
     "cancel": "Ləğv et",
+    "close": "Bağla",
     "edit": "Redaktə et",
     "delete": "Sil",
     "create": "Yarat",
@@ -30,7 +31,18 @@
     "deleteIrreversible": "Bu əməliyyat geri qaytarıla bilməz.",
     "deleteSelectedTitle": "Seçilənlər silinsin?",
     "confirmDelete": "Sil",
-    "detail": "Detal"
+    "detail": "Detal",
+    "upload": {
+      "title": "Fayl əlavə et",
+      "name": "Ad",
+      "dragDrop": "Buraya sürüşdürüb buraxın",
+      "formats": "JPEG, PNG, PDF və MP4 formatı, 60MB-a qədər",
+      "or": "və ya",
+      "selectFile": "Fayl seçin",
+      "tooLarge": "{name} {limit} həddini aşır və əlavə edilmədi",
+      "enterToAdd": "Əlavə etmək üçün Enter basın",
+      "selectFirst": "Əvvəlcə fayl seçin"
+    }
   },
   "nav": {
     "newsFeed": "Xəbər lenti",
@@ -53,6 +65,7 @@
     "rememberMe": "Məni xatırla",
     "forgotPassword": "Şifrəni unutmusunuz?",
     "signIn": "Panelə daxil ol",
+    "register": "Qeydiyyat",
     "securityNote": "Korporativ səviyyəli təhlükəsizliklə qorunur",
     "invalidCredentials": "E-poçt və ya şifrə yanlışdır",
     "panelTitle": "Azərbaycanın premium daşınmaz əmlakını idarə edin",
@@ -62,7 +75,34 @@
     "feature2Title": "Müştəri və sövdələşmələr baş-başa",
     "feature2Body": "İlk müraciətdən təhvilə qədər, heç nə itmədən.",
     "feature3Title": "Yoxlana bilən komissiya",
-    "feature3Body": "Brokerlər və komandaları üçün şəffaf ödənişlər."
+    "feature3Body": "Brokerlər və komandaları üçün şəffaf ödənişlər.",
+    "registerType": {
+      "step": "Addım {current} / {total}",
+      "title": "Qeydiyyat növünü seçin",
+      "subtitle": "Necə qeydiyyatdan keçmək istədiyinizi bildirin — komanda üzvlərini sonra da əlavə edə bilərsiniz.",
+      "individual": "Fərdi",
+      "individualHint": "Şəxsi hesab kimi qeydiyyatdan keçin.",
+      "company": "Şirkət",
+      "companyHint": "Şirkət adından qeydiyyatdan keçin.",
+      "companySetup": "Şirkət quraşdırması",
+      "createCompany": "Yeni şirkət yarat",
+      "createCompanyHint": "Yeni şirkət qeydiyyatdan keçirin və onun ilk administratoru olun.",
+      "joinCompany": "Mövcud şirkətə qoşul",
+      "joinCompanyHint": "Artıq platformadan istifadə edən şirkətə qoşulmaq üçün sorğu göndərin.",
+      "searchCompany": "Şirkət axtarın və ya seçin",
+      "back": "Geri",
+      "continue": "Davam et",
+      "legalPrefix": "Davam etməklə siz",
+      "legalAnd": "və",
+      "terms": "İstifadə Şərtlərini",
+      "privacy": "Məxfilik Siyasətini"
+    },
+    "registerCredentials": {
+      "title": "Hesabınızı yaradın",
+      "subtitle": "Daxil olacağınız e-poçtu yazın.",
+      "passwordHint": "Ən azı 8 simvol.",
+      "submit": "Hesab yarat"
+    }
   },
   "news": {
     "title": "Xəbər lenti",
@@ -136,65 +176,67 @@
   },
   "clients": {
     "title": "Müştərilər",
-    "subtitle": "Müştəri bazasını, potensial müştəriləri və fəaliyyəti idarə edin",
-    "count": "{total} müştəri",
-    "add": "Müştəri əlavə et",
-    "filter": "Filtr",
+    "subtitle": "Müştəri bazanızı, potensial müştəriləri və fəaliyyəti idarə edin",
+    "allClients": "Bütün müştərilər",
+    "add": "Yeni lead qeyd et",
     "searchPlaceholder": "Müştəri axtar",
     "columns": {
-      "client": "Müştəri",
-      "contact": "Əlaqə",
-      "broker": "Təyin olunmuş broker",
+      "index": "№",
+      "fullName": "Ad Soyad",
+      "contacts": "Əlaqə",
+      "objectOfInterest": "Maraqlandığı obyekt",
       "status": "Status"
     },
     "status": {
-      "lead": "Potensial",
-      "active": "Aktiv",
-      "negotiating": "Danışıqlarda",
-      "closed": "Bağlanıb",
-      "lost": "İtirilib"
+      "pending": "Gözləyir",
+      "approved": "Təsdiqlənib",
+      "rejected": "Rədd edilib",
+      "approvedUntil": "{date} tarixinədək təsdiqlənib"
     },
-    "selected": "{count} seçilib",
     "form": {
-      "createTitle": "Yeni müştəri",
-      "editTitle": "Müştərini redaktə et",
-      "firstName": "Ad",
-      "lastName": "Soyad",
-      "phone": "Telefon nömrəsi",
-      "email": "E-poçt ünvanı",
-      "broker": "Təyin olunmuş broker",
-      "budget": "Büdcə",
-      "interest": "Maraqlandığı",
-      "notes": "Qeydlər",
-      "notesPlaceholder": "Kontekst, üstünlüklər, zəng tarixçəsi…",
-      "consent": "Müştəri yeni elanlar barədə əlaqə saxlanılmasına razıdır",
-      "save": "Yadda saxla",
-      "addPhone": "Başqa nömrə əlavə et"
+      "createTitle": "Yeni lead qeyd et",
+      "editTitle": "Lead-i redaktə et",
+      "name": "Ad",
+      "surname": "Soyad",
+      "primaryNumber": "Əsas nömrə",
+      "addPhone": "Başqa nömrə əlavə et",
+      "removePhone": "Bu nömrəni sil",
+      "email": "E-poçt",
+      "objectOfInterest": "Maraqlandığı obyekt",
+      "objectOfInterestPlaceholder": "Layihə seçin",
+      "developerBrand": "Developer brendi",
+      "website": "Veb sayt",
+      "comments": "Qeydlər",
+      "consentBefore": "Təsdiq edirəm ki, müştəri Məxfilik siyasəti ilə tanış oldu və",
+      "consentLink": "Razılıq",
+      "consentAfter": "verdi",
+      "submit": "Təsdiqə göndər"
     },
     "deleteConfirm": "Bu müştəri silinsin? Geri qaytarmaq mümkün olmayacaq.",
-    "noClients": "Hələ müştəri yoxdur",
+    "noClients": "Hələ müştəriniz yoxdur",
     "noMatches": "Axtarışa uyğun müştəri tapılmadı",
-    "approvalStatus": "Təsdiq statusu",
-    "agentName": "Agentin adı",
-    "interestedIn": "Maraqlandığı",
+    "detail": {
+      "email": "E-poçt",
+      "phone": "Telefon",
+      "approvalStatus": "Təsdiq statusu",
+      "agent": "Agent",
+      "reviewTitle": "Yoxlamanın nəticələri",
+      "reviewBody": "Bu müştəri ilə işlədiyiniz günlərdə yoxlamanın nəticələrini gözləyin. Qiymətləndirmə tamamlandıqda sizə bildiriş göndəriləcək."
+    },
     "tabs": {
-      "overview": "İcmal",
-      "activity": "Fəaliyyət",
-      "deals": "Sövdələşmələr"
+      "salesOpportunities": "Satış imkanları",
+      "history": "Tarixçə"
     }
   },
   "brokerRole": {
     "title": "Broker rolu",
     "subtitle": "Ortaq broşürlər, qiymət siyahıları, mərtəbə planları və təqdimatlar",
-    "count": "{total} fayl",
-    "upload": "Fayl yüklə",
+    "addFiles": "Fayl əlavə et",
+    "addedToast": "Fayl əlavə edildi",
     "download": "Yüklə",
-    "share": "Paylaş",
-    "remove": "Sil",
     "downloads": "{count} endirmə",
     "version": "v{version}",
-    "searchPlaceholder": "Materiallarda axtar",
-    "details": "Fayl məlumatları",
+    "details": "Fayl təfərrüatları",
     "currentVersion": "Cari versiya",
     "uploadedBy": "Yükləyən",
     "uploadDate": "Yüklənmə tarixi",
@@ -202,62 +244,170 @@
     "fileSize": "Fayl ölçüsü",
     "fileType": "Fayl tipi",
     "visibility": "Görünürlük",
-    "visibilityAll": "Bütün brokerlər",
-    "visibilityTop": "Yalnız top brokerlər",
-    "visibilityAdmin": "Yalnız adminlər",
-    "deleteConfirm": "Bu fayl silinsin? Brokerlər ona çıxışı itirəcək."
+    "deleteConfirm": "Bu fayl silinsin? Brokerlər ona çıxışı itirəcək.",
+    "editor": {
+      "autosaved": "Qaralama kimi avtomatik saxlanıldı",
+      "saved": "Bütün dəyişikliklər saxlanıldı",
+      "save": "Dəyişiklikləri saxla",
+      "deleteFile": "Faylı sil",
+      "fileInformation": "Fayl məlumatı",
+      "fileName": "Fayl adı",
+      "category": "Fayl kateqoriyası",
+      "language": "Dil",
+      "description": "Qeydlər"
+    },
+    "categories": {
+      "brochure": "Broşür",
+      "price_list": "Qiymət siyahısı",
+      "floor_plan": "Mərtəbə planı",
+      "presentation": "Təqdimat",
+      "policy": "Qayda",
+      "other": "Digər"
+    },
+    "languages": {
+      "az": "Azərbaycan",
+      "en": "İngilis",
+      "ru": "Rus"
+    },
+    "flags": {
+      "active": "Aktiv",
+      "featured": "Seçilmiş fayl",
+      "allowDownload": "Endirməyə icazə",
+      "notifyBrokers": "Dəyişikliklər barədə brokerlərə bildir"
+    }
   },
   "finance": {
     "title": "Maliyyə",
-    "subtitle": "Komissiyalar, ödənişlər və maliyyə göstəriciləri",
-    "commission": "Ümumi komissiya",
-    "pendingPayout": "Gözləyən ödəniş",
-    "closedDeals": "Bağlanmış sövdələşmələr",
-    "avgDeal": "Orta sövdələşmə dəyəri",
-    "vsPrev": "əvvəlki dövrlə müqayisədə",
-    "monthlyTitle": "Son 12 ayın komissiyası",
-    "splitTitle": "Statusa görə komissiya",
-    "transactions": "Əməliyyatlar",
-    "searchPlaceholder": "Nömrə, müştəri və ya layihə ilə axtar",
+    "subtitle": "Büdcə, pul axını, xərclər və ödənişləri bir yerdən idarə edin",
+    "kpi": {
+      "commission": "Ümumi komissiya",
+      "deals": "Bağlanan sövdələr",
+      "volume": "Satış həcmi",
+      "rank": "Reytinq mövqeyi",
+      "vsLastMonth": "keçən aya nisbətən {value}",
+      "topPercent": "Brokerlərin ilk {percent}%-i"
+    },
+    "trendTitle": "Satış trendi",
+    "trendSubtitle": "Son 6 ayın göstəriciləri",
+    "revenueTitle": "Layihə üzrə gəlir",
+    "leaderboard": "Bütün brokerlərin reytinqi",
     "columns": {
-      "reference": "Nömrə",
-      "client": "Müştəri",
-      "project": "Layihə",
-      "broker": "Broker",
-      "amount": "Məbləğ",
-      "commission": "Komissiya",
-      "status": "Status",
-      "date": "Tarix"
-    },
-    "status": {
+      "index": "№",
+      "project": "Layihə adı",
+      "unit": "A 23 - 02",
+      "listingPrice": "Elan qiyməti",
+      "salesPrice": "Satış qiyməti",
+      "receivable": "Alınacaq",
       "paid": "Ödənilib",
-      "pending": "Gözləyir",
-      "processing": "İcradadır",
-      "cancelled": "Ləğv edilib"
+      "remaining": "Qalıq",
+      "salesDate": "Satış tarixi",
+      "name": "Ad",
+      "deals": "Sövdələr",
+      "commission": "Komissiya"
     },
-    "tabs": {
-      "all": "Hamısı",
-      "paid": "Ödənilib",
-      "processing": "İcradadır",
-      "pending": "Gözləyir",
-      "cancelled": "Ləğv edilib"
+    "request": {
+      "name": "Ad",
+      "surname": "Soyad",
+      "number": "Nömrə",
+      "finId": "FİN",
+      "downPayment": "İlkin ödəniş",
+      "creditTerm": "Kredit müddəti",
+      "lastPaymentDate": "Son ödəniş tarixi",
+      "approvedUntil": "{date} tarixinədək təsdiqlənib",
+      "consentPrefix": "Təsdiq edirəm ki, Müştəri Məxfilik siyasəti ilə tanış olub və ",
+      "consentLink": "Razılıq",
+      "consentSuffix": " verib",
+      "submit": "Sorğu göndər",
+      "sentToast": "Sorğu göndərildi"
     }
   },
   "projects": {
     "title": "Layihələr",
-    "subtitle": "İnkişaf layihələrinə baxın və idarə edin",
-    "count": "{total} layihə",
-    "add": "Layihə əlavə et",
-    "searchPlaceholder": "Layihələrdə axtar",
-    "from": "başlayan",
-    "units": "{total} mənzildən {available}",
+    "subtitle": "Bütün daşınmaz əmlak layihələrinizi tək paneldən yaradın, təşkil edin və idarə edin",
+    "add": "Yeni layihə əlavə et",
     "status": {
-      "planning": "Planlaşdırma",
-      "construction": "Tikintidə",
-      "ready": "Hazır",
-      "soldOut": "Satılıb"
+      "active": "Aktiv",
+      "inactive": "Deaktiv"
     },
-    "delivery": "Təhvil"
+    "unitsTotal": "Cəmi {total} vahid",
+    "unitsAvailable": "{available} mövcud",
+    "deleteConfirm": "Bu layihə silinsin? Brokerlər onun vahidlərinə çıxışı itirəcək.",
+    "from": "başlayır",
+    "editor": {
+      "name": "Layihənin adı",
+      "publicUrl": "İctimai URL",
+      "save": "Dəyişiklikləri saxla",
+      "heroImage": "Örtük şəkli",
+      "galleryImage": "Qalereya şəkli",
+      "highlights": "Əsas məqamlar",
+      "highlightsHint": "Alıcıya layihəni tez qiymətləndirməyə kömək edən qısa faktlar.",
+      "highlightLabel": "Etiket",
+      "highlightValue": "Dəyər",
+      "highlightEnabled": "Bu məqamı göstər",
+      "addHighlight": "Məqam əlavə et",
+      "offers": "Xüsusi təkliflər",
+      "offersHint": "Müddətli kampaniyaları və alıcı stimullarını önə çıxarın.",
+      "offerTag": "Təklif nişanı",
+      "offerTitle": "Təklifin başlığı",
+      "offerDescription": "Təklifi təsvir edin…",
+      "offerEnabled": "Bu təklifi göstər",
+      "offerTags": {
+        "new": "Yeni",
+        "limited": "Məhdud",
+        "exclusive": "Eksklüziv"
+      },
+      "expires": "Bitir:",
+      "expiresPlaceholder": "Tarix seçin",
+      "addOffer": "Təklif əlavə et",
+      "materials": "Marketinq materialları",
+      "materialsHint": "Agentlər və alıcılar üçün broşürlər, təqdimatlar və sənədlər.",
+      "columns": {
+        "file": "Fayl",
+        "category": "Kateqoriya",
+        "language": "Dil",
+        "size": "Ölçü",
+        "actions": "Əməliyyatlar"
+      },
+      "replace": "Faylı əvəz et",
+      "dropTitle": "Buraya sürüşdürüb buraxın",
+      "dropHint": "JPEG, PNG, PDF və MP4 formatı, 60MB-a qədər",
+      "or": "və ya",
+      "selectFile": "Fayl seç",
+      "availability": "Canlı mövcudluq",
+      "availabilityHint": "İctimai elanda göstərilən real vaxt vahid sayı.",
+      "autoCalculate": "Avtomatik hesabla",
+      "buckets": {
+        "available": "Mövcud",
+        "reserved": "Rezerv",
+        "sold": "Satılıb"
+      },
+      "shareOfTotal": "ümumidən {percent}%",
+      "createTitle": "Yeni layihə əlavə et",
+      "editTitle": "Layihəni redaktə et",
+      "delete": "Layihəni sil",
+      "imageHint": "Klikləyin və ya şəkli buraxın",
+      "replaceImage": "Şəkli dəyiş"
+    },
+    "detail": {
+      "pageLink": "Səhifə keçidi",
+      "download": "Yüklə",
+      "downloads": "{count} yükləmə",
+      "finance": "Maliyyə",
+      "floorPlan": "Mərtəbə planı",
+      "lastSynced": "Son sinxronizasiya: {when}",
+      "edit": "Redaktə et",
+      "financeColumns": {
+        "index": "№",
+        "projectName": "Layihə adı",
+        "unitCode": "Mənzil",
+        "listingPrice": "Elan qiyməti",
+        "salesPrice": "Satış qiyməti",
+        "received": "Daxil.",
+        "paid": "Ödənilib",
+        "remaining": "Qalıq",
+        "salesDate": "Satış tarixi"
+      }
+    }
   },
   "floorPlan": {
     "title": "Mərtəbə planı",
@@ -266,13 +416,61 @@
       "available": "Mövcud",
       "reserved": "Rezerv",
       "sold": "Satılıb",
-      "blocked": "Bloklanıb"
+      "blocked": "Əlçatmaz"
     },
     "unit": "Mənzil {code}",
     "floor": "{level}-ci mərtəbə",
     "specs": "{beds} otaq · {area} m²",
     "selectUnit": "Detalları görmək üçün mənzil seçin",
-    "totalUnits": "{total} mənzil"
+    "totalUnits": "{total} mənzil",
+    "views": {
+      "grid": "Şəbəkə",
+      "gridPlus": "Şəbəkə+",
+      "properties": "Mənzillər",
+      "layouts": "Planlar"
+    },
+    "sorts": {
+      "lowestPrice": "Ən aşağı qiymət",
+      "highestPrice": "Ən yüksək qiymət",
+      "largestArea": "Ən böyük sahə"
+    },
+    "sortBy": "Sırala",
+    "card": {
+      "floor": "Mərtəbə",
+      "type": "Tip",
+      "area": "Sahə",
+      "loggia": "Lodjiya"
+    },
+    "layout": {
+      "priceFrom": "{price}-dan",
+      "properties": "{count} mənzil"
+    },
+    "building": "Bina",
+    "listing": {
+      "floors": "{count} mərtəbə",
+      "units": "{count} yaşayış vahidi"
+    },
+    "rail": {
+      "residentialUnit": "Yaşayış vahidi",
+      "unitNo": "N№ {code}",
+      "close": "Bağla",
+      "area": "Sahə",
+      "floor": "Mərtəbə",
+      "status": "Status",
+      "floorPlan": "Mərtəbə planı",
+      "selectUnit": "Vahidi seç",
+      "priceNote": "Qiymət cədvələ uyğundur ©",
+      "pricePerSqm": "{price} / m²",
+      "propertyDetails": "Obyekt məlumatları",
+      "apartmentNumber": "Mənzil nömrəsi",
+      "subType": "Alt tip",
+      "address": "Ünvan",
+      "buildingEntrance": "Bina girişi",
+      "floorLabel": "Mərtəbə",
+      "buildingName": "Binanın adı",
+      "complex": "Kompleks",
+      "totalArea": "Ümumi sahə, m²"
+    }
   },
   "users": {
     "title": "İstifadəçilər",
@@ -281,16 +479,21 @@
       "user": "İstifadəçi",
       "agency": "Daşınmaz Əmlak Agentlikləri"
     },
-    "add": "İstifadəçi əlavə et",
-    "export": "İxrac et",
-    "searchPlaceholder": "Ad, e-poçt və ya telefonla axtar",
+    "cooperationType": "Əməkdaşlıq növü",
+    "cooperationTypes": {
+      "exclusive": "Eksklüziv",
+      "partner": "Tərəfdaş",
+      "external": "Xarici"
+    },
     "columns": {
       "name": "Ad",
       "email": "E-poçt",
+      "emailAgency": "E-Mail",
+      "password": "Şifrə",
       "phone": "Telefon",
       "role": "Rol",
-      "team": "Komanda",
       "status": "Status",
+      "lastLogin": "Son giriş",
       "actions": "Əməliyyatlar",
       "manager": "Menecer",
       "contacts": "Əlaqə",
@@ -298,38 +501,61 @@
     },
     "status": {
       "active": "Aktiv",
-      "blocked": "Bloklanmış",
+      "blocked": "Deaktiv",
       "invited": "Dəvət olunmuş"
     },
     "form": {
-      "createTitle": "Yeni istifadəçi",
-      "editTitle": "İstifadəçini redaktə et",
+      "createTitle": "Agent yarat",
+      "editTitle": "Agenti redaktə et",
+      "createCrumb": "Yarat",
       "firstName": "Ad",
       "lastName": "Soyad",
-      "email": "E-poçt ünvanı",
+      "email": "E-poçt",
       "password": "Şifrə",
-      "generate": "Şifrə yarat",
-      "phone": "Telefon nömrəsi",
-      "jobTitle": "Vəzifə",
-      "team": "Komanda",
+      "phone": "Əsas nömrə",
+      "addPhone": "Başqa nömrə əlavə et",
+      "cooperationType": "Əməkdaşlıq növü",
+      "agentlik": "Agentlik",
+      "agency": "Agentlik adı",
+      "accessPermissions": "Giriş icazələri",
+      "accessPermissionOptions": {
+        "full": "Tam giriş",
+        "extended": "Genişləndirilmiş",
+        "standard": "Standart"
+      },
       "role": "Rol",
-      "roleHint": "Bu hesabın hansı ekranlara və əməliyyatlara çıxışı olacağını təyin edir",
+      "roleOptions": {
+        "broker": "Agent",
+        "top_broker": "Aparıcı agent",
+        "admin": "Direktor"
+      },
       "blockAgent": "Agenti blokla",
-      "blockHint": "Bloklanmış hesab sistemə daxil ola bilmir",
-      "save": "Yadda saxla",
-      "confirmPassword": "Şifrəni təsdiqlə",
-      "passwordMismatch": "Şifrələr uyğun gəlmir",
-      "organization": "Təşkilat"
+      "create": "Yarat",
+      "save": "Yadda saxla"
+    },
+    "profile": {
+      "title": "Profil"
+    },
+    "agencyColumns": {
+      "status": "Status",
+      "marketingName": "Marketinq adı",
+      "city": "Şəhər",
+      "registrationDate": "Qeydiyyat tarixi",
+      "crmConnection": "CRM bağlantısı"
+    },
+    "agencyStatus": {
+      "new": "Yeni",
+      "active": "Aktiv",
+      "pending": "Gözləyir"
     },
     "deleteConfirm": "Bu istifadəçi silinsin? Geri qaytarmaq mümkün olmayacaq.",
     "addUser": "İstifadəçi əlavə et",
-    "addAgency": "Agentlik əlavə et",
     "userAdded": "İstifadəçi uğurla əlavə edildi",
     "agencyAdded": "Agentlik uğurla əlavə edildi",
     "userDeleted": "İstifadəçi silindi",
     "agencyDeleted": "Agentlik silindi",
-    "searchUsers": "İstifadəçi axtar",
-    "searchAgencies": "Agentlik axtar",
+    "searchUsers": "Ad, soyad və ya telefon nömrəsi ilə axtar",
+    "searchAgencies": "Daşınmaz Əmlak Agentlikləri",
     "userUpdated": "İstifadəçi yeniləndi"
   },
   "listings": {
@@ -364,7 +590,7 @@
   },
   "roles": {
     "broker": "Broker",
-    "top_broker": "Top Broker",
+    "top_broker": "Menecer",
     "admin": "Admin"
   }
 }

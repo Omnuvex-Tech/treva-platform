@@ -4,19 +4,24 @@ import { useQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/lib/query/keys";
 import { financeService } from "../api/finance.service";
-import type { TransactionQuery } from "../types";
 
-export function useFinanceSummary(brokerId?: string) {
+export function useFinanceSummary() {
     return useQuery({
-        queryKey: [...queryKeys.finance.summary, brokerId ?? "all"],
-        queryFn: () => financeService.summary(brokerId),
+        queryKey: queryKeys.finance.summary,
+        queryFn: () => financeService.summary(),
     });
 }
 
-export function useTransactions(query: TransactionQuery) {
+export function useSales() {
     return useQuery({
-        queryKey: queryKeys.finance.transactions(query),
-        queryFn: () => financeService.transactions(query),
-        placeholderData: (previous) => previous,
+        queryKey: queryKeys.finance.sales,
+        queryFn: () => financeService.sales(),
+    });
+}
+
+export function useLeaderboard() {
+    return useQuery({
+        queryKey: queryKeys.finance.leaderboard,
+        queryFn: () => financeService.leaderboard(),
     });
 }

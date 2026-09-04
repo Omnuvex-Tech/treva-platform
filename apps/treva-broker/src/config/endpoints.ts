@@ -6,6 +6,7 @@
 export const endpoints = {
     auth: {
         login: "/auth/login",
+        register: "/auth/register",
         logout: "/auth/logout",
         me: "/auth/me",
         forgotPassword: "/auth/forgot-password",
@@ -35,7 +36,8 @@ export const endpoints = {
     },
     finance: {
         summary: "/finance/summary",
-        transactions: "/finance/transactions",
+        sales: "/finance/sales",
+        leaderboard: "/finance/leaderboard",
     },
     projects: {
         list: "/projects",
@@ -56,5 +58,7 @@ export const endpoints = {
     users: {
         list: "/users",
         detail: (id: string) => `/users/${id}`,
+        /** The agency row under the agent editor (873:48887). */
+        agencyLink: (id: string) => `/users/${id}/agency`,
     },
 } as const;

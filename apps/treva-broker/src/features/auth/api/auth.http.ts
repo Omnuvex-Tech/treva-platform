@@ -1,6 +1,6 @@
 import { http } from "@/lib/api/http";
 import { endpoints } from "@/config/endpoints";
-import type { LoginPayload, Session } from "@/types/auth";
+import type { LoginPayload, RegisterPayload, Session } from "@/types/auth";
 
 /**
  * Real adapter against the NestJS broker API.
@@ -13,6 +13,10 @@ import type { LoginPayload, Session } from "@/types/auth";
 export async function login(payload: LoginPayload): Promise<Session> {
     // The response carries the account's role; the client never asserts one.
     return http.post<Session>(endpoints.auth.login, payload);
+}
+
+export async function register(payload: RegisterPayload): Promise<Session> {
+    return http.post<Session>(endpoints.auth.register, payload);
 }
 
 export async function logout(): Promise<void> {

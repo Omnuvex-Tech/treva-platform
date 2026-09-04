@@ -33,7 +33,8 @@ export const queryKeys = {
     finance: {
         all: ["finance"] as const,
         summary: ["finance", "summary"] as const,
-        transactions: (query: PageQuery) => ["finance", "transactions", query] as const,
+        sales: ["finance", "sales"] as const,
+        leaderboard: ["finance", "leaderboard"] as const,
     },
 
     projects: {
@@ -52,5 +53,6 @@ export const queryKeys = {
         all: ["users"] as const,
         list: (query: PageQuery) => ["users", "list", query] as const,
         detail: (id: string) => ["users", "detail", id] as const,
+        agencyLink: (id: string) => ["users", "agency-link", id] as const,
     },
 } as const;

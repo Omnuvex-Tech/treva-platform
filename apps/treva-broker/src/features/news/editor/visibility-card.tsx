@@ -40,7 +40,7 @@ export function VisibilityCard({ visibility, onChange }: VisibilityCardProps) {
             <ul className="flex flex-col gap-3">
                 {VISIBILITY_AUDIENCES.map((audience) => (
                     <li key={audience} className="flex items-start gap-2.5">
-                        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-s bg-bg-secondary text-content-tertiary">
+                        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-sm bg-bg-secondary text-content-tertiary">
                             <HugeiconsIcon
                                 icon={AUDIENCE_ICON[audience]}
                                 size={13}
