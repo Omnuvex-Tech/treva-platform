@@ -142,7 +142,10 @@ export async function getProjectCards(locale = "az"): Promise<ProjectCard[]> {
                 return {
                     slug: category.slug,
                     title: localized(category.title, locale),
-                    developer: localized(category.brand, locale),
+                    // Every project on the grid is a Sea Breeze development, so the
+                    // developer label is fixed — the CMS `brand` field is not read
+                    // for the card (it still feeds the header menu's `desc`).
+                    developer: "Sea Breeze",
                     icon: toAbsUrl(category.brandImage ?? "") || undefined,
                     image: toAbsUrl(category.image ?? ""),
                     startingFrom: "",

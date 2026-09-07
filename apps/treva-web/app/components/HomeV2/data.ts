@@ -111,7 +111,7 @@ export const projectCards: ProjectCard[] = [
     {
         slug: "panorama-by-elie-saab",
         title: "Panorama by ELIE SAAB",
-        developer: "DreamFest Arena",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/dreamfest-arena.svg",
         image: "/images/features-pro/figma/panorama-building.png",
         sky: "/images/features-pro/figma/panorama-sky.jpg",
@@ -123,7 +123,7 @@ export const projectCards: ProjectCard[] = [
     {
         slug: "arabian-ranches",
         title: "Arabian Ranches",
-        developer: "Dubai Autodrome",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/dubai-autodrome.svg",
         image: "/images/features-pro/figma/arabian-ranches-building.png",
         sky: "/images/features-pro/figma/arabian-ranches-sky.jpg",
@@ -135,7 +135,7 @@ export const projectCards: ProjectCard[] = [
     {
         slug: "sabah-towers",
         title: "Sabah Towers",
-        developer: "Lighthouse Mall",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/lighthouse-mall.svg",
         image: "/images/features-pro/figma/sabah-towers-building.png",
         sky: "/images/features-pro/figma/sabah-towers-sky.jpg",
@@ -151,7 +151,7 @@ export const projectCards: ProjectCard[] = [
         // the footer drops the price for a localized "all units sold" line.
         slug: "sabah-residence",
         title: "Sabah Residence",
-        developer: "Flame Towers",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/sabah-residence.svg",
         image: "/images/features-pro/figma/sabah-residence-building.png",
         sky: "/images/features-pro/figma/sabah-residence-sky.jpg",
@@ -163,7 +163,7 @@ export const projectCards: ProjectCard[] = [
     {
         slug: "brabus-island-baku",
         title: "Brabus İsland Baku",
-        developer: "Nikki Beach",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/nikki-beach.svg",
         image: "/images/features-pro/figma/brabus-island-baku-building.png",
         sky: "/images/features-pro/figma/brabus-island-baku-sky.jpg",
@@ -175,7 +175,7 @@ export const projectCards: ProjectCard[] = [
     {
         slug: "reportage-heights",
         title: "Reportage Heights",
-        developer: "Sea Breeze Casino",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/sea-breeze-casino.svg",
         image: "/images/features-pro/figma/reportage-heights-building.png",
         sky: "/images/features-pro/figma/reportage-heights-sky.jpg",
@@ -187,7 +187,7 @@ export const projectCards: ProjectCard[] = [
     {
         slug: "marina-village",
         title: "Mariana Village",
-        developer: "Sea Breeze Marina",
+        developer: "Sea Breeze",
         icon: "/images/features-pro/icons/sea-breeze-marina.svg",
         image: "/images/features-pro/figma/mariana-village-building.png",
         sky: "/images/features-pro/figma/mariana-village-sky.jpg",
@@ -262,4 +262,7 @@ export const partnerLogos: PartnerLogo[] = [
     { alt: "Best Home", src: "/images/partners/best-home.png", width: 164, height: 116 },
 ];
 
-export const roomOptions = ["1", "2", "3", "4", "5", "5+"];
+// "0" is the studio bucket — rendered with the localized "Studiya" label in
+// SearchPanelV2, sent to the backend as `rooms=0` / `roomCount=0` (a `number`
+// match). The rest are shown verbatim.
+export const roomOptions = ["0", "1", "2", "3", "4", "4+"];
