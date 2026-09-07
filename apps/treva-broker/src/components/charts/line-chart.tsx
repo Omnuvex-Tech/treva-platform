@@ -11,41 +11,101 @@ export interface LinePoint {
 
 export interface LineChartProps {
     points: readonly LinePoint[];
-    /** Formats the value in the tooltip and on the y axis. */
+    /** Formats the value on the y axis and in the tooltip. */
     format: (value: number) => string;
-    /** Names the series — a single-series chart needs no legend box. */
+    /** Names the series — a single-series chart needs no legend. */
     caption?: string;
     className?: string;
     height?: number;
 }
 
-const PADDING = { top: 12, right: 12, bottom: 26, left: 56 };
+/**
+ * Left is wide enough for "₼ 50,000"; the bottom holds the month row. The
+ * artboard's plot starts at x=61 of 692 and leaves 31px under the axis.
+ */
+const PADDING = { top: 12, right: 4, bottom: 30, left: 62 };
 const VIEW_WIDTH = 692;
+/** The artboard draws six gridlines (1173:18003). */
+const TICK_TARGET = 6;
+
+/** 1, 2, 5 x 10^n — the steps that produce round axis labels. */
+function niceStep(rough: number): number {
+    const magnitude = 10 ** Math.floor(Math.log10(rough));
+    const normalized = rough / magnitude;
+    const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+    return step * magnitude;
+}
 
 /**
- * Single-series line chart, hand-rolled in SVG.
+ * Catmull-Rom through every point, emitted as cubic curves.
  *
- * No charting library: one line and one donut is not worth 40kB of runtime, and
- * inline SVG keeps every colour on the design tokens instead of a library theme.
+ * The artboard's line is a spline, not a polyline — it eases between months
+ * rather than cornering at them. Catmull-Rom is the spline that passes exactly
+ * through its points, which a chart needs and a smoothing filter would not give.
+ */
+function smoothPath(coords: readonly { x: number; y: number }[]): string {
+    const first = coords[0];
+    if (!first) return "";
+    if (coords.length === 1) return `M${first.x},${first.y}`;
+
+    const segments = [`M${first.x.toFixed(2)},${first.y.toFixed(2)}`];
+
+    for (let index = 0; index < coords.length - 1; index += 1) {
+        const p1 = coords[index];
+        const p2 = coords[index + 1];
+        if (!p1 || !p2) continue;
+
+        const p0 = coords[index - 1] ?? p1;
+        const p3 = coords[index + 2] ?? p2;
+
+        const c1x = p1.x + (p2.x - p0.x) / 6;
+        const c1y = p1.y + (p2.y - p0.y) / 6;
+        const c2x = p2.x - (p3.x - p1.x) / 6;
+        const c2y = p2.y - (p3.y - p1.y) / 6;
+
+        segments.push(
+            `C${c1x.toFixed(2)},${c1y.toFixed(2)} ${c2x.toFixed(2)},${c2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`,
+        );
+    }
+
+    return segments.join(" ");
+}
+
+/**
+ * Single-series line chart, hand-rolled in SVG — the Sales Trend card
+ * (1173:18001).
+ *
+ * No charting library: one line is not worth 40kB of runtime, and inline SVG
+ * keeps every colour on the design tokens instead of a library theme.
  *
  * Deliberate choices, per the dataviz rules:
  *  - one y axis, never two;
- *  - one series, so no legend — the caption names it;
- *  - recessive grid (subtle horizontal rules only, no vertical ones);
+ *  - one series, so no legend — the card title names it;
+ *  - recessive grid: dotted horizontal rules only, never vertical ones;
+ *  - a marker on every month, 10.5px as drawn, filled on the surface grey with
+ *    a brand ring so it stays readable where the line passes under it;
  *  - crosshair + tooltip on hover, because an SVG chart in a browser should be
- *    inspectable rather than a picture;
- *  - the mark colour is the brand ink, which clears 3:1 on the white surface.
+ *    inspectable rather than a picture.
+ *
+ * The artboard labels its rows ₼50,000 / 45,000 / 30,000 / 25,000 / 15,000 /
+ * 10,000 — six evenly spaced rows carrying unevenly spaced values, which is a
+ * placeholder rather than a scale. The axis here keeps the six rows and derives
+ * round values from the data, so the picture matches and the numbers mean
+ * something.
  */
 export function LineChart({ points, format, caption, className, height = 228 }: LineChartProps) {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     const geometry = useMemo(() => {
         const values = points.map((point) => point.value);
-        const max = Math.max(...values, 0);
-        const min = Math.min(...values, 0);
+        const rawMin = values.length ? Math.min(...values) : 0;
+        const rawMax = values.length ? Math.max(...values) : 0;
 
-        // A flat series would divide by zero; give it a nominal band instead.
-        const span = max - min || 1;
+        const step = niceStep((rawMax - rawMin || Math.abs(rawMax) || 1) / (TICK_TARGET - 1));
+        const min = Math.floor(rawMin / step) * step;
+        const max = Math.max(Math.ceil(rawMax / step) * step, min + step);
+        const span = max - min;
+
         const plotWidth = VIEW_WIDTH - PADDING.left - PADDING.right;
         const plotHeight = height - PADDING.top - PADDING.bottom;
 
@@ -57,23 +117,18 @@ export function LineChart({ points, format, caption, className, height = 228 }: 
             y: PADDING.top + plotHeight - ((point.value - min) / span) * plotHeight,
         }));
 
-        const ticks = [0, 0.5, 1].map((ratio) => ({
-            value: min + span * ratio,
-            y: PADDING.top + plotHeight - ratio * plotHeight,
-        }));
+        const ticks: { value: number; y: number }[] = [];
+        for (let value = min; value <= max + step / 2; value += step) {
+            ticks.push({
+                value,
+                y: PADDING.top + plotHeight - ((value - min) / span) * plotHeight,
+            });
+        }
 
         return { coords, ticks, plotHeight };
     }, [points, height]);
 
     if (points.length === 0) return null;
-
-    const linePath = geometry.coords
-        .map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(2)},${point.y.toFixed(2)}`)
-        .join(" ");
-
-    const areaPath = `${linePath} L${geometry.coords.at(-1)!.x.toFixed(2)},${(
-        PADDING.top + geometry.plotHeight
-    ).toFixed(2)} L${geometry.coords[0]!.x.toFixed(2)},${(PADDING.top + geometry.plotHeight).toFixed(2)} Z`;
 
     const active = activeIndex === null ? null : geometry.coords[activeIndex];
 
@@ -108,29 +163,30 @@ export function LineChart({ points, format, caption, className, height = 228 }: 
                 onMouseLeave={() => setActiveIndex(null)}
             >
                 {geometry.ticks.map((tick) => (
-                    <g key={tick.y}>
+                    <g key={tick.value}>
                         <line
                             x1={PADDING.left}
                             x2={VIEW_WIDTH - PADDING.right}
                             y1={tick.y}
                             y2={tick.y}
-                            stroke="var(--color-chart-grid)"
+                            stroke="var(--color-border-tertiary)"
                             strokeWidth={1}
+                            strokeDasharray="1 4"
+                            strokeLinecap="round"
                         />
                         <text
-                            x={PADDING.left - 8}
+                            x={PADDING.left - 10}
                             y={tick.y + 4}
                             textAnchor="end"
-                            className="fill-content-tertiary text-[10px]"
+                            className="fill-content-primary text-xs"
                         >
                             {format(tick.value)}
                         </text>
                     </g>
                 ))}
 
-                <path d={areaPath} fill="var(--color-chart-line)" opacity={0.06} />
                 <path
-                    d={linePath}
+                    d={smoothPath(geometry.coords)}
                     fill="none"
                     stroke="var(--color-chart-line)"
                     strokeWidth={2}
@@ -138,16 +194,27 @@ export function LineChart({ points, format, caption, className, height = 228 }: 
                     strokeLinecap="round"
                 />
 
-                {geometry.coords.map((point, index) => (
+                {geometry.coords.map((point) => (
+                    <circle
+                        key={`marker-${point.label}`}
+                        cx={point.x}
+                        cy={point.y}
+                        r={5.25}
+                        fill="var(--color-bg-secondary)"
+                        stroke="var(--color-chart-line)"
+                        strokeWidth={1.5}
+                    />
+                ))}
+
+                {geometry.coords.map((point) => (
                     <text
-                        key={point.label}
+                        key={`label-${point.label}`}
                         x={point.x}
                         y={height - 8}
                         textAnchor="middle"
-                        className="fill-content-tertiary text-[10px]"
+                        className="fill-content-primary text-xs"
                     >
-                        {/* Every other label, so months never collide. */}
-                        {index % 2 === 0 ? point.label : ""}
+                        {point.label}
                     </text>
                 ))}
 
@@ -166,7 +233,7 @@ export function LineChart({ points, format, caption, className, height = 228 }: 
                         <circle
                             cx={active.x}
                             cy={active.y}
-                            r={5}
+                            r={5.25}
                             fill="var(--color-chart-line)"
                             stroke="var(--color-bg-primary)"
                             strokeWidth={2}
@@ -177,7 +244,7 @@ export function LineChart({ points, format, caption, className, height = 228 }: 
 
             {active ? (
                 <div
-                    className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-s border border-border-subtle bg-bg-primary px-2 py-1 text-xs shadow-l2"
+                    className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-sm border border-border-subtle bg-bg-primary px-2 py-1 text-xs shadow-l2"
                     style={{
                         left: `${(active.x / VIEW_WIDTH) * 100}%`,
                         top: `${(active.y / height) * 100}%`,

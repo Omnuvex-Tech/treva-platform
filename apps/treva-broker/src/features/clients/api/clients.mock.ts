@@ -18,7 +18,7 @@ export async function list(query: ClientListQuery = {}): Promise<Paginated<Clien
         "lastName",
         "email",
         "phone",
-        "interest",
+        "objectOfInterest",
         "brokerName",
     ]);
 
@@ -54,14 +54,19 @@ export async function create(input: ClientInput): Promise<Client> {
         firstName: input.firstName,
         lastName: input.lastName,
         phone: input.phone,
+        additionalPhones: input.additionalPhones,
         email: input.email.trim().toLowerCase(),
         brokerId: input.brokerId,
         brokerName: brokerName(input.brokerId),
-        budget: input.budget,
-        interest: input.interest,
-        status: input.status ?? "lead",
-        notes: input.notes,
-        marketingConsent: input.marketingConsent,
+        objectOfInterest: input.objectOfInterest,
+        developerBrand: input.developerBrand,
+        website: input.website,
+        comments: input.comments,
+        // The form's action is "Submit for approval", so a new lead always
+        // starts under review — never approved by the broker who created it.
+        status: input.status ?? "pending",
+        approvedUntil: null,
+        consent: input.consent,
         createdAt: new Date().toISOString(),
     };
 

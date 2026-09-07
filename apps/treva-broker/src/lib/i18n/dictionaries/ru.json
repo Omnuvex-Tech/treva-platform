@@ -3,6 +3,7 @@
     "search": "Поиск",
     "save": "Сохранить",
     "cancel": "Отмена",
+    "close": "Закрыть",
     "edit": "Редактировать",
     "delete": "Удалить",
     "create": "Создать",
@@ -30,7 +31,18 @@
     "deleteIrreversible": "Это действие необратимо.",
     "deleteSelectedTitle": "Удалить выбранное?",
     "confirmDelete": "Удалить",
-    "detail": "Детали"
+    "detail": "Детали",
+    "upload": {
+      "title": "Добавить файлы",
+      "name": "Название",
+      "dragDrop": "Перетащите сюда",
+      "formats": "Форматы JPEG, PNG, PDF и MP4, до 60 МБ",
+      "or": "или",
+      "selectFile": "Выбрать файл",
+      "tooLarge": "{name} больше {limit} и не был добавлен",
+      "enterToAdd": "Нажмите Enter, чтобы добавить",
+      "selectFirst": "Сначала выберите файл"
+    }
   },
   "nav": {
     "newsFeed": "Новости",
@@ -53,6 +65,7 @@
     "rememberMe": "Запомнить меня",
     "forgotPassword": "Забыли пароль?",
     "signIn": "Войти в панель",
+    "register": "Регистрация",
     "securityNote": "Защищено на корпоративном уровне",
     "invalidCredentials": "Неверная почта или пароль",
     "panelTitle": "Управляйте премиальной недвижимостью Азербайджана",
@@ -62,7 +75,34 @@
     "feature2Title": "Клиенты и сделки от и до",
     "feature2Body": "От первого обращения до передачи ключей, ничего не теряется.",
     "feature3Title": "Прозрачная комиссия",
-    "feature3Body": "Понятные выплаты брокерам и их командам."
+    "feature3Body": "Понятные выплаты брокерам и их командам.",
+    "registerType": {
+      "step": "Шаг {current} из {total}",
+      "title": "Выберите тип регистрации",
+      "subtitle": "Расскажите, как вы хотите зарегистрироваться — коллег можно добавить позже.",
+      "individual": "Частное лицо",
+      "individualHint": "Регистрация личного аккаунта.",
+      "company": "Компания",
+      "companyHint": "Регистрация от имени компании.",
+      "companySetup": "Настройка компании",
+      "createCompany": "Создать новую компанию",
+      "createCompanyHint": "Зарегистрируйте новую компанию и станьте её первым администратором.",
+      "joinCompany": "Присоединиться к компании",
+      "joinCompanyHint": "Отправьте запрос на вступление в компанию, уже работающую на платформе.",
+      "searchCompany": "Найдите или выберите компанию",
+      "back": "Назад",
+      "continue": "Продолжить",
+      "legalPrefix": "Продолжая, вы соглашаетесь с",
+      "legalAnd": "и",
+      "terms": "Условиями обслуживания",
+      "privacy": "Политикой конфиденциальности"
+    },
+    "registerCredentials": {
+      "title": "Создайте аккаунт",
+      "subtitle": "Укажите почту, с которой будете входить.",
+      "passwordHint": "Минимум 8 символов.",
+      "submit": "Создать аккаунт"
+    }
   },
   "news": {
     "title": "Новости",
@@ -137,64 +177,66 @@
   "clients": {
     "title": "Клиенты",
     "subtitle": "Управляйте базой клиентов, лидами и их активностью",
-    "count": "{total} клиентов",
-    "add": "Добавить клиента",
-    "filter": "Фильтр",
+    "allClients": "Все клиенты",
+    "add": "Зарегистрировать лид",
     "searchPlaceholder": "Поиск клиентов",
     "columns": {
-      "client": "Клиент",
-      "contact": "Контакты",
-      "broker": "Ответственный брокер",
+      "index": "№",
+      "fullName": "ФИО",
+      "contacts": "Контакты",
+      "objectOfInterest": "Интересующий объект",
       "status": "Статус"
     },
     "status": {
-      "lead": "Лид",
-      "active": "Активный",
-      "negotiating": "Переговоры",
-      "closed": "Закрыт",
-      "lost": "Потерян"
+      "pending": "На рассмотрении",
+      "approved": "Одобрен",
+      "rejected": "Отклонён",
+      "approvedUntil": "Одобрен до {date}"
     },
-    "selected": "Выбрано: {count}",
     "form": {
-      "createTitle": "Новый клиент",
-      "editTitle": "Редактировать клиента",
-      "firstName": "Имя",
-      "lastName": "Фамилия",
-      "phone": "Номер телефона",
-      "email": "Электронная почта",
-      "broker": "Ответственный брокер",
-      "budget": "Бюджет",
-      "interest": "Интересует",
-      "notes": "Заметки",
-      "notesPlaceholder": "Контекст, предпочтения, история звонков…",
-      "consent": "Клиент согласен на связь по новым объектам",
-      "save": "Сохранить",
-      "addPhone": "Добавить ещё номер"
+      "createTitle": "Зарегистрировать лид",
+      "editTitle": "Редактировать лид",
+      "name": "Имя",
+      "surname": "Фамилия",
+      "primaryNumber": "Основной номер",
+      "addPhone": "Добавить ещё номер",
+      "removePhone": "Удалить этот номер",
+      "email": "Эл. почта",
+      "objectOfInterest": "Интересующий объект",
+      "objectOfInterestPlaceholder": "Выберите проект",
+      "developerBrand": "Бренд застройщика",
+      "website": "Сайт",
+      "comments": "Комментарии",
+      "consentBefore": "Подтверждаю, что клиент ознакомился с Политикой конфиденциальности и дал",
+      "consentLink": "Согласие",
+      "consentAfter": "на обработку",
+      "submit": "Отправить на одобрение"
     },
     "deleteConfirm": "Удалить этого клиента? Действие необратимо.",
-    "noClients": "Клиентов пока нет",
+    "noClients": "У вас пока нет клиентов",
     "noMatches": "По вашему запросу клиентов не найдено",
-    "approvalStatus": "Статус одобрения",
-    "agentName": "Имя агента",
-    "interestedIn": "Интересует",
+    "detail": {
+      "email": "Эл. почта",
+      "phone": "Телефон",
+      "approvalStatus": "Статус одобрения",
+      "agent": "Агент",
+      "reviewTitle": "Результаты проверки",
+      "reviewBody": "В дни работы с этим клиентом дождитесь результатов проверки. Вы получите уведомление, как только оценка будет завершена."
+    },
     "tabs": {
-      "overview": "Обзор",
-      "activity": "Активность",
-      "deals": "Сделки"
+      "salesOpportunities": "Возможности продаж",
+      "history": "История"
     }
   },
   "brokerRole": {
     "title": "Роль брокера",
     "subtitle": "Общие брошюры, прайс-листы, планы этажей и презентации",
-    "count": "{total} файлов",
-    "upload": "Загрузить файл",
+    "addFiles": "Добавить файлы",
+    "addedToast": "Файл добавлен",
     "download": "Скачать",
-    "share": "Поделиться",
-    "remove": "Удалить",
     "downloads": "{count} загрузок",
     "version": "v{version}",
-    "searchPlaceholder": "Поиск материалов",
-    "details": "Данные файла",
+    "details": "Сведения о файле",
     "currentVersion": "Текущая версия",
     "uploadedBy": "Загрузил",
     "uploadDate": "Дата загрузки",
@@ -202,77 +244,233 @@
     "fileSize": "Размер файла",
     "fileType": "Тип файла",
     "visibility": "Видимость",
-    "visibilityAll": "Все брокеры",
-    "visibilityTop": "Только топ-брокеры",
-    "visibilityAdmin": "Только админы",
-    "deleteConfirm": "Удалить этот файл? Брокеры потеряют к нему доступ."
+    "deleteConfirm": "Удалить этот файл? Брокеры потеряют к нему доступ.",
+    "editor": {
+      "autosaved": "Автосохранено как черновик",
+      "saved": "Все изменения сохранены",
+      "save": "Сохранить изменения",
+      "deleteFile": "Удалить файл",
+      "fileInformation": "Информация о файле",
+      "fileName": "Имя файла",
+      "category": "Категория файла",
+      "language": "Язык",
+      "description": "Комментарии"
+    },
+    "categories": {
+      "brochure": "Брошюра",
+      "price_list": "Прайс-лист",
+      "floor_plan": "Планировка",
+      "presentation": "Презентация",
+      "policy": "Регламент",
+      "other": "Другое"
+    },
+    "languages": {
+      "az": "Азербайджанский",
+      "en": "Английский",
+      "ru": "Русский"
+    },
+    "flags": {
+      "active": "Активен",
+      "featured": "Избранный файл",
+      "allowDownload": "Разрешить скачивание",
+      "notifyBrokers": "Уведомлять брокеров об изменениях"
+    }
   },
   "finance": {
     "title": "Финансы",
-    "subtitle": "Комиссии, выплаты и финансовые показатели",
-    "commission": "Общая комиссия",
-    "pendingPayout": "Ожидает выплаты",
-    "closedDeals": "Закрытые сделки",
-    "avgDeal": "Средняя сумма сделки",
-    "vsPrev": "к предыдущему периоду",
-    "monthlyTitle": "Комиссия за последние 12 месяцев",
-    "splitTitle": "Комиссия по статусам",
-    "transactions": "Транзакции",
-    "searchPlaceholder": "Поиск по номеру, клиенту или проекту",
+    "subtitle": "Управляйте бюджетом, денежным потоком, расходами и платежами в одном месте",
+    "kpi": {
+      "commission": "Общая комиссия",
+      "deals": "Закрытые сделки",
+      "volume": "Объём продаж",
+      "rank": "Позиция в рейтинге",
+      "vsLastMonth": "{value} к прошлому месяцу",
+      "topPercent": "Топ {percent}% брокеров"
+    },
+    "trendTitle": "Динамика продаж",
+    "trendSubtitle": "Показатели за 6 месяцев",
+    "revenueTitle": "Выручка по проектам",
+    "leaderboard": "Рейтинг всех брокеров",
     "columns": {
-      "reference": "Номер",
-      "client": "Клиент",
-      "project": "Проект",
-      "broker": "Брокер",
-      "amount": "Сумма",
-      "commission": "Комиссия",
-      "status": "Статус",
-      "date": "Дата"
+      "index": "№",
+      "project": "Название проекта",
+      "unit": "A 23 - 02",
+      "listingPrice": "Цена в объявлении",
+      "salesPrice": "Цена продажи",
+      "receivable": "К получению",
+      "paid": "Выплачено",
+      "remaining": "Остаток",
+      "salesDate": "Дата продажи",
+      "name": "Имя",
+      "deals": "Сделки",
+      "commission": "Комиссия"
     },
-    "status": {
-      "paid": "Оплачено",
-      "pending": "Ожидает",
-      "processing": "В обработке",
-      "cancelled": "Отменено"
-    },
-    "tabs": {
-      "all": "Все",
-      "paid": "Оплачено",
-      "processing": "В обработке",
-      "pending": "Ожидает",
-      "cancelled": "Отменено"
+    "request": {
+      "name": "Имя",
+      "surname": "Фамилия",
+      "number": "Номер",
+      "finId": "FIN",
+      "downPayment": "Первоначальный взнос",
+      "creditTerm": "Срок кредита",
+      "lastPaymentDate": "Дата последнего платежа",
+      "approvedUntil": "Одобрено до {date}",
+      "consentPrefix": "Подтверждаю, что Клиент ознакомился с Политикой конфиденциальности и предоставил ",
+      "consentLink": "Согласие",
+      "consentSuffix": " на обработку данных",
+      "submit": "Отправить запрос",
+      "sentToast": "Запрос отправлен"
     }
   },
   "projects": {
     "title": "Проекты",
-    "subtitle": "Просмотр и управление проектами застройки",
-    "count": "{total} проектов",
+    "subtitle": "Создавайте, организуйте и управляйте всеми проектами недвижимости из одной панели",
     "add": "Добавить проект",
-    "searchPlaceholder": "Поиск проектов",
-    "from": "от",
-    "units": "{available} из {total} квартир",
     "status": {
-      "planning": "Планирование",
-      "construction": "Строится",
-      "ready": "Готов",
-      "soldOut": "Продано"
+      "active": "Активен",
+      "inactive": "Неактивен"
     },
-    "delivery": "Сдача"
+    "unitsTotal": "Всего {total} юнитов",
+    "unitsAvailable": "{available} доступно",
+    "deleteConfirm": "Удалить этот проект? Брокеры потеряют доступ к его юнитам.",
+    "from": "от",
+    "editor": {
+      "name": "Название проекта",
+      "publicUrl": "Публичный URL",
+      "save": "Сохранить изменения",
+      "heroImage": "Обложка",
+      "galleryImage": "Изображение галереи",
+      "highlights": "Ключевые факты",
+      "highlightsHint": "Краткие факты, помогающие покупателю быстро оценить проект.",
+      "highlightLabel": "Название",
+      "highlightValue": "Значение",
+      "highlightEnabled": "Показывать этот факт",
+      "addHighlight": "Добавить факт",
+      "offers": "Специальные предложения",
+      "offersHint": "Покажите акции с ограниченным сроком и выгоды для покупателя.",
+      "offerTag": "Метка предложения",
+      "offerTitle": "Название предложения",
+      "offerDescription": "Опишите предложение…",
+      "offerEnabled": "Показывать это предложение",
+      "offerTags": {
+        "new": "Новое",
+        "limited": "Ограниченное",
+        "exclusive": "Эксклюзив"
+      },
+      "expires": "Истекает:",
+      "expiresPlaceholder": "Выберите дату",
+      "addOffer": "Добавить предложение",
+      "materials": "Маркетинговые материалы",
+      "materialsHint": "Брошюры, презентации и документы для агентов и покупателей.",
+      "columns": {
+        "file": "Файл",
+        "category": "Категория",
+        "language": "Язык",
+        "size": "Размер",
+        "actions": "Действия"
+      },
+      "replace": "Заменить файл",
+      "dropTitle": "Перетащите сюда",
+      "dropHint": "Форматы JPEG, PNG, PDF и MP4, до 60 МБ",
+      "or": "или",
+      "selectFile": "Выбрать файл",
+      "availability": "Живая доступность",
+      "availabilityHint": "Актуальное количество юнитов на публичной странице.",
+      "autoCalculate": "Автоподсчёт",
+      "buckets": {
+        "available": "Доступно",
+        "reserved": "Резерв",
+        "sold": "Продано"
+      },
+      "shareOfTotal": "{percent}% от всего",
+      "createTitle": "Добавить новый проект",
+      "editTitle": "Редактировать проект",
+      "delete": "Удалить проект",
+      "imageHint": "Нажмите или перетащите изображение",
+      "replaceImage": "Заменить изображение"
+    },
+    "detail": {
+      "pageLink": "Ссылка на страницу",
+      "download": "Скачать",
+      "downloads": "{count} загрузок",
+      "finance": "Финансы",
+      "floorPlan": "Планировка",
+      "lastSynced": "Последняя синхронизация: {when}",
+      "edit": "Редактировать",
+      "financeColumns": {
+        "index": "№",
+        "projectName": "Название проекта",
+        "unitCode": "Юнит",
+        "listingPrice": "Цена в листинге",
+        "salesPrice": "Цена продажи",
+        "received": "Получ.",
+        "paid": "Оплачено",
+        "remaining": "Остаток",
+        "salesDate": "Дата продажи"
+      }
+    }
   },
   "floorPlan": {
     "title": "План этажа",
     "subtitle": "Здания, этажи и доступность квартир",
     "legend": {
-      "available": "Свободно",
-      "reserved": "Бронь",
+      "available": "Доступно",
+      "reserved": "Резерв",
       "sold": "Продано",
-      "blocked": "Заблокировано"
+      "blocked": "Недоступно"
     },
     "unit": "Квартира {code}",
     "floor": "Этаж {level}",
     "specs": "{beds} комн. · {area} м²",
     "selectUnit": "Выберите квартиру, чтобы увидеть детали",
-    "totalUnits": "{total} квартир"
+    "totalUnits": "{total} квартир",
+    "views": {
+      "grid": "Сетка",
+      "gridPlus": "Сетка+",
+      "properties": "Квартиры",
+      "layouts": "Планировки"
+    },
+    "sorts": {
+      "lowestPrice": "Сначала дешёвые",
+      "highestPrice": "Сначала дорогие",
+      "largestArea": "Больше площадь"
+    },
+    "sortBy": "Сортировка",
+    "card": {
+      "floor": "Этаж",
+      "type": "Тип",
+      "area": "Площадь",
+      "loggia": "Лоджия"
+    },
+    "layout": {
+      "priceFrom": "от {price}",
+      "properties": "{count} квартира"
+    },
+    "building": "Здание",
+    "listing": {
+      "floors": "{count} этажей",
+      "units": "{count} жилых юнитов"
+    },
+    "rail": {
+      "residentialUnit": "Жилой юнит",
+      "unitNo": "N№ {code}",
+      "close": "Закрыть",
+      "area": "Площадь",
+      "floor": "Этаж",
+      "status": "Статус",
+      "floorPlan": "Планировка",
+      "selectUnit": "Выбрать юнит",
+      "priceNote": "Цена согласно прайс-листу ©",
+      "pricePerSqm": "{price} / м²",
+      "propertyDetails": "Данные объекта",
+      "apartmentNumber": "Номер квартиры",
+      "subType": "Подтип",
+      "address": "Адрес",
+      "buildingEntrance": "Подъезд",
+      "floorLabel": "Этаж",
+      "buildingName": "Название здания",
+      "complex": "Комплекс",
+      "totalArea": "Общая площадь, м²"
+    }
   },
   "users": {
     "title": "Пользователи",
@@ -281,16 +479,21 @@
       "user": "Пользователь",
       "agency": "Агентства недвижимости"
     },
-    "add": "Добавить пользователя",
-    "export": "Экспорт",
-    "searchPlaceholder": "Поиск по имени, почте или телефону",
+    "cooperationType": "Тип сотрудничества",
+    "cooperationTypes": {
+      "exclusive": "Эксклюзив",
+      "partner": "Партнёр",
+      "external": "Внешний"
+    },
     "columns": {
       "name": "Имя",
-      "email": "Эл. почта",
+      "email": "Email",
+      "emailAgency": "E-Mail",
+      "password": "Пароль",
       "phone": "Телефон",
       "role": "Роль",
-      "team": "Команда",
       "status": "Статус",
+      "lastLogin": "Последний вход",
       "actions": "Действия",
       "manager": "Менеджер",
       "contacts": "Контакты",
@@ -298,38 +501,61 @@
     },
     "status": {
       "active": "Активен",
-      "blocked": "Заблокирован",
+      "blocked": "Неактивен",
       "invited": "Приглашён"
     },
     "form": {
-      "createTitle": "Новый пользователь",
-      "editTitle": "Редактировать пользователя",
+      "createTitle": "Создание агента",
+      "editTitle": "Редактирование агента",
+      "createCrumb": "Создать",
       "firstName": "Имя",
       "lastName": "Фамилия",
       "email": "Электронная почта",
       "password": "Пароль",
-      "generate": "Сгенерировать пароль",
-      "phone": "Номер телефона",
-      "jobTitle": "Должность",
-      "team": "Команда",
+      "phone": "Основной номер",
+      "addPhone": "Добавить ещё номер",
+      "cooperationType": "Тип сотрудничества",
+      "agentlik": "Агентство (Agentlik)",
+      "agency": "Агентство",
+      "accessPermissions": "Права доступа",
+      "accessPermissionOptions": {
+        "full": "Полный доступ",
+        "extended": "Расширенный",
+        "standard": "Стандартный"
+      },
       "role": "Роль",
-      "roleHint": "Определяет, какие экраны и действия доступны этому аккаунту",
+      "roleOptions": {
+        "broker": "Агент",
+        "top_broker": "Ведущий агент",
+        "admin": "Директор"
+      },
       "blockAgent": "Заблокировать агента",
-      "blockHint": "Заблокированный аккаунт не может войти в систему",
-      "save": "Сохранить",
-      "confirmPassword": "Подтвердите пароль",
-      "passwordMismatch": "Пароли не совпадают",
-      "organization": "Организация"
+      "create": "Создать",
+      "save": "Сохранить"
+    },
+    "profile": {
+      "title": "Профиль"
+    },
+    "agencyColumns": {
+      "status": "Статус",
+      "marketingName": "Маркетинговое название",
+      "city": "Город",
+      "registrationDate": "Дата регистрации",
+      "crmConnection": "Подключение CRM"
+    },
+    "agencyStatus": {
+      "new": "Новое",
+      "active": "Активно",
+      "pending": "В ожидании"
     },
     "deleteConfirm": "Удалить этого пользователя? Действие необратимо.",
     "addUser": "Добавить пользователя",
-    "addAgency": "Добавить агентство",
     "userAdded": "Пользователь успешно добавлен",
     "agencyAdded": "Агентство успешно добавлено",
     "userDeleted": "Пользователь удалён",
     "agencyDeleted": "Агентство удалено",
-    "searchUsers": "Поиск пользователей",
-    "searchAgencies": "Поиск агентств",
+    "searchUsers": "Поиск по имени, фамилии или номеру телефона",
+    "searchAgencies": "Агентства недвижимости",
     "userUpdated": "Пользователь обновлён"
   },
   "listings": {
@@ -364,7 +590,7 @@
   },
   "roles": {
     "broker": "Брокер",
-    "top_broker": "Топ-брокер",
+    "top_broker": "Менеджер",
     "admin": "Администратор"
   }
 }

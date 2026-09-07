@@ -141,7 +141,7 @@ export function RichTextEditor({
                             // collapse it before the command runs.
                             onMouseDown={(event) => event.preventDefault()}
                             onClick={action.run}
-                            className="flex size-8 items-center justify-center rounded-s text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
+                            className="flex size-8 items-center justify-center rounded-sm text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
                         >
                             <HugeiconsIcon icon={action.icon} size={16} strokeWidth={1.6} />
                         </button>

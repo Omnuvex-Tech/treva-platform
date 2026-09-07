@@ -64,7 +64,7 @@ export function NewsDetailView({ post }: NewsDetailViewProps) {
                                 {post.title}
                             </h1>
 
-                            <span className="inline-flex w-fit items-center gap-1.5 rounded-s bg-bg-secondary px-2 py-1 text-xs text-content-secondary">
+                            <span className="inline-flex w-fit items-center gap-1.5 rounded-sm bg-bg-secondary px-2 py-1 text-xs text-content-secondary">
                                 <HugeiconsIcon icon={Clock01Icon} size={14} strokeWidth={1.6} />
                                 {formatDate(post.publishedAt, locale)}
                             </span>
@@ -103,7 +103,7 @@ export function NewsDetailView({ post }: NewsDetailViewProps) {
                                         key={attachment.id}
                                         className="flex h-15 items-center gap-3 px-3"
                                     >
-                                        <span className="flex size-7.5 shrink-0 items-center justify-center rounded-s bg-bg-secondary text-content-tertiary">
+                                        <span className="flex size-7.5 shrink-0 items-center justify-center rounded-sm bg-bg-secondary text-content-tertiary">
                                             <HugeiconsIcon
                                                 icon={File01Icon}
                                                 size={15}

@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Lock, Mail } from "lucide-react";
 import { useActionState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { routes } from "@/config/routes";
+import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/providers/i18n-provider";
 import { signInAction, type LoginFormState } from "../actions";
 
@@ -64,13 +65,34 @@ export function LoginForm() {
                 </p>
             ) : null}
 
-            {/* 52px tall and full width, as in the artboard. Note the design
-                shows a *second* 508x52 button under this one whose label is not
-                in the file (it lives inside a component instance) — likely an
-                SSO option. Left out rather than guessed at. */}
-            <Button type="submit" size="lg" block loading={pending} className="h-13">
+            {/* Two 508x52 actions, 12 apart, both on the 3XL radius with a
+                16/Medium label (873:59616 / 873:59617). The pair is the whole
+                point of the artboard: signing in is the filled brand button,
+                registering the outlined one directly under it — same size, so
+                neither reads as secondary chrome. */}
+            <Button
+                type="submit"
+                size="lg"
+                block
+                loading={pending}
+                className="h-13 rounded-lg text-base"
+            >
                 {t.auth.signIn}
             </Button>
+
+            {/* A link, not a button: it navigates rather than submitting, and
+                nesting one inside the form's submit would post the credentials
+                on the way out. `buttonVariants` keeps it identical to the
+                filled action above. */}
+            <Link
+                href={routes.register(locale)}
+                className={cn(
+                    buttonVariants({ variant: "brandOutline", size: "lg", block: true }),
+                    "h-13 rounded-lg text-base",
+                )}
+            >
+                {t.auth.register}
+            </Link>
 
             <p className="text-center text-xs text-content-tertiary">{t.auth.securityNote}</p>
         </form>

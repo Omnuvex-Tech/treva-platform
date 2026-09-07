@@ -1,13 +1,16 @@
 "use client";
 
 import {
+    Add01Icon,
     Attachment01Icon,
     Delete02Icon,
     File01Icon,
     FileUploadIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useState } from "react";
 
+import { AddFilesModal } from "@/components/common/add-files-modal";
 import { Button } from "@/components/ui/button";
 import { FileDrop } from "@/components/ui/file-drop";
 import { interpolate } from "@/lib/i18n/interpolate";
@@ -25,6 +28,13 @@ export interface AttachmentsCardProps {
 /** The design states the cap in the hint, so it is enforced here too. */
 const MAX_BYTES = 25 * 1024 * 1024;
 
+/**
+ * Matches `attachHint` — "PDF, Word, Excel, or Images". The shared modal
+ * defaults to the wider set its own artboard names (JPEG/PNG/PDF/MP4, 60MB),
+ * which is Broker Role's rule, not this card's.
+ */
+const ACCEPT = "image/*,application/pdf,.doc,.docx,.xls,.xlsx";
+
 function kindFor(file: File): AttachmentKind {
     if (file.type.startsWith("image/")) return "image";
     if (file.type === "application/pdf") return "pdf";
@@ -37,30 +47,58 @@ function kindFor(file: File): AttachmentKind {
 export function AttachmentsCard({ attachments, onChange }: AttachmentsCardProps) {
     const { locale, t } = useI18n();
     const toast = useToast();
+    const [addOpen, setAddOpen] = useState(false);
+
+    /**
+     * The one entry point that enforces the cap, so the header modal and the
+     * inline drop zone cannot drift apart on what they accept.
+     */
+    function accept(file: File, name: string): NewsAttachment | null {
+        if (file.size > MAX_BYTES) {
+            toast.error(interpolate(t.news.editor.tooLarge, { name: file.name }));
+            return null;
+        }
+
+        return {
+            id: `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            name: name || file.name,
+            sizeBytes: file.size,
+            kind: kindFor(file),
+        };
+    }
 
     function addFiles(files: File[]) {
-        const accepted: NewsAttachment[] = [];
-
-        for (const file of files) {
-            if (file.size > MAX_BYTES) {
-                toast.error(interpolate(t.news.editor.tooLarge, { name: file.name }));
-                continue;
-            }
-
-            accepted.push({
-                // Index included so several files picked at once cannot collide.
-                id: `att_${Date.now()}_${accepted.length}`,
-                name: file.name,
-                sizeBytes: file.size,
-                kind: kindFor(file),
-            });
-        }
+        const accepted = files
+            .map((file) => accept(file, ""))
+            .filter((entry): entry is NewsAttachment => entry !== null);
 
         if (accepted.length) onChange([...attachments, ...accepted]);
     }
 
+    /** The header modal's single, optionally renamed file. */
+    function addNamedFile(file: File, name: string) {
+        const entry = accept(file, name);
+        if (entry) onChange([...attachments, entry]);
+    }
+
     return (
-        <EditorSection icon={Attachment01Icon} title={t.news.editor.attachments}>
+        <EditorSection
+            icon={Attachment01Icon}
+            title={t.news.editor.attachments}
+            action={
+                <Button
+                    variant="brandOutline"
+                    // The 32px form of `chip` — 873:51602 keeps the 3XL radius
+                    // and the 8px padding but stands a step taller.
+                    size="chip"
+                    className="h-8"
+                    leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
+                    onClick={() => setAddOpen(true)}
+                >
+                    {t.news.editor.addFile}
+                </Button>
+            }
+        >
             <div className="flex flex-col gap-3">
                 <FileDrop
                     icon={FileUploadIcon}
@@ -75,7 +113,7 @@ export function AttachmentsCard({ attachments, onChange }: AttachmentsCardProps)
                     <ul className="flex flex-col divide-y divide-border-subtle rounded-md border border-border-subtle">
                         {attachments.map((attachment) => (
                             <li key={attachment.id} className="flex items-center gap-3 px-3 py-2.5">
-                                <span className="flex size-8 shrink-0 items-center justify-center rounded-s bg-bg-secondary text-content-tertiary">
+                                <span className="flex size-8 shrink-0 items-center justify-center rounded-sm bg-bg-secondary text-content-tertiary">
                                     <HugeiconsIcon icon={File01Icon} size={15} strokeWidth={1.6} />
                                 </span>
 
@@ -106,6 +144,15 @@ export function AttachmentsCard({ attachments, onChange }: AttachmentsCardProps)
                     </ul>
                 ) : null}
             </div>
+
+            <AddFilesModal
+                open={addOpen}
+                onClose={() => setAddOpen(false)}
+                onAdd={addNamedFile}
+                hint={t.news.editor.attachHint}
+                accept={ACCEPT}
+                maxBytes={MAX_BYTES}
+            />
         </EditorSection>
     );
 }

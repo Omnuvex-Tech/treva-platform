@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
     Table,
     TableBody,
@@ -13,104 +12,90 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { routes } from "@/config/routes";
-import { formatCurrency } from "@/lib/utils/format";
+import { interpolate } from "@/lib/i18n/interpolate";
 import { useI18n } from "@/providers/i18n-provider";
 import type { Client, ClientStatus } from "../types";
 
-const STATUS_TONE: Record<ClientStatus, "positive" | "negative" | "notice" | "info" | "neutral"> = {
-    lead: "info",
-    active: "positive",
-    negotiating: "notice",
-    closed: "neutral",
-    lost: "negative",
+const STATUS_TONE: Record<ClientStatus, "positive" | "notice" | "negative"> = {
+    approved: "positive",
+    pending: "notice",
+    rejected: "negative",
 };
 
 export interface ClientTableProps {
     clients: readonly Client[];
-    selected: ReadonlySet<string>;
-    onToggle: (id: string) => void;
-    onToggleAll: () => void;
 }
 
 /**
- * Exactly five columns, per the table block in 873:49772: a 36px selection
+ * Formats the approval date the way the status pill spells it: "05:08:2026".
+ *
+ * Colons rather than dots or slashes, and no locale switch — that is literally
+ * what 873:49815 draws, and a date the reviewer quotes back is easier to match
+ * when every locale prints it identically.
+ */
+function approvalDate(value: string): string {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    const pad = (part: number) => String(part).padStart(2, "0");
+    return `${pad(date.getDate())}:${pad(date.getMonth() + 1)}:${date.getFullYear()}`;
+}
+
+/**
+ * Exactly five columns, per the table block in 873:49772: a 36px row-number
  * column plus four equal content columns (36 + 4 x 263 = 1088). `table-fixed`
  * is what makes the four equal — with auto layout they would size to content.
  *
- * There is deliberately no per-row action column: the artboard has none. Edit
- * lives on the client's own screen (the 94x44 button in 873:49423) and delete
- * is a bulk action driven by the selection column, which is the only reason a
- * 36px checkbox column exists at all.
+ * No selection column and no per-row actions: the artboard has neither. Delete
+ * lives on the client's own screen (873:49423), which is also where the row
+ * leads, so the whole row is the link target rather than just the name.
  */
-export function ClientTable({ clients, selected, onToggle, onToggleAll }: ClientTableProps) {
+export function ClientTable({ clients }: ClientTableProps) {
     const { locale, t } = useI18n();
-
-    const allSelected = clients.length > 0 && clients.every((client) => selected.has(client.id));
 
     return (
         <Table className="table-fixed">
             <TableHead>
                 <TableRow>
-                    <TableHeaderCell className="w-9">
-                        <Checkbox
-                            checked={allSelected}
-                            onChange={onToggleAll}
-                            aria-label="Select all rows"
-                        />
-                    </TableHeaderCell>
-                    <TableHeaderCell>{t.clients.columns.client}</TableHeaderCell>
-                    <TableHeaderCell>{t.clients.columns.contact}</TableHeaderCell>
-                    <TableHeaderCell>{t.clients.columns.broker}</TableHeaderCell>
+                    <TableHeaderCell className="w-9">{t.clients.columns.index}</TableHeaderCell>
+                    <TableHeaderCell>{t.clients.columns.fullName}</TableHeaderCell>
+                    <TableHeaderCell>{t.clients.columns.contacts}</TableHeaderCell>
+                    <TableHeaderCell>{t.clients.columns.objectOfInterest}</TableHeaderCell>
                     <TableHeaderCell>{t.clients.columns.status}</TableHeaderCell>
                 </TableRow>
             </TableHead>
 
             <TableBody>
-                {clients.map((client) => (
-                    <TableRow
-                        key={client.id}
-                        className={selected.has(client.id) ? "bg-bg-secondary" : undefined}
-                    >
-                        <TableCell>
-                            <Checkbox
-                                checked={selected.has(client.id)}
-                                onChange={() => onToggle(client.id)}
-                                aria-label={`Select ${client.firstName} ${client.lastName}`}
-                            />
-                        </TableCell>
+                {clients.map((client, index) => (
+                    <TableRow key={client.id} interactive>
+                        <TableCell>{index + 1}</TableCell>
 
-                        <TableCell className="truncate font-medium">
-                            {/* The name is the link rather than the whole row:
-                                a row-wide click target would swallow the
-                                checkbox that sits inside it. */}
+                        <TableCell className="truncate px-0">
+                            {/* The link fills the cell so the row reads as one
+                                target — there is no checkbox in it to swallow. */}
                             <Link
                                 href={routes.clientDetail(locale, client.id)}
-                                className="hover:underline"
+                                className="flex h-full items-center truncate px-3 hover:underline"
                             >
                                 {client.firstName} {client.lastName}
                             </Link>
-                            <span className="block truncate text-xs font-normal text-content-tertiary">
-                                {client.interest}
-                            </span>
                         </TableCell>
 
-                        <TableCell className="truncate text-content-secondary">
-                            <span className="block truncate">{client.phone}</span>
-                            <span className="block truncate text-xs text-content-tertiary">
-                                {client.email}
-                            </span>
-                        </TableCell>
-
-                        <TableCell className="truncate text-content-secondary">
-                            {client.brokerName}
-                            <span className="block truncate text-xs text-content-tertiary">
-                                {formatCurrency(client.budget, locale)}
-                            </span>
-                        </TableCell>
+                        <TableCell className="truncate">{client.phone}</TableCell>
+                        <TableCell className="truncate">{client.objectOfInterest}</TableCell>
 
                         <TableCell>
-                            <Badge tone={STATUS_TONE[client.status]}>
-                                {t.clients.status[client.status]}
+                            <Badge
+                                tone={STATUS_TONE[client.status]}
+                                // 8px/4px padding on a 12/Medium line, not the
+                                // 10px uppercase pill the news cards use.
+                                className="px-2 py-1 text-xs font-medium tracking-normal normal-case"
+                            >
+                                {client.status === "approved" && client.approvedUntil
+                                    ? interpolate(t.clients.status.approvedUntil, {
+                                          date: approvalDate(client.approvedUntil),
+                                      })
+                                    : t.clients.status[client.status]}
                             </Badge>
                         </TableCell>
                     </TableRow>

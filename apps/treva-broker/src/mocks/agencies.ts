@@ -24,7 +24,7 @@ export const MOCK_AGENCIES: Agency[] = [
     },
     {
         id: "ag_3",
-        name: "Elvin Mammadov",
+        name: "Elvin Məmmədov",
         managerName: "Ag Emlak",
         phone: "+994 50-301-35-05",
         organization: "",

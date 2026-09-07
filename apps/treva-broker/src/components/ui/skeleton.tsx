@@ -6,7 +6,7 @@ export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>
     return (
         <div
             aria-hidden
-            className={cn("animate-pulse rounded-s bg-bg-tertiary", className)}
+            className={cn("animate-pulse rounded-sm bg-bg-tertiary", className)}
             {...props}
         />
     );
@@ -25,7 +25,7 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-3 w-full" />
                     <Skeleton className="h-3 w-5/6" />
-                    <Skeleton className="h-7 w-24 rounded-s" />
+                    <Skeleton className="h-7 w-24 rounded-sm" />
                 </div>
             ))}
         </div>

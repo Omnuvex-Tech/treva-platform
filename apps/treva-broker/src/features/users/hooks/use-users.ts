@@ -14,6 +14,27 @@ export function useUsersList(query: UserListQuery) {
     });
 }
 
+export function useUser(id: string) {
+    return useQuery({
+        queryKey: queryKeys.users.detail(id),
+        queryFn: () => usersService.detail(id),
+    });
+}
+
+/**
+ * The agency row under the agent editor (873:48887).
+ *
+ * Guarded on the id because the same screen creates accounts, where there is
+ * nothing to look up yet.
+ */
+export function useUserAgencyLink(id: string) {
+    return useQuery({
+        queryKey: queryKeys.users.agencyLink(id),
+        queryFn: () => usersService.agencyLink(id),
+        enabled: id !== "",
+    });
+}
+
 export function useCreateUser() {
     const queryClient = useQueryClient();
 

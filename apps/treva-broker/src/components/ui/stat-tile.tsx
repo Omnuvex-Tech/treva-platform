@@ -1,66 +1,56 @@
-import { TrendingDown, TrendingUp } from "lucide-react";
-import type { ReactNode } from "react";
-
 import { cn } from "@/lib/utils/cn";
 
 export interface StatTileProps {
     label: string;
     value: string;
-    /** Percentage change against the previous period; omit when there is none. */
-    delta?: number;
-    hint?: string;
-    /** Any icon node — the app is mid-migration from lucide to hugeicons. */
-    icon?: ReactNode;
+    /** The line under the value — "12.4% vs last month", "Top 15% of brokers". */
+    note: string;
+    /**
+     * Prefixes `note` with an arrow and inks it. Left off, the note stays on
+     * Content/Secondary with no arrow — what the Rank Position tile draws,
+     * because "Top 15% of brokers" is a standing fact, not a movement.
+     */
+    trend?: "up" | "down";
     className?: string;
 }
 
 /**
- * A single headline number. The right answer whenever a "chart" would have
- * plotted exactly one value — a 260x136 tile is the KPI row in the Finance
- * artboard.
+ * A single headline number — the 260x136 tile in the Finance KPI row
+ * (1173:17971). The right answer whenever a "chart" would have plotted exactly
+ * one value.
  *
- * The trend arrow carries an icon as well as a colour, so direction is never
- * communicated by colour alone.
+ * Both the label and the number are Content/Brand, not Content/Primary: the
+ * tiles are the one surface in the app that inks its figure on the brand.
+ *
+ * The arrow is the literal glyph the artboard sets rather than an icon, and it
+ * is what keeps direction from resting on colour alone.
+ *
+ * Heights come out of the type scale exactly: 24 padding + 20 label + 40 value
+ * + 8 + 20 note + 24 padding = the artboard's 136.
  */
-export function StatTile({ label, value, delta, hint, icon, className }: StatTileProps) {
-    const rising = (delta ?? 0) >= 0;
-    const TrendIcon = rising ? TrendingUp : TrendingDown;
-
+export function StatTile({ label, value, note, trend, className }: StatTileProps) {
     return (
         <div
             className={cn(
-                "flex min-w-0 flex-col justify-between gap-3 rounded-lg border border-border-subtle bg-bg-primary p-4",
+                "flex min-w-0 flex-col rounded-md border border-border-subtle bg-bg-primary p-6",
                 className,
             )}
         >
-            <div className="flex items-start justify-between gap-2">
-                <p className="text-xs text-content-tertiary">{label}</p>
-                {icon ? (
-                    <span className="shrink-0 text-content-tertiary [&_svg]:size-4">{icon}</span>
-                ) : null}
-            </div>
-
-            <div>
-                <p className="truncate text-2xl font-medium text-content-primary">{value}</p>
-
-                {delta === undefined ? (
-                    hint ? <p className="mt-0.5 text-xs text-content-tertiary">{hint}</p> : null
-                ) : (
-                    <p
-                        className={cn(
-                            "mt-0.5 inline-flex items-center gap-1 text-xs font-medium",
-                            rising ? "text-content-positive-bold" : "text-content-negative",
-                        )}
-                    >
-                        <TrendIcon className="size-3.5" />
-                        {rising ? "+" : ""}
-                        {delta.toFixed(1)}%
-                        {hint ? (
-                            <span className="font-normal text-content-tertiary">{hint}</span>
-                        ) : null}
-                    </p>
+            <p className="truncate text-sm font-medium text-content-brand">{label}</p>
+            <p className="truncate text-3xl font-semibold text-content-brand">{value}</p>
+            <p
+                className={cn(
+                    "mt-2 truncate text-sm",
+                    trend === "up"
+                        ? "text-content-positive-bold"
+                        : trend === "down"
+                          ? "text-content-negative"
+                          : "text-content-secondary",
                 )}
-            </div>
+            >
+                {trend ? `${trend === "up" ? "↑" : "↓"} ` : ""}
+                {note}
+            </p>
         </div>
     );
 }

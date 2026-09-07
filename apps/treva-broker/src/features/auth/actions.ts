@@ -68,3 +68,47 @@ export async function signOutAction(locale: Locale): Promise<void> {
 
     redirect(routes.login(isLocale(locale) ? locale : DEFAULT_LOCALE));
 }
+
+export interface RegisterFormState {
+    error: string | null;
+}
+
+/**
+ * Handles the sign-up form.
+ *
+ * The same shape as {@link signInAction}, and for the same reason: the session
+ * cookie has to be set `httpOnly`, which only the server can do. A new account
+ * is signed in immediately — there is no verification step in the file.
+ */
+export async function signUpAction(
+    _previousState: RegisterFormState,
+    formData: FormData,
+): Promise<RegisterFormState> {
+    const localeValue = String(formData.get("locale") ?? "");
+    const locale: Locale = isLocale(localeValue) ? localeValue : DEFAULT_LOCALE;
+    const type = formData.get("type") === "company" ? "company" : "individual";
+
+    try {
+        const session = await authService.register({
+            email: String(formData.get("email") ?? ""),
+            password: String(formData.get("password") ?? ""),
+            type,
+        });
+
+        const store = await cookies();
+        store.set(SESSION_COOKIE, encodeSession(session), {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: SESSION_MAX_AGE,
+        });
+    } catch (error) {
+        return {
+            error: isApiError(error) ? error.message : "Registration failed. Please try again.",
+        };
+    }
+
+    // Outside the try/catch: redirect() signals by throwing.
+    redirect(HOME_ROUTE(locale));
+}

@@ -23,3 +23,17 @@ export interface LoginPayload {
     password: string;
     rememberMe: boolean;
 }
+
+/**
+ * What sign-up sends.
+ *
+ * Only the individual branch is wired: the artboards draw the type step and
+ * nothing after it, so a personal account is created from an address and a
+ * password the way signing in reads them. `type` rides along so the company
+ * branch has somewhere to land once its screens exist.
+ */
+export interface RegisterPayload {
+    email: string;
+    password: string;
+    type: "individual" | "company";
+}

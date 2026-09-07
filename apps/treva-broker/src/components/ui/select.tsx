@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent , type ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 import { AnchoredPopover } from "./popover";
@@ -25,10 +25,18 @@ export interface SelectProps {
     /** Renders a hidden input so the value is submitted with a `<form>`. */
     name?: string;
     disabled?: boolean;
+    /** Draws the red asterisk beside the label, as the design's fields do. */
+    required?: boolean;
     id?: string;
     "aria-label"?: string;
     containerClassName?: string;
     className?: string;
+    /**
+     * Draws the chosen value yourself. Special Offers (873:51241) puts a Badge
+     * in the field rather than plain text, which no combination of classes on
+     * the label can produce.
+     */
+    renderValue?: (value: string) => ReactNode;
 }
 
 /**
@@ -51,10 +59,12 @@ export function Select({
     onChange,
     name,
     disabled,
+    required,
     id,
     "aria-label": ariaLabel,
     containerClassName,
     className,
+    renderValue,
 }: SelectProps) {
     const generatedId = useId();
     const triggerId = id ?? generatedId;
@@ -156,9 +166,10 @@ export function Select({
             {label ? (
                 <label
                     htmlFor={triggerId}
-                    className="mb-0.5 text-xs leading-3 font-medium text-content-secondary"
+                    className="mb-1 text-xs font-semibold text-content-secondary"
                 >
                     {label}
+                    {required ? <span className="text-content-negative">*</span> : null}
                 </label>
             ) : null}
 
@@ -189,7 +200,9 @@ export function Select({
                 )}
             >
                 <span className={cn("truncate", !selectedOption && "text-content-tertiary")}>
-                    {selectedOption?.label ?? placeholder ?? ""}
+                    {selectedOption && renderValue
+                        ? renderValue(selectedOption.value)
+                        : (selectedOption?.label ?? placeholder ?? "")}
                 </span>
                 <ChevronDown
                     aria-hidden

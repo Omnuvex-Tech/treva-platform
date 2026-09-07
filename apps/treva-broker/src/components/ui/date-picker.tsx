@@ -273,7 +273,7 @@ export function DatePicker({
                                     new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1),
                                 )
                             }
-                            className="flex size-8 items-center justify-center rounded-s text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
+                            className="flex size-8 items-center justify-center rounded-sm text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
                         >
                             <ChevronLeft className="size-4" />
                         </button>
@@ -290,7 +290,7 @@ export function DatePicker({
                                     new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1),
                                 )
                             }
-                            className="flex size-8 items-center justify-center rounded-s text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
+                            className="flex size-8 items-center justify-center rounded-sm text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
                         >
                             <ChevronRight className="size-4" />
                         </button>
@@ -326,7 +326,7 @@ export function DatePicker({
                                     disabled={outOfRange}
                                     onClick={() => commit(day)}
                                     className={cn(
-                                        "flex h-9 items-center justify-center rounded-s text-sm transition-colors",
+                                        "flex h-9 items-center justify-center rounded-sm text-sm transition-colors",
                                         "text-content-secondary hover:bg-bg-secondary hover:text-content-primary",
                                         outside && "text-content-disabled",
                                         isToday &&
@@ -348,7 +348,7 @@ export function DatePicker({
                         <button
                             type="button"
                             onClick={() => commit(startOfDay(new Date()))}
-                            className="rounded-s px-2 py-1 text-xs font-medium text-content-link transition-colors hover:bg-bg-secondary"
+                            className="rounded-sm px-2 py-1 text-xs font-medium text-content-link transition-colors hover:bg-bg-secondary"
                         >
                             {t.common.datePicker.today}
                         </button>
@@ -360,7 +360,7 @@ export function DatePicker({
                                     onChange("");
                                     close();
                                 }}
-                                className="rounded-s px-2 py-1 text-xs font-medium text-content-tertiary transition-colors hover:bg-bg-secondary hover:text-content-primary"
+                                className="rounded-sm px-2 py-1 text-xs font-medium text-content-tertiary transition-colors hover:bg-bg-secondary hover:text-content-primary"
                             >
                                 {t.common.datePicker.clear}
                             </button>

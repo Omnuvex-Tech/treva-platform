@@ -48,6 +48,7 @@ export function NewsCard({ post, onEdit, onDelete }: NewsCardProps) {
     const canDelete = can("news:delete");
     const announcement = post.category === "announcement";
     const hasImageArea = post.coverImageUrl !== null;
+    const href = routes.newsDetail(locale, post.id);
 
     const badge = (
         <Badge tone={announcement ? "notice" : "positive"}>
@@ -90,21 +91,30 @@ export function NewsCard({ post, onEdit, onDelete }: NewsCardProps) {
                 )}
             >
                 {hasImageArea ? (
-                    <div className="relative aspect-[247/200] w-full overflow-hidden rounded-s bg-bg-secondary">
-                        {post.coverImageUrl ? (
-                            <Image
-                                src={post.coverImageUrl}
-                                alt=""
-                                fill
-                                sizes="(max-width: 768px) 100vw, 263px"
-                                className="object-cover"
-                            />
-                        ) : null}
+                    <div className="relative aspect-[247/200] w-full overflow-hidden rounded-sm bg-bg-secondary">
+                        {/* The cover is a link in its own right — the title is
+                            not the only way into the article. It stays a
+                            separate anchor rather than wrapping the whole tile,
+                            because the delete control lives on top of it and an
+                            anchor cannot contain a button. */}
+                        <Link href={href} aria-label={post.title} className="absolute inset-0">
+                            {post.coverImageUrl ? (
+                                <Image
+                                    src={post.coverImageUrl}
+                                    alt=""
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 263px"
+                                    className="object-cover"
+                                />
+                            ) : null}
+                        </Link>
 
-                        {/* The badge and the delete control sit on the image. */}
-                        <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-2">
+                        {/* The badge and the delete control sit on the image.
+                            The row itself ignores clicks so the cover behind it
+                            stays reachable; only the button takes them back. */}
+                        <div className="pointer-events-none absolute inset-x-2 top-2 flex items-start justify-between gap-2">
                             {badge}
-                            {deleteButton}
+                            <span className="pointer-events-auto">{deleteButton}</span>
                         </div>
                     </div>
                 ) : (
@@ -119,10 +129,10 @@ export function NewsCard({ post, onEdit, onDelete }: NewsCardProps) {
                     </div>
                 )}
 
-                <CardText post={post} href={routes.newsDetail(locale, post.id)} />
+                <CardText post={post} href={href} />
 
                 <div className="mt-auto flex h-7 items-center justify-between gap-2 px-[5px]">
-                    <span className="inline-flex items-center gap-1.5 rounded-s bg-bg-secondary px-2 py-1 text-xs text-content-secondary">
+                    <span className="inline-flex items-center gap-1.5 rounded-sm bg-bg-secondary px-2 py-1 text-xs text-content-secondary">
                         <HugeiconsIcon icon={Clock01Icon} size={14} strokeWidth={1.6} />
                         {formatDate(post.publishedAt, locale)}
                     </span>
