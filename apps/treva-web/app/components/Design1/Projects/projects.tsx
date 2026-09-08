@@ -269,7 +269,6 @@ import './projects.css'
 gsap.registerPlugin(ScrollTrigger, SplitText)
 
 const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
-
 type LocalizedValue = string | { az?: string; en?: string; ru?: string };
 
 function getLocalized(val: LocalizedValue | undefined | null, loc: string, fallback = ""): string {
@@ -310,7 +309,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
           setCategories(list);
         }
       } catch {
-        // fallback
       } finally {
         setLoading(false);
       }
@@ -335,7 +333,6 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
     if (!container) return
 
     hasAnimatedRef.current = true
-
     gsap.to('body', { autoAlpha: 1, duration: 0.2 })
 
     const section = container.querySelector('.projects_component')
@@ -462,44 +459,44 @@ export function ProjectsPage({ locale }: ProjectsPageProps) {
                         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
                       </div>
                     ) : (
-                    <div className="w-dyn-list">
-                      <div fs-list-element="list" role="list" className="projects_list w-dyn-items">
-                        {categories.map((cat) => (
-                          <div key={cat.slug} role="listitem" className="w-dyn-item">
-                            <a
-                              aria-label="go to project"
-                              href={`/${locale}/projects/${cat.slug}?design=2`}
-                              className="projects_item w-inline-block"
-                            >
-                              <div className="projects_img-wrap">
-                                <div className="projects_img-holder">
-                                  {cat.image ? (
-                                    <img
-                                      src={getAssetUrl(cat.image || undefined)}
-                                      loading="lazy"
-                                      alt={getLocalized(cat.title, locale)}
-                                      className="fullwidth-img"
-                                    />
-                                  ) : (
-                                    <div style={{ width: '100%', height: '100%', background: '#f3f4f6' }} />
-                                  )}
-                                </div>
-                                <div className="projects_overlay">
-                                  <div className="news_btn">
-                                    <div>Layihəyə bax</div>
+                      <div className="w-dyn-list">
+                        <div fs-list-element="list" role="list" className="projects_list w-dyn-items">
+                          {categories.map((cat) => (
+                            <div key={cat.slug} role="listitem" className="w-dyn-item">
+                              <a
+                                aria-label="go to project"
+                                href={`/${locale}/projects/${cat.slug}?design=2`}
+                                className="projects_item w-inline-block"
+                              >
+                                <div className="projects_img-wrap">
+                                  <div className="projects_img-holder">
+                                    {cat.image ? (
+                                      <img
+                                        src={getAssetUrl(cat.image || undefined)}
+                                        loading="lazy"
+                                        alt={getLocalized(cat.title, locale)}
+                                        className="fullwidth-img"
+                                      />
+                                    ) : (
+                                      <div style={{ width: '100%', height: '100%', background: '#f3f4f6' }} />
+                                    )}
                                   </div>
+                                  <div className="projects_overlay">
+                                    <div className="news_btn">
+                                      <div>Layihəyə bax</div>
+                                    </div>
+                                  </div>
+                                  <div className="img-cover"></div>
                                 </div>
-                                <div className="img-cover"></div>
-                              </div>
-                              <div className="projects_content-wrap">
-                                <div className="heading-style-h3 text-color-blue400">{getLocalized(cat.title, locale)}</div>
-                                <div fs-list-field="location">{getLocalized(cat.brand, locale)}</div>
-                              </div>
-                            </a>
-                          </div>
-                        ))}
+                                <div className="projects_content-wrap">
+                                  <div className="heading-style-h3 text-color-blue400">{getLocalized(cat.title, locale)}</div>
+                                  <div fs-list-field="location">{getLocalized(cat.brand, locale)}</div>
+                                </div>
+                              </a>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
                     )}
                   </div>
                 </div>
