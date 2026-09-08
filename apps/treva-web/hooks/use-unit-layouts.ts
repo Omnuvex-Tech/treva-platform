@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { trevaApi as api } from "@/lib/api";
 import { endpoints } from "@/config/endpoints";
 import {
@@ -26,6 +26,10 @@ export function useUnitLayouts(filters?: UnitLayoutFilters) {
             );
             return response.data;
         },
+        // Keep the previous page/filter's results on screen while the next
+        // request is in flight, so paginating ("show more") or tweaking a
+        // filter dims the current list instead of blanking it to a spinner.
+        placeholderData: keepPreviousData,
     });
 }
 

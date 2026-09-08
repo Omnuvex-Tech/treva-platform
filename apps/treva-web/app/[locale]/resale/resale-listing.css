@@ -10,7 +10,10 @@
 
 .re-page-wrapper .re-main-wrapper {
   padding-top: calc(var(--treva-nav-height, 64px) + 24px);
-  padding-bottom: 64px;
+  /* The CTA banner below (.hv2-s-callback) already contributes its own 40px
+     padding-top — the same section gap the home/projects pages use. Extra
+     wrapper padding here just made the gap to the CTA too large. */
+  padding-bottom: 0;
 }
 
 .re-page-container {
@@ -21,7 +24,7 @@
 @media (max-width: 768px) {
   .re-page-wrapper .re-main-wrapper {
     padding-top: calc(var(--treva-nav-height, 64px) + 16px);
-    padding-bottom: 52px;
+    padding-bottom: 0;
   }
 
   .re-page-container {
@@ -165,56 +168,72 @@
   width: 100%;
 }
 
-.re-pagination {
+.re-empty-state {
+  padding: 64px 0;
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+/* ========================================================
+   LOAD MORE  (shown count + progress + "show more")
+   ======================================================== */
+.re-load-more {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
   width: 100%;
   margin-top: 40px;
-  padding-top: 20px;
 }
 
-.re-pagination-numbers {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.re-page-num {
+.re-load-more__shown {
+  font-family: var(--font-stack);
   font-size: 18px;
+  font-weight: 400;
   color: var(--text-muted);
-  cursor: pointer;
-  font-weight: 500;
   text-transform: none;
 }
 
-.re-page-active {
-  color: var(--text-main);
-  font-weight: 700;
+.re-load-more__progress {
+  width: 100%;
+  max-width: 250px;
+  height: 4px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
 }
 
-.re-page-ellipsis {
-  color: var(--text-muted);
-  font-size: 18px;
+.re-load-more__progress-fill {
+  height: 100%;
+  background-color: var(--slate-dark);
+  border-radius: 2px;
+  transition: width 0.3s ease;
 }
 
-.re-next-btn {
+.re-load-more__btn {
+  min-width: 156px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 50px;
   background-color: var(--slate-dark);
   color: #ffffff;
-  border: none;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-family: var(--font-stack);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: background-color 0.18s ease, opacity 0.18s ease;
 }
 
-.re-next-btn:hover {
-  opacity: 0.93;
+.re-load-more__btn:hover {
+  background-color: #2f3134;
+}
+
+.re-load-more__btn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 @media (max-width: 768px) {
@@ -242,11 +261,7 @@
     gap: 24px;
   }
 
-  .re-pagination {
+  .re-load-more {
     margin-top: 32px;
-  }
-
-  .re-pagination-numbers {
-    gap: 20px;
   }
 }

@@ -1,9 +1,8 @@
 'use client';
 
-import React, { Suspense, useState, useCallback, useEffect } from 'react';
-import Link from 'next/link';
+import { Suspense, useState, useMemo, useEffect } from 'react';
 import UnitCardV2 from '@/app/components/UnitCardV2';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/app/components/HomeV2/V2Nav';
 import { HomeFooter } from '@/app/components/HomeV2/V2Footer';
 import CallbackV2 from "@/app/components/HomeV2/V2Callback";
@@ -62,6 +61,16 @@ function getLocalizedApartmentTypeLabel(
 }
 
 export default function ResalePage() {
+  // `ResaleListing` reads the filter query via useSearchParams, so it has to
+  // sit under a Suspense boundary for the static shell to prerender.
+  return (
+    <Suspense fallback={null}>
+      <ResaleListing />
+    </Suspense>
+  );
+}
+
+function ResaleListing() {
   const params = useParams();
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const dictionary = {
@@ -75,6 +84,9 @@ export default function ResalePage() {
       room: 'otaqlı',
       floor: 'mərtəbə',
       details: 'Mənzilə bax',
+      shown: 'Göstərilib',
+      outOf: '/',
+      showMore: 'Daha çox göstər',
     },
     en: {
       pageTitle: 'PURCHASE APARTMENTS IN BAKU',
@@ -86,6 +98,9 @@ export default function ResalePage() {
       room: 'room',
       floor: 'floor',
       details: 'View Apartment Details',
+      shown: 'Shown',
+      outOf: 'out of',
+      showMore: 'Show more',
     },
     ru: {
       pageTitle: 'КВАРТИРЫ НА ВТОРИЧНОМ РЫНКЕ В БАКУ',
@@ -97,24 +112,82 @@ export default function ResalePage() {
       room: 'комн.',
       floor: 'этаж',
       details: 'Смотреть квартиру',
+      shown: 'Показано',
+      outOf: 'из',
+      showMore: 'Показать еще',
     },
   } as const;
   const t = dictionary[locale] || dictionary.az;
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [savedItems, setSavedItems] = useState<string[]>([]);
   const [comparedItems, setComparedItems] = useState<string[]>([]);
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<ResaleFilterState>({});
-  const [isDebouncing, setIsDebouncing] = useState(false);
 
+  // The committed filter set and the page number both live in the URL query.
+  // The fetch derives from it, so a backend request only goes out when the
+  // query actually changes (see ResaleFilter — dropdown pick / input blur /
+  // slider release). `page` climbs via "show more" and resets on any filter
+  // change (ResaleFilter drops it).
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+
+  const filters = useMemo<ResaleFilterState>(() => {
+    const num = (key: string): number | undefined => {
+      const raw = searchParams.get(key);
+      if (raw == null || raw === '') return undefined;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : undefined;
+    };
+    const out: ResaleFilterState = { currency: searchParams.get('currency') || 'AZN' };
+    const type = searchParams.get('type');
+    if (type) out.apartmentTypeId = type;
+    const city = searchParams.get('city');
+    if (city) out.city = city;
+    const region = searchParams.get('region');
+    if (region) out.region = region;
+    const purpose = searchParams.get('purpose');
+    if (purpose === 'sale' || purpose === 'rent') out.purpose = purpose;
+    if (searchParams.get('mortgage') != null) out.mortgage = searchParams.get('mortgage') === 'true';
+    if (searchParams.get('extract') != null) out.extract = searchParams.get('extract') === 'true';
+    const minPrice = num('minPrice');
+    if (minPrice != null) out.minPrice = minPrice;
+    const maxPrice = num('maxPrice');
+    if (maxPrice != null) out.maxPrice = maxPrice;
+    const minArea = num('minArea');
+    if (minArea != null) out.minArea = minArea;
+    const maxArea = num('maxArea');
+    if (maxArea != null) out.maxArea = maxArea;
+    const roomCount = num('roomCount');
+    if (roomCount != null) out.roomCount = roomCount;
+    // No `status` param means the default "active only" view; "all" clears it.
+    const status = searchParams.get('status') ?? 'active';
+    if (status && status !== 'all') out.status = status;
+    return out;
+  }, [searchParams]);
+
+  const goToPage = (next: number) => {
+    const sp = new URLSearchParams(searchParams.toString());
+    sp.set('page', String(next));
+    router.replace(`?${sp.toString()}`, { scroll: false });
+  };
+
+  // "Show more" grows a single cumulative request instead of stitching pages
+  // together in component state. `page` lives in the URL, so a refresh or a
+  // tab the browser discarded and reloaded re-fetches the whole window
+  // (pages 1..N) in one call — the list is never left showing only the last
+  // page's slice.
+  const PAGE_SIZE = 12;
   const { data: response, isLoading, isFetching } = useResaleApartments({
     ...filters,
-    page,
-    limit: 12,
+    page: 1,
+    limit: page * PAGE_SIZE,
   });
 
   const apartments = response?.data ?? [];
   const pagination = response?.pagination;
-  const showSpinner = isLoading || isFetching || isDebouncing;
+  const hasMore = !!pagination && apartments.length < pagination.total;
+
+  const isAppending = isFetching && page > 1;
+  const showSpinner = (isLoading || isFetching) && !isAppending;
 
   useEffect(() => {
     setSavedItems(getSaved().filter(p => p.type === 'resale').map(p => p.id));
@@ -175,11 +248,6 @@ export default function ResalePage() {
     }
   };
 
-  const handleFilterChange = useCallback((f: ResaleFilterState) => {
-    setFilters(f);
-    setPage(1);
-  }, []);
-
   const formatPrice = (p: number) =>
     p.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
@@ -211,7 +279,7 @@ export default function ResalePage() {
       <main className="re-main-wrapper">
         <PageContainer className="re-page-container">
           <Suspense fallback={null}>
-            <ResaleFilter onFilterChange={handleFilterChange} totalCount={pagination?.total ?? 0} onDebouncingChange={setIsDebouncing} />
+            <ResaleFilter totalCount={pagination?.total ?? 0} />
           </Suspense>
 
           <header className="re-header">
@@ -234,12 +302,12 @@ export default function ResalePage() {
                 .re-grid--fadein { animation: fadeIn 0.35s ease-out; }
               `}</style>
 
-              {isLoading ? (
+              {isLoading && apartments.length === 0 ? (
                 <div className="re-spinner-overlay">
                   <div className="re-spinner-icon"></div>
                 </div>
               ) : apartments.length === 0 && !showSpinner ? (
-                <div className="py-16 text-center text-white/50">{t.noApartments}</div>
+                <div className="re-empty-state">{t.noApartments}</div>
               ) : (
                 <div style={{ position: 'relative' }}>
                   {showSpinner && (
@@ -279,42 +347,27 @@ export default function ResalePage() {
               )}
             </div>
 
-          {pagination && pagination.totalPages > 1 && (
-            <footer className="re-pagination">
-              <div className="re-pagination-numbers">
-                {page > 1 && (
-                  <span className="re-page-num" onClick={() => setPage(page - 1)}>
-                    &laquo;
-                  </span>
-                )}
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                  .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 2)
-                  .reduce<(number | string)[]>((acc, p, idx, arr) => {
-                    if (idx > 0 && typeof arr[idx - 1] === 'number' && (p as number) - (arr[idx - 1] as number) > 1) {
-                      acc.push('...');
-                    }
-                    acc.push(p);
-                    return acc;
-                  }, [])
-                  .map((p, idx) =>
-                    typeof p === 'string' ? (
-                      <span key={`e-${idx}`} className="re-page-ellipsis">{p}</span>
-                    ) : (
-                      <span
-                        key={p}
-                        className={`re-page-num ${page === p ? 're-page-active' : ''}`}
-                        onClick={() => setPage(p)}
-                      >
-                        {p}
-                      </span>
-                    )
-                  )}
-                {page < pagination.totalPages && (
-                  <span className="re-page-num" onClick={() => setPage(page + 1)}>
-                    &raquo;
-                  </span>
-                )}
+          {pagination && apartments.length > 0 && (
+            <footer className="re-load-more">
+              <span className="re-load-more__shown">
+                {t.shown} {Math.min(apartments.length, pagination.total)} {t.outOf} {pagination.total}
+              </span>
+              <div className="re-load-more__progress">
+                <div
+                  className="re-load-more__progress-fill"
+                  style={{ width: `${pagination.total ? (Math.min(apartments.length, pagination.total) / pagination.total) * 100 : 0}%` }}
+                ></div>
               </div>
+              {hasMore && (
+                <button
+                  type="button"
+                  className="re-load-more__btn"
+                  onClick={() => goToPage(page + 1)}
+                  disabled={isAppending}
+                >
+                  {t.showMore}
+                </button>
+              )}
             </footer>
           )}
         </PageContainer>

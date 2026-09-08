@@ -1,25 +1,27 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import UnitCardV2 from '@/app/components/UnitCardV2';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useUnitLayouts, useUnitLayoutRange, useUnitLayoutFloors } from '@/hooks/use-unit-layouts';
-import { useStatusOptions } from '@/hooks/use-status-options';
 import { useCurrencies } from '@/hooks/use-currencies';
-import { useDebounce } from '@/hooks/use-debounce';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
 import type { UnitLayout } from '@/lib/unit-layout.types';
 import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
 import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import './unit-filter.css';
 
-const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string }> = [
+// `id` is what goes into the `?rooms=` query and straight to the backend
+// (`number` match, `0` = studio). `labelKey` (when set) is resolved against the
+// locale dictionary so "Studiya" is translated; otherwise `label` is shown as-is.
+const ROOM_COUNT_OPTIONS: Array<{ id: string; label: string; labelKey?: 'studio' }> = [
+  { id: '0', label: 'Studio', labelKey: 'studio' },
   { id: '1', label: '1' },
   { id: '2', label: '2' },
   { id: '3', label: '3' },
   { id: '4', label: '4' },
-  { id: '4plus', label: '4+' },
+  // `4+` matches the home SearchPanelV2 deep-link value; backend accepts it (gte 4).
+  { id: '4+', label: '4+' },
 ];
 
 const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:10021";
@@ -38,17 +40,43 @@ export default function UnitLayout() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
-  const [selectedCategorySlug, setSelectedCategorySlug] = useState(searchParams.get('category') || '');
 
-  // The range-hydration effect below resets price/area to defaults once the
-  // API range loads — captured once here so it knows not to stomp a min/max
-  // the URL (e.g. the home page search widget) already asked for.
-  const urlDefaults = useRef({
-    priceMin: searchParams.get('priceMin'),
-    priceMax: searchParams.get('priceMax'),
-    areaMin: searchParams.get('areaMin'),
-    areaMax: searchParams.get('areaMax'),
-  }).current;
+  // ── Committed filters live in the URL query. The list fetch below is derived
+  //    from the query, so a backend request goes out only when the query
+  //    actually changes — a dropdown pick, an input blur, or a slider release,
+  //    never on every tick while a slider is being dragged.
+  const selectedCategorySlug = searchParams.get('category') || '';
+  const currency = searchParams.get('currency') || 'AZN';
+  const floor = searchParams.get('floor') || '';
+  const selectedStatus = searchParams.get('status') || '';
+  const selectedRooms = searchParams.get('rooms') || '';
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+
+  const qNum = (key: string): number | null => {
+    const raw = searchParams.get(key);
+    if (raw == null || raw === '') return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  };
+  const urlPriceMin = qNum('priceMin') ?? 0;
+  const urlPriceMax = qNum('priceMax');
+  const urlAreaMin = qNum('areaMin') ?? 0;
+  const urlAreaMax = qNum('areaMax');
+
+  const commit = React.useCallback(
+    (patch: Record<string, string | number | null | undefined>, keepPage = false) => {
+      const sp = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(patch)) {
+        if (value === '' || value === null || value === undefined) sp.delete(key);
+        else sp.set(key, String(value));
+      }
+      // Any filter change drops pagination back to the first page.
+      if (!keepPage) sp.delete('page');
+      const qs = sp.toString();
+      router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
+    },
+    [searchParams, router],
+  );
 
   const dictionary = {
     az: {
@@ -63,6 +91,7 @@ export default function UnitLayout() {
       status: 'Status',
       rooms: 'Otaq sayı',
       noRooms: 'Otaq yoxdur',
+      studio: 'Studiya',
       results: 'mənzil tapıldı',
       reset: 'Filtrləri sıfırla',
       bannerTitle: 'Daha Ətraflı Məlumat Alın',
@@ -96,6 +125,7 @@ export default function UnitLayout() {
       status: 'Status',
       rooms: 'Number of rooms',
       noRooms: 'No rooms',
+      studio: 'Studio',
       results: 'apartments found',
       reset: 'Reset filters',
       bannerTitle: 'Get More Information',
@@ -129,6 +159,7 @@ export default function UnitLayout() {
       status: 'Статус',
       rooms: 'Количество комнат',
       noRooms: 'Нет комнат',
+      studio: 'Студия',
       results: 'квартир найдено',
       reset: 'Сбросить фильтры',
       bannerTitle: 'Получить больше информации',
@@ -154,10 +185,15 @@ export default function UnitLayout() {
 
   const t = dictionary[locale] || dictionary.az;
 
-  const [currency, setCurrency] = useState(searchParams.get('currency') || 'AZN');
-  const [floor, setFloor] = useState(searchParams.get('floor') || '');
-  const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '');
-  const [selectedRooms, setSelectedRooms] = useState<string>(searchParams.get('rooms') || '');
+  // Must mirror the values the inventory panel actually stores on a unit layout
+  // (UNIT_LAYOUT_STATUS_BUTTONS): available / reserved / sold. The old filter
+  // sent a `statusOptionId` from /status-options that unit layouts never carry,
+  // so every pick returned nothing.
+  const statusOptions = [
+    { id: 'available', value: t.available },
+    { id: 'reserved', value: t.reserved },
+    { id: 'sold', value: t.sold },
+  ];
 
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
@@ -168,19 +204,21 @@ export default function UnitLayout() {
   const floorRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
-  const [priceMin, setPriceMin] = useState<number | ''>(Number(searchParams.get('priceMin')) || 0);
-  const [priceMax, setPriceMax] = useState<number | ''>(Number(searchParams.get('priceMax')) || '');
-  const [priceMinInput, setPriceMinInput] = useState<number | ''>(Number(searchParams.get('priceMin')) || 0);
-  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(Number(searchParams.get('priceMax')) || '');
+  // Draft values for the price/area controls. They track what the user is
+  // currently typing / dragging; nothing is sent to the backend until a commit
+  // event (blur or slider release) pushes them into the URL query.
+  const [priceMin, setPriceMin] = useState<number | ''>(urlPriceMin);
+  const [priceMax, setPriceMax] = useState<number | ''>(urlPriceMax ?? '');
+  const [priceMinInput, setPriceMinInput] = useState<number | ''>(urlPriceMin);
+  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(urlPriceMax ?? '');
   const totalPriceMin = 0;
 
-  const [areaMin, setAreaMin] = useState<number | ''>(Number(searchParams.get('areaMin')) || 0);
-  const [areaMax, setAreaMax] = useState<number | ''>(Number(searchParams.get('areaMax')) || '');
-  const [areaMinInput, setAreaMinInput] = useState<number | ''>(Number(searchParams.get('areaMin')) || 0);
-  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(Number(searchParams.get('areaMax')) || '');
+  const [areaMin, setAreaMin] = useState<number | ''>(urlAreaMin);
+  const [areaMax, setAreaMax] = useState<number | ''>(urlAreaMax ?? '');
+  const [areaMinInput, setAreaMinInput] = useState<number | ''>(urlAreaMin);
+  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(urlAreaMax ?? '');
   const totalAreaMin = 0;
 
-  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const limit = 12;
 
   const [categories, setCategories] = useState<Array<{ slug: string; title: string }>>([]);
@@ -192,9 +230,6 @@ export default function UnitLayout() {
     setComparedItems(getCompared().filter(p => p.type === 'off-plan').map(p => p.id));
   }, []);
 
-  const { data: statusOptionsData } = useStatusOptions();
-  const statusOptions = statusOptionsData || [];
-
   const { data: currenciesData } = useCurrencies();
   const currencies = currenciesData || [];
 
@@ -205,36 +240,22 @@ export default function UnitLayout() {
   const totalPriceMax = rangeData?.maxPrice || 1500000;
   const totalAreaMax = rangeData?.maxTotalArea || 10000;
 
-  // Hydrating the price/area sliders from the fetched range (below) briefly makes
-  // `priceMax`/`areaMax` differ from their debounced counterparts, which used to
-  // make `isDebouncing` (and therefore the loading spinner) flip on again for a
-  // second right after the initial list had already loaded. This ref lets the
-  // spinner logic tell "range just loaded" apart from "user is dragging a slider".
-  const isHydratingRangeRef = useRef(false);
-  const rangeHydratedRef = useRef(false);
-
+  // Snap the draft controls back to the committed query — on first load, after
+  // Reset, and on browser back — and up to the API's real ceiling once the
+  // range resolves. A slider drag never lands here because it doesn't touch the
+  // URL until release.
   useEffect(() => {
-    if (rangeData && !rangeHydratedRef.current) {
-      rangeHydratedRef.current = true;
-      isHydratingRangeRef.current = true;
-      if (urlDefaults.priceMax == null) {
-        setPriceMax(rangeData.maxPrice);
-        setPriceMaxInput(rangeData.maxPrice);
-      }
-      if (urlDefaults.areaMax == null) {
-        setAreaMax(rangeData.maxTotalArea);
-        setAreaMaxInput(rangeData.maxTotalArea);
-      }
-      if (urlDefaults.priceMin == null) {
-        setPriceMin(0);
-        setPriceMinInput(0);
-      }
-      if (urlDefaults.areaMin == null) {
-        setAreaMin(0);
-        setAreaMinInput(0);
-      }
-    }
-  }, [rangeData, urlDefaults]);
+    setPriceMin(urlPriceMin);
+    setPriceMinInput(urlPriceMin);
+    const pMax = urlPriceMax ?? rangeData?.maxPrice ?? '';
+    setPriceMax(pMax);
+    setPriceMaxInput(pMax);
+    setAreaMin(urlAreaMin);
+    setAreaMinInput(urlAreaMin);
+    const aMax = urlAreaMax ?? rangeData?.maxTotalArea ?? '';
+    setAreaMax(aMax);
+    setAreaMaxInput(aMax);
+  }, [urlPriceMin, urlPriceMax, urlAreaMin, urlAreaMax, rangeData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -246,22 +267,6 @@ export default function UnitLayout() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (selectedCategorySlug) sp.set('category', selectedCategorySlug);
-    if (currency && currency !== 'AZN') sp.set('currency', currency);
-    if (floor) sp.set('floor', floor);
-    if (selectedStatus) sp.set('status', selectedStatus);
-    if (selectedRooms) sp.set('rooms', selectedRooms);
-    if (typeof priceMin === 'number' && priceMin > 0) sp.set('priceMin', String(priceMin));
-    if (typeof priceMax === 'number' && priceMax > 0 && priceMax < totalPriceMax) sp.set('priceMax', String(priceMax));
-    if (typeof areaMin === 'number' && areaMin > 0) sp.set('areaMin', String(areaMin));
-    if (typeof areaMax === 'number' && areaMax > 0 && areaMax < totalAreaMax) sp.set('areaMax', String(areaMax));
-    if (page > 1) sp.set('page', String(page));
-    const qs = sp.toString();
-    router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
-  }, [selectedCategorySlug, currency, floor, selectedStatus, selectedRooms, priceMin, priceMax, areaMin, areaMax, page, router]);
 
   useEffect(() => {
     // Source the project list from the CMS (same as the homepage hero) so every
@@ -286,11 +291,9 @@ export default function UnitLayout() {
       .catch(() => {});
   }, [locale]);
 
-  const debouncedPriceMin = useDebounce(priceMin, 1000);
-  const debouncedPriceMax = useDebounce(priceMax, 1000);
-  const debouncedAreaMin = useDebounce(areaMin, 1000);
-  const debouncedAreaMax = useDebounce(areaMax, 1000);
-
+  // Everything the query needs is read straight from the URL, so `filters`
+  // changes identity only when the committed query changes — that is the one
+  // and only trigger for a backend request.
   const filters = useMemo(() => ({
     page,
     limit,
@@ -299,29 +302,24 @@ export default function UnitLayout() {
     // (parkings are archived wholesale), and without this they came back in
     // the results anyway.
     archived: false,
+    currency,
     ...(selectedCategorySlug && { categorySlug: selectedCategorySlug }),
     ...(floor && { floor: parseInt(floor) }),
-    ...(selectedStatus && { statusOptionId: selectedStatus }),
+    ...(selectedStatus && { status: selectedStatus }),
     ...(selectedRooms && { rooms: selectedRooms }),
-    ...(typeof debouncedPriceMin === 'number' && debouncedPriceMin > 0 && { minPrice: debouncedPriceMin }),
-    ...(typeof debouncedPriceMax === 'number' && debouncedPriceMax < totalPriceMax && { maxPrice: debouncedPriceMax }),
-    currency,
-    ...(typeof debouncedAreaMin === 'number' && debouncedAreaMin > 0 && { minArea: debouncedAreaMin }),
-    ...(typeof debouncedAreaMax === 'number' && debouncedAreaMax < totalAreaMax && { maxArea: debouncedAreaMax }),
-  }), [page, limit, selectedCategorySlug, floor, selectedStatus, selectedRooms, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, currency]);
+    ...(urlPriceMin > 0 && { minPrice: urlPriceMin }),
+    ...(urlPriceMax != null && { maxPrice: urlPriceMax }),
+    ...(urlAreaMin > 0 && { minArea: urlAreaMin }),
+    ...(urlAreaMax != null && { maxArea: urlAreaMax }),
+  }), [page, limit, currency, selectedCategorySlug, floor, selectedStatus, selectedRooms, urlPriceMin, urlPriceMax, urlAreaMin, urlAreaMax]);
 
   const { data: response, isLoading, isFetching } = useUnitLayouts(filters);
 
-  useEffect(() => {
-    if (isHydratingRangeRef.current && priceMax === debouncedPriceMax && areaMax === debouncedAreaMax) {
-      isHydratingRangeRef.current = false;
-    }
-  }, [debouncedPriceMax, debouncedAreaMax, priceMax, areaMax]);
-
-  const isDebouncing =
-    !isHydratingRangeRef.current &&
-    (priceMin !== debouncedPriceMin || priceMax !== debouncedPriceMax || areaMin !== debouncedAreaMin || areaMax !== debouncedAreaMax);
-  const showSpinner = isLoading || isFetching || isDebouncing;
+  // A fetch with page > 1 is always a "show more" append (every filter change
+  // resets page to 1). Those must not dim or overlay the already-visible cards
+  // — only the button gets a loading state.
+  const isAppending = (isFetching || isLoading) && page > 1;
+  const showSpinner = (isLoading || isFetching) && !isAppending;
 
   const pageLayouts = response?.data || [];
   const pagination = response?.pagination;
@@ -348,6 +346,22 @@ export default function UnitLayout() {
   const safeAreaMin = typeof areaMin === 'number' ? areaMin : 0;
   const safeAreaMax = typeof areaMax === 'number' ? areaMax : totalAreaMax;
 
+  // Push the current price/area drafts into the URL query. Called on a slider
+  // release or an input blur — never mid-drag. A bound sitting at the far end
+  // of the range is written as "no limit" (param removed).
+  const commitPriceRange = (min = safePriceMin, max = safePriceMax) => {
+    commit({
+      priceMin: min > 0 ? Math.round(min) : null,
+      priceMax: max < totalPriceMax ? Math.round(max) : null,
+    });
+  };
+  const commitAreaRange = (min = safeAreaMin, max = safeAreaMax) => {
+    commit({
+      areaMin: min > 0 ? Math.round(min * 100) / 100 : null,
+      areaMax: max < totalAreaMax ? Math.round(max * 100) / 100 : null,
+    });
+  };
+
   const priceLeftPercent = ((safePriceMin - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
   const priceRightPercent = 100 - ((safePriceMax - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
 
@@ -362,14 +376,6 @@ export default function UnitLayout() {
   const formatPrice = (prices: Record<string, number>, curr: string) => {
     const price = prices?.[curr] || 0;
     return `${curr} ${formatNumber(price)}`;
-  };
-
-  const formatStatus = (status: string) => {
-    const normalized = status.trim().toLowerCase();
-    if (normalized === 'available') return t.available;
-    if (normalized === 'sold') return t.sold;
-    if (normalized === 'reserved') return t.reserved;
-    return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
   };
 
   const formatFloor = (floorValue: string | number) => `${floorValue} ${t.floorSuffix}`;
@@ -391,19 +397,16 @@ export default function UnitLayout() {
   };
 
   const handleReset = () => {
-    setFloor('');
-    setSelectedStatus('');
-    setSelectedRooms('');
-    setSelectedCategorySlug('');
+    // Clear the query (the draft-sync effect snaps the sliders back), and also
+    // reset the drafts here so the thumbs move immediately.
     setPriceMin(0);
     setPriceMinInput(0);
-    setPriceMax(totalPriceMax);
-    setPriceMaxInput(totalPriceMax);
+    setPriceMax(rangeData?.maxPrice ?? '');
+    setPriceMaxInput(rangeData?.maxPrice ?? '');
     setAreaMin(0);
     setAreaMinInput(0);
-    setAreaMax(totalAreaMax);
-    setAreaMaxInput(totalAreaMax);
-    setPage(1);
+    setAreaMax(rangeData?.maxTotalArea ?? '');
+    setAreaMaxInput(rangeData?.maxTotalArea ?? '');
     router.replace(window.location.pathname, { scroll: false });
   };
 
@@ -484,7 +487,7 @@ export default function UnitLayout() {
               </button>
               {categoryOpen && (
                 <div className="custom-select__dropdown">
-                  <button type="button" className={`custom-select__option ${!selectedCategorySlug ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedCategorySlug(''); setPage(1); setCategoryOpen(false); }}>
+                  <button type="button" className={`custom-select__option ${!selectedCategorySlug ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ category: null }); setCategoryOpen(false); }}>
                     {t.all}
                   </button>
                   {categories.map((cat) => (
@@ -492,7 +495,7 @@ export default function UnitLayout() {
                       key={cat.slug}
                       type="button"
                       className={`custom-select__option ${selectedCategorySlug === cat.slug ? 'custom-select__option--active' : ''}`}
-                      onClick={() => { setSelectedCategorySlug(cat.slug); setPage(1); setCategoryOpen(false); }}
+                      onClick={() => { commit({ category: cat.slug }); setCategoryOpen(false); }}
                     >
                       {cat.title || cat.slug}
                     </button>
@@ -509,49 +512,44 @@ export default function UnitLayout() {
               <div className="dual-inputs">
                 <div className="input-with-prefix">
                   <span>{t.from}</span>
-                  <input 
-                    type="text" 
-                    value={priceMinInput} 
+                  <input
+                    type="text"
+                    value={priceMinInput}
                     onChange={(e) => {
+                      // Echo the keystrokes only; the value is committed (and
+                      // clamped) on blur so typing a number that is briefly out
+                      // of range isn't fought character by character.
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setPriceMinInput(''); setPriceMin(0); return; }
+                      if (raw === '') { setPriceMinInput(''); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      const val = Number(raw);
-                      setPriceMinInput(val);
-                      const clamped = Math.max(totalPriceMin, Math.min(val, safePriceMax - 1000));
-                      setPriceMin(clamped);
-                      setPage(1);
+                      setPriceMinInput(Number(raw));
                     }}
                     onBlur={() => {
                       const raw = priceMinInput === '' ? 0 : Number(priceMinInput);
                       const val = Math.max(totalPriceMin, Math.min(raw, safePriceMax - 1000));
                       setPriceMin(val);
                       setPriceMinInput(val);
-                      setPage(1);
+                      commitPriceRange(val, safePriceMax);
                     }}
                   />
                 </div>
                 <div className="input-with-prefix">
                   <span>{t.to}</span>
-                  <input 
-                    type="text" 
-                    value={priceMaxInput} 
+                  <input
+                    type="text"
+                    value={priceMaxInput}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setPriceMaxInput(''); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      const val = Number(raw);
-                      setPriceMaxInput(val);
-                      const clamped = Math.max(safePriceMin + 1000, Math.min(val, totalPriceMax));
-                      setPriceMax(clamped);
-                      setPage(1);
+                      setPriceMaxInput(Number(raw));
                     }}
                     onBlur={() => {
                       const raw = priceMaxInput === '' ? totalPriceMax : Number(priceMaxInput);
                       const val = Math.max(safePriceMin + 1000, Math.min(raw, totalPriceMax));
                       setPriceMax(val);
                       setPriceMaxInput(val);
-                      setPage(1);
+                      commitPriceRange(safePriceMin, val);
                     }}
                   />
                 </div>
@@ -570,7 +568,7 @@ export default function UnitLayout() {
                         key={c}
                         type="button"
                         className={`custom-select__option ${currency === c ? 'custom-select__option--active' : ''}`}
-                        onClick={() => { setCurrency(c); setPage(1); setCurrencyOpen(false); }}
+                        onClick={() => { commit({ currency: c === 'AZN' ? null : c }); setCurrencyOpen(false); }}
                       >
                         {c}
                       </button>
@@ -586,31 +584,35 @@ export default function UnitLayout() {
                 className="slider-active-track" 
                 style={{ left: `${priceLeftPercent}%`, right: `${priceRightPercent}%` }}
               ></div>
-              <input 
-                type="range" 
-                min={totalPriceMin} 
-                max={totalPriceMax} 
+              <input
+                type="range"
+                min={totalPriceMin}
+                max={totalPriceMax}
                 value={safePriceMin}
                 className="thumb thumb--left"
                 onChange={(e) => {
                   const val = Math.min(Number(e.target.value), safePriceMax - 1000);
                   setPriceMin(val);
                   setPriceMinInput(val);
-                  setPage(1);
                 }}
+                onMouseUp={() => commitPriceRange()}
+                onTouchEnd={() => commitPriceRange()}
+                onBlur={() => commitPriceRange()}
               />
-              <input 
-                type="range" 
-                min={totalPriceMin} 
-                max={totalPriceMax} 
+              <input
+                type="range"
+                min={totalPriceMin}
+                max={totalPriceMax}
                 value={safePriceMax}
                 className="thumb thumb--right"
                 onChange={(e) => {
                   const val = Math.max(Number(e.target.value), safePriceMin + 1000);
                   setPriceMax(val);
                   setPriceMaxInput(val);
-                  setPage(1);
                 }}
+                onMouseUp={() => commitPriceRange()}
+                onTouchEnd={() => commitPriceRange()}
+                onBlur={() => commitPriceRange()}
               />
             </div>
           </div>
@@ -622,49 +624,41 @@ export default function UnitLayout() {
               <div className="dual-inputs">
                 <div className="input-with-prefix">
                   <span>{t.from}</span>
-                  <input 
-                    type="text" 
-                    value={areaMinInput} 
+                  <input
+                    type="text"
+                    value={areaMinInput}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
-                      if (raw === '') { setAreaMinInput(''); setAreaMin(0); return; }
+                      if (raw === '') { setAreaMinInput(''); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      const val = Number(raw);
-                      setAreaMinInput(val);
-                      const clamped = Math.max(totalAreaMin, Math.min(val, safeAreaMax - 5));
-                      setAreaMin(clamped);
-                      setPage(1);
+                      setAreaMinInput(Number(raw));
                     }}
                     onBlur={() => {
                       const raw = areaMinInput === '' ? 0 : Number(areaMinInput);
                       const val = Math.max(totalAreaMin, Math.min(raw, safeAreaMax - 5));
                       setAreaMin(val);
                       setAreaMinInput(val);
-                      setPage(1);
+                      commitAreaRange(val, safeAreaMax);
                     }}
                   />
                 </div>
                 <div className="input-with-prefix">
                   <span>{t.to}</span>
-                  <input 
-                    type="text" 
-                    value={areaMaxInput} 
+                  <input
+                    type="text"
+                    value={areaMaxInput}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\s+/g, '');
                       if (raw === '') { setAreaMaxInput(''); return; }
                       if (!/^\d+(\.\d+)?$/.test(raw)) return;
-                      const val = Number(raw);
-                      setAreaMaxInput(val);
-                      const clamped = Math.max(safeAreaMin + 5, Math.min(val, totalAreaMax));
-                      setAreaMax(clamped);
-                      setPage(1);
+                      setAreaMaxInput(Number(raw));
                     }}
                     onBlur={() => {
                       const raw = areaMaxInput === '' ? totalAreaMax : Number(areaMaxInput);
                       const val = Math.max(safeAreaMin + 5, Math.min(raw, totalAreaMax));
                       setAreaMax(val);
                       setAreaMaxInput(val);
-                      setPage(1);
+                      commitAreaRange(safeAreaMin, val);
                     }}
                   />
                 </div>
@@ -676,33 +670,37 @@ export default function UnitLayout() {
                   className="slider-active-track" 
                   style={{ left: `${areaLeftPercent}%`, right: `${areaRightPercent}%` }}
                 ></div>
-                <input 
-                  type="range" 
+                <input
+                  type="range"
                   step="0.01"
-                  min={totalAreaMin} 
-                  max={totalAreaMax} 
+                  min={totalAreaMin}
+                  max={totalAreaMax}
                   value={safeAreaMin}
                   className="thumb thumb--left"
                   onChange={(e) => {
                     const val = Math.min(Number(e.target.value), safeAreaMax - 5);
                     setAreaMin(val);
                     setAreaMinInput(val);
-                    setPage(1);
                   }}
+                  onMouseUp={() => commitAreaRange()}
+                  onTouchEnd={() => commitAreaRange()}
+                  onBlur={() => commitAreaRange()}
                 />
-                <input 
-                  type="range" 
+                <input
+                  type="range"
                   step="0.01"
-                  min={totalAreaMin} 
-                  max={totalAreaMax} 
+                  min={totalAreaMin}
+                  max={totalAreaMax}
                   value={safeAreaMax}
                   className="thumb thumb--right"
                   onChange={(e) => {
                     const val = Math.max(Number(e.target.value), safeAreaMin + 5);
                     setAreaMax(val);
                     setAreaMaxInput(val);
-                    setPage(1);
                   }}
+                  onMouseUp={() => commitAreaRange()}
+                  onTouchEnd={() => commitAreaRange()}
+                  onBlur={() => commitAreaRange()}
                 />
               </div>
             </div>
@@ -718,7 +716,7 @@ export default function UnitLayout() {
                 </button>
                 {floorOpen && (
                   <div className="custom-select__dropdown">
-                    <button type="button" className={`custom-select__option ${!floor || floor === 'All' ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(''); setPage(1); setFloorOpen(false); }}>
+                    <button type="button" className={`custom-select__option ${!floor || floor === 'All' ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ floor: null }); setFloorOpen(false); }}>
                       {t.all}
                     </button>
                     {floors.map((f, idx) => {
@@ -726,7 +724,7 @@ export default function UnitLayout() {
                       if (typeof val === 'object') val = JSON.stringify(val);
                       const valStr = String(val);
                       return (
-                        <button key={idx} type="button" className={`custom-select__option ${floor === valStr ? 'custom-select__option--active' : ''}`} onClick={() => { setFloor(valStr); setPage(1); setFloorOpen(false); }}>
+                        <button key={idx} type="button" className={`custom-select__option ${floor === valStr ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ floor: valStr }); setFloorOpen(false); }}>
                           {valStr}
                         </button>
                       );
@@ -743,19 +741,19 @@ export default function UnitLayout() {
               <label className="filter-label">{t.status}</label>
               <div className="custom-select" ref={statusRef}>
                 <button type="button" className="custom-select__trigger" aria-expanded={statusOpen} onClick={() => setStatusOpen((p) => !p)}>
-                  <span>{selectedStatus ? formatStatus(statusOptions.find(s => s.id === selectedStatus)?.value || '') : t.all}</span>
+                  <span>{statusOptions.find(s => s.id === selectedStatus)?.value || t.all}</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
                 {statusOpen && (
                   <div className="custom-select__dropdown">
-                    <button type="button" className={`custom-select__option ${!selectedStatus ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(''); setPage(1); setStatusOpen(false); }}>
+                    <button type="button" className={`custom-select__option ${!selectedStatus ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ status: null }); setStatusOpen(false); }}>
                       {t.all}
                     </button>
                     {statusOptions.map((opt) => (
-                      <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(opt.id); setPage(1); setStatusOpen(false); }}>
-                        {formatStatus(opt.value)}
+                      <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ status: opt.id }); setStatusOpen(false); }}>
+                        {opt.value}
                       </button>
                     ))}
                   </div>
@@ -773,9 +771,9 @@ export default function UnitLayout() {
                   key={room.id}
                   type="button"
                   className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
-                  onClick={() => { setSelectedRooms(selectedRooms === room.id ? '' : room.id); setPage(1); }}
+                  onClick={() => commit({ rooms: selectedRooms === room.id ? null : room.id })}
                 >
-                  <span className="room-btn__text">{room.label}</span>
+                  <span className="room-btn__text">{room.labelKey ? t[room.labelKey] : room.label}</span>
                 </button>
               ))}
             </div>
@@ -825,7 +823,7 @@ export default function UnitLayout() {
             .cards-grid--fadein { animation: fadeIn 0.35s ease-out; }
           `}</style>
 
-          {isLoading ? (
+          {isLoading && layouts.length === 0 ? (
             <div className="spinner-overlay">
               <div className="spinner-icon"></div>
             </div>
@@ -887,7 +885,12 @@ export default function UnitLayout() {
               ></div>
             </div>
             {page < pagination.totalPages && (
-              <button type="button" className="pagination-show-more" onClick={() => setPage((p) => p + 1)}>
+              <button
+                type="button"
+                className="pagination-show-more"
+                onClick={() => commit({ page: page + 1 }, true)}
+                disabled={isAppending}
+              >
                 {t.showMore}
               </button>
             )}

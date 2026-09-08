@@ -763,7 +763,7 @@ export default function ApartmentCard() {
                         className="apt-plan-img"
                       />
                     ) : (
-                      <div className="apt-plan-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f2eb', color: '#6d717a' }}>
+                      <div className="apt-plan-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f2eb', color: '#6d717a', width: '100%', minHeight: 260 }}>
                         {t.noImage}
                       </div>
                     )}

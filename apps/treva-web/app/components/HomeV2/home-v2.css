@@ -1227,7 +1227,8 @@ body:has(.hv2-nav) .vision-hero__container {
 /* rooms segmented control */
 .hv2-rooms {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    /* First slot is the "Studiya" bucket — give it extra width for the word. */
+    grid-template-columns: 1.5fr repeat(5, minmax(0, 1fr));
     gap: 8px;
 }
 
@@ -1239,6 +1240,8 @@ body:has(.hv2-nav) .vision-hero__container {
     font-size: 12.5px;
     color: var(--hv2-ink-2);
     cursor: pointer;
+    white-space: nowrap;
+    padding: 0 4px;
     transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 

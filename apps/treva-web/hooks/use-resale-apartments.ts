@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { trevaApi as api } from "@/lib/api";
 import { endpoints } from "@/config/endpoints";
 import type { ResaleApartment, ResaleApartmentListResponse, ResaleFilters, ResaleCurrency, ResaleLocationOption } from "@/lib/resale.types";
@@ -20,6 +20,9 @@ export function useResaleApartments(filters?: ResaleFilters) {
             );
             return response.data;
         },
+        // Keep the current results visible (dimmed) while the next page or a
+        // changed filter loads, instead of tearing the list down to a spinner.
+        placeholderData: keepPreviousData,
     });
 }
 

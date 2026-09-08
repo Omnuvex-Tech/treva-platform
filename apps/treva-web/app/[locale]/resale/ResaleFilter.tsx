@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useResaleApartmentRange, useResaleCurrencies, useResaleLocationOptions, useResaleRooms, useResaleApartmentTypes } from '@/hooks/use-resale-apartments';
-import { useDebounce } from '@/hooks/use-debounce';
 import type { ResaleLocationOption } from '@/lib/resale.types';
 import './unit-filter.css';
 
@@ -48,8 +47,8 @@ const filterDictionary = {
     yes: 'Bəli',
     no: 'Xeyr',
     active: 'Aktiv',
-    pending: 'Gözləmədə',
-    nonActive: 'Aktiv deyil',
+    reserved: 'Bron edilib',
+    sold: 'Satılıb',
     noRooms: 'Otaq yoxdur',
     results: 'mənzil tapıldı',
     reset: 'Filtrləri sıfırla',
@@ -78,8 +77,8 @@ const filterDictionary = {
     yes: 'Yes',
     no: 'No',
     active: 'Active',
-    pending: 'Pending',
-    nonActive: 'Non Active',
+    reserved: 'Reserved',
+    sold: 'Sold',
     noRooms: 'No rooms',
     results: 'apartments found',
     reset: 'Reset filters',
@@ -108,8 +107,8 @@ const filterDictionary = {
     yes: 'Да',
     no: 'Нет',
     active: 'Активный',
-    pending: 'В ожидании',
-    nonActive: 'Неактивный',
+    reserved: 'Забронировано',
+    sold: 'Продано',
     noRooms: 'Комнат нет',
     results: 'квартир найдено',
     reset: 'Сбросить фильтры',
@@ -179,25 +178,54 @@ function getApartmentTypeOrder(apartmentType: { slug?: string; title?: string } 
   return orderMap[normalized] ?? 999;
 }
 
-export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingChange }: { onFilterChange?: (filters: ResaleFilterState) => void; totalCount?: number; onDebouncingChange?: (v: boolean) => void }) {
+export default function ResaleFilter({ totalCount }: { totalCount?: number }) {
   const params = useParams();
   const locale = ((params?.locale as string) || 'az') as 'az' | 'en' | 'ru';
   const t = filterDictionary[locale] || filterDictionary.az;
 
-  /*
-   * The home page's search widget links here with minPrice/maxPrice/minArea/
-   * maxArea/roomCount already in the URL. Read them once on mount — captured
-   * in a ref so the range-driven effect below (which sets the price/area max
-   * once the API range loads) knows not to clobber a max the URL specified.
-   */
+  // ── Committed filters live in the URL query. The listing page derives its
+  //    fetch from the query, so a backend request goes out only when the query
+  //    changes here — a dropdown pick, an input blur, or a slider release. The
+  //    home page's search widget deep-links with the same param names
+  //    (minPrice/maxPrice/minArea/maxArea/roomCount), so they just work.
   const searchParams = useSearchParams();
-  const urlDefaults = useRef({
-    minPrice: Number(searchParams.get('minPrice')) || 0,
-    maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : null,
-    minArea: Number(searchParams.get('minArea')) || 0,
-    maxArea: searchParams.get('maxArea') ? Number(searchParams.get('maxArea')) : null,
-    roomCount: searchParams.get('roomCount') || '',
-  }).current;
+  const router = useRouter();
+
+  const qNum = (key: string): number | null => {
+    const raw = searchParams.get(key);
+    if (raw == null || raw === '') return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  };
+  const urlPriceMin = qNum('minPrice') ?? 0;
+  const urlPriceMax = qNum('maxPrice');
+  const urlAreaMin = qNum('minArea') ?? 0;
+  const urlAreaMax = qNum('maxArea');
+
+  const selectedTypeId = searchParams.get('type') || '';
+  const selectedCity = searchParams.get('city') || '';
+  const selectedRegion = searchParams.get('region') || '';
+  const selectedPurpose = searchParams.get('purpose') || '';
+  const selectedMortgage = searchParams.get('mortgage') || '';
+  const selectedExtract = searchParams.get('extract') || '';
+  const selectedStatus = searchParams.get('status') ?? 'active';
+  const selectedRooms = searchParams.get('roomCount') || '';
+  const currency = searchParams.get('currency') || 'AZN';
+
+  const commit = useCallback(
+    (patch: Record<string, string | number | null | undefined>) => {
+      const sp = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(patch)) {
+        if (value === '' || value === null || value === undefined) sp.delete(key);
+        else sp.set(key, String(value));
+      }
+      sp.delete('page'); // any filter change → back to the first page
+      const qs = sp.toString();
+      router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
+    },
+    [searchParams, router],
+  );
+
   const { data: apartmentTypesData } = useResaleApartmentTypes();
   const { data: locationOptionsData } = useResaleLocationOptions();
   const { data: currenciesData } = useResaleCurrencies();
@@ -213,10 +241,13 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     ? roomCountsData.map((roomCount) => ({ value: String(roomCount), label: String(roomCount) }))
     : [];
 
+  // Must mirror the values the inventory panel actually stores on an apartment
+  // (RESALE_STATUS_OPTIONS): active / reserved / sold. "pending"/"non-active"
+  // never matched anything.
   const resaleStatusOptions = [
     { id: 'active', value: t.active },
-    { id: 'pending', value: t.pending },
-    { id: 'non-active', value: t.nonActive },
+    { id: 'reserved', value: t.reserved },
+    { id: 'sold', value: t.sold },
   ];
 
   const purposeOptions = [
@@ -229,22 +260,12 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
     { id: 'false', value: t.no },
   ];
 
-  const [currency, setCurrency] = useState('');
-  const { data: rangeData } = useResaleApartmentRange(currency || undefined);
+  const { data: rangeData } = useResaleApartmentRange(currency);
 
   const totalPriceMax = rangeData?.maxPrice || 1500000;
   const totalAreaMax = rangeData?.maxTotalArea || 500;
   const totalPriceMin = 0;
   const totalAreaMin = 0;
-
-  const [selectedTypeId, setSelectedTypeId] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedRegion, setSelectedRegion] = useState('');
-  const [selectedPurpose, setSelectedPurpose] = useState('');
-  const [selectedMortgage, setSelectedMortgage] = useState('');
-  const [selectedExtract, setSelectedExtract] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedRooms, setSelectedRooms] = useState(urlDefaults.roomCount);
 
   const [cityOpen, setCityOpen] = useState(false);
   const [regionOpen, setRegionOpen] = useState(false);
@@ -264,45 +285,37 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const currencyRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLDivElement>(null);
 
-  const [priceMin, setPriceMin] = useState<number | ''>(urlDefaults.minPrice);
-  const [priceMax, setPriceMax] = useState<number | ''>(urlDefaults.maxPrice ?? totalPriceMax);
-  const [priceMinInput, setPriceMinInput] = useState<number | ''>(urlDefaults.minPrice);
-  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(urlDefaults.maxPrice ?? totalPriceMax);
+  // Draft values for the price/area controls — what the user is currently
+  // typing / dragging. Nothing is committed to the URL (and thus to the
+  // backend) until a blur or a slider release.
+  const [priceMin, setPriceMin] = useState<number | ''>(urlPriceMin);
+  const [priceMax, setPriceMax] = useState<number | ''>(urlPriceMax ?? '');
+  const [priceMinInput, setPriceMinInput] = useState<number | ''>(urlPriceMin);
+  const [priceMaxInput, setPriceMaxInput] = useState<number | ''>(urlPriceMax ?? '');
 
-  const [areaMin, setAreaMin] = useState<number | ''>(urlDefaults.minArea);
-  const [areaMax, setAreaMax] = useState<number | ''>(urlDefaults.maxArea ?? totalAreaMax);
-  const [areaMinInput, setAreaMinInput] = useState<number | ''>(urlDefaults.minArea);
-  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(urlDefaults.maxArea ?? totalAreaMax);
+  const [areaMin, setAreaMin] = useState<number | ''>(urlAreaMin);
+  const [areaMax, setAreaMax] = useState<number | ''>(urlAreaMax ?? '');
+  const [areaMinInput, setAreaMinInput] = useState<number | ''>(urlAreaMin);
+  const [areaMaxInput, setAreaMaxInput] = useState<number | ''>(urlAreaMax ?? '');
 
   const regionOptions = selectedCity
     ? locationOptions.filter((option: ResaleLocationOption) => option.type === 'region' && option.city?.title === selectedCity)
     : [];
 
+  // Snap the draft controls back to the committed query (first load, Reset,
+  // browser back) and up to the API's real ceiling once the range resolves.
   useEffect(() => {
-    if (!rangeData) return;
-    // Don't stomp a max the URL asked for with the API's own ceiling.
-    if (urlDefaults.maxPrice == null) {
-      setPriceMax(rangeData.maxPrice);
-      setPriceMaxInput(rangeData.maxPrice);
-    }
-    if (urlDefaults.maxArea == null) {
-      setAreaMax(rangeData.maxTotalArea);
-      setAreaMaxInput(rangeData.maxTotalArea);
-    }
-  }, [rangeData, urlDefaults.maxPrice, urlDefaults.maxArea]);
-
-  // AZN is what the listing opens in — the picker still switches it, and the
-  // API's own first currency is only the fallback for a catalogue without one.
-  useEffect(() => {
-    if (currenciesData?.length && !currency) {
-      const azn = currenciesData.find((c) => c.value === 'AZN');
-      setCurrency(azn?.value || currenciesData[0]?.value || '');
-    }
-  }, [currenciesData, currency]);
-
-  useEffect(() => {
-    setSelectedRegion('');
-  }, [selectedCity]);
+    setPriceMin(urlPriceMin);
+    setPriceMinInput(urlPriceMin);
+    const pMax = urlPriceMax ?? rangeData?.maxPrice ?? '';
+    setPriceMax(pMax);
+    setPriceMaxInput(pMax);
+    setAreaMin(urlAreaMin);
+    setAreaMinInput(urlAreaMin);
+    const aMax = urlAreaMax ?? rangeData?.maxTotalArea ?? '';
+    setAreaMax(aMax);
+    setAreaMaxInput(aMax);
+  }, [urlPriceMin, urlPriceMax, urlAreaMin, urlAreaMax, rangeData]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -324,40 +337,21 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const safeAreaMin = typeof areaMin === 'number' ? areaMin : 0;
   const safeAreaMax = typeof areaMax === 'number' ? areaMax : totalAreaMax;
 
-  const debouncedPriceMin = useDebounce(safePriceMin, 1000);
-  const debouncedPriceMax = useDebounce(safePriceMax, 1000);
-  const debouncedAreaMin = useDebounce(safeAreaMin, 1000);
-  const debouncedAreaMax = useDebounce(safeAreaMax, 1000);
-
-  const isDebouncing = safePriceMin !== debouncedPriceMin || safePriceMax !== debouncedPriceMax || safeAreaMin !== debouncedAreaMin || safeAreaMax !== debouncedAreaMax;
-
-  useEffect(() => {
-    onDebouncingChange?.(isDebouncing);
-  }, [isDebouncing, onDebouncingChange]);
-
-  const fireFilters = useCallback(() => {
-    if (!onFilterChange) return;
-    const f: ResaleFilterState = {};
-    if (selectedCity) f.city = selectedCity;
-    if (selectedRegion) f.region = selectedRegion;
-    if (selectedTypeId) f.apartmentTypeId = selectedTypeId;
-    if (selectedPurpose === 'sale' || selectedPurpose === 'rent') f.purpose = selectedPurpose;
-    if (selectedMortgage) f.mortgage = selectedMortgage === 'true';
-    if (selectedExtract) f.extract = selectedExtract === 'true';
-    if (debouncedPriceMin > 0) f.minPrice = debouncedPriceMin;
-    if (debouncedPriceMax < totalPriceMax) f.maxPrice = debouncedPriceMax;
-    if (debouncedAreaMin > 0) f.minArea = debouncedAreaMin;
-    if (debouncedAreaMax < totalAreaMax) f.maxArea = debouncedAreaMax;
-    if (selectedRooms) {
-      const rc = parseInt(selectedRooms, 10);
-      if (Number.isFinite(rc)) f.roomCount = rc;
-    }
-    if (currency) f.currency = currency;
-    if (selectedStatus) f.status = selectedStatus;
-    onFilterChange(f);
-  }, [selectedCity, selectedRegion, selectedTypeId, selectedPurpose, selectedMortgage, selectedExtract, debouncedPriceMin, debouncedPriceMax, debouncedAreaMin, debouncedAreaMax, selectedRooms, currency, selectedStatus, onFilterChange, totalPriceMax, totalAreaMax]);
-
-  useEffect(() => { fireFilters(); }, [fireFilters]);
+  // Push the current price/area drafts into the URL query. Called on a slider
+  // release or an input blur — never mid-drag. A bound at the far end of the
+  // range is written as "no limit" (param removed).
+  const commitPriceRange = (min = safePriceMin, max = safePriceMax) => {
+    commit({
+      minPrice: min > 0 ? Math.round(min) : null,
+      maxPrice: max < totalPriceMax ? Math.round(max) : null,
+    });
+  };
+  const commitAreaRange = (min = safeAreaMin, max = safeAreaMax) => {
+    commit({
+      minArea: min > 0 ? Math.round(min * 100) / 100 : null,
+      maxArea: max < totalAreaMax ? Math.round(max * 100) / 100 : null,
+    });
+  };
 
   const priceLeftPercent = ((safePriceMin - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
   const priceRightPercent = 100 - ((safePriceMax - totalPriceMin) / (totalPriceMax - totalPriceMin)) * 100;
@@ -366,22 +360,17 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
   const areaRightPercent = 100 - ((safeAreaMax - totalAreaMin) / (totalAreaMax - totalAreaMin)) * 100;
 
   const handleReset = () => {
-    setSelectedCity('');
-    setSelectedRegion('');
-    setSelectedTypeId('');
-    setSelectedPurpose('');
-    setSelectedMortgage('');
-    setSelectedExtract('');
-    setSelectedStatus('');
-    setSelectedRooms('');
+    // Clear the whole query (the draft-sync effect snaps the sliders back), and
+    // reset the drafts here too so the thumbs move immediately.
     setPriceMin(0);
     setPriceMinInput(0);
-    setPriceMax(totalPriceMax);
-    setPriceMaxInput(totalPriceMax);
+    setPriceMax(rangeData?.maxPrice ?? '');
+    setPriceMaxInput(rangeData?.maxPrice ?? '');
     setAreaMin(0);
     setAreaMinInput(0);
-    setAreaMax(totalAreaMax);
-    setAreaMaxInput(totalAreaMax);
+    setAreaMax(rangeData?.maxTotalArea ?? '');
+    setAreaMaxInput(rangeData?.maxTotalArea ?? '');
+    router.replace(window.location.pathname, { scroll: false });
   };
 
   return (
@@ -417,6 +406,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                     const val = Math.max(totalPriceMin, Math.min(raw, safePriceMax - 1000));
                     setPriceMin(val);
                     setPriceMinInput(val);
+                    commitPriceRange(val, safePriceMax);
                   }}
                 />
               </div>
@@ -436,6 +426,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                     const val = Math.max(safePriceMin + 1000, Math.min(raw, totalPriceMax));
                     setPriceMax(val);
                     setPriceMaxInput(val);
+                    commitPriceRange(safePriceMin, val);
                   }}
                 />
               </div>
@@ -458,7 +449,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                         key={opt.value}
                         type="button"
                         className={`custom-select__option ${currency === opt.value ? 'custom-select__option--active' : ''}`}
-                        onClick={() => { setCurrency(opt.value); setCurrencyOpen(false); }}
+                        onClick={() => { commit({ currency: opt.value === 'AZN' ? null : opt.value }); setCurrencyOpen(false); }}
                       >
                         {opt.value}
                       </button>
@@ -486,6 +477,9 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                 setPriceMin(val);
                 setPriceMinInput(val);
               }}
+              onMouseUp={() => commitPriceRange()}
+              onTouchEnd={() => commitPriceRange()}
+              onBlur={() => commitPriceRange()}
             />
             <input
               type="range"
@@ -498,6 +492,9 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                 setPriceMax(val);
                 setPriceMaxInput(val);
               }}
+              onMouseUp={() => commitPriceRange()}
+              onTouchEnd={() => commitPriceRange()}
+              onBlur={() => commitPriceRange()}
             />
           </div>
         </div>
@@ -522,6 +519,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                   const val = Math.max(totalAreaMin, Math.min(raw, safeAreaMax - 5));
                   setAreaMin(val);
                   setAreaMinInput(val);
+                  commitAreaRange(val, safeAreaMax);
                 }}
               />
             </div>
@@ -541,6 +539,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                   const val = Math.max(safeAreaMin + 5, Math.min(raw, totalAreaMax));
                   setAreaMax(val);
                   setAreaMaxInput(val);
+                  commitAreaRange(safeAreaMin, val);
                 }}
               />
             </div>
@@ -564,6 +563,9 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                 setAreaMin(val);
                 setAreaMinInput(val);
               }}
+              onMouseUp={() => commitAreaRange()}
+              onTouchEnd={() => commitAreaRange()}
+              onBlur={() => commitAreaRange()}
             />
             <input
               type="range"
@@ -577,6 +579,9 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                 setAreaMax(val);
                 setAreaMaxInput(val);
               }}
+              onMouseUp={() => commitAreaRange()}
+              onTouchEnd={() => commitAreaRange()}
+              onBlur={() => commitAreaRange()}
             />
           </div>
         </div>
@@ -593,11 +598,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {cityOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedCity ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedCity(''); setCityOpen(false); }}>
+                <button type="button" className={`custom-select__option ${!selectedCity ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ city: null, region: null }); setCityOpen(false); }}>
                   {t.allCities}
                 </button>
                 {cities.map((city) => (
-                  <button key={city.id} type="button" className={`custom-select__option ${selectedCity === city.title ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedCity(city.title); setCityOpen(false); }}>
+                  <button key={city.id} type="button" className={`custom-select__option ${selectedCity === city.title ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ city: city.title, region: null }); setCityOpen(false); }}>
                     {city.title}
                   </button>
                 ))}
@@ -618,11 +623,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {regionOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedRegion ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedRegion(''); setRegionOpen(false); }}>
+                <button type="button" className={`custom-select__option ${!selectedRegion ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ region: null }); setRegionOpen(false); }}>
                   {t.allRegions}
                 </button>
                 {regionOptions.map((region) => (
-                  <button key={region.id} type="button" className={`custom-select__option ${selectedRegion === region.title ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedRegion(region.title); setRegionOpen(false); }}>
+                  <button key={region.id} type="button" className={`custom-select__option ${selectedRegion === region.title ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ region: region.title }); setRegionOpen(false); }}>
                     {region.title}
                   </button>
                 ))}
@@ -643,11 +648,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {typeOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedTypeId ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedTypeId(''); setTypeOpen(false); }}>
+                <button type="button" className={`custom-select__option ${!selectedTypeId ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ type: null }); setTypeOpen(false); }}>
                   {t.allProjects}
                 </button>
                 {apartmentTypes.map((type: any) => (
-                  <button key={type.id} type="button" className={`custom-select__option ${selectedTypeId === type.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedTypeId(type.id); setTypeOpen(false); }}>
+                  <button key={type.id} type="button" className={`custom-select__option ${selectedTypeId === type.id ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ type: type.id }); setTypeOpen(false); }}>
                     {getLocalizedApartmentTypeLabel(type, locale)}
                   </button>
                 ))}
@@ -668,11 +673,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {purposeOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedPurpose ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedPurpose(''); setPurposeOpen(false); }}>
+                <button type="button" className={`custom-select__option ${!selectedPurpose ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ purpose: null }); setPurposeOpen(false); }}>
                   {t.all}
                 </button>
                 {purposeOptions.map((option) => (
-                  <button key={option.id} type="button" className={`custom-select__option ${selectedPurpose === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedPurpose(option.id); setPurposeOpen(false); }}>
+                  <button key={option.id} type="button" className={`custom-select__option ${selectedPurpose === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ purpose: option.id }); setPurposeOpen(false); }}>
                     {option.value}
                   </button>
                 ))}
@@ -693,11 +698,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {mortgageOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedMortgage ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedMortgage(''); setMortgageOpen(false); }}>
+                <button type="button" className={`custom-select__option ${!selectedMortgage ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ mortgage: null }); setMortgageOpen(false); }}>
                   {t.all}
                 </button>
                 {booleanOptions.map((option) => (
-                  <button key={option.id} type="button" className={`custom-select__option ${selectedMortgage === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedMortgage(option.id); setMortgageOpen(false); }}>
+                  <button key={option.id} type="button" className={`custom-select__option ${selectedMortgage === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ mortgage: option.id }); setMortgageOpen(false); }}>
                     {option.value}
                   </button>
                 ))}
@@ -718,11 +723,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {extractOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedExtract ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedExtract(''); setExtractOpen(false); }}>
+                <button type="button" className={`custom-select__option ${!selectedExtract ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ extract: null }); setExtractOpen(false); }}>
                   {t.all}
                 </button>
                 {booleanOptions.map((option) => (
-                  <button key={option.id} type="button" className={`custom-select__option ${selectedExtract === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedExtract(option.id); setExtractOpen(false); }}>
+                  <button key={option.id} type="button" className={`custom-select__option ${selectedExtract === option.id ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ extract: option.id }); setExtractOpen(false); }}>
                     {option.value}
                   </button>
                 ))}
@@ -743,11 +748,11 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
             </button>
             {statusOpen && (
               <div className="custom-select__dropdown">
-                <button type="button" className={`custom-select__option ${!selectedStatus ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(''); setStatusOpen(false); }}>
+                <button type="button" className={`custom-select__option ${selectedStatus === 'all' ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ status: 'all' }); setStatusOpen(false); }}>
                   {t.all}
                 </button>
                 {resaleStatusOptions.map((opt) => (
-                  <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { setSelectedStatus(opt.id); setStatusOpen(false); }}>
+                  <button key={opt.id} type="button" className={`custom-select__option ${selectedStatus === opt.id ? 'custom-select__option--active' : ''}`} onClick={() => { commit({ status: opt.id === 'active' ? null : opt.id }); setStatusOpen(false); }}>
                     {opt.value}
                   </button>
                 ))}
@@ -768,7 +773,7 @@ export default function ResaleFilter({ onFilterChange, totalCount, onDebouncingC
                   key={room.value}
                   type="button"
                   className={`room-btn ${selectedRooms === room.value ? 'room-btn--active' : ''}`}
-                  onClick={() => setSelectedRooms(selectedRooms === room.value ? '' : room.value)}
+                  onClick={() => commit({ roomCount: selectedRooms === room.value ? null : room.value })}
                   aria-pressed={selectedRooms === room.value}
                 >
                   <span className="room-btn__text">{room.label}</span>

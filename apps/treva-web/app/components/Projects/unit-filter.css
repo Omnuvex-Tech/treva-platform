@@ -522,8 +522,7 @@
 }
 
 .pagination-show-more {
-  width: 100%;
-  max-width: 156px;
+  min-width: 156px;
   padding: 13px 24px;
   border: none;
   border-radius: 50px;
@@ -532,8 +531,10 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.18s ease;
+  transition: background-color 0.18s ease, opacity 0.18s ease;
 }
 
 .pagination-show-more:hover {
@@ -542,6 +543,11 @@
 
 .pagination-show-more:active {
   background-color: #000000;
+}
+
+.pagination-show-more:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* ========================================================

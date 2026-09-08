@@ -36,7 +36,7 @@ export const MOCK_LISTINGS: Listing[] = [
     {
         id: "lst_3",
         unitName: "Penthouse 21A",
-        projectName: "Seaside Residence",
+        projectName: "Sabah Residence",
         dealType: "sale",
         price: 615_000,
         location: "Baku, Bayil",

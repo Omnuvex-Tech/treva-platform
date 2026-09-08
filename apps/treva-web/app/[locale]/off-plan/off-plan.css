@@ -1,6 +1,9 @@
 .page-wrapper .main-wrapper {
   padding-top: calc(var(--treva-nav-height, 64px) + 24px);
-  /* padding-bottom: 64px; */
+  /* No bottom padding: the CTA banner below (.hv2-s-callback) brings its own
+     40px padding-top, which is the exact section gap the home/projects pages
+     use. Adding wrapper padding on top of that made the gap ~2.5x too big. */
+  padding-bottom: 0;
 }
 
 .off-plan-page-container {
@@ -11,7 +14,7 @@
 @media (max-width: 768px) {
   .page-wrapper .main-wrapper {
     padding-top: calc(var(--treva-nav-height, 64px) + 16px);
-    padding-bottom: 52px;
+    padding-bottom: 0;
   }
 
   .off-plan-page-container {

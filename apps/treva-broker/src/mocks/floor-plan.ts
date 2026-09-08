@@ -95,7 +95,7 @@ function makeBuilding(id: string, name: string, projectName: string, seed: numbe
 export const MOCK_BUILDINGS: Building[] = [
     makeBuilding("bld_a", "Tower A", "Pearl Towers", 20250401),
     makeBuilding("bld_b", "Tower B", "Pearl Towers", 20250402),
-    makeBuilding("bld_c", "Seaside Block", "Seaside Residence", 20250403),
+    makeBuilding("bld_c", "Seaside Block", "Sabah Residence", 20250403),
 ];
 
 /**

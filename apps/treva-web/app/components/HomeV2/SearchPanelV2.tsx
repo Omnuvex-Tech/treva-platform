@@ -159,7 +159,7 @@ export default function SearchPanelV2({ locale }: Props) {
                     aria-pressed={room === option}
                     onClick={() => toggleRoom(option)}
                   >
-                    {option}
+                    {option === "0" ? dict.search.studio : option}
                   </button>
                 ))}
               </div>

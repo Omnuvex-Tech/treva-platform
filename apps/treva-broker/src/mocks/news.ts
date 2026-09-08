@@ -71,10 +71,10 @@ export const MOCK_NEWS: NewsPost[] = [
     },
     {
         id: "news_3",
-        title: "Seaside Residence: Phase 2 Availability",
+        title: "Sabah Residence: Phase 2 Availability",
         excerpt:
-            "Phase 2 of Seaside Residence opens with 96 units. Sea-view apartments on floors 12 and above are released in limited batches.",
-        body: "Phase 2 of Seaside Residence opens with 96 units. Sea-view apartments on floors 12 and above are released in limited batches to keep pricing stable.",
+            "Phase 2 of Sabah Residence opens with 96 units. Sea-view apartments on floors 12 and above are released in limited batches.",
+        body: "Phase 2 of Sabah Residence opens with 96 units. Sea-view apartments on floors 12 and above are released in limited batches to keep pricing stable.",
         category: "news",
         coverImageUrl: null,
         publishedAt: daysAgo(3),

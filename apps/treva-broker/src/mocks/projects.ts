@@ -175,7 +175,7 @@ export const MOCK_PROJECTS: Project[] = [
     },
     {
         id: "prj_2",
-        name: "Seaside Residence",
+        name: "Sabah Residence",
         developer: "Azure Group",
         location: "Baku, Bayil",
         status: "active",
@@ -226,7 +226,7 @@ export const MOCK_PROJECTS: Project[] = [
         ],
         materials: MATERIALS,
         availability: { available: 38, reserved: 38, sold: 88, autoCalculate: true, lastSyncedAt: minutesAgo(14) },
-        financeRows: financeRowsFor("Seaside Residence"),
+        financeRows: financeRowsFor("Sabah Residence"),
         layouts: LAYOUTS,
     },
     {
