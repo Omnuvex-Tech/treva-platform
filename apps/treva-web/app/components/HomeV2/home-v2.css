@@ -385,7 +385,7 @@ body:has(.hv2-nav) .vision-hero__container {
     --hv2-row-gap: 24px;
     /* Pulled well below the shared --hv2-section rhythm (120px) — the search
        card and this section read as one flow rather than separate blocks. */
-    padding-top: 40px;
+    padding-top: 80px;
 }
 
 .hv2-s-projects--single {
@@ -418,7 +418,7 @@ body:has(.hv2-nav) .vision-hero__container {
 .hv2-s-team {
     min-height: 600px;
     /* Same pulled-in rhythm as the sections above it. */
-    padding-top: 40px;
+    padding-top: 80px;
 }
 
 /* padding-top 40 + 696 of content — see the note on Projects above. The
@@ -847,6 +847,7 @@ body:has(.hv2-nav) .vision-hero__container {
     grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
     gap: 24px;
     padding-top: 0;
+        margin-top: 25px;
 }
 
 /* --- left: credit calculator card --- */
@@ -974,24 +975,15 @@ body:has(.hv2-nav) .vision-hero__container {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* =========================================================================
-   SEARCH PANEL
-   ========================================================================= */
 
-/* Calculator block: 1344x411, radius XL, 1px border. Pulled up closer to the
-   hero than the shared --hv2-section rhythm (120px) — the two read as one
-   flow rather than separate sections. */
 .hv2-search {
     display: flex;
     flex-direction: column;
-    /* Figma reads 411 Hug — the content sets the height. Forcing it as a
-       min-height stretched the body and left dead space above the footer. */
-    margin-top: 28px;
+    margin-top: 111px;
+    margin-bottom: 60px;
     border: 1px solid var(--hv2-line);
     border-radius: var(--hv2-r-xl);
     background: var(--hv2-surface);
-    /* No overflow:hidden — it clipped the project dropdown at the card edge.
-       The footer bar rounds its own bottom corners instead. */
 }
 
 .hv2-search__body {

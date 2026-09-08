@@ -535,10 +535,13 @@ export default function ResaleDetailPage() {
                       <img src={img} alt={`${gt.image} ${idx + 1}`} />
                     </div>
                   ))}
-                  {gallery.length > 5 && (
+                                 {gallery.length > 5 && (
                     <div
                       className="pdet-thumb-box pdet-thumb-overlay"
-                      onClick={() => setActiveThumb(4)}
+                      onClick={() => {
+                        setActiveThumb(4);
+                        openGallery(4);
+                      }}
                     >
                       <img src={gallery[4]} alt={gt.morePhotos} />
                       <div className="pdet-overlay-text">+{extraCount} {gt.images}</div>
