@@ -151,7 +151,9 @@ export const projectCards: ProjectCard[] = [
         // the footer drops the price for a localized "all units sold" line.
         slug: "sabah-residence",
         title: "Sabah Residence",
-        developer: "Sea Breeze",
+        // Sabah Residence shows its location instead of the fixed "Sea Breeze"
+        // developer label.
+        developer: "Baku, Bayil",
         icon: "/images/features-pro/icons/sabah-residence.svg",
         image: "/images/features-pro/figma/sabah-residence-building.png",
         sky: "/images/features-pro/figma/sabah-residence-sky.jpg",
