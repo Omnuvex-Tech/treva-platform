@@ -7,13 +7,13 @@ import Navbar from '@/app/components/HomeV2/V2Nav';
 import { HomeFooter } from '@/app/components/HomeV2/V2Footer';
 import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import PageContainer from '@/app/components/Container/PageContainer';
-import ResaleFilter, { ResaleFilterState } from './ResaleFilter';
+import ResaleFilter, { ResaleFilterState } from '../ResaleFilter';
 import { useResaleApartments } from '@/hooks/use-resale-apartments';
 import { getSaved, addSaved, removeSaved } from '@/lib/saved-properties';
 import { getCompared, addCompared, removeCompared } from '@/lib/compare-properties';
 import type { ResaleApartment } from '@/lib/resale.types';
 import { getTrevaAssetUrl as getAssetUrl } from '@/lib/asset-url';
-import './resale-listing.css';
+import '../resale-listing.css';
 
 function getLocalizedApartmentTypeLabel(
   apartmentType: { slug?: string; title?: string } | undefined,

@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
 import ContactPageV2 from "@/app/components/HomeV2/ContactPage";
 import { config } from "@/config";
+import { staticPageMetadata } from "@/lib/seo-fallbacks";
+import PageJsonLd from "@/app/components/PageJsonLd";
 
 export function generateStaticParams() {
     return config.project.staticLanguages.map((language) => ({
         locale: language.code,
     }));
 }
+
+export const generateMetadata = staticPageMetadata("contact");
 
 /**
  * Contact — the V2 redesign, served straight from `/[locale]/contact`. The old
@@ -25,5 +29,10 @@ export default async function ContactRoute({
         notFound();
     }
 
-    return <ContactPageV2 locale={locale} />;
+    return (
+        <>
+            <PageJsonLd pageKey="contact" locale={locale} />
+            <ContactPageV2 locale={locale} />
+        </>
+    );
 }

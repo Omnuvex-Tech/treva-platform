@@ -1,6 +1,9 @@
-import React from "react";
+import React, { cache } from "react";
+import type { Metadata } from "next";
 import PulseArticleDetail from "@/app/components/Pulse/PulseArticleDetail";
-import { getArticleBySlug, getArticles, apiArticleToArticle } from "@/lib/pulse-api";
+import PageJsonLd from "@/app/components/PageJsonLd";
+import { getArticleBySlug, getArticles, apiArticleToArticle, getLocalized, toAbsUrl } from "@/lib/pulse-api";
+import { buildPageMetadata } from "@/lib/seo";
 import { Article } from "@/lib/pulse.types";
 import { notFound } from "next/navigation";
 
@@ -11,12 +14,33 @@ type Props = {
   }>;
 };
 
+/** generateMetadata + səhifə eyni sorğunu bölüşsün deyə keşlənir. */
+const loadArticle = cache((slug: string) => getArticleBySlug(slug));
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, slug } = await params;
+  try {
+    const apiArticle = await loadArticle(slug);
+    return buildPageMetadata({
+      pageKey: `pulse:${apiArticle.id}`,
+      locale,
+      fallback: {
+        title: getLocalized(apiArticle.title, locale),
+        description: getLocalized(apiArticle.excerpt, locale),
+        ogImage: apiArticle.coverImage ? toAbsUrl(apiArticle.coverImage) : undefined,
+      },
+    });
+  } catch {
+    return {};
+  }
+}
+
 export default async function Page({ params }: Props) {
   const { locale, slug } = await params;
 
   let apiArticle;
   try {
-    apiArticle = await getArticleBySlug(slug);
+    apiArticle = await loadArticle(slug);
   } catch (error) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 250));
@@ -49,12 +73,15 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <PulseArticleDetail
-      locale={locale}
-      article={article}
-      sidebarArticles={sidebarArticles}
-      relatedArticles={relatedArticles}
-    />
+    <>
+      <PageJsonLd pageKey={`pulse:${apiArticle.id}`} locale={locale} />
+      <PulseArticleDetail
+        locale={locale}
+        article={article}
+        sidebarArticles={sidebarArticles}
+        relatedArticles={relatedArticles}
+      />
+    </>
   );
 }
 

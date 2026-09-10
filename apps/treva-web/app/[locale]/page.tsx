@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import HomeV2 from "@/app/components/HomeV2";
+import PageJsonLd from "@/app/components/PageJsonLd";
+import { staticPageMetadata } from "@/lib/seo-fallbacks";
 import { config } from "@/config";
 import {
     getArticles,
@@ -18,6 +20,8 @@ export function generateStaticParams() {
         locale: language.code,
     }));
 }
+
+export const generateMetadata = staticPageMetadata("home");
 
 /**
  * Home — the V2 redesign, now served straight from `/`. The old V1 home
@@ -98,12 +102,15 @@ export default async function HomePage({
     }));
 
     return (
-        <HomeV2
-            locale={locale}
-            inventory={inventory}
-            resaleInventory={resaleInventory}
-            team={team}
-            news={news}
-        />
+        <>
+            <PageJsonLd pageKey="home" locale={locale} />
+            <HomeV2
+                locale={locale}
+                inventory={inventory}
+                resaleInventory={resaleInventory}
+                team={team}
+                news={news}
+            />
+        </>
     );
 }

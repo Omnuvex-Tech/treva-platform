@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { config } from "@/config";
+import { staticPageMetadata } from "@/lib/seo-fallbacks";
+import PageJsonLd from "@/app/components/PageJsonLd";
 import ProjectsPageV2 from "@/app/components/HomeV2/ProjectsPage";
 
 export const dynamicParams = false;
@@ -9,6 +11,8 @@ export function generateStaticParams() {
         locale: language.code,
     }));
 }
+
+export const generateMetadata = staticPageMetadata("projects");
 
 /**
  * Projects — the V2 redesign, served straight from `/[locale]/projects`. The
@@ -27,5 +31,10 @@ export default async function ProjectsRoute({
         notFound();
     }
 
-    return <ProjectsPageV2 locale={locale} />;
+    return (
+        <>
+            <PageJsonLd pageKey="projects" locale={locale} />
+            <ProjectsPageV2 locale={locale} />
+        </>
+    );
 }

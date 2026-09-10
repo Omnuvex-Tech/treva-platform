@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import Pulse from "@/app/components/Pulse/pulse";
+import PageJsonLd from "@/app/components/PageJsonLd";
+import { staticPageMetadata } from "@/lib/seo-fallbacks";
 import { config } from "@/config";
 import {
     getArticles,
@@ -17,6 +19,8 @@ export function generateStaticParams() {
         locale: language.code,
     }));
 }
+
+export const generateMetadata = staticPageMetadata("pulse");
 
 export default async function PulseRoute({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
@@ -54,6 +58,8 @@ export default async function PulseRoute({ params }: { params: Promise<{ locale:
     
 
     return (
+        <>
+        <PageJsonLd pageKey="pulse" locale={locale} />
         <Pulse
             locale={locale}
             articles={articles}
@@ -63,5 +69,6 @@ export default async function PulseRoute({ params }: { params: Promise<{ locale:
             weekArticles={weekArticles}
             categories={categories}
         />
+        </>
     );
 }

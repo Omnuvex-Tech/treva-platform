@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { config } from "@/config";
 import { getAuthors, toAbsUrl } from "@/lib/pulse-api";
+import { staticPageMetadata } from "@/lib/seo-fallbacks";
+import PageJsonLd from "@/app/components/PageJsonLd";
 import AboutPageV2 from "@/app/components/HomeV2/AboutPage";
 
 export function generateStaticParams() {
@@ -8,6 +10,8 @@ export function generateStaticParams() {
     locale: language.code,
   }));
 }
+
+export const generateMetadata = staticPageMetadata("about-us");
 
 /**
  * About — the V2 redesign, served straight from `/[locale]/about-us`. The old
@@ -39,5 +43,10 @@ export default async function AboutUsRoute({
     href: `/${locale}/authors/${author.slug}`,
   }));
 
-  return <AboutPageV2 locale={locale} members={members} />;
+  return (
+    <>
+      <PageJsonLd pageKey="about-us" locale={locale} />
+      <AboutPageV2 locale={locale} members={members} />
+    </>
+  );
 }

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { cache } from "react";
+import type { Metadata } from "next";
 import Navbar from "@/app/components/HomeV2/V2Nav";
 import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
 import CallbackV2 from "@/app/components/HomeV2/V2Callback";
+import PageJsonLd from "@/app/components/PageJsonLd";
 import OtherArticlesSection from "./OtherArticlesSection";
 import Link from "next/link";
 import {
@@ -12,6 +14,7 @@ import {
   getPulseCategories,
   getLocalized,
 } from "@/lib/pulse-api";
+import { buildPageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { FaLinkedin, FaArrowRightLong } from "react-icons/fa6";
 import "@/app/components/Pulse/pulse.css";
@@ -47,6 +50,33 @@ export async function generateStaticParams() {
   }
 }
 
+/** generateMetadata + səhifə eyni sorğunu bölüşsün deyə keşlənir. */
+const loadAuthor = cache((slug: string, locale: string) =>
+  getAuthorBySlug(slug, locale),
+);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  try {
+    const author = await loadAuthor(slug, locale);
+    return buildPageMetadata({
+      pageKey: `author:${author.id}`,
+      locale,
+      fallback: {
+        title: `${author.name} | TREVA Real Estate`,
+        description: author.description || undefined,
+        ogImage: author.avatar ? toAbsUrl(author.avatar) : undefined,
+      },
+    });
+  } catch {
+    return {};
+  }
+}
+
 /** Müəllif səhifəsinin mətnləri — əvvəl sabit azərbaycanca idi. */
 const authorPageLabels = {
   az: { recent: 'Son məqalələr', read: 'Məqaləni oxu', keywords: 'Açar sözlər' },
@@ -61,7 +91,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
 
   let apiAuthor;
   try {
-    apiAuthor = await getAuthorBySlug(slug, locale);
+    apiAuthor = await loadAuthor(slug, locale);
   } catch {
     notFound();
   }
@@ -111,6 +141,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
   }
   return (
     <div className="page-wrapper" data-locale={locale}>
+      <PageJsonLd pageKey={`author:${apiAuthor.id}`} locale={locale} />
       <Navbar locale={locale} variant="solid" />
 
       <main className="main-wrapper">

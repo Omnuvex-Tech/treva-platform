@@ -4,7 +4,11 @@ import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
 import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import PageContainer from "@/app/components/Container/PageContainer";
 import UnitFilter from "@/app/components/Projects/UnitFilter";
+import PageJsonLd from "@/app/components/PageJsonLd";
+import { staticPageMetadata } from "@/lib/seo-fallbacks";
 import "./off-plan.css";
+
+export const generateMetadata = staticPageMetadata("off-plan");
 
 export default async function OffPlanPage({
   params,
@@ -15,6 +19,7 @@ export default async function OffPlanPage({
 
   return (
     <div className="page-wrapper" data-locale={locale}>
+      <PageJsonLd pageKey="off-plan" locale={locale} />
       <Navbar locale={locale} variant="solid" />
       <main className="main-wrapper">
         <PageContainer className="off-plan-page-container">
