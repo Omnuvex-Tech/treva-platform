@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import Navbar from '@/app/components/HomeV2/V2Nav'
 import { HomeFooter } from '@/app/components/HomeV2/V2Footer'
 import CallbackV2 from '@/app/components/HomeV2/V2Callback'
@@ -226,6 +227,7 @@ type BrokerLocale = keyof typeof brokersDictionary
 export function BrokersPage({ locale }: BrokersPageProps) {
   const lang = (locale in brokersDictionary ? locale : 'az') as BrokerLocale
   const t = brokersDictionary[lang]
+  const router = useRouter()
   const gsapReady = useRef(false)
 
   const [fields, setFields] = useState<BrokerFields>(INITIAL_FIELDS)
@@ -457,8 +459,8 @@ export function BrokersPage({ locale }: BrokersPageProps) {
       })
       
       if (!res.ok) throw new Error('Xəta baş verdi')
-      setStatus('success')
-      setFields(INITIAL_FIELDS)
+      // Registration is now in the CMS — hand the visitor to the thank-you page.
+      router.push(`/${lang}/thank-you`)
     } catch (err) {
       console.error(err)
       setStatus('error')

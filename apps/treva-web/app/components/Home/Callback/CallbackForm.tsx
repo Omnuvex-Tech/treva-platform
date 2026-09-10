@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import './call-back.css';
 import '../../Contact/contact.css';
 import PageContainer from '@/app/components/Container/PageContainer';
@@ -108,6 +108,7 @@ function CallbackSubmitButton({ label, loading, ...props }: CallbackSubmitButton
 
 export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const detectedLocale = pathname?.split("/")[1];
   const locale: Locale = (detectedLocale && detectedLocale in callbackDictionary) ? detectedLocale as Locale : "az";
   const content = callbackDictionary[locale];
@@ -229,18 +230,10 @@ export default function CallbackForm({ allowedRoles, sectionId }: CallbackFormPr
         body: JSON.stringify({ name, phone: fullPhone, role: activeRole }),
       });
       if (!res.ok) throw new Error('Xəta baş verdi');
-      setSubmitted(true);
-      setName('');
-      setPhone('');
-      setCountryCode(DEFAULT_COUNTRY_CODE);
-      setCountryFlag('/images/flags/az.png');
-      setPhonePlaceholder('50 123 45 67');
-      setPhoneMaxLength(9);
-      setPhoneFormat('XX XXX XX XX');
-      setActiveRole(visibleRoles[0] ?? 'Client');
+      // Lead is now in the CMS — hand the visitor to the thank-you page.
+      router.push(`/${locale}/thank-you`);
     } catch {
       setError('Göndərilmədi. Yenidən cəhd edin.');
-    } finally {
       setSubmitting(false);
     }
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { getDict } from "./dictionary";
 
@@ -41,6 +42,7 @@ function normalizePhone(raw: string): string {
  */
 export default function CallbackV2({ locale, role = "Client" }: Props) {
   const dict = getDict(locale);
+  const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -57,9 +59,8 @@ export default function CallbackV2({ locale, role = "Client" }: Props) {
         body: JSON.stringify({ name: name.trim(), phone: normalizePhone(phone), role }),
       });
       if (!res.ok) throw new Error("request failed");
-      setStatus("done");
-      setName("");
-      setPhone("");
+      // Lead is now in the CMS — hand the visitor to the thank-you page.
+      router.push(`/${locale}/thank-you`);
     } catch {
       setStatus("error");
     }
@@ -129,18 +130,26 @@ export default function CallbackV2({ locale, role = "Client" }: Props) {
 
               <button
                 type="submit"
-                className="hv2-pill hv2-pill--dark hv2-pill--cta"
+                className={`hv2-pill hv2-pill--dark hv2-pill--cta${status === "sending" ? " is-loading" : ""}`}
                 disabled={status === "sending"}
+                style={{ position: "relative" }}
               >
-                {status === "sending" ? dict.callback.sending : dict.callback.cta}
-                <Image
-                  src="/images/icons/phone-light.svg"
-                  alt=""
-                  aria-hidden="true"
-                  width={24}
-                  height={24}
-                  unoptimized
-                />
+                {status === "sending" ? (
+                  <span className="hv2-cb__spinner" aria-hidden="true" />
+                ) : null}
+                <span
+                  className={status === "sending" ? "hv2-cb__btn-label hv2-cb__btn-label--hidden" : "hv2-cb__btn-label"}
+                >
+                  {dict.callback.cta}
+                  <Image
+                    src="/images/icons/phone-light.svg"
+                    alt=""
+                    aria-hidden="true"
+                    width={24}
+                    height={24}
+                    unoptimized
+                  />
+                </span>
               </button>
             </>
           )}

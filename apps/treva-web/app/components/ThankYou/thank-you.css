@@ -1,6 +1,19 @@
 .thankyou-page-wrapper .main-wrapper {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  /* The backdrop runs the whole content area — from behind the (transparent,
+     fixed) navbar down to where the footer starts. */
+  background-image: url('/images/thank-you.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+}
+
+/* No blue tint strip behind the footer on this page, and no gap between the
+   backdrop image and the footer card — the image runs right up to it. */
+.thankyou-page-wrapper .hv2-footer-wrap {
+  background: transparent;
+  padding-top: 0;
 }
 
 .thankyou-section {
@@ -13,13 +26,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--treva-nav-height, 92px));
   padding: 40px 24px;
   overflow-x: hidden;
-  background-color: #ffffff;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+  background: transparent;
 }
 
 .thankyou-content {
@@ -30,7 +40,8 @@
   align-items: center;
   text-align: center;
   max-width: 640px;
-      padding-top: 175px;
+  /* Nudged below the vertical centre so it clears the navbar area. */
+  transform: translateY(90px);
 }
 
 .thankyou-icon {

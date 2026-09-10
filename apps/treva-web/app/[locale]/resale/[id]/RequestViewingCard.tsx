@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCreateRequest } from '@/hooks/use-resale-apartments';
+
+/** cms-api base — same env var the callback / contact CTAs post to. */
+const CMS_API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:10021';
 import '../../../components/Contact/contact.css';
 import './property-info-cards.css';
 
@@ -12,6 +15,7 @@ interface RequestViewingCardProps {
 
 export default function RequestViewingCard({ className = '' }: RequestViewingCardProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const detectedLocale = pathname?.split('/')[1];
   const locale = (detectedLocale && ['az', 'en', 'ru'].includes(detectedLocale)) ? detectedLocale : 'az';
 
@@ -159,15 +163,20 @@ export default function RequestViewingCard({ className = '' }: RequestViewingCar
     createRequest.mutate(
       { fullName, phoneNumber },
       {
-        onSuccess: () => {
-          setSubmitSuccess(true);
-          setName('');
-          setPhone('');
-          setCountryCode('+994');
-          setCountryFlag('/images/flags/az.png');
-          setPhonePlaceholder('50 123 45 67');
-          setPhoneMaxLength(9);
-          setPhoneFormat('XX XXX XX XX');
+        onSuccess: async () => {
+          // The viewing request must also land in the CMS as a resale
+          // inquiry CTA before the visitor is sent to the thank-you page.
+          try {
+            await fetch(`${CMS_API}/resale-inquiries`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: fullName, phone: phoneNumber }),
+            });
+          } catch {
+            // The primary request already succeeded — don't block the visitor
+            // on the CMS write.
+          }
+          router.push(`/${locale}/thank-you`);
         },
       }
     );

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent, MouseEvent } from 'react'
 import Script from 'next/script'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay } from 'swiper/modules'
 import Header from '@/app/components/Home/TrevaHero/navbar'
@@ -237,6 +238,7 @@ const contactDictionary = {
 
 function ContactForm({ locale }: { locale: string }) {
   const t = contactDictionary[locale as keyof typeof contactDictionary] ?? contactDictionary.az;
+  const router = useRouter()
   const [fields, setFields] = useState<ContactFields>(INITIAL_CONTACT_FIELDS)
   const [errors, setErrors] = useState<ContactErrors>({})
   const [status, setStatus] = useState<ContactStatus>('idle')
@@ -281,8 +283,8 @@ function ContactForm({ locale }: { locale: string }) {
         body: JSON.stringify(fields),
       })
       if (res.ok) {
-        setStatus('success')
-        setFields(INITIAL_CONTACT_FIELDS)
+        // Lead is now in the CMS — hand the visitor to the thank-you page.
+        router.push(`/${locale}/thank-you`)
       } else {
         throw new Error('Xəta baş verdi')
       }

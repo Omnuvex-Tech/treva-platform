@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import Navbar from '@/app/components/Home/TrevaHero/navbar'
-import { HomeFooter } from '@/app/components/Home/HomeFooter'
+import Navbar from '@/app/components/HomeV2/V2Nav'
+import { HomeFooter } from '@/app/components/HomeV2/V2Footer'
 import './thank-you.css'
 
 const COPY: Record<string, { title: string; subtitle: string; button: string }> = {
@@ -32,13 +32,10 @@ export function ThankYouPage({ locale }: ThankYouPageProps) {
   const copy = COPY[locale] ?? COPY.az!
   return (
     <div className="page-wrapper thankyou-page-wrapper" data-locale={locale}>
-      <Navbar locale={locale} variant="solid" />
+      <Navbar locale={locale} />
 
       <main className="main-wrapper">
-        <section
-          className="thankyou-section"
-          style={{ backgroundImage: "url('/images/thank-you.png')" }}
-        >
+        <section className="thankyou-section">
           <div className="thankyou-content">
            
             <h1 className="thankyou-title">{copy.title}</h1>

@@ -2187,6 +2187,42 @@ body:has(.hv2-nav) .vision-hero__container {
     color: #c0362c;
 }
 
+/* Submit button loading state — a ring spinner over a width-stable label,
+   the same treatment the V1 callback / contact CTAs use. */
+.hv2-cb__btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hv2-cb__btn-label--hidden {
+    visibility: hidden;
+}
+
+.hv2-pill--cta.is-loading {
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+.hv2-cb__spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: hv2-cb-spin 0.7s linear infinite;
+}
+
+@keyframes hv2-cb-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* ---------- picture dropdown -------------------------------------------
    Figma 825:26696 — a 639x180 panel holding a 3-column grid of 173x60 tiles,
    20 padding, 40 between columns and 20 between rows. It only kicks in for
