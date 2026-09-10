@@ -6,8 +6,12 @@ import PageContainer from "@/app/components/Container/PageContainer";
 import UnitFilter from "@/app/components/Projects/UnitFilter";
 import "./off-plan.css";
 
-export default function OffPlanPage({ params }: { params: { locale: string } }) {
-  const locale = params?.locale || "az";
+export default async function OffPlanPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
 
   return (
     <div className="page-wrapper" data-locale={locale}>

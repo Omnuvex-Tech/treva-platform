@@ -22,7 +22,7 @@ function getLocalizedApartmentTypeLabel(
   const normalized = String(apartmentType?.slug || apartmentType?.title || '')
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '_');
+    .replace(/[\s-]+/g, '_');
 
   const translations = {
     country_house: {
@@ -37,7 +37,7 @@ function getLocalizedApartmentTypeLabel(
     },
     new_constructed: {
       az: 'Yeni tikili',
-      en: 'New Constructed',
+      en: 'New Construction',
       ru: 'Новостройка',
     },
     object: {
@@ -52,7 +52,7 @@ function getLocalizedApartmentTypeLabel(
     },
     old_constructed: {
       az: 'Köhnə tikili',
-      en: 'Old Constructed',
+      en: 'Old Construction',
       ru: 'Старый фонд',
     },
   } as const;
