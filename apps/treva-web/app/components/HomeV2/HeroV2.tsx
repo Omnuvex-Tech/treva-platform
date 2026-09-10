@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Calculator, Handshake } from "lucide-react";
+import { Calculator } from "lucide-react";
 import { getDict } from "./dictionary";
 import VideoV2 from "./VideoV2";
+import ConsultationCta from "./ConsultationCta";
 
 type Props = { locale: string };
 
@@ -46,10 +47,9 @@ export default function HeroV2({ locale }: Props) {
               {dict.heroScroll[1]}
             </p>
 
-            <Link href={`/${locale}/contact`} className="hv2-pill hv2-heroimg__cta">
-              {dict.consultation}
-              <Handshake size={20} strokeWidth={1.6} />
-            </Link>
+            {/* Not a route to /contact: the consultation pill scrolls down to
+                the callback banner on this same page (see ConsultationCta). */}
+            <ConsultationCta label={dict.consultation} />
           </div>
         </div>
       </div>
