@@ -1399,8 +1399,15 @@
   max-width: 300px;
 }
 
-.author-page_left-col .pulse-social-icon-link {
+.author-page_social-links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-top: 1.5rem;
+}
+
+.author-page_left-col .pulse-social-icon-link {
+  margin-top: 0;
 }
 
 .author-page_right-col {

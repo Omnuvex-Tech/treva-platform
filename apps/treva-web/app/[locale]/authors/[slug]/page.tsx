@@ -16,7 +16,7 @@ import {
 } from "@/lib/pulse-api";
 import { buildPageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
-import { FaLinkedin, FaArrowRightLong } from "react-icons/fa6";
+import { FaLinkedin, FaArrowRightLong, FaGlobe } from "react-icons/fa6";
 import "@/app/components/Pulse/pulse.css";
 
 type Props = {
@@ -103,6 +103,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
     ? toAbsUrl(apiAuthor.avatar)
     : "/assets/webflow-placeholder.svg";
   const authorLinkedin = apiAuthor.linkedin;
+  const authorWebsite = apiAuthor.website;
   const authorDescription =
     apiAuthor.description ||
     "TREVA real estate komandasının peşəkar üzvü. Daşınmaz əmlak bazarı üzrə ən son xəbərlər, təhlillər və məsləhətlər.";
@@ -158,16 +159,31 @@ export default async function AuthorPage({ params, searchParams }: Props) {
                 <h1 className="author-page_name">{String(authorName || "")}</h1>
                 <p className="author-page_title">{String(authorTitle || "")}</p>
                 <p className="author-page_desc">{String(authorDescription || "")}</p>
-                {authorLinkedin && (
-                  <a
-                    href={authorLinkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="pulse-social-icon-link"
-                    aria-label={`${String(authorName || "")} LinkedIn profili`}
-                  >
-                    <FaLinkedin size={22} aria-hidden="true" />
-                  </a>
+                {(authorLinkedin || authorWebsite) && (
+                  <div className="author-page_social-links">
+                    {authorLinkedin && (
+                      <a
+                        href={authorLinkedin}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="pulse-social-icon-link"
+                        aria-label={`${String(authorName || "")} LinkedIn profili`}
+                      >
+                        <FaLinkedin size={22} aria-hidden="true" />
+                      </a>
+                    )}
+                    {authorWebsite && (
+                      <a
+                        href={authorWebsite}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="pulse-social-icon-link"
+                        aria-label={`${String(authorName || "")} vebsaytı`}
+                      >
+                        <FaGlobe size={22} aria-hidden="true" />
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
 

@@ -18,6 +18,7 @@ export interface Article {
     slug: string;
     title?: string;
     linkedin?: string;
+    website?: string;
     avatar?: string;
   };
   keywords?: { id: string; name: string; slug: string }[];

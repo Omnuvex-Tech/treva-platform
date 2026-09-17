@@ -37,6 +37,7 @@ interface ApiAuthorPayload {
     slug: string;
     title?: LocalizedString;
     linkedin?: string;
+    website?: string;
     avatar?: string;
     description?: LocalizedString;
 }
@@ -47,6 +48,7 @@ export interface ApiAuthor {
     slug: string;
     title?: string;
     linkedin?: string;
+    website?: string;
     avatar?: string;
     description?: string;
 }
@@ -291,6 +293,7 @@ export function apiArticleToArticle(api: any, locale: string = "az"): Article {
                 slug: safeApi.author.slug,
                 title: getLocalized(safeApi.author.title, locale),
                 linkedin: safeApi.author.linkedin,
+                website: safeApi.author.website,
                 avatar: safeApi.author.avatar,
             }
             : undefined,

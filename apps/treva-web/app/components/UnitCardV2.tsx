@@ -57,7 +57,7 @@ export default function UnitCardV2({
         <div className="hv2-ucard__media">
           <div className="hv2-ucard__plan">
             {image ? (
-              <CardImage src={image} alt={alt} fill sizes={sizes} style={{ objectFit: "cover" }} />
+              <CardImage src={image} alt={alt} fill sizes={sizes} style={{ objectFit: "contain" }} />
             ) : null}
           </div>
         </div>

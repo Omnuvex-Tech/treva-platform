@@ -6,12 +6,11 @@ import { config } from "@/config";
 import {
     getArticles,
     apiArticleToArticle,
-    getAuthors,
     toAbsUrl,
 } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 import { getHomeInventory, getHomeResale } from "@/app/components/HomeV2/inventory-api";
-import type { InventoryCard, NewsCard, TeamMember } from "@/app/components/HomeV2/data";
+import type { InventoryCard, NewsCard } from "@/app/components/HomeV2/data";
 
 export const dynamicParams = false;
 
@@ -54,23 +53,6 @@ export default async function HomePage({
         pulseArticles = [];
     }
 
-    // Two feeds the V1 home never asked for. Both are optional: the sections
-    // hide themselves (team, news) or fall back to seed cards (inventory) when a
-    // service is unreachable.
-    let team: TeamMember[] = [];
-    try {
-        const authors = await getAuthors(locale);
-        team = authors.slice(0, 3).map((author) => ({
-            id: author.id,
-            name: author.name,
-            role: author.title || "",
-            avatar: toAbsUrl(author.avatar || "") || "",
-            href: `/${locale}/authors/${author.slug}`,
-        }));
-    } catch {
-        team = [];
-    }
-
     // Off-plan and resale are separate models/endpoints (unit-layouts vs
     // apartments) — fetched in parallel so the strip's two tabs show real,
     // distinct listings instead of the same off-plan units regardless of
@@ -95,9 +77,9 @@ export default async function HomePage({
         date: article.date,
         category: article.category,
         // apiArticleToArticle hands back the CMS's raw, relative path — toAbsUrl
-        // (already used for the team avatars above) is what the V1 home page's
-        // own Pulse section calls before rendering the same field. Without it
-        // every cover 404s against treva-web's own origin instead of the CMS's.
+        // is what the V1 home page's own Pulse section calls before rendering the
+        // same field. Without it every cover 404s against treva-web's own origin
+        // instead of the CMS's.
         image: toAbsUrl(article.coverImage || article.image || ""),
     }));
 
@@ -108,7 +90,6 @@ export default async function HomePage({
                 locale={locale}
                 inventory={inventory}
                 resaleInventory={resaleInventory}
-                team={team}
                 news={news}
             />
         </>

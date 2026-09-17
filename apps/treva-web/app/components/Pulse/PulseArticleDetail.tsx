@@ -10,6 +10,7 @@ import CallbackV2 from "@/app/components/HomeV2/V2Callback";
 import { Article } from "@/lib/pulse.types";
 import { BlockRenderer } from "./BlockRenderer";
 import { toAbsUrl } from "@/lib/pulse-api";
+import { FaGlobe, FaLinkedin } from "react-icons/fa6";
 import "./pulse-article.css";
 
 const AUTHOR_IMAGE_FALLBACK = "/assets/webflow-placeholder.svg";
@@ -420,6 +421,32 @@ const PulseArticleDetail: React.FC<PulseArticleDetailProps> = ({ locale, article
                               <div className="text-size-small">{article.authorTitle || "Ekspert"}</div>
                             </div>
                           </a>
+                          {(article.authorObj?.linkedin || article.authorObj?.website) && (
+                            <div className="article_author-social-links">
+                              {article.authorObj?.linkedin && (
+                                <a
+                                  href={article.authorObj.linkedin}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="article_author-website-link"
+                                  aria-label={`${article.author} LinkedIn profili`}
+                                >
+                                  <FaLinkedin size={18} aria-hidden="true" />
+                                </a>
+                              )}
+                              {article.authorObj?.website && (
+                                <a
+                                  href={article.authorObj.website}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="article_author-website-link"
+                                  aria-label={`${article.author} vebsaytı`}
+                                >
+                                  <FaGlobe size={18} aria-hidden="true" />
+                                </a>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
 
