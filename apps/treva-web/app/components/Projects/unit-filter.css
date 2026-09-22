@@ -522,6 +522,9 @@
 }
 
 .pagination-show-more {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
   min-width: 156px;
   padding: 13px 24px;
   border: none;
@@ -545,7 +548,8 @@
   background-color: #000000;
 }
 
-.pagination-show-more:disabled {
+.pagination-show-more:disabled,
+.pagination-show-more[aria-disabled="true"] {
   opacity: 0.6;
   cursor: default;
 }

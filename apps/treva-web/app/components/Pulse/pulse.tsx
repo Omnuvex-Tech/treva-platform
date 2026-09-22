@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from "@/app/components/HomeV2/V2Nav";
 import { HomeFooter } from "@/app/components/HomeV2/V2Footer";
 import CallbackV2 from "@/app/components/HomeV2/V2Callback";
@@ -11,8 +11,12 @@ import { toAbsUrl } from "@/lib/pulse-api";
 import "./pulse.css";
 import { ReadMoreOverlay } from "../ReadMoreOverlay";
 import { ButtonText } from '@/app/components/ButtonText';
+import { readPageParam, writePageParam } from '@/lib/page-param';
 
 const AUTHOR_IMAGE_FALLBACK = '/assets/webflow-placeholder.svg';
+
+/** Articles per "Show more" step — also what one `?page=` is worth. */
+const PULSE_PAGE_SIZE = 6;
 
 /** Pulse siyahı səhifəsinin mətnləri — əvvəl hamısı sabit azərbaycanca idi. */
 const pulsePageDictionary = {
@@ -341,8 +345,21 @@ function PulseHeaderSection({
 
 function PulseNewsSection({ locale, articles: initialArticles, weekArticles, categories }: { locale: string; articles: Article[]; weekArticles: Article[]; categories: { id: string; name: string; slug: string }[] }) {
   const pt = pulsePageDictionary[locale as keyof typeof pulsePageDictionary] ?? pulsePageDictionary.az;
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [visibleCount, setVisibleCount] = useState(PULSE_PAGE_SIZE);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // A direct `?page=N` visit (e.g. a crawler following "Show more") opens
+  // with N pages of articles already shown.
+  useEffect(() => {
+    setVisibleCount(readPageParam() * PULSE_PAGE_SIZE);
+  }, []);
+
+  const visiblePage = Math.ceil(visibleCount / PULSE_PAGE_SIZE);
+
+  const resetVisible = () => {
+    setVisibleCount(PULSE_PAGE_SIZE);
+    writePageParam(1);
+  };
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
 
   const weekSlugs = useMemo(() => new Set(weekArticles.map((a) => a.slug)), [weekArticles]);
@@ -370,24 +387,26 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setVisibleCount(6);
+    resetVisible();
   };
 
   const toggleCategory = (slug: string) => {
     setSelectedSlugs(prev =>
       prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
     );
-    setVisibleCount(6);
+    resetVisible();
   };
 
   const clearFilters = () => {
     setSelectedSlugs([]);
     setSearchQuery('');
-    setVisibleCount(6);
+    resetVisible();
   };
 
-  const handleViewMore = () => {
-    setVisibleCount(prev => prev + 6);
+  const handleViewMore = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setVisibleCount(prev => prev + PULSE_PAGE_SIZE);
+    writePageParam(visiblePage + 1);
   };
 
   return (
@@ -501,9 +520,11 @@ function PulseNewsSection({ locale, articles: initialArticles, weekArticles, cat
 
                 {visibleCount < gridArticles.length && (
                   <div className="news_view-more-container">
-                    <button onClick={handleViewMore} className="button is-view-more">
+                    {/* A real link to the next `?page=` so crawlers can follow
+                        it; a click still reveals more in place. */}
+                    <a href={`?page=${visiblePage + 1}`} onClick={handleViewMore} className="button is-view-more">
                       <ButtonText>{pt.showMore}</ButtonText>
-                    </button>
+                    </a>
                   </div>
                 )}
               </div>

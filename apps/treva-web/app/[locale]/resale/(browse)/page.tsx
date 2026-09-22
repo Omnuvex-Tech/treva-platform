@@ -164,10 +164,14 @@ function ResaleListing() {
     return out;
   }, [searchParams]);
 
-  const goToPage = (next: number) => {
+  const pageHref = (next: number) => {
     const sp = new URLSearchParams(searchParams.toString());
     sp.set('page', String(next));
-    router.replace(`?${sp.toString()}`, { scroll: false });
+    return `?${sp.toString()}`;
+  };
+
+  const goToPage = (next: number) => {
+    router.replace(pageHref(next), { scroll: false });
   };
 
   // "Show more" grows a single cumulative request instead of stitching pages
@@ -359,14 +363,19 @@ function ResaleListing() {
                 ></div>
               </div>
               {hasMore && (
-                <button
-                  type="button"
+                // A real link to the next `?page=` so crawlers can follow it;
+                // a click still appends in place instead of navigating.
+                <a
+                  href={pageHref(page + 1)}
                   className="re-load-more__btn"
-                  onClick={() => goToPage(page + 1)}
-                  disabled={isAppending}
+                  aria-disabled={isAppending}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    if (!isAppending) goToPage(page + 1);
+                  }}
                 >
                   {t.showMore}
-                </button>
+                </a>
               )}
             </footer>
           )}

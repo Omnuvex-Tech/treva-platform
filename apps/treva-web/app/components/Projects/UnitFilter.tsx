@@ -78,6 +78,13 @@ export default function UnitLayout() {
     [searchParams, router],
   );
 
+  // The current filters with the page bumped by one — the "Show more" href.
+  const nextPageHref = (() => {
+    const sp = new URLSearchParams(searchParams.toString());
+    sp.set('page', String(page + 1));
+    return `?${sp.toString()}`;
+  })();
+
   const dictionary = {
     az: {
       titleThin: 'Mənzil',
@@ -885,14 +892,19 @@ export default function UnitLayout() {
               ></div>
             </div>
             {page < pagination.totalPages && (
-              <button
-                type="button"
+              // A real link to the next `?page=` so crawlers can follow it;
+              // a click still appends in place instead of navigating.
+              <a
+                href={nextPageHref}
                 className="pagination-show-more"
-                onClick={() => commit({ page: page + 1 }, true)}
-                disabled={isAppending}
+                aria-disabled={isAppending}
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (!isAppending) commit({ page: page + 1 }, true);
+                }}
               >
                 {t.showMore}
-              </button>
+              </a>
             )}
           </div>
         )}

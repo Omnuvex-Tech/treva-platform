@@ -212,6 +212,9 @@
 }
 
 .re-load-more__btn {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
   min-width: 156px;
   padding: 13px 24px;
   border: none;
@@ -231,7 +234,8 @@
   background-color: #2f3134;
 }
 
-.re-load-more__btn:disabled {
+.re-load-more__btn:disabled,
+.re-load-more__btn[aria-disabled="true"] {
   opacity: 0.6;
   cursor: default;
 }
