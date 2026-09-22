@@ -47,7 +47,7 @@ export default async function HomePage({
 
     let pulseArticles: Article[] = [];
     try {
-        const result = await getArticles({ limit: 4 });
+        const result = await getArticles({ limit: 4, summary: true });
         pulseArticles = result.data.map(a => apiArticleToArticle(a, locale));
     } catch {
         pulseArticles = [];

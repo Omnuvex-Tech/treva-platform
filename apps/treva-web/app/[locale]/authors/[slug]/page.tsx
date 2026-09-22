@@ -124,7 +124,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
 
   try {
     const [apiArticlesRes, categoriesRes] = await Promise.all([
-      getArticles({ limit: 100 }),
+      getArticles({ limit: 100, summary: true }),
       getPulseCategories(),
     ]);
 

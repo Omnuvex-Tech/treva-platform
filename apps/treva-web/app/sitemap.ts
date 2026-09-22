@@ -81,7 +81,7 @@ async function projectSlugs(): Promise<string[]> {
 }
 
 async function pulseArticleSlugs(): Promise<string[]> {
-    const raw = await safeJson<unknown>(`${CMS_API}/pulse/articles?limit=1000`, []);
+    const raw = await safeJson<unknown>(`${CMS_API}/pulse/articles?limit=1000&fields=summary`, []);
     return asArray(raw)
         .map((item) => item?.slug)
         .filter((slug): slug is string => Boolean(slug));
