@@ -3962,8 +3962,11 @@ a.hv2-ct__entryvalue:hover {
     }
 
     /* Keep the phone and Cabinet buttons; drop the secondary icon actions. The
-       burger is one of them, so it has to opt back in. */
-    .hv2-nav__btn--icon:not(.hv2-nav__burger) {
+       burger is one of them, so it has to opt back in. Scoped to the header
+       row: unscoped, this rule sits later in the file than the equally
+       specific `.hv2-nav__mobile-actions .hv2-nav__btn--icon` and hid the
+       compare / saved / language icons inside the open menu too. */
+    .hv2-nav__actions .hv2-nav__btn--icon:not(.hv2-nav__burger) {
         display: none;
     }
 
