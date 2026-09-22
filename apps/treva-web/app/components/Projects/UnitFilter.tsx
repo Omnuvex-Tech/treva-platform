@@ -770,7 +770,7 @@ export default function UnitLayout() {
                 <button
                   key={room.id}
                   type="button"
-                  className={`room-btn ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
+                  className={`room-btn ${room.labelKey === 'studio' ? 'room-btn--studio' : ''} ${selectedRooms === room.id ? 'room-btn--active' : ''}`}
                   onClick={() => commit({ rooms: selectedRooms === room.id ? null : room.id })}
                 >
                   <span className="room-btn__text">{room.labelKey ? t[room.labelKey] : room.label}</span>

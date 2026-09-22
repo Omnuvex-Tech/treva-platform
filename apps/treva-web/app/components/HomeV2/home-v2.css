@@ -3748,6 +3748,16 @@ a.hv2-ct__entryvalue:hover {
     .hv2-about__cards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    /* The desktop pull (a full gutter + 1px) runs the card past the screen
+       edge once the shell column is full-width, clipping its rounded
+       corners. Pull back only half the gutter so the card floats clear of
+       the edges, and give the other half back as padding so the logo still
+       lines up with the page column. */
+    .hv2-nav__inner {
+        margin-inline: calc((var(--hv2-pad) / 2 + 1px) * -1);
+        padding-inline: calc(var(--hv2-pad) / 2);
+    }
 }
 
 @media (max-width: 768px) {
@@ -3775,9 +3785,21 @@ a.hv2-ct__entryvalue:hover {
 
     /* Header is 64 of content: an even 12 above and below the 40 burger, with
        the bar's own 1px border underneath that (see `.hv2-nav__bar`). */
+    /* Half-gutter inline padding — see the 1024px block. */
     .hv2-nav__inner {
         gap: 16px;
-        padding: 12px var(--hv2-pad);
+        padding: 12px calc(var(--hv2-pad) / 2);
+    }
+
+    /* Same 8px gap above the scrolled card as at its sides. */
+    .hv2-nav--scrolled .hv2-nav__bar {
+        transform: translateY(8px);
+    }
+
+    /* The menu sheet follows it down, keeping its 8px gap under the card. */
+    .hv2-nav--scrolled .hv2-nav__mobile {
+        translate: 0 16px;
+        max-height: calc(100vh - var(--hv2-nav-h) - 16px);
     }
 
     /* Only the logo and the burger survive; the design hides the rest behind it. */
@@ -4046,6 +4068,15 @@ a.hv2-ct__entryvalue:hover {
         letter-spacing: 0.25px;
     }
 
+    /* At 32px the Russian title needs three lines on a phone and the subtitle
+       lands on the VA artwork. Scale it with the viewport so "Внутренний
+       кредитный" stays on one line and the title keeps to two, as in az/en. */
+    .hv2-calc[data-locale="ru"] .hv2-calc__title {
+        font-size: clamp(20px, 5.9vw, 32px);
+        line-height: 1.25;
+        letter-spacing: 0;
+    }
+
     .hv2-calc__subtitle {
         margin: 8px 0 0 12px;
     }
@@ -4302,5 +4333,49 @@ a.hv2-ct__entryvalue:hover {
     .hv2-about__title {
         font-size: 24px;
         line-height: 32px;
+    }
+}
+
+/* Calculator card, tablet and large phones (481–1024). The card is a wide
+   landscape strip here, but its art is portrait (400x568): `cover` blew it up
+   and parked a giant VA right behind the title. Title runs on one line (two
+   on the narrow end) and the art sits whole at the card's right end, its left
+   edge faded into the card's own fill so there is no hard seam. Placed after
+   the 768px blocks on purpose — it overrides their mobile card. */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .hv2-calc {
+        min-height: 380px;
+        padding: 28px 32px 32px;
+        background-image: none;
+        isolation: isolate;
+    }
+
+    .hv2-calc::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 0 auto;
+        z-index: -1;
+        /* Exactly the art's own box at the card's height, so the fade below
+           lands on the image and not on empty space beside it. */
+        aspect-ratio: 400 / 568;
+        background: url("/va-art.jpg") center / cover no-repeat;
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 40%);
+        mask-image: linear-gradient(to right, transparent, #000 40%);
+        pointer-events: none;
+    }
+
+    /* [data-locale] matches the phone-only Russian override's specificity. */
+    .hv2-calc .hv2-calc__title,
+    .hv2-calc[data-locale] .hv2-calc__title {
+        margin-left: 0;
+        max-width: none;
+        font-size: 28px;
+        line-height: 40px;
+        letter-spacing: -0.01em;
+    }
+
+    .hv2-calc .hv2-calc__subtitle {
+        margin: 0;
+        font-size: 16px;
     }
 }

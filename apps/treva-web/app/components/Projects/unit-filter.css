@@ -607,6 +607,15 @@
     font-size: 15px;
   }
 
+  /* The circle is a fixed 48px here, so the word ("Studiya" / "Studio" /
+     "Студия") has to shrink to fit inside it instead of spilling past the
+     border. Padding is dropped so the full inner width is available. */
+  .room-btn--studio {
+    padding: 0;
+    font-size: 11px;
+    letter-spacing: -0.02em;
+  }
+
   .complex-banner {
     height: auto;
     padding: 32px 20px;

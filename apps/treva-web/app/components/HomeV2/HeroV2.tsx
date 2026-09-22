@@ -15,7 +15,9 @@ export default function HeroV2({ locale }: Props) {
     <section className="hv2-shell">
       <div className="hv2-hero">
         {/* Internal Credit Calculator — va.svg is the card artwork (see home-v2.css). */}
-        <div className="hv2-calc">
+        {/* data-locale: the Russian title is much longer than the other two
+            and gets its own sizing in home-v2.css. */}
+        <div className="hv2-calc" data-locale={locale}>
           <h2 className="hv2-calc__title">{dict.calculator.title}</h2>
           <p className="hv2-calc__subtitle">{dict.calculator.subtitle}</p>
 
