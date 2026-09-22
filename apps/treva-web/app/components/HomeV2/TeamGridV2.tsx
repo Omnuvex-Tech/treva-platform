@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { readPageParam, writePageParam } from "@/lib/page-param";
 import { getDict } from "./dictionary";
 import type { TeamMember } from "./data";
 
@@ -28,8 +29,15 @@ export default function TeamGridV2({ locale, members }: Props) {
   const dict = getDict(locale);
   const [count, setCount] = useState(STEP);
 
+  // A direct `?page=N` visit (e.g. a crawler following "more") opens with N
+  // steps of the team already shown.
+  useEffect(() => {
+    setCount(readPageParam() * STEP);
+  }, []);
+
   const visible = members.slice(0, count);
   const canShowMore = count < members.length;
+  const nextPage = Math.ceil(count / STEP) + 1;
 
   return (
     <>
@@ -57,13 +65,19 @@ export default function TeamGridV2({ locale, members }: Props) {
 
       {canShowMore ? (
         <div className="hv2-center">
-          <button
-            type="button"
+          {/* A real link to the next `?page=` so crawlers can follow it; a
+              click still reveals more in place. */}
+          <a
+            href={`?page=${nextPage}`}
             className="hv2-pill hv2-pill--dark hv2-pill--cta"
-            onClick={() => setCount((c) => c + STEP)}
+            onClick={(event) => {
+              event.preventDefault();
+              setCount((c) => c + STEP);
+              writePageParam(nextPage);
+            }}
           >
             {dict.about.teamMore}
-          </button>
+          </a>
         </div>
       ) : null}
     </>
