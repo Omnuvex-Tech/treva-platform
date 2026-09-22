@@ -103,12 +103,19 @@ export async function getArticles(params?: {
     category?: string;
     page?: number;
     limit?: number;
+    /**
+     * Card data only — cms-api leaves out the article body (`blocks`) and the
+     * nested `selectedArticles`, which are most of the payload. Every list
+     * page wants this; only code that needs the full article must not.
+     */
+    summary?: boolean;
 }): Promise<PaginatedResponse<ApiArticle>> {
     const searchParams = new URLSearchParams();
     if (params?.q) searchParams.set("q", params.q);
     if (params?.category) searchParams.set("category", params.category);
     if (params?.page) searchParams.set("page", String(params.page));
     if (params?.limit) searchParams.set("limit", String(params.limit));
+    if (params?.summary) searchParams.set("fields", "summary");
 
     const url = `${API}/pulse/articles${searchParams.toString() ? `?${searchParams}` : ""}`;
     const res = await fetch(url, { next: { revalidate: 60 } });

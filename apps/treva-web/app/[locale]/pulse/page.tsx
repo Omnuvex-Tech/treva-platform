@@ -9,6 +9,7 @@ import {
     getPulseCategories,
     apiArticleToArticle,
     getLocalized,
+    type ApiArticle,
 } from "@/lib/pulse-api";
 import { Article } from "@/lib/pulse.types";
 
@@ -30,32 +31,32 @@ export default async function PulseRoute({ params }: { params: Promise<{ locale:
         notFound();
     }
 
-    let articles: Article[] = [];
-    let leftArticles: Article[] = [];
-    let centerArticle: Article | null = null;
-    let rightArticles: Article[] = [];
-    let weekArticles: Article[] = [];
-    let categories: { id: string; name: string; slug: string }[] = [];
+    // allSettled, not all: the six requests are independent, so one slow or
+    // failed call (usually the heavy article list) must not blank the whole
+    // page — every block that did load is still shown.
+    const [allResult, left, center, right, week, cats] = await Promise.allSettled([
+        getArticles({ limit: 50, summary: true }),
+        getHeaderArticles("left"),
+        getHeaderArticles("center"),
+        getHeaderArticles("right"),
+        getHeaderArticles("week"),
+        getPulseCategories(),
+    ]);
 
-    try {
-        const [allResult, left, center, right, week, cats] = await Promise.all([
-            getArticles({ limit: 50 }),
-            getHeaderArticles("left"),
-            getHeaderArticles("center"),
-            getHeaderArticles("right"),
-            getHeaderArticles("week"),
-            getPulseCategories(),
-        ]);
-        articles = allResult.data.map(a => apiArticleToArticle(a, locale));
-        leftArticles = left.map(a => apiArticleToArticle(a, locale));
-        centerArticle = center[0] ? apiArticleToArticle(center[0], locale) : null;
-        rightArticles = right.map(a => apiArticleToArticle(a, locale));
-        weekArticles = week.map(a => apiArticleToArticle(a, locale));
-        categories = cats.map((c) => ({ id: c.id, name: getLocalized(c.name, locale), slug: c.slug }));
-    } catch {
-        articles = [];
-    }
-    
+    const toArticles = (result: PromiseSettledResult<ApiArticle[]>): Article[] =>
+        result.status === "fulfilled" ? result.value.map((a) => apiArticleToArticle(a, locale)) : [];
+
+    const articles: Article[] =
+        allResult.status === "fulfilled" ? allResult.value.data.map((a) => apiArticleToArticle(a, locale)) : [];
+    const leftArticles = toArticles(left);
+    const centerArticle: Article | null = toArticles(center)[0] ?? null;
+    const rightArticles = toArticles(right);
+    const weekArticles = toArticles(week);
+    const categories =
+        cats.status === "fulfilled"
+            ? cats.value.map((c) => ({ id: c.id, name: getLocalized(c.name, locale), slug: c.slug }))
+            : [];
+
 
     return (
         <>

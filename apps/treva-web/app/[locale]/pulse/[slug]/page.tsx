@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
   }
 
   try {
-    const result = await getArticles({ limit: 10 });
+    const result = await getArticles({ limit: 10, summary: true });
     const all = result.data.map(a => apiArticleToArticle(a, locale));
     if (sidebarArticles.length === 0) {
       sidebarArticles = all.filter((a) => a.slug !== slug).slice(0, 4);
@@ -87,7 +87,7 @@ export default async function Page({ params }: Props) {
 
 export async function generateStaticParams() {
   try {
-    const result = await getArticles({ limit: 200 });
+    const result = await getArticles({ limit: 200, summary: true });
     const locales = ["az", "en", "ru"];
     const params: { locale: string; slug: string }[] = [];
     for (const locale of locales) {
