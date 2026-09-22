@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { apartmentsApi, CreateApartmentData, type ApartmentFurnishing, type ApartmentRenovation, UploadResponse } from "../../api/apartments";
+import { apartmentsApi, CreateApartmentData, UploadResponse } from "../../api/apartments";
 import { apartmentTypesApi, ApartmentType } from "../../api/apartment-types";
 import { ownersApi, Owner } from "../../api/owners";
 import { attributesApi, Attribute } from "../../api/attributes";
@@ -296,6 +296,40 @@ function BinarySwitchField({
     );
 }
 
+function CheckboxField({
+    label,
+    checkedLabel,
+    checked,
+    onChange,
+}: {
+    label: string;
+    checkedLabel: string;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+}) {
+    return (
+        <div className="inline-flex w-fit max-w-full self-start flex-col">
+            <span className="mb-1.5 block text-xs font-medium text-[#4E525D]">{label}</span>
+            <label className="inline-flex w-fit max-w-full min-h-[52px] cursor-pointer select-none items-center gap-3 rounded-[20px] border border-[#ECEEF2] bg-[#F8F9FB] px-4 py-2">
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => onChange(e.target.checked)}
+                    className="sr-only"
+                />
+                {checked ? (
+                    <img src="/images/inv-dashboard/inv-offplan/checkbox-checked.svg" alt="" className="h-5 w-5" />
+                ) : (
+                    <img src="/images/inv-dashboard/inv-offplan/checkbox.svg" alt="" className="h-5 w-5 opacity-60" />
+                )}
+                <span className={`text-sm leading-5 ${checked ? "font-semibold text-[#1A1A1A]" : "font-medium text-[#9AA1AF]"}`}>
+                    {checkedLabel}
+                </span>
+            </label>
+        </div>
+    );
+}
+
 export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {}) {
     const { id } = useParams();
     const isEdit = Boolean(id);
@@ -456,11 +490,11 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
         locationTitle: "",
         locationUrl: "",
         locationGoogleMapsUrl: "",
-        renovation: undefined,
-        mortgage: undefined,
-        extract: undefined,
+        renovation: "non-renovated",
+        mortgage: false,
+        extract: false,
         buildingAge: undefined as unknown as number,
-        furnishing: undefined,
+        furnishing: "unfurnished",
         ceilingHeight: undefined as unknown as number,
         apartmentTypeId: "",
         categoryId: "",
@@ -502,11 +536,11 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                 locationTitle: d.locationTitle || "",
                 locationUrl: d.locationUrl || "",
                 locationGoogleMapsUrl: d.locationGoogleMapsUrl || "",
-                renovation: d.renovation || undefined,
-                mortgage: d.mortgage ?? undefined,
-                extract: d.extract ?? undefined,
+                renovation: d.renovation || "non-renovated",
+                mortgage: d.mortgage ?? false,
+                extract: d.extract ?? false,
                 buildingAge: d.buildingAge ?? undefined,
-                furnishing: d.furnishing || undefined,
+                furnishing: d.furnishing || "unfurnished",
                 ceilingHeight: d.ceilingHeight ?? undefined,
                 apartmentTypeId: d.apartmentTypeId || "",
                 categoryId: d.categoryId || "",
@@ -1211,39 +1245,35 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     />
                                 </div>
                                 <div>
-                                    <BinarySwitchField
+                                    <CheckboxField
                                         label="Renovation"
-                                        value={form.renovation}
-                                        leftOption={{ id: "renovated", label: "Renovated" }}
-                                        rightOption={{ id: "non-renovated", label: "Unrenovated" }}
-                                        onChange={(id) => updateField("renovation", id as ApartmentRenovation)}
+                                        checkedLabel="Renovated"
+                                        checked={form.renovation === "renovated"}
+                                        onChange={(checked) => updateField("renovation", checked ? "renovated" : "non-renovated")}
                                     />
                                 </div>
                                 <div>
-                                    <BinarySwitchField
+                                    <CheckboxField
                                         label="Furnishing"
-                                        value={form.furnishing}
-                                        leftOption={{ id: "furnished", label: "Furnished" }}
-                                        rightOption={{ id: "unfurnished", label: "Unfurnished" }}
-                                        onChange={(id) => updateField("furnishing", id as ApartmentFurnishing)}
+                                        checkedLabel="Furnished"
+                                        checked={form.furnishing === "furnished"}
+                                        onChange={(checked) => updateField("furnishing", checked ? "furnished" : "unfurnished")}
                                     />
                                 </div>
                                 <div>
-                                    <BinarySwitchField
+                                    <CheckboxField
                                         label="Mortgage"
-                                        value={form.mortgage === undefined ? undefined : String(form.mortgage)}
-                                        leftOption={{ id: "true", label: "Yes" }}
-                                        rightOption={{ id: "false", label: "No" }}
-                                        onChange={(id) => updateField("mortgage", id === "true")}
+                                        checkedLabel="Mortgage available"
+                                        checked={form.mortgage === true}
+                                        onChange={(checked) => updateField("mortgage", checked)}
                                     />
                                 </div>
                                 <div>
-                                    <BinarySwitchField
+                                    <CheckboxField
                                         label="Extract"
-                                        value={form.extract === undefined ? undefined : String(form.extract)}
-                                        leftOption={{ id: "true", label: "Yes" }}
-                                        rightOption={{ id: "false", label: "No" }}
-                                        onChange={(id) => updateField("extract", id === "true")}
+                                        checkedLabel="Extract available"
+                                        checked={form.extract === true}
+                                        onChange={(checked) => updateField("extract", checked)}
                                     />
                                 </div>
                             </div>
