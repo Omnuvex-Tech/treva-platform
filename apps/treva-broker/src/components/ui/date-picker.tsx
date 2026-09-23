@@ -3,7 +3,7 @@
 import { Calendar03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/providers/i18n-provider";
@@ -24,6 +24,9 @@ export interface DatePickerProps {
     disabled?: boolean;
     id?: string;
     containerClassName?: string;
+    /** Drawn before the value instead of the trailing calendar glyph. */
+    leadingIcon?: ReactNode;
+    triggerClassName?: string;
 }
 
 function pad(value: number) {
@@ -87,6 +90,8 @@ export function DatePicker({
     disabled,
     id,
     containerClassName,
+    leadingIcon,
+    triggerClassName,
 }: DatePickerProps) {
     const { locale, t } = useI18n();
     const generatedId = useId();
@@ -245,17 +250,21 @@ export function DatePicker({
                     open && "border-border-brand bg-bg-primary",
                     "disabled:cursor-not-allowed disabled:opacity-60",
                     error && "border-content-negative",
+                    triggerClassName,
                 )}
             >
+                {leadingIcon}
                 <span className={cn("flex-1 truncate", !displayValue && "text-content-tertiary")}>
-                    {displayValue || placeholder || t.common.datePicker.placeholder}
+                    {displayValue || (placeholder ?? t.common.datePicker.placeholder)}
                 </span>
-                <HugeiconsIcon
-                    icon={Calendar03Icon}
-                    size={16}
-                    strokeWidth={1.6}
-                    className="shrink-0 text-content-tertiary"
-                />
+                {leadingIcon ? null : (
+                    <HugeiconsIcon
+                        icon={Calendar03Icon}
+                        size={16}
+                        strokeWidth={1.6}
+                        className="shrink-0 text-content-tertiary"
+                    />
+                )}
             </button>
 
             {name ? <input type="hidden" name={name} value={value} /> : null}

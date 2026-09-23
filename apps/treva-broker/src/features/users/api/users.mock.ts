@@ -17,7 +17,7 @@ export async function list(query: UserListQuery = {}): Promise<Paginated<Platfor
 
     // The artboard's search box reads "by name, surname, or phone number"
     // (873:48498), so email and organization are not matched here.
-    let filtered = searchBy(users, query.search, ["firstName", "lastName", "phone"]);
+    let filtered = searchBy(users, query.search, ["firstName", "lastName", "phones"]);
 
     if (query.status && query.status !== "all") {
         filtered = filtered.filter((user) => user.status === query.status);
@@ -92,12 +92,11 @@ export async function create(input: UserInput): Promise<PlatformUser> {
         lastName: input.lastName,
         email,
         password: input.password || firstLoginPassword(input.firstName),
-        phone: input.phone,
+        phones: input.phones,
         role: input.role,
         organization: input.organization,
         jobTitle: input.jobTitle,
         cooperationType: input.cooperationType,
-        agentlik: input.agentlik,
         agency: input.agency,
         accessPermission: input.accessPermission,
         // A new account has not signed in yet, so it starts as invited unless it

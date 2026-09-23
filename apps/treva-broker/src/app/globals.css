@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* The shared Tiptap editor from @repo/ui is styled with Tailwind classes. */
+@source "../../../../packages/ui/src/components/RichTextEditor";
 
 /* ---------------------------------------------------------------------------
  * TREVA Broker — design tokens
@@ -155,6 +157,13 @@
     --color-content-notice-bold: #967b38; /* Content/Notice Bold */
     --color-content-negative-bold: #c3362b; /* Content/Negative Bold */
     --color-border-positive: #00c274; /* Border/Positive — the Available swatch edge */
+    /* The article cover's corner (920:11710). Plain CSS for the reason given
+       above: a new @theme radius stayed at Tailwind's 1rem default in the
+       running build. Consumed as `rounded-[var(--radius-5xl)]`. */
+    --radius-5xl: 24px; /* Border radius/5XL */
+    /* Chrome's own autofill blue, so a filled field reads the way the browser
+       draws it — but painted by us across the whole box (see the base layer). */
+    --color-bg-autofill: #e8f0fe;
 }
 
 /* ---------------------------------------------------------------------------
@@ -167,6 +176,55 @@
 
     html {
         -webkit-text-size-adjust: 100%;
+    }
+
+    /* A <button> renders with the UA's `cursor: default`, and preflight does
+       not put a pointer back — so every button in this app was missing the
+       affordance that the same control has in treva-inventory, which carries
+       exactly this rule. Kept inside @layer base rather than unlayered (the
+       shape inventory uses) so the `cursor-not-allowed` / `cursor-default`
+       utilities this app already writes on individual controls still win. */
+    a[href],
+    button:not(:disabled),
+    summary,
+    select:not(:disabled),
+    label[for],
+    input[type="button"]:not(:disabled),
+    input[type="submit"]:not(:disabled),
+    input[type="reset"]:not(:disabled),
+    input[type="checkbox"]:not(:disabled),
+    input[type="radio"]:not(:disabled) {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    select:disabled,
+    input:disabled {
+        cursor: not-allowed;
+    }
+
+    /* An autofilled field turns light blue, as the login fields do — but the
+       whole field, edge to edge.
+
+       The browser paints that fill on the <input> alone, and most fields here
+       draw their border, radius and padding on a wrapper around a transparent
+       input (components/ui/input.tsx), so the fill stopped short of the box
+       and left strips at both ends and in the rounded corners. So the fill is
+       ours instead: the UA's own (which is !important and cannot be restyled)
+       is held off by pushing its transition out indefinitely, the input
+       paints --color-bg-autofill as an inset shadow — which follows its
+       radius, so a field that is its own box (login) fills completely — and
+       the Input wrapper paints the same colour behind its padding. The UA also
+       forces the text to pure black; put the app's ink back. */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        box-shadow: inset 0 0 0 1000px var(--color-bg-autofill);
+        -webkit-text-fill-color: var(--color-content-primary);
+        caret-color: var(--color-content-primary);
+        transition: background-color 9999s ease-out 0s;
     }
 
     body {
@@ -243,6 +301,18 @@
     }
 }
 
+/* Scrolls without drawing a bar. For panels whose artboard has no scrollbar
+   and whose layout is measured to the pixel — a gutter there would push the
+   News Feed grid from three 263px columns down to two. Wheel, touch and
+   keyboard scrolling are unaffected. */
+@utility scrollbar-none {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 @keyframes dialog-in {
     from {
         opacity: 0;
@@ -259,5 +329,22 @@
 @keyframes dialog-backdrop-in {
     from {
         background-color: rgb(0 0 0 / 0);
+    }
+}
+
+/* ── Sign-up step entry ───────────────────────────────────────────────────
+   Sign-up swaps the content of one kept card on every step — type choice to
+   company setup to credentials — with a plain conditional render, no exit
+   lifecycle to animate against. Applied via
+   `motion-safe:animate-[step-in_260ms_ease-out]` (see register-view.tsx and
+   register-type-view.tsx), `motion-safe:` alone getting reduced-motion users
+   the plain instant swap rather than a second keyframe.
+
+   Opacity only, deliberately: the card behind this content is animating its
+   own height at the same time, and the column re-centres it as it grows. That
+   is the movement — a translate here would be a second one fighting it. */
+@keyframes step-in {
+    from {
+        opacity: 0;
     }
 }

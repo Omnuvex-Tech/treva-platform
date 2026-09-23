@@ -1,20 +1,28 @@
 "use client";
 
-import { Add01Icon, MinusSignIcon } from "@hugeicons/core-free-icons";
+import { MinusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useId, useState, type FormEvent } from "react";
 
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { isApiError } from "@/lib/api/errors";
-import { MOCK_PROJECTS } from "@/mocks/projects";
+import { useProjectsList } from "@/features/projects/hooks/use-projects";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
 import { useCreateClient, useUpdateClient } from "../hooks/use-clients";
 import type { Client, ClientInput } from "../types";
+
+/**
+ * The fields' text sits 8px from the outer edge in the artboard — Figma counts
+ * the 1px stroke inside that padding, CSS adds it outside — so the input takes
+ * the pixel back.
+ */
+const FIELD_TEXT = "-ml-px";
 
 export interface ClientFormProps {
     client: Client | null;
@@ -52,10 +60,20 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
     const editing = client !== null;
     const pending = createClient.isPending || updateClient.isPending;
 
-    const projectOptions = MOCK_PROJECTS.map((project) => ({
-        value: project.name,
-        label: project.name,
-    }));
+    // The Projects screen's own list, not fixtures: Object of interest offers
+    // the objects an admin actually added. 100 is the API's ceiling and the
+    // field is a picker, so it takes one page and no pager.
+    const projects = useProjectsList({ page: 1, perPage: 100 });
+
+    const projectNames = (projects.data?.items ?? []).map((project) => project.name);
+    // A client saved against a project that has since been renamed or deleted
+    // keeps its value as an option of its own, so opening the form to edit a
+    // phone number cannot silently blank the field.
+    const saved = client?.objectOfInterest ?? "";
+    const projectOptions = [
+        ...(saved && !projectNames.includes(saved) ? [saved] : []),
+        ...projectNames,
+    ].map((name) => ({ value: name, label: name }));
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -101,6 +119,7 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                         label={t.clients.form.name}
                         surface="form"
                         size="sm"
+                        className={FIELD_TEXT}
                         defaultValue={client?.firstName}
                         required
                     />
@@ -109,6 +128,7 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                         label={t.clients.form.surname}
                         surface="form"
                         size="sm"
+                        className={FIELD_TEXT}
                         defaultValue={client?.lastName}
                     />
 
@@ -123,6 +143,7 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                                 placeholder="+994"
                                 surface="form"
                                 size="sm"
+                                className={FIELD_TEXT}
                                 defaultValue={client?.phone}
                                 required
                             />
@@ -135,7 +156,7 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                                 title={t.clients.form.addPhone}
                                 onClick={() => setExtraPhones((current) => [...current, ""])}
                             >
-                                <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />
+                                <AssetIcon src="/images/news/icon-plus.svg" size={16} className="text-content-brand" />
                             </Button>
                         </div>
 
@@ -150,6 +171,7 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                                     placeholder="+994"
                                     surface="form"
                                     size="sm"
+                                    className={FIELD_TEXT}
                                     value={value}
                                     onChange={(event) =>
                                         setExtraPhones((current) =>
@@ -191,19 +213,37 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                         label={t.clients.form.email}
                         surface="form"
                         size="sm"
+                        className={FIELD_TEXT}
                         defaultValue={client?.email}
                     />
                 </div>
 
-                <Select
-                    name="objectOfInterest"
-                    label={t.clients.form.objectOfInterest}
-                    placeholder={t.clients.form.objectOfInterestPlaceholder}
-                    defaultValue={client?.objectOfInterest ?? ""}
-                    options={projectOptions}
-                    className="h-9 border-border-tertiary bg-bg-primary pr-3 pl-4"
-                    required
-                />
+                {/* One cell of the same two-column grid the fields above and
+                    below use: as the form's own child it stretched the full
+                    width and read as a different kind of field. */}
+                <div className="grid gap-x-6 gap-y-4 md:grid-cols-2">
+                    <Select
+                        name="objectOfInterest"
+                        label={t.clients.form.objectOfInterest}
+                        placeholder={t.clients.form.objectOfInterestPlaceholder}
+                        defaultValue={client?.objectOfInterest ?? ""}
+                        options={projectOptions}
+                        disabled={projects.isPending}
+                        // 16 / 12 in the artboard (I873:49395;8154:5399), less the 1px
+                        // edge CSS adds outside the padding and Figma counts inside.
+                        className="h-9 border-border-tertiary bg-bg-primary pr-[11px] pl-[15px]"
+                        // `direction-down 01`: a 9.6x4.6 glyph centred in a 20px box.
+                        icon={
+                            <AssetIcon
+                                src="/images/clients/icon-direction-down.svg"
+                                size={20}
+                                glyph={{ width: 9.58346, height: 4.58352 }}
+                                className="text-content-tertiary"
+                            />
+                        }
+                        required
+                    />
+                </div>
 
                 <div className="grid gap-x-6 gap-y-4 md:grid-cols-2">
                     <Input
@@ -212,6 +252,7 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                         placeholder={t.clients.form.developerBrand}
                         surface="form"
                         size="sm"
+                        className={FIELD_TEXT}
                         defaultValue={client?.developerBrand}
                     />
                     <Input
@@ -220,16 +261,33 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                         placeholder={t.clients.form.website}
                         surface="form"
                         size="sm"
+                        className={FIELD_TEXT}
                         defaultValue={client?.website}
                     />
                 </div>
 
-                <Textarea
-                    name="comments"
-                    label={t.clients.form.comments}
-                    defaultValue={client?.comments}
-                    className="h-[120px] rounded-lg border-border-tertiary bg-bg-primary p-3"
-                />
+                {/* The artboard's own 12px Resizer sits 5px up and 4px in
+                    (I873:49399;8083:6023); the native grip is made transparent
+                    so only that one shows, and the box still resizes. */}
+                <div className="relative">
+                    <Textarea
+                        name="comments"
+                        label={t.clients.form.comments}
+                        defaultValue={client?.comments}
+                        className="h-[120px] rounded-lg border-border-tertiary bg-bg-primary p-[11px] [&::-webkit-resizer]:bg-transparent"
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the grip glyph exported from the artboard */}
+                    <img
+                        src="/images/news/editor/resizer.svg"
+                        alt=""
+                        width={12}
+                        height={12}
+                        // Matched against the artboard render rather than its
+                        // nominal 5 / 4 offsets, which land the half-pixel
+                        // strokes a pixel low and right in the browser.
+                        className="pointer-events-none absolute right-[5px] bottom-[6px] size-[12.35px]"
+                    />
+                </div>
 
                 {/* The consent line carries a link, so the label is written out
                     here rather than passed to Checkbox as a string. */}
@@ -259,7 +317,8 @@ export function ClientForm({ client, onDone, onCancel }: ClientFormProps) {
                     <Button
                         type="submit"
                         size="sm"
-                        className="h-9 min-w-[162px] rounded-lg px-3.5"
+                        // 14/Medium (I873:49402;8272:10834); `sm` alone is the 12px label.
+                        className="h-9 min-w-[162px] rounded-lg px-3.5 text-sm"
                         loading={pending}
                     >
                         {t.clients.form.submit}

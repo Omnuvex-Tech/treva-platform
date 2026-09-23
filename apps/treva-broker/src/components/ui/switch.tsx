@@ -39,9 +39,10 @@ export function Switch({ label, className, id, ...props }: SwitchProps) {
                     )}
                     {...props}
                 />
+                {/* A flat white knob — the master (6116:2252) carries no effect. */}
                 <span
                     aria-hidden
-                    className="pointer-events-none absolute top-0.5 left-0.5 size-4 rounded-pill bg-bg-primary shadow-l2 transition-transform peer-checked:translate-x-3"
+                    className="pointer-events-none absolute top-0.5 left-0.5 size-4 rounded-pill bg-bg-primary transition-transform peer-checked:translate-x-3"
                 />
             </span>
 

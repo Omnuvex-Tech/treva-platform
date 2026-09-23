@@ -2,7 +2,14 @@ import { delay, paginate, searchBy } from "@/lib/api/mock";
 import { ApiError } from "@/lib/api/errors";
 import type { Paginated } from "@/lib/api/types";
 import { MOCK_NEWS, MOCK_NEWS_STATS } from "@/mocks/news";
-import { EMPTY_VISIBILITY, type NewsInput, type NewsListQuery, type NewsPost, type NewsStats } from "../types";
+import {
+    EMPTY_VISIBILITY,
+    type NewsInput,
+    type NewsListQuery,
+    type NewsPost,
+    type NewsStats,
+    type UploadedFile,
+} from "../types";
 
 /**
  * In-memory store. Mutations are applied to this array so create/edit/delete
@@ -35,9 +42,17 @@ export async function pinned(): Promise<NewsPost[]> {
     return posts.filter((post) => post.pinned);
 }
 
+/** Which posts this session has opened; the API keeps a row per user instead. */
+const read = new Set<string>();
+
 export async function stats(): Promise<NewsStats> {
     await delay(180);
-    return MOCK_NEWS_STATS;
+
+    // Unread is counted rather than served from the fixture so opening a post
+    // moves the number here too — a draft is not news yet, as the API has it.
+    const unread = posts.filter((post) => post.status !== "draft" && !read.has(post.id)).length;
+
+    return { ...MOCK_NEWS_STATS, unread };
 }
 
 export async function detail(id: string): Promise<NewsPost> {
@@ -47,6 +62,15 @@ export async function detail(id: string): Promise<NewsPost> {
     if (!post) throw new ApiError("News post not found", 404, "not_found");
 
     return post;
+}
+
+export async function markRead(id: string): Promise<void> {
+    await delay(120);
+
+    const post = posts.find((entry) => entry.id === id);
+    if (!post) throw new ApiError("News post not found", 404, "not_found");
+
+    read.add(id);
 }
 
 export async function create(input: NewsInput): Promise<NewsPost> {
@@ -65,6 +89,7 @@ export async function create(input: NewsInput): Promise<NewsPost> {
         status: input.status ?? "draft",
         attachments: input.attachments ?? [],
         visibility: input.visibility ?? EMPTY_VISIBILITY,
+        language: input.language ?? "",
         publishAt: input.publishAt ?? "",
         expiresAt: input.expiresAt ?? "",
     };
@@ -93,4 +118,11 @@ export async function remove(id: string): Promise<void> {
     }
 
     posts = posts.filter((entry) => entry.id !== id);
+}
+
+/** Nothing is stored: the file lives in this tab as a blob URL until reload. */
+export async function upload(file: File): Promise<UploadedFile> {
+    await delay(300);
+
+    return { url: URL.createObjectURL(file), name: file.name, sizeBytes: file.size, mimeType: file.type };
 }

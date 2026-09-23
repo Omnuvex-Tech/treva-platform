@@ -7,6 +7,8 @@
         "dev": "turbo run dev",
         "api:db:dev": "npm --prefix apps/treva-api run db:dev",
         "api:db:deploy": "npm --prefix apps/treva-api run db:deploy",
+        "broker-api:db:dev": "npm --prefix apps/treva-broker-api run db:dev",
+        "broker-api:db:deploy": "npm --prefix apps/treva-broker-api run db:deploy",
         "lint": "turbo run lint",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
         "check-types": "turbo run check-types"

@@ -41,7 +41,9 @@
       "selectFile": "Fayl seçin",
       "tooLarge": "{name} {limit} həddini aşır və əlavə edilmədi",
       "enterToAdd": "Əlavə etmək üçün Enter basın",
-      "selectFirst": "Əvvəlcə fayl seçin"
+      "selectFirst": "Əvvəlcə fayl seçin",
+      "uploading": "Yüklənir…",
+      "uploadFailed": "{name} yüklənə bilmədi"
     }
   },
   "nav": {
@@ -50,7 +52,7 @@
     "brokerRole": "Broker rolu",
     "finance": "Maliyyə",
     "projects": "Layihələr",
-    "floorPlan": "Mərtəbə planı",
+    "floorPlan": "Magazine",
     "adminPanel": "Admin panel",
     "users": "İstifadəçilər",
     "listings": "Elanlar",
@@ -60,11 +62,12 @@
     "welcomeTitle": "TREVA-ya xoş gəlmisiniz",
     "welcomeSubtitle": "Premium daşınmaz əmlak idarəetmə platforması",
     "email": "E-poçt ünvanı",
-    "emailPlaceholder": "admin@treva.az",
+    "emailPlaceholder": "info@treva.realestate",
     "password": "Şifrə",
     "rememberMe": "Məni xatırla",
     "forgotPassword": "Şifrəni unutmusunuz?",
     "signIn": "Panelə daxil ol",
+    "signingIn": "Daxil olunur...",
     "register": "Qeydiyyat",
     "securityNote": "Korporativ səviyyəli təhlükəsizliklə qorunur",
     "invalidCredentials": "E-poçt və ya şifrə yanlışdır",
@@ -89,6 +92,7 @@
       "createCompanyHint": "Yeni şirkət qeydiyyatdan keçirin və onun ilk administratoru olun.",
       "joinCompany": "Mövcud şirkətə qoşul",
       "joinCompanyHint": "Artıq platformadan istifadə edən şirkətə qoşulmaq üçün sorğu göndərin.",
+      "companyName": "Şirkətin adı",
       "searchCompany": "Şirkət axtarın və ya seçin",
       "back": "Geri",
       "continue": "Davam et",
@@ -102,12 +106,27 @@
       "subtitle": "Daxil olacağınız e-poçtu yazın.",
       "passwordHint": "Ən azı 8 simvol.",
       "submit": "Hesab yarat"
+    },
+    "errors": {
+      "invalid_credentials": "E-poçt və ya şifrə yanlışdır",
+      "account_disabled": "Bu hesab deaktiv edilib",
+      "email_taken": "Bu e-poçt artıq qeydiyyatdan keçib",
+      "company_name_taken": "Bu adda şirkət artıq mövcuddur",
+      "validation_error": "Sahələri yoxlayıb yenidən cəhd edin",
+      "network_error": "Serverə qoşulmaq mümkün olmadı. Yenidən cəhd edin.",
+      "timeout": "Server vaxtında cavab vermədi. Yenidən cəhd edin.",
+      "internal_error": "Serverdə xəta baş verdi. Yenidən cəhd edin.",
+      "signInFailed": "Daxil olmaq alınmadı. Yenidən cəhd edin.",
+      "registerFailed": "Qeydiyyat alınmadı. Yenidən cəhd edin."
     }
   },
   "news": {
     "title": "Xəbər lenti",
     "subtitle": "Ən son xəbərlərə, elanlara və layihə yeniliklərinə baxın və idarə edin",
     "add": "Xəbər əlavə et",
+    "copy": "Kopyala",
+    "copySuffix": "(Kopya)",
+    "copied": "Məqalə kopyalandı",
     "pinned": "Sabitlənmiş",
     "quickStats": "Qısa statistika",
     "postsThisWeek": "Bu həftəki paylaşımlar",
@@ -122,10 +141,10 @@
       "autosaved": "Avtomatik saxlanıldı",
       "saving": "Saxlanılır…",
       "basicInformation": "Əsas məlumat",
-      "titleLabel": "Başlıq",
-      "titlePlaceholder": "Məqaləyə başlıq verin",
-      "summaryLabel": "Qısa məzmun",
-      "summaryPlaceholder": "Kartda görünəcək bir-iki cümlə",
+      "titleLabel": "Xəbərin başlığı",
+      "titlePlaceholder": "məs. II rüb komissiya strukturunun yenilənməsi",
+      "summaryLabel": "Qısa təsvir",
+      "summaryPlaceholder": "Xəbər kartlarında və axtarış nəticələrində görünən qısa xülasə yazın...",
       "categoryLabel": "Kateqoriya",
       "coverImage": "Örtük şəkli",
       "coverDrop": "Örtük yüklə",
@@ -142,37 +161,38 @@
       "addFile": "Fayl əlavə et",
       "publishing": "Dərc",
       "publishDate": "Dərc tarixi",
-      "publishTime": "Saat",
-      "expiryDate": "Bitmə tarixi",
-      "expiryPolicy": "Bitdikdən sonra",
-      "expiryKeep": "Görünən qalsın",
-      "expiryArchive": "Arxivləşdir",
-      "expiryDelete": "Sil",
-      "author": "Müəllif",
+      "publishTime": "Dərc saatı",
       "visibility": "Görünürlük",
-      "audience": {
-        "brokers": "Brokerlər",
-        "topBrokers": "Top brokerlər",
-        "admins": "Adminlər",
-        "agencies": "Agentliklər",
-        "clients": "Müştərilər"
-      },
-      "audienceHint": {
-        "brokers": "Broker hesabı olan hər kəs",
-        "topBrokers": "Yalnız komanda rəhbərləri",
-        "admins": "Platforma administratorları",
-        "agencies": "Tərəfdaş agentliklər",
-        "clients": "Müştəri portalında göstərilir"
-      },
-      "saveDraft": "Qaralamanı saxla",
-      "publish": "Dərc et",
+      "saveDraft": "Qaralama kimi saxla",
+      "publish": "Xəbəri dərc et",
       "update": "Yenilə",
       "discard": "İmtina et",
       "publishedToast": "Məqalə dərc olundu",
       "draftToast": "Qaralama saxlanıldı",
       "tooLarge": "{name} 25 MB-dan böyükdür, əlavə edilmədi",
-      "backToFeed": "Xəbər lentinə qayıt"
-    }
+      "backToFeed": "Xəbər lentinə qayıt",
+      "language": "Dil",
+      "expirationDate": "Bitmə tarixi",
+      "blockParagraph": "Paraqraf",
+      "blockHeading": "Başlıq",
+      "blockSubheading": "Alt başlıq",
+      "blockQuote": "Sitat",
+      "options": {
+        "pinned": "Postu sabitlə",
+        "featured": "Seçilmiş xəbər",
+        "showOnDashboard": "Paneldə göstər",
+        "pushNotification": "Push bildiriş",
+        "emailNotification": "E-poçt bildirişi"
+      },
+      "optionHints": {
+        "pinned": "Lentin yuxarısında sabit qalır",
+        "featured": "Seçilmişlər bölməsində vurğulanır",
+        "showOnDashboard": "Əsas paneldə görünür",
+        "pushNotification": "Dərc zamanı bütün istifadəçilərə bildiriş",
+        "emailNotification": "Abunəçi siyahısına göndərilir"
+      }
+    },
+    "crumbFeed": "Xəbər lenti"
   },
   "clients": {
     "title": "Müştərilər",
@@ -185,7 +205,8 @@
       "fullName": "Ad Soyad",
       "contacts": "Əlaqə",
       "objectOfInterest": "Maraqlandığı obyekt",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Əməliyyatlar"
     },
     "status": {
       "pending": "Gözləyir",
@@ -335,6 +356,7 @@
     "from": "başlayır",
     "editor": {
       "name": "Layihənin adı",
+      "location": "Yerləşmə",
       "publicUrl": "İctimai URL",
       "save": "Dəyişiklikləri saxla",
       "heroImage": "Örtük şəkli",
@@ -344,6 +366,9 @@
       "highlightLabel": "Etiket",
       "highlightValue": "Dəyər",
       "highlightEnabled": "Bu məqamı göstər",
+      "highlightIcon": "İkon yüklə",
+      "replaceIcon": "İkonu dəyiş",
+      "removeIcon": "İkonu sil",
       "addHighlight": "Məqam əlavə et",
       "offers": "Xüsusi təkliflər",
       "offersHint": "Müddətli kampaniyaları və alıcı stimullarını önə çıxarın.",
@@ -393,7 +418,7 @@
       "download": "Yüklə",
       "downloads": "{count} yükləmə",
       "finance": "Maliyyə",
-      "floorPlan": "Mərtəbə planı",
+      "floorPlan": "Magazine",
       "lastSynced": "Son sinxronizasiya: {when}",
       "edit": "Redaktə et",
       "financeColumns": {
@@ -402,16 +427,21 @@
         "unitCode": "Mənzil",
         "listingPrice": "Elan qiyməti",
         "salesPrice": "Satış qiyməti",
-        "received": "Daxil.",
+        "received": "Daxil olan",
         "paid": "Ödənilib",
         "remaining": "Qalıq",
         "salesDate": "Satış tarixi"
-      }
-    }
+      },
+      "expires": "Bitmə tarixi {date}"
+    },
+    "sync": "Sinxronlaşdır",
+    "syncing": "Sinxronlaşdırılır…",
+    "synced": "{projects} layihə və {units} mənzil sinxronlaşdırıldı"
   },
   "floorPlan": {
-    "title": "Mərtəbə planı",
+    "title": "Magazine",
     "subtitle": "Binalar, mərtəbələr və mənzil mövcudluğu",
+    "buildingSubtitle": "Hər layihə üçün binaları və mənzilləri yaradın, təşkil edin və yeniləyin",
     "legend": {
       "available": "Mövcud",
       "reserved": "Rezerv",
@@ -474,7 +504,7 @@
   },
   "users": {
     "title": "İstifadəçilər",
-    "subtitle": "Bütün tikinti mərhələsindəki obyektləri idarə edin",
+    "subtitle": "Bütün istifadəçiləri və onların girişini idarə edin",
     "tabs": {
       "user": "İstifadəçi",
       "agency": "Daşınmaz Əmlak Agentlikləri"
@@ -512,11 +542,14 @@
       "lastName": "Soyad",
       "email": "E-poçt",
       "password": "Şifrə",
+      "passwordCreateHint": "Ən azı 8 simvol. Boş buraxsanız, birdəfəlik şifrə yaradılır.",
+      "passwordEditHint": "Ən azı 8 simvol. Boş buraxsanız, mövcud şifrə saxlanılır.",
       "phone": "Əsas nömrə",
       "addPhone": "Başqa nömrə əlavə et",
+      "removePhone": "Bu nömrəni sil",
       "cooperationType": "Əməkdaşlıq növü",
-      "agentlik": "Agentlik",
       "agency": "Agentlik adı",
+      "agencyNone": "Agentliksiz",
       "accessPermissions": "Giriş icazələri",
       "accessPermissionOptions": {
         "full": "Tam giriş",
@@ -532,6 +565,19 @@
       "blockAgent": "Agenti blokla",
       "create": "Yarat",
       "save": "Yadda saxla"
+    },
+    "agencyForm": {
+      "createTitle": "Daşınmaz əmlak yarat",
+      "editTitle": "Daşınmaz əmlakı redaktə et",
+      "name": "Ad",
+      "managerName": "Menecer",
+      "phone": "Əlaqə",
+      "organization": "Təşkilat",
+      "email": "E-poçt",
+      "managerNote": "Yalnız heç bir agentliyə bağlı olmayan hesablar menecer ola bilər. Yeni menecer əlavə etdikdə onun hesabı birdəfəlik şifrə ilə yaradılır — şifrəni profilində dəyişir.",
+      "manager": "Menecer",
+      "managerPlaceholder": "Hesab seçin",
+      "managerNew": "Yeni menecer əlavə et"
     },
     "profile": {
       "title": "Profil"
@@ -550,8 +596,10 @@
     },
     "deleteConfirm": "Bu istifadəçi silinsin? Geri qaytarmaq mümkün olmayacaq.",
     "addUser": "İstifadəçi əlavə et",
+    "addAgency": "Daşınmaz əmlak əlavə et",
     "userAdded": "İstifadəçi uğurla əlavə edildi",
     "agencyAdded": "Agentlik uğurla əlavə edildi",
+    "agencyUpdated": "Agentlik uğurla yeniləndi",
     "userDeleted": "İstifadəçi silindi",
     "agencyDeleted": "Agentlik silindi",
     "searchUsers": "Ad, soyad və ya telefon nömrəsi ilə axtar",

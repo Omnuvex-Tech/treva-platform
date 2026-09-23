@@ -363,3 +363,21 @@ model ApartmentPrice {
 
   @@unique([apartmentId, currencyId])
 }
+
+/// One row per Profitbase image this API has copied onto its own storage.
+///
+/// Profitbase is the platform's upstream and should be reached from here and
+/// nowhere else; consumers read the copy, at this API's own address. The row
+/// keyed by the upstream URL is what lets a later sync skip a picture it
+/// already holds — the stored file is named after a hash of its bytes, which
+/// cannot be known until those bytes have been downloaded.
+model ProfitbaseImage {
+  /// Profitbase's own absolute URL.
+  sourceUrl String   @id
+  /// Root-relative (`/uploads/profitbase/...`). Several sources share one file
+  /// whenever the pictures are identical, which is Profitbase's normal case.
+  url       String
+  createdAt DateTime @default(now())
+
+  @@index([url])
+}

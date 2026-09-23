@@ -47,6 +47,8 @@ export const queryKeys = {
         all: ["floor-plan"] as const,
         buildings: ["floor-plan", "buildings"] as const,
         floors: (buildingId: string) => ["floor-plan", "floors", buildingId] as const,
+        layouts: (buildingId: string, query: object) =>
+            ["floor-plan", "layouts", buildingId, query] as const,
     },
 
     users: {

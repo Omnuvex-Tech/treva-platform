@@ -65,7 +65,11 @@ export function AgencyTable({ agencies, onEdit, onDelete }: AgencyTableProps) {
                     <TableRow key={agency.id}>
                         <TableCell className="truncate">{agency.name}</TableCell>
                         <TableCell className="truncate">{agency.managerName}</TableCell>
-                        <TableCell className="whitespace-nowrap">{agency.phone}</TableCell>
+                        {/* Every number the manager lists, so a second one is
+                            visible without opening the editor. */}
+                        <TableCell className="whitespace-nowrap">
+                            {agency.phones.join(", ")}
+                        </TableCell>
                         <TableCell className="truncate">{agency.organization}</TableCell>
                         <TableCell className="truncate">{agency.email}</TableCell>
 

@@ -1,10 +1,11 @@
 "use client";
 
-import { Delete02Icon, PinIcon } from "@hugeicons/core-free-icons";
+import { Delete02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
@@ -141,8 +142,10 @@ export function ClientDetailView({ client }: ClientDetailViewProps) {
                 it cannot be a band of a full-width card. */}
             <div className="px-2">
                 <div className="flex w-[730px] max-w-full gap-2 rounded-lg bg-bg-tertiary p-3">
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-pill bg-bg-secondary text-content-secondary">
-                        <HugeiconsIcon icon={PinIcon} size={14} strokeWidth={1.6} />
+                    {/* The artboard's own 14px pin (873:49441), drawn in
+                        Content/Notice rather than the note's ink. */}
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-pill bg-bg-secondary text-content-notice">
+                        <AssetIcon src="/images/clients/icon-pin.svg" size={14} />
                     </span>
 
                     <div className="flex min-w-0 flex-col gap-2 text-content-secondary">

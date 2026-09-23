@@ -18,4 +18,6 @@ export interface DocumentsService {
     remove(id: string): Promise<void>;
 }
 
-export const documentsService: DocumentsService = config.api.useMock ? mockAdapter : httpAdapter;
+export const documentsService: DocumentsService = config.api.useMockBrokerRole
+    ? mockAdapter
+    : httpAdapter;

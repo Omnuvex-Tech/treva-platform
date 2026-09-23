@@ -1,12 +1,11 @@
 "use client";
 
-import { Cancel01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -51,7 +50,7 @@ export interface DocumentEditViewProps {
  */
 function DetailRow({ label, children }: { label: string; children: ReactNode }) {
     return (
-        <div className="flex items-center justify-between gap-3 border-b border-border-subtle px-3 py-2.5">
+        <div className="flex items-center justify-between gap-3 border-b border-border-subtle px-3 pt-[10.5px] pb-[11.5px]">
             <span className="truncate text-xs text-content-tertiary">{label}</span>
             <span className="truncate text-xs font-semibold text-content-primary">{children}</span>
         </div>
@@ -171,7 +170,12 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex gap-3 px-4 pt-5 pb-8">
+        // 873:52030 — this screen draws no white content area behind its two
+        // columns, only the body’s own Background/Secondary.
+        <form
+            onSubmit={handleSubmit}
+            className="flex min-h-full gap-3 bg-bg-secondary px-4 pt-5 pb-8"
+        >
             {/* 876:13871 — the form column is itself a card: white, 3XL, padded
                 16 with 12 between the headline and the form. */}
             <div className="flex min-w-0 flex-1 flex-col gap-3 rounded-lg bg-bg-primary p-4">
@@ -188,9 +192,9 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
                                 type="button"
                                 variant="dangerOutline"
                                 size="lg"
-                                className="rounded-lg px-3.5"
+                                className="rounded-lg px-[13px]"
                                 leadingIcon={
-                                    <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.5} />
+                                    <AssetIcon src="/images/news/icon-trash.svg" size={16} />
                                 }
                                 onClick={confirmDelete.ask}
                             >
@@ -202,9 +206,11 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
                             type="button"
                             variant="brandOutline"
                             size="lg"
-                            className="rounded-lg px-3.5"
+                            className="rounded-lg px-[13px]"
+                            // `interface/solid/remove` (I876:13880;8272:10941) —
+                            // a filled X, not the stroked one npm ships.
                             leadingIcon={
-                                <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={1.5} />
+                                <AssetIcon src="/images/news/editor/cancel.svg" size={16} />
                             }
                             onClick={() => router.push(routes.brokerRole(locale))}
                         >
@@ -215,7 +221,7 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
                             <Button
                                 type="submit"
                                 size="lg"
-                                className="rounded-lg border border-border-inverse px-3.5"
+                                className="rounded-lg border border-border-inverse px-[13px]"
                                 loading={updateDocument.isPending}
                             >
                                 {t.brokerRole.editor.save}
@@ -240,6 +246,10 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
                                     label={t.brokerRole.editor.fileName}
                                     surface="light"
                                     size="sm"
+                                    // The text sits 8 from the outer edge in
+                                    // the artboard, and Figma counts the
+                                    // stroke inside that; CSS adds it outside.
+                                    className="-ml-px"
                                     defaultValue={document.name}
                                     required
                                     disabled={!canManage}
@@ -256,7 +266,20 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
                                             value,
                                             label: t.brokerRole.categories[value],
                                         }))}
-                                        className="h-9 border-border-tertiary bg-bg-primary pr-3 pl-4"
+                                        // 16 / 12 in the artboard
+                                        // (I876:13899;8154:5399), each less the
+                                        // 1px edge CSS adds outside the padding.
+                                        className="h-9 border-border-tertiary bg-bg-primary pr-[11px] pl-[15px]"
+                                        // `direction-down 01`: a 9.6x4.6 glyph
+                                        // centred in a 20px box.
+                                        icon={
+                                            <AssetIcon
+                                                src="/images/clients/icon-direction-down.svg"
+                                                size={20}
+                                                glyph={{ width: 9.58346, height: 4.58352 }}
+                                                className="text-content-tertiary"
+                                            />
+                                        }
                                     />
                                     <Select
                                         name="language"
@@ -267,7 +290,20 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
                                             value,
                                             label: t.brokerRole.languages[value],
                                         }))}
-                                        className="h-9 border-border-tertiary bg-bg-primary pr-3 pl-4"
+                                        // 16 / 12 in the artboard
+                                        // (I876:13900;8154:5399), each less the
+                                        // 1px edge CSS adds outside the padding.
+                                        className="h-9 border-border-tertiary bg-bg-primary pr-[11px] pl-[15px]"
+                                        // `direction-down 01`: a 9.6x4.6 glyph
+                                        // centred in a 20px box.
+                                        icon={
+                                            <AssetIcon
+                                                src="/images/clients/icon-direction-down.svg"
+                                                size={20}
+                                                glyph={{ width: 9.58346, height: 4.58352 }}
+                                                className="text-content-tertiary"
+                                            />
+                                        }
                                     />
                                 </div>
                             </div>
@@ -276,13 +312,26 @@ export function DocumentEditView({ document }: DocumentEditViewProps) {
 
                     {/* 876:13901 holds nothing but the field — no header, no
                         card around it. */}
-                    <div className="px-2">
+                    <div className="relative px-2">
                         <Textarea
                             name="description"
                             label={t.brokerRole.editor.description}
                             defaultValue={document.description}
                             disabled={!canManage}
-                            className="h-[120px] rounded-lg border-border-tertiary bg-bg-primary p-3"
+                            className="h-[120px] rounded-lg border-border-tertiary bg-bg-primary p-[11px] [&::-webkit-resizer]:bg-transparent"
+                        />
+                        {/* The artboard draws its own 12px Resizer 5px up and
+                            4px in (I876:13902;8083:6023); the native grip is
+                            made transparent so only that one shows. The
+                            offsets carry the field’s own 8px inset, and are
+                            matched against the render as the lead form’s are. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element -- the grip glyph exported from the artboard */}
+                        <img
+                            src="/images/news/editor/resizer.svg"
+                            alt=""
+                            width={12}
+                            height={12}
+                            className="pointer-events-none absolute right-[13px] bottom-[6px] size-[12.35px]"
                         />
                     </div>
 

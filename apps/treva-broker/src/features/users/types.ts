@@ -6,18 +6,45 @@ export type UsersTab = "user" | "agency";
 export interface Agency {
     id: string;
     name: string;
+    /** The account that owns the agency — the Manager field picks it. */
+    managerId: string;
     managerName: string;
-    phone: string;
+    /** Every number on the manager's account, primary first. */
+    phones: string[];
+    /**
+     * The tab's Organization column (873:48597), which the artboard draws
+     * blank in all five rows. Free text with no meaning the design ever gave
+     * it — kept because admins asked for the box, not because it is defined.
+     */
     organization: string;
     email: string;
 }
 
 export interface AgencyInput {
     name: string;
-    managerName: string;
-    phone: string;
+    /**
+     * The new manager's sign-in password. Read only while an account is being
+     * created; blank generates a one-time one.
+     */
+    password?: string;
+    /**
+     * An existing account to put in charge. Empty means the form is creating
+     * one instead, from `managerName` and `email`.
+     */
+    managerId: string;
+    /** Only sent while creating a manager; omitted when one is chosen. */
+    managerName?: string;
+    phones: string[];
     organization: string;
+    email?: string;
+}
+
+/** An account the Manager field can offer: one that belongs to no agency. */
+export interface ManagerOption {
+    id: string;
+    fullName: string;
     email: string;
+    phones: string[];
 }
 
 export type UserStatus = "active" | "blocked" | "invited";
@@ -27,7 +54,8 @@ export interface PlatformUser {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
+    /** Every number on the account, primary first (873:48716). */
+    phones: string[];
     /**
      * The User tab prints this in a column of its own (873:48530), so the shape
      * carries it rather than the table inventing a placeholder.
@@ -43,12 +71,6 @@ export interface PlatformUser {
     jobTitle: string;
     /** Cooperation Type on the agent form (873:48721). */
     cooperationType: string;
-    /**
-     * "Agentlik" (873:48722) — the artboard's own label, kept verbatim because
-     * the same form has a separate "Agency" field beside it and the file gives
-     * no hint what distinguishes them. Rename once design says which is which.
-     */
-    agentlik: string;
     /** Agency (873:48724) — the real-estate agency the agent belongs to. */
     agency: string;
     /** Access Permissions (873:48725) — a single choice, not a set. */
@@ -79,11 +101,10 @@ export interface UserInput {
      * the file that asks for one.
      */
     password?: string;
-    phone: string;
+    phones: string[];
     jobTitle: string;
     organization: string;
     cooperationType: string;
-    agentlik: string;
     agency: string;
     accessPermission: string;
     role: Role;

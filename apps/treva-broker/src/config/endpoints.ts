@@ -15,8 +15,12 @@ export const endpoints = {
     news: {
         list: "/news",
         detail: (id: string) => `/news/${id}`,
+        read: (id: string) => `/news/${id}/read`,
+        pinned: "/news/pinned",
         stats: "/news/stats",
     },
+    /** Multipart, one `file` per request; answers with the stored file's URL. */
+    uploads: "/uploads",
     clients: {
         list: "/clients",
         detail: (id: string) => `/clients/${id}`,
@@ -42,10 +46,22 @@ export const endpoints = {
     projects: {
         list: "/projects",
         detail: (id: string) => `/projects/${id}`,
+        /** Multipart, one `file`; the editor's image wells. */
+        images: "/projects/images",
+        /** Multipart, one `file`; a Key Highlights row's own icon. */
+        icons: "/projects/icons",
+        /** Multipart, one `file`; a Marketing Materials row's file. */
+        materials: "/projects/materials",
+        materialDownload: (id: string, materialId: string) =>
+            `/projects/${id}/materials/${materialId}/download`,
+        /** Copies treva-api's off-plan objects, buildings and units in. */
+        sync: "/projects/sync",
     },
     floorPlan: {
         buildings: "/floor-plan/buildings",
         floors: (buildingId: string) => `/floor-plan/buildings/${buildingId}/floors`,
+        /** `?page&perPage&sort` — the Layouts tab, paginated. */
+        layouts: (buildingId: string) => `/floor-plan/buildings/${buildingId}/layouts`,
     },
     listings: {
         sections: "/listings/sections",
@@ -53,6 +69,8 @@ export const endpoints = {
     },
     agencies: {
         list: "/agencies",
+        /** Accounts that belong to no agency — the Manager field's options. */
+        managers: "/agencies/managers",
         detail: (id: string) => `/agencies/${id}`,
     },
     users: {

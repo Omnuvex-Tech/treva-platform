@@ -6,13 +6,14 @@ import * as mockAdapter from "./auth.mock";
 
 /**
  * The contract every auth adapter satisfies. Screens and server actions import
- * `authService` and never the adapters, so switching NEXT_PUBLIC_USE_MOCK off
+ * `authService` and never the adapters, so switching NEXT_PUBLIC_USE_MOCK_AUTH off
  * is the only change needed when the NestJS API goes live.
  */
 export interface AuthService {
     login(payload: LoginPayload): Promise<Session>;
     register(payload: RegisterPayload): Promise<Session>;
-    logout(): Promise<void>;
+    /** Best effort; the caller clears its own cookie regardless. */
+    logout(accessToken?: string): Promise<void>;
 }
 
-export const authService: AuthService = config.api.useMock ? mockAdapter : httpAdapter;
+export const authService: AuthService = config.api.useMockAuth ? mockAdapter : httpAdapter;

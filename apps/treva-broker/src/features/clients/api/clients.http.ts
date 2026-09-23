@@ -3,7 +3,12 @@ import type { Paginated } from "@/lib/api/types";
 import { endpoints } from "@/config/endpoints";
 import type { Client, ClientInput, ClientListQuery } from "../types";
 
-/** Real adapter — see the note in features/auth/api/auth.http.ts. */
+/**
+ * Real adapter against apps/treva-broker-api, used while
+ * NEXT_PUBLIC_USE_MOCK_CLIENTS is "0". The API answers in these exact shapes
+ * (see ClientsService there) and scopes every call to the signed-in user, so
+ * `brokerId` here only narrows what that user may already see.
+ */
 export async function list(query: ClientListQuery = {}): Promise<Paginated<Client>> {
     return http.get<Paginated<Client>>(endpoints.clients.list, {
         params: {

@@ -1,40 +1,145 @@
 "use client";
 
-import {
-    Add01Icon,
-    BankIcon,
-    Calendar01Icon,
-    CreditCardIcon,
-    Delete02Icon,
-    MetroIcon,
-    SwimmingIcon,
-    WavesIcon,
-} from "@hugeicons/core-free-icons";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { IconSvgElement } from "@hugeicons/react";
+import { useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { AssetIcon } from "@/components/ui/asset-icon";
+import { isApiError } from "@/lib/api/errors";
+import { interpolate } from "@/lib/i18n/interpolate";
 import { cn } from "@/lib/utils/cn";
+import { formatBytes } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
+import { useToast } from "@/providers/toast-provider";
+import { projectsService } from "../api/projects.service";
 import { HIGHLIGHT_KINDS, type HighlightKind, type ProjectHighlight } from "../types";
+import { AddRowButton, RowControls } from "./row-controls";
 import { SectionHeader } from "./section-header";
 
+const ICONS = "/images/projects";
+
 /**
- * One glyph per kind (873:51136).
+ * One glyph per kind (873:51136…873:51217), exported from the artboard.
  *
- * The artboard exports a different icon in every card and names none of them,
- * so these are matched to what each row is about — the layer names spell that
- * out even though the rendered text is placeholder copy.
+ * The six cards carry five distinct icons — calendar, card, waves, a pill and a
+ * tram — and the switched-off sixth repeats the card, so mortgage shares
+ * payment's glyph rather than inventing a bank.
  */
-const KIND_ICON: Record<HighlightKind, IconSvgElement> = {
-    handover: Calendar01Icon,
-    payment: CreditCardIcon,
-    view: WavesIcon,
-    amenities: SwimmingIcon,
-    transit: MetroIcon,
-    mortgage: BankIcon,
+const KIND_ICON: Record<HighlightKind, string> = {
+    handover: `${ICONS}/highlight-handover.svg`,
+    payment: `${ICONS}/highlight-payment.svg`,
+    view: `${ICONS}/highlight-view.svg`,
+    amenities: `${ICONS}/highlight-amenities.svg`,
+    transit: `${ICONS}/highlight-transit.svg`,
+    mortgage: `${ICONS}/highlight-payment.svg`,
 };
+
+/** What POST /projects/icons stores: the gallery's types plus SVG, up to 1 MB. */
+const ICON_ACCEPT = "image/svg+xml,image/png,image/jpeg,image/webp";
+const MAX_ICON_BYTES = 1024 * 1024;
+
+/**
+ * The 36px icon well (873:51135) as a control: click it to upload the row's own
+ * icon, which then replaces the kind's glyph. An uploaded icon keeps its own
+ * colours rather than being masked to brand, and a small chip on its corner
+ * puts the glyph back.
+ */
+function IconWell({
+    highlight,
+    onChange,
+    disabled,
+}: {
+    highlight: ProjectHighlight;
+    onChange: (iconUrl: string | null) => void;
+    disabled?: boolean;
+}) {
+    const { t, locale } = useI18n();
+    const toast = useToast();
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [uploading, setUploading] = useState(false);
+    const iconUrl = highlight.iconUrl ?? null;
+    const label = iconUrl ? t.projects.editor.replaceIcon : t.projects.editor.highlightIcon;
+
+    async function upload(file: File) {
+        if (file.size > MAX_ICON_BYTES) {
+            toast.error(
+                interpolate(t.common.upload.tooLarge, {
+                    name: file.name,
+                    limit: formatBytes(MAX_ICON_BYTES, locale),
+                }),
+            );
+            return;
+        }
+
+        setUploading(true);
+        try {
+            onChange(await projectsService.uploadIcon(file));
+        } catch (error) {
+            toast.error(
+                isApiError(error) && error.status !== 0
+                    ? error.message
+                    : interpolate(t.common.upload.uploadFailed, { name: file.name }),
+            );
+        } finally {
+            setUploading(false);
+        }
+    }
+
+    return (
+        <span className="group/icon relative shrink-0">
+            {/* 36 square, Background/Secondary behind a 1px white edge; the
+                kind's 14px glyph in brand, or the uploaded icon at 20. */}
+            <button
+                type="button"
+                disabled={disabled || uploading}
+                aria-busy={uploading}
+                aria-label={label}
+                title={label}
+                onClick={() => {
+                    if (inputRef.current) inputRef.current.value = "";
+                    inputRef.current?.click();
+                }}
+                className={cn(
+                    "flex size-9 cursor-pointer items-center justify-center overflow-hidden rounded-[10px] border border-bg-primary bg-bg-secondary text-content-brand transition-shadow hover:ring-2 hover:ring-border-brand focus-visible:ring-2 focus-visible:ring-border-brand focus-visible:outline-none disabled:cursor-not-allowed disabled:hover:ring-0",
+                    uploading && "animate-pulse",
+                )}
+            >
+                {iconUrl ? (
+                    // An SVG or a data URL (mock uploads) — neither goes through
+                    // next's Image optimiser.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={iconUrl} alt="" className="size-5 object-contain" />
+                ) : (
+                    <AssetIcon src={KIND_ICON[highlight.kind]} size={14} />
+                )}
+            </button>
+
+            {iconUrl && !disabled ? (
+                <button
+                    type="button"
+                    onClick={() => onChange(null)}
+                    aria-label={t.projects.editor.removeIcon}
+                    title={t.projects.editor.removeIcon}
+                    className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full border border-border-subtle bg-bg-primary text-content-secondary opacity-0 transition-opacity group-hover/icon:opacity-100 hover:text-content-primary focus-visible:opacity-100"
+                >
+                    <HugeiconsIcon icon={Cancel01Icon} size={10} strokeWidth={2} />
+                </button>
+            ) : null}
+
+            <input
+                ref={inputRef}
+                type="file"
+                accept={ICON_ACCEPT}
+                className="sr-only"
+                tabIndex={-1}
+                onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) void upload(file);
+                }}
+            />
+        </span>
+    );
+}
 
 export interface HighlightsSectionProps {
     highlights: readonly ProjectHighlight[];
@@ -45,20 +150,25 @@ export interface HighlightsSectionProps {
 /**
  * Key Highlights (873:51127).
  *
- * A two-column grid of 550x86 cards 12 apart, each holding a 36px icon well, a
- * 14/Semibold label over a 12/Regular value, and a switch beside a 28px delete
- * chip. Turning a row off greys the whole card rather than hiding it, which is
- * what the sixth card in the artboard is showing.
+ * A two-column grid of 550x86.67 cards 12 apart. Each card is a 14px radius
+ * with its 17px inset measured from the outer edge (16 + the 1px stroke), and
+ * holds a 36px icon well, a 52.5-tall text column and the switch/delete pair.
+ * Turning a row off greys the whole card rather than hiding it, which is what
+ * the sixth card in the artboard is showing.
  *
  * Both text lines are editable in place: the artboard draws them as "Text
- * Input" frames, not as static labels, so they are inputs that carry no chrome
- * until focused.
+ * Input" frames, not as static labels, so they are inputs that carry no chrome.
+ * Their offsets are the frames' own — the label at 3, the value at 32.
  */
 export function HighlightsSection({ highlights, onChange, disabled }: HighlightsSectionProps) {
     const { t } = useI18n();
+    // An icon upload resolves after the render that started it; patching from
+    // that render's list would drop whatever was typed in the meantime.
+    const latest = useRef(highlights);
+    latest.current = highlights;
 
     function patch(id: string, changes: Partial<ProjectHighlight>) {
-        onChange(highlights.map((entry) => (entry.id === id ? { ...entry, ...changes } : entry)));
+        onChange(latest.current.map((entry) => (entry.id === id ? { ...entry, ...changes } : entry)));
     }
 
     function add() {
@@ -69,6 +179,7 @@ export function HighlightsSection({ highlights, onChange, disabled }: Highlights
             {
                 id: `hl_${Date.now().toString(36)}`,
                 kind,
+                iconUrl: null,
                 label: "",
                 value: "",
                 enabled: true,
@@ -79,6 +190,7 @@ export function HighlightsSection({ highlights, onChange, disabled }: Highlights
     return (
         <section className="flex flex-col gap-3">
             <SectionHeader
+                variant="highlights"
                 title={t.projects.editor.highlights}
                 description={t.projects.editor.highlightsHint}
             />
@@ -88,22 +200,19 @@ export function HighlightsSection({ highlights, onChange, disabled }: Highlights
                     <div
                         key={highlight.id}
                         className={cn(
-                            // 86.67 tall in the file: a 52.5 text column inside 17px padding.
-                            "flex min-h-[86px] items-start gap-3 rounded-md border border-border-subtle bg-bg-primary p-[17px]",
-                            // 873:51178 draws the switched-off row at half
+                            "flex min-h-[86.67px] items-start gap-3 rounded-[14px] border border-border-subtle bg-bg-primary p-4",
+                            // 873:51214 draws the switched-off row at half
                             // strength rather than removing it.
                             !highlight.enabled && "opacity-50",
                         )}
                     >
-                        <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-border-inverse bg-bg-secondary text-content-tertiary">
-                            <HugeiconsIcon
-                                icon={KIND_ICON[highlight.kind]}
-                                size={14}
-                                strokeWidth={1.6}
-                            />
-                        </span>
+                        <IconWell
+                            highlight={highlight}
+                            disabled={disabled}
+                            onChange={(iconUrl) => patch(highlight.id, { iconUrl })}
+                        />
 
-                        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+                        <div className="flex h-[52.5px] min-w-0 flex-1 flex-col">
                             <input
                                 value={highlight.label}
                                 disabled={disabled}
@@ -112,7 +221,7 @@ export function HighlightsSection({ highlights, onChange, disabled }: Highlights
                                 }
                                 placeholder={t.projects.editor.highlightLabel}
                                 aria-label={t.projects.editor.highlightLabel}
-                                className="w-full bg-transparent text-sm font-semibold text-content-primary outline-none placeholder:font-normal placeholder:text-content-disabled"
+                                className="mt-[3px] block h-5 w-full bg-transparent p-0 text-sm leading-5 font-semibold text-content-primary outline-none placeholder:font-normal placeholder:text-content-disabled"
                             />
                             <input
                                 value={highlight.value}
@@ -122,51 +231,24 @@ export function HighlightsSection({ highlights, onChange, disabled }: Highlights
                                 }
                                 placeholder={t.projects.editor.highlightValue}
                                 aria-label={t.projects.editor.highlightValue}
-                                className="w-full bg-transparent text-xs text-content-secondary outline-none placeholder:text-content-disabled"
+                                className="mt-[9px] block h-[18px] w-full bg-transparent p-0 text-xs leading-[18px] text-content-secondary outline-none placeholder:text-content-disabled"
                             />
                         </div>
 
-                        <div className="flex shrink-0 items-center gap-2 pt-0.5">
-                            <Switch
-                                checked={highlight.enabled}
-                                disabled={disabled}
-                                onChange={(event) =>
-                                    patch(highlight.id, { enabled: event.target.checked })
-                                }
-                                aria-label={t.projects.editor.highlightEnabled}
-                            />
-
-                            <button
-                                type="button"
-                                disabled={disabled}
-                                onClick={() =>
-                                    onChange(highlights.filter((entry) => entry.id !== highlight.id))
-                                }
-                                aria-label={t.common.delete}
-                                title={t.common.delete}
-                                className="flex h-7 items-center rounded-sm bg-bg-secondary px-2 text-content-tertiary transition-colors hover:bg-bg-tertiary disabled:opacity-50"
-                            >
-                                <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
-                            </button>
-                        </div>
+                        <RowControls
+                            enabled={highlight.enabled}
+                            disabled={disabled}
+                            toggleLabel={t.projects.editor.highlightEnabled}
+                            onToggle={(enabled) => patch(highlight.id, { enabled })}
+                            onDelete={() =>
+                                onChange(highlights.filter((entry) => entry.id !== highlight.id))
+                            }
+                        />
                     </div>
                 ))}
             </div>
 
-            {/* 873:51229 — full width, 44 tall, outlined. */}
-            <div className="px-2">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    disabled={disabled}
-                    className="w-full rounded-lg"
-                    leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
-                    onClick={add}
-                >
-                    {t.projects.editor.addHighlight}
-                </Button>
-            </div>
+            <AddRowButton label={t.projects.editor.addHighlight} disabled={disabled} onClick={add} />
         </section>
     );
 }

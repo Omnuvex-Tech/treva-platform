@@ -173,6 +173,8 @@ export function UsersView() {
                         />
                     ) : null}
 
+                    {/* One button, two entities: the tab switches what gets
+                        created, the same way it switches the table below. */}
                     {can("users:create") ? (
                         <Button
                             size="lg"
@@ -180,9 +182,15 @@ export function UsersView() {
                             leadingIcon={
                                 <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />
                             }
-                            onClick={() => router.push(routes.adminUserNew(locale))}
+                            onClick={() =>
+                                router.push(
+                                    onUserTab
+                                        ? routes.adminUserNew(locale)
+                                        : routes.adminAgencyNew(locale),
+                                )
+                            }
                         >
-                            {t.users.addUser}
+                            {onUserTab ? t.users.addUser : t.users.addAgency}
                         </Button>
                     ) : null}
                 </div>
@@ -250,11 +258,9 @@ export function UsersView() {
                     <Panel>
                         <AgencyTable
                             agencies={agencies}
-                            onEdit={() => {
-                                // The agency form is not in the artboards yet —
-                                // the pencil is drawn, the screen behind it is
-                                // not.
-                            }}
+                            onEdit={(agency) =>
+                                router.push(routes.adminAgencyEdit(locale, agency.id))
+                            }
                             onDelete={(agency) => confirmDelete.ask({ kind: "agency", agency })}
                         />
                     </Panel>

@@ -1,34 +1,25 @@
 "use client";
 
-import { Delete02Icon, Image01Icon } from "@hugeicons/core-free-icons";
+import { Image01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useRef, useState, type DragEvent } from "react";
 
+import { AssetIcon } from "@/components/ui/asset-icon";
+import { isApiError } from "@/lib/api/errors";
+import { interpolate } from "@/lib/i18n/interpolate";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/providers/i18n-provider";
+import { useToast } from "@/providers/toast-provider";
+import { projectsService } from "../api/projects.service";
 
 /** The three tiles the artboard draws under the hero (873:51119…). */
 const SLOTS = 3;
 
 const ACCEPT = "image/jpeg,image/png,image/webp";
 
-/**
- * Reads a picked file into a data URL.
- *
- * Not `URL.createObjectURL`: that URL dies with the File it came from, and this
- * component clears the input right after reading it so the same file can be
- * picked twice — which left the preview pointing at a revoked blob. A data URL
- * has no such lifetime, and there is no upload endpoint to send bytes to yet.
- */
-function readAsDataUrl(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-    });
-}
+/** Which well an upload is filling: the hero, or a tile by index. */
+type WellKey = "hero" | number;
 
 export interface GallerySectionProps {
     heroImageUrl: string | null;
@@ -52,7 +43,9 @@ function ImageWell({
     onPick,
     onClear,
     disabled,
+    uploading,
     className,
+    chipClassName,
     sizes,
 }: {
     src: string | null;
@@ -61,7 +54,10 @@ function ImageWell({
     onPick: (file: File) => void;
     onClear: () => void;
     disabled?: boolean;
+    uploading?: boolean;
     className?: string;
+    /** Where the delete chip sits: 16 in from the hero's corner, 12 on a tile. */
+    chipClassName: string;
     sizes: string;
 }) {
     const { t } = useI18n();
@@ -71,7 +67,7 @@ function ImageWell({
     function handleDrop(event: DragEvent<HTMLDivElement>) {
         event.preventDefault();
         setDragging(false);
-        if (disabled) return;
+        if (disabled || uploading) return;
 
         const file = Array.from(event.dataTransfer.files).find((entry) =>
             entry.type.startsWith("image/"),
@@ -89,14 +85,19 @@ function ImageWell({
             onDragLeave={() => setDragging(false)}
             onDrop={handleDrop}
             className={cn(
-                "relative overflow-hidden rounded-xl border bg-bg-secondary transition-colors",
-                dragging ? "border-border-brand bg-bg-tertiary" : "border-border-subtle",
+                // 5XL (24) and no stroke: the wells are image fills on a
+                // clipped frame (873:51116). No border box at all — even a
+                // transparent 1px edge would take 2px off the grid — so the
+                // drag state is an inset ring instead.
+                "@container relative overflow-hidden rounded-[var(--radius-5xl)] bg-bg-app transition-shadow",
+                dragging && "ring-2 ring-border-brand ring-inset",
                 className,
             )}
         >
             <button
                 type="button"
-                disabled={disabled}
+                disabled={disabled || uploading}
+                aria-busy={uploading}
                 onClick={() => {
                     // Clear here, not in onChange: resetting the input while the
                     // reader still holds its File releases the backing store
@@ -127,12 +128,37 @@ function ImageWell({
                         </span>
                     </>
                 ) : (
-                    <span className="flex size-full flex-col items-center justify-center gap-2 text-content-disabled">
-                        <HugeiconsIcon icon={Image01Icon} size={24} strokeWidth={1.5} />
-                        <span className="text-xs text-content-tertiary">{label}</span>
-                        <span className="text-xs">{hint}</span>
-                    </span>
+                    <>
+                        {/* The artboard fills an empty well with a transparency
+                            grid (873:51116): sixteen #ebebeb / #fafafa cells
+                            across whatever the width, centred like the cover
+                            fit of a square image. Sized in container units so
+                            the 1104 hero and the 354 tiles both get sixteen. */}
+                        <span
+                            aria-hidden
+                            className="absolute inset-0"
+                            style={{
+                                backgroundImage:
+                                    "repeating-conic-gradient(var(--color-bg-tertiary) 0 25%, var(--color-bg-app) 0 50%)",
+                                backgroundSize: "12.5cqw 12.5cqw",
+                                backgroundPosition: "center",
+                            }}
+                        />
+                        {/* The how-to only surfaces on hover, so the resting
+                            well is the artboard's bare grid. */}
+                        <span className="relative flex size-full flex-col items-center justify-center gap-2 text-content-tertiary opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                            <HugeiconsIcon icon={Image01Icon} size={24} strokeWidth={1.5} />
+                            <span className="text-xs">{label}</span>
+                            <span className="text-xs">{hint}</span>
+                        </span>
+                    </>
                 )}
+
+                {uploading ? (
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-medium text-content-inverse">
+                        {t.common.upload.uploading}
+                    </span>
+                ) : null}
             </button>
 
             {src && !disabled ? (
@@ -141,9 +167,14 @@ function ImageWell({
                     onClick={onClear}
                     aria-label={t.common.delete}
                     title={t.common.delete}
-                    className="absolute top-2 right-2 flex size-8 items-center justify-center rounded-pill bg-bg-primary text-content-secondary shadow-l2 transition-colors hover:bg-bg-secondary"
+                    // 873:51117 — 32 square on Background/Secondary with an 8px
+                    // radius, a 1px-stroke trash in brand.
+                    className={cn(
+                        "absolute flex size-8 items-center justify-center rounded-sm bg-bg-secondary p-2 text-content-brand transition-colors hover:bg-bg-tertiary",
+                        chipClassName,
+                    )}
                 >
-                    <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
+                    <AssetIcon src="/images/projects/icon-trash-thin.svg" size={16} />
                 </button>
             ) : null}
 
@@ -165,11 +196,12 @@ function ImageWell({
  * The gallery at the top of the project editor (873:51112).
  *
  * A 368px hero over three 200px tiles, all 24 apart and inset 8 to line up with
- * the sections below.
+ * the sections below. The hero's own row carries a further 8 on its left
+ * (873:51115), so it is 1104 wide and flush right while the tiles span the full
+ * 1112 — drawn that way, kept that way.
  *
- * Picked files stay local: `lib/api/http` serialises every body as JSON and has
- * no multipart path, so a well shows an object URL and the real upload is one
- * endpoint away. Nothing else about this component changes when it lands.
+ * A picked file is stored first and only its URL goes into the project, so a
+ * save never carries the bytes themselves.
  */
 export function GallerySection({
     heroImageUrl,
@@ -178,17 +210,50 @@ export function GallerySection({
     disabled,
 }: GallerySectionProps) {
     const { t } = useI18n();
+    const toast = useToast();
+    const [uploading, setUploading] = useState<ReadonlySet<WellKey>>(new Set());
+
+    // An upload resolves renders after it started; reading the props it closed
+    // over would drop whatever another well stored in the meantime.
+    const latest = useRef({ heroImageUrl, galleryImageUrls });
+    latest.current = { heroImageUrl, galleryImageUrls };
 
     function setHero(url: string | null) {
-        onChange({ heroImageUrl: url, galleryImageUrls: [...galleryImageUrls] });
+        onChange({ heroImageUrl: url, galleryImageUrls: [...latest.current.galleryImageUrls] });
     }
 
     function setSlot(index: number, url: string | null) {
-        const next = [...galleryImageUrls];
+        const next = [...latest.current.galleryImageUrls];
         if (url === null) next.splice(index, 1);
         else next[index] = url;
 
-        onChange({ heroImageUrl, galleryImageUrls: next });
+        // Filling the third tile of an empty gallery must not save two holes.
+        onChange({
+            heroImageUrl: latest.current.heroImageUrl,
+            galleryImageUrls: next.filter(Boolean),
+        });
+    }
+
+    async function upload(key: WellKey, file: File) {
+        setUploading((current) => new Set(current).add(key));
+
+        try {
+            const url = await projectsService.uploadImage(file);
+            if (key === "hero") setHero(url);
+            else setSlot(key, url);
+        } catch (error) {
+            toast.error(
+                isApiError(error) && error.status !== 0
+                    ? error.message
+                    : interpolate(t.common.upload.uploadFailed, { name: file.name }),
+            );
+        } finally {
+            setUploading((current) => {
+                const next = new Set(current);
+                next.delete(key);
+                return next;
+            });
+        }
     }
 
     return (
@@ -199,9 +264,11 @@ export function GallerySection({
                 hint={t.projects.editor.imageHint}
                 sizes="1104px"
                 disabled={disabled}
-                onPick={(file) => void readAsDataUrl(file).then(setHero)}
+                uploading={uploading.has("hero")}
+                onPick={(file) => void upload("hero", file)}
                 onClear={() => setHero(null)}
-                className="h-92"
+                className="ml-2 h-92"
+                chipClassName="top-4 right-4"
             />
 
             <div className="grid gap-6 sm:grid-cols-3">
@@ -213,9 +280,11 @@ export function GallerySection({
                         hint={t.projects.editor.imageHint}
                         sizes="355px"
                         disabled={disabled}
-                        onPick={(file) => void readAsDataUrl(file).then((url) => setSlot(index, url))}
+                        uploading={uploading.has(index)}
+                        onPick={(file) => void upload(index, file)}
                         onClear={() => setSlot(index, null)}
                         className="h-50"
+                        chipClassName="top-3 right-3"
                     />
                 ))}
             </div>

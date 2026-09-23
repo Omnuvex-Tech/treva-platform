@@ -1,6 +1,7 @@
 import { delay, searchBy } from "@/lib/api/mock";
 import { ApiError } from "@/lib/api/errors";
 import { MOCK_DOCUMENTS } from "@/mocks/documents";
+import { kindFor } from "../kind";
 import {
     DEFAULT_DOCUMENT_FLAGS,
     type BrokerDocument,
@@ -34,6 +35,10 @@ export async function detail(id: string): Promise<BrokerDocument> {
  * new row starts on neutral values: the category, the language and the
  * description are what the edit screen (873:52019) exists to fill in. The real
  * endpoint stamps the same defaults, along with the uploader and the clock.
+ *
+ * The file is read for its name, size and kind and then dropped — there is
+ * nowhere to put the bytes, which is why a mocked row has no `url` and its
+ * Download chip only moves the counter.
  */
 export async function create(input: DocumentCreateInput): Promise<BrokerDocument> {
     await delay();
@@ -41,12 +46,12 @@ export async function create(input: DocumentCreateInput): Promise<BrokerDocument
     const now = new Date().toISOString();
     const document: BrokerDocument = {
         id: `doc_${Date.now().toString(36)}`,
-        name: input.name,
-        kind: input.kind,
+        name: input.name || input.file.name,
+        kind: kindFor(input.file),
         category: "other",
         language: "en",
         description: "",
-        sizeBytes: input.sizeBytes,
+        sizeBytes: input.file.size,
         downloads: 0,
         version: 1,
         uploadedBy: input.uploadedBy,

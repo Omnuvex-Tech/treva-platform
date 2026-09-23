@@ -1,24 +1,21 @@
+/* eslint-disable @next/next/no-img-element -- the 15px paperclip exported from the artboard */
 "use client";
 
-import {
-    Add01Icon,
-    Attachment01Icon,
-    Delete02Icon,
-    File01Icon,
-    FileUploadIcon,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, File01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useState } from "react";
+import { useRef, useState, type DragEvent } from "react";
 
 import { AddFilesModal } from "@/components/common/add-files-modal";
-import { Button } from "@/components/ui/button";
-import { FileDrop } from "@/components/ui/file-drop";
+import { AssetIcon } from "@/components/ui/asset-icon";
+import { isApiError } from "@/lib/api/errors";
+import { cn } from "@/lib/utils/cn";
 import { interpolate } from "@/lib/i18n/interpolate";
 import { formatBytes } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
 import { useToast } from "@/providers/toast-provider";
+import { newsService } from "../api/news.service";
 import type { AttachmentKind, NewsAttachment } from "../types";
-import { EditorSection } from "./editor-section";
+import { EditorCard, outlineButtonClass } from "./editor-card";
 
 export interface AttachmentsCardProps {
     attachments: NewsAttachment[];
@@ -28,11 +25,7 @@ export interface AttachmentsCardProps {
 /** The design states the cap in the hint, so it is enforced here too. */
 const MAX_BYTES = 25 * 1024 * 1024;
 
-/**
- * Matches `attachHint` — "PDF, Word, Excel, or Images". The shared modal
- * defaults to the wider set its own artboard names (JPEG/PNG/PDF/MP4, 60MB),
- * which is Broker Role's rule, not this card's.
- */
+/** Matches `attachHint` — "PDF, Word, Excel, or Images". */
 const ACCEPT = "image/*,application/pdf,.doc,.docx,.xls,.xlsx";
 
 function kindFor(file: File): AttachmentKind {
@@ -43,70 +36,122 @@ function kindFor(file: File): AttachmentKind {
     return "other";
 }
 
-/** Artboard 873:51593 — a drop zone plus the list of what is already attached. */
+/**
+ * Attachments (873:51594): a 32px Add File button in the header, and a 150px
+ * dashed drop zone on the 14px radius — a 36px Background/Secondary tile with
+ * the paperclip, "Attach files" in 14/Semibold, the limits in 12/Regular on
+ * Content/Tertiary Inverse. What is already attached lists under it.
+ */
 export function AttachmentsCard({ attachments, onChange }: AttachmentsCardProps) {
     const { locale, t } = useI18n();
+    const copy = t.news.editor;
     const toast = useToast();
+    const inputRef = useRef<HTMLInputElement>(null);
     const [addOpen, setAddOpen] = useState(false);
+    const [dragging, setDragging] = useState(false);
+    const [pending, setPending] = useState(0);
+
+    // Uploads finish after the render that started them; appending to the prop
+    // they closed over would drop whatever landed in between.
+    const latest = useRef(attachments);
+    latest.current = attachments;
 
     /**
-     * The one entry point that enforces the cap, so the header modal and the
-     * inline drop zone cannot drift apart on what they accept.
+     * The one entry point that enforces the cap and stores the file, so the
+     * header modal and the inline drop zone cannot drift apart on what they
+     * accept. Only a stored file joins the list.
      */
-    function accept(file: File, name: string): NewsAttachment | null {
+    async function accept(file: File, name: string) {
         if (file.size > MAX_BYTES) {
-            toast.error(interpolate(t.news.editor.tooLarge, { name: file.name }));
-            return null;
+            toast.error(interpolate(copy.tooLarge, { name: file.name }));
+            return;
         }
 
-        return {
-            id: `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-            name: name || file.name,
-            sizeBytes: file.size,
-            kind: kindFor(file),
-        };
+        setPending((count) => count + 1);
+        try {
+            const stored = await newsService.upload(file);
+            const entry: NewsAttachment = {
+                id: `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                name: name || file.name,
+                sizeBytes: stored.sizeBytes,
+                kind: kindFor(file),
+                url: stored.url,
+            };
+
+            latest.current = [...latest.current, entry];
+            onChange(latest.current);
+        } catch (error) {
+            toast.error(
+                isApiError(error) && error.status !== 0
+                    ? error.message
+                    : interpolate(t.common.upload.uploadFailed, { name: file.name }),
+            );
+        } finally {
+            setPending((count) => count - 1);
+        }
     }
 
     function addFiles(files: File[]) {
-        const accepted = files
-            .map((file) => accept(file, ""))
-            .filter((entry): entry is NewsAttachment => entry !== null);
-
-        if (accepted.length) onChange([...attachments, ...accepted]);
+        for (const file of files) void accept(file, "");
     }
 
-    /** The header modal's single, optionally renamed file. */
-    function addNamedFile(file: File, name: string) {
-        const entry = accept(file, name);
-        if (entry) onChange([...attachments, entry]);
+    function handleDrop(event: DragEvent<HTMLButtonElement>) {
+        event.preventDefault();
+        setDragging(false);
+        addFiles(Array.from(event.dataTransfer.files));
     }
 
     return (
-        <EditorSection
-            icon={Attachment01Icon}
-            title={t.news.editor.attachments}
+        <EditorCard
+            iconSrc="/images/news/editor/heading-attachment.svg"
+            title={copy.attachments}
             action={
-                <Button
-                    variant="brandOutline"
-                    // The 32px form of `chip` — 873:51602 keeps the 3XL radius
-                    // and the 8px padding but stands a step taller.
-                    size="chip"
-                    className="h-8"
-                    leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
+                <button
+                    type="button"
                     onClick={() => setAddOpen(true)}
+                    className={cn(outlineButtonClass, "h-8 px-[7px]")}
                 >
-                    {t.news.editor.addFile}
-                </Button>
+                    <AssetIcon src="/images/news/icon-plus.svg" size={16} />
+                    {copy.addFile}
+                </button>
             }
         >
-            <div className="flex flex-col gap-3">
-                <FileDrop
-                    icon={FileUploadIcon}
-                    title={t.news.editor.attachFiles}
-                    hint={t.news.editor.attachHint}
+            {/* relative: the hidden file input is absolutely positioned and would
+                otherwise anchor to <body> and stretch the document. */}
+            <div className="relative flex flex-col gap-3 px-5 py-4">
+                <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    onDragOver={(event) => {
+                        event.preventDefault();
+                        setDragging(true);
+                    }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={handleDrop}
+                    className={cn(
+                        "flex w-full flex-col items-center justify-center gap-1 rounded-[14px] border border-dashed px-px py-8 transition-colors",
+                        dragging ? "border-border-brand bg-bg-secondary" : "border-border-subtle bg-bg-primary",
+                    )}
+                >
+                    <span className="flex size-9 items-center justify-center rounded-[14px] bg-bg-secondary">
+                        <img src="/images/news/editor/attach.svg" alt="" width={15} height={15} className="size-[15px]" />
+                    </span>
+                    <span className="text-sm leading-5 font-semibold text-content-primary">{copy.attachFiles}</span>
+                    <span className="pt-0.5 text-xs leading-[18px] text-[var(--color-content-tertiary-inverse)]">
+                        {copy.attachHint}
+                    </span>
+                </button>
+
+                <input
+                    ref={inputRef}
+                    type="file"
+                    accept={ACCEPT}
                     multiple
-                    minHeight={150}
-                    onFiles={addFiles}
+                    className="sr-only"
+                    onChange={(event) => {
+                        addFiles(Array.from(event.target.files ?? []));
+                        event.target.value = "";
+                    }}
                 />
 
                 {attachments.length > 0 ? (
@@ -118,41 +163,46 @@ export function AttachmentsCard({ attachments, onChange }: AttachmentsCardProps)
                                 </span>
 
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm text-content-primary">
-                                        {attachment.name}
-                                    </p>
+                                    <p className="truncate text-sm text-content-primary">{attachment.name}</p>
                                     <p className="text-xs text-content-tertiary">
                                         {formatBytes(attachment.sizeBytes, locale)}
                                     </p>
                                 </div>
 
-                                <Button
-                                    variant="ghost"
-                                    size="iconSm"
+                                <button
+                                    type="button"
                                     aria-label={`${t.common.delete}: ${attachment.name}`}
                                     onClick={() =>
-                                        onChange(
-                                            attachments.filter((entry) => entry.id !== attachment.id),
-                                        )
+                                        onChange(attachments.filter((entry) => entry.id !== attachment.id))
                                     }
-                                    className="text-content-tertiary hover:text-content-negative"
+                                    className="flex size-8 items-center justify-center rounded-sm text-content-tertiary transition-colors hover:bg-bg-secondary hover:text-content-negative"
                                 >
                                     <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
-                                </Button>
+                                </button>
                             </li>
                         ))}
                     </ul>
+                ) : null}
+
+                {pending > 0 ? (
+                    <p role="status" className="flex items-center gap-2 text-xs text-content-tertiary">
+                        <span
+                            aria-hidden
+                            className="size-3 animate-spin rounded-pill border-2 border-current border-t-transparent"
+                        />
+                        {t.common.upload.uploading}
+                    </p>
                 ) : null}
             </div>
 
             <AddFilesModal
                 open={addOpen}
                 onClose={() => setAddOpen(false)}
-                onAdd={addNamedFile}
-                hint={t.news.editor.attachHint}
+                onAdd={(file, name) => void accept(file, name)}
+                hint={copy.attachHint}
                 accept={ACCEPT}
                 maxBytes={MAX_BYTES}
             />
-        </EditorSection>
+        </EditorCard>
     );
 }

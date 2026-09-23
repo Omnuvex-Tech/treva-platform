@@ -1,72 +1,86 @@
 "use client";
 
-import {
-    Building01Icon,
-    Key01Icon,
-    Settings02Icon,
-    UserGroup03Icon,
-    UserMultiple02Icon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import type { IconSvgElement } from "@hugeicons/react";
-
-import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils/cn";
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { useI18n } from "@/providers/i18n-provider";
-import { VISIBILITY_AUDIENCES, type VisibilityAudience } from "../types";
-import { EditorSection } from "./editor-section";
+import { VISIBILITY_OPTIONS, type VisibilityOption } from "../types";
+import { EditorSideCard } from "./editor-card";
 
-export interface VisibilityCardProps {
-    visibility: Record<VisibilityAudience, boolean>;
-    onChange: (visibility: Record<VisibilityAudience, boolean>) => void;
-}
+type Row = "pinned" | VisibilityOption;
 
-const AUDIENCE_ICON: Record<VisibilityAudience, IconSvgElement> = {
-    brokers: UserMultiple02Icon,
-    topBrokers: Key01Icon,
-    admins: Settings02Icon,
-    agencies: Building01Icon,
-    clients: UserGroup03Icon,
+const ROWS: readonly Row[] = ["pinned", ...VISIBILITY_OPTIONS];
+
+const ICON: Record<Row, string> = {
+    pinned: "opt-pinned",
+    featured: "opt-featured",
+    showOnDashboard: "opt-dashboard",
+    pushNotification: "opt-push",
+    emailNotification: "opt-email",
 };
 
+export interface VisibilityCardProps {
+    pinned: boolean;
+    visibility: Record<VisibilityOption, boolean>;
+    onChange: (patch: { pinned?: boolean; visibility?: Record<VisibilityOption, boolean> }) => void;
+}
+
 /**
- * Artboard 873:51626 — five audience rows, each an icon plus a title and a
- * description with a toggle on the right.
+ * Visibility (873:51626): five rows 8px apart — a 28px Background/Secondary
+ * tile on the 10px radius with a 13px glyph, a 12/Semibold title over a
+ * description clipped to 13.75px, and the 32x20 `Toggle` 12px to the right.
  */
-export function VisibilityCard({ visibility, onChange }: VisibilityCardProps) {
+export function VisibilityCard({ pinned, visibility, onChange }: VisibilityCardProps) {
     const { t } = useI18n();
+    const copy = t.news.editor;
 
     return (
-        <EditorSection icon={UserGroup03Icon} title={t.news.editor.visibility}>
-            <ul className="flex flex-col gap-3">
-                {VISIBILITY_AUDIENCES.map((audience) => (
-                    <li key={audience} className="flex items-start gap-2.5">
-                        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-sm bg-bg-secondary text-content-tertiary">
-                            <HugeiconsIcon
-                                icon={AUDIENCE_ICON[audience]}
-                                size={13}
-                                strokeWidth={1.6}
-                            />
-                        </span>
+        <EditorSideCard title={copy.visibility}>
+            {/* -mr-px: the artboard's list is 236 wide in a 235px body (873:51631), which
+                is what puts the toggles 204px in. */}
+            <ul className="-mr-px flex flex-col gap-2">
+                {ROWS.map((row) => {
+                    const checked = row === "pinned" ? pinned : visibility[row];
+                    const toggle = () =>
+                        row === "pinned"
+                            ? onChange({ pinned: !pinned })
+                            : onChange({ visibility: { ...visibility, [row]: !visibility[row] } });
 
-                        <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-content-primary">
-                                {t.news.editor.audience[audience]}
-                            </p>
-                            <p className="text-xs text-content-tertiary">
-                                {t.news.editor.audienceHint[audience]}
-                            </p>
-                        </div>
+                    return (
+                        <li key={row} className="flex items-center gap-3">
+                            <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                                <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-bg-secondary text-content-brand">
+                                    <AssetIcon src={`/images/news/editor/${ICON[row]}.svg`} size={13} />
+                                </span>
 
-                        <Switch
-                            checked={visibility[audience]}
-                            aria-label={t.news.editor.audience[audience]}
-                            onChange={(event) =>
-                                onChange({ ...visibility, [audience]: event.target.checked })
-                            }
-                        />
-                    </li>
-                ))}
+                                <div className="flex min-w-0 flex-col">
+                                    <p className="truncate text-xs leading-[18px] font-semibold text-content-primary">
+                                        {copy.options[row]}
+                                    </p>
+                                    <p className="h-[13.75px] overflow-hidden text-xs leading-[18px] whitespace-nowrap text-[var(--color-content-tertiary-inverse)]">
+                                        {copy.optionHints[row]}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* `Toggle` (873:51643): 32x20, a 16px white knob inset 2,
+                                Background/Teritary off and Content/Brand on. */}
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={checked}
+                                aria-label={copy.options[row]}
+                                onClick={toggle}
+                                className={cn(
+                                    "flex h-5 w-8 shrink-0 items-center overflow-clip rounded-[120px] p-0.5 transition-colors",
+                                    checked ? "justify-end bg-content-brand" : "justify-start bg-bg-tertiary",
+                                )}
+                            >
+                                <span aria-hidden className="size-4 rounded-[100px] bg-bg-primary" />
+                            </button>
+                        </li>
+                    );
+                })}
             </ul>
-        </EditorSection>
+        </EditorSideCard>
     );
 }

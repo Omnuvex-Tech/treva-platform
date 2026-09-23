@@ -33,6 +33,8 @@ export type HighlightKind = (typeof HIGHLIGHT_KINDS)[number];
 export interface ProjectHighlight {
     id: string;
     kind: HighlightKind;
+    /** An uploaded icon drawn instead of the kind's glyph; null keeps the glyph. */
+    iconUrl?: string | null;
     label: string;
     value: string;
     /** The switch on the row; off greys the whole card out. */
@@ -64,6 +66,8 @@ export interface ProjectMaterial {
      * not show it; the detail screen's list does (1173:16305).
      */
     downloads: number;
+    /** Where POST /projects/materials stored the file. */
+    url?: string;
 }
 
 /**
@@ -149,6 +153,17 @@ export interface Project {
     layouts: Layout[];
 }
 
+/**
+ * What one press of Synchronize did (treva-broker-api's `SyncSummary`): the
+ * off-plan objects, buildings and units it copied in from treva-api.
+ */
+export interface ProjectSyncSummary {
+    projects: { created: number; updated: number; deactivated: number };
+    buildings: number;
+    units: { created: number; updated: number; removed: number; total: number };
+    durationMs: number;
+}
+
 export interface ProjectListQuery {
     page?: number;
     perPage?: number;
@@ -159,10 +174,13 @@ export interface ProjectListQuery {
 /** Everything the editor (873:51091) owns. */
 export interface ProjectInput {
     name: string;
+    /** Beside the name in the editor's headline; the card prints it. */
+    location: string;
     publicUrl: string;
     heroImageUrl: string | null;
     galleryImageUrls: string[];
     highlights: ProjectHighlight[];
     offers: ProjectOffer[];
+    materials: ProjectMaterial[];
     availability: ProjectAvailability;
 }

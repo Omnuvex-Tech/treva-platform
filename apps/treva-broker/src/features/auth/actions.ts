@@ -4,28 +4,67 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { isApiError } from "@/lib/api/errors";
-import { SESSION_COOKIE, SESSION_MAX_AGE, encodeSession } from "@/lib/auth/session-cookie";
+import {
+    SESSION_COOKIE,
+    SESSION_MAX_AGE,
+    decodeSession,
+    encodeSession,
+} from "@/lib/auth/session-cookie";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n/config";
 import { HOME_ROUTE, routes } from "@/config/routes";
+import type { Session } from "@/types/auth";
 import { authService } from "./api/auth.service";
 
-export interface LoginFormState {
+/**
+ * What a failed auth form gets back. `code` is the API's machine-readable key
+ * (`invalid_credentials`, `email_taken`, …) which the form translates; `error`
+ * is the raw message, shown only when the code has no translation.
+ */
+export interface AuthFormState {
     error: string | null;
+    code: string | null;
+}
+
+export type LoginFormState = AuthFormState;
+export type RegisterFormState = AuthFormState;
+
+function failure(error: unknown, fallbackCode: string): AuthFormState {
+    return isApiError(error)
+        ? { error: error.message, code: error.code }
+        : { error: null, code: fallbackCode };
+}
+
+function readLocale(formData: FormData): Locale {
+    const value = String(formData.get("locale") ?? "");
+    return isLocale(value) ? value : DEFAULT_LOCALE;
+}
+
+async function storeSession(session: Session) {
+    // The cookie never outlives the token inside it.
+    const secondsLeft = Math.floor((new Date(session.expiresAt).getTime() - Date.now()) / 1000);
+
+    const store = await cookies();
+    store.set(SESSION_COOKIE, encodeSession(session), {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: Math.max(0, Math.min(SESSION_MAX_AGE, secondsLeft || SESSION_MAX_AGE)),
+    });
 }
 
 /**
  * Handles the login form.
  *
  * A Server Action rather than a client fetch so the session cookie is set with
- * `httpOnly` — a token in a JS-readable cookie is one XSS away from being
- * stolen, and that matters the moment this stops talking to the mock adapter.
+ * `httpOnly` — the API's access token lives in it, and a token in a JS-readable
+ * cookie is one XSS away from being stolen.
  */
 export async function signInAction(
     _previousState: LoginFormState,
     formData: FormData,
 ): Promise<LoginFormState> {
-    const localeValue = String(formData.get("locale") ?? "");
-    const locale: Locale = isLocale(localeValue) ? localeValue : DEFAULT_LOCALE;
+    const locale = readLocale(formData);
 
     try {
         // The role is never sent from here — it belongs to the account and is
@@ -36,18 +75,9 @@ export async function signInAction(
             rememberMe: formData.get("rememberMe") === "on",
         });
 
-        const store = await cookies();
-        store.set(SESSION_COOKIE, encodeSession(session), {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: SESSION_MAX_AGE,
-        });
+        await storeSession(session);
     } catch (error) {
-        return {
-            error: isApiError(error) ? error.message : "Sign in failed. Please try again.",
-        };
+        return failure(error, "signInFailed");
     }
 
     // Outside the try/catch on purpose: redirect() signals by throwing, and a
@@ -56,21 +86,19 @@ export async function signInAction(
 }
 
 export async function signOutAction(locale: Locale): Promise<void> {
+    const store = await cookies();
+    const session = decodeSession(store.get(SESSION_COOKIE)?.value);
+
     try {
-        await authService.logout();
+        await authService.logout(session?.accessToken);
     } catch {
         // A failed server-side revoke must not strand the user in a signed-in
         // UI — the local cookie is cleared either way.
     }
 
-    const store = await cookies();
     store.delete(SESSION_COOKIE);
 
     redirect(routes.login(isLocale(locale) ? locale : DEFAULT_LOCALE));
-}
-
-export interface RegisterFormState {
-    error: string | null;
 }
 
 /**
@@ -79,34 +107,33 @@ export interface RegisterFormState {
  * The same shape as {@link signInAction}, and for the same reason: the session
  * cookie has to be set `httpOnly`, which only the server can do. A new account
  * is signed in immediately — there is no verification step in the file.
+ *
+ * Creating a company sends nothing about it but its name; the API creates the
+ * company and the account together and makes this user its owner.
  */
 export async function signUpAction(
     _previousState: RegisterFormState,
     formData: FormData,
 ): Promise<RegisterFormState> {
-    const localeValue = String(formData.get("locale") ?? "");
-    const locale: Locale = isLocale(localeValue) ? localeValue : DEFAULT_LOCALE;
+    const locale = readLocale(formData);
     const type = formData.get("type") === "company" ? "company" : "individual";
+    const companyName = String(formData.get("companyName") ?? "").trim();
+
+    if (type === "company" && !companyName) {
+        return { error: "Company name is required", code: "validation_error" };
+    }
 
     try {
         const session = await authService.register({
             email: String(formData.get("email") ?? ""),
             password: String(formData.get("password") ?? ""),
             type,
+            ...(type === "company" ? { companyName } : {}),
         });
 
-        const store = await cookies();
-        store.set(SESSION_COOKIE, encodeSession(session), {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: SESSION_MAX_AGE,
-        });
+        await storeSession(session);
     } catch (error) {
-        return {
-            error: isApiError(error) ? error.message : "Registration failed. Please try again.",
-        };
+        return failure(error, "registerFailed");
     }
 
     // Outside the try/catch: redirect() signals by throwing.

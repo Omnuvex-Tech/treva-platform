@@ -6,6 +6,11 @@ export interface TabItem<T extends string = string> {
     value: T;
     label: string;
     count?: number;
+    /**
+     * Extra classes for this one tab, applied last — for a screen whose panel
+     * draws its tabs at fixed sizes rather than hugging their labels.
+     */
+    className?: string;
 }
 
 export type TabsVariant = "track" | "pill";
@@ -83,6 +88,7 @@ export function Tabs<T extends string = string>({
                                 : pill
                                   ? "text-content-disabled hover:text-content-secondary"
                                   : "text-content-tertiary hover:text-content-primary",
+                            item.className,
                         )}
                     >
                         {item.label}

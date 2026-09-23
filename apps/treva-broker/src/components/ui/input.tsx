@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
+import { useId, useState, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -28,6 +29,11 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
      * (873:60467) is the one that draws 20.
      */
     iconSize?: 16 | 20;
+    /**
+     * A password field draws the reveal eye sign-in uses. Pass `false` where a
+     * field holds a password nobody should be able to shoulder-surf.
+     */
+    revealable?: boolean;
 }
 
 /**
@@ -52,15 +58,35 @@ export function Input({
     surface = "filled",
     size = "md",
     iconSize = 16,
+    revealable = true,
     className,
     id,
     disabled,
     required,
+    type,
     ...props
 }: InputProps) {
     const generatedId = useId();
     const inputId = id ?? generatedId;
     const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined;
+
+    // A password field swaps its own type rather than asking every caller to
+    // hold the flag — the eye is the same one sign-in draws (login-form.tsx).
+    const [revealed, setRevealed] = useState(false);
+    const isPassword = type === "password";
+    const showEye = isPassword && revealable && !disabled;
+
+    const reveal = showEye ? (
+        <button
+            type="button"
+            onClick={() => setRevealed((previous) => !previous)}
+            aria-label={revealed ? "Hide password" : "Show password"}
+            aria-pressed={revealed}
+            className="flex items-center text-content-tertiary transition-colors hover:text-content-primary"
+        >
+            {revealed ? <IoEyeOffOutline /> : <IoEyeOutline />}
+        </button>
+    ) : null;
 
     return (
         <div className={cn("flex w-full flex-col", containerClassName)}>
@@ -100,6 +126,13 @@ export function Input({
                             ? "border border-border-subtle bg-bg-primary"
                             : "border border-transparent bg-bg-secondary",
                     "focus-within:border-border-brand focus-within:bg-bg-primary",
+                    // The autofill blue (globals.css) is painted by this box, not
+                    // by the input, so it reaches the edges and corners in one
+                    // piece. Important so focus's white cannot punch holes in
+                    // it; clipped to the padding box so the blue does not tint
+                    // the 1px edge, which at fractional zoom straddles two
+                    // device rows and would read darker where the fill is.
+                    "has-[input:-webkit-autofill]:bg-[var(--color-bg-autofill)]! has-[input:-webkit-autofill]:bg-clip-padding",
                     error && "border-content-negative",
                     // Background/Disabled is Background/Secondary — the field
                     // keeps its edge and loses its white (I873:48774). An
@@ -121,6 +154,7 @@ export function Input({
 
                 <input
                     id={inputId}
+                    type={isPassword && revealed ? "text" : type}
                     disabled={disabled}
                     required={required}
                     aria-invalid={error ? true : undefined}
@@ -128,20 +162,25 @@ export function Input({
                     className={cn(
                         "h-full w-full min-w-0 bg-transparent text-sm text-content-primary outline-none",
                         "placeholder:text-content-tertiary",
+                        // The wrapper paints the autofill blue here (see the box
+                        // above), so the input must not paint its own on top: at
+                        // fractional zoom its edges snap a subpixel off the
+                        // wrapper's inner edge and leave a step where it starts.
+                        "[&:-webkit-autofill]:shadow-none",
                         "disabled:cursor-not-allowed disabled:text-content-disabled disabled:placeholder:text-content-disabled",
                         className,
                     )}
                     {...props}
                 />
 
-                {trailingIcon ? (
+                {trailingIcon ?? reveal ? (
                     <span
                         className={cn(
                             "flex shrink-0 items-center text-content-tertiary",
                             iconSize === 20 ? "[&_svg]:size-5" : "[&_svg]:size-4",
                         )}
                     >
-                        {trailingIcon}
+                        {trailingIcon ?? reveal}
                     </span>
                 ) : null}
             </div>

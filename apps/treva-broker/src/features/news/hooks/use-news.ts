@@ -38,6 +38,27 @@ export function useNewsStats() {
     });
 }
 
+/**
+ * Marks an article read, then refreshes the rail's Unread count.
+ *
+ * `refetchType: "all"` because the rail is unmounted while the article is open:
+ * the default only refetches observed queries, which would leave the stale
+ * count to paint on the way back to the feed and correct itself a beat later.
+ */
+export function useMarkNewsRead() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => newsService.markRead(id),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({
+                queryKey: queryKeys.news.stats,
+                refetchType: "all",
+            });
+        },
+    });
+}
+
 export function useCreateNews() {
     const queryClient = useQueryClient();
 

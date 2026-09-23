@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { LogoCell } from "@/components/layout/logo-cell";
+import { ScrollMain } from "@/components/layout/scroll-main";
 import { Sidebar } from "@/components/layout/sidebar";
 import { requireSession } from "@/lib/auth/guard";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
@@ -43,9 +44,7 @@ export default async function DashboardLayout({
 
                     <div className="flex min-h-0 flex-1">
                         <Sidebar />
-                        <main className="scrollbar-thin min-w-0 flex-1 overflow-y-auto bg-bg-app">
-                            {children}
-                        </main>
+                        <ScrollMain>{children}</ScrollMain>
                     </div>
                 </div>
             </ToastProvider>

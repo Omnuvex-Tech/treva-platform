@@ -41,7 +41,9 @@
       "selectFile": "Select file",
       "tooLarge": "{name} is larger than {limit} and was not added",
       "enterToAdd": "Press Enter to add",
-      "selectFirst": "Choose a file first"
+      "selectFirst": "Choose a file first",
+      "uploading": "Uploading…",
+      "uploadFailed": "{name} could not be uploaded"
     }
   },
   "nav": {
@@ -50,7 +52,7 @@
     "brokerRole": "Broker Role",
     "finance": "Finance",
     "projects": "Projects",
-    "floorPlan": "Floor Plan",
+    "floorPlan": "Magazine",
     "adminPanel": "Admin Panel",
     "users": "Users",
     "listings": "Listings",
@@ -60,11 +62,12 @@
     "welcomeTitle": "Welcome to TREVA",
     "welcomeSubtitle": "Premium real estate management platform",
     "email": "Email address",
-    "emailPlaceholder": "admin@treva.az",
+    "emailPlaceholder": "info@treva.realestate",
     "password": "Password",
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password?",
     "signIn": "Sign in to dashboard",
+    "signingIn": "Signing in...",
     "register": "Register",
     "securityNote": "Protected by enterprise-grade security",
     "invalidCredentials": "Email or password is incorrect",
@@ -89,6 +92,7 @@
       "createCompanyHint": "Register a new company and become its first administrator.",
       "joinCompany": "Join Existing Company",
       "joinCompanyHint": "Request to join a company already using the platform.",
+      "companyName": "Company name",
       "searchCompany": "Search or select a company",
       "back": "Back",
       "continue": "Continue",
@@ -102,12 +106,27 @@
       "subtitle": "Use the email you'll sign in with.",
       "passwordHint": "At least 8 characters.",
       "submit": "Create account"
+    },
+    "errors": {
+      "invalid_credentials": "Email or password is incorrect",
+      "account_disabled": "This account has been deactivated",
+      "email_taken": "That email is already registered",
+      "company_name_taken": "A company with this name already exists",
+      "validation_error": "Check the fields and try again",
+      "network_error": "Could not reach the server. Please try again.",
+      "timeout": "The server took too long to respond. Please try again.",
+      "internal_error": "Something went wrong on the server. Please try again.",
+      "signInFailed": "Sign in failed. Please try again.",
+      "registerFailed": "Registration failed. Please try again."
     }
   },
   "news": {
     "title": "News Feed",
     "subtitle": "View and manage the latest news, announcements, and project updates",
     "add": "Add news",
+    "copy": "Copy",
+    "copySuffix": "(Copy)",
+    "copied": "Article duplicated",
     "pinned": "Pinned",
     "quickStats": "Quick Stats",
     "postsThisWeek": "Posts this week",
@@ -122,10 +141,10 @@
       "autosaved": "Auto-saved",
       "saving": "Saving…",
       "basicInformation": "Basic Information",
-      "titleLabel": "Title",
-      "titlePlaceholder": "Give the article a headline",
-      "summaryLabel": "Summary",
-      "summaryPlaceholder": "One or two sentences shown on the card",
+      "titleLabel": "News Title",
+      "titlePlaceholder": "e.g. Q2 Commission Structure Update",
+      "summaryLabel": "Short Description",
+      "summaryPlaceholder": "Write a concise summary shown in news cards and search results...",
       "categoryLabel": "Category",
       "coverImage": "Cover Image",
       "coverDrop": "Upload a cover",
@@ -139,40 +158,41 @@
       "attachments": "Attachments",
       "attachHint": "PDF, Word, Excel, or Images · Max 25 MB",
       "attachFiles": "Attach files",
-      "addFile": "Add file",
+      "addFile": "Add File",
       "publishing": "Publishing",
-      "publishDate": "Publish date",
-      "publishTime": "Time",
-      "expiryDate": "Expires",
-      "expiryPolicy": "After expiry",
-      "expiryKeep": "Keep visible",
-      "expiryArchive": "Archive",
-      "expiryDelete": "Delete",
-      "author": "Author",
+      "publishDate": "Publish Date",
+      "publishTime": "Publish Time",
       "visibility": "Visibility",
-      "audience": {
-        "brokers": "Brokers",
-        "topBrokers": "Top brokers",
-        "admins": "Admins",
-        "agencies": "Agencies",
-        "clients": "Clients"
-      },
-      "audienceHint": {
-        "brokers": "Everyone with a broker account",
-        "topBrokers": "Team leads only",
-        "admins": "Platform administrators",
-        "agencies": "Partner real-estate agencies",
-        "clients": "Shown in the client portal"
-      },
-      "saveDraft": "Save draft",
-      "publish": "Publish",
+      "saveDraft": "Save a draft",
+      "publish": "Publish News",
       "update": "Update",
       "discard": "Discard",
       "publishedToast": "Article published",
       "draftToast": "Draft saved",
       "tooLarge": "{name} is larger than 25 MB and was not attached",
-      "backToFeed": "Back to news feed"
-    }
+      "backToFeed": "Back to news feed",
+      "language": "Language",
+      "expirationDate": "Expiration Date",
+      "blockParagraph": "Paragraph",
+      "blockHeading": "Heading",
+      "blockSubheading": "Subheading",
+      "blockQuote": "Quote",
+      "options": {
+        "pinned": "Pin this Post",
+        "featured": "Featured News",
+        "showOnDashboard": "Show on Dashboard",
+        "pushNotification": "Push Notification",
+        "emailNotification": "Email Notification"
+      },
+      "optionHints": {
+        "pinned": "Fixed at top of feed",
+        "featured": "Highlight in featured section",
+        "showOnDashboard": "Visible on main dashboard",
+        "pushNotification": "Alert all users on publish",
+        "emailNotification": "Send to subscriber list"
+      }
+    },
+    "crumbFeed": "News feed"
   },
   "clients": {
     "title": "Clients",
@@ -185,7 +205,8 @@
       "fullName": "Full Name",
       "contacts": "Contacts",
       "objectOfInterest": "Object of interest",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
     },
     "status": {
       "pending": "Pending",
@@ -335,6 +356,7 @@
     "from": "from",
     "editor": {
       "name": "Project name",
+      "location": "Location",
       "publicUrl": "Public URL",
       "save": "Save Changes",
       "heroImage": "Cover image",
@@ -344,6 +366,9 @@
       "highlightLabel": "Label",
       "highlightValue": "Value",
       "highlightEnabled": "Show this highlight",
+      "highlightIcon": "Upload icon",
+      "replaceIcon": "Replace icon",
+      "removeIcon": "Remove icon",
       "addHighlight": "Add Highlight",
       "offers": "Special Offers",
       "offersHint": "Highlight limited-time promotions and buyer incentives.",
@@ -393,25 +418,30 @@
       "download": "Download",
       "downloads": "{count} downloads",
       "finance": "Finance",
-      "floorPlan": "Floor Plan",
+      "floorPlan": "Magazine",
       "lastSynced": "Last synced: {when}",
       "edit": "Edit",
       "financeColumns": {
-        "index": "No",
+        "index": "№",
         "projectName": "Project Name",
         "unitCode": "Unit",
         "listingPrice": "Listing Price",
         "salesPrice": "Sales Price",
-        "received": "Rec.",
+        "received": "Receivable",
         "paid": "Paid",
-        "remaining": "Rem.",
+        "remaining": "Remaining",
         "salesDate": "Sales Date"
-      }
-    }
+      },
+      "expires": "Expires {date}"
+    },
+    "sync": "Synchronize",
+    "syncing": "Synchronizing…",
+    "synced": "Synchronized {projects} projects and {units} units"
   },
   "floorPlan": {
-    "title": "Floor Plan",
+    "title": "Magazine",
     "subtitle": "Explore buildings, floors, and unit availability",
+    "buildingSubtitle": "Create, organize, and update buildings and units for every project",
     "legend": {
       "available": "Available",
       "reserved": "Reserved",
@@ -474,7 +504,7 @@
   },
   "users": {
     "title": "Users",
-    "subtitle": "Manage all off-plan development objects",
+    "subtitle": "Manage all users and their access",
     "tabs": {
       "user": "User",
       "agency": "Real Estate Agencies"
@@ -512,11 +542,14 @@
       "lastName": "Surname",
       "email": "Email",
       "password": "Password",
+      "passwordCreateHint": "At least 8 characters. Leave blank and a one-time password is generated.",
+      "passwordEditHint": "At least 8 characters. Leave blank to keep the current password.",
       "phone": "Primary number",
       "addPhone": "Add another number",
+      "removePhone": "Remove this number",
       "cooperationType": "Cooperation Type",
-      "agentlik": "Agentlik",
       "agency": "Agency",
+      "agencyNone": "No agency",
       "accessPermissions": "Access Permissions",
       "accessPermissionOptions": {
         "full": "Full access",
@@ -532,6 +565,19 @@
       "blockAgent": "Block Agent",
       "create": "Create",
       "save": "Save"
+    },
+    "agencyForm": {
+      "createTitle": "Real estate create",
+      "editTitle": "Real estate edit",
+      "name": "Name",
+      "managerName": "Manager",
+      "phone": "Contacts",
+      "organization": "Organization",
+      "email": "E-Mail",
+      "managerNote": "Only accounts that belong to no agency can be put in charge. Adding a new manager creates their account with a one-time password, which they change on their profile.",
+      "manager": "Manager",
+      "managerPlaceholder": "Choose an account",
+      "managerNew": "Add a new manager"
     },
     "profile": {
       "title": "Profile"
@@ -550,8 +596,10 @@
     },
     "deleteConfirm": "Delete this user? This cannot be undone.",
     "addUser": "Add User",
+    "addAgency": "Add Real Estate",
     "userAdded": "User Successfully Added",
     "agencyAdded": "Agency Successfully Added",
+    "agencyUpdated": "Agency Successfully Updated",
     "userDeleted": "User removed",
     "agencyDeleted": "Agency removed",
     "searchUsers": "Search by name, surname, or phone number",

@@ -13,7 +13,7 @@ const nextConfig = {
     experimental: {
         authInterrupts: true,
     },
-    transpilePackages: ["@repo/shared", "@repo/types"],
+    transpilePackages: ["@repo/shared", "@repo/types", "@repo/ui"],
     images: {
         /**
          * Next 16 refuses any remote image host that resolves to a private IP
@@ -27,6 +27,13 @@ const nextConfig = {
         remotePatterns: [
             { protocol: "http", hostname: "localhost" },
             { protocol: "https", hostname: "images.unsplash.com" },
+            /**
+             * Building photos and unit layout drawings synchronised from
+             * treva-api point at Profitbase, where treva-api's own import
+             * found them; the broker stores the URLs, not the files.
+             */
+            { protocol: "https", hostname: "**.profitbase.ru" },
+            { protocol: "https", hostname: "api.treva.realestate" },
             {
                 protocol: brokerApiOrigin.protocol.replace(":", ""),
                 hostname: brokerApiOrigin.hostname,
