@@ -4,30 +4,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FormDropdown } from "@repo/ui";
 import { IoClose } from "react-icons/io5";
 import { FiClock, FiGift, FiRefreshCcw, FiStar, FiTag } from "react-icons/fi";
-import { housesApi, type CreateHouseData } from "../../api/houses";
+import { housesApi, type CreateHouseData, type UpdateHouseData } from "../../api/houses";
 import { categoriesApi, type Category } from "../../api/categories";
 import { typeOfBuildingOptionsApi, type TypeOfBuildingOption } from "../../api/type-of-building-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { DatePickerField } from "../../components/DatePickerField";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
-
-const STATIC_TYPE_OF_BUILDING_OPTIONS = [
-    { id: "Residential building", label: "Residential building" },
-    { id: "Apartment block", label: "Apartment block" },
-    { id: "Villa complex", label: "Villa complex" },
-    { id: "Townhouse", label: "Townhouse" },
-    { id: "Business center", label: "Business center" },
-    { id: "Mixed-use building", label: "Mixed-use building" },
-];
-
-const STATIC_CONSTRUCTION_STAGE_OPTIONS = [
-    { id: "Planning", label: "Planning" },
-    { id: "Foundation", label: "Foundation" },
-    { id: "Under construction", label: "Under construction" },
-    { id: "Finishing", label: "Finishing" },
-    { id: "Ready", label: "Ready" },
-];
+import { ProfitbaseLocked, ProfitbaseNotice } from "../../components/ProfitbaseNotice";
+import { CONSTRUCTION_STAGE_OPTIONS, TYPE_OF_BUILDING_OPTIONS, withCurrentOption } from "../../utils/offplanOptions";
 
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#A3A3A3] outline-none transition-colors focus:border-[#C8CDD8]";
@@ -189,7 +174,7 @@ export function HouseForm({
     );
     const mergedTypeOfBuildingOptions = useMemo(() => {
         const apiOptions = typeOfBuildingOptions.map((item) => ({ id: item.value, label: item.value }));
-        const combined = [...STATIC_TYPE_OF_BUILDING_OPTIONS, ...apiOptions];
+        const combined = [...TYPE_OF_BUILDING_OPTIONS, ...apiOptions];
 
         return combined.filter((option, index, array) =>
             array.findIndex((item) => item.id === option.id) === index
@@ -197,6 +182,8 @@ export function HouseForm({
     }, [typeOfBuildingOptions]);
     const categoryId = (categoryRes as any)?.data?.id || selectedCategoryId;
     const existingHouse = (existingHouseRes as any)?.data;
+    // Synced houses belong to Profitbase: its fields are read-only here.
+    const isSynced = Boolean(existingHouse?.externalId);
 
     useEffect(() => {
         if (!isEditMode || !existingHouse) return;
@@ -285,7 +272,7 @@ export function HouseForm({
     };
 
     const mutation = useMutation({
-        mutationFn: (data: Partial<CreateHouseData>) => {
+        mutationFn: (data: UpdateHouseData) => {
             if (isEditMode && houseId) {
                 return housesApi.update(houseId, data);
             }
@@ -312,7 +299,7 @@ export function HouseForm({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!categoryId || !form.name.trim() || !form.typeOfBuilding) {
+        if (!categoryId || !form.name.trim() || (!isSynced && !form.typeOfBuilding)) {
             showError({
                 title: "Please fill required house fields",
                 description: "House name and type of building are required.",
@@ -347,11 +334,22 @@ export function HouseForm({
                   attributeIds: [],
               };
 
+        // Name, type and image come from Profitbase on synced houses.
+        const profitbaseOwned = isSynced
+            ? {}
+            : {
+                  title: form.name.trim(),
+                  name: form.name.trim(),
+                  typeOfBuilding: form.typeOfBuilding,
+                  mainImage: form.image.trim() ? { url: form.image.trim(), alt: form.name.trim() || "House" } : undefined,
+              };
+        // A cleared field is sent as null on edit so the API clears it.
+        const text = (value: string) => value.trim() || (isEditMode ? null : undefined);
+
         mutation.mutate({
             ...createOnlyDefaults,
+            ...profitbaseOwned,
             categoryId,
-            title: form.name.trim(),
-            name: form.name.trim(),
             slug: form.slug.trim() || slugify(form.name),
             ...(Number.isFinite(parsedHouseNumber)
                 ? { number: parsedHouseNumber }
@@ -359,18 +357,16 @@ export function HouseForm({
                   ? {}
                   : { number: 1 }),
             completionYear,
-            mainImage: form.image.trim() ? { url: form.image.trim(), alt: form.name.trim() || "House" } : undefined,
             gallery: existingHouse?.gallery || [],
             documents: existingHouse?.documents || [],
-            street: form.street.trim() || undefined,
-            houseNumber: form.houseNumber.trim() || undefined,
-            typeOfBuilding: form.typeOfBuilding,
-            constructionStage: form.constructionStage || undefined,
-            deadlineForCommissioning: form.deadlineForCommissioning || undefined,
-            salesOffice: form.salesOffice.trim() || undefined,
-            landCadastralNumber: form.landCadastralNumber.trim() || undefined,
-            contractAddress: form.contractAddress.trim() || undefined,
-            showroomAvailability: form.showroomAvailability.trim() || undefined,
+            street: text(form.street),
+            houseNumber: text(form.houseNumber),
+            constructionStage: text(form.constructionStage),
+            deadlineForCommissioning: text(form.deadlineForCommissioning),
+            salesOffice: text(form.salesOffice),
+            landCadastralNumber: text(form.landCadastralNumber),
+            contractAddress: text(form.contractAddress),
+            showroomAvailability: text(form.showroomAvailability),
         });
     };
 
@@ -392,7 +388,7 @@ export function HouseForm({
     return (
         <form onSubmit={handleSubmit} className="rounded-[28px] border border-[#E9ECF2] bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
             <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-[22px] font-medium text-[#1A1A1A]">Making a home</h3>
+                <h3 className="text-[22px] font-medium text-[#1A1A1A]">{isEditMode ? "Edit house" : "Add house"}</h3>
                 {!embedded ? (
                     <button
                         type="button"
@@ -403,6 +399,14 @@ export function HouseForm({
                     </button>
                 ) : null}
             </div>
+
+            {isSynced ? (
+                <ProfitbaseNotice>
+                    The name, type of building, image, floors and prices come from Profitbase and update on every Transfer. Profitbase
+                    leaves the address, sales and showroom fields empty for most houses, so they are edited here. A Transfer only
+                    overwrites the construction stage and commissioning deadline when Profitbase has them.
+                </ProfitbaseNotice>
+            ) : null}
 
             {!activeCategorySlug ? (
                 <div className="mb-4">
@@ -418,7 +422,7 @@ export function HouseForm({
             ) : null}
 
             <div className="mb-5 grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
-                <div className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
+                <ProfitbaseLocked locked={isSynced} className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
                     <ImageAssetCard
                         label="Main Image"
                         description="Primary image used in house cards and list views."
@@ -444,28 +448,30 @@ export function HouseForm({
                             if (imageInputRef.current) imageInputRef.current.value = "";
                         }}
                     />
-                </div>
+                </ProfitbaseLocked>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                        <label className="mb-1 block text-xs text-[#4E525D]">House name *</label>
-                        <input
-                            className={inputClass}
-                            value={form.name}
-                            onChange={(e) => updateField("name", e.target.value)}
-                            placeholder="Enter house name"
-                        />
-                    </div>
-                    <div>
-                        <FormDropdown
-                            label="Type of building"
-                            required
-                            value={form.typeOfBuilding}
-                            options={mergedTypeOfBuildingOptions}
-                            onChange={(id) => updateField("typeOfBuilding", id)}
-                            placeholder="Select type"
-                        />
-                    </div>
+                    <ProfitbaseLocked locked={isSynced} className="grid gap-4 md:col-span-2 md:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-xs text-[#4E525D]">House name *</label>
+                            <input
+                                className={inputClass}
+                                value={form.name}
+                                onChange={(e) => updateField("name", e.target.value)}
+                                placeholder="Enter house name"
+                            />
+                        </div>
+                        <div>
+                            <FormDropdown
+                                label="Type of building"
+                                required
+                                value={form.typeOfBuilding}
+                                options={withCurrentOption(mergedTypeOfBuildingOptions, form.typeOfBuilding)}
+                                onChange={(id) => updateField("typeOfBuilding", id)}
+                                placeholder="Select type"
+                            />
+                        </div>
+                    </ProfitbaseLocked>
                     <div>
                         <label className="mb-1 block text-xs text-[#4E525D]">Street</label>
                         <input className={inputClass} value={form.street} onChange={(e) => updateField("street", e.target.value)} placeholder="e.g. Main street" />
@@ -482,7 +488,7 @@ export function HouseForm({
                     <FormDropdown
                         label="Construction stage"
                         value={form.constructionStage}
-                        options={STATIC_CONSTRUCTION_STAGE_OPTIONS}
+                        options={withCurrentOption(CONSTRUCTION_STAGE_OPTIONS, form.constructionStage)}
                         onChange={(id) => updateField("constructionStage", id)}
                         placeholder="Select stage"
                     />

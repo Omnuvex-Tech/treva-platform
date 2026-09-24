@@ -491,7 +491,7 @@ export function OffPlanObjectsSection() {
                                     <div className="mb-3 rounded-[20px] bg-[#F4F5F6] px-3 py-2.5">
                                         <div className="grid grid-cols-4 gap-2 text-center">
                                             <div>
-                                                <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Units</span>
+                                                <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Houses</span>
                                                 <span className="block text-[14px] font-semibold leading-[20px] text-[#1A1A1A]">
                                                     {(cat.metrics?.houses ?? 0).toLocaleString()}
                                                 </span>
@@ -548,7 +548,7 @@ export function OffPlanObjectsSection() {
                                     <th className="px-5 py-4 font-medium text-[#4E525D]">Object</th>
                                     <th className="px-4 py-4 font-medium text-[#4E525D]">Developer</th>
                                     <th className="px-4 py-4 font-medium text-[#4E525D]">Location</th>
-                                    <th className="px-4 py-4 font-medium text-[#4E525D]">Units</th>
+                                    <th className="px-4 py-4 font-medium text-[#4E525D]">Houses</th>
                                     <th className="px-4 py-4 font-medium text-[#4E525D]">Status</th>
                                     <th className="px-5 py-4 text-right font-medium text-[#4E525D]">Actions</th>
                                 </tr>

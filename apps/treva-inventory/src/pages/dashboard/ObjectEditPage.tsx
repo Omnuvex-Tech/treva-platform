@@ -16,6 +16,8 @@ import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { PlanUploadCard } from "../../components/PlanUploadCard";
 import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
+import { withCurrentOption } from "../../utils/offplanOptions";
+import { ProfitbaseLocked, ProfitbaseNotice } from "../../components/ProfitbaseNotice";
 import { IoClose } from "react-icons/io5";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
@@ -183,6 +185,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     });
 
     const category = response?.data;
+    // Synced objects belong to Profitbase: their name, title and currency are read-only here.
+    const isSynced = Boolean(category?.externalId);
     const documents: CategoryDocument[] = category?.documents || [];
 
     const { data: cmsData } = useQuery({
@@ -471,26 +475,33 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const updateMutation = useMutation({
         mutationFn: (data: typeof formData) => {
+            // A cleared field is sent as null so the API clears it.
+            const text = (value: string | undefined) => optionalText(value) || null;
             return categoriesApi.update(category!.id, {
-                name: data.name,
-                title: data.title,
-                objectType: data.objectType?.trim() || undefined,
-                propertyName: data.name || data.title,
-                currency: optionalText(data.currency) || undefined,
-                region: optionalText(data.region) || undefined,
-                area: optionalText(data.area) || undefined,
-                city: optionalText(data.city) || undefined,
-                locationGoogleMapsUrl: optionalText(data.locationGoogleMapsUrl) || undefined,
-                locationTitle: optionalText(data.locationTitle) || undefined,
-                locationUrl: optionalText(data.locationUrl) || undefined,
-                developerBrand: optionalText(data.developerBrand) || undefined,
-                website: optionalText(data.website) || undefined,
-                salesDepartment: optionalText(data.salesDepartment) || undefined,
-                phoneNumber: optionalText(data.phoneNumber) || undefined,
+                // Name, title and currency come from Profitbase on synced objects.
+                ...(isSynced
+                    ? {}
+                    : {
+                          name: data.name,
+                          title: data.title,
+                          propertyName: data.name || data.title,
+                          currency: optionalText(data.currency) || undefined,
+                      }),
+                objectType: text(data.objectType),
+                region: text(data.region),
+                area: text(data.area),
+                city: text(data.city),
+                locationGoogleMapsUrl: text(data.locationGoogleMapsUrl),
+                locationTitle: text(data.locationTitle),
+                locationUrl: text(data.locationUrl),
+                developerBrand: text(data.developerBrand),
+                website: text(data.website),
+                salesDepartment: text(data.salesDepartment),
+                phoneNumber: text(data.phoneNumber),
                 fedLaw214: data.fedLaw214,
-                image: data.image || undefined,
-                coverImage: data.coverImage || undefined,
-                bannerImage: data.bannerImage || undefined,
+                image: data.image || null,
+                coverImage: data.coverImage || null,
+                bannerImage: data.bannerImage || null,
             });
         },
         onSuccess: (_response, variables) => {
@@ -859,6 +870,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const formContent = (
         <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
+            {isSynced ? (
+                <ProfitbaseNotice>
+                    The name, title and currency come from Profitbase and update on every Transfer, as do this object&apos;s houses and
+                    units. Everything else about the object is edited here.
+                </ProfitbaseNotice>
+            ) : null}
             <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
                 {TABS.map((tab) => (
                     <button
@@ -948,7 +965,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div className="grid gap-4 lg:grid-cols-2">
+                                    <ProfitbaseLocked locked={isSynced} className="grid gap-4 lg:grid-cols-2">
                                         <div>
                                             <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Name *</label>
                                             <input
@@ -967,7 +984,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 placeholder="Sea Breeze Residence"
                                             />
                                         </div>
-                                    </div>
+                                    </ProfitbaseLocked>
                                     <div>
                                         <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Object Type</label>
                                         <input
@@ -978,15 +995,15 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         />
                                     </div>
                                     <div className="grid gap-4 lg:grid-cols-2">
-                                        <div>
+                                        <ProfitbaseLocked locked={isSynced}>
                                             <FormDropdown
                                                 label="Currency"
                                                 value={formData.currency}
-                                                options={currencies.map((item) => ({ id: item.value, label: item.label }))}
+                                                options={withCurrentOption(currencies.map((item) => ({ id: item.value, label: item.label })), formData.currency)}
                                                 placeholder="Select currency"
                                                 onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
                                             />
-                                        </div>
+                                        </ProfitbaseLocked>
                                         <div>
                                             <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area</label>
                                             <input

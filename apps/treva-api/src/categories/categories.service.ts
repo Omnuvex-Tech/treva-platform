@@ -64,6 +64,7 @@ export class CategoriesService {
       phoneNumber: category.phoneNumber,
       documents: category.documents,
       fedLaw214: category.fedLaw214,
+      externalId: category.externalId,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
       metrics: {
@@ -117,6 +118,7 @@ export class CategoriesService {
       phoneNumber: category.phoneNumber,
       documents: category.documents,
       fedLaw214: category.fedLaw214,
+      externalId: category.externalId,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
       metrics: {
@@ -170,6 +172,7 @@ export class CategoriesService {
       phoneNumber: category.phoneNumber,
       documents: category.documents,
       fedLaw214: category.fedLaw214,
+      externalId: category.externalId,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
       metrics: {

@@ -6,8 +6,12 @@ export interface ProfitbaseHouse {
   projectId: number;
   projectName: string;
   title: string;
-  type: string | null;
+  type: string | null; // 'RESIDENTIAL' | 'PARKING'
   isArchive: boolean;
+  // e.g. "UNFINISHED"
+  buildingState: string | null;
+  // Free-text finishing for the whole house, e.g. "Без Ремонта".
+  facing: string | null;
   street: string | null;
   number: string | null;
   minFloor: number | null;
@@ -73,19 +77,47 @@ export interface ProfitbaseProperty {
   projectName: string;
   number: string | null;
   rooms_amount: number | null;
+  studio: boolean;
   floor: number | null;
+  // Building entrance / block, e.g. "C".
+  sectionName: string | null;
   propertyType: string | null;
-  typePurpose: string | null;
+  typePurpose: string | null; // 'residential' | 'parking' | 'commercial'
   area: {
     area_total: number | null;
     area_living: number | null;
     area_balcony: number | null;
   } | null;
   price: { value: number | null } | null;
-  status: 'AVAILABLE' | 'SOLD' | 'BOOKED' | 'UNAVAILABLE' | string;
+  status: string; // 'AVAILABLE' | 'SOLD' | 'BOOKED' | 'UNAVAILABLE'
+  // Only on `full=true` requests.
+  attributes?: { facing: string | null } | null;
+  custom_fields?: ProfitbaseCustomField[];
+}
+
+export interface ProfitbaseCustomField {
+  id: string;
+  name: string;
+  value: string | number | boolean | null;
+}
+
+export interface ProfitbaseProject {
+  id: number;
+  title: string;
+  archiveState: string; // 'NOT_ARCHIVED' | 'ARCHIVED' | 'PARTIALLY_ARCHIVED'
+  locality: string | null;
+  developer_brand: string | null;
+  currency: string | null;
+  location: {
+    latitude: string | null;
+    longitude: string | null;
+  } | null;
+  images: { url: string }[] | null;
 }
 
 const PROPERTY_PAGE_SIZE = 1000;
+// Profitbase caps `full=true` property pages at 100 records.
+const FULL_PROPERTY_PAGE_SIZE = 100;
 
 @Injectable()
 export class ProfitbaseClientService {
@@ -221,6 +253,16 @@ export class ProfitbaseClientService {
     return all;
   }
 
+  async getProjects(): Promise<ProfitbaseProject[]> {
+    // Unlike the other endpoints, `projects` returns a bare array.
+    return this.request<ProfitbaseProject[]>('projects');
+  }
+
+  /**
+   * Every property with its custom fields and attributes (`full=true`), which
+   * carry details the plain list lacks: external area, renovation, handover
+   * state, construction stage.
+   */
   async getProperties(): Promise<ProfitbaseProperty[]> {
     const all: ProfitbaseProperty[] = [];
     let offset = 0;
@@ -229,14 +271,15 @@ export class ProfitbaseClientService {
       const res = await this.request<{ data: ProfitbaseProperty[] }>(
         'property',
         {
-          limit: PROPERTY_PAGE_SIZE,
+          full: 'true',
+          limit: FULL_PROPERTY_PAGE_SIZE,
           offset,
         },
       );
       if (!res.data.length) break;
       all.push(...res.data);
-      if (res.data.length < PROPERTY_PAGE_SIZE) break;
-      offset += PROPERTY_PAGE_SIZE;
+      if (res.data.length < FULL_PROPERTY_PAGE_SIZE) break;
+      offset += FULL_PROPERTY_PAGE_SIZE;
     }
 
     return all;

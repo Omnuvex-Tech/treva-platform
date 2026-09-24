@@ -33,13 +33,13 @@ export class HouseLocationDto {
 export class HouseNumberOfFloorsDto {
   @ApiProperty({ example: 3 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   start: number;
 
   @ApiProperty({ example: 30 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   end: number;
 }
@@ -142,7 +142,7 @@ export class CreateHouseDto {
 
   @ApiProperty({ example: 5 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   floor: number;
 

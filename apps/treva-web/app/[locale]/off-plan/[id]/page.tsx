@@ -892,12 +892,13 @@ export default function ApartmentCard() {
                     <span className="apt-label">{t.internalArea}</span>
                     <span className="apt-value">{layout.internalArea} m²</span>
                   </div>
-                  {layout.balconyArea && (
+                  {/* A ternary, not &&: a 0 m² balcony would otherwise render "0". */}
+                  {layout.balconyArea ? (
                     <div className="apt-spec-item">
                       <span className="apt-label">{t.balcony}</span>
                       <span className="apt-value">{layout.balconyArea} m²</span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="apt-footer">

@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUnitLayoutDto } from './dto/create-unit-layout.dto';
 import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
+import { EUR_PER_USD, USD_PER_AZN } from './currency-prices';
 
 @Injectable()
 export class UnitLayoutsService {
@@ -201,7 +202,9 @@ export class UnitLayoutsService {
         unitTypeOptionId: createDto.unitTypeOptionId,
         realEstateType: createDto.realEstateType,
         floor: createDto.floor,
+        // The panel edits `number`, the site reads `rooms`; keep them equal.
         number: createDto.number,
+        rooms: createDto.number,
         entrance: createDto.entrance,
         totalArea: createDto.totalArea,
         internalArea: createDto.internalArea,
@@ -217,6 +220,9 @@ export class UnitLayoutsService {
         houseId: createDto.houseId,
         typeOfBuilding: createDto.typeOfBuilding,
         constructionStage: createDto.constructionStage,
+        unitCode: createDto.unitCode,
+        renovation: createDto.renovation,
+        furnishing: createDto.furnishing,
         description: createDto.description,
         heatingTypeIds: createDto.heatingTypeIds || [],
         attributeIds: createDto.attributeIds || [],
@@ -514,7 +520,10 @@ export class UnitLayoutsService {
     if (updateDto.realEstateType !== undefined)
       data.realEstateType = updateDto.realEstateType;
     if (updateDto.floor !== undefined) data.floor = updateDto.floor;
-    if (updateDto.number !== undefined) data.number = updateDto.number;
+    if (updateDto.number !== undefined) {
+      data.number = updateDto.number;
+      data.rooms = updateDto.number;
+    }
     if (updateDto.entrance !== undefined) data.entrance = updateDto.entrance;
     if (updateDto.totalArea !== undefined) data.totalArea = updateDto.totalArea;
     if (updateDto.internalArea !== undefined)
@@ -537,6 +546,11 @@ export class UnitLayoutsService {
       data.typeOfBuilding = updateDto.typeOfBuilding;
     if (updateDto.constructionStage !== undefined)
       data.constructionStage = updateDto.constructionStage;
+    if (updateDto.unitCode !== undefined) data.unitCode = updateDto.unitCode;
+    if (updateDto.renovation !== undefined)
+      data.renovation = updateDto.renovation;
+    if (updateDto.furnishing !== undefined)
+      data.furnishing = updateDto.furnishing;
     if (updateDto.description !== undefined)
       data.description = updateDto.description;
     if (updateDto.heatingTypeIds !== undefined)
@@ -640,8 +654,7 @@ export class UnitLayoutsService {
    * the one the sync writes — the others are always derived.
    */
   async syncCurrencies() {
-    const AZN_PER_USD = 1 / 0.59;
-    const EUR_PER_USD = 0.87;
+    const AZN_PER_USD = 1 / USD_PER_AZN;
 
     const layouts = await this.prisma.unitLayout.findMany({
       select: { id: true, prices: true },
@@ -658,7 +671,7 @@ export class UnitLayoutsService {
 
       const usd =
         value('USD') ??
-        (value('AZN') !== null ? value('AZN')! * 0.59 : null) ??
+        (value('AZN') !== null ? value('AZN')! * USD_PER_AZN : null) ??
         (value('EUR') !== null ? value('EUR')! / EUR_PER_USD : null);
       if (usd === null) continue;
 

@@ -43,6 +43,8 @@ export interface Category {
     phoneNumber?: string;
     documents?: CategoryDocument[];
     fedLaw214: boolean;
+    // Profitbase project id; set on synced objects, whose Profitbase fields are read-only.
+    externalId?: string | null;
     createdAt: string;
     updatedAt: string;
     metrics?: CategoryMetrics;
@@ -130,7 +132,8 @@ export const categoriesApi = {
     create: (data: CreateCategoryData) =>
         apiClient.post<Category>("/categories", data),
 
-    update: (id: string, data: UpdateCategoryData) =>
+    // Optional fields may be sent as null to clear them.
+    update: (id: string, data: { [K in keyof UpdateCategoryData]?: UpdateCategoryData[K] | null }) =>
         apiClient.patch<Category>(`/categories/${id}`, data),
 
     delete: (id: string) => apiClient.delete(`/categories/${id}`),

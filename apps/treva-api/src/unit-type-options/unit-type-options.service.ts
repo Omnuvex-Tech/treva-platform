@@ -28,7 +28,10 @@ export class UnitTypeOptionsService {
   }
 
   async findAll() {
-    return this.prisma.unitTypeOption.findMany({ orderBy: { title: 'asc' } });
+    // `order` puts synced types in size order (Studio, 1 Bedroom, 2 Bedroom...).
+    return this.prisma.unitTypeOption.findMany({
+      orderBy: [{ order: 'asc' }, { title: 'asc' }],
+    });
   }
 
   async findOne(id: string) {

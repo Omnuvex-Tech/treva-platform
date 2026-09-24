@@ -89,6 +89,8 @@ export interface House {
     typeOfBuilding?: string;
     constructionStage?: string;
     description?: string;
+    // Profitbase house id; set on synced houses, whose Profitbase fields are read-only.
+    externalId?: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -201,72 +203,82 @@ export interface UploadResponse {
     mimetype: string;
 }
 
-const cleanString = (value: string | undefined) => {
+const cleanString = (value: string | null | undefined) => {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
 };
 
-const sanitizeHouseData = (
-    data: Partial<CreateHouseData>
-): Partial<CreateHouseData> => {
-    const locationTitle = cleanString(data.location?.title) || cleanString(data.locationTitle);
-    const locationType = cleanString(data.location?.type);
-        const mainImageUrl = cleanString(data.mainImage?.url);
-        const coverImageUrl = cleanString(data.coverImage?.url);
+// Edits may send null to clear an optional field.
+export type UpdateHouseData = {
+    [K in keyof CreateHouseData]?: CreateHouseData[K] | null;
+};
 
-    return {
-        ...data,
-        title: data.title?.trim(),
-        name: data.name?.trim(),
-        slug: data.slug?.trim(),
-        seoTitle: cleanString(data.seoTitle),
-        seoDescription: cleanString(data.seoDescription),
-        seoKeywords: cleanString(data.seoKeywords),
-        canonicalUrl: cleanString(data.canonicalUrl),
-        seoImage: cleanString(data.seoImage),
-            status: data.status || "available",
-        number: data.number,
-        balconyArea: data.balconyArea,
-        similarApartmentIds: data.similarApartmentIds?.filter(Boolean),
-        ownerId: cleanString(data.ownerId),
-        heatingTypeIds: data.heatingTypeIds?.filter(Boolean) || [],
-        attributeIds: data.attributeIds?.filter(Boolean) || [],
-        locationTitle: cleanString(data.locationTitle) || cleanString(data.location?.title),
-        locationUrl: cleanString(data.locationUrl) || cleanString(data.location?.url),
-        locationGoogleMapsUrl: cleanString(data.locationGoogleMapsUrl),
-        mainImage: mainImageUrl
-            ? {
-                  url: mainImageUrl,
-                  alt: cleanString(data.mainImage?.alt),
-              }
-            : undefined,
-            coverImage: coverImageUrl
-                ? {
-                      url: coverImageUrl,
-                      alt: cleanString(data.coverImage?.alt),
-                  }
-                : undefined,
-        gallery: data.gallery
-            ?.map((image) => ({
-                url: cleanString(image.url) || "",
-                alt: cleanString(image.alt),
-            }))
-            .filter((image) => image.url),
-        documents: data.documents
-            ?.map((document) => ({
-                type: cleanString(document.type) || "",
-                url: cleanString(document.url) || "",
-            }))
-            .filter((document) => document.type && document.url),
-        location:
-            locationTitle && locationType
-                ? {
-                      title: locationTitle,
-                      type: locationType,
-                      url: cleanString(data.location?.url) || cleanString(data.locationUrl),
-                  }
-                : undefined,
-    };
+// Optional text fields. A cleared one is dropped on create and sent as null on
+// edit, so the API actually clears it instead of keeping the old value.
+const OPTIONAL_TEXT_KEYS = [
+    "seoTitle",
+    "seoDescription",
+    "seoKeywords",
+    "canonicalUrl",
+    "seoImage",
+    "ownerId",
+    "locationTitle",
+    "locationUrl",
+    "locationGoogleMapsUrl",
+    "street",
+    "houseNumber",
+    "deadlineForCommissioning",
+    "salesOffice",
+    "landCadastralNumber",
+    "contractAddress",
+    "secondContractAddress",
+    "showroomAvailability",
+    "secondShowroomAvailability",
+    "typeOfBuilding",
+    "constructionStage",
+] as const;
+
+const cleanImage = (image: MainImage | null | undefined) => {
+    const url = cleanString(image?.url);
+    return url ? { url, alt: cleanString(image?.alt) } : undefined;
+};
+
+/**
+ * Tidies a payload without adding anything to it: only the keys the caller
+ * sent go out, so a partial edit (archive toggle, house form) leaves the
+ * house's status, attributes and everything else alone.
+ */
+const sanitizeHouseData = (data: UpdateHouseData, emptyAs: undefined | null): UpdateHouseData => {
+    const out: UpdateHouseData = { ...data };
+    const has = (key: keyof UpdateHouseData) => key in data;
+
+    if (has("title")) out.title = data.title?.trim();
+    if (has("name")) out.name = data.name?.trim();
+    if (has("slug")) out.slug = data.slug?.trim();
+    for (const key of OPTIONAL_TEXT_KEYS) {
+        if (has(key)) out[key] = cleanString(data[key]) ?? emptyAs;
+    }
+    if (has("similarApartmentIds")) out.similarApartmentIds = data.similarApartmentIds?.filter(Boolean) ?? [];
+    if (has("heatingTypeIds")) out.heatingTypeIds = data.heatingTypeIds?.filter(Boolean) ?? [];
+    if (has("attributeIds")) out.attributeIds = data.attributeIds?.filter(Boolean) ?? [];
+    if (has("mainImage")) out.mainImage = cleanImage(data.mainImage);
+    if (has("coverImage")) out.coverImage = cleanImage(data.coverImage);
+    if (has("gallery")) {
+        out.gallery = data.gallery
+            ?.map((image) => ({ url: cleanString(image.url) || "", alt: cleanString(image.alt) }))
+            .filter((image) => image.url);
+    }
+    if (has("documents")) {
+        out.documents = data.documents
+            ?.map((document) => ({ type: cleanString(document.type) || "", url: cleanString(document.url) || "" }))
+            .filter((document) => document.type && document.url);
+    }
+    if (has("location")) {
+        const title = cleanString(data.location?.title);
+        const type = cleanString(data.location?.type);
+        out.location = title && type ? { title, type, url: cleanString(data.location?.url) } : undefined;
+    }
+    return out;
 };
 
 export const housesApi = {
@@ -303,12 +315,15 @@ export const housesApi = {
         apiClient.get<House>(`/houses/${id}`),
 
     create: (data: CreateHouseData) =>
-        apiClient.post<House>("/houses", sanitizeHouseData(data)),
+        apiClient.post<House>("/houses", {
+            status: "available",
+            ...sanitizeHouseData(data, undefined),
+        }),
 
-    update: (id: string, data: Partial<CreateHouseData>) =>
+    update: (id: string, data: UpdateHouseData) =>
         apiClient.patch<House>(
             `/houses/${id}`,
-            sanitizeHouseData(data)
+            sanitizeHouseData(data, null)
         ),
 
     delete: (id: string) =>

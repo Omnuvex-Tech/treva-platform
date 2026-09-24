@@ -42,7 +42,7 @@ model Category {
   reservedCount   Int      @default(0)
   soldCount       Int      @default(0)
   propertyName    String?
-  currency        String   @default("Rubels")
+  currency        String   @default("USD")
   region          String?
   area            String?
   city            String?
@@ -163,6 +163,8 @@ model UnitLayout {
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
   typeOfBuilding              String?
   constructionStage           String?
+  renovation                  String?     // "renovated" | "non-renovated"; null = unknown
+  furnishing                  String?     // "furnished" | "partially-furnished" | "unfurnished"; null = unknown
   description                 String?
   heatingTypeIds              String[]    @default([])
   attributeIds                String[]    @default([])

@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsArray,
   IsEnum,
+  IsIn,
   ValidateNested,
   IsObject,
   Min,
@@ -16,13 +17,13 @@ import { Type } from 'class-transformer';
 export class NumberOfFloorsDto {
   @ApiProperty({ example: 3 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   start: number;
 
   @ApiProperty({ example: 30 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   end: number;
 }
@@ -142,14 +143,14 @@ export class CreateUnitLayoutDto {
 
   @ApiProperty({ example: 5 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   floor: number;
 
   @ApiPropertyOptional({ example: 1 })
   @IsOptional()
   @IsNumber()
-  @Min(1)
+  @Min(0)
   @Max(999)
   number?: number;
 
@@ -229,6 +230,23 @@ export class CreateUnitLayoutDto {
   @IsOptional()
   @IsString()
   constructionStage?: string;
+
+  @ApiPropertyOptional({ example: 'D-1407', description: 'Apartment number' })
+  @IsOptional()
+  @IsString()
+  unitCode?: string;
+
+  @ApiPropertyOptional({ enum: ['renovated', 'non-renovated'] })
+  @IsOptional()
+  @IsIn(['renovated', 'non-renovated'])
+  renovation?: 'renovated' | 'non-renovated' | null;
+
+  @ApiPropertyOptional({
+    enum: ['furnished', 'partially-furnished', 'unfurnished'],
+  })
+  @IsOptional()
+  @IsIn(['furnished', 'partially-furnished', 'unfurnished'])
+  furnishing?: 'furnished' | 'partially-furnished' | 'unfurnished' | null;
 
   @ApiPropertyOptional({ example: '<p>Beautiful apartment</p>' })
   @IsOptional()

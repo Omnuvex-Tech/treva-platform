@@ -1,11 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { pricesInAllCurrencies } from '../unit-layouts/currency-prices';
 import {
   ProfitbaseClientService,
   ProfitbaseHouse,
   ProfitbasePlan,
+  ProfitbaseProject,
   ProfitbaseProperty,
 } from './profitbase-client.service';
+import {
+  CUSTOM_FIELD,
+  constructionStageFromHouse,
+  constructionStageFromUnit,
+  customFieldNumber,
+  customFieldValue,
+  isParking,
+  realEstateTypeLabel,
+  typeOfBuildingLabel,
+  unitFinishing,
+  unitTypeFor,
+} from './profitbase-mappers';
+
+/**
+ * Profitbase is the source of truth for everything it knows about an object,
+ * a house or a unit: each Transfer overwrites those fields, and the panel
+ * shows them read-only on synced records. The panel owns what Profitbase has
+ * no notion of - slugs, SEO, descriptions, attributes, brochures - and the
+ * house fields Profitbase leaves empty on our account (street, sales office,
+ * deadline when there is no handover quarter...), which the sync only fills
+ * when Profitbase has a value.
+ *
+ * One site policy sits on top: parkings are not sold through the site, so
+ * parking units and parking houses are always archived.
+ */
 
 interface SyncCounters {
   created: number;
@@ -22,13 +49,6 @@ interface SyncedHouse {
   id: string;
   completionYear: number;
 }
-
-const REAL_ESTATE_TYPE_LABELS: Record<string, string> = {
-  apartment: 'Apartment',
-  townhouse: 'Townhouse',
-  villa: 'Villa',
-  commercial_premises: 'Commercial',
-};
 
 const STATUS_MAP: Record<string, { status: string; archived: boolean }> = {
   AVAILABLE: { status: 'available', archived: false },
@@ -94,7 +114,8 @@ export class ProfitbaseSyncService {
   }
 
   async sync(): Promise<ProfitbaseSyncSummary> {
-    const [houses, plans, properties] = await Promise.all([
+    const [projects, houses, plans, properties] = await Promise.all([
+      this.client.getProjects(),
       this.client.getHouses(),
       this.client.getPlans(),
       this.client.getProperties(),
@@ -106,11 +127,16 @@ export class ProfitbaseSyncService {
       unitLayouts: { created: 0, updated: 0 },
     };
 
+    const projectById = new Map<number, ProfitbaseProject>();
+    for (const project of projects) projectById.set(project.id, project);
+
     const propertyById = new Map<string, ProfitbaseProperty>();
     for (const property of properties) {
       propertyById.set(String(property.id), property);
     }
 
+    // Only projects that actually have houses or units become objects; the
+    // project list also holds empty and duplicate projects.
     const projectNameById = new Map<number, string>();
     for (const house of houses)
       projectNameById.set(house.projectId, house.projectName);
@@ -130,6 +156,7 @@ export class ProfitbaseSyncService {
       const categoryId = await this.upsertCategory(
         projectId,
         projectName,
+        projectById.get(projectId) ?? null,
         summary,
       );
       categoryIdByProjectId.set(projectId, categoryId);
@@ -146,10 +173,11 @@ export class ProfitbaseSyncService {
     }
 
     const touchedCategoryIds = new Set<string>(categoryIdByProjectId.values());
+    const unitTypeIds = await this.loadUnitTypeIds();
 
-    // The layout data (rooms, areas, prices, plan images) comes from `plan`.
-    // `property` only resolves the house/category link plus the per-unit
-    // fields a plan does not carry at all: unit number, floor and status.
+    // The layout data (areas, prices, plan images) comes from `plan`.
+    // `property` resolves the house/category link plus the per-unit fields a
+    // plan does not carry: unit number, floor, entrance, status, finishing.
     const syncUnit = async (
       plan: ProfitbasePlan | null,
       property: ProfitbaseProperty,
@@ -162,6 +190,7 @@ export class ProfitbaseSyncService {
         categoryId,
         syncedHouseByExternalId.get(property.house_id) ?? null,
         houseById.get(property.house_id) ?? null,
+        unitTypeIds,
         summary,
       );
     };
@@ -179,8 +208,9 @@ export class ProfitbaseSyncService {
       }
     }
 
-    // Profitbase has no plan for a handful of properties (29 sold units at the
-    // time of writing); without this pass they would drop out of the catalogue.
+    // Profitbase has no plan for some properties (sold units, and all of
+    // Sabah Towers' Tower 2 at the time of writing); without this pass they
+    // would drop out of the catalogue.
     for (const property of properties) {
       if (syncedPropertyIds.has(String(property.id))) continue;
       await syncUnit(null, property);
@@ -196,9 +226,27 @@ export class ProfitbaseSyncService {
   private async upsertCategory(
     projectId: number,
     projectName: string,
+    project: ProfitbaseProject | null,
     summary: ProfitbaseSyncSummary,
   ): Promise<string> {
     const externalId = String(projectId);
+    const projectImage = project?.images?.[0]?.url;
+    const sharedData = {
+      title: projectName,
+      name: projectName,
+      ...(project
+        ? {
+            // An archived project comes off the site; a partially archived
+            // one still has houses on sale.
+            status: project.archiveState === 'ARCHIVED' ? 'archive' : 'active',
+            ...(project.currency ? { currency: project.currency } : {}),
+            ...(project.developer_brand
+              ? { developerBrand: project.developer_brand }
+              : {}),
+          }
+        : {}),
+    };
+
     const existing = await this.prisma.category.findUnique({
       where: { externalId },
     });
@@ -206,7 +254,12 @@ export class ProfitbaseSyncService {
     if (existing) {
       await this.prisma.category.update({
         where: { id: existing.id },
-        data: { title: projectName, name: projectName },
+        data: {
+          ...sharedData,
+          // Object images are uploaded in the panel; Profitbase has one for a
+          // single project, so it only fills a missing image.
+          ...(!existing.image && projectImage ? { image: projectImage } : {}),
+        },
       });
       summary.categories.updated++;
       return existing.id;
@@ -215,8 +268,8 @@ export class ProfitbaseSyncService {
     const slug = `${this.slugify(projectName)}-${projectId}`;
     const created = await this.prisma.category.create({
       data: {
-        title: projectName,
-        name: projectName,
+        ...sharedData,
+        ...(projectImage ? { image: projectImage } : {}),
         slug,
         type: 'object',
         externalId,
@@ -232,34 +285,42 @@ export class ProfitbaseSyncService {
     summary: ProfitbaseSyncSummary,
   ): Promise<SyncedHouse> {
     const externalId = String(house.id);
+    const title = house.title || house.projectName;
     const minFloor = house.minFloor ?? 1;
     const maxFloor = Math.max(house.maxFloor ?? minFloor, minFloor);
     const handover = this.parseHandover(house);
     const currencyCode = house.currency?.code || 'USD';
     const imageUrl = house.fullImage || house.image || undefined;
+    const constructionStage = constructionStageFromHouse(house);
 
     const sharedData = {
+      title,
+      name: title,
+      categoryId,
       floor: minFloor,
       // Profitbase has no house-level area (`minPriceArea` is a price per m²).
       totalArea: 0,
       internalArea: 0,
       prices: house.minPrice ? { [currencyCode]: house.minPrice } : {},
+      numberOfFloors: { start: minFloor, end: maxFloor },
+      typeOfBuilding: typeOfBuildingLabel(house.type),
+      archived: (house.isArchive ?? false) || house.type === 'PARKING',
+      mainImage: imageUrl
+        ? { url: imageUrl, alt: house.title || undefined }
+        : undefined,
+      // Profitbase leaves these empty for most houses, and the panel may fill
+      // them in, so they are only written when Profitbase has a value.
       ...(handover
         ? {
             completionYear: handover.year,
             deadlineForCommissioning: handover.deadline,
           }
         : {}),
-      numberOfFloors: { start: minFloor, end: maxFloor },
+      ...(constructionStage ? { constructionStage } : {}),
       locationTitle: house.address?.full || undefined,
       street: house.street || house.address?.street || undefined,
       houseNumber: house.number || house.address?.number || undefined,
       contractAddress: house.contractAddress || undefined,
-      typeOfBuilding: house.type || undefined,
-      archived: house.isArchive ?? false,
-      mainImage: imageUrl
-        ? { url: imageUrl, alt: house.title || undefined }
-        : undefined,
     };
 
     const existing = await this.prisma.house.findUnique({
@@ -275,16 +336,12 @@ export class ProfitbaseSyncService {
       return { id: updated.id, completionYear: updated.completionYear };
     }
 
-    const title = house.title || house.projectName;
     const slug = `${this.slugify(`${house.projectName}-${title}`)}-${house.id}`;
     const created = await this.prisma.house.create({
       data: {
         ...sharedData,
         completionYear: handover?.year ?? new Date().getFullYear(),
-        title,
-        name: title,
         slug,
-        categoryId,
         similarApartmentIds: [],
         gallery: [],
         documents: [],
@@ -295,52 +352,67 @@ export class ProfitbaseSyncService {
     return { id: created.id, completionYear: created.completionYear };
   }
 
+  /** Unit type ids by name, so the sync can reuse the ones it created. */
+  private async loadUnitTypeIds(): Promise<Map<string, string>> {
+    const options = await this.prisma.unitTypeOption.findMany({
+      select: { id: true, name: true },
+    });
+    return new Map(options.map((option) => [option.name, option.id]));
+  }
+
+  private async unitTypeOptionId(
+    property: ProfitbaseProperty,
+    unitTypeIds: Map<string, string>,
+  ): Promise<string | null> {
+    const unitType = unitTypeFor(property);
+    if (!unitType) return null;
+
+    const known = unitTypeIds.get(unitType.name);
+    if (known) return known;
+
+    const option = await this.prisma.unitTypeOption.upsert({
+      where: { name: unitType.name },
+      update: {},
+      create: unitType,
+    });
+    unitTypeIds.set(unitType.name, option.id);
+    return option.id;
+  }
+
   private async upsertUnitLayout(
     plan: ProfitbasePlan | null,
     property: ProfitbaseProperty,
     categoryId: string,
     syncedHouse: SyncedHouse | null,
     parentHouse: ProfitbaseHouse | null,
+    unitTypeIds: Map<string, string>,
     summary: ProfitbaseSyncSummary,
   ): Promise<void> {
     const externalId = String(property.id);
     const currencyCode = parentHouse?.currency?.code || 'USD';
     const floor = property.floor ?? 0;
+    const parking = isParking(property);
 
-    // Unit number, floor and status live on the property only - a plan has no
-    // idea which apartment it was sold as.
     const statusInfo = STATUS_MAP[property.status] ?? {
       status: 'available',
       archived: false,
     };
 
-    // Everything below describes the layout itself, so the plan is the source
-    // of truth; the property values are only a fallback for the units
-    // Profitbase has no plan for.
+    // Areas, price and images describe the layout, so the plan wins; the
+    // property values are the fallback for units Profitbase has no plan for.
     const totalArea =
       this.parseNumber(plan?.areaRange?.min) ?? property.area?.area_total ?? 0;
     const price =
       this.parseNumber(plan?.priceRange?.min) ?? property.price?.value ?? null;
-    const roomCount = plan?.roomsAmount ?? property.rooms_amount ?? undefined;
-    const propertyTypeAlias =
-      plan?.propertyTypeAliases?.[0] ?? property.propertyType;
-    const propertyTypeLabel = propertyTypeAlias
-      ? (REAL_ESTATE_TYPE_LABELS[propertyTypeAlias] ?? propertyTypeAlias)
-      : undefined;
+    // Profitbase counts bedrooms; a studio has none.
+    const roomCount = property.studio
+      ? 0
+      : (plan?.roomsAmount ?? property.rooms_amount ?? null);
 
     // Both main and cover use the original full-size `source` directly.
-    const mainImage = plan?.image
-      ? {
-          url: plan.image.source,
-          alt: plan.image.imageName || undefined,
-        }
-      : undefined;
-    const coverImage = plan?.image
-      ? {
-          url: plan.image.source,
-          alt: plan.image.imageName || undefined,
-        }
-      : undefined;
+    const planImage = plan?.image
+      ? { url: plan.image.source, alt: plan.image.imageName || undefined }
+      : null;
     const gallery = (plan?.planImages || []).map((img) => ({
       url: img.big || img.source,
       alt: img.imageName || undefined,
@@ -348,33 +420,41 @@ export class ProfitbaseSyncService {
 
     // Profitbase reports a missing living area as 0 as well as null.
     const livingArea = property.area?.area_living;
+    const { renovation, furnishing } = unitFinishing(property, parentHouse);
 
     const sharedData = {
       floor,
-      unitCode: property.number || undefined,
-      // The panel, DTO/service and the rooms filter all use the `number`
-      // column for room count; `rooms` is kept in sync for completeness.
+      unitCode: property.number || null,
+      // The panel edits `number`, the site reads `rooms`; both hold the count.
       number: roomCount,
       rooms: roomCount,
+      entrance: property.sectionName || null,
+      unitTypeOptionId: await this.unitTypeOptionId(property, unitTypeIds),
       totalArea,
       internalArea: livingArea && livingArea > 0 ? livingArea : totalArea,
-      balconyArea: property.area?.area_balcony ?? undefined,
-      prices: price ? { [currencyCode]: price } : {},
+      balconyArea: customFieldNumber(property, CUSTOM_FIELD.externalArea),
+      prices: price ? pricesInAllCurrencies(currencyCode, price) : {},
       // Units follow their house, whose year may also have been set by hand
       // when Profitbase has no handover date.
       ...(syncedHouse ? { completionYear: syncedHouse.completionYear } : {}),
       // A synced unit is one apartment on one floor. The building's floor
-      // range lives on the house; storing it here made every unit read as
-      // "floors 3-14" on the site.
+      // range lives on the house.
       numberOfFloors: { start: floor, end: floor },
-      realEstateType: propertyTypeLabel,
+      realEstateType: realEstateTypeLabel(property.propertyType),
+      constructionStage:
+        constructionStageFromUnit(
+          customFieldValue(property, CUSTOM_FIELD.constructionStage),
+        ) ?? constructionStageFromHouse(parentHouse),
+      renovation,
+      furnishing,
       status: statusInfo.status,
-      archived: statusInfo.archived,
+      archived: statusInfo.archived || parking,
       categoryId,
       houseId: syncedHouse?.id ?? null,
-      mainImage,
-      coverImage,
-      gallery,
+      // Plan images replace the unit's images only when Profitbase has them;
+      // units without a plan keep whatever the panel uploaded.
+      ...(planImage ? { mainImage: planImage, coverImage: planImage } : {}),
+      ...(gallery.length > 0 ? { gallery } : {}),
     };
 
     const existing = await this.prisma.unitLayout.findUnique({
@@ -396,13 +476,12 @@ export class ProfitbaseSyncService {
     await this.prisma.unitLayout.create({
       data: {
         ...sharedData,
-        completionYear:
-          syncedHouse?.completionYear ?? new Date().getFullYear(),
+        completionYear: syncedHouse?.completionYear ?? new Date().getFullYear(),
         title,
         name: title,
         slug,
         similarApartmentIds: [],
-        gallery: gallery as any,
+        gallery,
         documents: [],
         externalId,
       } as any,
