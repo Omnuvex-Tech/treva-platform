@@ -14,4 +14,4 @@ export interface ClientsService {
     removeMany(ids: readonly string[]): Promise<void>;
 }
 
-export const clientsService: ClientsService = config.api.useMock ? mockAdapter : httpAdapter;
+export const clientsService: ClientsService = config.api.useMockClients ? mockAdapter : httpAdapter;

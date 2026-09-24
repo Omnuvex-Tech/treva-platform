@@ -4,7 +4,8 @@ import { useState } from "react";
 
 import { NotDesignedYet } from "@/components/common/not-designed-yet";
 import { RegisterCredentialsView } from "./register-credentials-view";
-import { RegisterTypeView, type RegistrationType } from "./register-type-view";
+import { RegisterShell } from "./register-shell";
+import { RegisterTypeView, type RegistrationChoice } from "./register-type-view";
 
 /**
  * Sign-up, behind the Register action on the Welcome artboard (873:59617).
@@ -15,28 +16,68 @@ import { RegisterTypeView, type RegistrationType } from "./register-type-view";
  * - Individual goes on to a credentials step. Nothing draws it, so it is the
  *   two fields the login screen already asks for, on the type card's own
  *   chrome — enough to actually create an account rather than dead-end.
- * - Company keeps the placeholder: its remaining steps collect company details
- *   nobody has specified, and inventing those is a different thing entirely.
+ * - Creating a company asks for nothing but the company's name (typed on the
+ *   type step itself), then lands on the same credentials step.
+ * - Joining a company keeps the placeholder: there is no company list to pick
+ *   from yet, and inventing that flow is a different thing entirely.
+ *
+ * Every branch renders THROUGH `RegisterShell`, never as its own page: the card
+ * has to survive the swap for its height to animate across it.
  */
 export function RegisterView() {
-    const [choice, setChoice] = useState<RegistrationType | null>(null);
+    // The last choice made on the type step, kept after Back so going back to
+    // fix something (a taken company name, say) doesn't wipe the whole form.
+    const [draft, setDraft] = useState<RegistrationChoice | null>(null);
+    const [continued, setContinued] = useState(false);
+    // Owned here rather than by the credentials step so Back and forth keeps them.
+    const [credentials, setCredentials] = useState({ email: "", password: "" });
 
-    if (choice === "individual") {
-        return (
-            <RegisterCredentialsView type="individual" onBack={() => setChoice(null)} />
-        );
-    }
+    const choice = continued ? draft : null;
+    const back = () => setContinued(false);
 
-    if (choice === "company") {
-        return (
-            <div className="mx-auto flex min-h-dvh max-w-[540px] items-center px-4 py-12">
+    const step =
+        choice?.type === "individual" ? (
+            <RegisterCredentialsView
+                type="individual"
+                credentials={credentials}
+                onCredentialsChange={setCredentials}
+                onBack={back}
+            />
+        ) : choice?.setup === "create" && choice.companyName ? (
+            <RegisterCredentialsView
+                type="company"
+                companyName={choice.companyName}
+                credentials={credentials}
+                onCredentialsChange={setCredentials}
+                onBack={back}
+            />
+        ) : choice?.type === "company" ? (
+            // Inset so the placeholder's own dashed edge reads as a panel
+            // inside the card rather than a second border against its own.
+            <div className="p-6">
                 <NotDesignedYet
                     nodeId="873:60389"
                     purpose="The company branch of sign-up, after the registration type is chosen."
                 />
             </div>
+        ) : (
+            <RegisterTypeView
+                initial={draft}
+                onContinue={(next) => {
+                    setDraft(next);
+                    setContinued(true);
+                }}
+            />
         );
-    }
 
-    return <RegisterTypeView onContinue={(next) => setChoice(next.type)} />;
+    return (
+        <RegisterShell>
+            {/* Keyed so each step is a fresh node and plays the fade on arrival.
+                Only the fade lives here — the travel and the resize belong to
+                the card around it, which is animating its own height. */}
+            <div key={choice ? `${choice.type}-${choice.setup ?? ""}` : "type"} className="motion-safe:animate-[step-in_260ms_ease-out]">
+                {step}
+            </div>
+        </RegisterShell>
+    );
 }

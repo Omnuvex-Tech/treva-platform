@@ -8,6 +8,7 @@ import { Flag } from "@/components/ui/flag";
 import { LOCALES, LOCALE_LABELS, LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE } from "@/lib/i18n/config";
 import type { Locale } from "@/lib/i18n/config";
 import { stripLocale } from "@/config/page-meta";
+import { headerChipClass } from "./profile-chip";
 import { useI18n } from "@/providers/i18n-provider";
 
 /** The `EN` chip in the app header, with the az / en / ru picker behind it. */
@@ -40,10 +41,9 @@ export function LanguageSwitcher() {
                 disabled={pending}
                 aria-haspopup="listbox"
                 aria-expanded={open}
-                className={cn(
-                    "flex h-11 items-center justify-center rounded-md bg-bg-tertiary px-3 text-xs font-semibold text-content-secondary",
-                    "transition-colors hover:bg-border-tertiary disabled:opacity-60",
-                )}
+                // 48 wide in the header (905:13010); the label alone renders a
+                // pixel short of that.
+                className={cn(headerChipClass, "min-w-12 text-sm font-medium")}
             >
                 {LOCALE_LABELS[locale].short}
             </button>

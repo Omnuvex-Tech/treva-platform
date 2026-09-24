@@ -37,6 +37,8 @@ export interface SelectProps {
      * the label can produce.
      */
     renderValue?: (value: string) => ReactNode;
+    /** Replaces the default chevron — for fields that draw the design's own glyph. */
+    icon?: ReactNode;
 }
 
 /**
@@ -65,6 +67,7 @@ export function Select({
     containerClassName,
     className,
     renderValue,
+    icon,
 }: SelectProps) {
     const generatedId = useId();
     const triggerId = id ?? generatedId;
@@ -204,13 +207,15 @@ export function Select({
                         ? renderValue(selectedOption.value)
                         : (selectedOption?.label ?? placeholder ?? "")}
                 </span>
-                <ChevronDown
-                    aria-hidden
-                    className={cn(
-                        "size-4 shrink-0 text-content-tertiary transition-transform",
-                        open && "rotate-180",
-                    )}
-                />
+                {icon ?? (
+                    <ChevronDown
+                        aria-hidden
+                        className={cn(
+                            "size-4 shrink-0 text-content-tertiary transition-transform",
+                            open && "rotate-180",
+                        )}
+                    />
+                )}
             </button>
 
             {name ? <input type="hidden" name={name} value={current} /> : null}

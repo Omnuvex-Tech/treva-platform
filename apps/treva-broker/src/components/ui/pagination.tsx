@@ -11,6 +11,11 @@ export interface PaginationProps {
     onPageChange: (page: number) => void;
     /** Optional "Showing 1–10 of 42" line rendered on the left. */
     summary?: string;
+    /**
+     * `rounded` centres the control under its content: circular buttons in
+     * one white pill, the current page filled in brand, the summary beneath.
+     */
+    variant?: "default" | "rounded";
     className?: string;
 }
 
@@ -19,11 +24,71 @@ export function Pagination({
     totalPages,
     onPageChange,
     summary,
+    variant = "default",
     className,
 }: PaginationProps) {
     if (totalPages <= 1 && !summary) return null;
 
     const pages = pageWindow(page, totalPages);
+
+    if (variant === "rounded") {
+        const step =
+            "flex size-9 items-center justify-center rounded-full text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4";
+
+        return (
+            <nav aria-label="Pagination" className={cn("flex flex-col items-center gap-2", className)}>
+                <div className="flex items-center gap-1 rounded-full border border-border-subtle bg-bg-primary p-1 shadow-l1">
+                    <button
+                        type="button"
+                        className={step}
+                        disabled={page <= 1}
+                        onClick={() => onPageChange(page - 1)}
+                        aria-label="Previous page"
+                    >
+                        <ChevronLeft />
+                    </button>
+
+                    {pages.map((entry, index) =>
+                        entry === "gap" ? (
+                            <span
+                                key={`gap-${index}`}
+                                className="flex size-9 items-center justify-center text-sm text-content-tertiary"
+                            >
+                                …
+                            </span>
+                        ) : (
+                            <button
+                                key={entry}
+                                type="button"
+                                onClick={() => onPageChange(entry)}
+                                aria-current={entry === page ? "page" : undefined}
+                                className={cn(
+                                    "flex size-9 items-center justify-center rounded-full text-sm font-medium tabular-nums transition-colors",
+                                    entry === page
+                                        ? "bg-bg-brand text-content-inverse shadow-l1"
+                                        : "text-content-secondary hover:bg-bg-secondary hover:text-content-primary",
+                                )}
+                            >
+                                {entry}
+                            </button>
+                        ),
+                    )}
+
+                    <button
+                        type="button"
+                        className={step}
+                        disabled={page >= totalPages}
+                        onClick={() => onPageChange(page + 1)}
+                        aria-label="Next page"
+                    >
+                        <ChevronRight />
+                    </button>
+                </div>
+
+                {summary ? <p className="text-xs text-content-tertiary">{summary}</p> : null}
+            </nav>
+        );
+    }
 
     return (
         <div className={cn("flex items-center justify-between gap-4", className)}>

@@ -50,3 +50,19 @@ export function useSaveProject() {
         },
     });
 }
+
+/**
+ * Backs the Synchronize button. Projects and Floor Plan both read what a sync
+ * writes, so both caches go stale together.
+ */
+export function useSyncProjects() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: () => projectsService.sync(),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: queryKeys.projects.all });
+            void queryClient.invalidateQueries({ queryKey: queryKeys.floorPlan.all });
+        },
+    });
+}

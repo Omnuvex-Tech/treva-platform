@@ -18,7 +18,10 @@ export interface Unit {
     areaSqm: number;
     /** "Loggia 7.0 m²" on the Properties card (873:50111). */
     loggiaSqm: number;
+    /** In AZN; 0 where the developer has not priced the unit. */
     price: number;
+    /** The unit's layout drawing, when the synchronised inventory has one. */
+    planImageUrl?: string | null;
 }
 
 export interface Floor {
@@ -37,6 +40,20 @@ export interface Building {
 }
 
 /**
+ * The Layouts tab's sort control (873:50496). The tab is paged, so the API
+ * sorts before cutting the page — apps/treva-broker-api's LAYOUT_SORTS.
+ */
+export const LAYOUT_SORTS = ["lowestPrice", "highestPrice", "largestArea"] as const;
+
+export type LayoutSort = (typeof LAYOUT_SORTS)[number];
+
+export interface LayoutListQuery {
+    page?: number;
+    perPage?: number;
+    sort?: LayoutSort;
+}
+
+/**
  * What one Listings card needs (886:16162).
  *
  * The screen groups these by `projectName` and draws, per card, the floor count
@@ -45,6 +62,8 @@ export interface Building {
 export interface BuildingSummary {
     id: string;
     name: string;
+    /** The project the building belongs to; Listings filters on it. */
+    projectId: string;
     projectName: string;
     floors: number;
     unitsTotal: number;

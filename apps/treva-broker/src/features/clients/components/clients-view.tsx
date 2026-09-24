@@ -1,10 +1,12 @@
 "use client";
 
-import { Add01Icon, ArrowDown01Icon, Search01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { UserGroupIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -12,12 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { AnchoredPopover } from "@/components/ui/popover";
 import { TableSkeleton } from "@/components/ui/skeleton";
+import { useConfirm } from "@/hooks/use-confirm";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { interpolate } from "@/lib/i18n/interpolate";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
-import { useClientsList } from "../hooks/use-clients";
-import type { ClientStatus } from "../types";
+import { useClientsList, useDeleteClients } from "../hooks/use-clients";
+import type { Client, ClientStatus } from "../types";
 import { ClientForm } from "./client-form";
 import { ClientTable } from "./client-table";
 
@@ -50,6 +53,9 @@ export function ClientsView() {
     const [page, setPage] = useState(1);
     const [formOpen, setFormOpen] = useState(false);
 
+    const deleteClients = useDeleteClients();
+    const confirmDelete = useConfirm<Client>();
+
     const debouncedSearch = useDebouncedValue(search, 300);
     const seesEveryone = can("clients:read_all");
 
@@ -74,6 +80,11 @@ export function ClientsView() {
     const from = data ? (data.page - 1) * data.perPage + 1 : 0;
     const to = data ? Math.min(data.page * data.perPage, data.total) : 0;
 
+    function performDelete() {
+        if (!confirmDelete.target) return;
+        deleteClients.mutate([confirmDelete.target.id], { onSettled: confirmDelete.dismiss });
+    }
+
     if (formOpen) {
         return (
             <div className="flex flex-col px-4 pt-4 pb-8">
@@ -91,8 +102,14 @@ export function ClientsView() {
     const registerButton = can("clients:create") ? (
         <Button
             size="lg"
-            className="shrink-0 rounded-lg border border-border-inverse px-3.5"
-            leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
+            // 182px is the artboard's hug width (873:49764). The label there is
+            // misspelt "Resgister", which is what makes it that wide; a floor
+            // keeps the headline group where the file puts it, and a longer
+            // translation still grows past it. Content starts at the artboard's
+            // 14px (13 + the 1px edge Figma counts inside) rather than centring
+            // in the extra width.
+            className="min-w-[182px] shrink-0 justify-start rounded-lg border border-border-inverse pr-3.5 pl-[13px]"
+            leadingIcon={<AssetIcon src="/images/news/icon-plus.svg" size={16} />}
             onClick={() => setFormOpen(true)}
         >
             {t.clients.add}
@@ -124,8 +141,14 @@ export function ClientsView() {
                             }}
                             placeholder={t.common.search}
                             aria-label={t.clients.searchPlaceholder}
+                            // Same 20px search-03 glyph as the app header; it sits
+                            // 16px in (873:49761): 1 of border, 12 of padding, 3 here.
                             leadingIcon={
-                                <HugeiconsIcon icon={Search01Icon} size={20} strokeWidth={1.6} />
+                                <AssetIcon
+                                    src="/images/layout/icon-search.svg"
+                                    size={20}
+                                    className="ml-[3px] text-content-brand"
+                                />
                             }
                             surface="outlined"
                             containerClassName="w-70 shrink-0"
@@ -159,9 +182,15 @@ export function ClientsView() {
                     />
                 ) : items.length > 0 ? (
                     <>
-                        {/* The table is inset 20px inside its card (873:49772). */}
-                        <Card className="p-5">
-                            <ClientTable clients={items} />
+                        {/* `content` (873:49771): 12px radius, and the table
+                            20px in from the card's outer edge — Figma draws
+                            the stroke inside, so 19 of padding plus the 1px
+                            border. The card is as wide as the whole headline
+                            (1128) but starts 8px in, so it runs 16px past the
+                            buttons on the right, exactly as the artboard lays
+                            it (x 304 → 1432 at 1440). */}
+                        <Card className="-mr-4 rounded-md p-[19px]">
+                            <ClientTable clients={items} onDelete={confirmDelete.ask} />
                         </Card>
 
                         {/* Hidden in the artboard (873:49823) because eight rows
@@ -195,6 +224,21 @@ export function ClientsView() {
                     />
                 )}
             </div>
+
+            <ConfirmDialog
+                open={confirmDelete.isOpen}
+                title={t.common.deleteTitle}
+                description={t.clients.deleteConfirm}
+                subject={
+                    confirmDelete.target
+                        ? `${confirmDelete.target.firstName} ${confirmDelete.target.lastName}`
+                        : undefined
+                }
+                confirmLabel={t.common.confirmDelete}
+                loading={deleteClients.isPending}
+                onConfirm={performDelete}
+                onCancel={confirmDelete.dismiss}
+            />
         </div>
     );
 }
@@ -226,7 +270,7 @@ function StatusFilter({
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 className="w-25 shrink-0 justify-center rounded-lg border-border-brand px-3.5 text-content-brand"
-                trailingIcon={<HugeiconsIcon icon={ArrowDown01Icon} size={16} strokeWidth={1.6} />}
+                trailingIcon={<AssetIcon src="/images/layout/icon-chevron-down.svg" size={16} />}
                 onClick={() => setOpen((current) => !current)}
             >
                 {t.clients.columns.status}

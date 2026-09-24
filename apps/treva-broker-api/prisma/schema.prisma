@@ -1,0 +1,376 @@
+// A client of its own, generated into src/ rather than node_modules: treva-api
+// also generates a Prisma client, and both would otherwise overwrite the same
+// hoisted @prisma/client at the monorepo root.
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Values are exactly what treva-broker's `Role` type expects.
+enum UserRole {
+  broker
+  top_broker
+  admin
+}
+
+/// The registration type picked on the first sign-up step.
+enum AccountType {
+  individual
+  company
+}
+
+enum CompanyMemberRole {
+  owner
+  member
+}
+
+model User {
+  id               String             @id @default(uuid())
+  email            String             @unique
+  password         String
+  fullName         String
+  role             UserRole           @default(broker)
+  accountType      AccountType        @default(individual)
+  jobTitle         String             @default("")
+  /// The Users screen's agent form (873:48686). Sign-up collects none of these.
+  /// An account can list several numbers; the first is the one tables print.
+  phones           String[]
+  cooperationType  String             @default("")
+  accessPermission String             @default("")
+  avatarUrl        String?
+  isActive         Boolean            @default(true)
+  companyId        String?
+  companyRole      CompanyMemberRole?
+  lastLoginAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  company        Company?         @relation("CompanyMembers", fields: [companyId], references: [id], onDelete: SetNull)
+  ownedCompanies Company[]        @relation("CompanyOwner")
+  newsPosts      NewsPost[]       @relation("NewsAuthor")
+  newsReads      NewsRead[]
+  clients        Client[]         @relation("ClientBroker")
+  documents      BrokerDocument[] @relation("DocumentUploader")
+  projects       Project[]        @relation("ProjectCreator")
+
+  @@index([companyId])
+}
+
+model Company {
+  id           String   @id @default(uuid())
+  name         String
+  /// Normalised from the name; unique so two companies can't share a name.
+  slug         String   @unique
+  /// The Organization column on the Real Estate Agencies tab (873:48597).
+  organization String   @default("")
+  ownerId      String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  owner   User   @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members User[] @relation("CompanyMembers")
+
+  @@index([ownerId])
+}
+
+/// Values are exactly what treva-broker's `NewsCategory` type expects.
+enum NewsCategory {
+  news
+  announcement
+}
+
+enum NewsStatus {
+  draft
+  scheduled
+  published
+}
+
+model NewsPost {
+  id            String       @id @default(uuid())
+  title         String
+  excerpt       String       @default("")
+  /// HTML written by the News Content editor.
+  body          String       @default("")
+  category      NewsCategory @default(news)
+  coverImageUrl String?
+  pinned        Boolean      @default(false)
+  status        NewsStatus   @default(draft)
+  /// `{ id, name, sizeBytes, kind, url }[]` — files already stored by /uploads.
+  attachments   Json         @default("[]")
+  /// The editor's Visibility switches, keyed by option.
+  visibility    Json         @default("{}")
+  /// "az" | "en" | "ru", or "" until the author picks one.
+  language      String       @default("")
+  /// When a published post goes live; null means as soon as it is published.
+  publishAt     DateTime?
+  /// When the post stops being shown; null means never.
+  expiresAt     DateTime?
+  /// Stamped the first time the post is published; null while a draft.
+  publishedAt   DateTime?
+  authorId      String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  author User       @relation("NewsAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  reads  NewsRead[]
+
+  @@index([status, publishedAt])
+  @@index([pinned])
+}
+
+/// One row per user per post opened — what the feed's "Unread" count reads.
+model NewsRead {
+  userId String
+  postId String
+  readAt DateTime @default(now())
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post NewsPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@index([postId])
+}
+
+/// Values are exactly what treva-broker's `ClientStatus` type expects.
+enum ClientStatus {
+  pending
+  approved
+  rejected
+}
+
+/// A lead a broker registered — the lead form (873:49382) and the Clients list.
+model Client {
+  id               String       @id @default(uuid())
+  firstName        String
+  lastName         String       @default("")
+  phone            String
+  /// Numbers added with the "+" beside the primary one.
+  additionalPhones String[]     @default([])
+  email            String       @default("")
+  objectOfInterest String
+  developerBrand   String       @default("")
+  website          String       @default("")
+  comments         String       @default("")
+  /// Set by review, never by the broker who registers the lead.
+  status           ClientStatus @default(pending)
+  /// When an approval lapses; null unless approved.
+  approvedUntil    DateTime?
+  /// The privacy-policy confirmation ticked on the form.
+  consent          Boolean      @default(false)
+  /// The broker who owns the relationship.
+  brokerId         String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  broker User @relation("ClientBroker", fields: [brokerId], references: [id], onDelete: Restrict)
+
+  @@index([brokerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// Values are exactly what treva-broker's `DocumentKind` type expects.
+enum DocumentKind {
+  pdf
+  pptx
+  docx
+  xlsx
+  image
+  other
+}
+
+/// treva-broker's `DocumentCategory` — the edit screen's first select.
+enum DocumentCategory {
+  brochure
+  price_list
+  floor_plan
+  presentation
+  policy
+  other
+}
+
+/// treva-broker's `DocumentLanguage`.
+enum DocumentLanguage {
+  az
+  en
+  ru
+}
+
+/// A file in the shared materials library — the Broker Role screen (873:49451).
+model BrokerDocument {
+  id            String           @id @default(uuid())
+  name          String
+  /// Read off the uploaded file here, never trusted from the client.
+  kind          DocumentKind     @default(other)
+  category      DocumentCategory @default(other)
+  language      DocumentLanguage @default(en)
+  description   String           @default("")
+  sizeBytes     Int
+  downloads     Int              @default(0)
+  /// Bumped by every save, so the editor's "Current version" moves.
+  version       Int              @default(1)
+  /// The four Visibility switches (873:52110) — independent, a column each.
+  active        Boolean          @default(true)
+  featured      Boolean          @default(false)
+  allowDownload Boolean          @default(true)
+  notifyBrokers Boolean          @default(false)
+  /// Root-relative (`/uploads/documents/...`), so it works behind any host.
+  url           String
+  /// The file on disk, relative to UPLOADS_DIR; deleting the row unlinks it.
+  storagePath   String
+  uploadedById  String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  uploadedBy User @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([updatedAt])
+  @@index([uploadedById])
+}
+
+/// Values are exactly what treva-broker's `ProjectStatus` type expects.
+enum ProjectStatus {
+  active
+  inactive
+}
+
+/// A development on the Projects grid (873:49133) and its editor (873:51091).
+model Project {
+  id                   String        @id @default(uuid())
+  name                 String
+  developer            String        @default("")
+  location             String        @default("")
+  status               ProjectStatus @default(active)
+  /// Lowest available unit price, in AZN.
+  priceFrom            Int           @default(0)
+  bedroomsFrom         Int           @default(0)
+  bedroomsTo           Int           @default(0)
+  /// When the developer expects to hand over; null until known.
+  deliveryDate         DateTime?
+  /// The public page the editor's URL field points at.
+  publicUrl            String        @default("")
+  /// Root-relative (`/uploads/projects/...`); doubles as the card's cover.
+  heroImageUrl         String?
+  galleryImageUrls     String[]      @default([])
+  /// `{ id, kind, label, value, enabled }[]` — Key Highlights, in order.
+  highlights           Json          @default("[]")
+  /// `{ id, tag, title, description, expiresAt, enabled }[]` — Special Offers.
+  offers               Json          @default("[]")
+  /// `{ id, name, category, language, sizeBytes, downloads, url }[]` — Marketing Materials.
+  materials            Json          @default("[]")
+  /// Live Availability. The card's unit counts are derived from these three.
+  unitsAvailable       Int           @default(0)
+  unitsReserved        Int           @default(0)
+  unitsSold            Int           @default(0)
+  autoCalculate        Boolean       @default(true)
+  /// Moved whenever the counts change — "Last synced: 14 min ago".
+  availabilitySyncedAt DateTime      @default(now())
+  /// The treva-api object (a `Category` of type "object") this project was
+  /// synchronised from; null for a project created in the editor.
+  externalId           String?       @unique
+  /// When the last synchronisation wrote this project.
+  syncedAt             DateTime?
+  createdById          String
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  createdBy User              @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  buildings ProjectBuilding[]
+  units     ProjectUnit[]
+
+  @@index([updatedAt])
+  @@index([status])
+  @@index([createdById])
+}
+
+/// Values are exactly what treva-broker's `UnitStatus` type expects.
+enum UnitStatus {
+  available
+  reserved
+  sold
+  blocked
+}
+
+/// A building of a synchronised project — a treva-api `House`. The broker's own
+/// copy: Floor Plan reads this table, never treva-api.
+model ProjectBuilding {
+  id             String   @id @default(uuid())
+  projectId      String
+  externalId     String   @unique
+  name           String
+  imageUrl       String?
+  floorsFrom     Int      @default(1)
+  floorsTo       Int      @default(1)
+  completionYear Int?
+  syncedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  project Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  units   ProjectUnit[]
+
+  @@index([projectId])
+}
+
+/// One off-plan unit of a synchronised building — a treva-api `UnitLayout`.
+model ProjectUnit {
+  id              String     @id @default(uuid())
+  projectId       String
+  buildingId      String
+  externalId      String     @unique
+  /// "C-2019" — the developer's unit code.
+  code            String
+  floor           Int
+  /// Where on the floor the unit sits; the stacking plan's column.
+  position        Int
+  status          UnitStatus @default(available)
+  /// "Apartment", "Villa", "parking"… as treva-api reports it.
+  realEstateType  String     @default("")
+  bedrooms        Int        @default(0)
+  areaSqm         Float      @default(0)
+  internalAreaSqm Float?
+  loggiaSqm       Float      @default(0)
+  /// Whole units of each currency; null where treva-api has no price.
+  priceAzn        Int?
+  priceUsd        Int?
+  priceEur        Int?
+  /// The layout drawing. Root-relative (`/uploads/synced/...`) once the sync
+  /// has mirrored it; the developer's own absolute URL when it could not.
+  planImageUrl    String?
+  completionYear  Int?
+  syncedAt        DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  project  Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  building ProjectBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([buildingId, floor])
+  @@index([status])
+}
+
+/// One row per remote image the inventory sync has copied onto this API's own
+/// storage, so a later sync can skip a drawing it already holds.
+///
+/// Without it every sync would re-download every image: the stored file is
+/// named after a hash of its bytes, which cannot be known until the bytes have
+/// been fetched. Keyed by the developer's URL, which is what the sync has in
+/// hand before deciding whether to fetch anything.
+model SyncedImage {
+  /// The developer's absolute URL, as treva-api reports it.
+  sourceUrl String   @id
+  /// Root-relative (`/uploads/synced/...`). Several sources can share one file:
+  /// the name is the content, and a plan is served once per unit that has it.
+  url       String
+  createdAt DateTime @default(now())
+
+  @@index([url])
+}

@@ -74,18 +74,19 @@ export interface DocumentListQuery {
 /**
  * What "Add Files" (873:49824) sends up.
  *
- * Metadata only — the bytes are missing because `lib/api/http` serialises every
- * body as JSON and has no multipart path. Wiring the real upload means adding
- * one there and widening this to carry the `File`; nothing else about the
- * screen changes, since the row is drawn from the document the call returns.
+ * The file itself, not metadata about it: POST /broker-role/documents is
+ * multipart and stores the bytes and creates the row in one call, so the size,
+ * the kind and the stored URL are all read off the upload by the server rather
+ * than claimed from here. `lib/api/http` sends a `FormData` body as is.
  *
- * `uploadedBy` is here for the mock's benefit alone. The real endpoint takes
- * the uploader from the authenticated session and ignores whatever is sent.
+ * `uploadedBy` is here for the mock's benefit alone — it has no session to read
+ * a name from. The real adapter never sends it; the endpoint takes the uploader
+ * from the token.
  */
 export interface DocumentCreateInput {
+    file: File;
+    /** The name typed in the modal; empty falls back to the file's own. */
     name: string;
-    kind: DocumentKind;
-    sizeBytes: number;
     uploadedBy: string;
 }
 

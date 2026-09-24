@@ -1,9 +1,8 @@
 "use client";
 
-import { Delete02Icon, Download01Icon, Edit03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { FileText } from "lucide-react";
 
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { interpolate } from "@/lib/i18n/interpolate";
 import { formatBytes, formatNumber } from "@/lib/utils/format";
@@ -11,17 +10,38 @@ import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
 import type { BrokerDocument } from "../types";
 
+/**
+ * The chips' glyphs, exported from the artboard rather than taken from
+ * @hugeicons/core-free-icons: the pack the design draws from differs from the
+ * npm line — the trash lid is bowed, not straight — and a 16px box carries a
+ * 1.5px stroke where the npm icon, being a 24px drawing scaled down, renders 1.
+ * News drew the same three first, so these are its files.
+ */
+const ICONS = "/images/news";
+
+const DOWNLOAD_MASK = `url("${ICONS}/detail/download.svg") center / 100% 100% no-repeat`;
+
+/**
+ * `Huge-icon/arrows/solid/download 01` (I873:49494;9137:7763): an 11.67x14.33
+ * glyph sitting off-centre in its 16px box, so it cannot go through the square
+ * AssetIcon. Same mask technique, same insets as the news article's own
+ * download button.
+ */
+function DownloadGlyph() {
+    return (
+        <span aria-hidden className="relative size-4 shrink-0">
+            <span
+                className="absolute inset-[1.04%_13.54%_9.37%_13.54%] bg-current"
+                style={{ mask: DOWNLOAD_MASK, WebkitMask: DOWNLOAD_MASK }}
+            />
+        </span>
+    );
+}
+
 export interface DocumentRowProps {
     document: BrokerDocument;
     onDownload: (document: BrokerDocument) => void;
-    /**
-     * Optional on purpose, and unwired for now. The artboard links Edit to the
-     * file's own screen (873:52019), which is out of scope for this pass, so
-     * there is nowhere to send the click yet. The chip is drawn regardless:
-     * hiding it would make the row differ from the artboard in a way that reads
-     * as unfinished rather than as a deliberate gap. Handing the view an
-     * `onEdit` is the only thing left once that screen lands.
-     */
+    /** Opens the file's own screen (873:52019). */
     onEdit?: (document: BrokerDocument) => void;
     onDelete: (document: BrokerDocument) => void;
 }
@@ -82,9 +102,8 @@ export function DocumentRow({ document, onDownload, onEdit, onDelete }: Document
                 <Button
                     variant="brandOutline"
                     size="chip"
-                    leadingIcon={
-                        <HugeiconsIcon icon={Download01Icon} size={16} strokeWidth={1.5} />
-                    }
+                    className="px-[7px]"
+                    leadingIcon={<DownloadGlyph />}
                     onClick={() => onDownload(document)}
                 >
                     {t.brokerRole.download}
@@ -94,7 +113,8 @@ export function DocumentRow({ document, onDownload, onEdit, onDelete }: Document
                     <Button
                         variant="brandOutline"
                         size="chip"
-                        leadingIcon={<HugeiconsIcon icon={Edit03Icon} size={16} strokeWidth={1.5} />}
+                        className="px-[7px]"
+                        leadingIcon={<AssetIcon src={`${ICONS}/icon-pencil.svg`} size={16} />}
                         onClick={() => onEdit?.(document)}
                     >
                         {t.common.edit}
@@ -105,9 +125,8 @@ export function DocumentRow({ document, onDownload, onEdit, onDelete }: Document
                     <Button
                         variant="dangerOutline"
                         size="chip"
-                        leadingIcon={
-                            <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.5} />
-                        }
+                        className="px-[7px]"
+                        leadingIcon={<AssetIcon src={`${ICONS}/icon-trash.svg`} size={16} />}
                         onClick={() => onDelete(document)}
                     >
                         {t.common.delete}

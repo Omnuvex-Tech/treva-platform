@@ -8,6 +8,7 @@ import {
   ProfitbaseProject,
   ProfitbaseProperty,
 } from './profitbase-client.service';
+import { ProfitbaseImageService } from './profitbase-image.service';
 import {
   CUSTOM_FIELD,
   constructionStageFromHouse,
@@ -63,7 +64,17 @@ export class ProfitbaseSyncService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly client: ProfitbaseClientService,
+    private readonly images: ProfitbaseImageService,
   ) {}
+
+  /** The copy of an upstream picture, or its own URL when copying failed. */
+  private stored(
+    mirrored: Map<string, string>,
+    url: string | null | undefined,
+  ): string | undefined {
+    if (!url) return undefined;
+    return mirrored.get(url) ?? url;
+  }
 
   private slugify(value: string): string {
     const slug = value
@@ -128,6 +139,20 @@ export class ProfitbaseSyncService {
       unitLayouts: { created: 0, updated: 0 },
     };
 
+    // Every picture this run will reference, copied before anything is written.
+    // Done in one pass rather than per row so the downloads can run in
+    // parallel, and so a row is only ever written with an address this API can
+    // serve itself.
+    const mirrored = await this.images.mirrorAll(
+      [
+        ...houses.map((house) => house.fullImage || house.image),
+        ...plans.flatMap((plan) => [
+          plan.image?.source,
+          ...(plan.planImages ?? []).map((img) => img.big || img.source),
+        ]),
+      ].filter((url): url is string => Boolean(url)),
+    );
+
     const projectById = new Map<number, ProfitbaseProject>();
     for (const project of projects) projectById.set(project.id, project);
 
@@ -169,7 +194,12 @@ export class ProfitbaseSyncService {
       houseById.set(house.id, house);
       const categoryId = categoryIdByProjectId.get(house.projectId);
       if (!categoryId) continue;
-      const syncedHouse = await this.upsertHouse(house, categoryId, summary);
+      const syncedHouse = await this.upsertHouse(
+        house,
+        categoryId,
+        summary,
+        mirrored,
+      );
       syncedHouseByExternalId.set(house.id, syncedHouse);
     }
 
@@ -193,6 +223,7 @@ export class ProfitbaseSyncService {
         houseById.get(property.house_id) ?? null,
         unitTypeIds,
         summary,
+        mirrored,
       );
     };
 
@@ -284,6 +315,7 @@ export class ProfitbaseSyncService {
     house: ProfitbaseHouse,
     categoryId: string,
     summary: ProfitbaseSyncSummary,
+    mirrored: Map<string, string>,
   ): Promise<SyncedHouse> {
     const externalId = String(house.id);
     const title = house.title || house.projectName;
@@ -291,7 +323,7 @@ export class ProfitbaseSyncService {
     const maxFloor = Math.max(house.maxFloor ?? minFloor, minFloor);
     const handover = this.parseHandover(house);
     const currencyCode = house.currency?.code || 'USD';
-    const imageUrl = house.fullImage || house.image || undefined;
+    const imageUrl = this.stored(mirrored, house.fullImage || house.image);
     const constructionStage = constructionStageFromHouse(house);
 
     const sharedData = {
@@ -388,6 +420,7 @@ export class ProfitbaseSyncService {
     parentHouse: ProfitbaseHouse | null,
     unitTypeIds: Map<string, string>,
     summary: ProfitbaseSyncSummary,
+    mirrored: Map<string, string>,
   ): Promise<void> {
     const externalId = String(property.id);
     const currencyCode = parentHouse?.currency?.code || 'USD';
@@ -414,12 +447,16 @@ export class ProfitbaseSyncService {
       ? 0
       : (plan?.roomsAmount ?? property.rooms_amount ?? null);
 
-    // Both main and cover use the original full-size `source` directly.
+    // Main and cover are the same picture, so they are built once. The address
+    // is this API's copy of it, never Profitbase's own.
     const planImage = plan?.image
-      ? { url: plan.image.source, alt: plan.image.imageName || undefined }
+      ? {
+          url: this.stored(mirrored, plan.image.source)!,
+          alt: plan.image.imageName || undefined,
+        }
       : null;
     const gallery = (plan?.planImages || []).map((img) => ({
-      url: img.big || img.source,
+      url: this.stored(mirrored, img.big || img.source)!,
       alt: img.imageName || undefined,
     }));
 

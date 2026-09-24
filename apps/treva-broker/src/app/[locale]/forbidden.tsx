@@ -7,7 +7,7 @@ import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 /**
  * Rendered when `requirePermission()` calls `forbidden()` — a signed-in user
- * who lacks the permission for a route, e.g. a broker typing /admin/users.
+ * who lacks the permission for a route, e.g. a broker typing /users.
  *
  * Boundary files receive no params, so the copy falls back to the default
  * locale. A signed-in user reaching this page is a rare, corrective moment; a

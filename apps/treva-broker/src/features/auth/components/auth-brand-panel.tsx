@@ -1,57 +1,51 @@
 "use client";
 
-import { Building2, HandCoins, Users } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
 import { useI18n } from "@/providers/i18n-provider";
 
 /**
- * The right half of the Welcome artboard (873:72389): a dark panel carrying the
- * product headline and three feature rows.
- *
- * The headline and subheading are the copy written in the design. The three
- * feature titles/descriptions are placeholders there ("Feature 1 Title",
- * "Feature 1 Description"), so the wording below is ours — replace it with
- * marketing's copy when there is any.
+ * The right half of the auth screens, a 1:1 visual copy of the treva-inventory
+ * login panel: the same diagonal dark gradient and the same three feature
+ * rows. Only the copy is TREVA Broker's own (from the i18n dictionary).
  */
 export function AuthBrandPanel() {
     const { t } = useI18n();
 
-    const features: { icon: LucideIcon; title: string; body: string }[] = [
-        { icon: Building2, title: t.auth.feature1Title, body: t.auth.feature1Body },
-        { icon: Users, title: t.auth.feature2Title, body: t.auth.feature2Body },
-        { icon: HandCoins, title: t.auth.feature3Title, body: t.auth.feature3Body },
+    const features = [
+        { title: t.auth.feature1Title, body: t.auth.feature1Body },
+        { title: t.auth.feature2Title, body: t.auth.feature2Body },
+        { title: t.auth.feature3Title, body: t.auth.feature3Body },
     ];
 
     return (
-        <div className="relative flex size-full flex-col justify-center overflow-hidden bg-bg-dark px-16 py-12 text-content-inverse">
-            {/* Soft light bloom, standing in for the artwork layer that sits
-                behind this panel in the artboard. */}
-            <div
-                aria-hidden
-                className="pointer-events-none absolute -top-1/4 -right-1/4 size-[80vh] rounded-pill bg-white/5"
-            />
-
-            <div className="relative max-w-lg">
-                <h2 className="text-3xl leading-tight font-medium text-balance">
+        <div
+            className="hidden w-1/2 items-center justify-center px-16 py-16 md:flex lg:px-24"
+            style={{ background: "linear-gradient(135deg, #1A1A1A 0%, #4E525D 50%, #666666 100%)" }}
+        >
+            <div className="w-full max-w-[520px]">
+                <h2 className="mb-5 text-white" style={{ fontSize: 40, fontWeight: 600, lineHeight: "48px", letterSpacing: 0 }}>
                     {t.auth.panelTitle}
                 </h2>
-                <p className="mt-3 text-sm text-white/70">{t.auth.panelSubtitle}</p>
+                <p className="mb-12 text-[19px] leading-relaxed text-[#B2B3BD]">
+                    {t.auth.panelSubtitle}
+                </p>
 
-                <ul className="mt-10 flex flex-col gap-6">
-                    {features.map(({ icon: Icon, title, body }) => (
-                        <li key={title} className="flex gap-3">
-                            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-pill bg-white/10">
-                                <Icon className="size-3.5" />
-                            </span>
-
-                            <div className="min-w-0">
-                                <p className="text-base font-medium">{title}</p>
-                                <p className="mt-0.5 text-sm text-white/60">{body}</p>
+                <div className="flex flex-col gap-7">
+                    {features.map(({ title, body }) => (
+                        <div key={title} className="flex items-start gap-4">
+                            <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "#FFFFFF1F" }}>
+                                <div className="h-3 w-3 rounded-full bg-white" />
                             </div>
-                        </li>
+                            <div>
+                                <h3 className="m-0 text-white" style={{ fontWeight: 500, fontSize: 20, lineHeight: "28px", letterSpacing: 0 }}>
+                                    {title}
+                                </h3>
+                                <p className="mt-1 m-0" style={{ fontWeight: 400, fontSize: 16, lineHeight: "20px", letterSpacing: 0, color: "#C8C9CD" }}>
+                                    {body}
+                                </p>
+                            </div>
+                        </div>
                     ))}
-                </ul>
+                </div>
             </div>
         </div>
     );

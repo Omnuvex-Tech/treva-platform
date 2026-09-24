@@ -35,7 +35,6 @@ export type PageHeading =
  */
 const PAGE_META: Record<string, (t: Dictionary) => PageHeading> = {
     "/news-feed": (t) => ({ kind: "title", title: t.news.title, subtitle: t.news.subtitle }),
-    "/news-feed/new": (t) => ({ kind: "title", title: t.news.editor.createTitle, subtitle: "" }),
     "/clients": (t) => ({ kind: "title", title: t.clients.title, subtitle: t.clients.subtitle }),
     "/broker-role": (t) => ({
         kind: "title",
@@ -44,12 +43,12 @@ const PAGE_META: Record<string, (t: Dictionary) => PageHeading> = {
     }),
     "/finance": (t) => ({ kind: "title", title: t.finance.title, subtitle: t.finance.subtitle }),
     "/projects": (t) => ({ kind: "title", title: t.projects.title, subtitle: t.projects.subtitle }),
-    "/floor-plan": (t) => ({
+    "/magazine": (t) => ({
         kind: "title",
         title: t.floorPlan.title,
         subtitle: t.floorPlan.subtitle,
     }),
-    "/admin/users": (t) => ({ kind: "title", title: t.users.title, subtitle: t.users.subtitle }),
+    "/users": (t) => ({ kind: "title", title: t.users.title, subtitle: t.users.subtitle }),
     "/admin/listings": (t) => ({
         kind: "title",
         title: t.listings.title,
@@ -71,6 +70,14 @@ export function stripLocale(pathname: string): string {
 
 export function getPageHeading(pathname: string, t: Dictionary, locale: Locale): PageHeading {
     const path = stripLocale(pathname);
+
+    // 873:51439 — "News feed > Add news"; the feed crumb needs the locale.
+    if (path === "/news-feed/new") {
+        return {
+            kind: "breadcrumbs",
+            trail: [{ label: t.news.crumbFeed, href: routes.newsFeed(locale) }, { label: t.news.add }],
+        };
+    }
 
     // Article routes carry an id, so they cannot be static keys in the map.
     if (/^\/news-feed\/[^/]+\/edit$/.test(path)) {
@@ -98,15 +105,14 @@ export function getPageHeading(pathname: string, t: Dictionary, locale: Locale):
         };
     }
 
-    // A building swaps the section title for a trail, the way every other
-    // second-level screen does.
-    if (/^\/floor-plan\/[^/]+$/.test(path)) {
+    // A building keeps the section's Title + Subtitle block, with its own
+    // subtitle and the search field and chips beside it (873:48908) — unlike
+    // the other second-level screens, the Magazine artboards draw no trail.
+    if (/^\/magazine\/[^/]+$/.test(path)) {
         return {
-            kind: "breadcrumbs",
-            trail: [
-                { label: t.floorPlan.title, href: routes.floorPlan(locale) },
-                { label: t.floorPlan.building },
-            ],
+            kind: "title",
+            title: t.floorPlan.title,
+            subtitle: t.floorPlan.buildingSubtitle,
         };
     }
 
@@ -148,8 +154,8 @@ export function getPageHeading(pathname: string, t: Dictionary, locale: Locale):
     // The agent form does the same in both directions — 873:48692 draws "User"
     // then "Creat", 873:48820 "User" then "Edit". Profile is deliberately not
     // here: 873:48750 keeps the section's Title + Subtitle block, so it falls
-    // through to the /admin/users entry below.
-    if (path === "/admin/users/new") {
+    // through to the /users entry above.
+    if (path === "/users/new") {
         return {
             kind: "breadcrumbs",
             trail: [
@@ -158,11 +164,32 @@ export function getPageHeading(pathname: string, t: Dictionary, locale: Locale):
             ],
         };
     }
-    if (/^\/admin\/users\/[^/]+\/edit$/.test(path)) {
+    if (/^\/users\/[^/]+\/edit$/.test(path)) {
         return {
             kind: "breadcrumbs",
             trail: [
                 { label: t.users.tabs.user, href: routes.adminUsers(locale) },
+                { label: t.common.edit },
+            ],
+        };
+    }
+
+    // The agency form is the same trail one tab over: the Real Estate
+    // Agencies tab is where it returns to, so that is the crumb it hangs off.
+    if (path === "/admin/agencies/new") {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.users.tabs.agency, href: routes.adminUsers(locale) },
+                { label: t.users.form.createCrumb },
+            ],
+        };
+    }
+    if (/^\/admin\/agencies\/[^/]+\/edit$/.test(path)) {
+        return {
+            kind: "breadcrumbs",
+            trail: [
+                { label: t.users.tabs.agency, href: routes.adminUsers(locale) },
                 { label: t.common.edit },
             ],
         };

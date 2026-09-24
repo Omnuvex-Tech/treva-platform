@@ -1,9 +1,9 @@
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { AssetIcon } from "@/components/ui/asset-icon";
 import type { Crumb } from "@/config/page-meta";
+import { cn } from "@/lib/utils/cn";
 
 export interface BreadcrumbsProps {
     trail: Crumb[];
@@ -15,6 +15,10 @@ export interface BreadcrumbsProps {
  * Measured from the artboard: the row is 132 wide and 20 tall for
  * "News Feed" (71) + arrow (12) + "Detail" (37), which leaves exactly 6px on
  * each side of the arrow — hence `gap-1.5` rather than a guessed spacing.
+ *
+ * The earlier crumbs are 14/Regular on Content/Tertiary Inverse, the current
+ * one 14/Medium on Content/Primary. The arrow is the artboard's own 12px
+ * chevron-up turned to point right (-90° and flipped), in the same #b2b2b2.
  */
 export function Breadcrumbs({ trail }: BreadcrumbsProps): ReactNode {
     return (
@@ -29,25 +33,29 @@ export function Breadcrumbs({ trail }: BreadcrumbsProps): ReactNode {
                             className="flex min-w-0 items-center gap-1.5"
                         >
                             {index > 0 ? (
-                                <HugeiconsIcon
-                                    icon={ArrowRight01Icon}
+                                <AssetIcon
+                                    src="/images/layout/icon-breadcrumb-arrow.svg"
                                     size={12}
-                                    strokeWidth={1.6}
-                                    className="shrink-0 text-content-tertiary"
+                                    className="-scale-y-100 -rotate-90 text-[var(--color-content-tertiary-inverse)]"
                                 />
                             ) : null}
 
                             {crumb.href && !last ? (
                                 <Link
                                     href={crumb.href}
-                                    className="truncate text-content-tertiary transition-colors hover:text-content-primary"
+                                    className="truncate text-[var(--color-content-tertiary-inverse)] transition-colors hover:text-content-primary"
                                 >
                                     {crumb.label}
                                 </Link>
                             ) : (
                                 <span
                                     aria-current={last ? "page" : undefined}
-                                    className="truncate text-content-primary"
+                                    className={cn(
+                                        "truncate",
+                                        last
+                                            ? "font-medium text-content-primary"
+                                            : "text-[var(--color-content-tertiary-inverse)]",
+                                    )}
                                 >
                                     {crumb.label}
                                 </span>

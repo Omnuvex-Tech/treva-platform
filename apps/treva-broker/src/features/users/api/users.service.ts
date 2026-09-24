@@ -14,4 +14,4 @@ export interface UsersService {
     remove(id: string): Promise<void>;
 }
 
-export const usersService: UsersService = config.api.useMock ? mockAdapter : httpAdapter;
+export const usersService: UsersService = config.api.useMockUsers ? mockAdapter : httpAdapter;

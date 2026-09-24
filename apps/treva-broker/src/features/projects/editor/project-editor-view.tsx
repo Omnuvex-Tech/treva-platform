@@ -1,18 +1,23 @@
 "use client";
 
-import { Delete02Icon, Link01Icon, ViewIcon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, ViewIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { routes } from "@/config/routes";
 import { useConfirm } from "@/hooks/use-confirm";
 import { isApiError } from "@/lib/api/errors";
+import { interpolate } from "@/lib/i18n/interpolate";
+import { formatBytes } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
+import { useToast } from "@/providers/toast-provider";
+import { projectsService } from "../api/projects.service";
 import { useDeleteProject, useSaveProject } from "../hooks/use-projects";
 import type {
     Project,
@@ -26,6 +31,9 @@ import { GallerySection } from "./gallery-section";
 import { HighlightsSection } from "./highlights-section";
 import { MaterialsSection } from "./materials-section";
 import { OffersSection } from "./offers-section";
+
+/** What POST /projects/materials accepts, and what the dropzone hint promises. */
+const MAX_MATERIAL_BYTES = 60 * 1024 * 1024;
 
 export interface ProjectEditorViewProps {
     project: Project;
@@ -56,6 +64,7 @@ export interface ProjectEditorViewProps {
  */
 export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewProps) {
     const { locale, t } = useI18n();
+    const toast = useToast();
     const { can } = useSession();
     const router = useRouter();
 
@@ -65,6 +74,7 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
     const confirmDelete = useConfirm<Project>();
 
     const [name, setName] = useState(project.name);
+    const [location, setLocation] = useState(project.location);
     const [publicUrl, setPublicUrl] = useState(project.publicUrl);
     const [heroImageUrl, setHeroImageUrl] = useState(project.heroImageUrl);
     const [galleryImageUrls, setGalleryImageUrls] = useState<string[]>([
@@ -73,6 +83,7 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
     const [highlights, setHighlights] = useState<ProjectHighlight[]>([...project.highlights]);
     const [offers, setOffers] = useState<ProjectOffer[]>([...project.offers]);
     const [materials, setMaterials] = useState<ProjectMaterial[]>([...project.materials]);
+    const [uploadingMaterials, setUploadingMaterials] = useState(0);
     const [availability, setAvailability] = useState<ProjectAvailability>(project.availability);
     const [error, setError] = useState<string | null>(null);
 
@@ -94,11 +105,13 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                 id: project.id,
                 input: {
                     name: name.trim(),
+                    location: location.trim(),
                     publicUrl: publicUrl.trim(),
                     heroImageUrl,
                     galleryImageUrls,
                     highlights,
                     offers,
+                    materials,
                     availability,
                 },
             });
@@ -108,20 +121,93 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
         }
     }
 
-    function addMaterials(files: File[]) {
-        // No multipart path exists yet, so a picked file becomes a row from its
-        // own metadata; the bytes are dropped until the upload endpoint lands.
-        setMaterials((current) => [
-            ...current,
-            ...files.map((file, index) => ({
-                id: `mt_${Date.now().toString(36)}_${index}`,
-                name: file.name,
-                category: "other",
-                language: "en",
-                sizeBytes: file.size,
-                downloads: 0,
-            })),
-        ]);
+    /**
+     * Stores one Marketing Materials file as soon as it is picked, like the
+     * gallery; the row, with the stored URL, is saved with the project.
+     * Answers null when the file was refused, having said why.
+     */
+    async function uploadMaterial(file: File): Promise<string | null> {
+        if (file.size > MAX_MATERIAL_BYTES) {
+            toast.error(
+                interpolate(t.common.upload.tooLarge, {
+                    name: file.name,
+                    limit: formatBytes(MAX_MATERIAL_BYTES, locale),
+                }),
+            );
+            return null;
+        }
+
+        setUploadingMaterials((count) => count + 1);
+        try {
+            return await projectsService.uploadMaterial(file);
+        } catch (uploadError) {
+            toast.error(
+                isApiError(uploadError) && uploadError.status !== 0
+                    ? uploadError.message
+                    : interpolate(t.common.upload.uploadFailed, { name: file.name }),
+            );
+            return null;
+        } finally {
+            setUploadingMaterials((count) => count - 1);
+        }
+    }
+
+    async function addMaterials(files: File[]) {
+        await Promise.all(
+            files.map(async (file) => {
+                const url = await uploadMaterial(file);
+                if (!url) return;
+
+                setMaterials((current) => [
+                    ...current,
+                    {
+                        id: crypto.randomUUID(),
+                        name: file.name,
+                        category: "other",
+                        language: "en",
+                        sizeBytes: file.size,
+                        downloads: 0,
+                        url,
+                    },
+                ]);
+            }),
+        );
+    }
+
+    /**
+     * Only a row already saved with this very file has a count on the server;
+     * a new or replaced one starts counting once the project is saved.
+     */
+    function countMaterialDownload(material: ProjectMaterial) {
+        const saved = project.materials.some(
+            (entry) => entry.id === material.id && entry.url === material.url,
+        );
+        if (!saved || !project.id) return;
+
+        projectsService
+            .registerMaterialDownload(project.id, material.id)
+            .then((downloads) =>
+                setMaterials((current) =>
+                    current.map((entry) =>
+                        entry.id === material.id ? { ...entry, downloads } : entry,
+                    ),
+                ),
+            )
+            .catch(() => {});
+    }
+
+    /** Keeps the row — its place, category and language — with the new file in it. */
+    async function replaceMaterial(material: ProjectMaterial, file: File) {
+        const url = await uploadMaterial(file);
+        if (!url) return;
+
+        setMaterials((current) =>
+            current.map((entry) =>
+                entry.id === material.id
+                    ? { ...entry, name: file.name, sizeBytes: file.size, downloads: 0, url }
+                    : entry,
+            ),
+        );
     }
 
     return (
@@ -129,14 +215,37 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
             {/* 873:51105 — 60 tall, its row inset 8: the name left, the URL and
                 the two actions right, 12 apart. */}
             <div className="mb-3 flex h-15 items-center justify-between gap-3 px-2">
-                <input
-                    value={name}
-                    disabled={!canManage}
-                    onChange={(event) => setName(event.target.value)}
-                    aria-label={t.projects.editor.name}
-                    placeholder={t.projects.editor.name}
-                    className="min-w-0 flex-1 bg-transparent text-base font-medium text-content-primary outline-none placeholder:text-content-disabled"
-                />
+                {/* Location sits with the name rather than down in a section:
+                    the card prints the two as one block, so they are edited as
+                    one. Its glyph is the card's, for the same reason. */}
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <input
+                        value={name}
+                        disabled={!canManage}
+                        onChange={(event) => setName(event.target.value)}
+                        aria-label={t.projects.editor.name}
+                        placeholder={t.projects.editor.name}
+                        className="min-w-0 flex-1 bg-transparent text-base font-medium text-content-primary outline-none placeholder:text-content-disabled"
+                    />
+
+                    <Input
+                        value={location}
+                        disabled={!canManage}
+                        onChange={(event) => setLocation(event.target.value)}
+                        aria-label={t.projects.editor.location}
+                        placeholder={t.projects.editor.location}
+                        surface="light"
+                        size="sm"
+                        leadingIcon={
+                            <AssetIcon
+                                src="/images/projects/icon-location.svg"
+                                size={16}
+                                className="text-content-brand"
+                            />
+                        }
+                        containerClassName="w-65 shrink-0"
+                    />
+                </div>
 
                 <div className="flex shrink-0 items-center gap-3">
                     <Input
@@ -148,8 +257,17 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                         placeholder={t.projects.editor.publicUrl}
                         surface="light"
                         size="sm"
+                        // 914:15512 — the value is set in Content/Tertiary and
+                        // the glyph is the header's search mark in brand. (The
+                        // instance's own export is a stale info circle; the
+                        // render shows the magnifier.)
+                        className="text-content-tertiary"
                         leadingIcon={
-                            <HugeiconsIcon icon={Link01Icon} size={16} strokeWidth={1.6} />
+                            <AssetIcon
+                                src="/images/layout/icon-search.svg"
+                                size={16}
+                                className="text-content-brand"
+                            />
                         }
                         containerClassName="w-[412px]"
                     />
@@ -161,9 +279,9 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                         <>
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant="brandOutline"
                                 size="lg"
-                                className="rounded-lg px-3.5"
+                                className="rounded-lg px-[13px]"
                                 onClick={() =>
                                     router.push(routes.projectDetail(locale, project.id))
                                 }
@@ -183,7 +301,7 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                                     type="button"
                                     variant="dangerOutline"
                                     size="lg"
-                                    className="rounded-lg px-3.5"
+                                    className="rounded-lg px-[13px]"
                                     onClick={() => confirmDelete.ask(project)}
                                     leadingIcon={
                                         <HugeiconsIcon
@@ -199,11 +317,13 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                         </>
                     ) : null}
 
+                    {/* 873:51109 — Border/Brand edge and Content/Brand ink with
+                        no fill; both buttons' 14px inset counts the 1px edge. */}
                     <Button
                         type="button"
-                        variant="outline"
+                        variant="brandOutline"
                         size="lg"
-                        className="rounded-lg px-3.5"
+                        className="rounded-lg bg-transparent px-[13px]"
                         onClick={() => router.push(routes.projects(locale))}
                     >
                         {t.common.cancel}
@@ -213,8 +333,9 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                         <Button
                             type="submit"
                             size="lg"
-                            className="rounded-lg border border-border-inverse px-3.5"
-                            loading={saveProject.isPending}
+                            className="rounded-lg border border-border-inverse px-[13px]"
+                            // Saving mid-upload would drop the file being sent.
+                            loading={saveProject.isPending || uploadingMaterials > 0}
                         >
                             {t.projects.editor.save}
                         </Button>
@@ -245,6 +366,8 @@ export function ProjectEditorView({ project, mode = "edit" }: ProjectEditorViewP
                     materials={materials}
                     disabled={!canManage}
                     onAdd={addMaterials}
+                    onReplace={replaceMaterial}
+                    onDownload={countMaterialDownload}
                     onDelete={(material) =>
                         setMaterials((current) => current.filter((e) => e.id !== material.id))
                     }

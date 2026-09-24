@@ -2,6 +2,7 @@
 
 import { Switch } from "@/components/ui/switch";
 import { interpolate } from "@/lib/i18n/interpolate";
+import { cn } from "@/lib/utils/cn";
 import { formatNumber } from "@/lib/utils/format";
 import { useI18n } from "@/providers/i18n-provider";
 import type { ProjectAvailability } from "../types";
@@ -24,6 +25,9 @@ const BUCKET_STYLE: Record<Bucket, { mark: string; percent: string }> = {
     sold: { mark: "bg-content-negative", percent: "text-[var(--color-content-negative-bold)]" },
 };
 
+/** Both cards here edge in Background/Secondary, not Border/Subtle. */
+const CARD = "rounded-[14px] border border-bg-secondary bg-bg-primary p-4";
+
 export interface AvailabilitySectionProps {
     availability: ProjectAvailability;
     onChange: (availability: ProjectAvailability) => void;
@@ -33,8 +37,11 @@ export interface AvailabilitySectionProps {
 /**
  * Live Availability (873:51366).
  *
- * Three 125px stat cards — a 32x4 rule, a 10/Medium label, a 32/Bold count and
- * the share of the total — then a 10px stacked bar and its legend.
+ * Three 174.25-wide stat cards 12 apart, centred as a group in the column
+ * rather than stretched across it — a 32x4 rule, a 31px label paragraph
+ * (10/Medium with 12 above and 4 below), the 40-tall 32/Bold count and the
+ * share of the total. Under them, a 10px stacked bar and its legend in one
+ * card. Every card's 17px inset is measured from the outer edge.
  *
  * The counts are number inputs, not read-outs: the artboard draws them inside
  * "Number Input" frames and puts an Auto Calculate switch beside the heading,
@@ -58,67 +65,75 @@ export function AvailabilitySection({
             <SectionHeader
                 title={t.projects.editor.availability}
                 description={t.projects.editor.availabilityHint}
+                // 873:51373 — the labelled Toggle: 4 from its 16/Regular label.
                 action={
-                    <label className="flex cursor-pointer items-center gap-2 text-sm text-content-primary">
-                        <Switch
-                            checked={availability.autoCalculate}
-                            disabled={disabled}
-                            onChange={(event) =>
-                                onChange({ ...availability, autoCalculate: event.target.checked })
-                            }
-                            aria-label={t.projects.editor.autoCalculate}
-                        />
-                        {t.projects.editor.autoCalculate}
-                    </label>
+                    <Switch
+                        label={t.projects.editor.autoCalculate}
+                        checked={availability.autoCalculate}
+                        disabled={disabled}
+                        onChange={(event) =>
+                            onChange({ ...availability, autoCalculate: event.target.checked })
+                        }
+                    />
                 }
             />
 
-            <div className="grid gap-3 px-2 sm:grid-cols-3">
-                {BUCKETS.map((bucket) => (
-                    <div
-                        key={bucket}
-                        className="flex flex-col items-start rounded-md border border-bg-secondary bg-bg-primary p-[17px]"
-                    >
-                        <span
-                            aria-hidden
-                            className={`h-1 w-8 rounded-pill ${BUCKET_STYLE[bucket].mark}`}
-                        />
-
-                        <label
-                            htmlFor={`availability-${bucket}`}
-                            className="pt-3 pb-1 text-2xs font-medium text-content-tertiary"
+            {/* 873:51374 — a 124-tall row the 125.5 cards are centred in, so
+                they overhang it by 0.75 either side, exactly as drawn. The
+                cards' own content (127) runs past their frame the same way. */}
+            <div className="flex items-center px-2 sm:h-[124px]">
+                <div className="mx-auto grid max-w-full gap-3 sm:w-[546.75px] sm:grid-cols-3">
+                    {BUCKETS.map((bucket) => (
+                        <div
+                            key={bucket}
+                            // shrink-0 on every child: squeezing 127 of content
+                            // into the 125.5 frame would shave the label row.
+                            className={cn(
+                                "flex flex-col items-start sm:h-[125.5px] [&>*]:shrink-0",
+                                CARD,
+                            )}
                         >
-                            {t.projects.editor.buckets[bucket]}
-                        </label>
+                            <span
+                                aria-hidden
+                                className={cn("h-1 w-8 rounded-pill", BUCKET_STYLE[bucket].mark)}
+                            />
 
-                        <input
-                            id={`availability-${bucket}`}
-                            type="number"
-                            min={0}
-                            inputMode="numeric"
-                            value={availability[bucket]}
-                            readOnly={locked}
-                            onChange={(event) =>
-                                onChange({
-                                    ...availability,
-                                    [bucket]: Math.max(0, Number(event.target.value) || 0),
-                                })
-                            }
-                            className="w-full bg-transparent text-3xl font-bold text-content-primary outline-none read-only:cursor-default [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
+                            <label
+                                htmlFor={`availability-${bucket}`}
+                                className="block h-[31px] pt-3 pb-1 text-2xs font-medium text-content-tertiary"
+                            >
+                                {t.projects.editor.buckets[bucket]}
+                            </label>
 
-                        <span className={`text-xs font-semibold ${BUCKET_STYLE[bucket].percent}`}>
-                            {interpolate(t.projects.editor.shareOfTotal, {
-                                percent: share(availability[bucket]),
-                            })}
-                        </span>
-                    </div>
-                ))}
+                            <input
+                                id={`availability-${bucket}`}
+                                type="number"
+                                min={0}
+                                inputMode="numeric"
+                                value={availability[bucket]}
+                                readOnly={locked}
+                                onChange={(event) =>
+                                    onChange({
+                                        ...availability,
+                                        [bucket]: Math.max(0, Number(event.target.value) || 0),
+                                    })
+                                }
+                                className="block h-10 w-full bg-transparent p-0 text-3xl font-bold text-content-primary outline-none read-only:cursor-default [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            />
+
+                            <span className={cn("text-xs font-semibold", BUCKET_STYLE[bucket].percent)}>
+                                {interpolate(t.projects.editor.shareOfTotal, {
+                                    percent: share(availability[bucket]),
+                                })}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {/* 873:51404 — a 10px bar over a legend, both inside one 17px card. */}
+            {/* 873:51404 — a 10px bar over a legend, both inside one card. */}
             <div className="px-2">
-                <div className="rounded-md border border-bg-secondary bg-bg-primary p-[17px]">
+                <div className={CARD}>
                     <div
                         role="img"
                         aria-label={t.projects.editor.availability}
@@ -133,20 +148,25 @@ export function AvailabilitySection({
                         ))}
                     </div>
 
+                    {/* 873:51409 — 24 between items, 6 from the 8px dot, the
+                        label on Content/Brand and the count on Content/Primary,
+                        both 12/Medium. */}
                     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-3">
                         {BUCKETS.map((bucket) => (
                             <span
                                 key={bucket}
-                                className="flex items-center gap-1.5 text-xs text-content-secondary"
+                                className="flex items-center gap-1.5 text-xs font-medium text-content-brand"
                             >
                                 <span
                                     aria-hidden
-                                    className={`size-2 rounded-pill ${BUCKET_STYLE[bucket].mark}`}
+                                    className={cn("size-2 rounded-pill", BUCKET_STYLE[bucket].mark)}
                                 />
-                                {t.projects.editor.buckets[bucket]}{" "}
-                                <b className="font-semibold text-content-primary">
-                                    {formatNumber(availability[bucket], locale)}
-                                </b>
+                                <span>
+                                    {t.projects.editor.buckets[bucket]}{" "}
+                                    <span className="text-content-primary">
+                                        {formatNumber(availability[bucket], locale)}
+                                    </span>
+                                </span>
                             </span>
                         ))}
                     </div>

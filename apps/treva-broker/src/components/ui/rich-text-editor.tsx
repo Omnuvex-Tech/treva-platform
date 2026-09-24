@@ -1,19 +1,9 @@
 "use client";
 
-import {
-    TextBoldIcon,
-    TextItalicIcon,
-    TextUnderlineIcon,
-    LeftToRightListBulletIcon,
-    LeftToRightListNumberIcon,
-    Link01Icon,
-    RemoveFormattingIcon,
-} from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import type { IconSvgElement } from "@hugeicons/react";
-import { useCallback, useEffect, useId, useRef } from "react";
+import { Fragment, useCallback, useEffect, useId, useRef } from "react";
 
 import { cn } from "@/lib/utils/cn";
+import { AssetIcon } from "./asset-icon";
 import { Select } from "./select";
 
 export interface RichTextEditorProps {
@@ -23,26 +13,60 @@ export interface RichTextEditorProps {
     /** Body height in px — 360 in the News Content card. */
     minHeight?: number;
     ariaLabel?: string;
+    /** Renders the body read-only — the card's Preview toggle. */
+    readOnly?: boolean;
+    labels: {
+        paragraph: string;
+        heading: string;
+        subheading: string;
+        quote: string;
+    };
     className?: string;
 }
 
 interface ToolbarAction {
     key: string;
-    icon: IconSvgElement;
     label: string;
-    run: () => void;
+    command: string;
+    /** Asks for the command's argument; the action is dropped when it returns null. */
+    argument?: () => string | null;
 }
 
-const BLOCK_OPTIONS = [
-    { value: "p", label: "Paragraph" },
-    { value: "h2", label: "Heading" },
-    { value: "h3", label: "Subheading" },
-    { value: "blockquote", label: "Quote" },
+const ICONS = "/images/news/editor";
+
+/**
+ * The toolbar of the News Content card (873:51500), in the artboard's order.
+ * Each inner array is a group; the groups are split by 1x16 rules.
+ */
+const GROUPS: ToolbarAction[][] = [
+    [
+        { key: "undo", label: "Undo", command: "undo" },
+        { key: "redo", label: "Redo", command: "redo" },
+    ],
+    [
+        { key: "bold", label: "Bold", command: "bold" },
+        { key: "italic", label: "Italic", command: "italic" },
+        { key: "underline", label: "Underline", command: "underline" },
+        { key: "strike", label: "Strikethrough", command: "strikeThrough" },
+    ],
+    [
+        { key: "align-left", label: "Align left", command: "justifyLeft" },
+        { key: "align-center", label: "Align center", command: "justifyCenter" },
+        { key: "align-right", label: "Align right", command: "justifyRight" },
+        { key: "justify", label: "Justify", command: "justifyFull" },
+    ],
+    [
+        { key: "list", label: "Bulleted list", command: "insertUnorderedList" },
+        { key: "ordered", label: "Numbered list", command: "insertOrderedList" },
+        { key: "quote", label: "Quote", command: "formatBlock", argument: () => "<blockquote>" },
+        { key: "link", label: "Link", command: "createLink", argument: () => window.prompt("Link URL") },
+        { key: "image", label: "Image", command: "insertImage", argument: () => window.prompt("Image URL") },
+    ],
 ];
 
 /**
- * A small `contenteditable` editor: a block-format select, seven inline
- * commands, and an HTML string in and out.
+ * A small `contenteditable` editor: a block-format select, the artboard's
+ * seventeen commands, and an HTML string in and out.
  *
  * Why not the shared `@repo/ui` RichTextEditor: that one takes a CSS-module
  * object as a prop and expects the consuming page to define every one of its
@@ -54,6 +78,10 @@ const BLOCK_OPTIONS = [
  * `document.execCommand` is deprecated but is still the only API every browser
  * implements for this; the alternative is a full editing framework, which is a
  * separate decision from "build the screen the design shows".
+ *
+ * Measurements are the artboard's with Figma's inside strokes accounted for: a
+ * 68px toolbar row (16px padding, the rule taking one of the bottom sixteen), a
+ * 132x36 select 12px from 23px buttons 3px apart, 13px glyphs.
  */
 export function RichTextEditor({
     value,
@@ -61,6 +89,8 @@ export function RichTextEditor({
     placeholder,
     minHeight = 360,
     ariaLabel,
+    readOnly = false,
+    labels,
     className,
 }: RichTextEditorProps) {
     const bodyRef = useRef<HTMLDivElement>(null);
@@ -85,91 +115,94 @@ export function RichTextEditor({
         [onChange],
     );
 
-    const actions: ToolbarAction[] = [
-        { key: "bold", icon: TextBoldIcon, label: "Bold", run: () => exec("bold") },
-        { key: "italic", icon: TextItalicIcon, label: "Italic", run: () => exec("italic") },
-        { key: "underline", icon: TextUnderlineIcon, label: "Underline", run: () => exec("underline") },
-        {
-            key: "ul",
-            icon: LeftToRightListBulletIcon,
-            label: "Bulleted list",
-            run: () => exec("insertUnorderedList"),
-        },
-        {
-            key: "ol",
-            icon: LeftToRightListNumberIcon,
-            label: "Numbered list",
-            run: () => exec("insertOrderedList"),
-        },
-        {
-            key: "link",
-            icon: Link01Icon,
-            label: "Link",
-            run: () => {
-                const href = window.prompt("Link URL");
-                if (href) exec("createLink", href);
-            },
-        },
-        {
-            key: "clear",
-            icon: RemoveFormattingIcon,
-            label: "Clear formatting",
-            run: () => exec("removeFormat"),
-        },
-    ];
+    function run(action: ToolbarAction) {
+        if (!action.argument) {
+            exec(action.command);
+            return;
+        }
+        const argument = action.argument();
+        if (argument) exec(action.command, argument);
+    }
 
     return (
         <div className={cn("flex flex-col", className)}>
-            <div className="flex h-17 items-center gap-3 border-b border-border-subtle px-4">
-                <Select
-                    aria-label="Text style"
-                    options={BLOCK_OPTIONS}
-                    defaultValue="p"
-                    onChange={(block) => exec("formatBlock", `<${block}>`)}
-                    containerClassName="w-33"
-                    className="h-9"
-                />
+            <div className="relative border-b border-[var(--color-border-overlay)] bg-bg-primary px-4 pt-4 pb-[15px]">
+                <div className="flex items-center gap-3">
+                    <Select
+                        aria-label="Text style"
+                        options={[
+                            { value: "p", label: labels.paragraph },
+                            { value: "h2", label: labels.heading },
+                            { value: "h3", label: labels.subheading },
+                            { value: "blockquote", label: labels.quote },
+                        ]}
+                        defaultValue="p"
+                        onChange={(block) => exec("formatBlock", `<${block}>`)}
+                        disabled={readOnly}
+                        containerClassName="w-33 shrink-0"
+                        className="h-9 rounded-md border-border-tertiary bg-bg-primary pr-[11px] pl-[15px] text-content-tertiary"
+                        icon={
+                            <AssetIcon
+                                src={`${ICONS}/select-chevron.svg`}
+                                size={20}
+                                className="text-content-tertiary"
+                            />
+                        }
+                    />
 
-                <div className="flex items-center gap-1">
-                    {actions.map((action) => (
-                        <button
-                            key={action.key}
-                            type="button"
-                            title={action.label}
-                            aria-label={action.label}
-                            // Keep the selection: a mousedown-driven blur would
-                            // collapse it before the command runs.
-                            onMouseDown={(event) => event.preventDefault()}
-                            onClick={action.run}
-                            className="flex size-8 items-center justify-center rounded-sm text-content-secondary transition-colors hover:bg-bg-secondary hover:text-content-primary"
-                        >
-                            <HugeiconsIcon icon={action.icon} size={16} strokeWidth={1.6} />
-                        </button>
-                    ))}
+                    <div className="flex items-center gap-[3px]">
+                        {GROUPS.map((group, index) => (
+                            <Fragment key={index}>
+                                <span aria-hidden className="h-4 w-px shrink-0 bg-border-subtle" />
+                                {group.map((action) => (
+                                    <button
+                                        key={action.key}
+                                        type="button"
+                                        title={action.label}
+                                        aria-label={action.label}
+                                        disabled={readOnly}
+                                        // Keep the selection: a mousedown-driven blur would
+                                        // collapse it before the command runs.
+                                        onMouseDown={(event) => event.preventDefault()}
+                                        onClick={() => run(action)}
+                                        className="flex size-[23px] shrink-0 items-center justify-center rounded-xxs text-content-brand transition-colors hover:bg-bg-secondary disabled:opacity-50"
+                                    >
+                                        <AssetIcon src={`${ICONS}/tb-${action.key}.svg`} size={13} />
+                                    </button>
+                                ))}
+                            </Fragment>
+                        ))}
+                    </div>
                 </div>
+
+                {/* 873:51582 — a stray rule the artboard draws over the
+                    numbered-list button, kept so the row matches it. */}
+                <span aria-hidden className="absolute top-4 left-[472.5px] h-4 w-px bg-border-subtle" />
             </div>
 
             <div
                 id={editorId}
                 ref={bodyRef}
-                contentEditable
+                contentEditable={!readOnly}
                 suppressContentEditableWarning
                 role="textbox"
                 aria-multiline
+                aria-readonly={readOnly || undefined}
                 aria-label={ariaLabel}
                 data-placeholder={placeholder}
                 onInput={(event) => onChange(event.currentTarget.innerHTML)}
                 style={{ minHeight }}
                 className={cn(
-                    "scrollbar-thin overflow-y-auto px-4 py-3 text-sm text-content-primary outline-none",
+                    "scrollbar-thin overflow-y-auto p-5 text-sm leading-5 text-content-primary outline-none",
                     "[&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-semibold",
                     "[&_h3]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold",
                     "[&_p]:mb-2 [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-5",
                     "[&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5",
-                    "[&_a]:text-content-link [&_a]:underline",
+                    "[&_a]:text-content-link [&_a]:underline [&_img]:max-w-full [&_img]:rounded-sm",
                     "[&_blockquote]:border-l-2 [&_blockquote]:border-border-tertiary [&_blockquote]:pl-3 [&_blockquote]:text-content-secondary",
-                    // The placeholder is CSS-only so it never becomes real content.
-                    "empty:before:text-content-tertiary empty:before:content-[attr(data-placeholder)]",
+                    // The placeholder is CSS-only so it never becomes real content:
+                    // 14/Medium on Content/Tertiary Inverse, 20px in (873:51585).
+                    "empty:before:font-medium empty:before:text-[var(--color-content-tertiary-inverse)] empty:before:content-[attr(data-placeholder)]",
                 )}
             />
         </div>

@@ -18,10 +18,11 @@ function daysAgo(days: number): string {
  * Fields every fixture shares. Spelled once so each post below only states
  * what makes it different.
  */
-const PUBLISHED: Pick<NewsPost, "status" | "attachments" | "visibility" | "expiresAt"> = {
+const PUBLISHED: Pick<NewsPost, "status" | "attachments" | "visibility" | "language" | "expiresAt"> = {
     status: "published",
     attachments: [],
     visibility: EMPTY_VISIBILITY,
+    language: "en",
     expiresAt: "",
 };
 
@@ -59,12 +60,14 @@ export const MOCK_NEWS: NewsPost[] = [
                 name: "Q2 Commission Structure.pdf",
                 sizeBytes: 1.2 * 1024 * 1024,
                 kind: "pdf",
+                url: "",
             },
             {
                 id: "att_q2_2",
                 name: "Tier Calculation Sheet.xlsx",
                 sizeBytes: 0.3 * 1024 * 1024,
                 kind: "sheet",
+                url: "",
             },
         ],
         publishAt: daysAgo(2),

@@ -80,11 +80,13 @@ function ListingCard({ building }: { building: BuildingSummary }) {
  *
  * There is no tab strip here; the tabs belong to the building screen.
  */
-export function ListingsView() {
+export function ListingsView({ projectId }: { projectId?: string }) {
     const { t } = useI18n();
     const buildingsQuery = useBuildings();
 
-    const buildings = buildingsQuery.data ?? [];
+    const buildings = (buildingsQuery.data ?? []).filter(
+        (building) => !projectId || building.projectId === projectId,
+    );
 
     // Group in first-seen order so the sections follow the fixture order rather
     // than an alphabetical one the design does not ask for.

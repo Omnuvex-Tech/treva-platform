@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Location Icon" clip-path="url(#clip0_0_715)">
+<circle id="Ellipse 443" cx="8" cy="8" r="6.66667" stroke="#4E525D" stroke-width="1.5"/>
+<path id="Ellipse 444" d="M9 8C9 8.55228 8.55228 9 8 9C7.44772 9 7 8.55228 7 8C7 7.44772 7.44772 7 8 7C8.55228 7 9 7.44772 9 8Z" stroke="#4E525D" stroke-width="1.5"/>
+<path id="Vector 1134" d="M8 7V4" stroke="#4E525D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_0_715">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg>

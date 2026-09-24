@@ -31,6 +31,50 @@ function FolderUploadGlyph(props: SVGProps<SVGSVGElement>) {
     );
 }
 
+/**
+ * How many dash+gap periods the edge is cut into.
+ *
+ * The dash is 6 on / 6 off, so a plain `stroke-dasharray="6 6"` only comes out
+ * even if the outline happens to measure a multiple of 12 — otherwise the
+ * pattern meets itself mid-dash where the path closes, which is the stub that
+ * shows at the top-left corner (a rect path starts at the end of that arc).
+ * `pathLength` re-scales the outline to a length the pattern divides exactly,
+ * so the seam disappears at any size. 124 is that count for the 560x197 zone
+ * the Add Files modal draws: its outline measures 1483.4, and 124 periods put
+ * the dash at 5.98px — the artboard’s 6 to within a rounding error.
+ */
+const EDGE_DASH_PERIODS = 124;
+
+/**
+ * The zone’s dashed edge, stroked as SVG rather than left to `border-dashed`.
+ *
+ * Two reasons, both measured off the artboard: its dash is 6 on / 6 off, where
+ * Chrome draws a 1px dashed border at 3 / 3 and the line reads as dotted beside
+ * it; and Figma puts the stroke inside the frame, so the 24px padding is
+ * measured through it — a CSS border would add its pixel outside the padding
+ * box and make the zone 2px taller than the 197 the file draws.
+ */
+function DashedEdge() {
+    return (
+        <svg aria-hidden className="pointer-events-none absolute inset-0 size-full">
+            <rect
+                x="0.5"
+                y="0.5"
+                rx="15.5"
+                ry="15.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                pathLength={EDGE_DASH_PERIODS * 12}
+                strokeDasharray="6 6"
+                // Geometry properties are CSS in SVG2, so the rect can inset
+                // itself by the half-pixel the stroke straddles.
+                style={{ width: "calc(100% - 1px)", height: "calc(100% - 1px)" }}
+            />
+        </svg>
+    );
+}
+
 export interface UploadDropzoneProps {
     /** 16/Semibold headline — "Drag & drop here". */
     title: string;
@@ -95,13 +139,17 @@ export function UploadDropzone({
             onDragLeave={() => setDragging(false)}
             onDrop={handleDrop}
             className={cn(
-                "flex w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-6 transition-colors",
+                "relative flex w-full flex-col items-center justify-center gap-3 rounded-lg p-6 transition-colors",
+                // The edge takes its colour from `currentColor`; every text
+                // inside the zone sets its own ink.
                 dragging
-                    ? "border-border-brand bg-bg-secondary"
-                    : "border-border-primary bg-bg-primary",
+                    ? "bg-bg-secondary text-border-brand"
+                    : "bg-bg-primary text-border-primary",
                 className,
             )}
         >
+            <DashedEdge />
+
             <FolderUploadGlyph className="size-6 shrink-0 text-content-primary" />
 
             <div className="flex w-full flex-col items-center gap-2">
@@ -125,7 +173,14 @@ export function UploadDropzone({
                             <span className="h-px flex-1 bg-border-subtle" />
                         </div>
 
-                        <Button size="compact" onClick={() => inputRef.current?.click()}>
+                        {/* 14/Regular in the artboard (I382:13521;6002:482) —
+                            the only place the design sets a button label at
+                            the regular weight the shared Button does not use. */}
+                        <Button
+                            size="compact"
+                            className="font-normal"
+                            onClick={() => inputRef.current?.click()}
+                        >
                             {buttonLabel}
                         </Button>
                     </div>

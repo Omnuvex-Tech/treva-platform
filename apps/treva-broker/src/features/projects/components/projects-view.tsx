@@ -1,22 +1,25 @@
 "use client";
 
-import { Add01Icon } from "@hugeicons/core-free-icons";
+import { RefreshIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { routes } from "@/config/routes";
 import { useConfirm } from "@/hooks/use-confirm";
+import { isApiError } from "@/lib/api/errors";
 import { interpolate } from "@/lib/i18n/interpolate";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
-import { useDeleteProject, useProjectsList } from "../hooks/use-projects";
+import { useToast } from "@/providers/toast-provider";
+import { useDeleteProject, useProjectsList, useSyncProjects } from "../hooks/use-projects";
 import type { Project } from "../types";
 import { ProjectCard } from "./project-card";
 
@@ -47,7 +50,25 @@ export function ProjectsView() {
 
     const listQuery = useProjectsList({ page, perPage: PER_PAGE });
     const deleteProject = useDeleteProject();
+    const syncProjects = useSyncProjects();
     const confirmDelete = useConfirm<Project>();
+    const toast = useToast();
+
+    function synchronize() {
+        syncProjects.mutate(undefined, {
+            onSuccess: (summary) => {
+                setPage(1);
+                toast.success(
+                    interpolate(t.projects.synced, {
+                        projects: summary.projects.created + summary.projects.updated,
+                        units: summary.units.total,
+                    }),
+                );
+            },
+            onError: (error) =>
+                toast.error(isApiError(error) ? error.message : t.common.error),
+        });
+    }
 
     const data = listQuery.data;
     const from = data ? (data.page - 1) * data.perPage + 1 : 0;
@@ -72,16 +93,36 @@ export function ProjectsView() {
                 </p>
 
                 {can("projects:create") ? (
-                    <Button
-                        size="lg"
-                        // 164x44 with a 3XL radius — the shared `lg` size rounds
-                        // to 12px, this button is 16.
-                        className="shrink-0 rounded-lg border border-border-inverse px-3.5"
-                        leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
-                        onClick={() => router.push(routes.projectNew(locale))}
-                    >
-                        {t.projects.add}
-                    </Button>
+                    <div className="flex shrink-0 items-center gap-3">
+                        {/* Not in the artboard: copies treva-api's off-plan
+                            objects and their units into the broker's database.
+                            Drawn as the outlined sibling of the Add button — the
+                            same 44px, 3XL pair the editor's Cancel / Save use. */}
+                        <Button
+                            size="lg"
+                            variant="brandOutline"
+                            className="rounded-lg bg-transparent px-[13px]"
+                            loading={syncProjects.isPending}
+                            leadingIcon={
+                                <HugeiconsIcon icon={RefreshIcon} size={16} strokeWidth={1.8} />
+                            }
+                            onClick={synchronize}
+                        >
+                            {syncProjects.isPending ? t.projects.syncing : t.projects.sync}
+                        </Button>
+
+                        <Button
+                            size="lg"
+                            // 164x44 with a 3XL radius — the shared `lg` size
+                            // rounds to 12px, this button is 16. Figma's 14px
+                            // inset counts the 1px white edge inside it, hence 13.
+                            className="rounded-lg border border-border-inverse px-[13px]"
+                            leadingIcon={<AssetIcon src="/images/news/icon-plus.svg" size={16} />}
+                            onClick={() => router.push(routes.projectNew(locale))}
+                        >
+                            {t.projects.add}
+                        </Button>
+                    </div>
                 ) : null}
             </div>
 

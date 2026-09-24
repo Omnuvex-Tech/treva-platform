@@ -41,7 +41,9 @@
       "selectFile": "Выбрать файл",
       "tooLarge": "{name} больше {limit} и не был добавлен",
       "enterToAdd": "Нажмите Enter, чтобы добавить",
-      "selectFirst": "Сначала выберите файл"
+      "selectFirst": "Сначала выберите файл",
+      "uploading": "Загрузка…",
+      "uploadFailed": "Не удалось загрузить {name}"
     }
   },
   "nav": {
@@ -50,7 +52,7 @@
     "brokerRole": "Роль брокера",
     "finance": "Финансы",
     "projects": "Проекты",
-    "floorPlan": "План этажа",
+    "floorPlan": "Magazine",
     "adminPanel": "Админ-панель",
     "users": "Пользователи",
     "listings": "Объявления",
@@ -60,11 +62,12 @@
     "welcomeTitle": "Добро пожаловать в TREVA",
     "welcomeSubtitle": "Премиальная платформа управления недвижимостью",
     "email": "Электронная почта",
-    "emailPlaceholder": "admin@treva.az",
+    "emailPlaceholder": "info@treva.realestate",
     "password": "Пароль",
     "rememberMe": "Запомнить меня",
     "forgotPassword": "Забыли пароль?",
     "signIn": "Войти в панель",
+    "signingIn": "Вход...",
     "register": "Регистрация",
     "securityNote": "Защищено на корпоративном уровне",
     "invalidCredentials": "Неверная почта или пароль",
@@ -89,6 +92,7 @@
       "createCompanyHint": "Зарегистрируйте новую компанию и станьте её первым администратором.",
       "joinCompany": "Присоединиться к компании",
       "joinCompanyHint": "Отправьте запрос на вступление в компанию, уже работающую на платформе.",
+      "companyName": "Название компании",
       "searchCompany": "Найдите или выберите компанию",
       "back": "Назад",
       "continue": "Продолжить",
@@ -102,12 +106,27 @@
       "subtitle": "Укажите почту, с которой будете входить.",
       "passwordHint": "Минимум 8 символов.",
       "submit": "Создать аккаунт"
+    },
+    "errors": {
+      "invalid_credentials": "Неверная почта или пароль",
+      "account_disabled": "Этот аккаунт деактивирован",
+      "email_taken": "Эта почта уже зарегистрирована",
+      "company_name_taken": "Компания с таким названием уже существует",
+      "validation_error": "Проверьте поля и попробуйте снова",
+      "network_error": "Не удалось связаться с сервером. Попробуйте снова.",
+      "timeout": "Сервер слишком долго не отвечал. Попробуйте снова.",
+      "internal_error": "На сервере произошла ошибка. Попробуйте снова.",
+      "signInFailed": "Не удалось войти. Попробуйте снова.",
+      "registerFailed": "Не удалось зарегистрироваться. Попробуйте снова."
     }
   },
   "news": {
     "title": "Новости",
     "subtitle": "Просматривайте и управляйте новостями, объявлениями и обновлениями проектов",
     "add": "Добавить новость",
+    "copy": "Копировать",
+    "copySuffix": "(Копия)",
+    "copied": "Статья скопирована",
     "pinned": "Закреплённое",
     "quickStats": "Статистика",
     "postsThisWeek": "Публикаций за неделю",
@@ -122,10 +141,10 @@
       "autosaved": "Автосохранено",
       "saving": "Сохранение…",
       "basicInformation": "Основная информация",
-      "titleLabel": "Заголовок",
-      "titlePlaceholder": "Придумайте заголовок статьи",
+      "titleLabel": "Заголовок новости",
+      "titlePlaceholder": "напр. Обновление структуры комиссий за II квартал",
       "summaryLabel": "Краткое описание",
-      "summaryPlaceholder": "Одно-два предложения для карточки",
+      "summaryPlaceholder": "Краткое описание для карточек новостей и результатов поиска...",
       "categoryLabel": "Категория",
       "coverImage": "Обложка",
       "coverDrop": "Загрузить обложку",
@@ -142,28 +161,8 @@
       "addFile": "Добавить файл",
       "publishing": "Публикация",
       "publishDate": "Дата публикации",
-      "publishTime": "Время",
-      "expiryDate": "Истекает",
-      "expiryPolicy": "После истечения",
-      "expiryKeep": "Оставить видимой",
-      "expiryArchive": "В архив",
-      "expiryDelete": "Удалить",
-      "author": "Автор",
+      "publishTime": "Время публикации",
       "visibility": "Видимость",
-      "audience": {
-        "brokers": "Брокеры",
-        "topBrokers": "Топ-брокеры",
-        "admins": "Администраторы",
-        "agencies": "Агентства",
-        "clients": "Клиенты"
-      },
-      "audienceHint": {
-        "brokers": "Все с аккаунтом брокера",
-        "topBrokers": "Только руководители команд",
-        "admins": "Администраторы платформы",
-        "agencies": "Партнёрские агентства",
-        "clients": "Показывается в клиентском портале"
-      },
       "saveDraft": "Сохранить черновик",
       "publish": "Опубликовать",
       "update": "Обновить",
@@ -171,8 +170,29 @@
       "publishedToast": "Статья опубликована",
       "draftToast": "Черновик сохранён",
       "tooLarge": "{name} больше 25 МБ и не был прикреплён",
-      "backToFeed": "Назад к новостям"
-    }
+      "backToFeed": "Назад к новостям",
+      "language": "Язык",
+      "expirationDate": "Дата окончания",
+      "blockParagraph": "Абзац",
+      "blockHeading": "Заголовок",
+      "blockSubheading": "Подзаголовок",
+      "blockQuote": "Цитата",
+      "options": {
+        "pinned": "Закрепить пост",
+        "featured": "Избранная новость",
+        "showOnDashboard": "Показать на панели",
+        "pushNotification": "Push-уведомление",
+        "emailNotification": "Email-уведомление"
+      },
+      "optionHints": {
+        "pinned": "Закреплён вверху ленты",
+        "featured": "Выделяется в разделе избранного",
+        "showOnDashboard": "Виден на главной панели",
+        "pushNotification": "Уведомить всех при публикации",
+        "emailNotification": "Отправить подписчикам"
+      }
+    },
+    "crumbFeed": "Лента новостей"
   },
   "clients": {
     "title": "Клиенты",
@@ -185,7 +205,8 @@
       "fullName": "ФИО",
       "contacts": "Контакты",
       "objectOfInterest": "Интересующий объект",
-      "status": "Статус"
+      "status": "Статус",
+      "actions": "Действия"
     },
     "status": {
       "pending": "На рассмотрении",
@@ -335,6 +356,7 @@
     "from": "от",
     "editor": {
       "name": "Название проекта",
+      "location": "Расположение",
       "publicUrl": "Публичный URL",
       "save": "Сохранить изменения",
       "heroImage": "Обложка",
@@ -344,6 +366,9 @@
       "highlightLabel": "Название",
       "highlightValue": "Значение",
       "highlightEnabled": "Показывать этот факт",
+      "highlightIcon": "Загрузить иконку",
+      "replaceIcon": "Заменить иконку",
+      "removeIcon": "Удалить иконку",
       "addHighlight": "Добавить факт",
       "offers": "Специальные предложения",
       "offersHint": "Покажите акции с ограниченным сроком и выгоды для покупателя.",
@@ -393,7 +418,7 @@
       "download": "Скачать",
       "downloads": "{count} загрузок",
       "finance": "Финансы",
-      "floorPlan": "Планировка",
+      "floorPlan": "Magazine",
       "lastSynced": "Последняя синхронизация: {when}",
       "edit": "Редактировать",
       "financeColumns": {
@@ -402,16 +427,21 @@
         "unitCode": "Юнит",
         "listingPrice": "Цена в листинге",
         "salesPrice": "Цена продажи",
-        "received": "Получ.",
+        "received": "Поступило",
         "paid": "Оплачено",
         "remaining": "Остаток",
         "salesDate": "Дата продажи"
-      }
-    }
+      },
+      "expires": "Истекает {date}"
+    },
+    "sync": "Синхронизировать",
+    "syncing": "Синхронизация…",
+    "synced": "Синхронизировано проектов: {projects}, юнитов: {units}"
   },
   "floorPlan": {
-    "title": "План этажа",
+    "title": "Magazine",
     "subtitle": "Здания, этажи и доступность квартир",
+    "buildingSubtitle": "Создавайте, упорядочивайте и обновляйте здания и юниты для каждого проекта",
     "legend": {
       "available": "Доступно",
       "reserved": "Резерв",
@@ -474,7 +504,7 @@
   },
   "users": {
     "title": "Пользователи",
-    "subtitle": "Управление всеми строящимися объектами",
+    "subtitle": "Управляйте всеми пользователями и их доступом",
     "tabs": {
       "user": "Пользователь",
       "agency": "Агентства недвижимости"
@@ -512,11 +542,14 @@
       "lastName": "Фамилия",
       "email": "Электронная почта",
       "password": "Пароль",
+      "passwordCreateHint": "Не менее 8 символов. Оставьте пустым — будет создан одноразовый пароль.",
+      "passwordEditHint": "Не менее 8 символов. Оставьте пустым, чтобы сохранить текущий пароль.",
       "phone": "Основной номер",
       "addPhone": "Добавить ещё номер",
+      "removePhone": "Удалить этот номер",
       "cooperationType": "Тип сотрудничества",
-      "agentlik": "Агентство (Agentlik)",
       "agency": "Агентство",
+      "agencyNone": "Без агентства",
       "accessPermissions": "Права доступа",
       "accessPermissionOptions": {
         "full": "Полный доступ",
@@ -532,6 +565,19 @@
       "blockAgent": "Заблокировать агента",
       "create": "Создать",
       "save": "Сохранить"
+    },
+    "agencyForm": {
+      "createTitle": "Создание агентства",
+      "editTitle": "Редактирование агентства",
+      "name": "Название",
+      "managerName": "Менеджер",
+      "phone": "Контакты",
+      "organization": "Организация",
+      "email": "E-Mail",
+      "managerNote": "Руководить агентством может только учётная запись, не привязанная к другому агентству. Новый менеджер создаётся с одноразовым паролем, который он меняет в своём профиле.",
+      "manager": "Менеджер",
+      "managerPlaceholder": "Выберите учётную запись",
+      "managerNew": "Добавить нового менеджера"
     },
     "profile": {
       "title": "Профиль"
@@ -550,8 +596,10 @@
     },
     "deleteConfirm": "Удалить этого пользователя? Действие необратимо.",
     "addUser": "Добавить пользователя",
+    "addAgency": "Добавить агентство",
     "userAdded": "Пользователь успешно добавлен",
     "agencyAdded": "Агентство успешно добавлено",
+    "agencyUpdated": "Агентство успешно обновлено",
     "userDeleted": "Пользователь удалён",
     "agencyDeleted": "Агентство удалено",
     "searchUsers": "Поиск по имени, фамилии или номеру телефона",

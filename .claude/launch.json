@@ -12,6 +12,26 @@
             "runtimeExecutable": "npm",
             "runtimeArgs": ["run", "dev", "--workspace=apps/treva-web"],
             "port": 10010
+        },
+        {
+            "name": "treva-broker",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev", "--workspace=apps/treva-broker"],
+            "port": 10040
+        },
+        {
+            "name": "treva-broker-api",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev", "--workspace=apps/treva-broker-api"],
+            "port": 10041,
+            "autoPort": false
+        },
+        {
+            "name": "treva-api",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev", "--workspace=apps/treva-api"],
+            "port": 10011,
+            "autoPort": false
         }
     ]
 }

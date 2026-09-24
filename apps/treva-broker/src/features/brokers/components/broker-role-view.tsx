@@ -1,6 +1,6 @@
 "use client";
 
-import { Add01Icon, FolderOpenIcon } from "@hugeicons/core-free-icons";
+import { FolderOpenIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { useState } from "react";
 import { AddFilesModal } from "@/components/common/add-files-modal";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { routes } from "@/config/routes";
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -22,24 +23,11 @@ import {
     useDocuments,
     useRegisterDownload,
 } from "../hooks/use-documents";
-import type { BrokerDocument, DocumentKind } from "../types";
+import type { BrokerDocument } from "../types";
 import { DocumentRow } from "./document-row";
 
 /** Rows the loading card stands in for — the artboard draws four (873:49477). */
 const SKELETON_ROWS = 4;
-
-/**
- * Office files carry a generic MIME type often enough that the extension is the
- * more reliable signal; images and PDFs are the other way round.
- */
-function kindFor(file: File): DocumentKind {
-    if (file.type.startsWith("image/")) return "image";
-    if (file.type === "application/pdf") return "pdf";
-    if (/\.pptx?$/i.test(file.name)) return "pptx";
-    if (/\.docx?$/i.test(file.name)) return "docx";
-    if (/\.xlsx?$/i.test(file.name)) return "xlsx";
-    return "other";
-}
 
 /**
  * Broker Role — the shared materials library (artboard 873:49451).
@@ -89,12 +77,7 @@ export function BrokerRoleView() {
      */
     function handleAdd(file: File, name: string) {
         createDocument.mutate(
-            {
-                name: name || file.name,
-                kind: kindFor(file),
-                sizeBytes: file.size,
-                uploadedBy: user.fullName,
-            },
+            { file, name, uploadedBy: user.fullName },
             {
                 onSuccess: () => toast.success(t.brokerRole.addedToast),
                 onError: () => toast.error(t.common.error),
@@ -112,89 +95,101 @@ export function BrokerRoleView() {
     const documents = listQuery.data ?? [];
 
     return (
-        <div className="flex flex-col px-8 pt-4 pb-8">
-            {/* 873:49472 — 60px tall, the name left and the action right, both
-                inset 8px. The label repeats the header's own title because
-                873:49474 spells it out; the artboard only gets away with it by
-                leaving placeholder copy in the header above. */}
-            <div className="flex h-15 items-center justify-between gap-3 px-2">
-                <p className="truncate text-base font-medium text-content-primary">
-                    {t.brokerRole.title}
-                </p>
+        // The page chrome the artboard gives every screen (873:49468/873:49469):
+        <div className="flex min-h-full bg-bg-secondary px-0.5">
+            <div className="flex min-w-0 flex-1 flex-col bg-bg-primary/50 p-4">
+                {/* Card Container (873:49470) and Section (873:49471): the two
+                    8px insets the artboard nests inside the 16px content area,
+                    which together are the 16px this one class is. */}
+                <div className="flex min-w-0 flex-col px-4">
+                    {/* 873:49472 — 60px tall, the action right, inset 8px. The artboard
+                        repeats the screen title here (873:49474), but the header above
+                        already carries it for real, so the second copy is dropped and
+                        only the action is left. The row keeps its height either way:
+                        it is what sets the gap above the card. */}
+                    <div className="flex h-15 items-center justify-end gap-3 px-2">
+                        {can("brokers:create") ? (
+                            <Button
+                                size="lg"
+                                // 110x44 with a 3XL radius — the shared `lg` size rounds
+                                // to 12px, this button is 16. The padding is 13, not the
+                                // artboard's 14: Figma measures it from the frame edge,
+                                // inside the 1px stroke, where CSS adds the border on top.
+                                className="shrink-0 rounded-lg border border-border-inverse px-[13px]"
+                                // Interface/Solid/plus (I873:49476;8272:10833) — a
+                                // filled glyph, which no stroked npm icon reproduces.
+                                leadingIcon={<AssetIcon src="/images/news/icon-plus.svg" size={16} />}
+                                onClick={() => setAddOpen(true)}
+                            >
+                                {t.brokerRole.addFiles}
+                            </Button>
+                        ) : null}
+                    </div>
 
-                {can("brokers:create") ? (
-                    <Button
-                        size="lg"
-                        // 110x44 with a 3XL radius — the shared `lg` size rounds
-                        // to 12px, this button is 16.
-                        className="shrink-0 rounded-lg border border-border-inverse px-3.5"
-                        leadingIcon={<HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={1.8} />}
-                        onClick={() => setAddOpen(true)}
-                    >
-                        {t.brokerRole.addFiles}
-                    </Button>
-                ) : null}
-            </div>
-
-            {listQuery.isPending ? (
-                <Card className="divide-y divide-border-subtle px-2">
-                    {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-                        <div key={index} className="flex h-15 items-center gap-3 px-4">
-                            <Skeleton className="size-7.5 rounded-sm" />
-                            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                                <Skeleton className="h-3 w-40" />
-                                <Skeleton className="h-3 w-12" />
-                            </div>
-                            <Skeleton className="h-7 w-72 rounded-lg" />
-                        </div>
-                    ))}
-                </Card>
-            ) : listQuery.isError ? (
-                <EmptyState
-                    icon={<HugeiconsIcon icon={FolderOpenIcon} />}
-                    title={t.common.error}
-                    action={
-                        <Button variant="outline" onClick={() => listQuery.refetch()}>
-                            {t.common.retry}
-                        </Button>
-                    }
-                />
-            ) : documents.length > 0 ? (
-                /* The rows are inset 8px inside the card and separated by a rule
-                   that stops at that inset, not at the card edge (873:49477). */
-                <Card className="divide-y divide-border-subtle px-2">
-                    {documents.map((document) => (
-                        <DocumentRow
-                            key={document.id}
-                            document={document}
-                            onDownload={handleDownload}
-                            onEdit={(target) =>
-                                router.push(routes.brokerRoleEdit(locale, target.id))
+                    {listQuery.isPending ? (
+                        <Card className="divide-y divide-border-subtle px-2">
+                            {Array.from({ length: SKELETON_ROWS }, (_, index) => (
+                                <div key={index} className="flex h-15 items-center gap-3 px-4">
+                                    <Skeleton className="size-7.5 rounded-sm" />
+                                    <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                                        <Skeleton className="h-3 w-40" />
+                                        <Skeleton className="h-3 w-12" />
+                                    </div>
+                                    <Skeleton className="h-7 w-72 rounded-lg" />
+                                </div>
+                            ))}
+                        </Card>
+                    ) : listQuery.isError ? (
+                        <EmptyState
+                            icon={<HugeiconsIcon icon={FolderOpenIcon} />}
+                            title={t.common.error}
+                            action={
+                                <Button variant="outline" onClick={() => listQuery.refetch()}>
+                                    {t.common.retry}
+                                </Button>
                             }
-                            onDelete={confirmDelete.ask}
                         />
-                    ))}
-                </Card>
-            ) : (
-                <EmptyState
-                    icon={<HugeiconsIcon icon={FolderOpenIcon} />}
-                    title={t.common.empty}
-                    description={t.common.emptyHint}
-                />
-            )}
+                    ) : documents.length > 0 ? (
+                        /* The rows are inset 8px inside the card and separated by a rule
+                           that stops at that inset, not at the card edge (873:49477). */
+                        <Card className="divide-y divide-border-subtle px-2">
+                            {documents.map((document) => (
+                                <DocumentRow
+                                    key={document.id}
+                                    document={document}
+                                    onDownload={handleDownload}
+                                    onEdit={(target) =>
+                                        router.push(routes.brokerRoleEdit(locale, target.id))
+                                    }
+                                    onDelete={confirmDelete.ask}
+                                />
+                            ))}
+                        </Card>
+                    ) : (
+                        <EmptyState
+                            icon={<HugeiconsIcon icon={FolderOpenIcon} />}
+                            title={t.common.empty}
+                            description={t.common.emptyHint}
+                        />
+                    )}
 
-            <AddFilesModal open={addOpen} onClose={() => setAddOpen(false)} onAdd={handleAdd} />
+                    {/* The modal is drawn beside this screen in the file
+                        (873:49824), and its own defaults are what it draws:
+                        the artboard's formats line, picker and 60MB cap. */}
+                    <AddFilesModal open={addOpen} onClose={() => setAddOpen(false)} onAdd={handleAdd} />
 
-            <ConfirmDialog
-                open={confirmDelete.isOpen}
-                title={t.common.deleteTitle}
-                description={t.brokerRole.deleteConfirm}
-                subject={confirmDelete.target?.name}
-                confirmLabel={t.common.confirmDelete}
-                loading={deleteDocument.isPending}
-                onConfirm={performDelete}
-                onCancel={confirmDelete.dismiss}
-            />
+                    <ConfirmDialog
+                        open={confirmDelete.isOpen}
+                        title={t.common.deleteTitle}
+                        description={t.brokerRole.deleteConfirm}
+                        subject={confirmDelete.target?.name}
+                        confirmLabel={t.common.confirmDelete}
+                        loading={deleteDocument.isPending}
+                        onConfirm={performDelete}
+                        onCancel={confirmDelete.dismiss}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

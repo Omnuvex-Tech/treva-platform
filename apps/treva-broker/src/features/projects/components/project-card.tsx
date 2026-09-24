@@ -1,10 +1,9 @@
 "use client";
 
-import { Clock01Icon, Delete02Icon, Location01Icon, PencilEdit02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Building2 } from "lucide-react";
 import Image from "next/image";
 
+import { AssetIcon } from "@/components/ui/asset-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { interpolate } from "@/lib/i18n/interpolate";
@@ -17,6 +16,15 @@ import type { Project, ProjectStatus } from "../types";
 const STATUS_TONE: Record<ProjectStatus, "positive" | "neutral"> = {
     active: "positive",
     inactive: "neutral",
+};
+
+/**
+ * The pill inks Content/Positive (#00c274) — not the Positive Bold the shared
+ * positive tone carries for the news cards' "NEW".
+ */
+const STATUS_INK: Record<ProjectStatus, string | undefined> = {
+    active: "text-content-positive",
+    inactive: undefined,
 };
 
 export interface ProjectCardProps {
@@ -38,13 +46,17 @@ export interface ProjectCardProps {
  *
  * The footer's two controls are both 28 tall: a grey clock chip carrying how
  * long ago the project changed, and the brand Edit button.
+ *
+ * Figma draws the 1px edge inside the 260x368 frame, so each padding below is
+ * the artboard's minus that pixel; with the full 8/12 the body ran 2px past
+ * the fixed height.
  */
 export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardProps) {
     const { locale, t } = useI18n();
     const { can } = useSession();
 
     return (
-        <article className="flex h-92 flex-col gap-3 rounded-xl border border-border-subtle bg-bg-primary px-2 pt-2 pb-3">
+        <article className="flex h-92 flex-col gap-3 rounded-xl border border-border-subtle bg-bg-primary px-[7px] pt-[7px] pb-[11px]">
             {/* I873:49156;13186:128 — 200 tall, same 4XL radius as the card. The
                 cover is the way into the project's own screen; the artboard
                 draws no separate control for it and the footer's Edit button
@@ -85,7 +97,8 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
                         tone={STATUS_TONE[project.status]}
                         // 12/Medium sentence case, not the 10px uppercase pill
                         // the news cards use.
-                        className="px-2 py-1 text-xs font-medium tracking-normal normal-case"
+                        size="field"
+                        className={STATUS_INK[project.status]}
                     >
                         {t.projects.status[project.status]}
                     </Badge>
@@ -102,9 +115,10 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
                                 event.stopPropagation();
                                 onDelete(project);
                             }}
-                            className="flex h-8 shrink-0 items-center justify-center rounded-xl bg-bg-tertiary px-2 text-content-secondary transition-colors hover:bg-border-tertiary"
+                            // The glyph is Content/Tertiary on the artboard.
+                            className="flex h-8 shrink-0 items-center justify-center rounded-xl bg-bg-tertiary px-2 py-1 text-content-tertiary transition-colors hover:bg-border-tertiary"
                         >
-                            <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={1.6} />
+                            <AssetIcon src="/images/news/icon-trash.svg" size={16} />
                         </button>
                     ) : null}
                 </div>
@@ -132,12 +146,7 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
                     </h3>
 
                     <p className="flex min-w-0 items-center gap-1 text-sm font-medium text-content-brand">
-                        <HugeiconsIcon
-                            icon={Location01Icon}
-                            size={16}
-                            strokeWidth={1.6}
-                            className="shrink-0"
-                        />
+                        <AssetIcon src="/images/projects/icon-location.svg" size={16} />
                         <span className="truncate">{project.location}</span>
                     </p>
 
@@ -158,8 +167,11 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
                 </div>
 
                 <div className="flex items-center justify-between gap-2">
-                    <span className="flex h-7 shrink-0 items-center gap-1 rounded-lg bg-bg-tertiary px-2 text-sm font-semibold text-content-primary">
-                        <HugeiconsIcon icon={Clock01Icon} size={16} strokeWidth={1.6} />
+                    {/* Inked Black/950 rather than Content/Primary, with the
+                        glyph on brand — the same `Price` chip the news cards
+                        carry. */}
+                    <span className="flex h-7 shrink-0 items-center gap-1 rounded-lg bg-bg-tertiary px-2 py-1 text-sm font-semibold whitespace-nowrap text-black">
+                        <AssetIcon src="/images/news/icon-clock.svg" size={16} className="text-content-brand" />
                         {formatRelativeTime(project.updatedAt, locale)}
                     </span>
 
@@ -167,9 +179,7 @@ export function ProjectCard({ project, onDelete, onEdit, onOpen }: ProjectCardPr
                         <Button
                             size="chip"
                             className="shrink-0"
-                            leadingIcon={
-                                <HugeiconsIcon icon={PencilEdit02Icon} size={16} strokeWidth={1.6} />
-                            }
+                            leadingIcon={<AssetIcon src="/images/news/icon-pencil.svg" size={16} />}
                             onClick={() => onEdit?.(project)}
                         >
                             {t.common.edit}

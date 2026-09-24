@@ -1,10 +1,18 @@
 import { http } from "@/lib/api/http";
 import { endpoints } from "@/config/endpoints";
-import type { Agency, AgencyInput } from "../types";
+import type { Agency, AgencyInput, ManagerOption } from "../types";
 
 /** Real adapter — see the note in features/auth/api/auth.http.ts. */
 export async function list(search?: string): Promise<Agency[]> {
     return http.get<Agency[]>(endpoints.agencies.list, { params: { search } });
+}
+
+export async function managers(): Promise<ManagerOption[]> {
+    return http.get<ManagerOption[]>(endpoints.agencies.managers);
+}
+
+export async function detail(id: string): Promise<Agency> {
+    return http.get<Agency>(endpoints.agencies.detail(id));
 }
 
 export async function create(input: AgencyInput): Promise<Agency> {

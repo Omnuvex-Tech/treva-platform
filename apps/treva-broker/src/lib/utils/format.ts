@@ -171,8 +171,10 @@ export function formatBytes(bytes: number, locale: Locale): string {
         unitIndex += 1;
     }
 
+    // One decimal at every magnitude: the article attachments read "10.7 MB"
+    // (920:11750), not "11 MB".
     const formatted = new Intl.NumberFormat(INTL_LOCALES[locale], {
-        maximumFractionDigits: value < 10 ? 1 : 0,
+        maximumFractionDigits: 1,
     }).format(value);
 
     return `${formatted} ${units[unitIndex]}`;

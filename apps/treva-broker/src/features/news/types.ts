@@ -9,21 +9,34 @@ export interface NewsAttachment {
     name: string;
     sizeBytes: number;
     kind: AttachmentKind;
+    /** Where the stored file is served from (`/uploads/...`); "" on fixtures. */
+    url: string;
+}
+
+/** What the API answers after storing one file. */
+export interface UploadedFile {
+    url: string;
+    name: string;
+    sizeBytes: number;
+    mimeType: string;
 }
 
 /**
- * The audiences a post can be shown to. The editor's Visibility card is a list
- * of these with a toggle each (five rows in artboard 873:51626).
+ * The switches in the editor's Visibility card (873:51626), minus "Pin this
+ * Post", which is the post's own `pinned` flag — the feed's Pinned rail reads
+ * that one.
  */
-export const VISIBILITY_AUDIENCES = [
-    "brokers",
-    "topBrokers",
-    "admins",
-    "agencies",
-    "clients",
+export const VISIBILITY_OPTIONS = [
+    "featured",
+    "showOnDashboard",
+    "pushNotification",
+    "emailNotification",
 ] as const;
 
-export type VisibilityAudience = (typeof VISIBILITY_AUDIENCES)[number];
+export type VisibilityOption = (typeof VISIBILITY_OPTIONS)[number];
+
+/** The languages an article can be written in — the editor's Language select. */
+export type NewsLanguage = "az" | "en" | "ru";
 
 export interface NewsPost {
     id: string;
@@ -37,7 +50,9 @@ export interface NewsPost {
     authorName: string;
     status: NewsStatus;
     attachments: NewsAttachment[];
-    visibility: Record<VisibilityAudience, boolean>;
+    visibility: Record<VisibilityOption, boolean>;
+    /** Empty until the author picks one. */
+    language: NewsLanguage | "";
     /** ISO date-time the post goes live; empty while it is a draft. */
     publishAt: string;
     /** ISO date the post stops being shown; empty means it never expires. */
@@ -67,16 +82,17 @@ export interface NewsInput {
     pinned?: boolean;
     status?: NewsStatus;
     attachments?: NewsAttachment[];
-    visibility?: Record<VisibilityAudience, boolean>;
+    visibility?: Record<VisibilityOption, boolean>;
+    language?: NewsLanguage | "";
     publishAt?: string;
     expiresAt?: string;
 }
 
 /** Sensible starting point for a new post. */
-export const EMPTY_VISIBILITY: Record<VisibilityAudience, boolean> = {
-    brokers: true,
-    topBrokers: true,
-    admins: true,
-    agencies: false,
-    clients: false,
+export const EMPTY_VISIBILITY: Record<VisibilityOption, boolean> = {
+    featured: false,
+    // The artboard starts with only this one on.
+    showOnDashboard: true,
+    pushNotification: false,
+    emailNotification: false,
 };
