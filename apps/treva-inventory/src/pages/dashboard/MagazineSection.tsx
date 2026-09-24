@@ -8,6 +8,8 @@ import { UnitLayoutsSection, FilterSelect } from "./UnitLayoutsSection";
 import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 import { ImageLightbox } from "../../components/ImageLightbox";
 import { IoClose, IoEyeOutline } from "react-icons/io5";
+import { primaryPrice } from "../../utils/unitPrice";
+import { FURNISHING_OPTIONS, RENOVATION_OPTIONS } from "../../utils/offplanOptions";
 
 const statusTextMap: Record<string, string> = {
     available: "text-[#2D9A5B]",
@@ -22,10 +24,10 @@ const statusLabelMap: Record<string, string> = {
 };
 
 function formatPrice(prices: Record<string, number> | undefined) {
-    if (!prices || Object.keys(prices).length === 0) return null;
-    const [currency, amount] = Object.entries(prices)[0] || [];
-    if (!currency || amount === undefined) return null;
-    return currency === "USD" ? `$${Number(amount).toLocaleString()}` : `${currency} ${Number(amount).toLocaleString()}`;
+    const price = primaryPrice(prices);
+    if (!price) return null;
+    const amount = Math.round(price.amount).toLocaleString();
+    return price.currency === "USD" ? `$${amount}` : `${price.currency} ${amount}`;
 }
 
 const GRID_LEGEND = {
@@ -353,7 +355,7 @@ export function MagazineSection() {
                         >
                             <div className="mb-4 flex items-start justify-between gap-3">
                                 <div>
-                                    <p className="text-xs text-[#999]">Residential unit</p>
+                                    <p className="text-xs text-[#999]">{selectedGridLayout.realEstateType || "Unit"}</p>
                                     <p className="mt-1 text-[15px] font-semibold text-[#1A1A1A]">
                                         №{selectedGridLayout.unitCode || selectedGridLayout.number || selectedGridLayout.title}
                                     </p>
@@ -428,12 +430,15 @@ export function MagazineSection() {
                                 <p className="mt-1 text-lg font-semibold text-[#1A1A1A]">
                                     {formatPrice(selectedGridLayout.prices) || "No price"}
                                 </p>
-                                {selectedGridLayout.prices && Object.keys(selectedGridLayout.prices).length > 0 && selectedGridLayout.totalArea ? (
-                                    <p className="mt-0.5 text-xs text-[#999]">
-                                        {Math.round((Object.values(selectedGridLayout.prices)[0] || 0) / selectedGridLayout.totalArea).toLocaleString()}{" "}
-                                        {Object.keys(selectedGridLayout.prices)[0]} / m²
-                                    </p>
-                                ) : null}
+                                {(() => {
+                                    const price = primaryPrice(selectedGridLayout.prices);
+                                    if (!price || !selectedGridLayout.totalArea) return null;
+                                    return (
+                                        <p className="mt-0.5 text-xs text-[#999]">
+                                            {Math.round(price.amount / selectedGridLayout.totalArea).toLocaleString()} {price.currency} / m²
+                                        </p>
+                                    );
+                                })()}
                             </div>
 
                             <div className="border-t border-[#F1F2F4] pt-4">
@@ -441,12 +446,17 @@ export function MagazineSection() {
                                 <div className="space-y-2.5 text-sm">
                                     {[
                                         ["Apartment number", selectedGridLayout.unitCode || String(selectedGridLayout.number || "—")],
-                                        ["Sub-Type", selectedGridLayout.unitTypeOption?.title || "—"],
+                                        ["Unit type", selectedGridLayout.unitTypeOption?.title || "—"],
                                         ["Building entrance", selectedGridLayout.entrance || "—"],
                                         ["Floor", String(selectedGridLayout.floor)],
                                         ["Name of building", selectedGridLayout.house?.title || selectedHouse?.title || "—"],
                                         ["Complex", selectedHouse?.category?.title || "—"],
                                         ["Total area, m²", String(selectedGridLayout.totalArea)],
+                                        ["Internal area, m²", String(selectedGridLayout.internalArea)],
+                                        ["Balcony area, m²", selectedGridLayout.balconyArea ? String(selectedGridLayout.balconyArea) : "—"],
+                                        ["Construction stage", selectedGridLayout.constructionStage || "—"],
+                                        ["Renovation", RENOVATION_OPTIONS.find((option) => option.id === selectedGridLayout.renovation)?.label || "Not specified"],
+                                        ["Furnishing", FURNISHING_OPTIONS.find((option) => option.id === selectedGridLayout.furnishing)?.label || "Not specified"],
                                     ].map(([label, value]) => (
                                         <div key={label} className="flex items-center justify-between gap-3">
                                             <span className="text-[#999]">{label}</span>

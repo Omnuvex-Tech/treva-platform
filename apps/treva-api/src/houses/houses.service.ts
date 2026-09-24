@@ -85,6 +85,7 @@ export class HousesService {
         contractAddress: createDto.contractAddress,
         secondContractAddress: createDto.secondContractAddress,
         showroomAvailability: createDto.showroomAvailability,
+        tags: (createDto.tags as any) ?? [],
         secondShowroomAvailability: createDto.secondShowroomAvailability,
       },
       include: { category: true, owner: true },
@@ -182,7 +183,7 @@ export class HousesService {
     ]);
 
     return {
-      data,
+      data: query.summary ? data : await this.withEntranceCounts(data),
       pagination: {
         page,
         limit,
@@ -190,6 +191,27 @@ export class HousesService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  /** Adds how many distinct entrances each house's units are spread over. */
+  private async withEntranceCounts<T extends { id: string }>(houses: T[]) {
+    if (houses.length === 0) return houses;
+    const rows = await this.prisma.unitLayout.groupBy({
+      by: ['houseId', 'entrance'],
+      where: {
+        houseId: { in: houses.map((house) => house.id) },
+        entrance: { not: null },
+      },
+    });
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      if (row.houseId)
+        counts.set(row.houseId, (counts.get(row.houseId) ?? 0) + 1);
+    }
+    return houses.map((house) => ({
+      ...house,
+      entranceCount: counts.get(house.id) ?? 0,
+    }));
   }
 
   async findOne(id: string) {
@@ -312,6 +334,7 @@ export class HousesService {
       data.secondContractAddress = updateDto.secondContractAddress;
     if (updateDto.showroomAvailability !== undefined)
       data.showroomAvailability = updateDto.showroomAvailability;
+    if (updateDto.tags !== undefined) data.tags = updateDto.tags;
     if (updateDto.secondShowroomAvailability !== undefined)
       data.secondShowroomAvailability = updateDto.secondShowroomAvailability;
 

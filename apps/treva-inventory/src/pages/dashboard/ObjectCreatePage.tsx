@@ -16,7 +16,9 @@ import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { PlanUploadCard } from "../../components/PlanUploadCard";
 import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
+import { formatPrimaryPrice } from "../../utils/unitPrice";
 import { IoClose } from "react-icons/io5";
+import { Pagination } from "../../components/Pagination";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
@@ -36,16 +38,10 @@ const TABS: { key: TabKey; label: string }[] = [
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
 
-function formatPriceValue(value: number) {
-    return value.toLocaleString();
-}
+const UNIT_LAYOUTS_PAGE_SIZE = 24;
 
-function formatPricePreview(prices: Record<string, number> | undefined) {
-    if (!prices || Object.keys(prices).length === 0) return "No price";
-
-    const [currency, amount] = Object.entries(prices)[0] || [];
-    if (!currency || amount === undefined) return "No price";
-    return `${currency} ${formatPriceValue(Number(amount))}`;
+function formatPricePreview(prices: Record<string, number> | undefined, currency?: string | null) {
+    return formatPrimaryPrice(prices, currency) ?? "No price";
 }
 
 const DRAFT_KEY = "treva-object-create-draft";
@@ -290,16 +286,28 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         : allHouses.filter((h) => h.archived);
     const previewHouse = allHouses.find((house) => house.id === previewHouseId) || null;
 
+    // A house can hold hundreds of units, so the list is paged on the server
+    // and each tab asks only for its own units.
+    const [unitLayoutPage, setUnitLayoutPage] = useState(1);
+    useEffect(() => {
+        setUnitLayoutPage(1);
+    }, [previewHouseId, activeUnitLayoutTab]);
+
     const { data: unitLayoutsRes } = useQuery({
-        queryKey: ["unit-layouts", createdSlug, previewHouseId],
-        queryFn: () => unitLayoutsApi.getAll({ categorySlug: createdSlug!, houseId: previewHouseId!, limit: 100 }),
+        queryKey: ["unit-layouts", createdSlug, previewHouseId, activeUnitLayoutTab, unitLayoutPage],
+        queryFn: () =>
+            unitLayoutsApi.getAll({
+                categorySlug: createdSlug!,
+                houseId: previewHouseId!,
+                archived: activeUnitLayoutTab === "Archive",
+                page: unitLayoutPage,
+                limit: UNIT_LAYOUTS_PAGE_SIZE,
+            }),
         enabled: !!createdSlug && !!previewHouseId,
     });
 
-    const allUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
-    const filteredUnitLayouts = activeUnitLayoutTab === "Active"
-        ? allUnitLayouts.filter((layout) => !layout.archived)
-        : allUnitLayouts.filter((layout) => !!layout.archived);
+    const filteredUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
+    const unitLayoutTotalPages = unitLayoutsRes?.data?.pagination?.totalPages ?? 1;
 
     useEffect(() => {
         setShowUnitLayoutList(false);
@@ -1452,6 +1460,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                         })}
                                                     </div>
                                                 )}
+                                                <Pagination page={unitLayoutPage} totalPages={unitLayoutTotalPages} onPageChange={setUnitLayoutPage} />
                                             </div>
                                         </div>
                                     ) : (showHouseForm || editingHouseId) ? (

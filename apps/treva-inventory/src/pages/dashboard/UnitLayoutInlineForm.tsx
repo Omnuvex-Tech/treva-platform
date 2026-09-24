@@ -1003,7 +1003,7 @@ export function HouseForm({
                                         </div>
                                         <div className="space-y-4">
                                             {shouldSelectCategory ? (
-                                                <div>
+                                                <ProfitbaseLocked locked={isSynced}>
                                                     <FormDropdown
                                                         label="Object *"
                                                         value={selectedCategoryId}
@@ -1013,7 +1013,7 @@ export function HouseForm({
                                                             setSelectedCategoryId(String(value));
                                                         }}
                                                     />
-                                                </div>
+                                                </ProfitbaseLocked>
                                             ) : null}
                                             <div className="grid gap-4 lg:grid-cols-2">
                                                 <div>

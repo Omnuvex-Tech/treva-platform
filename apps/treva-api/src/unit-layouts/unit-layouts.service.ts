@@ -127,7 +127,8 @@ export class UnitLayoutsService {
         else if (words.some((word) => word.startsWith(token)))
           hit = field.weight * 6;
         else if (field.normalized.includes(token)) hit = field.weight * 3;
-        else if (squash(field.normalized).includes(token)) hit = field.weight * 2;
+        else if (squash(field.normalized).includes(token))
+          hit = field.weight * 2;
         if (hit > best) best = hit;
       }
       score += best;
@@ -253,6 +254,7 @@ export class UnitLayoutsService {
     houseId?: string;
     houseSlug?: string;
     archived?: boolean;
+    summary?: boolean;
   }) {
     const page = query.page || 1;
     const limit = query.limit || 12;
@@ -301,7 +303,9 @@ export class UnitLayoutsService {
       // field - that is what makes "b5 tower 5" find `Tower 5 · B5-705`.
       where.AND = [
         ...(where.AND ?? []),
-        ...searchTokens.map((token) => ({ OR: this.searchTokenMatchers(token) })),
+        ...searchTokens.map((token) => ({
+          OR: this.searchTokenMatchers(token),
+        })),
       ];
     }
 
@@ -408,14 +412,38 @@ export class UnitLayoutsService {
       };
     }
 
+    // Summary rows carry only what the panel's dashboard aggregates; the full
+    // rows embed the whole house and object and run to ~25 MB for every unit.
+    const summarySelect = {
+      id: true,
+      status: true,
+      archived: true,
+      categoryId: true,
+      prices: true,
+      totalArea: true,
+      attributeIds: true,
+      realEstateType: true,
+      createdAt: true,
+      category: { select: { id: true, title: true, currency: true } },
+      unitTypeOption: { select: { id: true, name: true, title: true } },
+    };
+
     const [data, total] = await Promise.all([
-      this.prisma.unitLayout.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include,
-      }),
+      query.summary
+        ? this.prisma.unitLayout.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+            select: summarySelect,
+          })
+        : this.prisma.unitLayout.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+            include,
+          }),
       this.prisma.unitLayout.count({ where }),
     ]);
 

@@ -292,7 +292,8 @@ export function Dashboard() {
         return Promise.all([
             unitLayoutsApi.getStats(),
             categoriesApi.getAll("object"),
-            unitLayoutsApi.getAll({ limit: 10000 }),
+            // Summary rows: the full ones embed house and object (~25 MB for all units).
+            unitLayoutsApi.getAll({ limit: 10000, summary: true }),
             attributesApi.getAll(),
             unitTypeOptionsApi.getAll(),
         ]).then(([statsRes, catsRes, layoutsRes, attributesRes, unitTypesRes]) => {
@@ -395,12 +396,17 @@ export function Dashboard() {
         const metricsAvailable = categories.reduce((sum, c) => sum + (c.metrics?.available ?? 0), 0);
 
         const totalHouses = unitLayouts.length;
-        const activeHouses = unitLayouts.filter((h) => h.status === "available").length;
-        const soldHouses = unitLayouts.filter((h) => h.status === "sold").length;
-        const reservedHouses = unitLayouts.filter((h) => h.status === "reserved").length;
-        const archivedHouses = unitLayouts.filter((h) => h.archived).length;
-        const categoryIdsWithHouses = new Set(unitLayouts.map((h) => h.categoryId));
-        const objectsWithHouses = categories.filter((c) => categoryIdsWithHouses.has(c.id)).length;
+        // Archived units (parkings, withdrawn units) are off the site, so they
+        // are counted on their own rather than as "available".
+        const listedUnits = unitLayouts.filter((h) => !h.archived);
+        const activeHouses = listedUnits.filter((h) => h.status === "available").length;
+        const soldHouses = listedUnits.filter((h) => h.status === "sold").length;
+        const reservedHouses = listedUnits.filter((h) => h.status === "reserved").length;
+        const archivedHouses = unitLayouts.length - listedUnits.length;
+        const categoryIdsWithHouses = new Set(listedUnits.map((h) => h.categoryId));
+        const objectsWithHouses = categories.filter(
+            (c) => categoryIdsWithHouses.has(c.id) && (c.status || "active") !== "archive",
+        ).length;
 
         const housesWithPrice = unitLayouts.filter((h) => Object.values(h.prices ?? {}).some((v) => v > 0)).length;
 
@@ -413,9 +419,13 @@ export function Dashboard() {
                 return sum + (match?.[1] ? parseInt(match[1], 10) : 0);
             }, 0) / unitLayouts.length
             : 0;
-        const allPrices = unitLayouts.flatMap((h) => Object.values(h.prices ?? {}));
-        const avgPrice = allPrices.length > 0
-            ? allPrices.reduce((sum, p) => sum + p, 0) / allPrices.length
+        // Every unit carries USD, AZN and EUR; averaging all of them mixed
+        // currencies, so the average is taken in USD over listed units.
+        const usdPrices = listedUnits
+            .map((h) => Number(h.prices?.USD))
+            .filter((price) => Number.isFinite(price) && price > 0);
+        const avgPrice = usdPrices.length > 0
+            ? usdPrices.reduce((sum, p) => sum + p, 0) / usdPrices.length
             : 0;
 
         const monthDates = Array.from({ length: 6 }, (_, index) => {
@@ -444,7 +454,7 @@ export function Dashboard() {
 
         const typeCountMap = new Map<string, number>();
         unitLayouts.forEach((h) => {
-            const label = h.category?.title || "Unassigned";
+            const label = h.realEstateType || "Not specified";
             typeCountMap.set(label, (typeCountMap.get(label) || 0) + 1);
         });
         const sortedTypeDistribution = Array.from(typeCountMap.entries())
@@ -473,9 +483,9 @@ export function Dashboard() {
 
         const topCards = [
             { label: "Objects", value: totalObjects, hint: `${activeObjects} active, ${archivedObjects} archived`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/second-img.svg" },
-            { label: "Unit Layouts", value: totalHouses, hint: `${activeHouses} available, ${soldHouses} sold`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/first-img.svg" },
+            { label: "Unit Layouts", value: totalHouses, hint: `${activeHouses} available, ${soldHouses} sold, ${archivedHouses} archived`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/first-img.svg" },
             { label: "Active Projects", value: objectsWithHouses, hint: `${objectsWithHouses} objects with unit layouts`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/third-img.svg" },
-            { label: "Average Price", value: formatChartValue(avgPrice), hint: `${avgArea.toFixed(0)} m² avg area`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/forth-img.svg" },
+            { label: "Average Price", value: `$${formatChartValue(avgPrice)}`, hint: `${avgArea.toFixed(0)} m² avg area`, accent: "text-[#2D9A5B]", icon: "/images/pages/inv-dashboard/forth-img.svg" },
         ];
 
         return {

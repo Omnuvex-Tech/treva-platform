@@ -31,7 +31,8 @@ import {
  * when Profitbase has a value.
  *
  * One site policy sits on top: parkings are not sold through the site, so
- * parking units and parking houses are always archived.
+ * parking units and parking houses are always archived. Units of a house
+ * archived in Profitbase are archived with it.
  */
 
 interface SyncCounters {
@@ -392,6 +393,10 @@ export class ProfitbaseSyncService {
     const currencyCode = parentHouse?.currency?.code || 'USD';
     const floor = property.floor ?? 0;
     const parking = isParking(property);
+    // Units of an archived house come off the site with it; an archived
+    // project has all of its houses archived.
+    const houseArchived =
+      property.isHouseArchive || (parentHouse?.isArchive ?? false);
 
     const statusInfo = STATUS_MAP[property.status] ?? {
       status: 'available',
@@ -448,7 +453,7 @@ export class ProfitbaseSyncService {
       renovation,
       furnishing,
       status: statusInfo.status,
-      archived: statusInfo.archived || parking,
+      archived: statusInfo.archived || parking || houseArchived,
       categoryId,
       houseId: syncedHouse?.id ?? null,
       // Plan images replace the unit's images only when Profitbase has them;

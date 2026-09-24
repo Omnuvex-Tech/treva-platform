@@ -35,6 +35,16 @@ export interface Category {
 
 export type HouseStatus = "available" | "reserved" | "sold";
 
+export type HouseTagIcon = "star" | "tag" | "refresh" | "gift" | "clock";
+
+export interface HouseTag {
+    id: string;
+    text: string;
+    color: string;
+    icon: HouseTagIcon;
+    enabled: boolean;
+}
+
 export const HOUSE_STATUS_OPTIONS: Array<{ id: HouseStatus; label: string }> = [
     { id: "available", label: "Available" },
     { id: "reserved", label: "Reserved" },
@@ -91,6 +101,9 @@ export interface House {
     description?: string;
     // Profitbase house id; set on synced houses, whose Profitbase fields are read-only.
     externalId?: string | null;
+    tags?: HouseTag[];
+    // Distinct entrances across the house's units (houses list only).
+    entranceCount?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -158,6 +171,7 @@ export interface CreateHouseData {
     typeOfBuilding?: string;
     constructionStage?: string;
     description?: string;
+    tags?: HouseTag[];
 }
 
 export interface HouseFilters {

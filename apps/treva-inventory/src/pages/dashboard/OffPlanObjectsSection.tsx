@@ -433,9 +433,9 @@ export function OffPlanObjectsSection() {
                                         e.stopPropagation();
                                         statusMut.mutate({ id: cat.id, status: (cat.status || "active") === "active" ? "archive" : "active" });
                                     }}
-                                    disabled={statusMut.isPending}
+                                    disabled={statusMut.isPending || Boolean(cat.externalId)}
                                     aria-label={(cat.status || "active") === "active" ? "Archive" : "Restore"}
-                                    title={(cat.status || "active") === "active" ? "Move to Archive" : "Restore"}
+                                    title={cat.externalId ? "Archived state is managed in Profitbase" : (cat.status || "active") === "active" ? "Move to Archive" : "Restore"}
                                     className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                 >
                                     {(cat.status || "active") === "active" ? (
@@ -449,20 +449,22 @@ export function OffPlanObjectsSection() {
                                     )}
                                 </button>
 
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteMut.mutate(cat.id);
-                                    }}
-                                    aria-label="Delete"
-                                    title="Delete"
-                                    className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                    </svg>
-                                </button>
+                                {!cat.externalId ? (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteMut.mutate(cat.id);
+                                        }}
+                                        aria-label="Delete"
+                                        title="Delete"
+                                        className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                        </svg>
+                                    </button>
+                                ) : null}
                             </div>
 
                             <div className="flex flex-1 flex-col justify-between px-1.5">
@@ -604,9 +606,9 @@ export function OffPlanObjectsSection() {
                                                 <button
                                                     type="button"
                                                     onClick={() => statusMut.mutate({ id: cat.id, status: (cat.status || "active") === "active" ? "archive" : "active" })}
-                                                    disabled={statusMut.isPending}
+                                                    disabled={statusMut.isPending || Boolean(cat.externalId)}
                                                     aria-label={(cat.status || "active") === "active" ? "Archive" : "Restore"}
-                                                    title={(cat.status || "active") === "active" ? "Move to Archive" : "Restore"}
+                                                    title={cat.externalId ? "Archived state is managed in Profitbase" : (cat.status || "active") === "active" ? "Move to Archive" : "Restore"}
                                                     className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#4E525D] transition-colors hover:bg-gray-100 disabled:opacity-50"
                                                 >
                                                     {(cat.status || "active") === "active" ? (
@@ -632,20 +634,22 @@ export function OffPlanObjectsSection() {
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
                                                     </svg>
                                                 </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => deleteMut.mutate(cat.id)}
-                                                    aria-label="Delete"
-                                                    title="Delete"
-                                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#C3362B] transition-colors hover:bg-[#FCEDEA]"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.75h4.5A1.5 1.5 0 0 1 15.75 5.25V7.5h-7.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l.675 10.125A1.5 1.5 0 0 0 8.922 19.5h6.156a1.5 1.5 0 0 0 1.497-1.875L17.25 7.5" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 10.5v5.25M13.5 10.5v5.25" />
-                                                    </svg>
-                                                </button>
+                                                {!cat.externalId ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => deleteMut.mutate(cat.id)}
+                                                        aria-label="Delete"
+                                                        title="Delete"
+                                                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#C3362B] transition-colors hover:bg-[#FCEDEA]"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.75h4.5A1.5 1.5 0 0 1 15.75 5.25V7.5h-7.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l.675 10.125A1.5 1.5 0 0 0 8.922 19.5h6.156a1.5 1.5 0 0 0 1.497-1.875L17.25 7.5" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 10.5v5.25M13.5 10.5v5.25" />
+                                                        </svg>
+                                                    </button>
+                                                ) : null}
                                                 <button
                                                     type="button"
                                                     onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}

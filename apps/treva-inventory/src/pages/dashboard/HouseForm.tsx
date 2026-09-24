@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FormDropdown } from "@repo/ui";
 import { IoClose } from "react-icons/io5";
 import { FiClock, FiGift, FiRefreshCcw, FiStar, FiTag } from "react-icons/fi";
-import { housesApi, type CreateHouseData, type UpdateHouseData } from "../../api/houses";
+import { housesApi, type CreateHouseData, type HouseTag, type HouseTagIcon, type UpdateHouseData } from "../../api/houses";
 import { categoriesApi, type Category } from "../../api/categories";
 import { typeOfBuildingOptionsApi, type TypeOfBuildingOption } from "../../api/type-of-building-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
@@ -28,16 +28,6 @@ const yearOptions = Array.from({ length: 12 }, (_, i) => ({
     id: String(2024 + i),
     label: String(2024 + i),
 }));
-
-type HouseTagIcon = "star" | "tag" | "refresh" | "gift" | "clock";
-
-type HouseTag = {
-    id: string;
-    text: string;
-    color: string;
-    icon: HouseTagIcon;
-    enabled: boolean;
-};
 
 const TAG_COLOR_OPTIONS = [
     "#06B6D4",
@@ -202,6 +192,7 @@ export function HouseForm({
             contractAddress: existingHouse.contractAddress || "",
             showroomAvailability: existingHouse.showroomAvailability || "",
         });
+        setHouseTags(Array.isArray(existingHouse.tags) ? existingHouse.tags : []);
         setSlugManuallyEdited(Boolean(existingHouse.slug));
     }, [existingHouse, isEditMode]);
 
@@ -367,6 +358,7 @@ export function HouseForm({
             landCadastralNumber: text(form.landCadastralNumber),
             contractAddress: text(form.contractAddress),
             showroomAvailability: text(form.showroomAvailability),
+            tags: houseTags,
         });
     };
 

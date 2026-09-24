@@ -50,16 +50,20 @@ export function HouseInformationCard({
             setDownloading(false);
         }
     };
-    const aboveGroundFloors =
-        house.numberOfFloors?.end || house.numberOfFloors?.start || 0;
+    // numberOfFloors is the house's floor range, e.g. -1..11: floors below 1
+    // are underground (0 counts as a ground-level technical floor).
+    const lowestFloor = house.numberOfFloors?.start ?? 1;
+    const highestFloor = house.numberOfFloors?.end ?? lowestFloor;
+    const aboveGroundFloors = Math.max(highestFloor, 0);
+    const undergroundFloors = lowestFloor < 0 ? Math.abs(lowestFloor) : 0;
 
     const details = [
         { label: "Name", value: displayValue(house.name || house.title) },
         { label: "Type of building", value: displayValue(house.typeOfBuilding) },
         { label: "Address", value: displayValue(address) },
-        { label: "Number of entrances", value: "0" },
+        { label: "Number of entrances", value: house.entranceCount ? String(house.entranceCount) : "Not specified" },
         { label: "Number above ground floors", value: String(aboveGroundFloors) },
-        { label: "Underground floors", value: "Not specified" },
+        { label: "Underground floors", value: String(undergroundFloors) },
         { label: "Construction stage", value: displayValue(house.constructionStage) },
     ];
 

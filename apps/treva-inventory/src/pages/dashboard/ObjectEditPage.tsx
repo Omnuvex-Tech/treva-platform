@@ -17,8 +17,10 @@ import { PlanUploadCard } from "../../components/PlanUploadCard";
 import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { withCurrentOption } from "../../utils/offplanOptions";
+import { formatPrimaryPrice } from "../../utils/unitPrice";
 import { ProfitbaseLocked, ProfitbaseNotice } from "../../components/ProfitbaseNotice";
 import { IoClose } from "react-icons/io5";
+import { Pagination } from "../../components/Pagination";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
@@ -38,16 +40,10 @@ const TABS: { key: TabKey; label: string }[] = [
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
 
-function formatPriceValue(value: number) {
-    return value.toLocaleString();
-}
+const UNIT_LAYOUTS_PAGE_SIZE = 24;
 
-function formatPricePreview(prices: Record<string, number> | undefined) {
-    if (!prices || Object.keys(prices).length === 0) return "No price";
-
-    const [currency, amount] = Object.entries(prices)[0] || [];
-    if (!currency || amount === undefined) return "No price";
-    return `${currency} ${formatPriceValue(Number(amount))}`;
+function formatPricePreview(prices: Record<string, number> | undefined, currency?: string | null) {
+    return formatPrimaryPrice(prices, currency) ?? "No price";
 }
 
 function getDefaultPlanName(fileName: string) {
@@ -299,16 +295,28 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         : allHouses.filter((h) => h.archived);
     const previewHouse = allHouses.find((house) => house.id === previewHouseId) || null;
 
+    // A house can hold hundreds of units, so the list is paged on the server
+    // and each tab asks only for its own units.
+    const [unitLayoutPage, setUnitLayoutPage] = useState(1);
+    useEffect(() => {
+        setUnitLayoutPage(1);
+    }, [previewHouseId, activeUnitLayoutTab]);
+
     const { data: unitLayoutsRes } = useQuery({
-        queryKey: ["unit-layouts", slug, previewHouseId],
-        queryFn: () => unitLayoutsApi.getAll({ categorySlug: slug!, houseId: previewHouseId!, limit: 100 }),
+        queryKey: ["unit-layouts", slug, previewHouseId, activeUnitLayoutTab, unitLayoutPage],
+        queryFn: () =>
+            unitLayoutsApi.getAll({
+                categorySlug: slug!,
+                houseId: previewHouseId!,
+                archived: activeUnitLayoutTab === "Archive",
+                page: unitLayoutPage,
+                limit: UNIT_LAYOUTS_PAGE_SIZE,
+            }),
         enabled: !!slug && !!previewHouseId,
     });
 
-    const allUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
-    const filteredUnitLayouts = activeUnitLayoutTab === "Active"
-        ? allUnitLayouts.filter((layout) => !layout.archived)
-        : allUnitLayouts.filter((layout) => !!layout.archived);
+    const filteredUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
+    const unitLayoutTotalPages = unitLayoutsRes?.data?.pagination?.totalPages ?? 1;
 
     useEffect(() => {
         setShowUnitLayoutList(false);
@@ -780,9 +788,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 event.stopPropagation();
                                                 archiveHouseMutation.mutate({ id: house.id, archived: !house.archived });
                                             }}
-                                            disabled={archiveHouseMutation.isPending}
+                                            disabled={archiveHouseMutation.isPending || Boolean(house.externalId)}
                                             aria-label={house.archived ? "Restore" : "Archive"}
-                                            title={house.archived ? "Restore" : "Archive"}
+                                            title={house.externalId ? "Archived state is managed in Profitbase" : house.archived ? "Restore" : "Archive"}
                                             className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                         >
                                             {house.archived ? (
@@ -796,20 +804,22 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                             )}
                                         </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                deleteHouseMutation.mutate(house.id);
-                                            }}
-                                            aria-label="Delete"
-                                            title="Delete"
-                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                            </svg>
-                                        </button>
+                                        {!house.externalId ? (
+                                            <button
+                                                type="button"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    deleteHouseMutation.mutate(house.id);
+                                                }}
+                                                aria-label="Delete"
+                                                title="Delete"
+                                                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                                </svg>
+                                            </button>
+                                        ) : null}
                                     </div>
 
                                     <div className="px-1 py-3">
@@ -817,18 +827,20 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                     </div>
 
                                     <div className="flex gap-1 px-1 pb-1">
-                                        <button
-                                            type="button"
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                setPreviewHouseId(null);
-                                                duplicateHouseMutation.mutate(house);
-                                            }}
-                                            disabled={duplicateHouseMutation.isPending}
-                                            className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
-                                        >
-                                            Copy
-                                        </button>
+                                        {!house.externalId ? (
+                                            <button
+                                                type="button"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    setPreviewHouseId(null);
+                                                    duplicateHouseMutation.mutate(house);
+                                                }}
+                                                disabled={duplicateHouseMutation.isPending}
+                                                className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                            >
+                                                Copy
+                                            </button>
+                                        ) : null}
                                         <button
                                             type="button"
                                             onClick={(event) => {
@@ -1464,9 +1476,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                             event.stopPropagation();
                                                                             archiveUnitLayoutMutation.mutate({ id: layout.id, archived: !layout.archived });
                                                                         }}
-                                                                        disabled={archiveUnitLayoutMutation.isPending}
+                                                                        disabled={archiveUnitLayoutMutation.isPending || Boolean(layout.externalId)}
                                                                         aria-label={layout.archived ? "Restore" : "Archive"}
-                                                                        title={layout.archived ? "Restore" : "Archive"}
+                                                                        title={layout.externalId ? "Archived state is managed in Profitbase" : layout.archived ? "Restore" : "Archive"}
                                                                         className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                                                     >
                                                                         {layout.archived ? (
@@ -1480,36 +1492,41 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                         )}
                                                                     </button>
 
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(event) => {
-                                                                            event.stopPropagation();
-                                                                            deleteUnitLayoutMutation.mutate(layout.id);
-                                                                        }}
-                                                                        aria-label="Delete"
-                                                                        title="Delete"
-                                                                        className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                                                    >
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                                                        </svg>
-                                                                    </button>
+                                                                    {!layout.externalId ? (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(event) => {
+                                                                                event.stopPropagation();
+                                                                                deleteUnitLayoutMutation.mutate(layout.id);
+                                                                            }}
+                                                                            aria-label="Delete"
+                                                                            title="Delete"
+                                                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                                                        >
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    ) : null}
                                                                 </div>
 
-                                                                <div className="flex items-center justify-between gap-3 px-1 py-3">
-                                                                    <p className="truncate text-base font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices)}</p>
+                                                                <p className="truncate px-1 pt-3 text-xs text-[#808191]">{layout.unitCode ? `№ ${layout.unitCode}` : layout.title}</p>
+                                                                <div className="flex items-center justify-between gap-3 px-1 pb-3 pt-1">
+                                                                    <p className="truncate text-base font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices, category?.currency)}</p>
                                                                     <p className="shrink-0 text-sm text-[#666666]">{layout.totalArea} m²</p>
                                                                 </div>
 
                                                                 <div className="flex gap-1 px-1 pb-1">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => duplicateUnitLayoutMutation.mutate(layout)}
-                                                                        disabled={duplicateUnitLayoutMutation.isPending}
-                                                                        className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
-                                                                    >
-                                                                        Copy
-                                                                    </button>
+                                                                    {!layout.externalId ? (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => duplicateUnitLayoutMutation.mutate(layout)}
+                                                                            disabled={duplicateUnitLayoutMutation.isPending}
+                                                                            className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                                                        >
+                                                                            Copy
+                                                                        </button>
+                                                                    ) : null}
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => {
@@ -1527,6 +1544,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                     })}
                                                 </div>
                                             )}
+                                            <Pagination page={unitLayoutPage} totalPages={unitLayoutTotalPages} onPageChange={setUnitLayoutPage} />
                                         </div>
                                     </div>
                                 ) : (showHouseForm || editingHouseId) ? (

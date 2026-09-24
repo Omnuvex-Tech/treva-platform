@@ -59,6 +59,7 @@ export class UnitLayoutsController {
   @ApiQuery({ name: 'houseId', required: false })
   @ApiQuery({ name: 'houseSlug', required: false })
   @ApiQuery({ name: 'archived', required: false, type: Boolean })
+  @ApiQuery({ name: 'summary', required: false, type: Boolean })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -78,6 +79,7 @@ export class UnitLayoutsController {
     @Query('houseId') houseId?: string,
     @Query('houseSlug') houseSlug?: string,
     @Query('archived') archived?: string,
+    @Query('summary') summary?: string,
   ) {
     return this.unitLayoutsService.findAll({
       page: page ? parseInt(page, 10) : undefined,
@@ -99,6 +101,7 @@ export class UnitLayoutsController {
       houseSlug,
       archived:
         archived === 'true' ? true : archived === 'false' ? false : undefined,
+      summary: summary === 'true',
     });
   }
 

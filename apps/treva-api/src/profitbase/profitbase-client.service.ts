@@ -73,6 +73,8 @@ export interface ProfitbaseProperty {
   id: number;
   house_id: number;
   houseName: string;
+  // True when the unit's house is archived in Profitbase.
+  isHouseArchive: boolean;
   projectId: number;
   projectName: string;
   number: string | null;

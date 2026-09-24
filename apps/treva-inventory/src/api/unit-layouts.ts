@@ -26,6 +26,7 @@ export interface Category {
     title: string;
     name: string;
     slug: string;
+    currency?: string;
 }
 
 export interface UnitTypeOption {
@@ -171,6 +172,8 @@ export interface UnitLayoutFilters {
     maxArea?: number;
     floor?: number;
     unitTypeOptionId?: string;
+    // Slim rows (no embedded house/object) for aggregate screens.
+    summary?: boolean;
 }
 
 export interface UploadResponse {
