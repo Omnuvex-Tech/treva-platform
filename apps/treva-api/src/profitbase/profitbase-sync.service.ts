@@ -18,6 +18,11 @@ export interface ProfitbaseSyncSummary {
   unitLayouts: SyncCounters;
 }
 
+interface SyncedHouse {
+  id: string;
+  completionYear: number;
+}
+
 const REAL_ESTATE_TYPE_LABELS: Record<string, string> = {
   apartment: 'Apartment',
   townhouse: 'Townhouse',
@@ -59,6 +64,33 @@ export class ProfitbaseSyncService {
     if (!value) return null;
     const match = /\d{4}/.exec(value);
     return match ? Number(match[0]) : null;
+  }
+
+  /**
+   * Handover year (and, when known, the last day of the handover quarter as
+   * an ISO date) for a house. `commissioningDate` is null on our account, so
+   * `developmentEndQuarter` is the real source; null means Profitbase has no
+   * date and the stored value must be left alone rather than guessed.
+   */
+  private parseHandover(
+    house: ProfitbaseHouse,
+  ): { year: number; deadline?: string } | null {
+    const endQuarter = house.developmentEndQuarter;
+    const year = Number(endQuarter?.year);
+    if (
+      endQuarter &&
+      Number.isInteger(year) &&
+      endQuarter.quarter >= 1 &&
+      endQuarter.quarter <= 4
+    ) {
+      // Day 0 of the month after the quarter is the quarter's last day.
+      const deadline = new Date(Date.UTC(year, endQuarter.quarter * 3, 0))
+        .toISOString()
+        .slice(0, 10);
+      return { year, deadline };
+    }
+    const commissioningYear = this.parseYear(house.commissioningDate);
+    return commissioningYear ? { year: commissioningYear } : null;
   }
 
   async sync(): Promise<ProfitbaseSyncSummary> {
@@ -104,13 +136,13 @@ export class ProfitbaseSyncService {
     }
 
     const houseById = new Map<number, ProfitbaseHouse>();
-    const houseIdByExternalId = new Map<number, string>();
+    const syncedHouseByExternalId = new Map<number, SyncedHouse>();
     for (const house of houses) {
       houseById.set(house.id, house);
       const categoryId = categoryIdByProjectId.get(house.projectId);
       if (!categoryId) continue;
-      const houseId = await this.upsertHouse(house, categoryId, summary);
-      houseIdByExternalId.set(house.id, houseId);
+      const syncedHouse = await this.upsertHouse(house, categoryId, summary);
+      syncedHouseByExternalId.set(house.id, syncedHouse);
     }
 
     const touchedCategoryIds = new Set<string>(categoryIdByProjectId.values());
@@ -128,7 +160,7 @@ export class ProfitbaseSyncService {
         plan,
         property,
         categoryId,
-        houseIdByExternalId.get(property.house_id) ?? null,
+        syncedHouseByExternalId.get(property.house_id) ?? null,
         houseById.get(property.house_id) ?? null,
         summary,
       );
@@ -198,22 +230,26 @@ export class ProfitbaseSyncService {
     house: ProfitbaseHouse,
     categoryId: string,
     summary: ProfitbaseSyncSummary,
-  ): Promise<string> {
+  ): Promise<SyncedHouse> {
     const externalId = String(house.id);
     const minFloor = house.minFloor ?? 1;
     const maxFloor = Math.max(house.maxFloor ?? minFloor, minFloor);
-    const completionYear =
-      this.parseYear(house.commissioningDate) ?? new Date().getFullYear();
-    const referenceArea = Number(house.minPriceArea) || 0;
+    const handover = this.parseHandover(house);
     const currencyCode = house.currency?.code || 'USD';
     const imageUrl = house.fullImage || house.image || undefined;
 
     const sharedData = {
       floor: minFloor,
-      totalArea: referenceArea,
-      internalArea: referenceArea,
+      // Profitbase has no house-level area (`minPriceArea` is a price per m²).
+      totalArea: 0,
+      internalArea: 0,
       prices: house.minPrice ? { [currencyCode]: house.minPrice } : {},
-      completionYear,
+      ...(handover
+        ? {
+            completionYear: handover.year,
+            deadlineForCommissioning: handover.deadline,
+          }
+        : {}),
       numberOfFloors: { start: minFloor, end: maxFloor },
       locationTitle: house.address?.full || undefined,
       street: house.street || house.address?.street || undefined,
@@ -231,12 +267,12 @@ export class ProfitbaseSyncService {
     });
 
     if (existing) {
-      await this.prisma.house.update({
+      const updated = await this.prisma.house.update({
         where: { id: existing.id },
         data: sharedData,
       });
       summary.houses.updated++;
-      return existing.id;
+      return { id: updated.id, completionYear: updated.completionYear };
     }
 
     const title = house.title || house.projectName;
@@ -244,6 +280,7 @@ export class ProfitbaseSyncService {
     const created = await this.prisma.house.create({
       data: {
         ...sharedData,
+        completionYear: handover?.year ?? new Date().getFullYear(),
         title,
         name: title,
         slug,
@@ -255,24 +292,20 @@ export class ProfitbaseSyncService {
       },
     });
     summary.houses.created++;
-    return created.id;
+    return { id: created.id, completionYear: created.completionYear };
   }
 
   private async upsertUnitLayout(
     plan: ProfitbasePlan | null,
     property: ProfitbaseProperty,
     categoryId: string,
-    houseId: string | null,
+    syncedHouse: SyncedHouse | null,
     parentHouse: ProfitbaseHouse | null,
     summary: ProfitbaseSyncSummary,
   ): Promise<void> {
     const externalId = String(property.id);
     const currencyCode = parentHouse?.currency?.code || 'USD';
-    const completionYear =
-      this.parseYear(parentHouse?.commissioningDate ?? null) ??
-      new Date().getFullYear();
-    const minFloor = parentHouse?.minFloor ?? 1;
-    const maxFloor = Math.max(parentHouse?.maxFloor ?? minFloor, minFloor);
+    const floor = property.floor ?? 0;
 
     // Unit number, floor and status live on the property only - a plan has no
     // idea which apartment it was sold as.
@@ -313,24 +346,32 @@ export class ProfitbaseSyncService {
       alt: img.imageName || undefined,
     }));
 
+    // Profitbase reports a missing living area as 0 as well as null.
+    const livingArea = property.area?.area_living;
+
     const sharedData = {
-      floor: property.floor ?? 0,
+      floor,
       unitCode: property.number || undefined,
       // The panel, DTO/service and the rooms filter all use the `number`
       // column for room count; `rooms` is kept in sync for completeness.
       number: roomCount,
       rooms: roomCount,
       totalArea,
-      internalArea: property.area?.area_living ?? totalArea,
+      internalArea: livingArea && livingArea > 0 ? livingArea : totalArea,
       balconyArea: property.area?.area_balcony ?? undefined,
       prices: price ? { [currencyCode]: price } : {},
-      completionYear,
-      numberOfFloors: { start: minFloor, end: maxFloor },
+      // Units follow their house, whose year may also have been set by hand
+      // when Profitbase has no handover date.
+      ...(syncedHouse ? { completionYear: syncedHouse.completionYear } : {}),
+      // A synced unit is one apartment on one floor. The building's floor
+      // range lives on the house; storing it here made every unit read as
+      // "floors 3-14" on the site.
+      numberOfFloors: { start: floor, end: floor },
       realEstateType: propertyTypeLabel,
       status: statusInfo.status,
       archived: statusInfo.archived,
       categoryId,
-      houseId,
+      houseId: syncedHouse?.id ?? null,
       mainImage,
       coverImage,
       gallery,
@@ -355,6 +396,8 @@ export class ProfitbaseSyncService {
     await this.prisma.unitLayout.create({
       data: {
         ...sharedData,
+        completionYear:
+          syncedHouse?.completionYear ?? new Date().getFullYear(),
         title,
         name: title,
         slug,

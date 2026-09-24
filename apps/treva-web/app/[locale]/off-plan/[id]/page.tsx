@@ -347,6 +347,15 @@ export default function ApartmentCard() {
           '')
     ).trim();
   const locationLabel = contractAddressValue ? t.contractAddress : t.location;
+  // A unit's own `numberOfFloors` is the floor(s) it sits on; the building's
+  // height comes from its house when there is one.
+  const houseTopFloor = layout?.house?.numberOfFloors?.end;
+  const numberOfFloorsValue =
+    typeof houseTopFloor === 'number'
+      ? `${houseTopFloor}`
+      : layout?.numberOfFloors?.start && layout?.numberOfFloors?.end && layout.numberOfFloors.end !== layout.numberOfFloors.start
+        ? `${layout.numberOfFloors.start} - ${layout.numberOfFloors.end}`
+        : `${layout?.numberOfFloors?.start ?? layout?.numberOfFloors?.end ?? ''}`;
 
   const galleryItems = (() => {
     const items: Array<{ url: string; alt?: string }> = [];
@@ -1110,11 +1119,7 @@ export default function ApartmentCard() {
                 </div>
                 <div className="panorama-row">
                   <span className="panorama-label">{t.numberOfFloors}</span>
-                  <span className="panorama-value">
-                    {layout.numberOfFloors?.start && layout.numberOfFloors?.end && layout.numberOfFloors.end !== layout.numberOfFloors.start
-                      ? `${layout.numberOfFloors.start} - ${layout.numberOfFloors.end}`
-                      : `${layout.numberOfFloors?.start ?? layout.numberOfFloors?.end ?? ''}`}
-                  </span>
+                  <span className="panorama-value">{numberOfFloorsValue}</span>
                 </div>
               </div>
             </section>

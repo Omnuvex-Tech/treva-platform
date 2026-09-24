@@ -285,11 +285,12 @@ export function HouseForm({
     };
 
     const mutation = useMutation({
-        mutationFn: (data: CreateHouseData) => {
+        mutationFn: (data: Partial<CreateHouseData>) => {
             if (isEditMode && houseId) {
                 return housesApi.update(houseId, data);
             }
-            return housesApi.create(data);
+            // handleSubmit adds the create-only defaults, so a new house is complete.
+            return housesApi.create(data as CreateHouseData);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["houses"] });
@@ -328,30 +329,39 @@ export function HouseForm({
             (existingHouse as any)?.completionYear ??
             2030;
 
+        // The form only edits the fields below. The rest of a house (floors,
+        // prices, status...) is filled by the Profitbase sync, so it gets
+        // placeholder values on create and is left untouched on edit.
+        const createOnlyDefaults = isEditMode
+            ? {}
+            : {
+                  status: "available" as const,
+                  floor: 1,
+                  totalArea: 0,
+                  internalArea: 0,
+                  balconyArea: 0,
+                  prices: {},
+                  numberOfFloors: { start: 1, end: 1 },
+                  similarApartmentIds: [],
+                  heatingTypeIds: [],
+                  attributeIds: [],
+              };
+
         mutation.mutate({
+            ...createOnlyDefaults,
             categoryId,
             title: form.name.trim(),
             name: form.name.trim(),
             slug: form.slug.trim() || slugify(form.name),
-            status: "available",
-            floor: 1,
-            number: Number.isFinite(parsedHouseNumber) ? parsedHouseNumber : 1,
-            totalArea: 0,
-            internalArea: 0,
-            balconyArea: 0,
-            prices: {},
+            ...(Number.isFinite(parsedHouseNumber)
+                ? { number: parsedHouseNumber }
+                : isEditMode
+                  ? {}
+                  : { number: 1 }),
             completionYear,
-            numberOfFloors: { start: 1, end: 1 },
-            similarApartmentIds: [],
             mainImage: form.image.trim() ? { url: form.image.trim(), alt: form.name.trim() || "House" } : undefined,
             gallery: existingHouse?.gallery || [],
             documents: existingHouse?.documents || [],
-            location: undefined,
-            locationTitle: undefined,
-            locationUrl: undefined,
-            locationGoogleMapsUrl: undefined,
-            heatingTypeIds: [],
-            attributeIds: [],
             street: form.street.trim() || undefined,
             houseNumber: form.houseNumber.trim() || undefined,
             typeOfBuilding: form.typeOfBuilding,

@@ -377,7 +377,7 @@ export function MagazineSection() {
                                     <p className="text-[11px] text-[#999]">Floor</p>
                                     <p className="mt-0.5 text-sm font-semibold text-[#1A1A1A]">
                                         {selectedGridLayout.floor}
-                                        {selectedGridLayout.numberOfFloors?.end ? ` / ${selectedGridLayout.numberOfFloors.end}` : ""}
+                                        {selectedGridLayout.house?.numberOfFloors?.end ? ` / ${selectedGridLayout.house.numberOfFloors.end}` : ""}
                                     </p>
                                 </div>
                                 <div>

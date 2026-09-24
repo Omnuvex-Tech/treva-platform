@@ -338,7 +338,9 @@ export function HouseForm({
                 ),
                 realEstateType: house.realEstateType || "",
                 status: (((firstValue(house.status, house.statusId) as string) || "available") as UnitLayoutStatus),
-                floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
+                // `floor` is the unit's own floor; `numberOfFloors` held the whole
+                // building's range on units synced before the fix, so it must not win.
+                floorFrom: toNumberOrUndefined(house.floorFrom, house.floor, house.numberOfFloors?.start),
                 floorTo: toNumberOrUndefined(house.floorTo, house.numberOfFloors?.end, house.floor),
                 roomCount: toNumberOrUndefined(house.roomCount, house.numberOfRooms, house.number),
                 attributeIds: house.attributeIds || house.similarApartmentIds || [],

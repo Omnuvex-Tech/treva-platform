@@ -21,13 +21,16 @@ import { IoClose } from "react-icons/io5";
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
 
-type TabKey = "basic" | "commercial" | "location" | "properties" | "payments" | "options" | "stock" | "unitLayouts";
+// "properties" is the General Plans tab; the houses and their units live
+// under "houses", labelled "Properties".
+type TabKey = "basic" | "commercial" | "location" | "properties" | "houses" | "payments" | "options" | "stock" | "unitLayouts";
 
 const TABS: { key: TabKey; label: string }[] = [
     { key: "basic", label: "Basic Info" },
     { key: "commercial", label: "Commercial" },
     { key: "location", label: "Location" },
     { key: "properties", label: "General Plans" },
+    { key: "houses", label: "Properties" },
 ];
 
 const inputClass =
@@ -56,6 +59,7 @@ function normalizePrimaryTab(tab?: string): TabKey {
         case "commercial":
         case "location":
         case "properties":
+        case "houses":
             return tab;
         default:
             return "basic";
@@ -138,9 +142,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const [showUnitLayoutForm, setShowUnitLayoutForm] = useState(false);
     const [editingUnitLayoutId, setEditingUnitLayoutId] = useState<string | null>(null);
     const [activeUnitLayoutTab, setActiveUnitLayoutTab] = useState<"Active" | "Archive">("Active");
-    const [selectedManagementCard, setSelectedManagementCard] = useState<"properties" | "payments" | "options" | "stock" | null>(null);
     const [selectedPostPlanCard, setSelectedPostPlanCard] = useState<"grid" | "property-layouts" | "floor-plans" | "facades" | null>("grid");
-    const [showPostPlanCards, setShowPostPlanCards] = useState(false);
 
     const buildNameFromTitle = (title: string) =>
         title
@@ -356,6 +358,13 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         }
 
         if (!validateStep("basic")) return;
+        if (nextTab === "houses" && !createdSlug) {
+            showError({
+                title: "Save the object first",
+                description: "Houses can be added once the object is saved on the General Plans tab.",
+            });
+            return;
+        }
         setActiveTab(nextTab);
     };
 
@@ -372,9 +381,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
     const handleLocationNext = () => {
         if (!validate()) return;
         setActiveTab("properties");
-        setSelectedManagementCard(null);
-        setSelectedPostPlanCard("grid");
-        setShowPostPlanCards(false);
     };
 
     const createMutation = useMutation({
@@ -413,10 +419,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
             const slug = response?.data?.slug;
             if (slug) {
                 setCreatedSlug(slug);
-                setActiveTab("properties");
-                setSelectedManagementCard(null);
-                setSelectedPostPlanCard("grid");
-                setShowPostPlanCards(true);
+                setActiveTab("houses");
                 showSuccess({ title: "Object saved" });
                 clearDraft();
             }
@@ -632,13 +635,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
         setDraftDocuments((current) => current.filter((_, i) => i !== index));
     };
 
-    const managementCards = [
-        { key: "properties" as const, label: "Properties", icon: "/images/inv-dashboard/inv-offplan/properties.svg" },
-        { key: "payments" as const, label: "Payment methods", icon: "/images/inv-dashboard/inv-offplan/payment.svg" },
-        { key: "options" as const, label: "Options", icon: "/images/inv-dashboard/inv-offplan/options.svg" },
-        { key: "stock" as const, label: "Stock", icon: "/images/inv-dashboard/inv-offplan/stock.svg" },
-    ];
-
     const postPlanCards = [
         { key: "grid" as const, label: "Grid", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
         { key: "property-layouts" as const, label: "Property layouts", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
@@ -817,11 +813,12 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                             key={tab.key}
                             type="button"
                             onClick={() => handleTabChange(tab.key)}
+                            title={tab.key === "houses" && !createdSlug ? "Save the object first" : undefined}
                             className={`relative cursor-pointer rounded-2xl px-4 py-2.5 text-sm font-medium transition-colors ${
                                 activeTab === tab.key
                                     ? "bg-[#4E525D] text-white shadow-sm"
                                     : "text-[#808191] hover:bg-[#F4F5F6] hover:text-[#4E525D]"
-                            }`}
+                            } ${tab.key === "houses" && !createdSlug ? "opacity-50" : ""}`}
                         >
                             {tab.label}
                         </button>
@@ -1182,8 +1179,6 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
 
             {/* Tab: Properties */}
             {activeTab === "properties" && (
-                <div className="space-y-5">
-                    {!showPostPlanCards ? (
                         <div className="space-y-5">
                             {/* General Plans */}
                             <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -1280,11 +1275,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                 {createdSlug ? (
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            setShowPostPlanCards(true);
-                                            setSelectedManagementCard(null);
-                                            setSelectedPostPlanCard("grid");
-                                        }}
+                                        onClick={() => setActiveTab("houses")}
                                         className="rounded-xl bg-[#4E525D] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
                                     >
                                         Next
@@ -1301,35 +1292,11 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                 )}
                             </div>
                         </div>
-                    ) : (
-                        <div className="space-y-5">
-                            {!previewHouse ? (
-                                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                                    {managementCards.map((card) => {
-                                        const isActive = selectedManagementCard === card.key;
-                                        return (
-                                            <button
-                                                key={card.key}
-                                                type="button"
-                                                onClick={() => {
-                                                if (card.key !== "properties") return;
-                                                setSelectedManagementCard("properties");
-                                                setSelectedPostPlanCard("grid");
-                                                }}
-                                                className={`flex min-h-[120px] flex-col items-center justify-center rounded-[20px] border bg-[#F3F3F3] px-5 py-6 text-center transition-colors ${
-                                                    isActive ? "border-[#4E525D] bg-white" : "border-[#E4E4E4]"
-                                                }`}
-                                            >
-                                                <img src={card.icon} alt="" className="mb-4 h-12 w-12 object-contain" />
-                                                <span className="text-sm font-medium text-[#4E525D]">{card.label}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            ) : null}
+            )}
 
-                            {selectedManagementCard === "properties" ? (
-                                previewHouse ? (
+            {activeTab === "houses" && (
+                        <div className="space-y-5">
+                                {previewHouse ? (
                                     showUnitLayoutList ? (
                                         <div className="space-y-5">
                                             <div className="space-y-6 rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -1577,11 +1544,8 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                     )
                                 ) : (
                                     unitLayoutsPanel
-                                )
-                            ) : null}
+                                )}
                         </div>
-                    )}
-                </div>
             )}
 
             {activeTab === "payments" && (

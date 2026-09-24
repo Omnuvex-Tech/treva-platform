@@ -43,6 +43,7 @@ export interface UnitLayoutHouse {
     location?: UnitLayoutLocation | null;
     locationTitle?: string | null;
     contractAddress?: string | null;
+    numberOfFloors?: UnitLayoutNumberOfFloors | null;
 }
 
 export interface UnitLayout {

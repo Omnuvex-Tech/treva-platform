@@ -74,7 +74,7 @@ export interface UnitLayout {
     categoryId: string;
     category: Category;
     houseId?: string;
-    house?: { id: string; title: string; name: string; slug: string };
+    house?: { id: string; title: string; name: string; slug: string; numberOfFloors?: NumberOfFloors };
     unitTypeOptionId?: string;
     unitTypeOption?: UnitTypeOption;
     realEstateType?: string;

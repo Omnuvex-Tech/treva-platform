@@ -12,7 +12,10 @@ export interface ProfitbaseHouse {
   number: string | null;
   minFloor: number | null;
   maxFloor: number | null;
+  // Always null on our account; the real handover date lives in
+  // `developmentEndQuarter`.
   commissioningDate: string | null;
+  developmentEndQuarter: { year: string; quarter: number } | null;
   currency: { code: string } | null;
   address: {
     full: string | null;
@@ -21,6 +24,7 @@ export interface ProfitbaseHouse {
   } | null;
   contractAddress: string | null;
   minPrice: number | null;
+  // Lowest price per m² in the house - not an area.
   minPriceArea: number | null;
   image: string | null;
   fullImage: string | null;
