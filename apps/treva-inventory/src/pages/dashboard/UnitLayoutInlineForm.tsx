@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type CreateUnitLayoutData, type UnitLayoutStatus, type UpdateUnitLayoutData } from "../../api/unit-layouts";
-import { ProfitbaseLocked, ProfitbaseNotice } from "../../components/ProfitbaseNotice";
+import { ProfitbaseNotice } from "../../components/ProfitbaseNotice";
 import {
     CONSTRUCTION_STAGE_OPTIONS,
     FURNISHING_OPTIONS,
@@ -329,8 +329,8 @@ export function HouseForm({
             description: "",
         });
 
-    // Synced units belong to Profitbase: their Profitbase fields are shown
-    // read-only and left out of the save, which the next Transfer would undo.
+    // Units imported from Profitbase are edited like any other unit, but may
+    // lack the area, price or image Profitbase never had.
     const isSynced = Boolean(existingHouseData?.externalId);
 
     useEffect(() => {
@@ -476,8 +476,6 @@ export function HouseForm({
                 if (!categoryId) errors.push("Object is required");
                 if (!form.name?.trim()) errors.push("Name is required");
                 if (!form.title?.trim()) errors.push("Title is required");
-                // Everything below comes from Profitbase on synced units.
-                if (isSynced) break;
                 if (form.floorFrom === undefined) errors.push("Floor From is required");
                 if (form.floorFrom !== undefined && (form.floorFrom < MIN_FLOOR || form.floorFrom > MAX_FLOOR)) {
                     errors.push(`Floor From must be between ${MIN_FLOOR} and ${MAX_FLOOR}`);
@@ -496,6 +494,7 @@ export function HouseForm({
                 }
                 break;
             case "area":
+                // Profitbase has no area or price for some units (sold ones).
                 if (isSynced) break;
                 if (!form.totalArea || form.totalArea <= 0) errors.push("Total Area is required");
                 if (!form.prices || form.prices.length === 0) {
@@ -622,8 +621,6 @@ export function HouseForm({
         const emptyAs = isEditMode ? null : undefined;
         const houseIdValue = parentHouseId || existingHouseData?.houseId || undefined;
 
-        // The fields the panel owns on every unit, synced or not. Images count:
-        // Profitbase replaces them only on units it has a plan image for.
         const panelFields: UpdateUnitLayoutData = {
             title: form.title,
             name: form.name,
@@ -640,14 +637,9 @@ export function HouseForm({
             gallery: form.gallery,
         };
 
-        if (isSynced) {
-            createMutation.mutate(panelFields);
-            return;
-        }
-
-        // Validated above: a manual unit always has a floor and a total area.
+        // Validated above: every unit has a floor, and a manual one a total area.
         const floorFrom = form.floorFrom as number;
-        const totalArea = form.totalArea as number;
+        const totalArea = form.totalArea ?? 0;
 
         createMutation.mutate({
             ...panelFields,
@@ -903,13 +895,10 @@ export function HouseForm({
                     </h4>
                 </div>
 
-                {isSynced ? (
-                    <ProfitbaseNotice>
-                        Unit type, status, floor, rooms, areas, prices and finishing are managed in Profitbase and update on every Transfer, so
-                        they are read-only here. Title, description, SEO, attributes and the brochure are edited here; images too, unless
-                        Profitbase has a floor plan for this unit.
-                    </ProfitbaseNotice>
-                ) : null}
+                <ProfitbaseNotice record={existingHouseData}>
+                    A Transfer overwrites the unit type, status, archived state, floor, rooms, areas, prices and finishing with
+                    Profitbase&apos;s values, and the images when Profitbase has a floor plan for this unit.
+                </ProfitbaseNotice>
 
                 <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
                 {TABS.map((tab) => {
@@ -1003,7 +992,7 @@ export function HouseForm({
                                         </div>
                                         <div className="space-y-4">
                                             {shouldSelectCategory ? (
-                                                <ProfitbaseLocked locked={isSynced}>
+                                                <div className="min-w-0">
                                                     <FormDropdown
                                                         label="Object *"
                                                         value={selectedCategoryId}
@@ -1013,7 +1002,7 @@ export function HouseForm({
                                                             setSelectedCategoryId(String(value));
                                                         }}
                                                     />
-                                                </ProfitbaseLocked>
+                                                </div>
                                             ) : null}
                                             <div className="grid gap-4 lg:grid-cols-2">
                                                 <div>
@@ -1038,7 +1027,7 @@ export function HouseForm({
                                                     />
                                                 </div>
                                             </div>
-                                            <ProfitbaseLocked locked={isSynced} className="space-y-4">
+                                            <div className="space-y-4">
                                                 <div className="grid gap-4 lg:grid-cols-2">
                                                     <FormDropdown
                                                         label="Unit type"
@@ -1077,13 +1066,13 @@ export function HouseForm({
                                                         })}
                                                     </div>
                                                 </div>
-                                            </ProfitbaseLocked>
+                                            </div>
                                         </div>
                                     </div>
                                 </SectionBlock>
 
                             <SectionBlock title="Specification" description="Where the unit sits, its size class and its handover state.">
-                                <ProfitbaseLocked locked={isSynced} className="space-y-4">
+                                <div className="space-y-4">
                                     <div className="grid gap-4 lg:grid-cols-3">
                                         <div>
                                             <label className="mb-1 block text-xs text-[#4E525D]">Apartment number</label>
@@ -1177,7 +1166,7 @@ export function HouseForm({
                                             onChange={(id) => updateField("furnishing", id)}
                                         />
                                     </div>
-                                </ProfitbaseLocked>
+                                </div>
                             </SectionBlock>
 
                             <SectionBlock title="Brochure" description="Upload a brochure PDF and save it immediately to this unit layout.">
@@ -1280,14 +1269,14 @@ export function HouseForm({
                     {activeTab === "area" && (
                         <div className="space-y-5">
                             <SectionBlock title="Area & Pricing" description="Surface area and price matrix for each available currency.">
-                                <ProfitbaseLocked locked={isSynced} className="space-y-4">
+                                <div className="space-y-4">
                                 <div className="grid gap-4 lg:grid-cols-3">
                                     <div>
                                         <label className="mb-1 block text-xs text-[#4E525D]">Total Area (m²) *</label>
                                         <input
                                             className={inputClass}
                                             type="number"
-                                            step="0.1"
+                                            step="any"
                                             value={form.totalArea ?? ""}
                                             onChange={(e) => updateField("totalArea", parseDecimalInput(e.target.value))}
                                             placeholder="60.5"
@@ -1299,7 +1288,7 @@ export function HouseForm({
                                         <input
                                             className={inputClass}
                                             type="number"
-                                            step="0.1"
+                                            step="any"
                                             value={form.internalArea ?? ""}
                                             onChange={(e) => updateField("internalArea", parseDecimalInput(e.target.value))}
                                             placeholder="55.0"
@@ -1311,7 +1300,7 @@ export function HouseForm({
                                         <input
                                             className={inputClass}
                                             type="number"
-                                            step="0.1"
+                                            step="any"
                                             value={form.balconyArea ?? ""}
                                             onChange={(e) => updateField("balconyArea", parseDecimalInput(e.target.value))}
                                             placeholder="5.5"
@@ -1334,6 +1323,7 @@ export function HouseForm({
                                                             <input
                                                                 className={inputClass}
                                                                 type="number"
+                                                                step="any"
                                                                 value={existingPrice?.priceTotal ?? ""}
                                                                 onChange={(e) => {
                                                                     const raw = e.target.value;
@@ -1360,6 +1350,7 @@ export function HouseForm({
                                                             <input
                                                                 className={inputClass}
                                                                 type="number"
+                                                                step="any"
                                                                 value={existingPrice?.priceByArea ?? ""}
                                                                 onChange={(e) => {
                                                                     const raw = e.target.value;
@@ -1387,7 +1378,7 @@ export function HouseForm({
                                         })}
                                     </div>
                                 ) : null}
-                                </ProfitbaseLocked>
+                                </div>
                             </SectionBlock>
                         </div>
                     )}
@@ -1399,7 +1390,7 @@ export function HouseForm({
                                     title="Gallery Images"
                                     description={`Additional listing photos${form.gallery && form.gallery.length > 0 ? ` (${form.gallery.length}/20)` : ""}.`}
                                 >
-                                    {isSynced ? (
+                                    {isSynced && !existingHouseData?.editedInInventoryAt ? (
                                         <p className="text-xs leading-5 text-[#808191]">
                                             When Profitbase has a floor plan for this unit, the next Transfer replaces the main image, cover and gallery with it.
                                         </p>

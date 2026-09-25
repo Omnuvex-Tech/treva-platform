@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { unitLayoutsApi, type UnitLayoutStats, type UnitLayout } from "../api/unit-layouts";
 import { categoriesApi, type Category } from "../api/categories";
-import { profitbaseApi } from "../api/profitbase";
+import { profitbaseApi, type ProfitbaseSyncCounters } from "../api/profitbase";
 import { useMessageCenter } from "../components/MessageCenter";
 import { getApiErrorMessage } from "../utils/apiError";
 import { apartmentsApi, type Apartment } from "../api/apartments";
@@ -316,9 +316,10 @@ export function Dashboard() {
         try {
             const res = await profitbaseApi.sync();
             const { categories: catSummary, houses, unitLayouts: layoutSummary } = res.data;
+            const counts = (c: ProfitbaseSyncCounters) => `+${c.created} / ${c.updated} updated / ${c.skipped} kept`;
             showSuccess({
                 title: "Profitbase transfer complete",
-                description: `Objects: +${catSummary.created} / ${catSummary.updated} updated · Houses: +${houses.created} / ${houses.updated} updated · Unit layouts: +${layoutSummary.created} / ${layoutSummary.updated} updated`,
+                description: `Objects: ${counts(catSummary)} · Houses: ${counts(houses)} · Unit layouts: ${counts(layoutSummary)}. Records edited or deleted in the inventory are kept as they are.`,
             });
             if (activeMenu === "offplan") await loadOffplanDashboardData();
         } catch (error) {

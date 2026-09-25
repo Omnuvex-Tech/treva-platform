@@ -6,8 +6,10 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { Pagination } from "../../components/Pagination";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
+import { ProfitbaseSourceBadge } from "../../components/ProfitbaseNotice";
 import { getApiErrorMessage } from "../../utils/apiError";
 import { formatPrimaryPrice } from "../../utils/unitPrice";
+import { confirmDelete } from "../../utils/confirmDelete";
 import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 import { IoClose } from "react-icons/io5";
 
@@ -480,9 +482,9 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                                 e.stopPropagation();
                                                 archiveMut.mutate({ id: layout.id, archived: !layout.archived });
                                             }}
-                                            disabled={archiveMut.isPending || Boolean(layout.externalId)}
+                                            disabled={archiveMut.isPending}
                                             aria-label={layout.archived ? "Restore" : "Archive"}
-                                            title={layout.externalId ? "Archived state is managed in Profitbase" : layout.archived ? "Restore" : "Archive"}
+                                            title={layout.archived ? "Restore" : "Archive"}
                                             className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                         >
                                             {layout.archived ? (
@@ -496,27 +498,26 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                             )}
                                         </button>
 
-                                        {!layout.externalId ? (
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    deleteMut.mutate(layout.id);
-                                                }}
-                                                aria-label="Delete"
-                                                title="Delete"
-                                                className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                                </svg>
-                                            </button>
-                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (confirmDelete(layout, "unit")) deleteMut.mutate(layout.id);
+                                            }}
+                                            aria-label="Delete"
+                                            title="Delete"
+                                            className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                            </svg>
+                                        </button>
                                     </div>
 
                                     <div className="flex flex-1 flex-col justify-between px-1.5 pb-1">
                                         <div>
                                             <p className="truncate text-sm font-semibold text-[#1A1A1A]">{layout.title}</p>
+                                            <ProfitbaseSourceBadge record={layout} className="my-0.5" />
                                             <p className="text-xs text-[#999]">
                                                 {layout.totalArea} m² · {layout.unitTypeOption?.title || `${layout.number || 0} rooms`}
                                             </p>
@@ -533,16 +534,14 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                         </div>
 
                                         <div className="mt-3 flex items-center gap-2">
-                                            {!layout.externalId ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => duplicateMut.mutate(layout)}
-                                                    disabled={duplicateMut.isPending}
-                                                    className="flex h-10 flex-1 items-center justify-center rounded-[14px] border border-[#E2E8F0] px-4 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
-                                                >
-                                                    Copy
-                                                </button>
-                                            ) : null}
+                                            <button
+                                                type="button"
+                                                onClick={() => duplicateMut.mutate(layout)}
+                                                disabled={duplicateMut.isPending}
+                                                className="flex h-10 flex-1 items-center justify-center rounded-[14px] border border-[#E2E8F0] px-4 text-[14px] font-medium leading-[20px] text-[#4E525D] transition-colors hover:bg-gray-50 cursor-pointer disabled:opacity-50"
+                                            >
+                                                Copy
+                                            </button>
                                             <button
                                                 type="button"
                                                 onClick={openEdit}
@@ -606,6 +605,7 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                                         <div className="min-w-0">
                                                             <div className="truncate font-semibold text-[#1A1A1A]">{layout.title}</div>
                                                             <div className="mt-1 truncate text-xs text-[#808191]">{formatDate(layout.createdAt)}</div>
+                                                            <ProfitbaseSourceBadge record={layout} className="mt-1" />
                                                         </div>
                                                     </button>
                                                 </td>
@@ -627,9 +627,9 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                                         <button
                                                             type="button"
                                                             onClick={() => archiveMut.mutate({ id: layout.id, archived: !layout.archived })}
-                                                            disabled={archiveMut.isPending || Boolean(layout.externalId)}
+                                                            disabled={archiveMut.isPending}
                                                             aria-label={layout.archived ? "Restore" : "Archive"}
-                                                            title={layout.externalId ? "Archived state is managed in Profitbase" : layout.archived ? "Restore" : "Archive"}
+                                                            title={layout.archived ? "Restore" : "Archive"}
                                                             className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#4E525D] transition-colors hover:bg-gray-100 disabled:opacity-50"
                                                         >
                                                             {layout.archived ? (
@@ -642,37 +642,35 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                                                 </svg>
                                                             )}
                                                         </button>
-                                                        {!layout.externalId ? (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => duplicateMut.mutate(layout)}
-                                                                disabled={duplicateMut.isPending}
-                                                                aria-label="Copy"
-                                                                title="Copy"
-                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#4E525D] transition-colors hover:bg-gray-100 disabled:opacity-50"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                                    <rect x="9" y="9" width="10" height="10" rx="2" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-                                                                </svg>
-                                                            </button>
-                                                        ) : null}
-                                                        {!layout.externalId ? (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => deleteMut.mutate(layout.id)}
-                                                                aria-label="Delete"
-                                                                title="Delete"
-                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#C3362B] transition-colors hover:bg-[#FCEDEA]"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.75h4.5A1.5 1.5 0 0 1 15.75 5.25V7.5h-7.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l.675 10.125A1.5 1.5 0 0 0 8.922 19.5h6.156a1.5 1.5 0 0 0 1.497-1.875L17.25 7.5" />
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 10.5v5.25M13.5 10.5v5.25" />
-                                                                </svg>
-                                                            </button>
-                                                        ) : null}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => duplicateMut.mutate(layout)}
+                                                            disabled={duplicateMut.isPending}
+                                                            aria-label="Copy"
+                                                            title="Copy"
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#4E525D] transition-colors hover:bg-gray-100 disabled:opacity-50"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                <rect x="9" y="9" width="10" height="10" rx="2" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (confirmDelete(layout, "unit")) deleteMut.mutate(layout.id);
+                                                            }}
+                                                            aria-label="Delete"
+                                                            title="Delete"
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#C3362B] transition-colors hover:bg-[#FCEDEA]"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 7.5h15" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.75h4.5A1.5 1.5 0 0 1 15.75 5.25V7.5h-7.5V5.25a1.5 1.5 0 0 1 1.5-1.5Z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 7.5l.675 10.125A1.5 1.5 0 0 0 8.922 19.5h6.156a1.5 1.5 0 0 0 1.497-1.875L17.25 7.5" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 10.5v5.25M13.5 10.5v5.25" />
+                                                            </svg>
+                                                        </button>
                                                         <button
                                                             type="button"
                                                             onClick={openEdit}

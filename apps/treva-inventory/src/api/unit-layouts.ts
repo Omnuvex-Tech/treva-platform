@@ -89,6 +89,7 @@ export interface UnitLayout {
     description?: string;
     // Profitbase property id; set on synced units, whose Profitbase fields are read-only.
     externalId?: string | null;
+    editedInInventoryAt?: string | null;
     createdAt: string;
     updatedAt: string;
 }

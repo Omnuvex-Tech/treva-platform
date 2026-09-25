@@ -748,6 +748,7 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
+                                            step="any"
                                             value={form.totalArea || ""}
                                             onChange={(e) =>
                                                 updateField(
@@ -758,7 +759,6 @@ export function UnitLayoutForm() {
                                             placeholder="85.5"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
-                                            step={0.1}
                                             required
                                         />
                                     </div>
@@ -768,6 +768,7 @@ export function UnitLayoutForm() {
                                         </label>
                                         <input
                                             type="number"
+                                            step="any"
                                             value={form.internalArea || ""}
                                             onChange={(e) =>
                                                 updateField(
@@ -778,7 +779,6 @@ export function UnitLayoutForm() {
                                             placeholder="72.3"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
-                                            step={0.1}
                                             required
                                         />
                                     </div>
@@ -789,6 +789,7 @@ export function UnitLayoutForm() {
                                     </label>
                                         <input
                                             type="number"
+                                            step="any"
                                             value={form.balconyArea ?? ""}
                                             onChange={(e) =>
                                                 updateField(
@@ -801,7 +802,6 @@ export function UnitLayoutForm() {
                                             placeholder="8.5"
                                             className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-[#F4F5F6] text-sm text-[#1A1A1A] placeholder-[#999] outline-none focus:bg-white focus:border-gray-400"
                                             min={0}
-                                            step={0.1}
                                             required
                                         />
                                 </div>
@@ -813,6 +813,7 @@ export function UnitLayoutForm() {
                                             </label>
                                             <input
                                                 type="number"
+                                                step="any"
                                                 value={form.prices?.[curr.value] || ""}
                                                 onChange={(e) =>
                                                     updateField(

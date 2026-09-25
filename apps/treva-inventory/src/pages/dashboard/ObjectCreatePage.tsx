@@ -17,6 +17,7 @@ import { PlanUploadCard } from "../../components/PlanUploadCard";
 import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { formatPrimaryPrice } from "../../utils/unitPrice";
+import { confirmDelete } from "../../utils/confirmDelete";
 import { IoClose } from "react-icons/io5";
 import { Pagination } from "../../components/Pagination";
 
@@ -761,7 +762,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                             type="button"
                                             onClick={(event) => {
                                                 event.stopPropagation();
-                                                deleteHouseMutation.mutate(house.id);
+                                                if (confirmDelete(house, "house")) deleteHouseMutation.mutate(house.id);
                                             }}
                                             aria-label="Delete"
                                             title="Delete"
@@ -1418,7 +1419,7 @@ export function ObjectCreatePage({ embedded = false }: { embedded?: boolean } = 
                                                                             type="button"
                                                                             onClick={(event) => {
                                                                                 event.stopPropagation();
-                                                                                deleteUnitLayoutMutation.mutate(layout.id);
+                                                                                if (confirmDelete(layout, "unit")) deleteUnitLayoutMutation.mutate(layout.id);
                                                                             }}
                                                                             aria-label="Delete"
                                                                             title="Delete"

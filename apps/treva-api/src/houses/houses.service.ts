@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { rememberProfitbaseDeletion } from '../profitbase/profitbase-deletions';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHouseDto } from './dto/create-house.dto';
 import { UpdateHouseDto } from './dto/update-house.dto';
@@ -337,6 +338,9 @@ export class HousesService {
     if (updateDto.tags !== undefined) data.tags = updateDto.tags;
     if (updateDto.secondShowroomAvailability !== undefined)
       data.secondShowroomAvailability = updateDto.secondShowroomAvailability;
+    // Any change to a synced house, archiving included, takes it out of the
+    // Transfer.
+    if (existing.externalId) data.editedInInventoryAt = new Date();
 
     const house = await this.prisma.house.update({
       where: { id },
@@ -360,6 +364,8 @@ export class HousesService {
     if (!existing) {
       throw new NotFoundException('House not found');
     }
+
+    await rememberProfitbaseDeletion(this.prisma, 'house', existing.externalId);
 
     await this.prisma.unitLayout.updateMany({
       where: { houseId: id },

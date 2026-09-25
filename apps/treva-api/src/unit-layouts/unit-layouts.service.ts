@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { rememberProfitbaseDeletion } from '../profitbase/profitbase-deletions';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUnitLayoutDto } from './dto/create-unit-layout.dto';
 import { UpdateUnitLayoutDto } from './dto/update-unit-layout.dto';
@@ -585,6 +586,9 @@ export class UnitLayoutsService {
       data.heatingTypeIds = updateDto.heatingTypeIds;
     if (updateDto.attributeIds !== undefined)
       data.attributeIds = updateDto.attributeIds;
+    // Any change to a synced unit, archiving included, takes it out of the
+    // Transfer.
+    if (existing.externalId) data.editedInInventoryAt = new Date();
 
     const layout = await this.prisma.unitLayout.update({
       where: { id },
@@ -608,6 +612,12 @@ export class UnitLayoutsService {
     if (!existing) {
       throw new NotFoundException('Unit layout not found');
     }
+
+    await rememberProfitbaseDeletion(
+      this.prisma,
+      'unitLayout',
+      existing.externalId,
+    );
 
     const result = await this.prisma.unitLayout.delete({
       where: { id },

@@ -54,6 +54,8 @@ export interface UnitLayout {
     status?: string;
     floor: number;
     number?: number;
+    // Apartment number, e.g. "B1-2303". `number` is the room count.
+    unitCode?: string | null;
     entrance?: string;
     totalArea: number;
     internalArea: number;

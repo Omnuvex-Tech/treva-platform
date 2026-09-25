@@ -1,31 +1,70 @@
 /**
- * Shown on objects, houses and units that come from Profitbase. Profitbase is
- * the source of truth for them: its fields are read-only here and every
- * Transfer overwrites them.
+ * Where an imported record stands with the Transfer. A record synced from
+ * Profitbase is overwritten by every Transfer until it is changed here; from
+ * then on it is "edited in inventory" and the Transfer leaves it alone.
  */
-export function ProfitbaseNotice({ children }: { children: React.ReactNode }) {
+interface ProfitbaseRecord {
+    externalId?: string | null;
+    editedInInventoryAt?: string | null;
+}
+
+/**
+ * Banner for the edit forms of imported records. `children` lists what a
+ * Transfer overwrites on a record that has not been edited yet.
+ */
+export function ProfitbaseNotice({ record, children }: { record: ProfitbaseRecord | null | undefined; children: React.ReactNode }) {
+    if (!record?.externalId) return null;
+    const edited = Boolean(record.editedInInventoryAt);
+
     return (
-        <div className="mb-5 flex items-start gap-3 rounded-[20px] border border-[#DCE6F5] bg-[#F4F8FD] px-4 py-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3C6AB0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 flex-shrink-0">
-                <rect x="4" y="11" width="16" height="10" rx="2" />
-                <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        <div
+            className={`mb-5 flex items-start gap-3 rounded-[20px] border px-4 py-3 ${
+                edited ? "border-[#D5EBDB] bg-[#F3FAF5]" : "border-[#DCE6F5] bg-[#F4F8FD]"
+            }`}
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={edited ? "#2F7A45" : "#3C6AB0"}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mt-0.5 flex-shrink-0"
+            >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 16v-4M12 8h.01" />
             </svg>
-            <div className="text-xs leading-5 text-[#2F4A73]">
-                <span className="font-semibold">Synced from Profitbase.</span> {children}
+            <div className={`text-xs leading-5 ${edited ? "text-[#24573A]" : "text-[#2F4A73]"}`}>
+                {edited ? (
+                    <>
+                        <span className="font-semibold">Edited in inventory.</span> Transfers from Profitbase no longer change this record.
+                    </>
+                ) : (
+                    <>
+                        <span className="font-semibold">Synced from Profitbase.</span> {children} Once you save a change here, archiving
+                        included, Transfers stop changing it.
+                    </>
+                )}
             </div>
         </div>
     );
 }
 
-/** Wraps Profitbase-owned inputs; a disabled fieldset disables every control inside it. */
-export function ProfitbaseLocked({ locked, children, className = "" }: { locked: boolean; children: React.ReactNode; className?: string }) {
+/** Small tag for list rows and cards; nothing for records created in the panel. */
+export function ProfitbaseSourceBadge({ record, className = "" }: { record: ProfitbaseRecord; className?: string }) {
+    if (!record.externalId) return null;
+    const edited = Boolean(record.editedInInventoryAt);
+
     return (
-        <fieldset
-            disabled={locked}
-            title={locked ? "Managed in Profitbase" : undefined}
-            className={`m-0 min-w-0 border-0 p-0 ${locked ? "cursor-not-allowed opacity-70 [&_*]:cursor-not-allowed" : ""} ${className}`}
+        <span
+            title={edited ? "Transfers no longer change this record" : "Overwritten by every Transfer until it is edited here"}
+            className={`inline-flex w-fit items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium leading-4 ${
+                edited ? "bg-[#EAF6EE] text-[#2F7A45]" : "bg-[#EAF1FB] text-[#3C6AB0]"
+            } ${className}`}
         >
-            {children}
-        </fieldset>
+            {edited ? "Edited in inventory" : "Synced from Profitbase"}
+        </span>
     );
 }

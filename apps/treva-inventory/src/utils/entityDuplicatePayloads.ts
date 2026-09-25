@@ -75,7 +75,8 @@ export function buildUnitLayoutDuplicatePayload(
         categoryId: layout.categoryId,
         houseId: layout.houseId,
         floor: layout.floor,
-        number: layout.number ?? 1,
+        // A studio has 0 rooms; unknown stays unknown rather than becoming 1.
+        number: layout.number ?? undefined,
         entrance: layout.entrance,
         totalArea: layout.totalArea,
         internalArea: layout.internalArea,
@@ -85,9 +86,19 @@ export function buildUnitLayoutDuplicatePayload(
         numberOfFloors: layout.numberOfFloors,
         similarApartmentIds: layout.similarApartmentIds || [],
         mainImage: layout.mainImage,
+        coverImage: layout.coverImage,
         gallery: layout.gallery || [],
         documents: layout.documents || [],
         unitTypeOptionId: layout.unitTypeOptionId,
+        realEstateType: layout.realEstateType,
+        typeOfBuilding: layout.typeOfBuilding,
+        constructionStage: layout.constructionStage,
+        renovation: layout.renovation,
+        furnishing: layout.furnishing,
+        description: layout.description,
+        heatingTypeIds: layout.heatingTypeIds || [],
+        attributeIds: layout.attributeIds || [],
+        // The unit number is left out: a copy is a different unit.
     };
 }
 
@@ -135,6 +146,7 @@ export function buildHouseDuplicatePayload(
         secondContractAddress: house.secondContractAddress,
         showroomAvailability: house.showroomAvailability,
         secondShowroomAvailability: house.secondShowroomAvailability,
+        tags: house.tags || [],
     };
 }
 

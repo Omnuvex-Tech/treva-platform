@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { rememberProfitbaseDeletion } from '../profitbase/profitbase-deletions';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -65,6 +66,7 @@ export class CategoriesService {
       documents: category.documents,
       fedLaw214: category.fedLaw214,
       externalId: category.externalId,
+      editedInInventoryAt: category.editedInInventoryAt,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
       metrics: {
@@ -119,6 +121,7 @@ export class CategoriesService {
       documents: category.documents,
       fedLaw214: category.fedLaw214,
       externalId: category.externalId,
+      editedInInventoryAt: category.editedInInventoryAt,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
       metrics: {
@@ -173,6 +176,7 @@ export class CategoriesService {
       documents: category.documents,
       fedLaw214: category.fedLaw214,
       externalId: category.externalId,
+      editedInInventoryAt: category.editedInInventoryAt,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
       metrics: {
@@ -212,6 +216,8 @@ export class CategoriesService {
       data: {
         ...updateCategoryDto,
         documents: updateCategoryDto.documents as any,
+        // Any change to a synced object takes it out of the Transfer.
+        ...(category.externalId ? { editedInInventoryAt: new Date() } : {}),
       },
     });
   }
@@ -224,6 +230,14 @@ export class CategoriesService {
     if (!category) {
       throw new NotFoundException('Category not found');
     }
+
+    // Its houses and units go with it, and the Transfer skips everything
+    // under an object it does not re-create.
+    await rememberProfitbaseDeletion(
+      this.prisma,
+      'category',
+      category.externalId,
+    );
 
     await this.prisma.unitLayout.deleteMany({
       where: { categoryId: id },

@@ -101,6 +101,7 @@ export interface House {
     description?: string;
     // Profitbase house id; set on synced houses, whose Profitbase fields are read-only.
     externalId?: string | null;
+    editedInInventoryAt?: string | null;
     tags?: HouseTag[];
     // Distinct entrances across the house's units (houses list only).
     entranceCount?: number;

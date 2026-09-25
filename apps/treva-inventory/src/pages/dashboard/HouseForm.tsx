@@ -11,7 +11,7 @@ import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { DatePickerField } from "../../components/DatePickerField";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
-import { ProfitbaseLocked, ProfitbaseNotice } from "../../components/ProfitbaseNotice";
+import { ProfitbaseNotice } from "../../components/ProfitbaseNotice";
 import { CONSTRUCTION_STAGE_OPTIONS, TYPE_OF_BUILDING_OPTIONS, withCurrentOption } from "../../utils/offplanOptions";
 
 const inputClass =
@@ -172,8 +172,6 @@ export function HouseForm({
     }, [typeOfBuildingOptions]);
     const categoryId = (categoryRes as any)?.data?.id || selectedCategoryId;
     const existingHouse = (existingHouseRes as any)?.data;
-    // Synced houses belong to Profitbase: its fields are read-only here.
-    const isSynced = Boolean(existingHouse?.externalId);
 
     useEffect(() => {
         if (!isEditMode || !existingHouse) return;
@@ -290,7 +288,7 @@ export function HouseForm({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!categoryId || !form.name.trim() || (!isSynced && !form.typeOfBuilding)) {
+        if (!categoryId || !form.name.trim() || !form.typeOfBuilding) {
             showError({
                 title: "Please fill required house fields",
                 description: "House name and type of building are required.",
@@ -325,21 +323,15 @@ export function HouseForm({
                   attributeIds: [],
               };
 
-        // Name, type and image come from Profitbase on synced houses.
-        const profitbaseOwned = isSynced
-            ? {}
-            : {
-                  title: form.name.trim(),
-                  name: form.name.trim(),
-                  typeOfBuilding: form.typeOfBuilding,
-                  mainImage: form.image.trim() ? { url: form.image.trim(), alt: form.name.trim() || "House" } : undefined,
-              };
         // A cleared field is sent as null on edit so the API clears it.
         const text = (value: string) => value.trim() || (isEditMode ? null : undefined);
 
         mutation.mutate({
             ...createOnlyDefaults,
-            ...profitbaseOwned,
+            title: form.name.trim(),
+            name: form.name.trim(),
+            typeOfBuilding: form.typeOfBuilding,
+            mainImage: form.image.trim() ? { url: form.image.trim(), alt: form.name.trim() || "House" } : undefined,
             categoryId,
             slug: form.slug.trim() || slugify(form.name),
             ...(Number.isFinite(parsedHouseNumber)
@@ -392,13 +384,10 @@ export function HouseForm({
                 ) : null}
             </div>
 
-            {isSynced ? (
-                <ProfitbaseNotice>
-                    The name, type of building, image, floors and prices come from Profitbase and update on every Transfer. Profitbase
-                    leaves the address, sales and showroom fields empty for most houses, so they are edited here. A Transfer only
-                    overwrites the construction stage and commissioning deadline when Profitbase has them.
-                </ProfitbaseNotice>
-            ) : null}
+            <ProfitbaseNotice record={existingHouse}>
+                A Transfer overwrites the name, type of building, image, floors, prices and archived state with Profitbase&apos;s values, and the
+                construction stage and commissioning deadline when Profitbase has them.
+            </ProfitbaseNotice>
 
             {!activeCategorySlug ? (
                 <div className="mb-4">
@@ -414,7 +403,7 @@ export function HouseForm({
             ) : null}
 
             <div className="mb-5 grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
-                <ProfitbaseLocked locked={isSynced} className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
+                <div className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
                     <ImageAssetCard
                         label="Main Image"
                         description="Primary image used in house cards and list views."
@@ -440,10 +429,10 @@ export function HouseForm({
                             if (imageInputRef.current) imageInputRef.current.value = "";
                         }}
                     />
-                </ProfitbaseLocked>
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                    <ProfitbaseLocked locked={isSynced} className="grid gap-4 md:col-span-2 md:grid-cols-2">
+                    <div className="grid gap-4 md:col-span-2 md:grid-cols-2">
                         <div>
                             <label className="mb-1 block text-xs text-[#4E525D]">House name *</label>
                             <input
@@ -463,7 +452,7 @@ export function HouseForm({
                                 placeholder="Select type"
                             />
                         </div>
-                    </ProfitbaseLocked>
+                    </div>
                     <div>
                         <label className="mb-1 block text-xs text-[#4E525D]">Street</label>
                         <input className={inputClass} value={form.street} onChange={(e) => updateField("street", e.target.value)} placeholder="e.g. Main street" />

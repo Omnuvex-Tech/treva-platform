@@ -59,6 +59,8 @@ model Category {
   fedLaw214       Boolean  @default(false)
   type            String   @default("object") // "category" | "object"
   externalId      String?  @unique
+  // Set when a synced object is changed in the panel; Transfers skip it from then on.
+  editedInInventoryAt DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -121,6 +123,8 @@ model House {
   tags                        Json        @default("[]")
   archived                    Boolean     @default(false)
   externalId                  String?     @unique
+  // Set when a synced record is changed in the panel; Transfers skip it from then on.
+  editedInInventoryAt         DateTime?
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 
@@ -172,6 +176,8 @@ model UnitLayout {
   attributeIds                String[]    @default([])
   archived                    Boolean     @default(false)
   externalId                  String?     @unique
+  // Set when a synced record is changed in the panel; Transfers skip it from then on.
+  editedInInventoryAt         DateTime?
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 }
@@ -384,4 +390,15 @@ model ProfitbaseImage {
   createdAt DateTime @default(now())
 
   @@index([url])
+}
+
+/// Profitbase records deleted in the panel, so a Transfer does not bring them
+/// back. The row outlives the record it names.
+model ProfitbaseDeletion {
+  /// "category" | "house" | "unitLayout"
+  entity     String
+  externalId String
+  deletedAt  DateTime @default(now())
+
+  @@id([entity, externalId])
 }

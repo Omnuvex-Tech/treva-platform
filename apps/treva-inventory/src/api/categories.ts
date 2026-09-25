@@ -45,6 +45,7 @@ export interface Category {
     fedLaw214: boolean;
     // Profitbase project id; set on synced objects, whose Profitbase fields are read-only.
     externalId?: string | null;
+    editedInInventoryAt?: string | null;
     createdAt: string;
     updatedAt: string;
     metrics?: CategoryMetrics;

@@ -18,7 +18,8 @@ import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
 import { withCurrentOption } from "../../utils/offplanOptions";
 import { formatPrimaryPrice } from "../../utils/unitPrice";
-import { ProfitbaseLocked, ProfitbaseNotice } from "../../components/ProfitbaseNotice";
+import { confirmDelete } from "../../utils/confirmDelete";
+import { ProfitbaseNotice, ProfitbaseSourceBadge } from "../../components/ProfitbaseNotice";
 import { IoClose } from "react-icons/io5";
 import { Pagination } from "../../components/Pagination";
 
@@ -181,8 +182,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     });
 
     const category = response?.data;
-    // Synced objects belong to Profitbase: their name, title and currency are read-only here.
-    const isSynced = Boolean(category?.externalId);
     const documents: CategoryDocument[] = category?.documents || [];
 
     const { data: cmsData } = useQuery({
@@ -486,15 +485,10 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             // A cleared field is sent as null so the API clears it.
             const text = (value: string | undefined) => optionalText(value) || null;
             return categoriesApi.update(category!.id, {
-                // Name, title and currency come from Profitbase on synced objects.
-                ...(isSynced
-                    ? {}
-                    : {
-                          name: data.name,
-                          title: data.title,
-                          propertyName: data.name || data.title,
-                          currency: optionalText(data.currency) || undefined,
-                      }),
+                name: data.name,
+                title: data.title,
+                propertyName: data.name || data.title,
+                currency: optionalText(data.currency) || undefined,
                 objectType: text(data.objectType),
                 region: text(data.region),
                 area: text(data.area),
@@ -788,9 +782,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 event.stopPropagation();
                                                 archiveHouseMutation.mutate({ id: house.id, archived: !house.archived });
                                             }}
-                                            disabled={archiveHouseMutation.isPending || Boolean(house.externalId)}
+                                            disabled={archiveHouseMutation.isPending}
                                             aria-label={house.archived ? "Restore" : "Archive"}
-                                            title={house.externalId ? "Archived state is managed in Profitbase" : house.archived ? "Restore" : "Archive"}
+                                            title={house.archived ? "Restore" : "Archive"}
                                             className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                         >
                                             {house.archived ? (
@@ -804,43 +798,40 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                             )}
                                         </button>
 
-                                        {!house.externalId ? (
-                                            <button
-                                                type="button"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    deleteHouseMutation.mutate(house.id);
-                                                }}
-                                                aria-label="Delete"
-                                                title="Delete"
-                                                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                                </svg>
-                                            </button>
-                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                if (confirmDelete(house, "house")) deleteHouseMutation.mutate(house.id);
+                                            }}
+                                            aria-label="Delete"
+                                            title="Delete"
+                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                            </svg>
+                                        </button>
                                     </div>
 
                                     <div className="px-1 py-3">
                                         <p className="truncate text-sm font-semibold text-[#1A1A1A]">{house.title}</p>
+                                        <ProfitbaseSourceBadge record={house} className="mt-1" />
                                     </div>
 
                                     <div className="flex gap-1 px-1 pb-1">
-                                        {!house.externalId ? (
-                                            <button
-                                                type="button"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    setPreviewHouseId(null);
-                                                    duplicateHouseMutation.mutate(house);
-                                                }}
-                                                disabled={duplicateHouseMutation.isPending}
-                                                className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
-                                            >
-                                                Copy
-                                            </button>
-                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setPreviewHouseId(null);
+                                                duplicateHouseMutation.mutate(house);
+                                            }}
+                                            disabled={duplicateHouseMutation.isPending}
+                                            className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                        >
+                                            Copy
+                                        </button>
                                         <button
                                             type="button"
                                             onClick={(event) => {
@@ -882,12 +873,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const formContent = (
         <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
-            {isSynced ? (
-                <ProfitbaseNotice>
-                    The name, title and currency come from Profitbase and update on every Transfer, as do this object&apos;s houses and
-                    units. Everything else about the object is edited here.
-                </ProfitbaseNotice>
-            ) : null}
+            <ProfitbaseNotice record={category}>
+                A Transfer overwrites the name, title, currency and archived state with Profitbase&apos;s values.
+            </ProfitbaseNotice>
             <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
                 {TABS.map((tab) => (
                     <button
@@ -977,7 +965,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                 </div>
 
                                 <div className="space-y-4">
-                                    <ProfitbaseLocked locked={isSynced} className="grid gap-4 lg:grid-cols-2">
+                                    <div className="grid gap-4 lg:grid-cols-2">
                                         <div>
                                             <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Name *</label>
                                             <input
@@ -996,7 +984,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 placeholder="Sea Breeze Residence"
                                             />
                                         </div>
-                                    </ProfitbaseLocked>
+                                    </div>
                                     <div>
                                         <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Object Type</label>
                                         <input
@@ -1007,7 +995,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         />
                                     </div>
                                     <div className="grid gap-4 lg:grid-cols-2">
-                                        <ProfitbaseLocked locked={isSynced}>
+                                        <div className="min-w-0">
                                             <FormDropdown
                                                 label="Currency"
                                                 value={formData.currency}
@@ -1015,7 +1003,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                 placeholder="Select currency"
                                                 onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
                                             />
-                                        </ProfitbaseLocked>
+                                        </div>
                                         <div>
                                             <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Area</label>
                                             <input
@@ -1476,9 +1464,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                             event.stopPropagation();
                                                                             archiveUnitLayoutMutation.mutate({ id: layout.id, archived: !layout.archived });
                                                                         }}
-                                                                        disabled={archiveUnitLayoutMutation.isPending || Boolean(layout.externalId)}
+                                                                        disabled={archiveUnitLayoutMutation.isPending}
                                                                         aria-label={layout.archived ? "Restore" : "Archive"}
-                                                                        title={layout.externalId ? "Archived state is managed in Profitbase" : layout.archived ? "Restore" : "Archive"}
+                                                                        title={layout.archived ? "Restore" : "Archive"}
                                                                         className="absolute left-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#EBEBEB] text-[#4E525D] transition-colors hover:bg-[#E0E0E0] disabled:opacity-50"
                                                                     >
                                                                         {layout.archived ? (
@@ -1492,41 +1480,40 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                         )}
                                                                     </button>
 
-                                                                    {!layout.externalId ? (
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={(event) => {
-                                                                                event.stopPropagation();
-                                                                                deleteUnitLayoutMutation.mutate(layout.id);
-                                                                            }}
-                                                                            aria-label="Delete"
-                                                                            title="Delete"
-                                                                            className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
-                                                                        >
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
-                                                                            </svg>
-                                                                        </button>
-                                                                    ) : null}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(event) => {
+                                                                            event.stopPropagation();
+                                                                            if (confirmDelete(layout, "unit")) deleteUnitLayoutMutation.mutate(layout.id);
+                                                                        }}
+                                                                        aria-label="Delete"
+                                                                        title="Delete"
+                                                                        className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FDECEC] text-[#C3362B] transition-colors hover:bg-[#F8DDD9]"
+                                                                    >
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6" />
+                                                                        </svg>
+                                                                    </button>
                                                                 </div>
 
-                                                                <p className="truncate px-1 pt-3 text-xs text-[#808191]">{layout.unitCode ? `№ ${layout.unitCode}` : layout.title}</p>
+                                                                <div className="flex items-center justify-between gap-2 px-1 pt-3">
+                                                                    <p className="truncate text-xs text-[#808191]">{layout.unitCode ? `№ ${layout.unitCode}` : layout.title}</p>
+                                                                    <ProfitbaseSourceBadge record={layout} />
+                                                                </div>
                                                                 <div className="flex items-center justify-between gap-3 px-1 pb-3 pt-1">
                                                                     <p className="truncate text-base font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices, category?.currency)}</p>
                                                                     <p className="shrink-0 text-sm text-[#666666]">{layout.totalArea} m²</p>
                                                                 </div>
 
                                                                 <div className="flex gap-1 px-1 pb-1">
-                                                                    {!layout.externalId ? (
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => duplicateUnitLayoutMutation.mutate(layout)}
-                                                                            disabled={duplicateUnitLayoutMutation.isPending}
-                                                                            className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
-                                                                        >
-                                                                            Copy
-                                                                        </button>
-                                                                    ) : null}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => duplicateUnitLayoutMutation.mutate(layout)}
+                                                                        disabled={duplicateUnitLayoutMutation.isPending}
+                                                                        className="flex-1 cursor-pointer rounded-full border border-[#E2E8F0] py-1.5 text-[12px] font-medium text-[#4E525D] transition-colors hover:bg-gray-50 disabled:opacity-50"
+                                                                    >
+                                                                        Copy
+                                                                    </button>
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => {

@@ -23,13 +23,17 @@ import {
 } from './profitbase-mappers';
 
 /**
- * Profitbase is the source of truth for everything it knows about an object,
- * a house or a unit: each Transfer overwrites those fields, and the panel
- * shows them read-only on synced records. The panel owns what Profitbase has
- * no notion of - slugs, SEO, descriptions, attributes, brochures - and the
- * house fields Profitbase leaves empty on our account (street, sales office,
- * deadline when there is no handover quarter...), which the sync only fills
- * when Profitbase has a value.
+ * Profitbase feeds the panel until the panel takes over. A Transfer creates
+ * the objects, houses and units it has not seen and overwrites the fields it
+ * knows on the ones it created - until someone changes a record in the panel
+ * (`editedInInventoryAt`), after which the Transfer never writes to it again.
+ * Records deleted in the panel are not re-created (`ProfitbaseDeletion`), nor
+ * are new units of a deleted house or anything under a deleted object.
+ *
+ * The panel owns what Profitbase has no notion of - slugs, SEO, descriptions,
+ * attributes, brochures - and the house fields Profitbase leaves empty on our
+ * account (street, sales office, deadline when there is no handover
+ * quarter...), which the sync only fills when Profitbase has a value.
  *
  * One site policy sits on top: parkings are not sold through the site, so
  * parking units and parking houses are always archived. Units of a house
@@ -39,6 +43,14 @@ import {
 interface SyncCounters {
   created: number;
   updated: number;
+  // Edited or deleted in the panel, so left alone.
+  skipped: number;
+}
+
+interface DeletedIds {
+  category: Set<string>;
+  house: Set<string>;
+  unitLayout: Set<string>;
 }
 
 export interface ProfitbaseSyncSummary {
@@ -134,10 +146,11 @@ export class ProfitbaseSyncService {
     ]);
 
     const summary: ProfitbaseSyncSummary = {
-      categories: { created: 0, updated: 0 },
-      houses: { created: 0, updated: 0 },
-      unitLayouts: { created: 0, updated: 0 },
+      categories: { created: 0, updated: 0, skipped: 0 },
+      houses: { created: 0, updated: 0, skipped: 0 },
+      unitLayouts: { created: 0, updated: 0, skipped: 0 },
     };
+    const deleted = await this.loadDeletedIds();
 
     // Every picture this run will reference, copied before anything is written.
     // Done in one pass rather than per row so the downloads can run in
@@ -183,9 +196,10 @@ export class ProfitbaseSyncService {
         projectId,
         projectName,
         projectById.get(projectId) ?? null,
+        deleted,
         summary,
       );
-      categoryIdByProjectId.set(projectId, categoryId);
+      if (categoryId) categoryIdByProjectId.set(projectId, categoryId);
     }
 
     const houseById = new Map<number, ProfitbaseHouse>();
@@ -197,10 +211,11 @@ export class ProfitbaseSyncService {
       const syncedHouse = await this.upsertHouse(
         house,
         categoryId,
+        deleted,
         summary,
         mirrored,
       );
-      syncedHouseByExternalId.set(house.id, syncedHouse);
+      if (syncedHouse) syncedHouseByExternalId.set(house.id, syncedHouse);
     }
 
     const touchedCategoryIds = new Set<string>(categoryIdByProjectId.values());
@@ -222,6 +237,7 @@ export class ProfitbaseSyncService {
         syncedHouseByExternalId.get(property.house_id) ?? null,
         houseById.get(property.house_id) ?? null,
         unitTypeIds,
+        deleted,
         summary,
         mirrored,
       );
@@ -259,8 +275,9 @@ export class ProfitbaseSyncService {
     projectId: number,
     projectName: string,
     project: ProfitbaseProject | null,
+    deleted: DeletedIds,
     summary: ProfitbaseSyncSummary,
-  ): Promise<string> {
+  ): Promise<string | null> {
     const externalId = String(projectId);
     const projectImage = project?.images?.[0]?.url;
     const sharedData = {
@@ -283,6 +300,11 @@ export class ProfitbaseSyncService {
       where: { externalId },
     });
 
+    if (existing?.editedInInventoryAt) {
+      summary.categories.skipped++;
+      return existing.id;
+    }
+
     if (existing) {
       await this.prisma.category.update({
         where: { id: existing.id },
@@ -295,6 +317,11 @@ export class ProfitbaseSyncService {
       });
       summary.categories.updated++;
       return existing.id;
+    }
+
+    if (deleted.category.has(externalId)) {
+      summary.categories.skipped++;
+      return null;
     }
 
     const slug = `${this.slugify(projectName)}-${projectId}`;
@@ -314,9 +341,10 @@ export class ProfitbaseSyncService {
   private async upsertHouse(
     house: ProfitbaseHouse,
     categoryId: string,
+    deleted: DeletedIds,
     summary: ProfitbaseSyncSummary,
     mirrored: Map<string, string>,
-  ): Promise<SyncedHouse> {
+  ): Promise<SyncedHouse | null> {
     const externalId = String(house.id);
     const title = house.title || house.projectName;
     const minFloor = house.minFloor ?? 1;
@@ -360,6 +388,11 @@ export class ProfitbaseSyncService {
       where: { externalId },
     });
 
+    if (existing?.editedInInventoryAt) {
+      summary.houses.skipped++;
+      return { id: existing.id, completionYear: existing.completionYear };
+    }
+
     if (existing) {
       const updated = await this.prisma.house.update({
         where: { id: existing.id },
@@ -367,6 +400,11 @@ export class ProfitbaseSyncService {
       });
       summary.houses.updated++;
       return { id: updated.id, completionYear: updated.completionYear };
+    }
+
+    if (deleted.house.has(externalId)) {
+      summary.houses.skipped++;
+      return null;
     }
 
     const slug = `${this.slugify(`${house.projectName}-${title}`)}-${house.id}`;
@@ -383,6 +421,19 @@ export class ProfitbaseSyncService {
     });
     summary.houses.created++;
     return { id: created.id, completionYear: created.completionYear };
+  }
+
+  private async loadDeletedIds(): Promise<DeletedIds> {
+    const rows = await this.prisma.profitbaseDeletion.findMany();
+    const ids: DeletedIds = {
+      category: new Set(),
+      house: new Set(),
+      unitLayout: new Set(),
+    };
+    for (const row of rows) {
+      ids[row.entity as keyof DeletedIds]?.add(row.externalId);
+    }
+    return ids;
   }
 
   /** Unit type ids by name, so the sync can reuse the ones it created. */
@@ -419,10 +470,24 @@ export class ProfitbaseSyncService {
     syncedHouse: SyncedHouse | null,
     parentHouse: ProfitbaseHouse | null,
     unitTypeIds: Map<string, string>,
+    deleted: DeletedIds,
     summary: ProfitbaseSyncSummary,
     mirrored: Map<string, string>,
   ): Promise<void> {
     const externalId = String(property.id);
+    const existing = await this.prisma.unitLayout.findUnique({
+      where: { externalId },
+    });
+    if (
+      existing
+        ? existing.editedInInventoryAt
+        : deleted.unitLayout.has(externalId) ||
+          deleted.house.has(String(property.house_id))
+    ) {
+      summary.unitLayouts.skipped++;
+      return;
+    }
+
     const currencyCode = parentHouse?.currency?.code || 'USD';
     const floor = property.floor ?? 0;
     const parking = isParking(property);
@@ -498,10 +563,6 @@ export class ProfitbaseSyncService {
       ...(planImage ? { mainImage: planImage, coverImage: planImage } : {}),
       ...(gallery.length > 0 ? { gallery } : {}),
     };
-
-    const existing = await this.prisma.unitLayout.findUnique({
-      where: { externalId },
-    });
 
     if (existing) {
       await this.prisma.unitLayout.update({
