@@ -9,6 +9,7 @@ import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '../generated/prisma/client';
 import type { AuthUser } from '../auth/jwt.strategy';
+import { BitrixSyncService } from '../bitrix/bitrix-sync.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   COMPANY_NAME_TAKEN,
@@ -139,6 +140,7 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly companies: CompaniesService,
+    private readonly bitrixSync: BitrixSyncService,
   ) {}
 
   private async find(id: string) {
@@ -262,7 +264,11 @@ export class UsersService {
     // inherits `@IsOptional()` from `SaveUserDto` and skips every validator on
     // a property that arrives undefined — so the decorators only bite when the
     // key is present. The guard belongs here, where nothing can inherit past it.
-    this.assertRequired(dto.email, 'A valid email is required', 'email_required');
+    this.assertRequired(
+      dto.email,
+      'A valid email is required',
+      'email_required',
+    );
     this.assertRequired(dto.firstName, 'Name is required', 'name_required');
     if (!dto.phones?.length) {
       throw new BadRequestException({
@@ -292,6 +298,9 @@ export class UsersService {
         },
         select: USER_SELECT,
       });
+
+      // Every broker is in Bitrix from the start (admins are skipped there).
+      void this.bitrixSync.syncBroker(row.id);
 
       const created = toPlatformUser(row);
       // Only a password the admin did not choose needs handing back.
@@ -550,6 +559,9 @@ export class UsersService {
         });
       });
 
+      // The manager — new or promoted — and the agency, into Bitrix.
+      void this.bitrixSync.syncBroker(company.owner.id);
+
       const agency = toAgency(company);
       // Only a generated password needs handing over: an admin who typed one
       // already knows it, and an existing account kept its own.
@@ -636,6 +648,9 @@ export class UsersService {
           select: AGENCY_SELECT,
         });
       });
+
+      // A new manager may be an account Bitrix does not have yet.
+      if (handover) void this.bitrixSync.syncBroker(company.owner.id);
 
       return toAgency(company);
     } catch (error) {

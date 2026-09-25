@@ -56,7 +56,9 @@ export class ClientsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Register a lead (always submitted for approval)' })
+  @ApiOperation({
+    summary: 'Register a client — checked against Bitrix24, deal if new',
+  })
   create(@Request() req: AuthedRequest, @Body() dto: CreateClientDto) {
     return this.clientsService.create(req.user, dto);
   }

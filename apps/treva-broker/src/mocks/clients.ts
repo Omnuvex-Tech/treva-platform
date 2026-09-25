@@ -36,7 +36,7 @@ const DEVELOPERS: Record<string, { developerBrand: string; website: string }> = 
     "Highland Park": { developerBrand: "Highland Estates", website: "highlandpark.az" },
 };
 
-export const MOCK_CLIENTS: Client[] = [
+const FIXTURES: Omit<Client, "bitrix">[] = [
     {
         id: "cl_1",
         firstName: "Emin",
@@ -49,7 +49,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Pearl Towers",
         ...DEVELOPERS["Pearl Towers"]!,
         comments: "Wants a sea view above floor 15. Viewing booked for next week.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(21),
         consent: true,
         createdAt: daysAgo(3),
@@ -83,7 +83,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Sabah Residence",
         ...DEVELOPERS["Sabah Residence"]!,
         comments: "Corporate purchase. Legal review of the contract is in progress.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(48),
         consent: false,
         createdAt: daysAgo(9),
@@ -100,7 +100,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Marina View",
         ...DEVELOPERS["Marina View"]!,
         comments: "Deal closed in April. Handover documents uploaded.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(9),
         consent: true,
         createdAt: daysAgo(15),
@@ -117,7 +117,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Pearl Towers",
         ...DEVELOPERS["Pearl Towers"]!,
         comments: "Negotiating the payment schedule. Wants a longer instalment plan.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(34),
         consent: true,
         createdAt: daysAgo(18),
@@ -134,7 +134,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Marina View",
         ...DEVELOPERS["Marina View"]!,
         comments: "Bought from another agency. Keep for future off-plan launches.",
-        status: "rejected",
+        status: "already_in_bitrix",
         approvedUntil: null,
         consent: false,
         createdAt: daysAgo(24),
@@ -151,7 +151,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Sabah Residence",
         ...DEVELOPERS["Sabah Residence"]!,
         comments: "Second viewing done. Waiting on mortgage pre-approval.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(15),
         consent: true,
         createdAt: daysAgo(29),
@@ -185,7 +185,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Sabah Residence",
         ...DEVELOPERS["Sabah Residence"]!,
         comments: "Investor. Interested in a bulk discount on two adjacent units.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(61),
         consent: false,
         createdAt: daysAgo(41),
@@ -202,7 +202,7 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Highland Park",
         ...DEVELOPERS["Highland Park"]!,
         comments: "Closed last quarter. Referred two friends.",
-        status: "approved",
+        status: "deal_created",
         approvedUntil: daysAhead(3),
         consent: true,
         createdAt: daysAgo(52),
@@ -236,9 +236,34 @@ export const MOCK_CLIENTS: Client[] = [
         objectOfInterest: "Highland Park",
         ...DEVELOPERS["Highland Park"]!,
         comments: "Price agreed verbally, contract being prepared.",
-        status: "rejected",
+        status: "already_in_bitrix",
         approvedUntil: null,
         consent: true,
         createdAt: daysAgo(66),
     },
 ];
+
+/**
+ * The Bitrix24 side of each fixture: every one has been checked, and one that
+ * got a deal has it to show.
+ */
+export const MOCK_CLIENTS: Client[] = FIXTURES.map((client, index) => ({
+    ...client,
+    bitrix: {
+        contactId: 90_100 + index,
+        syncState: "synced",
+        syncError: null,
+        syncedAt: daysAgo(0),
+        deal:
+            client.status === "deal_created"
+                ? {
+                      id: 41_200 + index,
+                      title: `${client.firstName} ${client.lastName} — ${client.objectOfInterest}`,
+                      stage: index % 3 === 0 ? "Бронь" : "Сделки от агентов",
+                      stageSemantics: "P",
+                      amount: null,
+                      currency: "AZN",
+                  }
+                : null,
+    },
+}));

@@ -47,6 +47,10 @@ model User {
   isActive         Boolean            @default(true)
   companyId        String?
   companyRole      CompanyMemberRole?
+  /// The broker's own contact in Bitrix24 ("Агенты"), made when the account
+  /// is; what deals link in "Агент (CRM)". Null for admins, or until Bitrix
+  /// could be reached (sign-in and the first deal try again).
+  bitrixContactId  Int?
   lastLoginAt      DateTime?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
@@ -138,14 +142,33 @@ model NewsRead {
   @@index([postId])
 }
 
-/// Values are exactly what treva-broker's `ClientStatus` type expects.
+/// Values are exactly what treva-broker's `ClientStatus` type expects — the
+/// outcome of checking the client against Bitrix24.
 enum ClientStatus {
+  /// Not checked yet — Bitrix is not configured, or could not be reached.
   pending
-  approved
-  rejected
+  /// New to Bitrix: a contact and a deal in "Сделки от агентов" were created.
+  deal_created
+  /// Bitrix already has a contact with this phone or email; no deal was made.
+  already_in_bitrix
+}
+
+/// Whether the last exchange with Bitrix24 about a client worked.
+enum BitrixSyncState {
+  /// Not sent yet — Bitrix is not configured, or the first check is still due.
+  pending
+  synced
+  /// The last attempt failed; the next read of the client retries it.
+  failed
 }
 
 /// A lead a broker registered — the lead form (873:49382) and the Clients list.
+///
+/// On registration the client is checked against Bitrix24's contacts (by phone
+/// and email). A new client becomes a contact and a deal in the "Сделки от
+/// агентов" stage; one Bitrix already knows gets no deal. `status` and the
+/// `bitrix*` columns record that outcome and mirror the deal from then on —
+/// BitrixSyncService writes them, never the panel's forms.
 model Client {
   id               String       @id @default(uuid())
   firstName        String
@@ -158,14 +181,35 @@ model Client {
   developerBrand   String       @default("")
   website          String       @default("")
   comments         String       @default("")
-  /// Set by review, never by the broker who registers the lead.
+  /// The outcome of the Bitrix check — see ClientStatus.
   status           ClientStatus @default(pending)
-  /// When an approval lapses; null unless approved.
+  /// No longer set: kept for the rows written before the Bitrix integration.
   approvedUntil    DateTime?
   /// The privacy-policy confirmation ticked on the form.
   consent          Boolean      @default(false)
   /// The broker who owns the relationship.
   brokerId         String
+
+  /// The Bitrix24 contact: the one this platform created, or — for a client
+  /// Bitrix already had — the existing one that matched.
+  bitrixContactId  Int?
+  /// The deal created for a new client; null when none was (or not yet).
+  bitrixDealId     Int?            @unique
+  /// Who the deal was assigned to — the platform takes turns between managers.
+  bitrixAssignedById Int?
+  bitrixDealTitle  String?
+  /// The deal's stage, by name — what the panel prints.
+  bitrixDealStage  String?
+  /// The stage's semantics: "P" in progress, "S" won, "F" lost.
+  bitrixDealStageSemantics String?
+  bitrixDealAmount   Float?
+  bitrixDealCurrency String?
+  bitrixSyncState  BitrixSyncState @default(pending)
+  /// Why the last push failed, for the admin; null once it succeeds.
+  bitrixSyncError  String?
+  /// When Bitrix was last read or written for this client.
+  bitrixSyncedAt   DateTime?
+
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
@@ -174,6 +218,7 @@ model Client {
   @@index([brokerId])
   @@index([status])
   @@index([createdAt])
+  @@index([bitrixSyncState])
 }
 
 /// Values are exactly what treva-broker's `DocumentKind` type expects.

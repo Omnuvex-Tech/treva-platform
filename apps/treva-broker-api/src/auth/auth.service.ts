@@ -10,6 +10,7 @@ import {
   COMPANY_NAME_TAKEN,
   CompaniesService,
 } from '../companies/companies.service';
+import { BitrixSyncService } from '../bitrix/bitrix-sync.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -114,6 +115,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly companiesService: CompaniesService,
+    private readonly bitrixSync: BitrixSyncService,
   ) {}
 
   async login({ email, password }: LoginDto): Promise<SessionResponse> {
@@ -139,6 +141,11 @@ export class AuthService {
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
+
+    // Brokers from before the Bitrix integration (or whose sync failed) get
+    // their Bitrix contact now; a no-op for everyone already there. Not
+    // awaited — signing in never waits on Bitrix.
+    void this.bitrixSync.syncBroker(user.id);
 
     return this.issueSession(user);
   }
@@ -179,6 +186,8 @@ export class AuthService {
             accountType: dto.type,
             role: isCompany ? 'top_broker' : 'broker',
             jobTitle: isCompany ? 'Company Owner' : 'Broker',
+            // Required with no database default; sign-up collects no numbers.
+            phones: [],
             // Signing up signs the account in, so it has logged in once.
             lastLoginAt: new Date(),
           },
@@ -198,6 +207,9 @@ export class AuthService {
           select: SESSION_USER_SELECT,
         });
       });
+
+      // Every broker is in Bitrix from the start, client or no client.
+      void this.bitrixSync.syncBroker(user.id);
 
       return this.issueSession(user);
     } catch (error) {

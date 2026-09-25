@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '../generated/prisma/client';
 import type { AuthUser } from '../auth/jwt.strategy';
+import { BitrixSyncService } from '../bitrix/bitrix-sync.service';
 import { PrismaService } from '../prisma/prisma.service';
 import type {
   ClientListQueryDto,
@@ -24,12 +25,21 @@ const withBroker = {
 
 type ClientRow = Prisma.ClientGetPayload<{ include: typeof withBroker }>;
 
+const ALREADY_IN_BITRIX = {
+  message:
+    'This client has already been checked in Bitrix24 and can no longer be edited here',
+  code: 'client_checked',
+} as const;
+
 /**
  * treva-broker's `Client` (apps/treva-broker/src/features/clients/types.ts):
  * dates as ISO strings and the broker's name alongside the id. Change both
  * together.
+ *
+ * Why a push to Bitrix failed is an admin's concern; a broker only learns
+ * whether their lead has reached Bitrix.
  */
-function toClient(row: ClientRow) {
+function toClient(row: ClientRow, user: AuthUser) {
   return {
     id: row.id,
     firstName: row.firstName,
@@ -47,6 +57,23 @@ function toClient(row: ClientRow) {
     approvedUntil: row.approvedUntil?.toISOString() ?? null,
     consent: row.consent,
     createdAt: row.createdAt.toISOString(),
+    bitrix: {
+      contactId: row.bitrixContactId,
+      syncState: row.bitrixSyncState,
+      syncError: user.role === 'admin' ? row.bitrixSyncError : null,
+      syncedAt: row.bitrixSyncedAt?.toISOString() ?? null,
+      deal:
+        row.bitrixDealId === null
+          ? null
+          : {
+              id: row.bitrixDealId,
+              title: row.bitrixDealTitle ?? '',
+              stage: row.bitrixDealStage ?? '',
+              stageSemantics: row.bitrixDealStageSemantics ?? 'P',
+              amount: row.bitrixDealAmount,
+              currency: row.bitrixDealCurrency,
+            },
+    },
   };
 }
 
@@ -55,34 +82,28 @@ function toClient(row: ClientRow) {
  * (src/lib/auth/permissions.ts), enforced here from the token rather than
  * trusted from the query string:
  *
- *  - a broker works their own book only;
- *  - a top broker (`clients:read_all`, `clients:assign`, `clients:delete`)
- *    works their whole team, which is their company;
- *  - an admin works every client.
+ *  - a broker and a top broker work their own leads only;
+ *  - an admin (`clients:read_all`, `clients:assign`) works every client.
+ *
+ * Registering a client checks it against Bitrix24 (BitrixSyncService): a new
+ * client gets a contact and a deal in "Сделки от агентов", one Bitrix already
+ * has gets none. The panel never writes `status`; reading a client brings its
+ * deal up to date from Bitrix.
  */
 @Injectable()
 export class ClientsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly bitrixSync: BitrixSyncService,
+  ) {}
 
-  private async scope(user: AuthUser): Promise<Prisma.ClientWhereInput> {
-    if (user.role === 'admin') return {};
-
-    if (user.role === 'top_broker') {
-      const me = await this.prisma.user.findUnique({
-        where: { id: user.id },
-        select: { companyId: true },
-      });
-
-      // A top broker outside any company has no team to see beyond themself.
-      if (me?.companyId) return { broker: { companyId: me.companyId } };
-    }
-
-    return { brokerId: user.id };
+  private scope(user: AuthUser): Prisma.ClientWhereInput {
+    return user.role === 'admin' ? {} : { brokerId: user.id };
   }
 
   private async findScoped(user: AuthUser, id: string) {
     const row = await this.prisma.client.findFirst({
-      where: { AND: [await this.scope(user), { id }] },
+      where: { AND: [this.scope(user), { id }] },
       include: withBroker,
     });
 
@@ -91,9 +112,8 @@ export class ClientsService {
   }
 
   /**
-   * The broker a lead is filed under. Everyone may keep it on themself; only a
-   * role that assigns clients may name someone else, and that someone has to
-   * be inside the caller's own scope.
+   * The broker a lead is filed under. Everyone may keep it on themself; only an
+   * admin may name someone else — anyone else would lose sight of the lead.
    */
   private async resolveBroker(
     user: AuthUser,
@@ -103,7 +123,7 @@ export class ClientsService {
     if (!requested || requested === fallback) return fallback;
     if (requested === user.id) return requested;
 
-    if (user.role === 'broker') {
+    if (user.role !== 'admin') {
       throw new ForbiddenException(
         'You cannot assign clients to other brokers',
       );
@@ -111,33 +131,14 @@ export class ClientsService {
 
     const broker = await this.prisma.user.findUnique({
       where: { id: requested },
-      select: { id: true, companyId: true, isActive: true },
+      select: { id: true, isActive: true },
     });
 
     if (!broker?.isActive) {
       throw new BadRequestException('That broker does not exist');
     }
 
-    if (user.role === 'top_broker') {
-      const me = await this.prisma.user.findUnique({
-        where: { id: user.id },
-        select: { companyId: true },
-      });
-
-      if (!me?.companyId || me.companyId !== broker.companyId) {
-        throw new ForbiddenException(
-          'You can only assign clients within your team',
-        );
-      }
-    }
-
     return broker.id;
-  }
-
-  private assertCanReview(user: AuthUser, status: string | undefined) {
-    if (status !== undefined && user.role !== 'admin') {
-      throw new ForbiddenException('Only an admin can change a lead’s status');
-    }
   }
 
   async list(user: AuthUser, query: ClientListQueryDto) {
@@ -147,7 +148,7 @@ export class ClientsService {
 
     const where: Prisma.ClientWhereInput = {
       AND: [
-        await this.scope(user),
+        this.scope(user),
         query.status ? { status: query.status } : {},
         query.brokerId ? { brokerId: query.brokerId } : {},
         search
@@ -182,8 +183,22 @@ export class ClientsService {
       this.prisma.client.count({ where }),
     ]);
 
+    // Bring the page on screen up to date with Bitrix, then read it again.
+    // (The status filter above ran on the previous mirror; the next load
+    // catches any client whose status just moved.)
+    const ids = rows.map((row) => row.id);
+    await this.bitrixSync.refresh(ids);
+    const fresh = new Map(
+      (
+        await this.prisma.client.findMany({
+          where: { id: { in: ids } },
+          include: withBroker,
+        })
+      ).map((row) => [row.id, row]),
+    );
+
     return {
-      items: rows.map(toClient),
+      items: rows.map((row) => toClient(fresh.get(row.id) ?? row, user)),
       page,
       perPage,
       total,
@@ -192,15 +207,12 @@ export class ClientsService {
   }
 
   async detail(user: AuthUser, id: string) {
-    return toClient(await this.findScoped(user, id));
+    const row = await this.findScoped(user, id);
+    await this.bitrixSync.refresh([row.id]);
+    return toClient(await this.findScoped(user, id), user);
   }
 
   async create(user: AuthUser, dto: CreateClientDto) {
-    // "Submit for approval": a lead always starts under review, whoever sends it.
-    if (dto.status !== undefined && dto.status !== 'pending') {
-      this.assertCanReview(user, dto.status);
-    }
-
     if (!dto.consent) {
       throw new BadRequestException({
         message: 'Confirm the client acknowledged the Privacy policy',
@@ -222,22 +234,28 @@ export class ClientsService {
         website: dto.website,
         comments: dto.comments,
         consent: dto.consent,
-        status: dto.status ?? 'pending',
+        // Pending until Bitrix has been checked, straight after this insert.
+        status: 'pending',
         brokerId,
       },
       include: withBroker,
     });
 
-    return toClient(row);
+    // Checked straight away; should Bitrix be unreachable the client is kept
+    // as `pending`, and the next read of it tries again.
+    await this.bitrixSync.push(row.id);
+
+    return toClient(await this.findScoped(user, row.id), user);
   }
 
   async update(user: AuthUser, id: string, dto: UpdateClientDto) {
     const existing = await this.findScoped(user, id);
 
-    // The edit form sends the status it loaded; only a change is a review.
-    const statusChanges =
-      dto.status !== undefined && dto.status !== existing.status;
-    if (statusChanges) this.assertCanReview(user, dto.status);
+    // Once the Bitrix check has run — deal created or client already there —
+    // Bitrix owns the record; only a client still waiting can be corrected.
+    if (existing.status !== 'pending') {
+      throw new ForbiddenException(ALREADY_IN_BITRIX);
+    }
 
     if (dto.consent === false) {
       throw new BadRequestException({
@@ -266,19 +284,12 @@ export class ClientsService {
         comments: dto.comments,
         consent: dto.consent,
         brokerId,
-        ...(statusChanges
-          ? {
-              status: dto.status,
-              // An approval outside this form carries its own date; leaving
-              // "approved" drops it.
-              ...(dto.status === 'approved' ? {} : { approvedUntil: null }),
-            }
-          : {}),
       },
-      include: withBroker,
     });
 
-    return toClient(row);
+    await this.bitrixSync.push(row.id);
+
+    return toClient(await this.findScoped(user, row.id), user);
   }
 
   async remove(user: AuthUser, id: string) {
@@ -292,7 +303,7 @@ export class ClientsService {
     if (!unique.length) return;
 
     const where: Prisma.ClientWhereInput = {
-      AND: [await this.scope(user), { id: { in: unique } }],
+      AND: [this.scope(user), { id: { in: unique } }],
     };
 
     const visible = await this.prisma.client.count({ where });

@@ -62,12 +62,12 @@ export async function create(input: ClientInput): Promise<Client> {
         developerBrand: input.developerBrand,
         website: input.website,
         comments: input.comments,
-        // The form's action is "Submit for approval", so a new lead always
-        // starts under review — never approved by the broker who created it.
-        status: input.status ?? "pending",
+        // Pending until the API has checked Bitrix24 for this client.
+        status: "pending",
         approvedUntil: null,
         consent: input.consent,
         createdAt: new Date().toISOString(),
+        bitrix: { contactId: null, syncState: "pending", syncError: null, syncedAt: null, deal: null },
     };
 
     clients = [client, ...clients];

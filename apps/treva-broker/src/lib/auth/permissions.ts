@@ -80,16 +80,16 @@ const BROKER_PERMISSIONS: readonly Permission[] = [
 ];
 
 /**
- * A top broker owns a team: team-wide visibility plus team management.
+ * A top broker owns a team: team management on top of the broker's baseline.
  *
  * Note what is NOT here: news writes. The News Feed artboard for this role has
- * no management affordances — publishing is an admin activity.
+ * no management affordances — publishing is an admin activity. Nor
+ * `clients:read_all` / `clients:assign`: every non-admin sees only the leads
+ * they registered themselves; only an admin sees (and reassigns) them all.
  */
 const TOP_BROKER_PERMISSIONS: readonly Permission[] = [
     ...BROKER_PERMISSIONS,
-    "clients:read_all",
     "clients:delete",
-    "clients:assign",
     "brokers:create",
     "brokers:update",
     "finance:read_all",

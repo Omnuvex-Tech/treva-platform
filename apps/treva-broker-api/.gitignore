@@ -1,0 +1,2 @@
+# Machine-local secrets (the Bitrix24 webhook) — never committed.
+.env.local

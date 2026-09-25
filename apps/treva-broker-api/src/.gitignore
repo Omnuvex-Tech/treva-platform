@@ -1,0 +1,3 @@
+# The root .gitignore drops every folder named "uploads" (runtime files).
+# This one is source code, the API's upload module, so it is kept.
+!uploads/

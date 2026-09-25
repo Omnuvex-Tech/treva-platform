@@ -16,7 +16,9 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
-    ConfigModule.forRoot({ isGlobal: true }),
+    // .env.local (git-ignored) holds machine-local secrets such as the Bitrix24
+    // webhook; everything else comes from the committed .env.<mode> files.
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env.local'] }),
     PrismaModule,
     CompaniesModule,
     AuthModule,
