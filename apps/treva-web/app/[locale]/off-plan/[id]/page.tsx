@@ -347,6 +347,15 @@ export default function ApartmentCard() {
           '')
     ).trim();
   const locationLabel = contractAddressValue ? t.contractAddress : t.location;
+  // A unit's own `numberOfFloors` is the floor(s) it sits on; the building's
+  // height comes from its house when there is one.
+  const houseTopFloor = layout?.house?.numberOfFloors?.end;
+  const numberOfFloorsValue =
+    typeof houseTopFloor === 'number'
+      ? `${houseTopFloor}`
+      : layout?.numberOfFloors?.start && layout?.numberOfFloors?.end && layout.numberOfFloors.end !== layout.numberOfFloors.start
+        ? `${layout.numberOfFloors.start} - ${layout.numberOfFloors.end}`
+        : `${layout?.numberOfFloors?.start ?? layout?.numberOfFloors?.end ?? ''}`;
 
   const galleryItems = (() => {
     const items: Array<{ url: string; alt?: string }> = [];
@@ -740,7 +749,7 @@ export default function ApartmentCard() {
             <nav className="apt-breadcrumbs">
               <Link href={`/${locale}`}>{t.main}</Link> <span className="apt-separator">/</span>
               <Link href={`/${locale}/off-plan?category=${layout.category?.slug || ''}`}>{layout.category?.title || t.offPlan}</Link> <span className="apt-separator">/</span>
-              <span className="apt-crumb-active">N° {layout.number || layout.id.slice(-2)}</span>
+              <span className="apt-crumb-active">N° {layout.unitCode || layout.id.slice(-2)}</span>
             </nav>
 
             {/* Main Container */}
@@ -883,12 +892,13 @@ export default function ApartmentCard() {
                     <span className="apt-label">{t.internalArea}</span>
                     <span className="apt-value">{layout.internalArea} m²</span>
                   </div>
-                  {layout.balconyArea && (
+                  {/* A ternary, not &&: a 0 m² balcony would otherwise render "0". */}
+                  {layout.balconyArea ? (
                     <div className="apt-spec-item">
                       <span className="apt-label">{t.balcony}</span>
                       <span className="apt-value">{layout.balconyArea} m²</span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="apt-footer">
@@ -1110,11 +1120,7 @@ export default function ApartmentCard() {
                 </div>
                 <div className="panorama-row">
                   <span className="panorama-label">{t.numberOfFloors}</span>
-                  <span className="panorama-value">
-                    {layout.numberOfFloors?.start && layout.numberOfFloors?.end && layout.numberOfFloors.end !== layout.numberOfFloors.start
-                      ? `${layout.numberOfFloors.start} - ${layout.numberOfFloors.end}`
-                      : `${layout.numberOfFloors?.start ?? layout.numberOfFloors?.end ?? ''}`}
-                  </span>
+                  <span className="panorama-value">{numberOfFloorsValue}</span>
                 </div>
               </div>
             </section>

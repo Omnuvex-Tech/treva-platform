@@ -43,6 +43,7 @@ export interface UnitLayoutHouse {
     location?: UnitLayoutLocation | null;
     locationTitle?: string | null;
     contractAddress?: string | null;
+    numberOfFloors?: UnitLayoutNumberOfFloors | null;
 }
 
 export interface UnitLayout {
@@ -53,6 +54,8 @@ export interface UnitLayout {
     status?: string;
     floor: number;
     number?: number;
+    // Apartment number, e.g. "B1-2303". `number` is the room count.
+    unitCode?: string | null;
     entrance?: string;
     totalArea: number;
     internalArea: number;

@@ -1324,7 +1324,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     <input
                                         className={inputClass}
                                         type="number"
-                                        step="0.1"
+                                        step="any"
                                         value={form.area ?? ""}
                                         onChange={(e) => updateField("area", parseFloat(e.target.value) || undefined)}
                                         placeholder="60.5"
@@ -1336,7 +1336,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     <input
                                         className={inputClass}
                                         type="number"
-                                        step="0.1"
+                                        step="any"
                                         value={form.grossArea ?? ""}
                                         onChange={(e) => updateField("grossArea", parseFloat(e.target.value) || undefined)}
                                         placeholder="67"
@@ -1348,7 +1348,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                     <input
                                         className={inputClass}
                                         type="number"
-                                        step="0.1"
+                                        step="any"
                                         value={form.ceilingHeight ?? ""}
                                         onChange={(e) => updateField("ceilingHeight", parseFloat(e.target.value) || undefined)}
                                         placeholder="2.8"
@@ -1377,6 +1377,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                         <input
                                                             className={inputClass}
                                                             type="number"
+                                                            step="any"
                                                             value={existingPrice?.priceTotal ?? ""}
                                                             onChange={(e) => {
                                                                 if (!cur.id) {
@@ -1410,6 +1411,7 @@ export function ApartmentForm({ embedded = false }: { embedded?: boolean } = {})
                                                         <input
                                                             className={inputClass}
                                                             type="number"
+                                                            step="any"
                                                             value={existingPrice?.priceByArea ?? ""}
                                                             onChange={(e) => {
                                                                 if (!cur.id) {

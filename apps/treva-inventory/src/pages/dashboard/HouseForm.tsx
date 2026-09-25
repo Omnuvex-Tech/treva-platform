@@ -4,30 +4,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FormDropdown } from "@repo/ui";
 import { IoClose } from "react-icons/io5";
 import { FiClock, FiGift, FiRefreshCcw, FiStar, FiTag } from "react-icons/fi";
-import { housesApi, type CreateHouseData } from "../../api/houses";
+import { housesApi, type CreateHouseData, type HouseTag, type HouseTagIcon, type UpdateHouseData } from "../../api/houses";
 import { categoriesApi, type Category } from "../../api/categories";
 import { typeOfBuildingOptionsApi, type TypeOfBuildingOption } from "../../api/type-of-building-options";
 import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { DatePickerField } from "../../components/DatePickerField";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { getApiErrorMessage } from "../../utils/apiError";
-
-const STATIC_TYPE_OF_BUILDING_OPTIONS = [
-    { id: "Residential building", label: "Residential building" },
-    { id: "Apartment block", label: "Apartment block" },
-    { id: "Villa complex", label: "Villa complex" },
-    { id: "Townhouse", label: "Townhouse" },
-    { id: "Business center", label: "Business center" },
-    { id: "Mixed-use building", label: "Mixed-use building" },
-];
-
-const STATIC_CONSTRUCTION_STAGE_OPTIONS = [
-    { id: "Planning", label: "Planning" },
-    { id: "Foundation", label: "Foundation" },
-    { id: "Under construction", label: "Under construction" },
-    { id: "Finishing", label: "Finishing" },
-    { id: "Ready", label: "Ready" },
-];
+import { ProfitbaseNotice } from "../../components/ProfitbaseNotice";
+import { CONSTRUCTION_STAGE_OPTIONS, TYPE_OF_BUILDING_OPTIONS, withCurrentOption } from "../../utils/offplanOptions";
 
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#A3A3A3] outline-none transition-colors focus:border-[#C8CDD8]";
@@ -43,16 +28,6 @@ const yearOptions = Array.from({ length: 12 }, (_, i) => ({
     id: String(2024 + i),
     label: String(2024 + i),
 }));
-
-type HouseTagIcon = "star" | "tag" | "refresh" | "gift" | "clock";
-
-type HouseTag = {
-    id: string;
-    text: string;
-    color: string;
-    icon: HouseTagIcon;
-    enabled: boolean;
-};
 
 const TAG_COLOR_OPTIONS = [
     "#06B6D4",
@@ -189,7 +164,7 @@ export function HouseForm({
     );
     const mergedTypeOfBuildingOptions = useMemo(() => {
         const apiOptions = typeOfBuildingOptions.map((item) => ({ id: item.value, label: item.value }));
-        const combined = [...STATIC_TYPE_OF_BUILDING_OPTIONS, ...apiOptions];
+        const combined = [...TYPE_OF_BUILDING_OPTIONS, ...apiOptions];
 
         return combined.filter((option, index, array) =>
             array.findIndex((item) => item.id === option.id) === index
@@ -215,6 +190,7 @@ export function HouseForm({
             contractAddress: existingHouse.contractAddress || "",
             showroomAvailability: existingHouse.showroomAvailability || "",
         });
+        setHouseTags(Array.isArray(existingHouse.tags) ? existingHouse.tags : []);
         setSlugManuallyEdited(Boolean(existingHouse.slug));
     }, [existingHouse, isEditMode]);
 
@@ -285,11 +261,12 @@ export function HouseForm({
     };
 
     const mutation = useMutation({
-        mutationFn: (data: CreateHouseData) => {
+        mutationFn: (data: UpdateHouseData) => {
             if (isEditMode && houseId) {
                 return housesApi.update(houseId, data);
             }
-            return housesApi.create(data);
+            // handleSubmit adds the create-only defaults, so a new house is complete.
+            return housesApi.create(data as CreateHouseData);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["houses"] });
@@ -328,39 +305,52 @@ export function HouseForm({
             (existingHouse as any)?.completionYear ??
             2030;
 
+        // The form only edits the fields below. The rest of a house (floors,
+        // prices, status...) is filled by the Profitbase sync, so it gets
+        // placeholder values on create and is left untouched on edit.
+        const createOnlyDefaults = isEditMode
+            ? {}
+            : {
+                  status: "available" as const,
+                  floor: 1,
+                  totalArea: 0,
+                  internalArea: 0,
+                  balconyArea: 0,
+                  prices: {},
+                  numberOfFloors: { start: 1, end: 1 },
+                  similarApartmentIds: [],
+                  heatingTypeIds: [],
+                  attributeIds: [],
+              };
+
+        // A cleared field is sent as null on edit so the API clears it.
+        const text = (value: string) => value.trim() || (isEditMode ? null : undefined);
+
         mutation.mutate({
-            categoryId,
+            ...createOnlyDefaults,
             title: form.name.trim(),
             name: form.name.trim(),
-            slug: form.slug.trim() || slugify(form.name),
-            status: "available",
-            floor: 1,
-            number: Number.isFinite(parsedHouseNumber) ? parsedHouseNumber : 1,
-            totalArea: 0,
-            internalArea: 0,
-            balconyArea: 0,
-            prices: {},
-            completionYear,
-            numberOfFloors: { start: 1, end: 1 },
-            similarApartmentIds: [],
+            typeOfBuilding: form.typeOfBuilding,
             mainImage: form.image.trim() ? { url: form.image.trim(), alt: form.name.trim() || "House" } : undefined,
+            categoryId,
+            slug: form.slug.trim() || slugify(form.name),
+            ...(Number.isFinite(parsedHouseNumber)
+                ? { number: parsedHouseNumber }
+                : isEditMode
+                  ? {}
+                  : { number: 1 }),
+            completionYear,
             gallery: existingHouse?.gallery || [],
             documents: existingHouse?.documents || [],
-            location: undefined,
-            locationTitle: undefined,
-            locationUrl: undefined,
-            locationGoogleMapsUrl: undefined,
-            heatingTypeIds: [],
-            attributeIds: [],
-            street: form.street.trim() || undefined,
-            houseNumber: form.houseNumber.trim() || undefined,
-            typeOfBuilding: form.typeOfBuilding,
-            constructionStage: form.constructionStage || undefined,
-            deadlineForCommissioning: form.deadlineForCommissioning || undefined,
-            salesOffice: form.salesOffice.trim() || undefined,
-            landCadastralNumber: form.landCadastralNumber.trim() || undefined,
-            contractAddress: form.contractAddress.trim() || undefined,
-            showroomAvailability: form.showroomAvailability.trim() || undefined,
+            street: text(form.street),
+            houseNumber: text(form.houseNumber),
+            constructionStage: text(form.constructionStage),
+            deadlineForCommissioning: text(form.deadlineForCommissioning),
+            salesOffice: text(form.salesOffice),
+            landCadastralNumber: text(form.landCadastralNumber),
+            contractAddress: text(form.contractAddress),
+            showroomAvailability: text(form.showroomAvailability),
+            tags: houseTags,
         });
     };
 
@@ -382,7 +372,7 @@ export function HouseForm({
     return (
         <form onSubmit={handleSubmit} className="rounded-[28px] border border-[#E9ECF2] bg-white p-6 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
             <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-[22px] font-medium text-[#1A1A1A]">Making a home</h3>
+                <h3 className="text-[22px] font-medium text-[#1A1A1A]">{isEditMode ? "Edit house" : "Add house"}</h3>
                 {!embedded ? (
                     <button
                         type="button"
@@ -393,6 +383,11 @@ export function HouseForm({
                     </button>
                 ) : null}
             </div>
+
+            <ProfitbaseNotice record={existingHouse}>
+                A Transfer overwrites the name, type of building, image, floors, prices and archived state with Profitbase&apos;s values, and the
+                construction stage and commissioning deadline when Profitbase has them.
+            </ProfitbaseNotice>
 
             {!activeCategorySlug ? (
                 <div className="mb-4">
@@ -437,24 +432,26 @@ export function HouseForm({
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                        <label className="mb-1 block text-xs text-[#4E525D]">House name *</label>
-                        <input
-                            className={inputClass}
-                            value={form.name}
-                            onChange={(e) => updateField("name", e.target.value)}
-                            placeholder="Enter house name"
-                        />
-                    </div>
-                    <div>
-                        <FormDropdown
-                            label="Type of building"
-                            required
-                            value={form.typeOfBuilding}
-                            options={mergedTypeOfBuildingOptions}
-                            onChange={(id) => updateField("typeOfBuilding", id)}
-                            placeholder="Select type"
-                        />
+                    <div className="grid gap-4 md:col-span-2 md:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-xs text-[#4E525D]">House name *</label>
+                            <input
+                                className={inputClass}
+                                value={form.name}
+                                onChange={(e) => updateField("name", e.target.value)}
+                                placeholder="Enter house name"
+                            />
+                        </div>
+                        <div>
+                            <FormDropdown
+                                label="Type of building"
+                                required
+                                value={form.typeOfBuilding}
+                                options={withCurrentOption(mergedTypeOfBuildingOptions, form.typeOfBuilding)}
+                                onChange={(id) => updateField("typeOfBuilding", id)}
+                                placeholder="Select type"
+                            />
+                        </div>
                     </div>
                     <div>
                         <label className="mb-1 block text-xs text-[#4E525D]">Street</label>
@@ -472,7 +469,7 @@ export function HouseForm({
                     <FormDropdown
                         label="Construction stage"
                         value={form.constructionStage}
-                        options={STATIC_CONSTRUCTION_STAGE_OPTIONS}
+                        options={withCurrentOption(CONSTRUCTION_STAGE_OPTIONS, form.constructionStage)}
                         onChange={(id) => updateField("constructionStage", id)}
                         placeholder="Select stage"
                     />

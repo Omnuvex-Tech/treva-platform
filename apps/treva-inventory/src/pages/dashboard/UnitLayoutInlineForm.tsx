@@ -1,7 +1,17 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { unitLayoutsApi, type CreateUnitLayoutData, type UnitLayoutStatus } from "../../api/unit-layouts";
+import { unitLayoutsApi, type CreateUnitLayoutData, type UnitLayoutStatus, type UpdateUnitLayoutData } from "../../api/unit-layouts";
+import { ProfitbaseNotice } from "../../components/ProfitbaseNotice";
+import {
+    CONSTRUCTION_STAGE_OPTIONS,
+    FURNISHING_OPTIONS,
+    REAL_ESTATE_TYPE_OPTIONS,
+    RENOVATION_OPTIONS,
+    withCurrentOption,
+    type UnitFurnishing,
+    type UnitRenovation,
+} from "../../utils/offplanOptions";
 import { unitTypeOptionsApi, type UnitTypeOption } from "../../api/unit-type-options";
 import { attributesApi, type Attribute } from "../../api/attributes";
 import { categoriesApi, type Category } from "../../api/categories";
@@ -118,6 +128,23 @@ const toNumberOrUndefined = (...values: unknown[]) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : (undefined as unknown as number);
 };
+
+// Number inputs: an empty box is "no value", but 0 and negative numbers are
+// real values (studios have 0 rooms, parkings sit on floor -1).
+const parseIntegerInput = (raw: string) => {
+    if (raw.trim() === "") return undefined;
+    const parsed = parseInt(raw, 10);
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const parseDecimalInput = (raw: string) => {
+    if (raw.trim() === "") return undefined;
+    const parsed = parseFloat(raw);
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const MIN_FLOOR = -20;
+const MAX_FLOOR = 999;
 
 export function HouseForm({
     embedded = false,
@@ -282,20 +309,29 @@ export function HouseForm({
             unitTypeOptionId: "",
             realEstateType: "",
             status: "available" as UnitLayoutStatus,
-            floorFrom: undefined as unknown as number,
-            floorTo: undefined as unknown as number,
-            roomCount: undefined as unknown as number,
+            floorFrom: undefined as number | undefined,
+            floorTo: undefined as number | undefined,
+            roomCount: undefined as number | undefined,
             attributeIds: [] as string[],
-            totalArea: undefined as unknown as number,
-            internalArea: undefined as unknown as number,
-            balconyArea: undefined as unknown as number,
+            totalArea: undefined as number | undefined,
+            internalArea: undefined as number | undefined,
+            balconyArea: undefined as number | undefined,
             prices: [] as { currencyId: string; priceTotal?: number; priceByArea?: number }[],
             image: "",
             coverImage: "",
             gallery: [] as { url: string; alt?: string }[],
             entrance: "",
+            unitCode: "",
+            constructionStage: "",
+            completionYear: undefined as number | undefined,
+            renovation: "" as UnitRenovation | "",
+            furnishing: "" as UnitFurnishing | "",
             description: "",
         });
+
+    // Units imported from Profitbase are edited like any other unit, but may
+    // lack the area, price or image Profitbase never had.
+    const isSynced = Boolean(existingHouseData?.externalId);
 
     useEffect(() => {
         if (existingHouseData && isEditMode) {
@@ -338,7 +374,9 @@ export function HouseForm({
                 ),
                 realEstateType: house.realEstateType || "",
                 status: (((firstValue(house.status, house.statusId) as string) || "available") as UnitLayoutStatus),
-                floorFrom: toNumberOrUndefined(house.floorFrom, house.numberOfFloors?.start, house.floor),
+                // `floor` is the unit's own floor; `numberOfFloors` held the whole
+                // building's range on units synced before the fix, so it must not win.
+                floorFrom: toNumberOrUndefined(house.floorFrom, house.floor, house.numberOfFloors?.start),
                 floorTo: toNumberOrUndefined(house.floorTo, house.numberOfFloors?.end, house.floor),
                 roomCount: toNumberOrUndefined(house.roomCount, house.numberOfRooms, house.number),
                 attributeIds: house.attributeIds || house.similarApartmentIds || [],
@@ -350,6 +388,11 @@ export function HouseForm({
                     coverImage: house.coverImage?.url || "",
                 gallery: (house.gallery || []).map((g: any) => ({ url: g.url, alt: g.alt })),
                 entrance: house.entrance || "",
+                unitCode: house.unitCode || "",
+                constructionStage: house.constructionStage || "",
+                completionYear: toNumberOrUndefined(house.completionYear),
+                renovation: house.renovation || "",
+                furnishing: house.furnishing || "",
                 description: house.description || "",
             });
             setSlugManuallyEdited(Boolean(house.slug));
@@ -377,11 +420,12 @@ export function HouseForm({
     };
 
     const createMutation = useMutation({
-        mutationFn: (data: CreateUnitLayoutData) => {
+        mutationFn: (data: UpdateUnitLayoutData) => {
             if (isEditMode && houseId) {
                 return unitLayoutsApi.update(houseId, data);
             }
-            return unitLayoutsApi.create(data);
+            // handleSubmit sends every required field for a new unit.
+            return unitLayoutsApi.create(data as CreateUnitLayoutData);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["unit-layouts"] });
@@ -432,15 +476,26 @@ export function HouseForm({
                 if (!categoryId) errors.push("Object is required");
                 if (!form.name?.trim()) errors.push("Name is required");
                 if (!form.title?.trim()) errors.push("Title is required");
-                if (!form.unitTypeOptionId) errors.push("Unit type is required");
-                if (!form.floorFrom || form.floorFrom < 1) errors.push("Floor From is required");
-                if (form.floorFrom && form.floorFrom > 999) errors.push("Floor From must be â‰¤ 999");
-                if (form.floorTo && form.floorTo < 1) errors.push("Floor To must be â‰¥ 1");
-                if (form.floorTo && form.floorTo > 999) errors.push("Floor To must be â‰¤ 999");
-                if (form.roomCount && form.roomCount < 1) errors.push("Room Count must be â‰¥ 1");
-                if (form.roomCount && form.roomCount > 999) errors.push("Room Count must be â‰¤ 999");
+                if (form.floorFrom === undefined) errors.push("Floor From is required");
+                if (form.floorFrom !== undefined && (form.floorFrom < MIN_FLOOR || form.floorFrom > MAX_FLOOR)) {
+                    errors.push(`Floor From must be between ${MIN_FLOOR} and ${MAX_FLOOR}`);
+                }
+                if (form.floorTo !== undefined && (form.floorTo < MIN_FLOOR || form.floorTo > MAX_FLOOR)) {
+                    errors.push(`Floor To must be between ${MIN_FLOOR} and ${MAX_FLOOR}`);
+                }
+                if (form.floorFrom !== undefined && form.floorTo !== undefined && form.floorTo < form.floorFrom) {
+                    errors.push("Floor To can't be below Floor From");
+                }
+                if (form.roomCount !== undefined && (form.roomCount < 0 || form.roomCount > 999)) {
+                    errors.push("Room Count must be between 0 and 999");
+                }
+                if (form.completionYear !== undefined && (form.completionYear < 1900 || form.completionYear > 2100)) {
+                    errors.push("Completion year must be between 1900 and 2100");
+                }
                 break;
             case "area":
+                // Profitbase has no area or price for some units (sold ones).
+                if (isSynced) break;
                 if (!form.totalArea || form.totalArea <= 0) errors.push("Total Area is required");
                 if (!form.prices || form.prices.length === 0) {
                     errors.push("At least one currency price is required");
@@ -448,11 +503,12 @@ export function HouseForm({
                     const hasAnyTotal = form.prices.some((p) => p.priceTotal && p.priceTotal > 0);
                     const hasAnyPerArea = form.prices.some((p) => p.priceByArea && p.priceByArea > 0);
                     if (!hasAnyTotal) errors.push("Price Total is required");
-                    if (!hasAnyPerArea) errors.push("Price per mÂ² is required");
+                    if (!hasAnyPerArea) errors.push("Price per m² is required");
                 }
                 break;
             case "gallery":
-                if (!form.image?.trim()) errors.push("Main Image is required");
+                // Profitbase has no plan image for some units; don't block them.
+                if (!isSynced && !form.image?.trim()) errors.push("Main Image is required");
                 break;
             case "seo":
                 if (!form.slug?.trim()) errors.push("Slug is required");
@@ -560,49 +616,54 @@ export function HouseForm({
             pricesRecord[cur?.value || p.currencyId] = p.priceTotal;
         }
 
-        const seoTitle = normalizeOptionalText(form.seoTitle);
-        const seoDescription = normalizeOptionalText(form.seoDescription);
-        const seoKeywords = normalizeOptionalText(form.seoKeywords);
-        const canonicalUrl = normalizeOptionalText(form.canonicalUrl);
-        const seoImage = normalizeOptionalText(form.seoImage);
-        const entrance = normalizeOptionalText(form.entrance);
-        const realEstateType = normalizeOptionalText(form.realEstateType);
+        // A cleared field is left out of a new unit and sent as null on an edit,
+        // so the API clears it. The API client trims text fields the same way.
+        const emptyAs = isEditMode ? null : undefined;
         const houseIdValue = parentHouseId || existingHouseData?.houseId || undefined;
-        const descriptionValue = normalizeOptionalText(form.description);
 
-        const submitData: CreateUnitLayoutData = {
+        const panelFields: UpdateUnitLayoutData = {
             title: form.title,
             name: form.name,
             slug: normalizeOptionalText(form.slug) || "",
-            categoryId,
-            floor: form.floorFrom,
-            totalArea: form.totalArea,
-            internalArea: form.internalArea || form.totalArea,
-            balconyArea: form.balconyArea || 0,
-            prices: pricesRecord,
-            completionYear: existingHouseData?.completionYear || new Date().getFullYear(),
-            numberOfFloors: { start: form.floorFrom, end: form.floorTo || form.floorFrom },
-            similarApartmentIds: form.attributeIds,
+            seoTitle: form.seoTitle,
+            seoDescription: form.seoDescription,
+            seoKeywords: form.seoKeywords,
+            canonicalUrl: form.canonicalUrl,
+            seoImage: form.seoImage,
+            description: normalizeOptionalText(form.description) ?? emptyAs,
             attributeIds: form.attributeIds,
-            heatingTypeIds: [],
             ...(form.image ? { mainImage: { url: form.image } } : {}),
             ...(form.coverImage ? { coverImage: { url: form.coverImage } } : {}),
             gallery: form.gallery,
-            status: (form.status || "available") as UnitLayoutStatus,
-            ...(seoTitle ? { seoTitle } : {}),
-            ...(seoDescription ? { seoDescription } : {}),
-            ...(seoKeywords ? { seoKeywords } : {}),
-            ...(canonicalUrl ? { canonicalUrl } : {}),
-            ...(seoImage ? { seoImage } : {}),
-            ...(houseIdValue ? { houseId: houseIdValue } : {}),
-            ...(entrance ? { entrance } : {}),
-            ...(realEstateType ? { realEstateType } : {}),
-            ...(form.roomCount ? { number: form.roomCount } : {}),
-            ...(form.unitTypeOptionId ? { unitTypeOptionId: form.unitTypeOptionId } : {}),
-            ...(descriptionValue ? { description: descriptionValue } : {}),
         };
 
-        createMutation.mutate(submitData);
+        // Validated above: every unit has a floor, and a manual one a total area.
+        const floorFrom = form.floorFrom as number;
+        const totalArea = form.totalArea ?? 0;
+
+        createMutation.mutate({
+            ...panelFields,
+            categoryId,
+            ...(houseIdValue ? { houseId: houseIdValue } : {}),
+            status: (form.status || "available") as UnitLayoutStatus,
+            unitTypeOptionId: form.unitTypeOptionId || emptyAs,
+            realEstateType: form.realEstateType,
+            entrance: form.entrance,
+            unitCode: form.unitCode,
+            constructionStage: form.constructionStage,
+            renovation: form.renovation || emptyAs,
+            furnishing: form.furnishing || emptyAs,
+            floor: floorFrom,
+            numberOfFloors: { start: floorFrom, end: form.floorTo ?? floorFrom },
+            number: form.roomCount ?? emptyAs,
+            totalArea,
+            internalArea: form.internalArea ?? totalArea,
+            balconyArea: form.balconyArea ?? 0,
+            prices: pricesRecord,
+            completionYear: form.completionYear ?? existingHouseData?.completionYear ?? new Date().getFullYear(),
+            // Neither is edited in this form: start empty, and keep them on edit.
+            ...(isEditMode ? {} : { similarApartmentIds: [], heatingTypeIds: [] }),
+        });
     };
 
     const inputClass =
@@ -834,6 +895,11 @@ export function HouseForm({
                     </h4>
                 </div>
 
+                <ProfitbaseNotice record={existingHouseData}>
+                    A Transfer overwrites the unit type, status, archived state, floor, rooms, areas, prices and finishing with
+                    Profitbase&apos;s values, and the images when Profitbase has a floor plan for this unit.
+                </ProfitbaseNotice>
+
                 <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
                 {TABS.map((tab) => {
                     return (
@@ -862,7 +928,7 @@ export function HouseForm({
                                         <div className="rounded-[24px] border border-[#ECEEF2] bg-[#FBFCFD] p-4">
                                             <div className="space-y-4">
                                                 <ImageAssetCard
-                                                    label="Main Image *"
+                                                    label={isSynced ? "Main Image" : "Main Image *"}
                                                     description="Primary thumbnail used in cards and quick unit layout views."
                                                     alt="Main"
                                                     imageUrl={form.image || null}
@@ -926,7 +992,7 @@ export function HouseForm({
                                         </div>
                                         <div className="space-y-4">
                                             {shouldSelectCategory ? (
-                                                <div>
+                                                <div className="min-w-0">
                                                     <FormDropdown
                                                         label="Object *"
                                                         value={selectedCategoryId}
@@ -961,97 +1027,143 @@ export function HouseForm({
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="grid gap-4 lg:grid-cols-2">
-                                                <FormDropdown
-                                                    label="Unit type *"
-                                                    value={form.unitTypeOptionId || ""}
-                                                    options={dropdownOptions(unitTypes, form.unitTypeOptionId || "", (t) => ({ id: t.id, label: t.title }))}
-                                                    placeholder="Select unit type"
-                                                    onChange={(id) => updateField("unitTypeOptionId", id)}
-                                                    createLabel="Create unit type"
-                                                    onCreateClick={() => setIsUnitTypeModalOpen(true)}
-                                                />
-                                                <div>
-                                                    <label className="mb-1 block text-xs text-[#4E525D]">Entrance (optional)</label>
-                                                    <input
-                                                        className={inputClass}
-                                                        type="text"
-                                                        value={form.entrance ?? ""}
-                                                        onChange={(e) => updateField("entrance", e.target.value)}
-                                                        placeholder="A"
+                                            <div className="space-y-4">
+                                                <div className="grid gap-4 lg:grid-cols-2">
+                                                    <FormDropdown
+                                                        label="Unit type"
+                                                        value={form.unitTypeOptionId || ""}
+                                                        options={dropdownOptions(unitTypes, form.unitTypeOptionId || "", (t) => ({ id: t.id, label: t.title }))}
+                                                        placeholder="Not specified"
+                                                        onChange={(id) => updateField("unitTypeOptionId", id)}
+                                                        createLabel="Create unit type"
+                                                        onCreateClick={() => setIsUnitTypeModalOpen(true)}
+                                                    />
+                                                    <FormDropdown
+                                                        label="Real estate type"
+                                                        value={form.realEstateType || ""}
+                                                        options={withCurrentOption(REAL_ESTATE_TYPE_OPTIONS, form.realEstateType)}
+                                                        placeholder="Not specified"
+                                                        onChange={(id) => updateField("realEstateType", id)}
                                                     />
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-xs text-[#4E525D]">Real estate type (optional)</label>
-                                                <input
-                                                    className={inputClass}
-                                                    type="text"
-                                                    value={form.realEstateType ?? ""}
-                                                    onChange={(e) => updateField("realEstateType", e.target.value)}
-                                                    placeholder="apartment"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Status</label>
-                                                <div className="grid grid-cols-3 gap-2">
-                                                    {UNIT_LAYOUT_STATUS_BUTTONS.map((option) => {
-                                                        const isSelected = (form.status || "available") === option.id;
-                                                        return (
-                                                            <button
-                                                                key={option.id}
-                                                                type="button"
-                                                                onClick={() => updateField("status", option.id)}
-                                                                className={`h-11 rounded-2xl border px-3 text-sm font-semibold transition-colors ${
-                                                                    isSelected ? option.activeClass : option.idleClass
-                                                                }`}
-                                                            >
-                                                                {option.label}
-                                                            </button>
-                                                        );
-                                                    })}
+                                                <div>
+                                                    <label className="mb-1.5 block text-xs font-medium text-[#4E525D]">Status</label>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        {UNIT_LAYOUT_STATUS_BUTTONS.map((option) => {
+                                                            const isSelected = (form.status || "available") === option.id;
+                                                            return (
+                                                                <button
+                                                                    key={option.id}
+                                                                    type="button"
+                                                                    onClick={() => updateField("status", option.id)}
+                                                                    className={`h-11 rounded-2xl border px-3 text-sm font-semibold transition-colors ${
+                                                                        isSelected ? option.activeClass : option.idleClass
+                                                                    }`}
+                                                                >
+                                                                    {option.label}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </SectionBlock>
 
-                            <SectionBlock title="Specification" description="Physical, ownership and construction details for this layout.">
-                                <div className="grid gap-4 lg:grid-cols-3">
-                                    <div>
-                                        <label className="mb-1 block text-xs text-[#4E525D]">Floor From *</label>
-                                        <input
-                                            className={inputClass}
-                                            type="number"
-                                            value={form.floorFrom ?? ""}
-                                            onChange={(e) => updateField("floorFrom", parseInt(e.target.value) || undefined)}
-                                            placeholder="8"
-                                            min={1}
-                                            max={999}
-                                        />
+                            <SectionBlock title="Specification" description="Where the unit sits, its size class and its handover state.">
+                                <div className="space-y-4">
+                                    <div className="grid gap-4 lg:grid-cols-3">
+                                        <div>
+                                            <label className="mb-1 block text-xs text-[#4E525D]">Apartment number</label>
+                                            <input
+                                                className={inputClass}
+                                                type="text"
+                                                value={form.unitCode}
+                                                onChange={(e) => updateField("unitCode", e.target.value)}
+                                                placeholder="D-1407"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-xs text-[#4E525D]">Entrance</label>
+                                            <input
+                                                className={inputClass}
+                                                type="text"
+                                                value={form.entrance}
+                                                onChange={(e) => updateField("entrance", e.target.value)}
+                                                placeholder="A"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-xs text-[#4E525D]">Room count</label>
+                                            <input
+                                                className={inputClass}
+                                                type="number"
+                                                value={form.roomCount ?? ""}
+                                                onChange={(e) => updateField("roomCount", parseIntegerInput(e.target.value))}
+                                                placeholder="0 for a studio"
+                                                min={0}
+                                                max={999}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-xs text-[#4E525D]">Floor From *</label>
+                                            <input
+                                                className={inputClass}
+                                                type="number"
+                                                value={form.floorFrom ?? ""}
+                                                onChange={(e) => updateField("floorFrom", parseIntegerInput(e.target.value))}
+                                                placeholder="8"
+                                                min={MIN_FLOOR}
+                                                max={MAX_FLOOR}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-xs text-[#4E525D]">Floor To</label>
+                                            <input
+                                                className={inputClass}
+                                                type="number"
+                                                value={form.floorTo ?? ""}
+                                                onChange={(e) => updateField("floorTo", parseIntegerInput(e.target.value))}
+                                                placeholder="16"
+                                                min={MIN_FLOOR}
+                                                max={MAX_FLOOR}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1 block text-xs text-[#4E525D]">Completion year</label>
+                                            <input
+                                                className={inputClass}
+                                                type="number"
+                                                value={form.completionYear ?? ""}
+                                                onChange={(e) => updateField("completionYear", parseIntegerInput(e.target.value))}
+                                                placeholder={String(new Date().getFullYear())}
+                                                min={1900}
+                                                max={2100}
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="mb-1 block text-xs text-[#4E525D]">Floor To</label>
-                                        <input
-                                            className={inputClass}
-                                            type="number"
-                                            value={form.floorTo ?? ""}
-                                            onChange={(e) => updateField("floorTo", parseInt(e.target.value) || undefined)}
-                                            placeholder="16"
-                                            min={1}
-                                            max={999}
+                                    <div className="grid gap-4 lg:grid-cols-3">
+                                        <FormDropdown
+                                            label="Construction stage"
+                                            value={form.constructionStage}
+                                            options={withCurrentOption(CONSTRUCTION_STAGE_OPTIONS, form.constructionStage)}
+                                            placeholder="Not specified"
+                                            onChange={(id) => updateField("constructionStage", id)}
                                         />
-                                    </div>
-                                    <div>
-                                        <label className="mb-1 block text-xs text-[#4E525D]">Room Count</label>
-                                        <input
-                                            className={inputClass}
-                                            type="number"
-                                            value={form.roomCount ?? ""}
-                                            onChange={(e) => updateField("roomCount", parseInt(e.target.value) || undefined)}
-                                            placeholder="2"
-                                            min={1}
-                                            max={999}
+                                        <FormDropdown
+                                            label="Renovation"
+                                            value={form.renovation}
+                                            options={RENOVATION_OPTIONS}
+                                            placeholder="Not specified"
+                                            onChange={(id) => updateField("renovation", id)}
+                                        />
+                                        <FormDropdown
+                                            label="Furnishing"
+                                            value={form.furnishing}
+                                            options={FURNISHING_OPTIONS}
+                                            placeholder="Not specified"
+                                            onChange={(id) => updateField("furnishing", id)}
                                         />
                                     </div>
                                 </div>
@@ -1157,15 +1269,16 @@ export function HouseForm({
                     {activeTab === "area" && (
                         <div className="space-y-5">
                             <SectionBlock title="Area & Pricing" description="Surface area and price matrix for each available currency.">
+                                <div className="space-y-4">
                                 <div className="grid gap-4 lg:grid-cols-3">
                                     <div>
                                         <label className="mb-1 block text-xs text-[#4E525D]">Total Area (m²) *</label>
                                         <input
                                             className={inputClass}
                                             type="number"
-                                            step="0.1"
+                                            step="any"
                                             value={form.totalArea ?? ""}
-                                            onChange={(e) => updateField("totalArea", parseFloat(e.target.value) || undefined)}
+                                            onChange={(e) => updateField("totalArea", parseDecimalInput(e.target.value))}
                                             placeholder="60.5"
                                             min={0}
                                         />
@@ -1175,9 +1288,9 @@ export function HouseForm({
                                         <input
                                             className={inputClass}
                                             type="number"
-                                            step="0.1"
+                                            step="any"
                                             value={form.internalArea ?? ""}
-                                            onChange={(e) => updateField("internalArea", parseFloat(e.target.value) || undefined)}
+                                            onChange={(e) => updateField("internalArea", parseDecimalInput(e.target.value))}
                                             placeholder="55.0"
                                             min={0}
                                         />
@@ -1187,9 +1300,9 @@ export function HouseForm({
                                         <input
                                             className={inputClass}
                                             type="number"
-                                            step="0.1"
+                                            step="any"
                                             value={form.balconyArea ?? ""}
-                                            onChange={(e) => updateField("balconyArea", parseFloat(e.target.value) || undefined)}
+                                            onChange={(e) => updateField("balconyArea", parseDecimalInput(e.target.value))}
                                             placeholder="5.5"
                                             min={0}
                                         />
@@ -1210,6 +1323,7 @@ export function HouseForm({
                                                             <input
                                                                 className={inputClass}
                                                                 type="number"
+                                                                step="any"
                                                                 value={existingPrice?.priceTotal ?? ""}
                                                                 onChange={(e) => {
                                                                     const raw = e.target.value;
@@ -1236,6 +1350,7 @@ export function HouseForm({
                                                             <input
                                                                 className={inputClass}
                                                                 type="number"
+                                                                step="any"
                                                                 value={existingPrice?.priceByArea ?? ""}
                                                                 onChange={(e) => {
                                                                     const raw = e.target.value;
@@ -1263,6 +1378,7 @@ export function HouseForm({
                                         })}
                                     </div>
                                 ) : null}
+                                </div>
                             </SectionBlock>
                         </div>
                     )}
@@ -1274,6 +1390,11 @@ export function HouseForm({
                                     title="Gallery Images"
                                     description={`Additional listing photos${form.gallery && form.gallery.length > 0 ? ` (${form.gallery.length}/20)` : ""}.`}
                                 >
+                                    {isSynced && !existingHouseData?.editedInInventoryAt ? (
+                                        <p className="text-xs leading-5 text-[#808191]">
+                                            When Profitbase has a floor plan for this unit, the next Transfer replaces the main image, cover and gallery with it.
+                                        </p>
+                                    ) : null}
                                     <div
                                         onDragOver={onGalleryDragOver}
                                         onDragEnter={onGalleryDragEnter}

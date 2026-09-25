@@ -4,8 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { categoriesApi, type Category } from "../../api/categories";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { useMessageCenter } from "../../components/MessageCenter";
+import { ProfitbaseSourceBadge } from "../../components/ProfitbaseNotice";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { confirmDelete } from "../../utils/confirmDelete";
 import { IoClose } from "react-icons/io5";
+
+const OBJECT_DELETE_NOTE = "All of its houses and units are deleted with it.";
 
 const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -453,7 +457,7 @@ export function OffPlanObjectsSection() {
                                     type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        deleteMut.mutate(cat.id);
+                                        if (confirmDelete(cat, "object", OBJECT_DELETE_NOTE)) deleteMut.mutate(cat.id);
                                     }}
                                     aria-label="Delete"
                                     title="Delete"
@@ -470,10 +474,13 @@ export function OffPlanObjectsSection() {
                                     <button
                                         type="button"
                                         onClick={() => navigate(`/dashboard/offplan/objects/${cat.slug}/edit`)}
-                                        className="mb-5 line-clamp-1 text-left text-[16px] font-semibold leading-[20px] text-[#1A1A1A] cursor-pointer"
+                                        className="mb-2 line-clamp-1 text-left text-[16px] font-semibold leading-[20px] text-[#1A1A1A] cursor-pointer"
                                     >
                                         {cat.title}
                                     </button>
+                                    <div className="mb-3 min-h-5">
+                                        <ProfitbaseSourceBadge record={cat} />
+                                    </div>
 
                                     <div className="mb-3 flex items-center gap-1">
                                         <img src="/images/inv-resale/location.svg" alt="" className="h-[14px] w-[14px]" />
@@ -491,7 +498,7 @@ export function OffPlanObjectsSection() {
                                     <div className="mb-3 rounded-[20px] bg-[#F4F5F6] px-3 py-2.5">
                                         <div className="grid grid-cols-4 gap-2 text-center">
                                             <div>
-                                                <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Units</span>
+                                                <span className="mb-1 block text-[11px] font-medium leading-[16px] text-[#808191]">Houses</span>
                                                 <span className="block text-[14px] font-semibold leading-[20px] text-[#1A1A1A]">
                                                     {(cat.metrics?.houses ?? 0).toLocaleString()}
                                                 </span>
@@ -548,7 +555,7 @@ export function OffPlanObjectsSection() {
                                     <th className="px-5 py-4 font-medium text-[#4E525D]">Object</th>
                                     <th className="px-4 py-4 font-medium text-[#4E525D]">Developer</th>
                                     <th className="px-4 py-4 font-medium text-[#4E525D]">Location</th>
-                                    <th className="px-4 py-4 font-medium text-[#4E525D]">Units</th>
+                                    <th className="px-4 py-4 font-medium text-[#4E525D]">Houses</th>
                                     <th className="px-4 py-4 font-medium text-[#4E525D]">Status</th>
                                     <th className="px-5 py-4 text-right font-medium text-[#4E525D]">Actions</th>
                                 </tr>
@@ -582,6 +589,7 @@ export function OffPlanObjectsSection() {
                                                 <div className="min-w-0">
                                                     <div className="truncate font-semibold text-[#1A1A1A]">{cat.title}</div>
                                                     <div className="mt-1 truncate text-xs text-[#808191]">{formatDate(cat.createdAt)}</div>
+                                                    <ProfitbaseSourceBadge record={cat} className="mt-1" />
                                                 </div>
                                             </button>
                                         </td>
@@ -634,7 +642,9 @@ export function OffPlanObjectsSection() {
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => deleteMut.mutate(cat.id)}
+                                                    onClick={() => {
+                                                        if (confirmDelete(cat, "object", OBJECT_DELETE_NOTE)) deleteMut.mutate(cat.id);
+                                                    }}
                                                     aria-label="Delete"
                                                     title="Delete"
                                                     className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#C3362B] transition-colors hover:bg-[#FCEDEA]"

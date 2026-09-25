@@ -6,7 +6,10 @@ import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { Pagination } from "../../components/Pagination";
 import { useMessageCenter } from "../../components/MessageCenter";
 import { buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
+import { ProfitbaseSourceBadge } from "../../components/ProfitbaseNotice";
 import { getApiErrorMessage } from "../../utils/apiError";
+import { formatPrimaryPrice } from "../../utils/unitPrice";
+import { confirmDelete } from "../../utils/confirmDelete";
 import { HouseForm as UnitLayoutInlineForm } from "./UnitLayoutInlineForm";
 import { IoClose } from "react-icons/io5";
 
@@ -120,16 +123,8 @@ const formatDate = (dateStr: string) => {
     return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}.${d.getFullYear()}`;
 };
 
-function formatPriceValue(value: number) {
-    return value.toLocaleString();
-}
-
-function formatPricePreview(prices: Record<string, number> | undefined) {
-    if (!prices || Object.keys(prices).length === 0) return "No price";
-
-    const [currency, amount] = Object.entries(prices)[0] || [];
-    if (!currency || amount === undefined) return "No price";
-    return `${currency} ${formatPriceValue(Number(amount))}`;
+function formatPricePreview(prices: Record<string, number> | undefined, currency?: string | null) {
+    return formatPrimaryPrice(prices, currency) ?? "No price";
 }
 
 export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: string; embedded?: boolean; minimal?: boolean } = {}) {
@@ -507,7 +502,7 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                             type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                deleteMut.mutate(layout.id);
+                                                if (confirmDelete(layout, "unit")) deleteMut.mutate(layout.id);
                                             }}
                                             aria-label="Delete"
                                             title="Delete"
@@ -522,6 +517,7 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                     <div className="flex flex-1 flex-col justify-between px-1.5 pb-1">
                                         <div>
                                             <p className="truncate text-sm font-semibold text-[#1A1A1A]">{layout.title}</p>
+                                            <ProfitbaseSourceBadge record={layout} className="my-0.5" />
                                             <p className="text-xs text-[#999]">
                                                 {layout.totalArea} m² · {layout.unitTypeOption?.title || `${layout.number || 0} rooms`}
                                             </p>
@@ -532,7 +528,7 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                             <div className="mt-3 rounded-[12px] bg-[#F4F5F6] px-3 py-2">
                                                 <p className="text-[11px] font-medium text-[#808191]">Price</p>
                                                 <p className="truncate text-sm font-semibold text-[#1A1A1A]">
-                                                    {formatPricePreview(layout.prices)}
+                                                    {formatPricePreview(layout.prices, layout.category?.currency)}
                                                 </p>
                                             </div>
                                         </div>
@@ -609,13 +605,14 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                                         <div className="min-w-0">
                                                             <div className="truncate font-semibold text-[#1A1A1A]">{layout.title}</div>
                                                             <div className="mt-1 truncate text-xs text-[#808191]">{formatDate(layout.createdAt)}</div>
+                                                            <ProfitbaseSourceBadge record={layout} className="mt-1" />
                                                         </div>
                                                     </button>
                                                 </td>
                                                 <td className="px-4 py-4 text-[#4E525D]">{layout.category?.title || "—"}</td>
                                                 <td className="px-4 py-4 text-[#4E525D]">{layout.floor}</td>
                                                 <td className="px-4 py-4 text-[#4E525D]">{layout.totalArea} m²</td>
-                                                <td className="px-4 py-4 text-[#4E525D]">{formatPricePreview(layout.prices)}</td>
+                                                <td className="px-4 py-4 text-[#4E525D]">{formatPricePreview(layout.prices, layout.category?.currency)}</td>
                                                 <td className="px-4 py-4">
                                                     <span
                                                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -660,7 +657,9 @@ export function UnitLayoutsSection({ houseId, embedded, minimal }: { houseId?: s
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            onClick={() => deleteMut.mutate(layout.id)}
+                                                            onClick={() => {
+                                                                if (confirmDelete(layout, "unit")) deleteMut.mutate(layout.id);
+                                                            }}
                                                             aria-label="Delete"
                                                             title="Delete"
                                                             className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#C3362B] transition-colors hover:bg-[#FCEDEA]"

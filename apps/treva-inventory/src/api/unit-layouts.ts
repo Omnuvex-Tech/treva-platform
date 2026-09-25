@@ -1,4 +1,5 @@
 import apiClient from "./client";
+import type { UnitFurnishing, UnitRenovation } from "../utils/offplanOptions";
 
 export interface NumberOfFloors {
     start: number;
@@ -25,6 +26,7 @@ export interface Category {
     title: string;
     name: string;
     slug: string;
+    currency?: string;
 }
 
 export interface UnitTypeOption {
@@ -74,7 +76,7 @@ export interface UnitLayout {
     categoryId: string;
     category: Category;
     houseId?: string;
-    house?: { id: string; title: string; name: string; slug: string };
+    house?: { id: string; title: string; name: string; slug: string; numberOfFloors?: NumberOfFloors };
     unitTypeOptionId?: string;
     unitTypeOption?: UnitTypeOption;
     realEstateType?: string;
@@ -82,7 +84,12 @@ export interface UnitLayout {
     attributeIds?: string[];
     typeOfBuilding?: string;
     constructionStage?: string;
+    renovation?: UnitRenovation | null;
+    furnishing?: UnitFurnishing | null;
     description?: string;
+    // Profitbase property id; set on synced units, whose Profitbase fields are read-only.
+    externalId?: string | null;
+    editedInInventoryAt?: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -138,9 +145,17 @@ export interface CreateUnitLayoutData {
     heatingTypeIds?: string[];
     attributeIds?: string[];
     typeOfBuilding?: string;
-    constructionStage?: string;
+    constructionStage?: string | null;
+    renovation?: UnitRenovation | null;
+    furnishing?: UnitFurnishing | null;
+    unitCode?: string | null;
     description?: string;
 }
+
+// Edits may send null to clear an optional field.
+export type UpdateUnitLayoutData = {
+    [K in keyof CreateUnitLayoutData]?: CreateUnitLayoutData[K] | null;
+};
 
 export interface UnitLayoutFilters {
     page?: number;
@@ -158,6 +173,8 @@ export interface UnitLayoutFilters {
     maxArea?: number;
     floor?: number;
     unitTypeOptionId?: string;
+    // Slim rows (no embedded house/object) for aggregate screens.
+    summary?: boolean;
 }
 
 export interface UploadResponse {
@@ -169,59 +186,61 @@ export interface UploadResponse {
     mimetype: string;
 }
 
-const cleanString = (value: string | undefined) => {
+const cleanString = (value: string | null | undefined) => {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
 };
 
-const sanitizeUnitLayoutData = (
-    data: Partial<CreateUnitLayoutData>
-): Partial<CreateUnitLayoutData> => {
-    const mainImageUrl = cleanString(data.mainImage?.url);
-    const coverImageUrl = cleanString(data.coverImage?.url);
+// Optional text fields. A cleared one is dropped on create and sent as null on
+// edit, so the API actually clears it instead of keeping the old value.
+const OPTIONAL_TEXT_KEYS = [
+    "seoTitle",
+    "seoDescription",
+    "seoKeywords",
+    "canonicalUrl",
+    "seoImage",
+    "entrance",
+    "unitCode",
+    "realEstateType",
+    "constructionStage",
+] as const;
 
-    return {
-        ...data,
-        title: data.title?.trim(),
-        name: data.name?.trim(),
-        slug: data.slug?.trim(),
-        seoTitle: cleanString(data.seoTitle),
-        seoDescription: cleanString(data.seoDescription),
-        seoKeywords: cleanString(data.seoKeywords),
-        canonicalUrl: cleanString(data.canonicalUrl),
-        seoImage: cleanString(data.seoImage),
-        entrance: cleanString(data.entrance),
-            status: data.status || "available",
-        number: data.number,
-        balconyArea: data.balconyArea,
-        similarApartmentIds: data.similarApartmentIds?.filter(Boolean),
-        heatingTypeIds: data.heatingTypeIds?.filter(Boolean) || [],
-        attributeIds: data.attributeIds?.filter(Boolean) || [],
-        mainImage: mainImageUrl
-            ? {
-                  url: mainImageUrl,
-                  alt: cleanString(data.mainImage?.alt),
-              }
-            : undefined,
-            coverImage: coverImageUrl
-                ? {
-                      url: coverImageUrl,
-                      alt: cleanString(data.coverImage?.alt),
-                  }
-                : undefined,
-        gallery: data.gallery
-            ?.map((image) => ({
-                url: cleanString(image.url) || "",
-                alt: cleanString(image.alt),
-            }))
-            .filter((image) => image.url),
-        documents: data.documents
-            ?.map((document) => ({
-                type: cleanString(document.type) || "",
-                url: cleanString(document.url) || "",
-            }))
-            .filter((document) => document.type && document.url),
-    };
+const cleanImage = (image: MainImage | null | undefined) => {
+    const url = cleanString(image?.url);
+    return url ? { url, alt: cleanString(image?.alt) } : undefined;
+};
+
+/**
+ * Tidies a payload without adding anything to it: only the keys the caller
+ * sent go out, so a partial edit (archive toggle, brochure upload) leaves
+ * the unit's status, attributes and everything else alone.
+ */
+const sanitizeUnitLayoutData = (data: UpdateUnitLayoutData, emptyAs: undefined | null): UpdateUnitLayoutData => {
+    const out: UpdateUnitLayoutData = { ...data };
+    const has = (key: keyof UpdateUnitLayoutData) => key in data;
+
+    if (has("title")) out.title = data.title?.trim();
+    if (has("name")) out.name = data.name?.trim();
+    if (has("slug")) out.slug = data.slug?.trim();
+    for (const key of OPTIONAL_TEXT_KEYS) {
+        if (has(key)) out[key] = cleanString(data[key]) ?? emptyAs;
+    }
+    if (has("similarApartmentIds")) out.similarApartmentIds = data.similarApartmentIds?.filter(Boolean) ?? [];
+    if (has("heatingTypeIds")) out.heatingTypeIds = data.heatingTypeIds?.filter(Boolean) ?? [];
+    if (has("attributeIds")) out.attributeIds = data.attributeIds?.filter(Boolean) ?? [];
+    if (has("mainImage")) out.mainImage = cleanImage(data.mainImage);
+    if (has("coverImage")) out.coverImage = cleanImage(data.coverImage);
+    if (has("gallery")) {
+        out.gallery = data.gallery
+            ?.map((image) => ({ url: cleanString(image.url) || "", alt: cleanString(image.alt) }))
+            .filter((image) => image.url);
+    }
+    if (has("documents")) {
+        out.documents = data.documents
+            ?.map((document) => ({ type: cleanString(document.type) || "", url: cleanString(document.url) || "" }))
+            .filter((document) => document.type && document.url);
+    }
+    return out;
 };
 
 export const unitLayoutsApi = {
@@ -243,12 +262,15 @@ export const unitLayoutsApi = {
         apiClient.get<UnitLayout>(`/unit-layouts/${id}`),
 
     create: (data: CreateUnitLayoutData) =>
-        apiClient.post<UnitLayout>("/unit-layouts", sanitizeUnitLayoutData(data)),
+        apiClient.post<UnitLayout>("/unit-layouts", {
+            status: "available",
+            ...sanitizeUnitLayoutData(data, undefined),
+        }),
 
-    update: (id: string, data: Partial<CreateUnitLayoutData>) =>
+    update: (id: string, data: UpdateUnitLayoutData) =>
         apiClient.patch<UnitLayout>(
             `/unit-layouts/${id}`,
-            sanitizeUnitLayoutData(data)
+            sanitizeUnitLayoutData(data, null)
         ),
 
     delete: (id: string) =>

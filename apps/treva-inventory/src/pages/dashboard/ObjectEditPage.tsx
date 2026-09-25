@@ -16,33 +16,35 @@ import { ImageAssetCard } from "../../components/ImageAssetCard";
 import { PlanUploadCard } from "../../components/PlanUploadCard";
 import { buildHouseDuplicatePayload, buildUnitLayoutDuplicatePayload } from "../../utils/entityDuplicatePayloads";
 import { STATIC_CURRENCIES } from "../../utils/staticCurrencies";
+import { withCurrentOption } from "../../utils/offplanOptions";
+import { formatPrimaryPrice } from "../../utils/unitPrice";
+import { confirmDelete } from "../../utils/confirmDelete";
+import { ProfitbaseNotice, ProfitbaseSourceBadge } from "../../components/ProfitbaseNotice";
 import { IoClose } from "react-icons/io5";
+import { Pagination } from "../../components/Pagination";
 
 const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 const IMAGE_ACCEPT = SUPPORTED_IMAGE_TYPES.join(",");
 
-type TabKey = "basic" | "commercial" | "location" | "properties" | "payments" | "options" | "stock" | "unitLayouts";
+// "properties" is the General Plans tab; the houses and their units live
+// under "houses", labelled "Properties".
+type TabKey = "basic" | "commercial" | "location" | "properties" | "houses";
 
 const TABS: { key: TabKey; label: string }[] = [
     { key: "basic", label: "Basic Info" },
     { key: "commercial", label: "Commercial" },
     { key: "location", label: "Location" },
     { key: "properties", label: "General Plans" },
+    { key: "houses", label: "Properties" },
 ];
 
 const inputClass =
     "w-full h-11 rounded-2xl border border-[#E7E9EE] bg-[#F8F9FB] px-4 py-0 text-sm leading-5 text-[#1A1A1A] placeholder-[#999] outline-none transition-colors focus:border-[#C8CDD8] focus:bg-white";
 
-function formatPriceValue(value: number) {
-    return value.toLocaleString();
-}
+const UNIT_LAYOUTS_PAGE_SIZE = 24;
 
-function formatPricePreview(prices: Record<string, number> | undefined) {
-    if (!prices || Object.keys(prices).length === 0) return "No price";
-
-    const [currency, amount] = Object.entries(prices)[0] || [];
-    if (!currency || amount === undefined) return "No price";
-    return `${currency} ${formatPriceValue(Number(amount))}`;
+function formatPricePreview(prices: Record<string, number> | undefined, currency?: string | null) {
+    return formatPrimaryPrice(prices, currency) ?? "No price";
 }
 
 function getDefaultPlanName(fileName: string) {
@@ -54,6 +56,7 @@ function normalizePrimaryTab(tab?: string): TabKey {
         case "commercial":
         case "location":
         case "properties":
+        case "houses":
             return tab;
         default:
             return "basic";
@@ -134,9 +137,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     const [showUnitLayoutForm, setShowUnitLayoutForm] = useState(false);
     const [editingUnitLayoutId, setEditingUnitLayoutId] = useState<string | null>(null);
     const [activeUnitLayoutTab, setActiveUnitLayoutTab] = useState<"Active" | "Archive">("Active");
-    const [selectedManagementCard, setSelectedManagementCard] = useState<"properties" | "payments" | "options" | "stock" | null>(null);
     const [selectedPostPlanCard, setSelectedPostPlanCard] = useState<"grid" | "property-layouts" | "floor-plans" | "facades" | null>("grid");
-    const [showPostPlanCards, setShowPostPlanCards] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const buildNameFromTitle = (title: string) =>
@@ -293,16 +294,28 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         : allHouses.filter((h) => h.archived);
     const previewHouse = allHouses.find((house) => house.id === previewHouseId) || null;
 
+    // A house can hold hundreds of units, so the list is paged on the server
+    // and each tab asks only for its own units.
+    const [unitLayoutPage, setUnitLayoutPage] = useState(1);
+    useEffect(() => {
+        setUnitLayoutPage(1);
+    }, [previewHouseId, activeUnitLayoutTab]);
+
     const { data: unitLayoutsRes } = useQuery({
-        queryKey: ["unit-layouts", slug, previewHouseId],
-        queryFn: () => unitLayoutsApi.getAll({ categorySlug: slug!, houseId: previewHouseId!, limit: 100 }),
+        queryKey: ["unit-layouts", slug, previewHouseId, activeUnitLayoutTab, unitLayoutPage],
+        queryFn: () =>
+            unitLayoutsApi.getAll({
+                categorySlug: slug!,
+                houseId: previewHouseId!,
+                archived: activeUnitLayoutTab === "Archive",
+                page: unitLayoutPage,
+                limit: UNIT_LAYOUTS_PAGE_SIZE,
+            }),
         enabled: !!slug && !!previewHouseId,
     });
 
-    const allUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
-    const filteredUnitLayouts = activeUnitLayoutTab === "Active"
-        ? allUnitLayouts.filter((layout) => !layout.archived)
-        : allUnitLayouts.filter((layout) => !!layout.archived);
+    const filteredUnitLayouts: UnitLayout[] = unitLayoutsRes?.data?.data || [];
+    const unitLayoutTotalPages = unitLayoutsRes?.data?.pagination?.totalPages ?? 1;
 
     useEffect(() => {
         setShowUnitLayoutList(false);
@@ -449,9 +462,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
     const handleLocationNext = () => {
         if (!validate()) return;
         setActiveTab("properties");
-        setSelectedManagementCard(null);
-        setSelectedPostPlanCard("grid");
-        setShowPostPlanCards(false);
     };
 
     const handleGeneralPlansSave = () => {
@@ -459,43 +469,41 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
         const baseline = baselineComparableRef.current;
         if (baseline && toComparable(formData) === baseline) {
-            setShowPostPlanCards(true);
-            setSelectedManagementCard(null);
-            setSelectedPostPlanCard("grid");
+            setActiveTab("houses");
             return;
         }
 
         updateMutation.mutate(formData, {
             onSuccess: () => {
-                setShowPostPlanCards(true);
-                setSelectedManagementCard(null);
-                setSelectedPostPlanCard("grid");
+                setActiveTab("houses");
             },
         });
     };
 
     const updateMutation = useMutation({
         mutationFn: (data: typeof formData) => {
+            // A cleared field is sent as null so the API clears it.
+            const text = (value: string | undefined) => optionalText(value) || null;
             return categoriesApi.update(category!.id, {
                 name: data.name,
                 title: data.title,
-                objectType: data.objectType?.trim() || undefined,
                 propertyName: data.name || data.title,
                 currency: optionalText(data.currency) || undefined,
-                region: optionalText(data.region) || undefined,
-                area: optionalText(data.area) || undefined,
-                city: optionalText(data.city) || undefined,
-                locationGoogleMapsUrl: optionalText(data.locationGoogleMapsUrl) || undefined,
-                locationTitle: optionalText(data.locationTitle) || undefined,
-                locationUrl: optionalText(data.locationUrl) || undefined,
-                developerBrand: optionalText(data.developerBrand) || undefined,
-                website: optionalText(data.website) || undefined,
-                salesDepartment: optionalText(data.salesDepartment) || undefined,
-                phoneNumber: optionalText(data.phoneNumber) || undefined,
+                objectType: text(data.objectType),
+                region: text(data.region),
+                area: text(data.area),
+                city: text(data.city),
+                locationGoogleMapsUrl: text(data.locationGoogleMapsUrl),
+                locationTitle: text(data.locationTitle),
+                locationUrl: text(data.locationUrl),
+                developerBrand: text(data.developerBrand),
+                website: text(data.website),
+                salesDepartment: text(data.salesDepartment),
+                phoneNumber: text(data.phoneNumber),
                 fedLaw214: data.fedLaw214,
-                image: data.image || undefined,
-                coverImage: data.coverImage || undefined,
-                bannerImage: data.bannerImage || undefined,
+                image: data.image || null,
+                coverImage: data.coverImage || null,
+                bannerImage: data.bannerImage || null,
             });
         },
         onSuccess: (_response, variables) => {
@@ -676,13 +684,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
         updateDocsMutation.mutate(documents.filter((_, itemIndex) => itemIndex !== index));
     };
 
-    const managementCards = [
-        { key: "properties" as const, label: "Properties", icon: "/images/inv-dashboard/inv-offplan/properties.svg" },
-        { key: "payments" as const, label: "Payment methods", icon: "/images/inv-dashboard/inv-offplan/payment.svg" },
-        { key: "options" as const, label: "Options", icon: "/images/inv-dashboard/inv-offplan/options.svg" },
-        { key: "stock" as const, label: "Stock", icon: "/images/inv-dashboard/inv-offplan/stock.svg" },
-    ];
-
     const postPlanCards = [
         { key: "grid" as const, label: "Grid", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
         { key: "property-layouts" as const, label: "Property layouts", icon: "/images/inv-dashboard/inv-offplan/properties.svg", filled: false },
@@ -801,7 +802,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                             type="button"
                                             onClick={(event) => {
                                                 event.stopPropagation();
-                                                deleteHouseMutation.mutate(house.id);
+                                                if (confirmDelete(house, "house")) deleteHouseMutation.mutate(house.id);
                                             }}
                                             aria-label="Delete"
                                             title="Delete"
@@ -815,6 +816,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
                                     <div className="px-1 py-3">
                                         <p className="truncate text-sm font-semibold text-[#1A1A1A]">{house.title}</p>
+                                        <ProfitbaseSourceBadge record={house} className="mt-1" />
                                     </div>
 
                                     <div className="flex gap-1 px-1 pb-1">
@@ -871,6 +873,9 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
 
     const formContent = (
         <div className="rounded-[32px] border border-[#ECEEF2] bg-[#FCFCFD] p-6 shadow-[0_10px_30px_rgba(17,24,39,0.04)]">
+            <ProfitbaseNotice record={category}>
+                A Transfer overwrites the name, title, currency and archived state with Profitbase&apos;s values.
+            </ProfitbaseNotice>
             <div className="mb-6 flex flex-wrap gap-2 rounded-[24px] border border-[#ECEEF2] bg-white p-2">
                 {TABS.map((tab) => (
                     <button
@@ -990,11 +995,11 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                         />
                                     </div>
                                     <div className="grid gap-4 lg:grid-cols-2">
-                                        <div>
+                                        <div className="min-w-0">
                                             <FormDropdown
                                                 label="Currency"
                                                 value={formData.currency}
-                                                options={currencies.map((item) => ({ id: item.value, label: item.label }))}
+                                                options={withCurrentOption(currencies.map((item) => ({ id: item.value, label: item.label })), formData.currency)}
                                                 placeholder="Select currency"
                                                 onChange={(id) => { updateFormData("currency", id); clearError("currency"); }}
                                             />
@@ -1241,8 +1246,6 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
             )}
 
             {activeTab === "properties" && (
-                <div className="space-y-5">
-                    {!showPostPlanCards ? (
                     <div className="space-y-5">
                         <div className="rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
                             <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#F1F2F4] pb-4">
@@ -1362,35 +1365,11 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                             </button>
                         </div>
                     </div>
-                    ) : (
-                    <div className="space-y-5">
-                        {!previewHouse ? (
-                            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                                {managementCards.map((card) => {
-                                    const isActive = selectedManagementCard === card.key;
-                                    return (
-                                        <button
-                                            key={card.key}
-                                            type="button"
-                                            onClick={() => {
-                                                if (card.key !== "properties") return;
-                                                setSelectedManagementCard("properties");
-                                                setSelectedPostPlanCard("grid");
-                                            }}
-                                            className={`flex min-h-[120px] flex-col items-center justify-center rounded-[20px] border bg-[#F3F3F3] px-5 py-6 text-center transition-colors ${
-                                                isActive ? "border-[#4E525D] bg-white" : "border-[#E4E4E4]"
-                                            }`}
-                                        >
-                                            <img src={card.icon} alt="" className="mb-4 h-12 w-12 object-contain" />
-                                            <span className="text-sm font-medium text-[#4E525D]">{card.label}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        ) : null}
+            )}
 
-                        {selectedManagementCard === "properties" ? (
-                            previewHouse ? (
+            {activeTab === "houses" && (
+                    <div className="space-y-5">
+                            {previewHouse ? (
                                 showUnitLayoutList ? (
                                     <div className="space-y-5">
                                         <div className="space-y-6 rounded-[28px] border border-[#E9ECF2] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.03)]">
@@ -1505,7 +1484,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                         type="button"
                                                                         onClick={(event) => {
                                                                             event.stopPropagation();
-                                                                            deleteUnitLayoutMutation.mutate(layout.id);
+                                                                            if (confirmDelete(layout, "unit")) deleteUnitLayoutMutation.mutate(layout.id);
                                                                         }}
                                                                         aria-label="Delete"
                                                                         title="Delete"
@@ -1517,8 +1496,12 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                                     </button>
                                                                 </div>
 
-                                                                <div className="flex items-center justify-between gap-3 px-1 py-3">
-                                                                    <p className="truncate text-base font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices)}</p>
+                                                                <div className="flex items-center justify-between gap-2 px-1 pt-3">
+                                                                    <p className="truncate text-xs text-[#808191]">{layout.unitCode ? `№ ${layout.unitCode}` : layout.title}</p>
+                                                                    <ProfitbaseSourceBadge record={layout} />
+                                                                </div>
+                                                                <div className="flex items-center justify-between gap-3 px-1 pb-3 pt-1">
+                                                                    <p className="truncate text-base font-semibold text-[#1A1A1A]">{formatPricePreview(layout.prices, category?.currency)}</p>
                                                                     <p className="shrink-0 text-sm text-[#666666]">{layout.totalArea} m²</p>
                                                                 </div>
 
@@ -1548,6 +1531,7 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                                     })}
                                                 </div>
                                             )}
+                                            <Pagination page={unitLayoutPage} totalPages={unitLayoutTotalPages} onPageChange={setUnitLayoutPage} />
                                         </div>
                                     </div>
                                 ) : (showHouseForm || editingHouseId) ? (
@@ -1643,11 +1627,8 @@ export function ObjectEditPage({ embedded = false }: { embedded?: boolean } = {}
                                 )
                             ) : (
                                 unitLayoutsPanel
-                            )
-                        ) : null}
+                            )}
                     </div>
-                    )}
-                </div>
             )}
         </div>
     );

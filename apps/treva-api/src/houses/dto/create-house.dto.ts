@@ -7,11 +7,35 @@ import {
   IsEnum,
   ValidateNested,
   IsObject,
+  IsBoolean,
   Min,
   Max,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+
+export class HouseTagDto {
+  @ApiProperty({ example: 'tag-1727180000000' })
+  @IsString()
+  id: string;
+
+  @ApiProperty({ example: 'Sales start' })
+  @IsString()
+  @IsNotEmpty()
+  text: string;
+
+  @ApiProperty({ example: '#06B6D4' })
+  @IsString()
+  color: string;
+
+  @ApiProperty({ example: 'star' })
+  @IsString()
+  icon: string;
+
+  @ApiProperty({ example: true })
+  @IsBoolean()
+  enabled: boolean;
+}
 
 export class HouseLocationDto {
   @ApiProperty({ example: 'Sea Breeze Resort' })
@@ -33,13 +57,13 @@ export class HouseLocationDto {
 export class HouseNumberOfFloorsDto {
   @ApiProperty({ example: 3 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   start: number;
 
   @ApiProperty({ example: 30 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   end: number;
 }
@@ -142,7 +166,7 @@ export class CreateHouseDto {
 
   @ApiProperty({ example: 5 })
   @IsNumber()
-  @Min(1)
+  @Min(-20)
   @Max(999)
   floor: number;
 
@@ -311,4 +335,11 @@ export class CreateHouseDto {
   @IsOptional()
   @IsString()
   secondShowroomAvailability?: string;
+
+  @ApiPropertyOptional({ type: [HouseTagDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HouseTagDto)
+  tags?: HouseTagDto[];
 }

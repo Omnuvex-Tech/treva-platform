@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { rememberProfitbaseDeletion } from '../profitbase/profitbase-deletions';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHouseDto } from './dto/create-house.dto';
 import { UpdateHouseDto } from './dto/update-house.dto';
@@ -85,6 +86,7 @@ export class HousesService {
         contractAddress: createDto.contractAddress,
         secondContractAddress: createDto.secondContractAddress,
         showroomAvailability: createDto.showroomAvailability,
+        tags: (createDto.tags as any) ?? [],
         secondShowroomAvailability: createDto.secondShowroomAvailability,
       },
       include: { category: true, owner: true },
@@ -182,7 +184,7 @@ export class HousesService {
     ]);
 
     return {
-      data,
+      data: query.summary ? data : await this.withEntranceCounts(data),
       pagination: {
         page,
         limit,
@@ -190,6 +192,27 @@ export class HousesService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  /** Adds how many distinct entrances each house's units are spread over. */
+  private async withEntranceCounts<T extends { id: string }>(houses: T[]) {
+    if (houses.length === 0) return houses;
+    const rows = await this.prisma.unitLayout.groupBy({
+      by: ['houseId', 'entrance'],
+      where: {
+        houseId: { in: houses.map((house) => house.id) },
+        entrance: { not: null },
+      },
+    });
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      if (row.houseId)
+        counts.set(row.houseId, (counts.get(row.houseId) ?? 0) + 1);
+    }
+    return houses.map((house) => ({
+      ...house,
+      entranceCount: counts.get(house.id) ?? 0,
+    }));
   }
 
   async findOne(id: string) {
@@ -312,8 +335,12 @@ export class HousesService {
       data.secondContractAddress = updateDto.secondContractAddress;
     if (updateDto.showroomAvailability !== undefined)
       data.showroomAvailability = updateDto.showroomAvailability;
+    if (updateDto.tags !== undefined) data.tags = updateDto.tags;
     if (updateDto.secondShowroomAvailability !== undefined)
       data.secondShowroomAvailability = updateDto.secondShowroomAvailability;
+    // Any change to a synced house, archiving included, takes it out of the
+    // Transfer.
+    if (existing.externalId) data.editedInInventoryAt = new Date();
 
     const house = await this.prisma.house.update({
       where: { id },
@@ -337,6 +364,8 @@ export class HousesService {
     if (!existing) {
       throw new NotFoundException('House not found');
     }
+
+    await rememberProfitbaseDeletion(this.prisma, 'house', existing.externalId);
 
     await this.prisma.unitLayout.updateMany({
       where: { houseId: id },

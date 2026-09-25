@@ -42,7 +42,7 @@ model Category {
   reservedCount   Int      @default(0)
   soldCount       Int      @default(0)
   propertyName    String?
-  currency        String   @default("Rubels")
+  currency        String   @default("USD")
   region          String?
   area            String?
   city            String?
@@ -59,6 +59,8 @@ model Category {
   fedLaw214       Boolean  @default(false)
   type            String   @default("object") // "category" | "object"
   externalId      String?  @unique
+  // Set when a synced object is changed in the panel; Transfers skip it from then on.
+  editedInInventoryAt DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -117,8 +119,12 @@ model House {
   secondContractAddress       String?
   showroomAvailability        String?
   secondShowroomAvailability  String?
+  // Badges shown on the house: [{ id, text, color, icon, enabled }]
+  tags                        Json        @default("[]")
   archived                    Boolean     @default(false)
   externalId                  String?     @unique
+  // Set when a synced record is changed in the panel; Transfers skip it from then on.
+  editedInInventoryAt         DateTime?
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 
@@ -163,11 +169,15 @@ model UnitLayout {
   statusOption                StatusOption? @relation(fields: [statusOptionId], references: [id])
   typeOfBuilding              String?
   constructionStage           String?
+  renovation                  String?     // "renovated" | "non-renovated"; null = unknown
+  furnishing                  String?     // "furnished" | "partially-furnished" | "unfurnished"; null = unknown
   description                 String?
   heatingTypeIds              String[]    @default([])
   attributeIds                String[]    @default([])
   archived                    Boolean     @default(false)
   externalId                  String?     @unique
+  // Set when a synced record is changed in the panel; Transfers skip it from then on.
+  editedInInventoryAt         DateTime?
   createdAt                   DateTime    @default(now())
   updatedAt                   DateTime    @updatedAt
 }
@@ -380,4 +390,15 @@ model ProfitbaseImage {
   createdAt DateTime @default(now())
 
   @@index([url])
+}
+
+/// Profitbase records deleted in the panel, so a Transfer does not bring them
+/// back. The row outlives the record it names.
+model ProfitbaseDeletion {
+  /// "category" | "house" | "unitLayout"
+  entity     String
+  externalId String
+  deletedAt  DateTime @default(now())
+
+  @@id([entity, externalId])
 }
