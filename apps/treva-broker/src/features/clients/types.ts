@@ -1,13 +1,47 @@
 /**
- * Approval, not pipeline stage.
+ * The outcome of checking the client against Bitrix24, which the API does as
+ * soon as the client is registered:
  *
- * The list draws a green "Approved until <date>" pill (873:49815) and the
- * client's own screen draws an amber "Pending" one (873:49434), so the status a
- * client carries is the outcome of the review the pinned note on the detail
- * screen talks about. `rejected` is the third outcome that review can have; the
- * file only draws the two above.
+ *  - "pending": not checked yet (Bitrix unreachable — it is retried);
+ *  - "deal_created": Bitrix had no contact with this phone number, so one
+ *    was created with a deal in "Сделки от агентов";
+ *  - "already_in_bitrix": Bitrix already knows the client — no deal.
+ *
+ * The pills keep the design's shape (873:49815, 873:49434); only the three
+ * outcomes they name have changed from a manual review.
  */
-export type ClientStatus = "pending" | "approved" | "rejected";
+export type ClientStatus = "pending" | "deal_created" | "already_in_bitrix";
+
+/** Whether the client has reached Bitrix24 as a lead. */
+export type BitrixSyncState = "pending" | "synced" | "failed";
+
+/** Bitrix's stage semantics: "P" in progress, "S" won, "F" lost. */
+export type DealStageSemantics = "P" | "S" | "F";
+
+/** The deal Bitrix24 converted the client's lead into. */
+export interface ClientDeal {
+    id: number;
+    title: string;
+    /** The stage's name, as Bitrix spells it. */
+    stage: string;
+    stageSemantics: DealStageSemantics;
+    amount: number | null;
+    currency: string | null;
+}
+
+export interface ClientBitrix {
+    /**
+     * The Bitrix contact — created for a new client, or the existing one that
+     * matched. Null until the check has run.
+     */
+    contactId: number | null;
+    syncState: BitrixSyncState;
+    /** Why the last push failed. Only ever sent to admins. */
+    syncError: string | null;
+    syncedAt: string | null;
+    /** The deal created for a new client; null otherwise. */
+    deal: ClientDeal | null;
+}
 
 export interface Client {
     id: string;
@@ -34,11 +68,12 @@ export interface Client {
     /** "Comments" (873:49399). */
     comments: string;
     status: ClientStatus;
-    /** ISO date the approval lapses. Null unless `status` is "approved". */
+    /** No longer set — kept for records made before the Bitrix integration. */
     approvedUntil: string | null;
     /** The privacy-policy confirmation the broker ticks before submitting. */
     consent: boolean;
     createdAt: string;
+    bitrix: ClientBitrix;
 }
 
 export interface ClientListQuery {
@@ -48,9 +83,9 @@ export interface ClientListQuery {
     /** Backs the "Status" dropdown in the list headline (873:49762). */
     status?: ClientStatus | "all";
     /**
-     * Scopes the list to one broker. A plain broker only ever sees their own
-     * clients — the caller passes their own id; roles with `clients:read_all`
-     * leave it undefined.
+     * Scopes the list to one broker. Brokers and top brokers only ever see
+     * their own clients — the caller passes their own id; an admin
+     * (`clients:read_all`) leaves it undefined.
      */
     brokerId?: string;
 }
@@ -68,5 +103,5 @@ export interface ClientInput {
     website: string;
     comments: string;
     consent: boolean;
-    status?: ClientStatus;
+    // No `status`: it is the outcome of the Bitrix24 check, set by the API.
 }

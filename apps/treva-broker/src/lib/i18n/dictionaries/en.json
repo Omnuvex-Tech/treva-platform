@@ -209,10 +209,9 @@
       "actions": "Actions"
     },
     "status": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "approvedUntil": "Approved until {date}"
+      "pending": "Checking in Bitrix24",
+      "deal_created": "Deal created",
+      "already_in_bitrix": "Already in Bitrix24"
     },
     "form": {
       "createTitle": "Register a new lead",
@@ -231,7 +230,9 @@
       "consentBefore": "I confirm that the Client read and acknowledged the Privacy policy and provided the",
       "consentLink": "Consent",
       "consentAfter": "to the",
-      "submit": "Submit for approval"
+      "submit": "Register client",
+      "lockedReviewed": "This client has already been checked in Bitrix24 and can no longer be edited here.",
+      "backToClient": "Back to client"
     },
     "deleteConfirm": "Delete this client? This cannot be undone.",
     "noClients": "You don't have any clients yet",
@@ -239,14 +240,30 @@
     "detail": {
       "email": "Email",
       "phone": "Phone",
-      "approvalStatus": "Approval status",
+      "approvalStatus": "Bitrix24 status",
       "agent": "Agent",
-      "reviewTitle": "Results of the review",
-      "reviewBody": "In days working with this client, please wait for the results of the review. You will be notified once the assessment is complete."
+      "reviewTitle": "Bitrix24 check",
+      "reviewBody": "When you register a client, Bitrix24 is checked for the same phone number. A new client gets a deal in \"Сделки от агентов\"; a client Bitrix24 already knows does not."
     },
     "tabs": {
       "salesOpportunities": "Sales Opportunities",
       "history": "History"
+    },
+    "bitrix": {
+      "contact": "Bitrix24 contact #{id}",
+      "synced": "Checked in Bitrix24",
+      "pending": "Waiting to be checked in Bitrix24",
+      "failed": "Bitrix24 could not be reached — it will be retried automatically"
+    },
+    "deal": {
+      "title": "Deal #{id}",
+      "stage": "Stage",
+      "amount": "Amount",
+      "inProgress": "In progress",
+      "won": "Won",
+      "lost": "Lost",
+      "none": "No deal yet — it appears here once the client has been checked in Bitrix24.",
+      "alreadyInBitrix": "This client already exists in Bitrix24 (same phone number), so no new deal was created."
     }
   },
   "brokerRole": {

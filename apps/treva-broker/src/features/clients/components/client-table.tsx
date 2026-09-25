@@ -17,37 +17,21 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { routes } from "@/config/routes";
-import { interpolate } from "@/lib/i18n/interpolate";
 import { cn } from "@/lib/utils/cn";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
 import type { Client, ClientStatus } from "../types";
 
 const STATUS_TONE: Record<ClientStatus, "positive" | "notice" | "negative"> = {
-    approved: "positive",
+    deal_created: "positive",
     pending: "notice",
-    rejected: "negative",
+    already_in_bitrix: "negative",
 };
 
 export interface ClientTableProps {
     clients: readonly Client[];
     /** Asks before deleting; the list owns the confirmation dialog. */
     onDelete: (client: Client) => void;
-}
-
-/**
- * Formats the approval date the way the status pill spells it: "05:08:2026".
- *
- * Colons rather than dots or slashes, and no locale switch — that is literally
- * what 873:49815 draws, and a date the reviewer quotes back is easier to match
- * when every locale prints it identically.
- */
-function approvalDate(value: string): string {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "—";
-
-    const pad = (part: number) => String(part).padStart(2, "0");
-    return `${pad(date.getDate())}:${pad(date.getMonth() + 1)}:${date.getFullYear()}`;
 }
 
 /**
@@ -125,21 +109,19 @@ export function ClientTable({ clients, onDelete }: ClientTableProps) {
                                 // Bold shade the tone carries elsewhere.
                                 className={cn(
                                     "px-2 py-1 text-xs font-medium tracking-normal normal-case",
-                                    client.status === "approved" && "text-content-positive",
+                                    client.status === "deal_created" && "text-content-positive",
                                 )}
                             >
-                                {client.status === "approved" && client.approvedUntil
-                                    ? interpolate(t.clients.status.approvedUntil, {
-                                          date: approvalDate(client.approvedUntil),
-                                      })
-                                    : t.clients.status[client.status]}
+                                {t.clients.status[client.status]}
                             </Badge>
                         </TableCell>
 
                         {hasActions ? (
                             <TableCell>
                                 <div className="flex items-center justify-end gap-2">
-                                    {canEdit ? (
+                                    {/* Once the Bitrix24 check has run, Bitrix
+                                        owns the record: no more edits here. */}
+                                    {canEdit && client.status === "pending" ? (
                                         // A link, not a button: Edit is a place
                                         // (/clients/:id/edit), so it opens in a new
                                         // tab and survives a reload like any page.

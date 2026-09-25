@@ -21,7 +21,11 @@ import { trimString } from '../../auth/dto/normalize';
  * The shapes below are treva-broker's `ClientInput` / `ClientListQuery`
  * (apps/treva-broker/src/features/clients/types.ts). Change both together.
  */
-export const CLIENT_STATUSES = ['pending', 'approved', 'rejected'] as const;
+export const CLIENT_STATUSES = [
+  'pending',
+  'deal_created',
+  'already_in_bitrix',
+] as const;
 export type ClientStatusValue = (typeof CLIENT_STATUSES)[number];
 
 /** Blank extra numbers are the rows a user added and left empty; drop them. */
@@ -74,8 +78,7 @@ export class CreateClientDto {
 
   /**
    * Sent by the form but decided by the server: a lead belongs to whoever
-   * registers it, and only a role that may assign clients can point it at
-   * another broker.
+   * registers it, and only an admin can point it at another broker.
    */
   @ApiPropertyOptional()
   @IsOptional()
@@ -111,11 +114,8 @@ export class CreateClientDto {
   @IsBoolean()
   consent: boolean;
 
-  /** Only admins review leads; anyone else sending it is refused. */
-  @ApiPropertyOptional({ enum: CLIENT_STATUSES })
-  @IsOptional()
-  @IsIn(CLIENT_STATUSES)
-  status?: ClientStatusValue;
+  // No `status`: it is the outcome of the Bitrix24 check, never sent by the
+  // form. The global pipe refuses a body that sends one.
 }
 
 export class UpdateClientDto extends PartialType(CreateClientDto) {}

@@ -16,11 +16,12 @@ import { useI18n } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
 import { useDeleteClients } from "../hooks/use-clients";
 import type { Client, ClientStatus } from "../types";
+import { ClientDealPanel } from "./client-deal-panel";
 
 const STATUS_TONE: Record<ClientStatus, "positive" | "notice" | "negative"> = {
-    approved: "positive",
+    deal_created: "positive",
     pending: "notice",
-    rejected: "negative",
+    already_in_bitrix: "negative",
 };
 
 type TabValue = "salesOpportunities" | "history";
@@ -60,9 +61,9 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
  * flush with the 1128 content column, a 730x70 pinned note inset 8px, and a
  * 44px tab row with 8px under it.
  *
- * Nothing is drawn below the tabs: 873:49450 is a bare Tab panel and the
- * artboard ends there, so the panel body is left to the screens that will fill
- * it rather than invented here.
+ * 873:49450 is a bare Tab panel and the artboard ends there. "Sales
+ * Opportunities" shows the outcome of the Bitrix24 check and the deal it
+ * created (ClientDealPanel); "History" is still left empty.
  */
 export function ClientDetailView({ client }: ClientDetailViewProps) {
     const { locale, t } = useI18n();
@@ -161,6 +162,8 @@ export function ClientDetailView({ client }: ClientDetailViewProps) {
             <div className="px-2 pb-2">
                 <Tabs variant="pill" items={tabs} value={tab} onChange={setTab} />
             </div>
+
+            {tab === "salesOpportunities" ? <ClientDealPanel client={client} /> : null}
 
             <ConfirmDialog
                 open={confirmDelete.isOpen}

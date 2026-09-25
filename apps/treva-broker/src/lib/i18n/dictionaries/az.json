@@ -209,10 +209,9 @@
       "actions": "Əməliyyatlar"
     },
     "status": {
-      "pending": "Gözləyir",
-      "approved": "Təsdiqlənib",
-      "rejected": "Rədd edilib",
-      "approvedUntil": "{date} tarixinədək təsdiqlənib"
+      "pending": "Bitrix24-də yoxlanılır",
+      "deal_created": "Sövdələşmə yaradıldı",
+      "already_in_bitrix": "Artıq Bitrix24-də var"
     },
     "form": {
       "createTitle": "Yeni lead qeyd et",
@@ -231,7 +230,9 @@
       "consentBefore": "Təsdiq edirəm ki, müştəri Məxfilik siyasəti ilə tanış oldu və",
       "consentLink": "Razılıq",
       "consentAfter": "verdi",
-      "submit": "Təsdiqə göndər"
+      "submit": "Müştərini qeyd et",
+      "lockedReviewed": "Bu müştəri artıq Bitrix24-də yoxlanılıb və burada redaktə edilə bilməz.",
+      "backToClient": "Müştəriyə qayıt"
     },
     "deleteConfirm": "Bu müştəri silinsin? Geri qaytarmaq mümkün olmayacaq.",
     "noClients": "Hələ müştəriniz yoxdur",
@@ -239,14 +240,30 @@
     "detail": {
       "email": "E-poçt",
       "phone": "Telefon",
-      "approvalStatus": "Təsdiq statusu",
+      "approvalStatus": "Bitrix24 statusu",
       "agent": "Agent",
-      "reviewTitle": "Yoxlamanın nəticələri",
-      "reviewBody": "Bu müştəri ilə işlədiyiniz günlərdə yoxlamanın nəticələrini gözləyin. Qiymətləndirmə tamamlandıqda sizə bildiriş göndəriləcək."
+      "reviewTitle": "Bitrix24 yoxlaması",
+      "reviewBody": "Müştəri qeyd edildikdə Bitrix24-də eyni telefon nömrəsi yoxlanılır. Yeni müştəri üçün \"Сделки от агентов\" mərhələsində sövdələşmə yaradılır; Bitrix24-də artıq olan müştəri üçün yaradılmır."
     },
     "tabs": {
       "salesOpportunities": "Satış imkanları",
       "history": "Tarixçə"
+    },
+    "bitrix": {
+      "contact": "Bitrix24 kontakt #{id}",
+      "synced": "Bitrix24-də yoxlanılıb",
+      "pending": "Bitrix24-də yoxlanılmağı gözləyir",
+      "failed": "Bitrix24 ilə əlaqə alınmadı — avtomatik yenidən cəhd ediləcək"
+    },
+    "deal": {
+      "title": "Sövdələşmə #{id}",
+      "stage": "Mərhələ",
+      "amount": "Məbləğ",
+      "inProgress": "Davam edir",
+      "won": "Uğurlu",
+      "lost": "Uğursuz",
+      "none": "Hələ sövdələşmə yoxdur — müştəri Bitrix24-də yoxlanıldıqdan sonra burada görünəcək.",
+      "alreadyInBitrix": "Bu müştəri artıq Bitrix24-də var (eyni telefon nömrəsi), ona görə yeni sövdələşmə yaradılmadı."
     }
   },
   "brokerRole": {

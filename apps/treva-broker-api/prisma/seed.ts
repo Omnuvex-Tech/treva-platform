@@ -38,6 +38,8 @@ async function main() {
       fullName: 'Treva Admin',
       role: 'admin',
       jobTitle: 'Platform Administrator',
+      // Required with no database default since the user_phones migration.
+      phones: [],
     },
   });
 

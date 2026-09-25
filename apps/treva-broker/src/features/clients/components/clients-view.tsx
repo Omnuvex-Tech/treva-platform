@@ -25,14 +25,14 @@ import { ClientForm } from "./client-form";
 import { ClientTable } from "./client-table";
 
 const PER_PAGE = 8;
-const STATUSES: readonly (ClientStatus | "all")[] = ["all", "pending", "approved", "rejected"];
+const STATUSES: readonly (ClientStatus | "all")[] = ["all", "deal_created", "already_in_bitrix", "pending"];
 
 /**
  * Clients, for all three roles.
  *
- * The one behavioural difference is scope, not layout: a broker without
- * `clients:read_all` is pinned to their own book by passing their id as
- * `brokerId`. That is a UI convenience — the real API must enforce the same
+ * The one behavioural difference is scope, not layout: anyone without
+ * `clients:read_all` (everyone but an admin) is pinned to their own leads by
+ * passing their id as `brokerId`. That is a UI convenience — the real API must enforce the same
  * scope from the token regardless of what this sends.
  *
  * Three states, all drawn in the file: the table (873:49737), the lead form
