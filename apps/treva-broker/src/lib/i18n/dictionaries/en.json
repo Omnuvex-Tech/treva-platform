@@ -103,9 +103,12 @@
     },
     "registerCredentials": {
       "title": "Create your account",
-      "subtitle": "Use the email you'll sign in with.",
+      "subtitle": "Your details, and the email you’ll sign in with.",
       "passwordHint": "At least 8 characters.",
-      "submit": "Create account"
+      "submit": "Create account",
+      "firstName": "Name",
+      "lastName": "Surname",
+      "phone": "Phone number"
     },
     "errors": {
       "invalid_credentials": "Email or password is incorrect",
@@ -117,7 +120,8 @@
       "timeout": "The server took too long to respond. Please try again.",
       "internal_error": "Something went wrong on the server. Please try again.",
       "signInFailed": "Sign in failed. Please try again.",
-      "registerFailed": "Registration failed. Please try again."
+      "registerFailed": "Registration failed. Please try again.",
+      "phone_taken": "This phone number is already used by another account"
     }
   },
   "news": {

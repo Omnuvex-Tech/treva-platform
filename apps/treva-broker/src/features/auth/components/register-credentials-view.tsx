@@ -2,7 +2,7 @@
 
 import { ArrowLeft02Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Phone } from "lucide-react";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,10 @@ import type { RegistrationType } from "./register-type-view";
 const initialState: RegisterFormState = { error: null, code: null };
 
 export interface RegisterCredentials {
+    firstName: string;
+    lastName: string;
+    /** Required: the platform and Bitrix24 both identify a broker by it. */
+    phone: string;
     email: string;
     password: string;
 }
@@ -37,20 +41,25 @@ export interface RegisterCredentialsViewProps {
  * shows what comes after — so this reuses that card's own chrome (the segmented
  * meter, the title block, the Back / Continue row and the legal footer, the
  * last two of which now come from `RegisterShell`) and fills the body with the
- * two fields the login screen already asks for. It is deliberately the smallest
- * thing that completes the flow; when the real step is designed, only the body
- * between the header and the actions changes.
+ * broker's name, surname and phone above the two fields the login screen
+ * already asks for. The phone is required: a number another account already
+ * uses is refused, and it is how the broker is matched in Bitrix24. When the
+ * real step is designed, only the body between the header and the actions
+ * changes.
  */
 export function RegisterCredentialsView({
     type,
     companyName,
-    credentials: { email, password },
+    credentials,
     onCredentialsChange,
     onBack,
 }: RegisterCredentialsViewProps) {
     const { locale, t } = useI18n();
     const copy = t.auth.registerType;
-    const credentials = t.auth.registerCredentials;
+    const copyCredentials = t.auth.registerCredentials;
+    const { firstName, lastName, phone, email, password } = credentials;
+    const update = (patch: Partial<RegisterCredentials>) =>
+        onCredentialsChange({ ...credentials, ...patch });
 
     const [state, formAction, pending] = useActionState(signUpAction, initialState);
     const errorMessage = authErrorMessage(t, state, "registerFailed");
@@ -90,16 +99,48 @@ export function RegisterCredentialsView({
                 </div>
 
                 <h1 className="pt-5 text-2xl font-semibold text-content-primary">
-                    {credentials.title}
+                    {copyCredentials.title}
                 </h1>
-                <p className="pt-1 text-sm text-content-tertiary">{credentials.subtitle}</p>
+                <p className="pt-1 text-sm text-content-tertiary">{copyCredentials.subtitle}</p>
             </header>
 
             <div className="flex flex-col gap-4 px-8 py-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Input
+                        name="firstName"
+                        value={firstName}
+                        onChange={(event) => update({ firstName: event.target.value })}
+                        autoComplete="given-name"
+                        required
+                        label={copyCredentials.firstName}
+                    />
+
+                    <Input
+                        name="lastName"
+                        value={lastName}
+                        onChange={(event) => update({ lastName: event.target.value })}
+                        autoComplete="family-name"
+                        required
+                        label={copyCredentials.lastName}
+                    />
+                </div>
+
+                <Input
+                    name="phone"
+                    value={phone}
+                    onChange={(event) => update({ phone: event.target.value })}
+                    type="tel"
+                    autoComplete="tel"
+                    required
+                    label={copyCredentials.phone}
+                    placeholder="+994"
+                    leadingIcon={<Phone />}
+                />
+
                 <Input
                     name="email"
                     value={email}
-                    onChange={(event) => onCredentialsChange({ email: event.target.value, password })}
+                    onChange={(event) => update({ email: event.target.value })}
                     type="email"
                     autoComplete="email"
                     required
@@ -111,14 +152,14 @@ export function RegisterCredentialsView({
                 <Input
                     name="password"
                     value={password}
-                    onChange={(event) => onCredentialsChange({ email, password: event.target.value })}
+                    onChange={(event) => update({ password: event.target.value })}
                     type="password"
                     autoComplete="new-password"
                     required
                     minLength={8}
                     label={t.auth.password}
                     placeholder="••••••••••"
-                    hint={credentials.passwordHint}
+                    hint={copyCredentials.passwordHint}
                     leadingIcon={<Lock />}
                 />
 
@@ -150,7 +191,7 @@ export function RegisterCredentialsView({
                         <HugeiconsIcon icon={ArrowRight02Icon} size={16} strokeWidth={1.6} />
                     }
                 >
-                    {credentials.submit}
+                    {copyCredentials.submit}
                 </Button>
             </div>
         </form>

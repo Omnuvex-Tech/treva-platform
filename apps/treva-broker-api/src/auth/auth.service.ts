@@ -11,6 +11,7 @@ import {
   CompaniesService,
 } from '../companies/companies.service';
 import { BitrixSyncService } from '../bitrix/bitrix-sync.service';
+import { USER_PHONE_TAKEN, userPhoneTaken } from '../common/phone';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -170,6 +171,10 @@ export class AuthService {
       throw new ConflictException(EMAIL_TAKEN);
     }
 
+    if (await userPhoneTaken(this.prisma, [dto.phone])) {
+      throw new ConflictException(USER_PHONE_TAKEN);
+    }
+
     if (companyName) {
       await this.companiesService.assertNameAvailable(companyName);
     }
@@ -182,12 +187,14 @@ export class AuthService {
           data: {
             email: dto.email,
             password: passwordHash,
-            fullName: dto.fullName || nameFromEmail(dto.email),
+            fullName:
+              [dto.firstName, dto.lastName].filter(Boolean).join(' ') ||
+              dto.fullName ||
+              nameFromEmail(dto.email),
             accountType: dto.type,
             role: isCompany ? 'top_broker' : 'broker',
             jobTitle: isCompany ? 'Company Owner' : 'Broker',
-            // Required with no database default; sign-up collects no numbers.
-            phones: [],
+            phones: [dto.phone],
             // Signing up signs the account in, so it has logged in once.
             lastLoginAt: new Date(),
           },

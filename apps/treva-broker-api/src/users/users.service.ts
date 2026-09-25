@@ -10,6 +10,7 @@ import { randomBytes } from 'node:crypto';
 import { Prisma } from '../generated/prisma/client';
 import type { AuthUser } from '../auth/jwt.strategy';
 import { BitrixSyncService } from '../bitrix/bitrix-sync.service';
+import { USER_PHONE_TAKEN, userPhoneTaken } from '../common/phone';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   COMPANY_NAME_TAKEN,
@@ -276,6 +277,7 @@ export class UsersService {
         code: 'phone_required',
       });
     }
+    await this.assertPhonesFree(dto.phones);
 
     const chosen = dto.password;
     const password = chosen || temporaryPassword();
@@ -367,6 +369,7 @@ export class UsersService {
     const companyId = agencyChanged
       ? await this.companyIdFor(dto.agency)
       : undefined;
+    if (dto.phones !== undefined) await this.assertPhonesFree(dto.phones, id);
 
     try {
       const row = await this.prisma.user.update({
@@ -522,6 +525,8 @@ export class UsersService {
         code: 'manager_email_required',
       });
     }
+    if (dto.phones?.length)
+      await this.assertPhonesFree(dto.phones, existing?.id);
 
     // An existing account keeps the password it already has.
     const chosen = existing ? null : dto.password;
@@ -603,6 +608,13 @@ export class UsersService {
     const handover =
       dto.managerId !== undefined && dto.managerId !== existing.ownerId;
     if (handover) await this.assertAssignable(dto.managerId!);
+    // The numbers land on the manager — the incoming one on a handover.
+    if (dto.phones !== undefined) {
+      await this.assertPhonesFree(
+        dto.phones,
+        handover ? dto.managerId : existing.ownerId,
+      );
+    }
 
     try {
       const company = await this.prisma.$transaction(async (tx) => {
@@ -735,6 +747,16 @@ export class UsersService {
     });
 
     return id;
+  }
+
+  /**
+   * An account's numbers must be its own: two brokers sharing one would share
+   * one Bitrix contact too, since brokers are matched there by phone.
+   */
+  private async assertPhonesFree(phones: string[], exceptId?: string) {
+    if (await userPhoneTaken(this.prisma, phones, exceptId)) {
+      throw new ConflictException(USER_PHONE_TAKEN);
+    }
   }
 
   /** A field the create DTO calls required, enforced past decorator inheritance. */

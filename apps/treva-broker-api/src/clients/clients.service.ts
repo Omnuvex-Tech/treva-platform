@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,6 +9,7 @@ import type { Prisma } from '../generated/prisma/client';
 import type { AuthUser } from '../auth/jwt.strategy';
 import { BitrixSyncService } from '../bitrix/bitrix-sync.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { clientPhoneTaken } from '../common/phone';
 import type {
   ClientListQueryDto,
   CreateClientDto,
@@ -24,6 +26,11 @@ const withBroker = {
 } satisfies Prisma.ClientInclude;
 
 type ClientRow = Prisma.ClientGetPayload<{ include: typeof withBroker }>;
+
+const PHONE_TAKEN = {
+  message: 'A client with this phone number is already registered',
+  code: 'client_phone_taken',
+} as const;
 
 const ALREADY_IN_BITRIX = {
   message:
@@ -141,6 +148,18 @@ export class ClientsService {
     return broker.id;
   }
 
+  /**
+   * A client's numbers must be new to the platform — whichever broker holds
+   * the other client, so a second broker cannot register someone already
+   * registered here. (Bitrix is a separate check: a number Bitrix knows but
+   * the platform does not is still saved here, just without a deal.)
+   */
+  private async assertPhonesFree(phones: string[], exceptId?: string) {
+    if (await clientPhoneTaken(this.prisma, phones, exceptId)) {
+      throw new ConflictException(PHONE_TAKEN);
+    }
+  }
+
   async list(user: AuthUser, query: ClientListQueryDto) {
     const page = query.page ?? 1;
     const perPage = query.perPage ?? 8;
@@ -220,6 +239,8 @@ export class ClientsService {
       });
     }
 
+    await this.assertPhonesFree([dto.phone, ...dto.additionalPhones]);
+
     const brokerId = await this.resolveBroker(user, dto.brokerId, user.id);
 
     const row = await this.prisma.client.create({
@@ -262,6 +283,16 @@ export class ClientsService {
         message: 'Confirm the client acknowledged the Privacy policy',
         code: 'consent_required',
       });
+    }
+
+    if (dto.phone !== undefined || dto.additionalPhones !== undefined) {
+      await this.assertPhonesFree(
+        [
+          dto.phone ?? existing.phone,
+          ...(dto.additionalPhones ?? existing.additionalPhones),
+        ],
+        id,
+      );
     }
 
     const brokerId = await this.resolveBroker(

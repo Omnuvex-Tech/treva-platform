@@ -103,9 +103,12 @@
     },
     "registerCredentials": {
       "title": "Hesabınızı yaradın",
-      "subtitle": "Daxil olacağınız e-poçtu yazın.",
+      "subtitle": "Məlumatlarınız və daxil olacağınız e-poçt.",
       "passwordHint": "Ən azı 8 simvol.",
-      "submit": "Hesab yarat"
+      "submit": "Hesab yarat",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "phone": "Telefon nömrəsi"
     },
     "errors": {
       "invalid_credentials": "E-poçt və ya şifrə yanlışdır",
@@ -117,7 +120,8 @@
       "timeout": "Server vaxtında cavab vermədi. Yenidən cəhd edin.",
       "internal_error": "Serverdə xəta baş verdi. Yenidən cəhd edin.",
       "signInFailed": "Daxil olmaq alınmadı. Yenidən cəhd edin.",
-      "registerFailed": "Qeydiyyat alınmadı. Yenidən cəhd edin."
+      "registerFailed": "Qeydiyyat alınmadı. Yenidən cəhd edin.",
+      "phone_taken": "Bu telefon nömrəsi artıq başqa hesabda istifadə olunur"
     }
   },
   "news": {

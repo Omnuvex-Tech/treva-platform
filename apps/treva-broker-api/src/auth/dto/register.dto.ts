@@ -44,10 +44,33 @@ export class RegisterDto {
   @MaxLength(120)
   companyName?: string;
 
+  /** Kept for older clients; `firstName` + `lastName` win when sent. */
   @ApiPropertyOptional({ example: 'Leyla Hasanova', maxLength: 120 })
   @Transform(trimString)
   @IsOptional()
   @IsString()
   @MaxLength(120)
   fullName?: string;
+
+  @ApiProperty({ example: 'Leyla', maxLength: 100 })
+  @Transform(trimString)
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  @MaxLength(100)
+  firstName: string;
+
+  @ApiProperty({ example: 'Hasanova', maxLength: 100 })
+  @Transform(trimString)
+  @IsString()
+  @IsNotEmpty({ message: 'Surname is required' })
+  @MaxLength(100)
+  lastName: string;
+
+  /** The broker's number — required: brokers are matched in Bitrix by it. */
+  @ApiProperty({ example: '+994 50 311 44 21', maxLength: 40 })
+  @Transform(trimString)
+  @IsString()
+  @IsNotEmpty({ message: 'Phone number is required' })
+  @MaxLength(40)
+  phone: string;
 }

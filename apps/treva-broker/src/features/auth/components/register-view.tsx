@@ -30,7 +30,13 @@ export function RegisterView() {
     const [draft, setDraft] = useState<RegistrationChoice | null>(null);
     const [continued, setContinued] = useState(false);
     // Owned here rather than by the credentials step so Back and forth keeps them.
-    const [credentials, setCredentials] = useState({ email: "", password: "" });
+    const [credentials, setCredentials] = useState({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: "",
+        password: "",
+    });
 
     const choice = continued ? draft : null;
     const back = () => setContinued(false);

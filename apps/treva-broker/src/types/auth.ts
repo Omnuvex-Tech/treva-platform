@@ -41,6 +41,10 @@ export interface LoginPayload {
  * company is collected at sign-up.
  */
 export interface RegisterPayload {
+    firstName: string;
+    lastName: string;
+    /** Required; a number another account uses is refused (`phone_taken`). */
+    phone: string;
     email: string;
     password: string;
     type: "individual" | "company";

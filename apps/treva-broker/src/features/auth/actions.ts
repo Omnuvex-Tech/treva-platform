@@ -125,6 +125,9 @@ export async function signUpAction(
 
     try {
         const session = await authService.register({
+            firstName: String(formData.get("firstName") ?? "").trim(),
+            lastName: String(formData.get("lastName") ?? "").trim(),
+            phone: String(formData.get("phone") ?? "").trim(),
             email: String(formData.get("email") ?? ""),
             password: String(formData.get("password") ?? ""),
             type,
