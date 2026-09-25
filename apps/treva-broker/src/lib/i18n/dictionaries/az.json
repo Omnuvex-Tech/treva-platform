@@ -243,7 +243,7 @@
       "approvalStatus": "Bitrix24 statusu",
       "agent": "Agent",
       "reviewTitle": "Bitrix24 yoxlaması",
-      "reviewBody": "Müştəri qeyd edildikdə Bitrix24-də eyni telefon nömrəsi və ya e-poçt yoxlanılır. Yeni müştəri üçün \"Сделки от агентов\" mərhələsində sövdələşmə yaradılır; Bitrix24-də artıq olan müştəri üçün yaradılmır."
+      "reviewBody": "Müştəri qeyd edildikdə Bitrix24-də eyni telefon nömrəsi yoxlanılır. Yeni müştəri üçün \"Сделки от агентов\" mərhələsində sövdələşmə yaradılır; Bitrix24-də artıq olan müştəri üçün yaradılmır."
     },
     "tabs": {
       "salesOpportunities": "Satış imkanları",
@@ -263,7 +263,7 @@
       "won": "Uğurlu",
       "lost": "Uğursuz",
       "none": "Hələ sövdələşmə yoxdur — müştəri Bitrix24-də yoxlanıldıqdan sonra burada görünəcək.",
-      "alreadyInBitrix": "Bu müştəri artıq Bitrix24-də var (eyni telefon nömrəsi və ya e-poçt), ona görə yeni sövdələşmə yaradılmadı."
+      "alreadyInBitrix": "Bu müştəri artıq Bitrix24-də var (eyni telefon nömrəsi), ona görə yeni sövdələşmə yaradılmadı."
     }
   },
   "brokerRole": {

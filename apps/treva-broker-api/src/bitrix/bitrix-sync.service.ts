@@ -117,7 +117,7 @@ export function phoneVariants(phone: string): string[] {
  * Registers broker-panel clients in Bitrix24 and keeps the outcome in view.
  *
  * On registration (`push`) the client is looked up among Bitrix's contacts by
- * every phone number and the email:
+ * phone number (the email only when there is none):
  *
  *  - a match means Bitrix already knows the client — no deal is created, and
  *    the client is marked `already_in_bitrix`;
@@ -323,7 +323,8 @@ export class BitrixSyncService {
   /**
    * The broker's own contact in Bitrix and their agency's company. The contact
    * id saved on the account is used when there is one; otherwise the broker is
-   * looked up by email, then phone, and created when missing — a contact of
+   * looked up by phone (email only for an account without one), and created
+   * when missing — a contact of
    * type "Агенты" under the agency — and the id saved. An existing contact is
    * used as it is, never edited.
    */
@@ -349,15 +350,16 @@ export class BitrixSyncService {
     broker: BrokerProfile,
     companyId: number | null,
   ): Promise<number> {
-    const byEmail = broker.email
-      ? await this.bitrix.findContacts('EMAIL', [broker.email])
-      : [];
+    // The phone is the broker's required identifier, so it decides; the email
+    // only matters for an account without a number (self sign-up asks none).
     const phones = [...new Set(broker.phones.flatMap(phoneVariants))];
-    const found = byEmail.length
-      ? byEmail
-      : phones.length
-        ? await this.bitrix.findContacts('PHONE', phones)
-        : [];
+    const byPhone = phones.length
+      ? await this.bitrix.findContacts('PHONE', phones)
+      : [];
+    const found =
+      byPhone.length || !broker.email
+        ? byPhone
+        : await this.bitrix.findContacts('EMAIL', [broker.email]);
     if (found.length) return Math.min(...found);
 
     const [firstName, ...rest] = broker.fullName.trim().split(/\s+/);
@@ -391,19 +393,22 @@ export class BitrixSyncService {
     });
   }
 
-  /** The oldest contact sharing any of the client's phones or their email. */
+  /**
+   * The oldest contact holding any of the client's phone numbers. The phone is
+   * the required field, so it decides — as for brokers; the email is only
+   * checked for a client without a number.
+   */
   private async findExistingContact(client: ClientForBitrix) {
-    const phones = [client.phone, ...client.additionalPhones].flatMap(
-      phoneVariants,
-    );
-    const ids = [
-      ...(phones.length
-        ? await this.bitrix.findContacts('PHONE', [...new Set(phones)])
-        : []),
-      ...(client.email
-        ? await this.bitrix.findContacts('EMAIL', [client.email])
-        : []),
+    const phones = [
+      ...new Set(
+        [client.phone, ...client.additionalPhones].flatMap(phoneVariants),
+      ),
     ];
+    const ids = phones.length
+      ? await this.bitrix.findContacts('PHONE', phones)
+      : client.email
+        ? await this.bitrix.findContacts('EMAIL', [client.email])
+        : [];
     return ids.length ? Math.min(...ids) : null;
   }
 

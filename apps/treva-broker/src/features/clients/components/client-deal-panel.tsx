@@ -25,7 +25,7 @@ export interface ClientDealPanelProps {
 /**
  * The "Sales Opportunities" tab: where the client stands in Bitrix24.
  *
- * On registration the API checks Bitrix for the client's phone and email. New
+ * On registration the API checks Bitrix for the client's phone number. New
  * client: a contact and a deal in "Сделки от агентов" are created, and the deal
  * — with the stage it has reached — shows here. Known client: no deal, and the
  * panel says so. An admin also sees why a check failed; a broker only that it

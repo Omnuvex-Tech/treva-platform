@@ -149,7 +149,7 @@ enum ClientStatus {
   pending
   /// New to Bitrix: a contact and a deal in "Сделки от агентов" were created.
   deal_created
-  /// Bitrix already has a contact with this phone or email; no deal was made.
+  /// Bitrix already has a contact with this phone number; no deal was made.
   already_in_bitrix
 }
 
@@ -165,7 +165,7 @@ enum BitrixSyncState {
 /// A lead a broker registered — the lead form (873:49382) and the Clients list.
 ///
 /// On registration the client is checked against Bitrix24's contacts (by phone
-/// and email). A new client becomes a contact and a deal in the "Сделки от
+/// number). A new client becomes a contact and a deal in the "Сделки от
 /// агентов" stage; one Bitrix already knows gets no deal. `status` and the
 /// `bitrix*` columns record that outcome and mirror the deal from then on —
 /// BitrixSyncService writes them, never the panel's forms.

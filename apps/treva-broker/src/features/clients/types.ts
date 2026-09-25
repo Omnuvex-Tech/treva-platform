@@ -3,7 +3,7 @@
  * soon as the client is registered:
  *
  *  - "pending": not checked yet (Bitrix unreachable — it is retried);
- *  - "deal_created": Bitrix had no contact with this phone or email, so one
+ *  - "deal_created": Bitrix had no contact with this phone number, so one
  *    was created with a deal in "Сделки от агентов";
  *  - "already_in_bitrix": Bitrix already knows the client — no deal.
  *

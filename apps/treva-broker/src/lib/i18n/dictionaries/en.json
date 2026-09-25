@@ -243,7 +243,7 @@
       "approvalStatus": "Bitrix24 status",
       "agent": "Agent",
       "reviewTitle": "Bitrix24 check",
-      "reviewBody": "When you register a client, Bitrix24 is checked for the same phone number or email. A new client gets a deal in \"Сделки от агентов\"; a client Bitrix24 already knows does not."
+      "reviewBody": "When you register a client, Bitrix24 is checked for the same phone number. A new client gets a deal in \"Сделки от агентов\"; a client Bitrix24 already knows does not."
     },
     "tabs": {
       "salesOpportunities": "Sales Opportunities",
@@ -263,7 +263,7 @@
       "won": "Won",
       "lost": "Lost",
       "none": "No deal yet — it appears here once the client has been checked in Bitrix24.",
-      "alreadyInBitrix": "This client already exists in Bitrix24 (same phone number or email), so no new deal was created."
+      "alreadyInBitrix": "This client already exists in Bitrix24 (same phone number), so no new deal was created."
     }
   },
   "brokerRole": {
